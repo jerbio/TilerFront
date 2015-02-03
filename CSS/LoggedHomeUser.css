@@ -1,0 +1,229 @@
+﻿
+
+.SelectedFooterDom {
+    box-shadow:inset rgba(20,20,20,.4);
+}
+
+
+#HomePageContainer 
+{
+    position:absolute;
+    width:100%;
+    height:100%;
+
+}
+/*Top**Start***/
+#HomePageTopBanner 
+{
+    display: table;
+    position:absolute;
+    width: 100%;
+    height:50px;
+    //overflow:hidden;
+    display: table-cell; 
+    vertical-align: middle; 
+    text-align: center; 
+}
+
+#HomePageProcrastinate 
+{
+    position:absolute;  
+
+    display: table-cell; 
+    vertical-align: middle; 
+    text-align: center; 
+}
+
+#ProfileInfoContainer 
+{
+    position:absolute;
+    height:100%;
+    width:75%;
+    left:25%;
+    font-family: 'Muli', sans-serif;
+    font-size:1em;
+    font-weight:400;
+    //color:white;
+    text-align:left;
+    
+}
+
+#NameProfileInfoContainer
+{
+    position:absolute;
+    top: 4px;
+    height:50%;
+    width:100%;
+    
+}
+
+#DateProfileInfoContainer
+{
+    position:absolute;
+    top: 50%;
+    height:50%;
+    width:100%;
+    font-size:.75em;
+}
+
+#FullInfoPanel 
+{
+    position:absolute;
+    left:15%;
+    width:70%;
+    height:100%;
+
+}
+
+#LoggedLogoContainer
+{
+    position:absolute;
+    left:0;
+    width:25%;
+    height:100%;
+}
+
+#innerLogoContainer /*media*/
+{
+    position:absolute;
+    height :20px;
+    margin-Top :-10px;
+    top :50%;
+    width :30px;
+    margin-left: -16px;
+    left :50%;
+}
+
+#HomepageSearchIcon 
+{
+    position:absolute;
+    /*width:100px;
+    height:100px;*/
+    //left:100%;
+    //margin-left:-100px;
+}
+
+#SearchButtonContainer /*media*/
+{
+    position:absolute;
+    top:50%;
+    margin-top:-12px;
+    width:40px;
+    text-align:center;
+    height:40px;
+    left:100%;
+    margin-left:-40px;
+}
+
+#LogOutButton  /*media*/
+{
+    position:absolute;
+    left:2.5%;
+    background:none;
+    height:80%;
+    padding:0 0 0 0;
+    max-height:40px;
+    text-align:center;
+    top:50%;
+    margin-top:-20px;
+    width:40px;
+    font-size:0.5em;
+    box-shadow:none;
+    border-width:2px;
+    border-radius:8px;
+}
+
+
+/*Top**End***/
+
+/*Middle**Start***/
+#HomeMiddleContent
+{
+    position:absolute;
+    box-sizing: border-box;
+    padding: 50px 0px 60px;
+    height:100%;
+    width:100%;
+    //z-index:-1;
+}
+
+#HomePageMiddle 
+{
+    position:absolute;
+    height:100%;
+    width:100%;
+    background-color:white;
+    overflow:auto;
+}
+
+.DisablePanel 
+{
+    position:absolute;
+    background-color:rgba(10,10,10,.45);
+    width:100%;
+    height:100%;
+}
+
+.TopBannerDisablePanel {
+    position:absolute;
+    background-color:rgba(10,10,10,.45);
+    width:100%;
+    height:100%;
+}
+
+
+
+
+
+
+/*Middle**End***/
+
+
+
+/*Footer**Start***/
+
+#HomePageFooterDOM {
+    position:absolute;
+    top:100%;
+    width:100%;
+    box-shadow:rgba(20,20,20,.4) 0 -10px 15px;
+    height:60px;
+    margin-top:-60px;
+    z-index:10;
+}
+
+.HomePageFooterOption {
+    position:absolute;
+    display: table;
+    top:0%;
+    height:100%;
+    //background: linear-gradient(135deg, rgba(188,188,188,1) 0%, rgba(208,208,208,1) 35%, rgba(235,235,235,1) 100%);
+    color:rgb(64,64,64);
+    text-align:center;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    width:33%;
+    
+}
+
+.HomePageFooterOption p 
+{
+    display: table-cell; 
+    vertical-align: middle; 
+    text-align: center; 
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+#FooterButtonContainerDom {
+    position:absolute;
+    width:100%;
+}
+/*Footer**End***/
+
+.TwelveHourCalendarEventContainer
+{
+    position: absolute;
+    width:700px;
+    height:155px;
+}

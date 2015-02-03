@@ -1,0 +1,94 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tiler</title>
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+    <!--
+    <script src='Scripts/moment.min.js'></script>
+    <script src="Scripts/fullcalendar.min.js"></script>
+    <script src="Scripts/WebControl.js"></script>
+    <script src="Scripts/MonthOverviewIni.js"></script>
+    <script src="Scripts/HomePageControl.js"></script>
+    <script src="Scripts/SelectedEvent.js"></script>
+    <script src="Scripts/AddNewEvent_Desktop0.js"></script>
+    <script src="Scripts/SearchHandler.js"></script>
+    <script src="Scripts/SeachHandlerDesktop.js"></script>
+    <script type="text/javascript" src="Scripts/bootstrap-datepicker.js"></script>
+    <script type="text/javascript" src="Scripts/jquery.timepicker.min.js"></script>
+    <script type="text/javascript" src="Scripts/datepair.js"></script>
+    <script src="Scripts/heartcode-canvasloader-min-0.9.1.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="CSS/TexGyreFont.css" />
+    <link rel="stylesheet" type="text/css" href="CSS/ui-lightness/jquery-ui-1.10.4.custom.css" />
+    <link rel="stylesheet" type="text/css" href="CSS/WeatherIcon.css" />
+    <link rel="stylesheet" type="text/css" href="CSS/jquery.timepicker.css" />
+    <link rel=" stylesheet" type="text/css" href="CSS/MainUI.css" />
+    <link rel="stylesheet" type="text/css" href="CSS/SubCalEventStyles.css" />
+    <link rel="stylesheet" type="text/css" href="CSS/MonthOverviewIni.css" />
+    <link rel='stylesheet' type="text/css" href='CSS/fullcalendar.css' />
+    <link rel="stylesheet" type="text/css" href="CSS/AddNewEventDesktop.css" />
+    <link rel="stylesheet" type="text/css" href="CSS/LoggedHomeUser.css" />
+    <link rel="stylesheet" type="text/css" href="CSS/SelectedSubEvent.css" />
+    <link rel="stylesheet" type="text/css" href="CSS/bootstrap-datepicker.css" />
+    <link rel="stylesheet" type="text/css" href="CSS/SearchDesktop.css" />
+    -->
+    @Scripts.Render("~/Content/TilerJS")
+    @Styles.Render("~/Content/TilerCss")
+
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+
+    <script type="text/javascript">
+        var appInsights=window.appInsights||function(config){
+            function s(config){t[config]=function(){var i=arguments;t.queue.push(function(){t[config].apply(t,i)})}}var t={config:config},r=document,f=window,e="script",o=r.createElement(e),i,u;for(o.src=config.url||"//az416426.vo.msecnd.net/scripts/a/ai.0.js",r.getElementsByTagName(e)[0].parentNode.appendChild(o),t.cookie=r.cookie,t.queue=[],i=["Event","Exception","Metric","PageView","Trace"];i.length;)s("track"+i.pop());return config.disableExceptionTracking||(i="onerror",s("_"+i),u=f[i],f[i]=function(config,r,f,e,o){var s=u&&u(config,r,f,e,o);return s!==!0&&t["_"+i](config,r,f,e,o),s}),t
+        }({
+            instrumentationKey:"42424fa7-58c9-4b31-9812-b89c89520079"
+        });
+        
+        window.appInsights=appInsights;
+        appInsights.trackPageView();
+    </script>
+</head>
+<body>
+    <!--
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                @Html.ActionLink("Application name", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li>@Html.ActionLink("Home", "Index", "Home")</li>
+                    <li>@Html.ActionLink("About", "About", "Home")</li>
+                    <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
+                </ul>
+                
+            </div>
+        </div>
+    </div>-->
+
+    @Html.Partial("_LoginPartial")
+    @RenderBody()
+    <!--
+    <div class="container body-content">
+        
+        <hr />
+        <footer>
+            <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
+        </footer>
+    </div>
+    -->
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+</body>
+</html>

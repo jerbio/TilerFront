@@ -1,0 +1,433 @@
+/* Reset */
+p { margin: 0}
+
+/* Global CSS */
+#AddNewEventContainer
+{
+  position:fixed;
+  width:100%;
+  height:100%;
+  background-color: rgba(255,255,255,1);
+  z-index: 35;
+  left:0;
+  top: 0;
+  padding: 20px 0 0 20px;
+}
+
+#AddNewEventContainer input {
+  font-size: 32px;
+  color: black;
+  border:none;
+  border-bottom: 1px solid #ccc;
+  font-family: 'texbold';
+  padding: 5px 0 5px 15px;
+  margin-left: 20px;
+}
+
+#AddNewEventContainer input:focus {
+    background-color: yellow;
+    outline: none;
+} 
+
+#EscapeMessage {
+  position: fixed;
+  top: 20px;
+  right: 45px;
+}
+/* Duration CSS */
+
+#DurationContainer {
+  margin-top: 10px;
+}
+
+#DurationContainer span {
+  font-size: 32px;
+  font-family: 'texbold';
+  color: #f2f2f2;
+  margin-left: -15px;
+}
+
+#DurationContainer input {
+  width: 60px;
+  margin-top: -14px;
+  margin-right: 20px;
+}
+#DurationExplanation {
+  margin-left: 0 !important;
+}
+#DurationExplanation p  {
+  margin-left: 34px;
+  font-size: 32px;
+  font-family: 'texbold';
+  color: #f2f2f2;
+}
+
+
+/* Location CSS */
+
+#NickLocationInput {
+  margin-bottom: 15px;
+}
+
+/* Split CSS */
+#splitInputContainer {
+  //display:none;
+}
+
+/* Button CSS */
+#SubmitButton {
+  border: 1px #ccc solid;
+  color: black;
+  background-color: white;
+  font-size: 16px;
+  font-family: 'texbold';
+  padding: 15px 40px;
+  -webkit-transition: all .2s ease-in-out;
+  -o-transition: all .2s ease-in-out;
+  -moz-transition: all .2s ease-in-out;
+  transition: all .2s ease-in-out;
+  margin-left: 19px;
+  cursor: pointer;
+  margin-top: -8px;
+  margin-left: 95px;
+}
+#SubmitButton:focus,
+  #SubmitButton:hover {
+  border: 1px transparent solid;
+  outline: none;
+  background-color: yellow;
+}
+
+
+/* Placeholder CSS */
+::-webkit-input-placeholder {
+  color: black;
+ }
+ :-moz-placeholder { /* Firefox 18- */
+   color: black;  
+}
+::-moz-placeholder {  /* Firefox 19+ */
+  color: black;  
+ }
+:-ms-input-placeholder {  
+   color: black;  
+}
+input:focus::-webkit-input-placeholder { color:rgba(0,0,0, 0.2); }
+input:focus:-moz-placeholder { color:rgba(0,0,0, 0.2); } /* FF 4-18 */
+input:focus::-moz-placeholder { color:rgba(0,0,0, 0.2); } /* FF 19+ */
+input:focus:-ms-input-placeholder { color:rgba(0,0,0, 0.2); }
+
+#ColorPickerContainer 
+{
+    position:static;
+    width: 200px;
+    height: 200px;
+    transform:translateY(-10%);
+    margin-top: 44px;
+    margin-left: 100px;
+}
+
+.ColorPicker 
+{
+    position:absolute;
+    border-radius:50%;
+    width:33%;
+    height:33%;
+    box-sizing:border-box;
+}
+
+.innerColor 
+{
+    position:absolute;
+    top:10%;
+    left:10%;
+    height:80%;
+    width:80%;
+    border-radius:50%;
+    //background-color:yellow;
+    box-sizing:border-box;
+}
+
+.OuterBlackColor 
+{
+    position:absolute;
+    top:2.5%;
+    left:2.5%;
+    height:95%;
+    border-radius:50%;
+    width:95%;
+    fill:transparent;
+    box-sizing:border-box;
+}
+
+.addCircleAround { border: 3px solid black; }
+.removeCircleAround { border:none; }
+
+.DisableTiler { display:none; }
+
+.EnableButtonContainer 
+{
+    width: 50px;
+    height: 25px;
+    top:25%;
+    position:relative;
+}
+.EnableButtonContainer:focus {
+  background-color: yellow;
+}
+
+#EnableTilerContainer {
+    height:7.5em;
+}
+
+#EnableSplitAndEndContainer {
+    position:absolute;
+    left: 100px;
+    transform: translateY(-30%);
+}
+
+#AddModalDom {
+    position:absolute;
+    height:150px;
+    width:450px;
+    background-color: #efefef;
+    z-index:1000;
+}
+
+.ModalButton 
+{
+    position:absolute;
+    top:5%;
+    width:40%;
+    height:40%;
+}
+
+#AddTileDom { left:5%; }
+
+#AddEventDom { left:55%; }
+
+.labelAndInputContainer 
+{
+    -webkit-transition: all .5s ease;
+    -o-transition: all .5s ease;
+    -moz-transition: all .5s ease;
+    transition:all .5s ease;
+    font-size: 20px !important;
+    display: inline-block;
+}
+
+.tileInputBoxElement {
+    -webkit-transition: all .5s ease;
+    -o-transition: all .5s ease;
+    -moz-transition: all .5s ease;
+    transition:all .5s ease;
+    font-size: 20px !important;
+    display: inline-block;
+}
+
+.NonReveal { 
+    //opacity:0;
+    display:none !important;
+}
+
+.invisibleSpan { 
+  opacity: 0;
+  position: fixed;
+  visibility:hidden;
+  bottom: 20px;
+  left: 20px;
+}
+.reveal {
+    visibility: visible;
+    //opacity: 1;
+    display: inline;
+}
+
+#ModalActiveTileContainer 
+{
+    position:relative;
+    padding: 50px;
+    -webkit-box-shadow: 6px 6px 29px -2px rgba(159,158,158,1);
+    -moz-box-shadow: 6px 6px 29px -2px rgba(159,158,158,1);
+    box-shadow: 6px 6px 29px -2px rgba(159,158,158,1);
+    font-family: 'texbold';
+    //top:50%;
+    /left:50%;
+    //margin-top: -200px;
+    //margin-left: -300px;
+    width: 100%;
+    height: auto;
+    background-color: #fff;
+    z-index:1;
+}
+#ModalInActiveTileContainer {
+
+    position:absolute;
+    padding: 25px 50px;
+    width:100%;
+    height:50%;
+    -webkit-box-shadow: 6px 6px 29px -2px rgba(159,158,158,1);
+    -moz-box-shadow: 6px 6px 29px -2px rgba(159,158,158,1);
+    box-shadow: 6px 6px 29px -2px rgba(159,158,158,1);
+    font-family: 'texbold';
+    width: 100%;
+    height: auto;
+    background-color: #fff;
+}
+
+#ModalContentContainer 
+{
+    font-family: 'texbold';
+    margin-bottom: 30px;
+    background-color: #fff;
+    z-index:1000;
+}
+
+.ModalTileContainer 
+{
+  position:absolute;
+  //padding: 40px 50px;
+  //-webkit-box-shadow: 6px 6px 29px -2px rgba(159,158,158,1);
+  //-moz-box-shadow: 6px 6px 29px -2px rgba(159,158,158,1);
+  //box-shadow: 6px 6px 29px -2px rgba(159,158,158,1);
+  font-family: 'texbold';
+  top:50%;
+  left:50%;
+  margin-top: -200px;
+  margin-left: -350px;/*extra padding because of internal element padding*/
+  width: 600px;
+  min-height: 120px;
+  height: auto;
+  background-color: #fff;
+  z-index:1;
+}
+
+/*.ModalTileContainer div { display: inline; }*/
+
+.ModalTileContainer label { 
+  color: #C2C1C1;
+  margin-right: 12px; }
+.ModalTileContainer input { 
+  font-family: 'texbold';
+  font-size: 20px;
+  padding-left: 5px;
+  margin-right: 15px;
+  width: auto;
+  max-width: 100%;
+  border: none; }
+.ModalTileContainer input:focus {
+  background-color: yellow;
+  outline: none;
+  transition:none;
+} 
+.returnedValueContainer div { 
+  background-color: #eee;
+  -webkit-transition: all .2s linear;
+  -moz-transition: all .2s linear;
+  -o-transition: all .2s linear;
+  transition: all .2s linear;
+  margin: 3px 0;
+  display: block; }
+.InvisibleAddEventPanel { opacity: 0; }
+.OnFocusDropDownElement { background-color: yellow !important; }
+
+
+#ModalDoneContentContainer 
+{
+    display: block;
+    margin-top:30px;
+}
+
+.HideTileDoneButton 
+{
+    display: none !important;
+}
+
+.HideInactiveElement {
+    display: none;
+}
+
+
+.RevealInactiveElement {
+    display: inline-block;
+}
+
+.EnableButtonContainer {
+    transform: rotate(0deg);
+    display:inline-block;
+}
+.SliderMessageContainer {
+    display:inline-block;
+    font-size: 20px;
+    color: #C2C1C1;
+    margin-left: 20px;
+}
+
+.AlInputDataContainer {
+    display:block;
+    margin-top: 30px;
+}
+
+.RevealInActivePanel {
+    display:block;
+}
+
+.InputBarAndContentContainer {
+  //z-index: 89;
+}
+
+#TileInputDoneButton {
+  float:right;
+  position: relative;
+  z-index: 90;
+  font-family: 'texreg', Helvetica, sans-serif;
+  color: #C2C1C1;
+}
+#TileInputDoneButton:focus {
+  outline: none;
+}
+#TileInputDoneButton:focus #ClickHereText, 
+#TileInputDoneButton:focus #ReturnText {
+  border-bottom: 1px solid yellow
+}
+
+#ReturnText, #ClickHereText {
+  color: #000;
+}
+
+#ClickHereText, #ReturnText {
+  padding-bottom: 2px;
+  border-bottom: 1px solid black;
+  display: inline-block;
+  cursor: pointer;
+  -webkit-transition: all .4s ease-in-out;
+  -moz-transition: all .4s ease-in-out;
+  -o-transition: all .4s ease-in-out;
+  transition: all .4s ease-in-out;
+  
+}
+#ClickHereText:hover {
+  border-bottom: 2px solid yellow;
+}
+.ActiveContainerSlider {
+}
+
+#ModalActiveOptionsContainer {
+    display:block;
+}
+.pressSpacebarSpan {
+  font-family: 'texreg', Helvetica, sans-serif;
+  display: block;
+  margin-left: 80px;
+}
+.TilerLogo {
+  display: block;
+  background: url('../img/Icons/logo.png');
+  height: 45px;
+  width: 69px;
+  background-size: 69px 45px;
+  position: absolute;
+  top: 20px; 
+  left: 30px;
+  cursor: pointer;
+}
