@@ -598,12 +598,17 @@ function populateSearchOptionDom(Dom)
 
         
 
-
+        /*
         myEvent.SubCalStartDate = new Date(myEvent.SubCalStartDate + global_TimeZone_ms );
         myEvent.SubCalEndDate = new Date(myEvent.SubCalEndDate + global_TimeZone_ms );
         myEvent.SubCalCalEventStart = new Date(myEvent.SubCalCalEventStart + global_TimeZone_ms );
         myEvent.SubCalCalEventEnd = new Date(myEvent.SubCalCalEventEnd + global_TimeZone_ms );
+        */
 
+        myEvent.SubCalStartDate = new Date(myEvent.SubCalStartDate);// + global_TimeZone_ms);
+        myEvent.SubCalEndDate = new Date(myEvent.SubCalEndDate);// + global_TimeZone_ms);
+        myEvent.SubCalCalEventStart = new Date(myEvent.SubCalCalEventStart );//+ global_TimeZone_ms);
+        myEvent.SubCalCalEventEnd = new Date(myEvent.SubCalCalEventEnd);// + global_TimeZone_ms);
         /*myEvent.SubCalStartDate = !myEvent.SubCalStartDate.dst() ? new Date(Number(myEvent.SubCalStartDate.getTime()) + OneHourInMs) : myEvent.SubCalStartDate;
         myEvent.SubCalEndDate =! myEvent.SubCalEndDate.dst() ? new Date(Number(myEvent.SubCalEndDate.getTime()) + OneHourInMs) : myEvent.SubCalEndDate;
         myEvent.SubCalCalEventStart = !myEvent.SubCalCalEventStart.dst() ? new Date(Number(myEvent.SubCalCalEventStart.getTime()) + OneHourInMs) : myEvent.SubCalCalEventStart;
@@ -1510,7 +1515,10 @@ function populateSearchOptionDom(Dom)
                 this.EngulfingDom = "namamama" + (weyy++);
             }
             eachSubEvent.PopulateYourself("hahaha")*/
-
+            if(eachSubEvent.ID=="87653_1_87661_87662")
+            {
+                //debugger;
+            }
             if (Dictionary_OfSubEvents[eachSubEvent.ID] == null) {
                 Dictionary_OfSubEvents[eachSubEvent.ID] = eachSubEvent;
             }
@@ -1571,7 +1579,7 @@ function populateSearchOptionDom(Dom)
     function getFullTimeFromEntry(Timpicker, DatePicker, ExtraDayInMS)//generateFunctionForFullTImeRetrieval
     {
         return function () {
-            var TimePickerValue = Timpicker.Dom.value;
+            var TimePickerValue = Timpicker !=null?Timpicker.Dom.value:"12:00am";
             var DatePickerValue = DatePicker.Dom.value;
             if (Timpicker.Dom.value.toLowerCase() == "")//handles initializing string values string 
             {
@@ -1597,7 +1605,7 @@ function populateSearchOptionDom(Dom)
             }
 
 
-            var TwentyFourHourTime = AP_To24Hour(TimePickerValue);
+            var TwentyFourHourTime =AP_To24Hour(TimePickerValue);
             var DateData = date_mm_dd__yyyy_ToDateObj(DatePickerValue, "/")
             var retValue = { Time: TwentyFourHourTime, Date: DateData };
 

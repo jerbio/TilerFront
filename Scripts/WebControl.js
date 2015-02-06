@@ -2,7 +2,8 @@
 
 
 //var global_refTIlerUrl = "http://localhost:53201/api/";
-var global_refTIlerUrl = "http://tilersmart.azurewebsites.net/api/";
+//var global_refTIlerUrl = "http://tilersmart.azurewebsites.net/api/";
+var global_refTIlerUrl = window.location.origin+"/api/";
 var UserTheme = { Light: new Theme("Light"), Dark: new Theme("Dark") };
 var CurrentTheme = UserTheme.Light;
 var UserCredentials = {UserName:"",ID:"", Name:""};
@@ -93,10 +94,14 @@ function GetCookieValue()//verifies that user has cookies
     }
     if (CookieValue == "")
     {
-        ///*
+        /*
         CookieValue = {};
         CookieValue.UserName = "jerbio";
         CookieValue.UserID = 18;
+        //*/
+        /*
+        CookieValue.UserName = "jackostalk@gmail.com";
+        CookieValue.UserID = 4167;
         //*/
     }
 
@@ -1292,18 +1297,14 @@ LoadingScreenControl.Counter = 0;
 
 function AutoSuggestControl(Url,Method, GenerateEachDomCallBack, UserInputBox)
 {
-    var InputBarContainerID = "InputBarContainer" + AutoSuggestControl.Counter++;
+    var myID = AutoSuggestControl.Counter++;
+    var InputBarContainerID = "InputBarContainer" + myID++;
     var InputBarContainer = getDomOrCreateNew(InputBarContainerID);
-    /*ParentDom = ParentDom.data[0];
-    ParentDom.appendChild(InputBarContainer.Dom);
-    $(ParentDom).addClass("textshadow");
-    $(ParentDom).addClass("blurry-text");*/
-
-
+    var myRequest = null;
     var DomAndContainer = generateFullInputBar(UserInputBox);
 
 
-    var InputBarAndContentContainerID = "InputBarAndContentContainer" + AutoSuggestControl.Counter++;;
+    var InputBarAndContentContainerID = "InputBarAndContentContainer" + myID;
     var InputBarAndContentContainer = getDomOrCreateNew(InputBarAndContentContainerID);
     $(InputBarAndContentContainer.Dom).addClass("InputBarAndContentContainer")
     if (UserInputBox==undefined)
@@ -1328,16 +1329,29 @@ function AutoSuggestControl(Url,Method, GenerateEachDomCallBack, UserInputBox)
         return InputBarContainer.Dom;
     }
 
+
+    function cancelRequest()
+    {
+        if (myRequest != null)
+        {
+            myRequest.abort();
+            myRequest = null;
+        }
+    }
+
+    this.cancelRequest = cancelRequest;
+
+    this.getAutoSuggestControlID = function ()
+    {
+        return myID;
+    }
     this.clear = function ()
     {
         if (InputBarContainer.Dom.parentNode != null)
         {
             $(InputBarContainer.Dom).empty();
             InputBarContainer.Dom.parentNode.removeChild(InputBarContainer.Dom);
-        }
-        
-
-        
+        }   
     }
     
     function generateFullInputBar(UserInputBox)
@@ -1348,7 +1362,6 @@ function AutoSuggestControl(Url,Method, GenerateEachDomCallBack, UserInputBox)
         {
             InputBar.Dom = UserInputBox
         }
-        
         $(InputBar.Dom).addClass("InputBar");
         var returnedValueContainerID = "returnedValueContainer" + AutoSuggestControl.Counter;
         var returnedValueContainer = getDomOrCreateNew(returnedValueContainerID);
@@ -1363,6 +1376,7 @@ function AutoSuggestControl(Url,Method, GenerateEachDomCallBack, UserInputBox)
 
     var ini_TimerResetID = -67767;
     var TimerResetID = ini_TimerResetID;
+    var CurrentRequests = {};
 
     $("document").mouseup(function (e) {
         var container = $(InputBarContainer.Dom);
@@ -1378,7 +1392,7 @@ function AutoSuggestControl(Url,Method, GenerateEachDomCallBack, UserInputBox)
 
     function prepCall(InputDom, url, Method, SuggestedValuesContainer)//[reps timer
     {
-        return function()
+        return function(e)
         {
             if (TimerResetID == ini_TimerResetID)
             {
@@ -1388,15 +1402,26 @@ function AutoSuggestControl(Url,Method, GenerateEachDomCallBack, UserInputBox)
             {
                 clearTimeout(TimerResetID);
             }
-            TimerResetID = setTimeout(prepCalToBackEnd(InputDom, url, Method, SuggestedValuesContainer), 300);
+            TimerResetID = setTimeout(prepCalToBackEnd(InputDom, url, Method, SuggestedValuesContainer,e), 300);
         }
     }
 
 
-    function prepCalToBackEnd(InputDom, url,Method ,SuggestedValuesContainer) {
-        return function () {
+    function prepCalToBackEnd(InputDom, url, Method, SuggestedValuesContainer,e) {
+        return function ()
+        {
+            //debugger;
+            if (typeof (url) != "string")//checks if data set is already provided. If it is provided then it should just call the call back.
+            {
+                var Data = url;
+                var AllDom = GenerateEachDomCallBack(Data, SuggestedValuesContainer, InputDom);
+                TimerResetID = ini_TimerResetID;
+                return;
+            }
+            cancelRequest();//cancels any preceeding requests
             var FullLetter = InputDom.value;
             FullLetter = FullLetter.trim();
+            myRequest=null;
             if (FullLetter == "")
             {
                 var AllDom = GenerateEachDomCallBack([], SuggestedValuesContainer, InputDom);
@@ -1407,7 +1432,8 @@ function AutoSuggestControl(Url,Method, GenerateEachDomCallBack, UserInputBox)
             {
                 Method="POST"
             }
-            $.ajax({
+            
+            myRequest = $.ajax({
                 type: Method,
                 url: url,
                 data: postData/*,
@@ -1423,15 +1449,14 @@ function AutoSuggestControl(Url,Method, GenerateEachDomCallBack, UserInputBox)
                 var data = response.Content;
                 var AllDom = GenerateEachDomCallBack(data, SuggestedValuesContainer, InputDom);
                 TimerResetID = ini_TimerResetID;
+                myRequest = null;
             });;
 
             //var returnedValue = getReturnedValueContainer(FullLetter);
             //var retValue = { InputBar: InputBar, returnedValue: returnedValue }
         }
     }
-
 }
-
 function encaseDivDomInRow(myDivDom)//function takes a div and inserts it in a row. Just incase you need the formatting of a table
 {
     var ID = encaseDivDomInRow.ID++;
@@ -1441,6 +1466,11 @@ function encaseDivDomInRow(myDivDom)//function takes a div and inserts it in a r
     tableRow.appendChild(tableColumn);
     return tableRow;
 }
+
+
+
+
+
 
 encaseDivDomInRow.ID = 0;
 AutoSuggestControl.Counter = 0;

@@ -1,0 +1,158 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.Entity;
+using System.Data.Entity.Infrastructure;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
+using System.Web.Http;
+using System.Web.Http.Description;
+using TilerElements;
+using TilerFront.Models;
+
+namespace TilerFront.Controllers
+{
+
+    public class CalendarEventController : ApiController
+    {
+        /*
+        private TilerContext db = new TilerContext();
+
+        // GET api/CalendarEvent
+        [NonAction]
+        public IQueryable<CalEvent> GetCalEvents()
+        {
+            return db.CalEvents;
+        }*/
+
+        // GET api/CalendarEvent/5
+        [ResponseType(typeof(PostBackStruct))]
+        public async Task<IHttpActionResult> GetCalEvent(string id,[FromUri]AuthorizedUser myUser )
+        {
+            UserAccount retrievedUser = new UserAccount(myUser.UserName, myUser.UserID);
+            await retrievedUser.Login();
+            TilerElements.CalendarEvent retrievedCalendarEvent = retrievedUser.ScheduleData.getCalendarEventWithID(id);
+            PostBackData retValue = new PostBackData(retrievedCalendarEvent.ToCalEvent(), 0);
+
+
+            return Ok(retValue.getPostBack);
+        }
+
+        // GET api/CalendarEvent/Name
+        [HttpGet]
+        [ResponseType(typeof(PostBackStruct))]
+        [Route("api/CalendarEvent/Name")]
+        public async Task<IHttpActionResult> CalEventName([FromUri]NameSearchModel myUser)
+        {
+            UserAccount retrievedUser = new UserAccount(myUser.UserName, myUser.UserID);
+            await retrievedUser.Login();
+
+            PostBackData retValue = new PostBackData("", 4);
+            if (retrievedUser.Status)
+            {
+                IEnumerable<CalendarEvent> retrievedCalendarEvents = retrievedUser.ScheduleData.getCalendarEventWithName(myUser.Data).Where(obj=>obj.isActive);
+                retValue = new PostBackData(retrievedCalendarEvents.Select(obj => obj.ToCalEvent()).ToList(), 0);
+            }
+            
+                
+            
+            return Ok(retValue.getPostBack);
+        }
+              
+        
+        /*
+        // POST api/CalendarEvent
+        [ResponseType(typeof(CalEvent))]
+        public async Task<IHttpActionResult> PostCalEvent([FromBody]CalEvent calevent)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            db.CalEvents.Add(calevent);
+
+            try
+            {
+                await db.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                if (CalEventExists(calevent.ID))
+                {
+                    return Conflict();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return CreatedAtRoute("DefaultApi", new { id = calevent.ID }, calevent);
+        }
+        */
+        // DELETE api/CalendarEvent/5
+        [ResponseType(typeof(PostBackStruct))]
+        public async Task<IHttpActionResult> DeleteCalEvent(string id, bool readjust, [FromBody]AuthorizedUser myUser )
+        {
+            UserAccountDirect retrievedUser = await myUser.getUserAccount();// new UserAccount(myUser.UserName, myUser.UserID);
+            await retrievedUser.Login();
+            PostBackData retValue ;
+            if(retrievedUser.Status)
+            {
+                My24HourTimerWPF.Schedule NewSchedule = new My24HourTimerWPF.Schedule(retrievedUser, new DateTime(myUser.getRefNow().Ticks));
+                CustomErrors messageReturned= NewSchedule.deleteCalendarEventAndReadjust(id);
+                retValue = new PostBackData(messageReturned, messageReturned.Code);
+            }
+            else
+            {
+                retValue = new PostBackData("",1);
+            }
+
+            return Ok(retValue.getPostBack);
+        }
+
+
+        [HttpPost]
+        [ResponseType(typeof(PostBackStruct))]
+        [Route("api/CalendarEvent/Now")]
+        public async Task<IHttpActionResult> Now( [FromBody]NowEventModel myUser)
+        {
+            UserAccountDirect retrievedUser = await myUser.getUserAccount(); //new UserAccountDirect(myUser.UserName, myUser.UserID);
+            await retrievedUser.Login();
+            PostBackData retValue;
+            if (retrievedUser.Status)
+            {
+                My24HourTimerWPF.Schedule NewSchedule = new My24HourTimerWPF.Schedule(retrievedUser, new DateTime(myUser.getRefNow().Ticks));
+                Tuple<CustomErrors, Dictionary<string, CalendarEvent>> ScheduleUpdateMessage = NewSchedule.SetCalendarEventAsNow(myUser.ID);
+                NewSchedule.UpdateWithProcrastinateSchedule(ScheduleUpdateMessage.Item2);
+                retValue = new PostBackData(ScheduleUpdateMessage.Item1);
+            }
+            else
+            {
+                retValue = new PostBackData("", 1);
+            }
+            return Ok(retValue.getPostBack);
+        }
+
+
+        /*
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                db.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+        
+        private bool CalEventExists(string id)
+        {
+            return db.CalEvents.Count(e => e.ID == id) > 0;
+        }
+        */
+
+    }
+}

@@ -22,8 +22,8 @@ function CallBackFunctionForReturnedValues(data, DomContainer) {
     data.forEach(resolveEachRetrievedEvent);
     function resolveEachRetrievedEvent(CalendarEvent) {
         var CalendarEventDom = generateDOM(CalendarEvent);
-        CalendarEventDom.Dom.style.top = (EventIndex * HeightOfDom) + "px";
-        CalendarEventDom.Dom.style.height = HeightOfDom + "px"
+        //CalendarEventDom.Dom.style.top = (EventIndex * HeightOfDom) + "px";
+        //CalendarEventDom.Dom.style.height = HeightOfDom + "px"
         DomContainer.Dom.appendChild(CalendarEventDom.Dom);
         DomContainer.Dom.style.height = (++EventIndex * HeightOfDom) + "px";
     }
@@ -52,7 +52,7 @@ function CallBackFunctionForReturnedValues(data, DomContainer) {
 
 
         TopPanelContainerContainer.Dom.appendChild(NameOfSearchedEventContainer.Dom);
-        NameOfSearchedEventContainer.Dom.style.width = "85%";//hack alert
+    //    NameOfSearchedEventContainer.Dom.style.width = "85%";//hack alert
         //TopPanelContainerContainer.Dom.appendChild(RepetitionOfSearchedEventContainer.Dom);
         //TopPanelContainerContainer.Dom.appendChild(CompletionGraphOfSearchedEventContainer.Dom);
         TopPanelContainerContainer.Dom.appendChild(DoNowButtonOfSearchedEventContainer.Dom);
@@ -75,8 +75,8 @@ function CallBackFunctionForReturnedValues(data, DomContainer) {
         var NameOfSearchedEventContainer = getDomOrCreateNew(NameOfSearchedEventContainerID);
         var NameOfSearchedEventTextID = "NameOfSearchedEventText" + CallBackFunctionForReturnedValues.counter
         NameOfSearchedEventContainer.Dom.innerHTML = MyCalendarEVent.CalendarName
-        NameOfSearchedEventContainer.Dom.style.fontSize = HeightOfDom / 4 + "px";
-        NameOfSearchedEventContainer.Dom.style.lineHeight = HeightOfDom + "px";
+       // NameOfSearchedEventContainer.Dom.style.fontSize = HeightOfDom / 4 + "px";
+       // NameOfSearchedEventContainer.Dom.style.lineHeight = HeightOfDom + "px";
 
         $(NameOfSearchedEventContainer.Dom).addClass("NameOfSearchedEventContainer");
         return NameOfSearchedEventContainer;

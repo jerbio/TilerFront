@@ -6,8 +6,15 @@ namespace TilerFront
     public class BundleConfig
     {
         // For more information on bundling, visit http://go.microsoft.com/fwlink/?LinkId=301862
+        public static string OldLog;
         public static void RegisterBundles(BundleCollection bundles)
         {
+            OldLog = HttpContext.Current.Server.MapPath("~\\OldLogs\\");
+            string LogLocation = HttpContext.Current.Server.MapPath("~\\WagTapCalLogs\\");//initializes the log location
+            
+            //LogLocation = @"C:\Users\OluJerome\Documents\Visual Studio 2010\Projects\LearnCuDAVS2010\LearnCUDAConsoleApplication\bin\Debug\WagTapCalLogs\";
+            //LogLocation = @"C:\Users\OluJerome\Documents\Visual Studio 2010\Projects\LearnCuDAVS2010\LearnCUDAConsoleApplication\WagTapCalLogs\";
+            TilerFront.LogControl.UpdateLogLocation(LogLocation);
             bundles.Add(new ScriptBundle("~/bundles/jquery").Include(
                         "~/Scripts/jquery-{version}.js"));
 
@@ -43,7 +50,8 @@ namespace TilerFront
                     ));
 
             bundles.Add(new ScriptBundle("~/Content/TilerJS").Include(
-                      "~/Scripts/moment.min.js",
+                    "~/Scripts/jquery-2.1.0.min.js"  ,
+                    "~/Scripts/moment.min.js",
                     "~/Scripts/fullcalendar.min.js",
                     "~/Scripts/WebControl.js",
                     "~/Scripts/MonthOverviewIni.js",

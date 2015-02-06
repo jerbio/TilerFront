@@ -46,6 +46,22 @@ namespace TilerFront.Models
         public string Email { get; set; }
     }
 
+    public class TilerUnAuthorizedModel : LoginViewModel
+    {
+        
+        [Display(Name = "Remember me?")]
+        public bool RememberMe { get; set; }
+
+        public LoginViewModel loginUser()
+        {
+            LoginViewModel retValue = new LoginViewModel();
+            retValue.Password = Password;
+            retValue.Username = Username;
+            return retValue;
+        }
+    }
+
+
     public class LoginViewModel
     {
         [Required]
@@ -87,7 +103,7 @@ namespace TilerFront.Models
         
         [Required]
         [Display(Name = "Username")]
-        public string UserName { get; set; }
+        public string Username { get; set; }
     }
 
     public class ResetPasswordViewModel

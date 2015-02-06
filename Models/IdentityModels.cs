@@ -2,6 +2,7 @@
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
+using System;
 using Microsoft.AspNet.Identity.EntityFramework;
 
 namespace TilerFront.Models
@@ -10,6 +11,7 @@ namespace TilerFront.Models
     public class ApplicationUser : IdentityUser
     {
         public string FullName { get; set; }
+        public  DateTime LastChange { get; set; }
         //public string UserName { get; set; }
         public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager)
         {

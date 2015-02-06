@@ -18,11 +18,43 @@
 #SearchBar
 {
     position:absolute;
-    top:40px;
+    top: 29px;
     //padding:40px 0px;
-    width:60%;
-    left:20%;
-    height:20px;
+    width:40%;
+    right: 94px;
+    height:40px;
+    border: 0;
+    border-bottom: 1px solid black;
+    padding-bottom: 3px;
+    outline: none;
+    font-family: 'texbold', Helvetica, sans-serif;
+    font-size: 24px;
 }
+#TopPanelContainer {
+  margin-top: 12%;
+  margin-left: 94px;
+  margin-right: 94px;
+  }
+
+.InputBarAndContentContainer {
+  top: 15%;
+  width: 90%;
+  margin-left: 5%;
+}
+.returnedValueContainer {
+  height: 40px;
+}
+.NameOfSearchedEventContainer {
+  font-family: 'texreg', Helvetica, sans-serif;
+  font-size: 18px;
+}
+.NowIcon {
+  width: 45px;
+  height: 45px;
+  position: static;
+}
+
+
+
 
 

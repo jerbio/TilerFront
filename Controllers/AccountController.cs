@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using System.Collections.Generic;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
@@ -52,6 +53,19 @@ namespace TilerFront.Controllers
             }
         }
 
+        [AllowAnonymous]
+        public ActionResult TilerUser(string returnUrl)
+        {
+            ViewBag.ReturnUrl = returnUrl;
+            return View();
+        }
+        [AllowAnonymous]
+        public ActionResult TilerUser(TilerUnAuthorizedModel model, string returnUrl)
+        {
+            ViewBag.ReturnUrl = returnUrl;
+            return View();
+        }
+        
         //
         // GET: /Account/Login
         [AllowAnonymous]
@@ -79,7 +93,7 @@ namespace TilerFront.Controllers
             switch (result)
             {
                 case SignInStatus.Success:
-                    return RedirectToAction("Desktop", "Home");
+                    return RedirectToAction("Desktop", "Account");
                 case SignInStatus.LockedOut:
                     return View("Lockout");
                 case SignInStatus.RequiresVerification:
@@ -90,6 +104,36 @@ namespace TilerFront.Controllers
                     return View(model);
             }
         }
+
+        async public Task<UserAccountDirect> LoginStatic(LoginViewModel model)
+        {
+            ApplicationUser myUser=null;
+            UserAccountDirect retValue = new UserAccountDirect(null);
+            if (!ModelState.IsValid)
+            {
+                return retValue;
+            }
+            
+            var result = await SignInManager.PasswordSignInAsync(model.Username, model.Password, model.RememberMe, shouldLockout: false);
+            switch (result)
+            {
+                case SignInStatus.Success:
+                    {
+                        string UserID = SignInManager.GetVerifiedUserId();
+                        myUser = await new UserController().GetUser(UserID, model.Username);
+                        retValue = new UserAccountDirect(myUser);
+                        await retValue.Login();
+                        return retValue;
+                    }
+                
+                default:
+                    return retValue;
+            }
+
+        }
+
+
+
 
         //
         // GET: /Account/VerifyCode
@@ -124,7 +168,8 @@ namespace TilerFront.Controllers
             switch (result)
             {
                 case SignInStatus.Success:
-                    return RedirectToLocal(model.ReturnUrl);
+                    return RedirectToAction("Desktop", "Account");
+                    //return RedirectToLocal(model.ReturnUrl);
                 case SignInStatus.LockedOut:
                     return View("Lockout");
                 case SignInStatus.Failure:
@@ -151,19 +196,45 @@ namespace TilerFront.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.UserName, Email = model.Email,FullName = model.FullName };
-                var result = await UserManager.CreateAsync(user, model.Password);
+                var user = new ApplicationUser { UserName = model.Username, Email = model.Email, FullName = model.FullName, LastChange = new DateTime(1970,1,1) };
+                var logGenerationresult = await generateLog(user);
+                var result = logGenerationresult.Item1;
                 if (result.Succeeded)
                 {
-                    await SignInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);
-                    
-                    // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=320771
-                    // Send an email with this link
-                    // string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
-                    // var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-                    // await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
+                    result = await UserManager.CreateAsync(user, model.Password);
 
-                    return RedirectToAction("Index", "Home");
+                    if (result.Succeeded)
+                    {
+                        await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
+                        if (logGenerationresult.Item2 > 0)
+                        {
+                            string CurrentLogLocation = LogControl.getLogLocation();
+                            DBControl newDB = new DBControl(model.Username, logGenerationresult.Item2);
+                            LogControl OldLog = new LogControl(newDB);
+                            string OldLogLocation = BundleConfig.OldLog;
+                            LogControl.UpdateLogLocation(OldLogLocation);
+                            UserAccount OldUserAccount = new UserAccount(model.Username, logGenerationresult.Item2);
+                            OldUserAccount.Login();
+                            newDB.deleteUser();
+                            OldUserAccount.DeleteLog();
+                            LogControl.UpdateLogLocation(CurrentLogLocation);
+                        }
+
+                        
+
+                        // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=320771
+                        // Send an email with this link
+                        // string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
+                        // var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
+                        // await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
+
+                        return RedirectToAction("Desktop", "Account");
+                    }
+                    else
+                    {
+                        LogControlDirect LogToBedeleted = new LogControlDirect(user);
+                        await LogToBedeleted.DeleteLog();
+                    }
                 }
                 AddErrors(result);
             }
@@ -172,6 +243,61 @@ namespace TilerFront.Controllers
             return View(model);
         }
 
+
+
+        async Task<Tuple<IdentityResult,int>> generateLog(ApplicationUser model)
+        {
+            Tuple<bool, int> ExistInOldDB = DBControl.doesUserExistInOldDB(model.UserName);
+            string CurrentLogLocation = LogControl.getLogLocation();
+            bool NewLogCreationSuccess=false;
+            Tuple<IdentityResult, int> retValue;
+            int OldID = -1;
+            if (ExistInOldDB.Item1)
+            {
+                OldID = ExistInOldDB.Item2;
+                DBControl newDB = new DBControl(model.UserName, model.PasswordHash);
+                LogControl OldLog = new LogControl(newDB);
+
+                
+                string OldLogLocation = BundleConfig.OldLog;
+                LogControl.UpdateLogLocation(OldLogLocation);
+                UserAccount OldUserAccount = new UserAccount(model.UserName, ExistInOldDB.Item2);
+                await OldUserAccount.Login();
+                ///*
+                if (OldUserAccount.Status)
+                {
+                    Task<Tuple<Dictionary<string, TilerElements.CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location_Elements>>> Task_profileData = OldUserAccount.ScheduleData.getProfileInfo();
+                    Tuple<Dictionary<string, TilerElements.CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location_Elements>> profileData = await Task_profileData;
+                    //OldUserAccount.DeleteLog();
+
+                    LogControlDirect newLog = new LogControlDirect(model, CurrentLogLocation);
+                    newLog.genereateNewLogFile(model.Id);
+                    newLog.UpdateReferenceDay(profileData.Item2);
+                    NewLogCreationSuccess = await newLog.WriteToLog(profileData.Item1.Values, OldUserAccount.LastEventTopNodeID.ToString());
+                }
+                
+                //*/
+            }
+            else
+            {
+
+                LogControlDirect newLog = new LogControlDirect(model, CurrentLogLocation);
+                UserAccountDirect newUser = new UserAccountDirect(model);
+                List<string> NameDist = model.FullName.Split().ToList();
+                Task< TilerElements.CustomErrors> registerStatus =  newUser.Register(model);
+                NewLogCreationSuccess =! (await registerStatus).Status;
+            }
+
+            if (NewLogCreationSuccess)
+            {
+                retValue = new Tuple<IdentityResult, int>(IdentityResult.Success, OldID);
+                return retValue;
+            }
+
+            retValue = new Tuple<IdentityResult, int>(IdentityResult.Failed("Registration is currently unavailable"), OldID);
+
+            return retValue;
+        }
         //
         // GET: /Account/ConfirmEmail
         [AllowAnonymous]
@@ -184,12 +310,20 @@ namespace TilerFront.Controllers
             var result = await UserManager.ConfirmEmailAsync(userId, code);
             return View(result.Succeeded ? "ConfirmEmail" : "Error");
         }
+        
 
         //
         // GET: /Account/ForgotPassword
         [AllowAnonymous]
         public ActionResult ForgotPassword()
         {
+            return View();
+        }
+
+        //[AllowAnonymous]
+        public ActionResult Desktop()
+        {
+            ViewBag.Message = "Welcome To Tiler";
             return View();
         }
 
@@ -384,7 +518,8 @@ namespace TilerFront.Controllers
             ViewBag.ReturnUrl = returnUrl;
             return View(model);
         }
-
+        
+        
         //
         // POST: /Account/LogOff
         [HttpPost]

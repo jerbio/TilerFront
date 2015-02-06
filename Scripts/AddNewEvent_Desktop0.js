@@ -3,17 +3,161 @@
 function addNewEvent(x, y, height, refStart)
 {
     //debugger;
-    clearTimeout(global_ClearRefreshDataInterval);
-
     var AddEventPanel = getDomOrCreateNew("AddEventPanel");
     generateAddEventContainer(x, y, height, AddEventPanel.Dom, refStart);
     
 }
 
+
+function prepSendTile(NameInput, AddressInput, SpliInput, HourInput, MinuteInput, DeadlineInput, RepetitionInput, RepetitionFlag)
+{
+    return function ()
+    {
+        var calendarColor = global_AllColorClasses[0];
+        
+        SubmitTile(NameInput.value, AddressInput.value, SpliInput.value, HourInput.value, MinuteInput.value, DeadlineInput.value, RepetitionInput.value, calendarColor, RepetitionFlag);
+    }
+}
+
+function SubmitTile(Name, Address, Splits, Hour, Minutes, Deadline, Repetition, CalendarColor,RepetitionFlag)
+{
+    var DictOfData = {};
+    DictOfData["day"] = { Range: OneDayInMs, Type: { Name: "Daily", Index: 0 }, Misc: null }
+    DictOfData["week"] = { Range: OneWeekInMs, Type: { Name: "Weekly", Index: 1 }, Misc: { AllDoms: [] } }
+    DictOfData["month"] = { Range: FourWeeksInMs, Type: { Name: "Monthly", Index: 2 }, Misc: null }
+    DictOfData["year"] = { Range: OneYearInMs, Type: { Name: "Yearly", Index: 3 }, Misc: null }
+
+
+    var EventName = Name;
+    if (!EventName)
+    {
+        alert("Oops your tile needs a name");
+        return null;
+    }
+    var LocationAddress = Address;
+    var LocationNickName = "";
+    var EventLocation = new Location(LocationNickName, LocationAddress);
+    Hour = Hour != "" ? Hour : 0;
+    Minutes = Minutes != "" ? Minutes : 0;
+
+    
+    var Start = new Date();
+    var EventStart = {}
+    EventStart.Date = new Date(Start.getFullYear(), Start.getMonth(), Start.getDate());
+    EventStart.Time = { Hour: 0, Minute: 0 };
+    var End = new Date(Deadline);
+    
+
+    var EventDuration = { Days: 0, Hours: Hour, Mins: Minutes };
+
+    var DurationInMS = (parseInt(EventDuration.Days) * OneDayInMs) + (parseInt(EventDuration.Hours) * OneHourInMs) + (parseInt(EventDuration.Mins) * OneMinInMs)
+    if (DurationInMS == 0) {
+        alert("Oops please provide a duration for \"" + EventName + "\"");
+        return null;
+    }
+
+    Splits = Splits != "" ? Splits : 1;
+    
+    Repetition = Repetition.trim().toLowerCase();
+    var DayPlusOne = new Date();
+    var Day = DayPlusOne.getDate();
+    var Month = DayPlusOne.getMonth() + 1;
+    var Year = DayPlusOne.getFullYear();
+    var DatePickerValue = Month + "/" + Day + "/" + Year;
+
+    var RepetitionStart = DatePickerValue;
+    var RepetitionEnd = ""
+
+
+    var repeteOpitonSelect = "none"
+    if( (Repetition != "")&&(RepetitionFlag))
+    {
+        repeteOpitonSelect = DictOfData[Repetition];
+        if (repeteOpitonSelect != undefined) {
+            RepetitionEnd = (End.getMonth() + 1) + "/" + End.getDate() + "/" + End.getFullYear();
+            var FullRange = End.getTime() - EventStart.Date.getTime()
+            if (repeteOpitonSelect.Range > FullRange)//checks if the given deadline extends past the range for a selected repetition sequence. e.g If user selects weekly, this line checks if range is between start and end is larger than 7 days
+            {
+                alert("please check your repetition, you dont have up to a " + Repetition + " before deadline");
+                return;
+            }
+
+            End = new Date(Start.getTime() + repeteOpitonSelect.Range);
+        }
+        else
+        {
+            alert("Seems like you have invalid data for repetition. Please check your repetition");
+            return;
+        }
+        
+    }
+    var EventEnd = {}
+    EventEnd.Date = new Date(End.getFullYear(), End.getMonth(), End.getDate());
+    EventEnd.Time = { Hour: 23, Minute: 59 };
+    
+    var NewEvent = new CalEventData(EventName, EventLocation, Splits, CalendarColor, EventDuration, EventStart, EventEnd, repeteOpitonSelect, RepetitionStart, RepetitionEnd, false);
+    //NewEvent.RepeatData = null;
+    if (NewEvent == null) {
+        return;
+    }
+    NewEvent.UserName = UserCredentials.UserName
+    NewEvent.UserID = UserCredentials.ID;
+
+    var TimeZone = new Date().getTimezoneOffset();
+    NewEvent.TimeZoneOffset = TimeZone;
+    //var url = "RootWagTap/time.top?WagCommand=1"
+    var url = global_refTIlerUrl + "Schedule/Event";
+
+    var HandleNEwPage = new LoadingScreenControl("Tiler is Adding \"" + NewEvent.Name + " \" to your schedule ...");
+    //alert("about to send out");
+    //debugger;
+    //return;
+    HandleNEwPage.Launch();
+    
+    
+    
+
+    $.ajax({
+        type: "POST",
+        url: url,
+        data: NewEvent,
+        // DO NOT SET CONTENT TYPE to json
+        // contentType: "application/json; charset=utf-8", 
+        // DataType needs to stay, otherwise the response object
+        // will be treated as a single string
+        //dataType: "json",
+        success: function (response) {
+            //alert(response);
+            //var myContainer = (CurrentTheme.getCurrentContainer());
+            //CurrentTheme.TransitionOldContainer();
+            //$(myContainer).empty();
+            //myContainer.outerHTML = "";
+        },
+        error: function (err) {
+            //var myError = err;
+            //var step = "err";
+            var NewMessage = "Oh No!!! Tiler is having issues modifying your schedule. Please try again Later :(";
+            var ExitAfter = { ExitNow: true, Delay: 1000 };
+            HandleNEwPage.UpdateMessage(NewMessage, ExitAfter, function () { });
+        }
+
+    }).done(function (data) {
+        HandleNEwPage.Hide();
+        AddTiledEvent.Exit();
+        getRefreshedData();
+        
+
+    });
+
+}
+
+
 function generateModal(x, y, height, width,WeekStart, RenderPlane)
 {
     //return;
+
     var modalAddDom = getDomOrCreateNew("AddModalDom");
+    
     var weekDayWidth = $($(".DayContainer")[0]).width();
     var AddTile = getDomOrCreateNew("AddTileDom", "button");
     var AddEvent = getDomOrCreateNew("AddEventDom", "button");
@@ -65,27 +209,43 @@ function generateModal(x, y, height, width,WeekStart, RenderPlane)
             $(document).off("keydown", document, removePanel);
             CloseModal();
         }
+        e.stopPropagation();
     }
 
-    $(document).keydown(removePanel);
     
-    RenderPlane.appendChild(modalAddDom.Dom);
-
-}
-
-function ClosePanel()
-{
-    global_ClearRefreshDataInterval = setTimeout(getRefreshedData);
-    var myAddPanel = getDomOrCreateNew("AddNewEventContainer");
-    if (myAddPanel.Dom.parentElement!=null)
+    modalAddDom.Dom.onblur = function ()//closes modal add when the modal panels is out of focus
     {
-        myAddPanel.Dom.parentElement.removeChild(myAddPanel.Dom);
-    }
+        function isDescendant(parent, child) {
+            var node = child.parentNode;
+            while (node != null) {
+                if (node == parent) {
+                    return true;
+                }
+                node = node.parentNode;
+            }
+            return false;
+        }
+        
+        setTimeout(function () {
+            if (!isDescendant(modalAddDom, document.activeElement)) {
+                $(document).off("keydown", document, removePanel);
+                CloseModal();
+            }
+        }, 1);
+
+        
+
+        
+    };
+    $(document).keydown(removePanel);
+    RenderPlane.appendChild(modalAddDom.Dom);
+    $(modalAddDom.Dom).attr('tabindex', 0).focus();
+
 }
+
 
 function CloseModal()
 {
-    global_ClearRefreshDataInterval = setTimeout(getRefreshedData);
     var myAddPanel = getDomOrCreateNew("AddModalDom");
     if (myAddPanel.Dom.parentElement != null)
     {
@@ -96,6 +256,8 @@ function CloseModal()
 
 function generateAddEventContainer(x,y,height,Container,refStartTime)
 {
+    StopPullingData();
+    ActivateUserSearch.setSearchAsOff();
     var NewEventcontainer = getDomOrCreateNew("AddNewEventContainer");
 
     $(NewEventcontainer.Dom).click(function (event) {//stops clicking of add event from propagating
@@ -105,11 +267,24 @@ function generateAddEventContainer(x,y,height,Container,refStartTime)
     {
         if (e.keyCode == 27)
         {
-            $(document).off("keyup", document, removePanel);
-            ClosePanel();
+            getRefreshedData();
+            CloseEventAddition()
+            
         }
+        e.stopPropagation();
     }
     
+
+    function CloseEventAddition()
+    {
+        $(document).off("keyup", document, removePanel);
+        if (NewEventcontainer != null) {
+            if (NewEventcontainer.Dom.parentElement != null) {
+                NewEventcontainer.Dom.parentElement.removeChild(NewEventcontainer.Dom);
+            }
+        }
+        ActivateUserSearch.setSearchAsOn();
+    }
     $(document).keyup(removePanel);
 
     //myClickManager.AddNewElement(NewEventcontainer.Dom);
@@ -140,7 +315,9 @@ function generateAddEventContainer(x,y,height,Container,refStartTime)
     
     
 
-    $(SubmitButton.Selector.Button.Dom).click(function () { BindSubmitClick(NameDom.Selector.Input.Dom.value, LocationDom.Selector.Address.Dom, LocationDom.Selector.NickName.Dom, SplitCount.Selector.Input.Dom, StartDom, EndDom, DurationDom, null, (EnableTiler.Selector.Button.status+1)%2, ColorPicker.Selector.getColor()) })
+    $(SubmitButton.Selector.Button.Dom).click(function () {
+        BindSubmitClick(NameDom.Selector.Input.Dom.value, LocationDom.Selector.Address.Dom.value, LocationDom.Selector.NickName.Dom.value, SplitCount.Selector.Input.Dom.value, StartDom, EndDom, DurationDom, null, true, ColorPicker.Selector.getColor(), CloseEventAddition)
+    })
     //var RepetitionDom = generateRepetitionContainer();
 }
 
@@ -340,7 +517,10 @@ function InactiveSlider(InActiveDom, ActiveDom,ButtonElements)
     AddToTileContainer(LastElement, AllInputDataContainer);
     //AllInputDataContainer.Dom.appendChild(LastElement.FullContainer.Dom);
 
-    
+    this.getAllElements =function()
+    {
+        return AllInputData;
+    }
 
     
     FirstElement.reveal();
@@ -417,6 +597,11 @@ function InactiveSlider(InActiveDom, ActiveDom,ButtonElements)
 
     }
 
+    this.getStatus = function ()
+    {
+        return ButtonSlide.status;
+    }
+
     ButtonSlide.SetAsOff();
 }
 
@@ -429,12 +614,15 @@ function PopulateSliders(AcitveSection, InAcitveSection)
 {
     var RepetionSliderData = GenerateTileRepetition();
     var RepetitionSlider = new InactiveSlider(InAcitveSection.Dom,AcitveSection.Dom, RepetionSliderData);
+
+    return RepetitionSlider;
 }
 
 function GenerateTileRepetition()
 {
     var CountElementData = { LabelBefore: "I need to do this" };
-    var PerElementData = { LabelBefore: "times per" };
+    var PerElementData = { LabelBefore: "times per", DefaultText: "Day/Week/Month/Year", DropDown: { url: [{ repetition: "Day" }, { repetition: "Week" }, { repetition: "Month" }, { repetition: "Year" }, { repetition: "Decade" }], LookOut: "repetition" } };
+
     var ButtonElements = [];
     ButtonElements.push(CountElementData);
     ButtonElements.push(PerElementData);
@@ -444,9 +632,16 @@ function GenerateTileRepetition()
     return RetValue;
 }
 
+
+function StopPullingData()
+{
+    clearTimeout(global_ClearRefreshDataInterval);
+}
 //handles the whole addition of tiled events. Handles the UI component and tabbing
 function AddTiledEvent()
 {
+    StopPullingData();
+    ActivateUserSearch.setSearchAsOff();
     var InvisiblePanelID = "AddEventPanel";
     var InvisiblePanel = getDomOrCreateNew(InvisiblePanelID);
     //$(InvisiblePanel.Dom).addClass("InvisibleAddEventPanel");
@@ -460,6 +655,8 @@ function AddTiledEvent()
     var ActiveContainer = getDomOrCreateNew(ActiveSectionID);
     var InActiveSectionID = "ModalInActiveTileContainer";
     var InActiveContainer = getDomOrCreateNew(InActiveSectionID);
+    
+
 
     $(modalTileEvent.Dom).addClass("ModalTileContainer");
 
@@ -473,15 +670,77 @@ function AddTiledEvent()
     ActiveContainer.Dom.appendChild(ModalContentContainer.Dom);
     ActiveContainer.Dom.appendChild(ModalActiveOptionsContainer.Dom)
     ActiveContainer.Dom.appendChild(ModalDoneContentContainer.Dom)
-    modalTileEvent.Dom.appendChild(ActiveContainer.Dom);
-    modalTileEvent.Dom.appendChild(InActiveContainer.Dom);
+    
 
     ModalActiveOptionsContainer.addOptions = function (NewOption)
     {
         ModalActiveOptionsContainer.appendChild(NewOption.Dom);
     }
 
+    function sentenceCompletion()
+    {
+        var ModalSenetenceContainerID = "ModalSenetenceContainer";
+        var ModalSenetenceContainer = getDomOrCreateNew(ModalSenetenceContainerID);
+        var FullSentenceContentID = "FullSentenceContent"
+        var FullSentenceContent = getDomOrCreateNew(FullSentenceContentID);
+        ModalSenetenceContainer.appendChild(FullSentenceContent);
+        hideAutoSentence();
+        var Messages = {};
+        var orderedMessage =[]
+        function addTileInput(tileInput)
+        {
+            Messages[tileInput.Message.Index] = tileInput;
+            orderedMessage.push(tileInput);
+            orderedMessage.sort(
+                function (a, b)
+                {
+                    var retvalue = (a.Message.Index) - (b.Message.Index);
+                    return retvalue;
+                });
+            //orderedMessage.reverse();
+        }
 
+        this.addTileInput = addTileInput;
+        function updateSentence()
+        {
+            var fullMessage = "";
+            for (var i = 0 ; i < orderedMessage.length; i++)
+            {
+                fullMessage += orderedMessage[i].getSentenceMessage()
+            }
+            if (fullMessage != "") {
+                showAutoSentence()
+            }
+            else {
+                hideAutoSentence()
+            }
+
+            FullSentenceContent.innerHTML = fullMessage;
+        }
+
+        function showAutoSentence()
+        {
+            $(ModalSenetenceContainer).removeClass("HideInactiveElement");
+        }
+
+        function hideAutoSentence()
+        {
+            $(ModalSenetenceContainer).addClass("HideInactiveElement");
+        }
+
+        this.getContainer = function () {
+            return ModalSenetenceContainer
+        }
+
+        this.UpdateAutoSentence = updateSentence;
+    }
+
+    var AutoSentence = new sentenceCompletion();
+    var AutoSentenceCOntainer= AutoSentence.getContainer()
+
+    modalTileEvent.Dom.appendChild(ActiveContainer.Dom);
+    modalTileEvent.Dom.appendChild(InActiveContainer.Dom);
+    modalTileEvent.Dom.appendChild(AutoSentenceCOntainer);
     ModalActiveOptionsContainer.removeOptions = function (NewOption)
     {
         if (NewOption.Dom.parentElement != null) {
@@ -539,51 +798,180 @@ function AddTiledEvent()
     
     var DoneContainerID = "ModalTileContainerDone";
     var DoneButton = getDomOrCreateNew(DoneContainerID);
-    var Element1 = { LabelBefore: "I need to" };
-    var Element2 = { LabelBefore: "at",DefaultText:"Location", DropDown: { url: global_refTIlerUrl + "User/Location", LookOut: "Address" } };
+    var Element1 = {
+        LabelBefore: "I need to",
+        Message:
+            {
+               Index: 0,
+               LoopBack: function (value) {
+                    var message = "";
+                    if (value!="")
+                    { message = "I need to " + value }
+
+                    return message;
+                }
+        }
+    };
+    var Element2 = {
+        LabelBefore: "at",
+        Message: {
+            Index: 1,
+            LoopBack: function (value) {
+                var message = "";
+                if (value != "")
+                {
+                    message = " at " + value;
+                }
+
+                return message;
+            }
+        },
+        DefaultText: "Location", DropDown: { url: global_refTIlerUrl + "User/Location", LookOut: "Address" }
+    };
     
-    var Hour = new TileInputBox({ LabelBefore:"It will take",LabelAfter: "H", InputCss: { width: "1em" } }, undefined, undefined, Exit)
-    var Min = new TileInputBox({ LabelAfter: "M", InputCss: { width: "1em" } }, undefined, undefined, Exit)
+    var Hour = new TileInputBox({
+        LabelAfter: "H", Message: {
+            Index: 3,
+            LoopBack: function (value) {
+                var message = "";
+                if (value != "") {
+                    if (value > 1) {
+                        message = value + " hours";
+                    }
+                    else
+                    {
+                        if (value != 0)
+                        {
+                            message = value + " hour";
+                        }
+                    }
+                    
+                }
+
+                return message;
+            }
+        }, InputCss: { width: "1em" }
+    }, undefined, undefined, Exit, undefined, null, AutoSentence)
+    var Min = new TileInputBox({
+        LabelAfter: "M", Message: {
+            Index: 4,
+            LoopBack: function (value) {
+                var message = "";
+                if (value != "") {
+                    if (value > 1) {
+                        message =" "+ value + " minutes";
+                    }
+                    else {
+                        if (value != 0)
+                        {
+                            message = " " + value + " minute";
+                        }
+                        
+
+                    }
+                }
+                return message;
+            }
+        }, InputCss: { width: "1em" }
+    }, undefined, undefined, Exit, undefined, null, AutoSentence)
     var Day = new TileInputBox({ LabelAfter: "D", InputCss: { width: "1em" } }, undefined, undefined, Exit)
     //var AllTimeLements = [Hour, Min, Day];
     var AllTimeLements = [Hour, Min];
 
 
-    var Element3 = { LabelBefore: "", SubTileInputBox: AllTimeLements,HideInput:true, HideInputDomain:true };
-    var Element4 = { LabelBefore: "and I need to get it done by", TriggerDone: true };
+    var Element3 = {
+        LabelBefore: "It will Take", Message: {
+            Index: 2,
+            LoopBack: function (value) {
+                var message = "";
+                if (value != "") {
+                    message = ". It will Take ";
+                }
+
+                return message;
+            }
+        }, SubTileInputBox: AllTimeLements, HideInput: true, HideInputDomain: true
+    };
+    var Element4 = {
+        LabelBefore: "and I need to get it done by", Message: {
+            Index: 5,
+            LoopBack: function (value) {
+                var message = "";
+                if (value != "") {
+
+                    value = new Date(value).toDateString();;
+                    message = " and I need to get it done by " + value;
+                }
+
+                return message;
+            }
+        }, TriggerDone: true
+    };
     //debugger;
-    PopulateSliders(ModalActiveOptionsContainer, InActiveContainer);
+    var RepetionSlider=PopulateSliders(ModalActiveOptionsContainer, InActiveContainer);
     InActiveContainer.Hide();
 
 
     function Exit()///forces the removal of the Div
     {
-        $(modalTileEvent.Dom).empty();
-        (modalTileEvent.Dom.parentElement.removeChild(modalTileEvent.Dom));
-        AddTiledEvent.Exit = undefined;
+        if (modalTileEvent != null)
+        {
+            $(modalTileEvent.Dom).empty();
+            if (modalTileEvent.Dom.parentElement!=null)
+            {
+                (modalTileEvent.Dom.parentElement.removeChild(modalTileEvent.Dom));
+            }
+        }
+        ActivateUserSearch.setSearchAsOn();
     }
+
+    
 
     var AllTileElements = [];
 
     TileInputBox.DoneButton = new TileDoneButton(InActiveContainer);//creates a done button and makes it a static member of TileInputBox.
-    ModalDoneContentContainer.Dom.appendChild(TileInputBox.DoneButton.GetDom());
-
+    TileInputBox.DoneButton.GetDom().onkeypress =(
+        function (e) {
+            if (e.which == 13) {
+                SendData()
+            }
+        })
     AddTiledEvent.Exit = Exit;
     AllInputData.push(Element1);
     AllInputData.push(Element2);
     AllInputData.push(Element3);
     AllInputData.push(Element4);
-    var LastElement = new TileInputBox(AllInputData[AllInputData.length - 1], ModalContentContainer, DoneButton, Exit);
+    var LastElement = new TileInputBox(AllInputData[AllInputData.length - 1], ModalContentContainer, DoneButton, Exit, undefined, null, AutoSentence);
     AllTileElements.push(LastElement);
     
     for (var i = AllInputData.length-2, j = AllInputData.length - 1; i >= 0; i--, j--)
     {
         AllInputData[i].NextElement = LastElement;
-        LastElement = new TileInputBox(AllInputData[i], ModalContentContainer, DoneButton, Exit);
+        LastElement = new TileInputBox(AllInputData[i], ModalContentContainer, DoneButton, Exit, undefined, null, AutoSentence);
         AllTileElements.push(LastElement);
     }
 
     var BoundTimePicerObj = BindDatePicker(TileInputBox.Dictionary[Element4.ID].Me.getInputDom());//Set inbox as date time picker box
+    
+
+    BoundTimePicerObj.on("show", function () {
+        //alert("show triggered");
+        var keyEntryFunc = TileInputBox.Dictionary[Element4.ID].Me.getKeyCallBackFunc()
+        var EndTimeInput = TileInputBox.Dictionary[Element4.ID].Me.getInputDom()
+        //debugger;
+        EndTimeInput.removeEventListener("keydown", keyEntryFunc);
+    })
+
+    BoundTimePicerObj.on("hide", function () {
+        //alert("hide triggered");
+        var keyEntryFunc = TileInputBox.Dictionary[Element4.ID].Me.getKeyCallBackFunc()
+        var EndTimeInput = TileInputBox.Dictionary[Element4.ID].Me.getInputDom()
+        EndTimeInput.addEventListener("keydown", keyEntryFunc);
+        keyEntryFunc();
+    })
+
+
+    //handles UI change when there is a change in deadline input box data
     $(TileInputBox.Dictionary[Element4.ID].Me.getInputDom()).change(function () {
         var currValue = TileInputBox.Dictionary[Element4.ID].Me.getInputDom().value;
         currValue = currValue.split(" ")
@@ -597,6 +985,7 @@ function AddTiledEvent()
             TileInputBox.DoneButton.Hide();
         }
     })
+
     var FirstElement = LastElement;
     
     while (LastElement.NextElement!=undefined)
@@ -609,7 +998,44 @@ function AddTiledEvent()
     //ModalContentContainer.Dom.appendChild(LastElement.FullContainer.Dom);
     
     
+
+    //sends schedule information to backend
+    function SendData()
+    {
+        var Splits = RepetionSlider.getAllElements()[0].TileInput;
+        var RepetionChoice = RepetionSlider.getAllElements()[1].TileInput;
+
+        var SendIt = prepSendTile(Element1.TileInput.getInputDom(), Element2.TileInput.getInputDom(), Splits.getInputDom(), Hour.getInputDom(), Min.getInputDom(), Element4.TileInput.getInputDom(), RepetionChoice.getInputDom(), RepetionSlider.getStatus());
+        if (TileInputBox.DoneButton.getStatus()) {
+            SendIt();
+            //AddTiledEvent.Exit();
+        }
+        else
+        {
+            alert("please provide viable deadline");
+        }
+    }
+
+
+
+    function UIAddTileUITrigger(e)
+    {
+        if (e.which == 27)//escape key press
+        {
+            document.removeEventListener("keydown", UIAddTileUITrigger);
+            AddTiledEvent.Exit()
+        }
+        
+    }
+    
+    
+    TileInputBox.Send = SendData;
+    
+    $(TileInputBox.DoneButton.GetDom()).click(SendData);
+    ModalDoneContentContainer.Dom.appendChild(TileInputBox.DoneButton.GetDom());
+
     InvisiblePanel.Dom.appendChild(modalTileEvent.Dom);
+    document.addEventListener("keydown", UIAddTileUITrigger);
     //debugger;
     FirstElement.reveal();
     FirstElement.forceFocus();
@@ -635,16 +1061,19 @@ function TileDoneButton(InActivePanel)
     DoneButton.Dom.appendChild(ClickHereText.Dom);
     DoneButton.Dom.appendChild(WhenDoneText.Dom);
     $(DoneButton.Dom).click(SendDataToBackEnd);
+    var ready = false;
     this.Show = function ()
     {
         $(DoneButton.Dom).removeClass("HideTileDoneButton");
         InActivePanel.reveal();
+        ready = true;
     }
 
     this.Hide = function ()
     {
         $(DoneButton.Dom).addClass("HideTileDoneButton");
         InActivePanel.Hide();
+        ready = false;
     }
 
     this.GetDom = function ()
@@ -666,7 +1095,10 @@ function TileDoneButton(InActivePanel)
     }
 
     this.RevealSecondPanel = RevealSecondPanel;
-
+    this.getStatus = function ()
+    {
+        return ready;
+    }
     
 }
 
@@ -677,7 +1109,7 @@ function SendDataToBackEnd()
 
 
 
-function TileInputBox(TabElement, ModalContainer, DoneButton, Exit, HideInput)
+function TileInputBox(TabElement, ModalContainer, SendTile, Exit, HideInput, getDataFunction, SenetenceCompletion)
 {
     var LabelBefore = TabElement.LabelBefore == null ? "" : TabElement.LabelBefore;
     var LabelAfter = TabElement.LabelAfter == null ? "" : TabElement.LabelAfter;
@@ -689,6 +1121,7 @@ function TileInputBox(TabElement, ModalContainer, DoneButton, Exit, HideInput)
     TabElement.ID = MyID;
     var meTHis = this;
     TileInputBox.Dictionary[MyID] = { TabElement: myTabElement, Me: meTHis };
+    TabElement.TileInput = meTHis;
     var InputBoxLabelBefore = getDomOrCreateNew(InputBoxLabelBeforeID, "label");
     InputBoxLabelBefore.Dom.innerHTML = LabelBefore;
     var InputBoxLabelAfter = getDomOrCreateNew(InputBoxLabelAfterID, "label");
@@ -750,6 +1183,7 @@ function TileInputBox(TabElement, ModalContainer, DoneButton, Exit, HideInput)
                 Container.Dom.appendChild(DropDownElement.Dom);
                 TabElement.DropDown.AllDoms.push(DropDownElement.Dom);
                 SelectDropOption(DropDownElement.Dom)
+                TabElement.DropDown.status = true;
             }
 
             function SetContainerToBottomOfInput()
@@ -842,9 +1276,11 @@ function TileInputBox(TabElement, ModalContainer, DoneButton, Exit, HideInput)
             TabElement.DropDown.AutoSuggestContainer = dropDown.getAutoSuggestControlContainer();
             InputDataDomain.Dom = TabElement.DropDown.AutoSuggestContainer;
             $(TabElement.DropDown.AutoSuggestContainer).css({ position : "absolute" });
+            TabElement.DropDown.status = false;
             TabElement.DropDown.CleanUp = function () {
                 var SuggestedValueContainer = dropDown.getSuggestedValueContainer();
                 $(SuggestedValueContainer).empty();
+                TabElement.DropDown.status = false;
             }
 
 
@@ -932,6 +1368,36 @@ function TileInputBox(TabElement, ModalContainer, DoneButton, Exit, HideInput)
         return InputBoxLabelAfter.Dom;
     }
     
+    //Function tries to attached to sentence completion if it has a message.
+    function getSentenceCompletionMessage()
+    {
+        var retValue = function () { return ""};
+        if (TabElement.Message != null)
+        {
+            retValue = function ()
+            {
+                var loopBackArg ="";
+                if (TabElement.SubTileInputBox != undefined) {
+                    for(var i=0;i< TabElement.SubTileInputBox.length;i++)
+                    {
+                        loopBackArg+=TabElement.SubTileInputBox[i].getSentenceCompletionMessage();
+                    }
+                }
+                if (InputBox != null)//scenario where tileinputbox has no input box, usually when label is used
+                {
+                    loopBackArg += InputBox.value;
+                }
+                return TabElement.Message.LoopBack(loopBackArg);
+            }
+
+            TabElement.getSentenceMessage = retValue;
+            SenetenceCompletion.addTileInput(TabElement);
+        }
+
+        return retValue;
+    }
+
+    
     var getAllElements=function()
     {
         var retValue = [InputBoxLabelBefore, InputBox, InputBoxLabelAfter,InputDataDomain.Dom, invisibleSpan];
@@ -970,8 +1436,18 @@ function TileInputBox(TabElement, ModalContainer, DoneButton, Exit, HideInput)
 
     function KeyEntry(e)
     {
-        e.stopPropagation();
         resizeInput();
+        setTimeout(function ()//delaying just to allow for input to post to UI on keydown
+        {
+            SenetenceCompletion.UpdateAutoSentence();
+        },10)
+        
+        if (e == null)//handles scenario when this called randomly. E.g when triggered by calendar UI trigger
+        {
+            return;
+        }
+        e.stopPropagation();
+        
         if ((e.shiftKey) && (e.which == 9))
         {
             return;
@@ -983,8 +1459,7 @@ function TileInputBox(TabElement, ModalContainer, DoneButton, Exit, HideInput)
         {
             if (myTabElement.TriggerDone == true)//checks if the tab should navigate to done
             {
-                //var DoneButton = TileInputBox.DoneButton.GetDom();
-                //DoneButton.focus();
+
             }
         }
 
@@ -992,8 +1467,13 @@ function TileInputBox(TabElement, ModalContainer, DoneButton, Exit, HideInput)
         {
             if (TabElement.DropDown != undefined)
             {
-                TabElement.DropDown.CurrentOnFocus.SetAsActive();
+                if(TabElement.DropDown.status)
+                {
+                    TabElement.DropDown.CurrentOnFocus.SetAsActive();
+                    return;
+                }
             }
+            TileInputBox.Send();
 
         }
         if (e.which == 27)//escape key press
@@ -1022,7 +1502,7 @@ function TileInputBox(TabElement, ModalContainer, DoneButton, Exit, HideInput)
         
     }
 
-    function CleanUp()
+    function CleanUp()// cleans up the UI element when it goes out of focus
     {
 
     }
@@ -1032,11 +1512,11 @@ function TileInputBox(TabElement, ModalContainer, DoneButton, Exit, HideInput)
         NextElement.Data = newNext;
     }
 
-    function onFocus()
+    function onFocus()//triigers reveal of next element when the tab button is pressed
     {
         $(InputBox.Dom).addClass("FocusTileEvent");
         tabfunction();
-        InputBox.Dom.onkeydown = KeyEntry;
+        InputBox.Dom.addEventListener("keydown", KeyEntry);
         TabElement.isInFocus = true;
         if (myTabElement.TriggerDone == true)//checks if the tab should navigate to done
         {
@@ -1044,7 +1524,8 @@ function TileInputBox(TabElement, ModalContainer, DoneButton, Exit, HideInput)
         }
     }
 
-    function outFocus() {
+    function outFocus()
+    {
         $(InputBox.Dom).removeClass("FocusTileEvent");
         TabElement.isInFocus = false;
         setTimeout(function () { ResizeInputTrim(); }, 0);
@@ -1056,6 +1537,12 @@ function TileInputBox(TabElement, ModalContainer, DoneButton, Exit, HideInput)
     {
         return TabElement.isInFocus;
     }
+
+    this.getKeyCallBackFunc = function ()//function returns the KeyEntry function.
+    {
+        return KeyEntry;
+    }
+
 
     
     var AllElements = getAllElements();
@@ -1090,6 +1577,9 @@ function TileInputBox(TabElement, ModalContainer, DoneButton, Exit, HideInput)
     }
     $(InputBox.Dom).focus(onFocus)
     $(InputBox.Dom).focusout(outFocus);
+
+    this.getSentenceCompletionMessage = getSentenceCompletionMessage();
+
     if (TabElement.HideInput)
     {
         InputBox = null;
@@ -1176,11 +1666,10 @@ function generateSubmitButton()
 }
 
 
-function BindSubmitClick(Name, Address, AddressNick, Splits, Start, End, EventNonRigidDurationHolder, RepetitionEnd, RigidFlag, CalendarColor)
+function BindSubmitClick(Name, Address, AddressNick, Splits, Start, End, EventNonRigidDurationHolder, RepetitionEnd, RigidFlag, CalendarColor,CloseEventAddition)
 {
-    var EventLocation = new Location(AddressNick.value, Address.value);
+    var EventLocation = new Location(AddressNick, Address);
     var EventName = Name;
-    Splits = Splits.value;
     if (Splits == "")
     {
         Splits = 1;
@@ -1257,6 +1746,7 @@ function BindSubmitClick(Name, Address, AddressNick, Splits, Start, End, EventNo
 
     }).done(function (data) {
         HandleNEwPage.Hide();
-        ClosePanel();
+        getRefreshedData();
+        CloseEventAddition();
     });
 }

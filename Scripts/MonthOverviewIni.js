@@ -2,10 +2,9 @@
 
 
 
-$(function(){
-  $('#ControlPanelCloseButton').click(function(){
-    $('#ControlPanelContainer').slideUp(500);
-  })
+$(function ()
+{
+  
 });
     
 $(document).ready(function () {
@@ -25,7 +24,7 @@ var global_CurrentRange;
 var global_ClearRefreshDataInterval = 0;
 var global_ColorAugmentation=0;
 var refreshCounter = 1000000;
-var global_refreshDataInterval = 30000;
+var global_refreshDataInterval = 60000;
 
 var FormatTime = function(date){
   var d = date;
@@ -188,7 +187,7 @@ function BindAddButton()
 
 function InitializeMonthlyOverview()
 {
-    //alert("Hey Jerome You called");
+
     BindAddButton();
     var verifiedUser = GetCookieValue();
     if (verifiedUser == "")
@@ -331,7 +330,7 @@ function InitiateGrid(refDate)
     function getRefreshedData()//RangeData)
     {
         //setTimeout(refreshIframe,200);
-        if (--refreshCounter < 0)
+        if (--refreshCounter < 0)//debugging counter. THis allows us to set a max number of refreshes before stopping calls to backend
         {
             return;
         }
@@ -340,6 +339,7 @@ function InitiateGrid(refDate)
         var DataHolder = { Data: "" };
         PopulateTotalSubEvents(DataHolder, global_WeekGrid);
         global_ClearRefreshDataInterval = setTimeout(getRefreshedData, global_refreshDataInterval);
+        return global_ClearRefreshDataInterval;
     }
 
     function getEventsInterferringInRange(StartDate, EndDate)
@@ -855,16 +855,40 @@ function InitiateGrid(refDate)
             {
                 global_DictionaryOfSubEvents[ID].Bind = BindToThis;
             }
+            /*
 
-            $(DayOfWeek.UISpecs[ID].Dom).click(function (e) { e.stopPropagation(); global_DictionaryOfSubEvents[ID].Bind() });
+            function triggerClick(e) {
+                if(e!=null)
+                {
+                    e.stopPropagation();
+                }
+                global_DictionaryOfSubEvents[ID].Bind()
+            };
+            //$(DayOfWeek.UISpecs[ID].Dom).click(triggerClick);
+            (DayOfWeek.UISpecs[ID].Dom).onclick=(triggerClick);
+
             $(DayOfWeek.UISpecs[ID].refrenceListElement.Dom).click
             (
-                function (e) { e.stopPropagation(); $(DayOfWeek.UISpecs[ID].Dom).trigger("click"); }
+                function (e) 
+                { 
+                    e.stopPropagation();
+                    triggerClick();
+                    //$(DayOfWeek.UISpecs[ID].Dom).trigger("click");
+                }
             )//clicking of the named element triggers a click on the
+            */
+
+            function call_renderSubEventsClickEvents(e) { e.stopPropagation(); renderSubEventsClickEvents(ID) }
+            DayOfWeek.UISpecs[ID].refrenceListElement.Dom.onclick = call_renderSubEventsClickEvents;
         }
         
     }
 
+    function renderSubEventsClickEvents(SubEventID)
+    {
+        global_DictionaryOfSubEvents[SubEventID].Bind();
+        global_DictionaryOfSubEvents[SubEventID].showBottomPanel();
+    }
 
 
 function renderUIChanges(DayOfWeek)
@@ -1159,7 +1183,11 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
         var percentHeight = (totalDuration / OneDayInMs) * 100;
 
         var percentTop = ((referenceStart - new Date(Range.Start)) / OneDayInMs) * 100;
-
+        function call_renderSubEventsClickEvents(e)
+        {
+            e.stopPropagation();
+            renderSubEventsClickEvents(SubEvent.ID)
+        }
         if (Range.UISpecs[SubEvent.ID].Enabled) {
             Range.UISpecs[SubEvent.ID].css = { height: 0, top: 0 };
             Range.UISpecs[SubEvent.ID].css.height = percentHeight;
@@ -1182,9 +1210,14 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                 //debugger;
                 $(EventDom.Dom).addClass(global_AllColorClasses[SubEvent.ColorSelection].cssClass);
             }
-            $(EventDom.Dom).addClass("SameSubEvent" + SubEvent.ID)
-            $(EventDom.Dom).click(prepOnClickOfCalendarElement(SubEvent, EventDom.Dom));
+            $(EventDom.Dom).addClass("SameSubEvent" + SubEvent.ID);
+
+            //$(EventDom.Dom).click(prepOnClickOfCalendarElement(SubEvent, EventDom.Dom));
+            global_DictionaryOfSubEvents[SubEvent.ID].showBottomPanel = prepOnClickOfCalendarElement(SubEvent, EventDom.Dom);
+
+
             
+            EventDom.Dom.onclick  = call_renderSubEventsClickEvents;
             //EventDom.Dom.innerHTML = SubEvent.Name
         }
         else
@@ -1202,9 +1235,9 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
     var global_previousSelectedSubCalEvent = new Array();
     function prepOnClickOfCalendarElement(SubEvent,Dom)
     {
-        return function (event)
+        return function ()
         {
-            event.stopPropagation();
+            //event.stopPropagation();
             for (var i = 0; i < global_previousSelectedSubCalEvent.length; i++)
             {
                 var myDom = global_previousSelectedSubCalEvent[i];
@@ -1225,7 +1258,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
               var ControlPanelSubEventTimeInfo = document.getElementById("ControlPanelSubEventTimeInfo");
 
 
-              $('#ControlPanelContainer').slideDown(500);
+              
               var FormatTime = function(date){
               var d = date;
               var TimeHours = d.getHours();
@@ -1323,11 +1356,190 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
             var EndDate = FormatTime(SubEvent.SubCalEndDate);
             var Deadline = FormatTime(SubEvent.SubCalCalEventEnd);
 
+            var yeaButton = getDomOrCreateNew("YeaToConfirmDelete");
+            var nayButton = getDomOrCreateNew("NayToConfirmDelete");
+            var completeButton = getDomOrCreateNew("ControlPanelCompleteButton");
+            var deleteButton = getDomOrCreateNew("ControlPanelDeleteButton");
+            var DeleteMessage =getDomOrCreateNew( "DeleteMessage")
+            closeControlPanel();
+            $('#ControlPanelContainer').slideDown(500);
+            function resetButtons()
+            {
+                yeaButton.onclick = null;
+                nayButton.onclick = null;
+            }
+
+
+            function closeControlPanel()
+            {
+                resetButtons();
+                closeModalDelete();
+                deleteButton.onclick = null;
+                completeButton.onclick = null;
+                $('#ControlPanelContainer').slideUp(500);
+            }
+
+
+            $('#ControlPanelCloseButton').click(closeControlPanel)
+
+            function deleteSubevent()//triggers the yea / nay deletion of events
+            {
+                DeleteMessage.innerHTML = "Sure you want to delete \"" + SubEvent.Name + "\"?"
+
+                yeaButton.onclick = yeaDeleteSubEvent;
+                nayButton.onclick = nayDeleteSubEvent;
+                $('#ConfirmDeleteModal').slideDown(500);
+            }
+
+            function yeaDeleteSubEvent()//triggers the deletion of subevent
+            {
+                SendMessage();
+                function SendMessage()
+                {
+                    var TimeZone = new Date().getTimezoneOffset();
+                    var DeletionEvent = { UserName: UserCredentials.UserName, UserID: UserCredentials.ID, EventID: SubEvent.ID, TimeZoneOffset: TimeZone };
+                    //var URL = "RootWagTap/time.top?WagCommand=6"
+                    var URL = global_refTIlerUrl + "Schedule/Event";
+                    var HandleNEwPage = new LoadingScreenControl("Tiler is Deleting your event :)");
+                    HandleNEwPage.Launch();
+
+                    $.ajax({
+                        type: "DELETE",
+                        url: URL,
+                        data: DeletionEvent,
+                        // DO NOT SET CONTENT TYPE to json
+                        // contentType: "application/json; charset=utf-8", 
+                        // DataType needs to stay, otherwise the response object
+                        // will be treated as a single string
+                        success: function (response) {
+                            //InitializeHomePage();
+                            //alert("alert 0-b");
+                        },
+                        error: function () {
+                            var NewMessage = "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
+                            var ExitAfter = { ExitNow: true, Delay: 1000 };
+                            HandleNEwPage.UpdateMessage(NewMessage, ExitAfter, InitializeHomePage);
+                        }
+                    }).done(function (data) {
+                        HandleNEwPage.Hide();
+                        triggerUIUPdate();//hack alert
+                        getRefreshedData();
+                    });
+                }
+                function triggerUIUPdate()
+                {
+                    //alert("we are deleting " + SubEvent.ID);
+                    //$('#ConfirmDeleteModal').slideToggle();
+                    //$('#ControlPanelContainer').slideUp(500);
+                    resetButtons();
+                    closeControlPanel();
+                }
+                
+            }
+
+
+            function nayDeleteSubEvent()//ignores deletion of events
+            {
+                closeModalDelete();
+                resetButtons();
+            }
+
+            
+
+            function markAsComplete()
+            {
+                SendMessage();
+                function SendMessage()
+                {
+                    var TimeZone = new Date().getTimezoneOffset();
+                    var Url;
+                    //Url="RootWagTap/time.top?WagCommand=7";
+                    Url = global_refTIlerUrl + "Schedule/Event/Complete";
+                    var HandleNEwPage = new LoadingScreenControl("Tiler is updating your schedule ...");
+                    HandleNEwPage.Launch();
+
+                    var MarkAsCompleteData = { UserName: UserCredentials.UserName, UserID: UserCredentials.ID, EventID: SubEvent.ID, TimeZoneOffset: TimeZone };
+                    $.ajax({
+                        type: "POST",
+                        url: Url,
+                        data: MarkAsCompleteData,
+                        // DO NOT SET CONTENT TYPE to json
+                        // contentType: "application/json; charset=utf-8", 
+                        // DataType needs to stay, otherwise the response object
+                        // will be treated as a single string
+                        //dataType: "json",
+                        success: function (response) {
+                            //alert(response);
+                            var myContainer = (response);
+                            if (myContainer.Error.code == 0) {
+                                //exitSelectedEventScreen();
+                            }
+                            else {
+                                alert("error detected with marking as complete");
+                            }
+
+                        },
+                        error: function (err) {
+                            var myError = err;
+                            var step = "err";
+                            var NewMessage = "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
+                            var ExitAfter = { ExitNow: true, Delay: 1000 };
+                            HandleNEwPage.UpdateMessage(NewMessage, ExitAfter, InitializeHomePage);
+                            //InitializeHomePage();
+
+
+                        }
+
+                    }).done(function (data) {
+                        HandleNEwPage.Hide();
+                        triggerUIUPdate();//hack alert
+                        getRefreshedData();
+                    });
+                }
+                function triggerUIUPdate()
+                {
+                    resetButtons();
+                    closeControlPanel();
+                }
+                
+            }
+
+            function closeModalDelete()
+            {
+                DeleteMessage.innerHTML = "Sure you want to delete ?"
+                $('#ConfirmDeleteModal').slideUp(500);
+            }
+            deleteButton.onclick = deleteSubevent;
+            completeButton.onclick = markAsComplete;
+            
+            /*
+            $('#YeaToConfirmDelete').click(function () {
+                $('#ConfirmDeleteModal').slideToggle();
+                $('#ControlPanelContainer').slideUp(500);
+            })
+            
+
+            $('#NayToConfirmDelete').click(function () {
+                //deleteEvent();
+                $('#ConfirmDeleteModal').slideToggle();
+                $('#ControlPanelContainer').slideUp(500);
+            })
+            */
+
             ControlPanelNameOfSubeventInfo.innerHTML = SubEvent.Name;
             ControlPanelDeadlineOfSubeventInfo.innerHTML = Deadline.hour + ' ' + Deadline.minute + ' ' + Deadline.merid + ' // ' + Deadline.day + ', ' + Deadline.mon + ' ' + Deadline.date;
             ControlPanelSubEventTimeInfo.innerHTML = StartDate.hour + ' ' + StartDate.minute + ' ' + StartDate.merid + ' &mdash; ' + EndDate.hour + ' ' + EndDate.minute + ' ' + EndDate.merid; 
+            var SubEventName = SubEvent.Name;
+            $(document).keyup(function(e){
+              if (e == 46){
+                deleteEvent();
+              };
+            });
+              
         }
     }
+
+
 
     function PopulateYourself(RangeData)
     {
@@ -1378,6 +1590,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
     function DeleteSubEvent()
     {
 
+      var x = SubEvent.Name;
     }
 
     function DeleteCurrentRepetition()

@@ -1,16 +1,24 @@
 ﻿@using Microsoft.AspNet.Identity
+
+   
+
 @if (Request.IsAuthenticated)
 {
+    var cookieValue = "{\"UserName\":\"" + User.Identity.GetUserName() + "\",\"UserID\":\"" + User.Identity.GetUserId() + "\"};";
+
+    Response.Cookies["TilerCaluserWaggy"].Value = cookieValue;
+    Response.Cookies["TilerCaluserWaggy"].Expires = DateTime.Now.AddDays(30); 
+    
     using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm", @class = "navbar-right" }))
     {
     @Html.AntiForgeryToken()
 
-    <ul class="nav navbar-nav navbar-right">
-        <li>
-            @Html.ActionLink("Hello " + User.Identity.GetUserName() + "!", "Index", "Manage", routeValues: null, htmlAttributes: new { title = "Manage" })
-        </li>
-        <li><a href="javascript:document.getElementById('logoutForm').submit()">Log off</a></li>
-    </ul>
+    <div class="nav navbar-nav navbar-right">
+        <span>
+            @Html.ActionLink("Hello " + User.Identity.Name + "!", "Index", "Manage", routeValues: null, htmlAttributes: new { title = "Manage" })
+        </span>
+        <span><a href="javascript:document.getElementById('logoutForm').submit()">Log off</a></span>
+    </div>
     }
 }
 else

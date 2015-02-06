@@ -1,0 +1,1438 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ScheduleLog>
+  <LastIDCounter>65</LastIDCounter>
+  <referenceDay>2/6/2015 12:00:00 AM +00:00</referenceDay>
+  <EventSchedules>
+    <EventSchedule>
+      <Recurrence />
+      <MiscData>
+        <TypeSelection>0</TypeSelection>
+        <UserNote />
+      </MiscData>
+      <UIParams>
+        <Type>0</Type>
+        <Color>
+          <UserSelection>-1</UserSelection>
+          <Blue>127</Blue>
+          <Green>127</Green>
+          <Red>127</Red>
+          <Opacity>1</Opacity>
+        </Color>
+        <Visible>True</Visible>
+      </UIParams>
+      <Location>
+        <CheckCalendarEvent>0</CheckCalendarEvent>
+        <isNull>False</isNull>
+        <Description />
+        <Address />
+        <YCoordinate>1.79769313486232E+308</YCoordinate>
+        <XCoordinate>1.79769313486232E+308</XCoordinate>
+      </Location>
+      <Enabled>True</Enabled>
+      <ID>1_7_0_0</ID>
+      <Name>I'll stand</Name>
+      <StartTime>2/6/2015 4:00:00 AM +00:00</StartTime>
+      <PreDeadline>00:00:00</PreDeadline>
+      <PrepTime>00:00:00</PrepTime>
+      <Deadline>2/6/2015 9:00:00 AM +00:00</Deadline>
+      <Split>1</Split>
+      <Duration>05:00:00</Duration>
+      <RigidFlag>True</RigidFlag>
+      <EventSubSchedules>
+        <EventSubSchedule>
+          <ConflictProfile>
+            <ConflictIDs />
+            <Flag>False</Flag>
+            <Type>0</Type>
+          </ConflictProfile>
+          <MiscData>
+            <TypeSelection>0</TypeSelection>
+            <UserNote />
+          </MiscData>
+          <UIParams>
+            <Type>1</Type>
+            <Color>
+              <UserSelection>5</UserSelection>
+              <Blue>255</Blue>
+              <Green>0</Green>
+              <Red>255</Red>
+              <Opacity>1</Opacity>
+            </Color>
+            <Visible>True</Visible>
+          </UIParams>
+          <Location>
+            <CheckCalendarEvent>0</CheckCalendarEvent>
+            <isNull>False</isNull>
+            <Description />
+            <Address />
+            <YCoordinate>1.79769313486232E+308</YCoordinate>
+            <XCoordinate>1.79769313486232E+308</XCoordinate>
+          </Location>
+          <Complete>False</Complete>
+          <Enabled>True</Enabled>
+          <ID>1_7_0_2</ID>
+          <ThirdPartyID />
+          <PrepTime>00:00:00</PrepTime>
+          <ActiveStartTime>2/6/2015 4:00:00 AM +00:00</ActiveStartTime>
+          <ActiveEndTime>2/6/2015 9:00:00 AM +00:00</ActiveEndTime>
+          <Duration>05:00:00</Duration>
+          <StartTime>2/6/2015 4:00:00 AM +00:00</StartTime>
+          <EndTime>2/6/2015 9:00:00 AM +00:00</EndTime>
+        </EventSubSchedule>
+      </EventSubSchedules>
+      <RepetitionFlag>False</RepetitionFlag>
+      <Completed>False</Completed>
+    </EventSchedule>
+    <EventSchedule>
+      <Recurrence>
+        <RepeatCalendarEvents>
+          <RepeatCalendarEvent>
+            <Recurrence />
+            <MiscData>
+              <TypeSelection>0</TypeSelection>
+              <UserNote />
+            </MiscData>
+            <UIParams>
+              <Type>0</Type>
+              <Color>
+                <UserSelection>-1</UserSelection>
+                <Blue>127</Blue>
+                <Green>127</Green>
+                <Red>127</Red>
+                <Opacity>1</Opacity>
+              </Color>
+              <Visible>True</Visible>
+            </UIParams>
+            <Location>
+              <CheckCalendarEvent>0</CheckCalendarEvent>
+              <isNull>False</isNull>
+              <Description>Work</Description>
+              <Address>work state highway 1, kaiwaka 0573, new zealand</Address>
+              <YCoordinate>174.4433817</YCoordinate>
+              <XCoordinate>-36.1645629</XCoordinate>
+            </Location>
+            <Enabled>True</Enabled>
+            <ID>3_7_17_0</ID>
+            <Name>Stand 2.0</Name>
+            <StartTime>3/6/2015 12:00:00 AM +00:00</StartTime>
+            <PreDeadline>00:00:00</PreDeadline>
+            <PrepTime>00:00:00</PrepTime>
+            <Deadline>4/6/2015 11:59:00 PM +00:00</Deadline>
+            <Split>6</Split>
+            <Duration>04:30:00</Duration>
+            <RigidFlag>False</RigidFlag>
+            <EventSubSchedules>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>0</Type>
+                  <Color>
+                    <UserSelection>-1</UserSelection>
+                    <Blue>127</Blue>
+                    <Green>127</Green>
+                    <Red>127</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>Work</Description>
+                  <Address>work state highway 1, kaiwaka 0573, new zealand</Address>
+                  <YCoordinate>174.4433817</YCoordinate>
+                  <XCoordinate>-36.1645629</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>3_7_17_23</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>4/6/2015 11:14:00 PM +00:00</ActiveStartTime>
+                <ActiveEndTime>4/6/2015 11:59:00 PM +00:00</ActiveEndTime>
+                <Duration>00:45:00</Duration>
+                <StartTime>4/6/2015 11:14:00 PM +00:00</StartTime>
+                <EndTime>4/6/2015 11:59:00 PM +00:00</EndTime>
+              </EventSubSchedule>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>0</Type>
+                  <Color>
+                    <UserSelection>-1</UserSelection>
+                    <Blue>127</Blue>
+                    <Green>127</Green>
+                    <Red>127</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>Work</Description>
+                  <Address>work state highway 1, kaiwaka 0573, new zealand</Address>
+                  <YCoordinate>174.4433817</YCoordinate>
+                  <XCoordinate>-36.1645629</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>3_7_17_22</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>4/6/2015 10:29:00 PM +00:00</ActiveStartTime>
+                <ActiveEndTime>4/6/2015 11:14:00 PM +00:00</ActiveEndTime>
+                <Duration>00:45:00</Duration>
+                <StartTime>4/6/2015 10:29:00 PM +00:00</StartTime>
+                <EndTime>4/6/2015 11:14:00 PM +00:00</EndTime>
+              </EventSubSchedule>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>0</Type>
+                  <Color>
+                    <UserSelection>-1</UserSelection>
+                    <Blue>127</Blue>
+                    <Green>127</Green>
+                    <Red>127</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>Work</Description>
+                  <Address>work state highway 1, kaiwaka 0573, new zealand</Address>
+                  <YCoordinate>174.4433817</YCoordinate>
+                  <XCoordinate>-36.1645629</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>3_7_17_21</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>4/6/2015 9:44:00 PM +00:00</ActiveStartTime>
+                <ActiveEndTime>4/6/2015 10:29:00 PM +00:00</ActiveEndTime>
+                <Duration>00:45:00</Duration>
+                <StartTime>4/6/2015 9:44:00 PM +00:00</StartTime>
+                <EndTime>4/6/2015 10:29:00 PM +00:00</EndTime>
+              </EventSubSchedule>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>0</Type>
+                  <Color>
+                    <UserSelection>-1</UserSelection>
+                    <Blue>127</Blue>
+                    <Green>127</Green>
+                    <Red>127</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>Work</Description>
+                  <Address>work state highway 1, kaiwaka 0573, new zealand</Address>
+                  <YCoordinate>174.4433817</YCoordinate>
+                  <XCoordinate>-36.1645629</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>3_7_17_20</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>4/6/2015 8:59:00 PM +00:00</ActiveStartTime>
+                <ActiveEndTime>4/6/2015 9:44:00 PM +00:00</ActiveEndTime>
+                <Duration>00:45:00</Duration>
+                <StartTime>4/6/2015 8:59:00 PM +00:00</StartTime>
+                <EndTime>4/6/2015 9:44:00 PM +00:00</EndTime>
+              </EventSubSchedule>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>0</Type>
+                  <Color>
+                    <UserSelection>-1</UserSelection>
+                    <Blue>127</Blue>
+                    <Green>127</Green>
+                    <Red>127</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>Work</Description>
+                  <Address>work state highway 1, kaiwaka 0573, new zealand</Address>
+                  <YCoordinate>174.4433817</YCoordinate>
+                  <XCoordinate>-36.1645629</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>3_7_17_19</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>4/6/2015 8:14:00 PM +00:00</ActiveStartTime>
+                <ActiveEndTime>4/6/2015 8:59:00 PM +00:00</ActiveEndTime>
+                <Duration>00:45:00</Duration>
+                <StartTime>4/6/2015 8:14:00 PM +00:00</StartTime>
+                <EndTime>4/6/2015 8:59:00 PM +00:00</EndTime>
+              </EventSubSchedule>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>0</Type>
+                  <Color>
+                    <UserSelection>-1</UserSelection>
+                    <Blue>127</Blue>
+                    <Green>127</Green>
+                    <Red>127</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>Work</Description>
+                  <Address>work state highway 1, kaiwaka 0573, new zealand</Address>
+                  <YCoordinate>174.4433817</YCoordinate>
+                  <XCoordinate>-36.1645629</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>3_7_17_18</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>4/6/2015 7:29:00 PM +00:00</ActiveStartTime>
+                <ActiveEndTime>4/6/2015 8:14:00 PM +00:00</ActiveEndTime>
+                <Duration>00:45:00</Duration>
+                <StartTime>4/6/2015 7:29:00 PM +00:00</StartTime>
+                <EndTime>4/6/2015 8:14:00 PM +00:00</EndTime>
+              </EventSubSchedule>
+            </EventSubSchedules>
+            <RepetitionFlag>False</RepetitionFlag>
+            <Completed>False</Completed>
+          </RepeatCalendarEvent>
+          <RepeatCalendarEvent>
+            <Recurrence />
+            <MiscData>
+              <TypeSelection>0</TypeSelection>
+              <UserNote />
+            </MiscData>
+            <UIParams>
+              <Type>0</Type>
+              <Color>
+                <UserSelection>-1</UserSelection>
+                <Blue>127</Blue>
+                <Green>127</Green>
+                <Red>127</Red>
+                <Opacity>1</Opacity>
+              </Color>
+              <Visible>True</Visible>
+            </UIParams>
+            <Location>
+              <CheckCalendarEvent>0</CheckCalendarEvent>
+              <isNull>False</isNull>
+              <Description>Work</Description>
+              <Address>work state highway 1, kaiwaka 0573, new zealand</Address>
+              <YCoordinate>174.4433817</YCoordinate>
+              <XCoordinate>-36.1645629</XCoordinate>
+            </Location>
+            <Enabled>True</Enabled>
+            <ID>3_7_10_0</ID>
+            <Name>Stand 2.0</Name>
+            <StartTime>2/6/2015 12:00:00 AM +00:00</StartTime>
+            <PreDeadline>00:00:00</PreDeadline>
+            <PrepTime>00:00:00</PrepTime>
+            <Deadline>3/6/2015 11:59:00 PM +00:00</Deadline>
+            <Split>6</Split>
+            <Duration>04:30:00</Duration>
+            <RigidFlag>False</RigidFlag>
+            <EventSubSchedules>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>0</Type>
+                  <Color>
+                    <UserSelection>-1</UserSelection>
+                    <Blue>127</Blue>
+                    <Green>127</Green>
+                    <Red>127</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>Work</Description>
+                  <Address>work state highway 1, kaiwaka 0573, new zealand</Address>
+                  <YCoordinate>174.4433817</YCoordinate>
+                  <XCoordinate>-36.1645629</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>3_7_10_16</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>2/9/2015 12:57:00 AM +00:00</ActiveStartTime>
+                <ActiveEndTime>2/9/2015 1:42:00 AM +00:00</ActiveEndTime>
+                <Duration>00:45:00</Duration>
+                <StartTime>2/9/2015 12:57:00 AM +00:00</StartTime>
+                <EndTime>2/9/2015 1:42:00 AM +00:00</EndTime>
+              </EventSubSchedule>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>0</Type>
+                  <Color>
+                    <UserSelection>-1</UserSelection>
+                    <Blue>127</Blue>
+                    <Green>127</Green>
+                    <Red>127</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>Work</Description>
+                  <Address>work state highway 1, kaiwaka 0573, new zealand</Address>
+                  <YCoordinate>174.4433817</YCoordinate>
+                  <XCoordinate>-36.1645629</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>3_7_10_15</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>2/9/2015 12:00:00 AM +00:00</ActiveStartTime>
+                <ActiveEndTime>2/9/2015 12:45:00 AM +00:00</ActiveEndTime>
+                <Duration>00:45:00</Duration>
+                <StartTime>2/9/2015 12:00:00 AM +00:00</StartTime>
+                <EndTime>2/9/2015 12:45:00 AM +00:00</EndTime>
+              </EventSubSchedule>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>0</Type>
+                  <Color>
+                    <UserSelection>-1</UserSelection>
+                    <Blue>127</Blue>
+                    <Green>127</Green>
+                    <Red>127</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>Work</Description>
+                  <Address>work state highway 1, kaiwaka 0573, new zealand</Address>
+                  <YCoordinate>174.4433817</YCoordinate>
+                  <XCoordinate>-36.1645629</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>3_7_10_14</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>2/8/2015 12:57:00 AM +00:00</ActiveStartTime>
+                <ActiveEndTime>2/8/2015 1:42:00 AM +00:00</ActiveEndTime>
+                <Duration>00:45:00</Duration>
+                <StartTime>2/8/2015 12:57:00 AM +00:00</StartTime>
+                <EndTime>2/8/2015 1:42:00 AM +00:00</EndTime>
+              </EventSubSchedule>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>0</Type>
+                  <Color>
+                    <UserSelection>-1</UserSelection>
+                    <Blue>127</Blue>
+                    <Green>127</Green>
+                    <Red>127</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>Work</Description>
+                  <Address>work state highway 1, kaiwaka 0573, new zealand</Address>
+                  <YCoordinate>174.4433817</YCoordinate>
+                  <XCoordinate>-36.1645629</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>3_7_10_13</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>2/8/2015 12:00:00 AM +00:00</ActiveStartTime>
+                <ActiveEndTime>2/8/2015 12:45:00 AM +00:00</ActiveEndTime>
+                <Duration>00:45:00</Duration>
+                <StartTime>2/8/2015 12:00:00 AM +00:00</StartTime>
+                <EndTime>2/8/2015 12:45:00 AM +00:00</EndTime>
+              </EventSubSchedule>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>0</Type>
+                  <Color>
+                    <UserSelection>-1</UserSelection>
+                    <Blue>127</Blue>
+                    <Green>127</Green>
+                    <Red>127</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>Work</Description>
+                  <Address>work state highway 1, kaiwaka 0573, new zealand</Address>
+                  <YCoordinate>174.4433817</YCoordinate>
+                  <XCoordinate>-36.1645629</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>3_7_10_12</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>2/7/2015 12:57:00 AM +00:00</ActiveStartTime>
+                <ActiveEndTime>2/7/2015 1:42:00 AM +00:00</ActiveEndTime>
+                <Duration>00:45:00</Duration>
+                <StartTime>2/7/2015 12:57:00 AM +00:00</StartTime>
+                <EndTime>2/7/2015 1:42:00 AM +00:00</EndTime>
+              </EventSubSchedule>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>0</Type>
+                  <Color>
+                    <UserSelection>-1</UserSelection>
+                    <Blue>127</Blue>
+                    <Green>127</Green>
+                    <Red>127</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>Work</Description>
+                  <Address>work state highway 1, kaiwaka 0573, new zealand</Address>
+                  <YCoordinate>174.4433817</YCoordinate>
+                  <XCoordinate>-36.1645629</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>3_7_10_11</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>2/7/2015 12:00:00 AM +00:00</ActiveStartTime>
+                <ActiveEndTime>2/7/2015 12:45:00 AM +00:00</ActiveEndTime>
+                <Duration>00:45:00</Duration>
+                <StartTime>2/7/2015 12:00:00 AM +00:00</StartTime>
+                <EndTime>2/7/2015 12:45:00 AM +00:00</EndTime>
+              </EventSubSchedule>
+            </EventSubSchedules>
+            <RepetitionFlag>False</RepetitionFlag>
+            <Completed>False</Completed>
+          </RepeatCalendarEvent>
+        </RepeatCalendarEvents>
+        <RepeatCountOfLowerLayer>0</RepeatCountOfLowerLayer>
+        <RepeatDays />
+        <RepeatDay>7</RepeatDay>
+        <RepeatFrequency>MONTHLY</RepeatFrequency>
+        <RepeatEndDate>3/24/2015 12:00:00 AM +00:00</RepeatEndDate>
+        <RepeatStartDate>2/6/2015 12:00:00 AM +00:00</RepeatStartDate>
+      </Recurrence>
+      <MiscData>
+        <TypeSelection>0</TypeSelection>
+        <UserNote />
+      </MiscData>
+      <UIParams>
+        <Type>0</Type>
+        <Color>
+          <UserSelection>-1</UserSelection>
+          <Blue>127</Blue>
+          <Green>127</Green>
+          <Red>127</Red>
+          <Opacity>1</Opacity>
+        </Color>
+        <Visible>True</Visible>
+      </UIParams>
+      <Location>
+        <CheckCalendarEvent>0</CheckCalendarEvent>
+        <isNull>False</isNull>
+        <Description>Work</Description>
+        <Address>work state highway 1, kaiwaka 0573, new zealand</Address>
+        <YCoordinate>174.4433817</YCoordinate>
+        <XCoordinate>-36.1645629</XCoordinate>
+      </Location>
+      <Enabled>True</Enabled>
+      <ID>3_7_0_0</ID>
+      <Name>Stand 2.0</Name>
+      <StartTime>2/6/2015 12:00:00 AM +00:00</StartTime>
+      <PreDeadline>00:00:00</PreDeadline>
+      <PrepTime>00:00:00</PrepTime>
+      <Deadline>3/24/2015 11:59:00 PM +00:00</Deadline>
+      <Split>6</Split>
+      <Duration>04:30:00</Duration>
+      <RigidFlag>False</RigidFlag>
+      <EventSubSchedules />
+      <RepetitionFlag>True</RepetitionFlag>
+      <Completed>False</Completed>
+    </EventSchedule>
+    <EventSchedule>
+      <Recurrence>
+        <RepeatCalendarEvents>
+          <RepeatCalendarEvent>
+            <Recurrence />
+            <MiscData>
+              <TypeSelection>0</TypeSelection>
+              <UserNote />
+            </MiscData>
+            <UIParams>
+              <Type>0</Type>
+              <Color>
+                <UserSelection>-1</UserSelection>
+                <Blue>127</Blue>
+                <Green>127</Green>
+                <Red>127</Red>
+                <Opacity>1</Opacity>
+              </Color>
+              <Visible>True</Visible>
+            </UIParams>
+            <Location>
+              <CheckCalendarEvent>0</CheckCalendarEvent>
+              <isNull>False</isNull>
+              <Description>work</Description>
+              <Address>work state highway 1, kaiwaka 0573, new zealand</Address>
+              <YCoordinate>174.4433817</YCoordinate>
+              <XCoordinate>-36.1645629</XCoordinate>
+            </Location>
+            <Enabled>True</Enabled>
+            <ID>31_7_36_0</ID>
+            <Name>Sun is rising</Name>
+            <StartTime>2/6/2015 12:00:00 AM +00:00</StartTime>
+            <PreDeadline>00:00:00</PreDeadline>
+            <PrepTime>00:00:00</PrepTime>
+            <Deadline>2/13/2015 11:59:00 PM +00:00</Deadline>
+            <Split>4</Split>
+            <Duration>03:00:00</Duration>
+            <RigidFlag>False</RigidFlag>
+            <EventSubSchedules>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>0</Type>
+                  <Color>
+                    <UserSelection>-1</UserSelection>
+                    <Blue>127</Blue>
+                    <Green>127</Green>
+                    <Red>127</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>work</Description>
+                  <Address>work state highway 1, kaiwaka 0573, new zealand</Address>
+                  <YCoordinate>174.4433817</YCoordinate>
+                  <XCoordinate>-36.1645629</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>False</Enabled>
+                <ID>31_7_36_37</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>2/6/2015 9:00:00 AM +00:00</ActiveStartTime>
+                <ActiveEndTime>2/6/2015 9:45:00 AM +00:00</ActiveEndTime>
+                <Duration>00:45:00</Duration>
+                <StartTime>2/6/2015 9:00:00 AM +00:00</StartTime>
+                <EndTime>2/6/2015 9:45:00 AM +00:00</EndTime>
+              </EventSubSchedule>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>0</Type>
+                  <Color>
+                    <UserSelection>-1</UserSelection>
+                    <Blue>127</Blue>
+                    <Green>127</Green>
+                    <Red>127</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>work</Description>
+                  <Address>work state highway 1, kaiwaka 0573, new zealand</Address>
+                  <YCoordinate>174.4433817</YCoordinate>
+                  <XCoordinate>-36.1645629</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>False</Enabled>
+                <ID>31_7_36_38</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>2/7/2015 12:57:00 AM +00:00</ActiveStartTime>
+                <ActiveEndTime>2/7/2015 1:42:00 AM +00:00</ActiveEndTime>
+                <Duration>00:45:00</Duration>
+                <StartTime>2/7/2015 12:57:00 AM +00:00</StartTime>
+                <EndTime>2/7/2015 1:42:00 AM +00:00</EndTime>
+              </EventSubSchedule>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>0</Type>
+                  <Color>
+                    <UserSelection>-1</UserSelection>
+                    <Blue>127</Blue>
+                    <Green>127</Green>
+                    <Red>127</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>work</Description>
+                  <Address>work state highway 1, kaiwaka 0573, new zealand</Address>
+                  <YCoordinate>174.4433817</YCoordinate>
+                  <XCoordinate>-36.1645629</XCoordinate>
+                </Location>
+                <Complete>True</Complete>
+                <Enabled>True</Enabled>
+                <ID>31_7_36_39</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>2/8/2015 12:57:00 AM +00:00</ActiveStartTime>
+                <ActiveEndTime>2/8/2015 1:42:00 AM +00:00</ActiveEndTime>
+                <Duration>00:45:00</Duration>
+                <StartTime>2/8/2015 12:57:00 AM +00:00</StartTime>
+                <EndTime>2/8/2015 1:42:00 AM +00:00</EndTime>
+              </EventSubSchedule>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>0</Type>
+                  <Color>
+                    <UserSelection>-1</UserSelection>
+                    <Blue>127</Blue>
+                    <Green>127</Green>
+                    <Red>127</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>work</Description>
+                  <Address>work state highway 1, kaiwaka 0573, new zealand</Address>
+                  <YCoordinate>174.4433817</YCoordinate>
+                  <XCoordinate>-36.1645629</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>31_7_36_40</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>2/6/2015 9:00:00 AM +00:00</ActiveStartTime>
+                <ActiveEndTime>2/6/2015 9:45:00 AM +00:00</ActiveEndTime>
+                <Duration>00:45:00</Duration>
+                <StartTime>2/6/2015 9:00:00 AM +00:00</StartTime>
+                <EndTime>2/6/2015 9:45:00 AM +00:00</EndTime>
+              </EventSubSchedule>
+            </EventSubSchedules>
+            <RepetitionFlag>False</RepetitionFlag>
+            <Completed>False</Completed>
+          </RepeatCalendarEvent>
+          <RepeatCalendarEvent>
+            <Recurrence />
+            <MiscData>
+              <TypeSelection>0</TypeSelection>
+              <UserNote />
+            </MiscData>
+            <UIParams>
+              <Type>0</Type>
+              <Color>
+                <UserSelection>-1</UserSelection>
+                <Blue>127</Blue>
+                <Green>127</Green>
+                <Red>127</Red>
+                <Opacity>1</Opacity>
+              </Color>
+              <Visible>True</Visible>
+            </UIParams>
+            <Location>
+              <CheckCalendarEvent>0</CheckCalendarEvent>
+              <isNull>False</isNull>
+              <Description>work</Description>
+              <Address>work state highway 1, kaiwaka 0573, new zealand</Address>
+              <YCoordinate>174.4433817</YCoordinate>
+              <XCoordinate>-36.1645629</XCoordinate>
+            </Location>
+            <Enabled>True</Enabled>
+            <ID>31_7_41_0</ID>
+            <Name>Sun is rising</Name>
+            <StartTime>2/13/2015 12:00:00 AM +00:00</StartTime>
+            <PreDeadline>00:00:00</PreDeadline>
+            <PrepTime>00:00:00</PrepTime>
+            <Deadline>2/20/2015 11:59:00 PM +00:00</Deadline>
+            <Split>4</Split>
+            <Duration>03:00:00</Duration>
+            <RigidFlag>False</RigidFlag>
+            <EventSubSchedules>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>0</Type>
+                  <Color>
+                    <UserSelection>-1</UserSelection>
+                    <Blue>127</Blue>
+                    <Green>127</Green>
+                    <Red>127</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>work</Description>
+                  <Address>work state highway 1, kaiwaka 0573, new zealand</Address>
+                  <YCoordinate>174.4433817</YCoordinate>
+                  <XCoordinate>-36.1645629</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>31_7_41_42</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>2/20/2015 6:44:00 PM +00:00</ActiveStartTime>
+                <ActiveEndTime>2/20/2015 7:29:00 PM +00:00</ActiveEndTime>
+                <Duration>00:45:00</Duration>
+                <StartTime>2/20/2015 6:44:00 PM +00:00</StartTime>
+                <EndTime>2/20/2015 7:29:00 PM +00:00</EndTime>
+              </EventSubSchedule>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>0</Type>
+                  <Color>
+                    <UserSelection>-1</UserSelection>
+                    <Blue>127</Blue>
+                    <Green>127</Green>
+                    <Red>127</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>work</Description>
+                  <Address>work state highway 1, kaiwaka 0573, new zealand</Address>
+                  <YCoordinate>174.4433817</YCoordinate>
+                  <XCoordinate>-36.1645629</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>31_7_41_43</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>2/20/2015 7:29:00 PM +00:00</ActiveStartTime>
+                <ActiveEndTime>2/20/2015 8:14:00 PM +00:00</ActiveEndTime>
+                <Duration>00:45:00</Duration>
+                <StartTime>2/20/2015 7:29:00 PM +00:00</StartTime>
+                <EndTime>2/20/2015 8:14:00 PM +00:00</EndTime>
+              </EventSubSchedule>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>0</Type>
+                  <Color>
+                    <UserSelection>-1</UserSelection>
+                    <Blue>127</Blue>
+                    <Green>127</Green>
+                    <Red>127</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>work</Description>
+                  <Address>work state highway 1, kaiwaka 0573, new zealand</Address>
+                  <YCoordinate>174.4433817</YCoordinate>
+                  <XCoordinate>-36.1645629</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>31_7_41_44</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>2/20/2015 8:14:00 PM +00:00</ActiveStartTime>
+                <ActiveEndTime>2/20/2015 8:59:00 PM +00:00</ActiveEndTime>
+                <Duration>00:45:00</Duration>
+                <StartTime>2/20/2015 8:14:00 PM +00:00</StartTime>
+                <EndTime>2/20/2015 8:59:00 PM +00:00</EndTime>
+              </EventSubSchedule>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>0</Type>
+                  <Color>
+                    <UserSelection>-1</UserSelection>
+                    <Blue>127</Blue>
+                    <Green>127</Green>
+                    <Red>127</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>work</Description>
+                  <Address>work state highway 1, kaiwaka 0573, new zealand</Address>
+                  <YCoordinate>174.4433817</YCoordinate>
+                  <XCoordinate>-36.1645629</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>31_7_41_45</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>2/20/2015 8:59:00 PM +00:00</ActiveStartTime>
+                <ActiveEndTime>2/20/2015 9:44:00 PM +00:00</ActiveEndTime>
+                <Duration>00:45:00</Duration>
+                <StartTime>2/20/2015 8:59:00 PM +00:00</StartTime>
+                <EndTime>2/20/2015 9:44:00 PM +00:00</EndTime>
+              </EventSubSchedule>
+            </EventSubSchedules>
+            <RepetitionFlag>False</RepetitionFlag>
+            <Completed>False</Completed>
+          </RepeatCalendarEvent>
+          <RepeatCalendarEvent>
+            <Recurrence />
+            <MiscData>
+              <TypeSelection>0</TypeSelection>
+              <UserNote />
+            </MiscData>
+            <UIParams>
+              <Type>0</Type>
+              <Color>
+                <UserSelection>-1</UserSelection>
+                <Blue>127</Blue>
+                <Green>127</Green>
+                <Red>127</Red>
+                <Opacity>1</Opacity>
+              </Color>
+              <Visible>True</Visible>
+            </UIParams>
+            <Location>
+              <CheckCalendarEvent>0</CheckCalendarEvent>
+              <isNull>False</isNull>
+              <Description>work</Description>
+              <Address>work state highway 1, kaiwaka 0573, new zealand</Address>
+              <YCoordinate>174.4433817</YCoordinate>
+              <XCoordinate>-36.1645629</XCoordinate>
+            </Location>
+            <Enabled>True</Enabled>
+            <ID>31_7_46_0</ID>
+            <Name>Sun is rising</Name>
+            <StartTime>2/20/2015 12:00:00 AM +00:00</StartTime>
+            <PreDeadline>00:00:00</PreDeadline>
+            <PrepTime>00:00:00</PrepTime>
+            <Deadline>2/27/2015 11:59:00 PM +00:00</Deadline>
+            <Split>4</Split>
+            <Duration>03:00:00</Duration>
+            <RigidFlag>False</RigidFlag>
+            <EventSubSchedules>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>0</Type>
+                  <Color>
+                    <UserSelection>-1</UserSelection>
+                    <Blue>127</Blue>
+                    <Green>127</Green>
+                    <Red>127</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>work</Description>
+                  <Address>work state highway 1, kaiwaka 0573, new zealand</Address>
+                  <YCoordinate>174.4433817</YCoordinate>
+                  <XCoordinate>-36.1645629</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>31_7_46_47</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>2/20/2015 9:44:00 PM +00:00</ActiveStartTime>
+                <ActiveEndTime>2/20/2015 10:29:00 PM +00:00</ActiveEndTime>
+                <Duration>00:45:00</Duration>
+                <StartTime>2/20/2015 9:44:00 PM +00:00</StartTime>
+                <EndTime>2/20/2015 10:29:00 PM +00:00</EndTime>
+              </EventSubSchedule>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>0</Type>
+                  <Color>
+                    <UserSelection>-1</UserSelection>
+                    <Blue>127</Blue>
+                    <Green>127</Green>
+                    <Red>127</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>work</Description>
+                  <Address>work state highway 1, kaiwaka 0573, new zealand</Address>
+                  <YCoordinate>174.4433817</YCoordinate>
+                  <XCoordinate>-36.1645629</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>31_7_46_48</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>2/20/2015 10:29:00 PM +00:00</ActiveStartTime>
+                <ActiveEndTime>2/20/2015 11:14:00 PM +00:00</ActiveEndTime>
+                <Duration>00:45:00</Duration>
+                <StartTime>2/20/2015 10:29:00 PM +00:00</StartTime>
+                <EndTime>2/20/2015 11:14:00 PM +00:00</EndTime>
+              </EventSubSchedule>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>0</Type>
+                  <Color>
+                    <UserSelection>-1</UserSelection>
+                    <Blue>127</Blue>
+                    <Green>127</Green>
+                    <Red>127</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>work</Description>
+                  <Address>work state highway 1, kaiwaka 0573, new zealand</Address>
+                  <YCoordinate>174.4433817</YCoordinate>
+                  <XCoordinate>-36.1645629</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>31_7_46_49</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>2/20/2015 11:14:00 PM +00:00</ActiveStartTime>
+                <ActiveEndTime>2/20/2015 11:59:00 PM +00:00</ActiveEndTime>
+                <Duration>00:45:00</Duration>
+                <StartTime>2/20/2015 11:14:00 PM +00:00</StartTime>
+                <EndTime>2/20/2015 11:59:00 PM +00:00</EndTime>
+              </EventSubSchedule>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>0</Type>
+                  <Color>
+                    <UserSelection>-1</UserSelection>
+                    <Blue>127</Blue>
+                    <Green>127</Green>
+                    <Red>127</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>work</Description>
+                  <Address>work state highway 1, kaiwaka 0573, new zealand</Address>
+                  <YCoordinate>174.4433817</YCoordinate>
+                  <XCoordinate>-36.1645629</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>31_7_46_50</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>2/27/2015 11:14:00 PM +00:00</ActiveStartTime>
+                <ActiveEndTime>2/27/2015 11:59:00 PM +00:00</ActiveEndTime>
+                <Duration>00:45:00</Duration>
+                <StartTime>2/27/2015 11:14:00 PM +00:00</StartTime>
+                <EndTime>2/27/2015 11:59:00 PM +00:00</EndTime>
+              </EventSubSchedule>
+            </EventSubSchedules>
+            <RepetitionFlag>False</RepetitionFlag>
+            <Completed>False</Completed>
+          </RepeatCalendarEvent>
+        </RepeatCalendarEvents>
+        <RepeatCountOfLowerLayer>0</RepeatCountOfLowerLayer>
+        <RepeatDays />
+        <RepeatDay>7</RepeatDay>
+        <RepeatFrequency>WEEKLY</RepeatFrequency>
+        <RepeatEndDate>2/25/2015 12:00:00 AM +00:00</RepeatEndDate>
+        <RepeatStartDate>2/6/2015 12:00:00 AM +00:00</RepeatStartDate>
+      </Recurrence>
+      <MiscData>
+        <TypeSelection>0</TypeSelection>
+        <UserNote />
+      </MiscData>
+      <UIParams>
+        <Type>0</Type>
+        <Color>
+          <UserSelection>-1</UserSelection>
+          <Blue>127</Blue>
+          <Green>127</Green>
+          <Red>127</Red>
+          <Opacity>1</Opacity>
+        </Color>
+        <Visible>True</Visible>
+      </UIParams>
+      <Location>
+        <CheckCalendarEvent>0</CheckCalendarEvent>
+        <isNull>False</isNull>
+        <Description>work</Description>
+        <Address>work state highway 1, kaiwaka 0573, new zealand</Address>
+        <YCoordinate>174.4433817</YCoordinate>
+        <XCoordinate>-36.1645629</XCoordinate>
+      </Location>
+      <Enabled>True</Enabled>
+      <ID>31_7_0_0</ID>
+      <Name>Sun is rising</Name>
+      <StartTime>2/6/2015 12:00:00 AM +00:00</StartTime>
+      <PreDeadline>00:00:00</PreDeadline>
+      <PrepTime>00:00:00</PrepTime>
+      <Deadline>2/25/2015 11:59:00 PM +00:00</Deadline>
+      <Split>4</Split>
+      <Duration>03:00:00</Duration>
+      <RigidFlag>False</RigidFlag>
+      <EventSubSchedules />
+      <RepetitionFlag>True</RepetitionFlag>
+      <Completed>False</Completed>
+    </EventSchedule>
+    <EventSchedule>
+      <Recurrence />
+      <MiscData>
+        <TypeSelection>0</TypeSelection>
+        <UserNote />
+      </MiscData>
+      <UIParams>
+        <Type>0</Type>
+        <Color>
+          <UserSelection>-1</UserSelection>
+          <Blue>127</Blue>
+          <Green>127</Green>
+          <Red>127</Red>
+          <Opacity>1</Opacity>
+        </Color>
+        <Visible>True</Visible>
+      </UIParams>
+      <Location>
+        <CheckCalendarEvent>0</CheckCalendarEvent>
+        <isNull>False</isNull>
+        <Description>work</Description>
+        <Address>work state highway 1, kaiwaka 0573, new zealand</Address>
+        <YCoordinate>174.4433817</YCoordinate>
+        <XCoordinate>-36.1645629</XCoordinate>
+      </Location>
+      <Enabled>True</Enabled>
+      <ID>56_7_0_0</ID>
+      <Name>Lost get found</Name>
+      <StartTime>2/6/2015 12:00:00 AM +00:00</StartTime>
+      <PreDeadline>00:00:00</PreDeadline>
+      <PrepTime>00:00:00</PrepTime>
+      <Deadline>2/7/2015 11:59:00 PM +00:00</Deadline>
+      <Split>1</Split>
+      <Duration>00:45:00</Duration>
+      <RigidFlag>False</RigidFlag>
+      <EventSubSchedules>
+        <EventSubSchedule>
+          <ConflictProfile>
+            <ConflictIDs />
+            <Flag>False</Flag>
+            <Type>0</Type>
+          </ConflictProfile>
+          <MiscData>
+            <TypeSelection>0</TypeSelection>
+            <UserNote />
+          </MiscData>
+          <UIParams>
+            <Type>0</Type>
+            <Color>
+              <UserSelection>-1</UserSelection>
+              <Blue>127</Blue>
+              <Green>127</Green>
+              <Red>127</Red>
+              <Opacity>1</Opacity>
+            </Color>
+            <Visible>True</Visible>
+          </UIParams>
+          <Location>
+            <CheckCalendarEvent>0</CheckCalendarEvent>
+            <isNull>False</isNull>
+            <Description>work</Description>
+            <Address>work state highway 1, kaiwaka 0573, new zealand</Address>
+            <YCoordinate>174.4433817</YCoordinate>
+            <XCoordinate>-36.1645629</XCoordinate>
+          </Location>
+          <Complete>False</Complete>
+          <Enabled>False</Enabled>
+          <ID>56_7_0_57</ID>
+          <ThirdPartyID />
+          <PrepTime>00:00:00</PrepTime>
+          <ActiveStartTime>2/7/2015 12:00:00 AM +00:00</ActiveStartTime>
+          <ActiveEndTime>2/7/2015 12:45:00 AM +00:00</ActiveEndTime>
+          <Duration>00:45:00</Duration>
+          <StartTime>2/7/2015 12:00:00 AM +00:00</StartTime>
+          <EndTime>2/7/2015 12:45:00 AM +00:00</EndTime>
+        </EventSubSchedule>
+      </EventSubSchedules>
+      <RepetitionFlag>False</RepetitionFlag>
+      <Completed>False</Completed>
+    </EventSchedule>
+  </EventSchedules>
+  <LocationCache>
+    <Locations>
+      <Location>
+        <CachedName>work</CachedName>
+        <LocationID>2</LocationID>
+        <CheckCalendarEvent>0</CheckCalendarEvent>
+        <isNull>False</isNull>
+        <Description>Work</Description>
+        <Address>work state highway 1, kaiwaka 0573, new zealand</Address>
+        <YCoordinate>174.4433817</YCoordinate>
+        <XCoordinate>-36.1645629</XCoordinate>
+      </Location>
+    </Locations>
+    <LastID>2</LastID>
+  </LocationCache>
+</ScheduleLog>

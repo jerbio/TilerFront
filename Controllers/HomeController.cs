@@ -26,11 +26,5 @@ namespace TilerFront.Controllers
 
             return View();
         }
-
-        public ActionResult Desktop()
-        {
-            ViewBag.Message = "Welcome To Tiler";
-            return View();
-        }
     }
 }

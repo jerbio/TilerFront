@@ -297,7 +297,7 @@ body {
 {
   position:absolute;
   right: 30px;
-  width: 200px;
+  width: 250px;
   top: 0;
   height:100%;
 }
@@ -331,6 +331,14 @@ body {
 #ControlPanelDeleteButton:hover { background-position: -45px -45px;}
 #ControlPanelLocationButton { background-position: -90px 0; }
 #ControlPanelLocationButton:hover { background-position: -90px -45px; }
+#ControlPanelCompleteButton { background-position: -180px 0; }
+#ControlPanelCompleteButton:hover { background-position: -180px -45px; }
+#ControlPanelSearchButton { 
+  right: 87px;
+  top: -5px;
+  position: absolute;
+  background-position: -225px 0; }
+#ControlPanelSearchButton:hover { background-position: -225px -45px; }
 
 /*
 .InfoControlPanel 
@@ -544,4 +552,28 @@ body {
 {
     border:white 1px solid;
     height: 60px;
+}
+
+#ConfirmDeleteModal {
+  height: 14%;
+  width: 100%;
+  background-color: white;
+  z-index: 1;
+  position: fixed;
+  bottom: 0;
+  display: none;
+}
+#ConfirmDeleteModal div {
+  margin-top: 3%;
+  width: 651px;
+  margin-left: auto;
+  margin-right: auto;
+
+}
+
+
+#DeleteMessage {
+    position:absolute;
+    top:0;
+    text-align:center;
 }

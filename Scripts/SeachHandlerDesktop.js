@@ -22,12 +22,14 @@
             return;
         }
     }
-    if (ActivateUserSearch.isSearchOn)
+
+
+    if (!ActivateUserSearch.isSearchOn)
     {
         return;
     }
 
-    if((e.which<46)||(e.which>91))
+    if((e.which<46)||(e.which>90))
     {
         return;
     }
@@ -41,7 +43,21 @@
     
 }
 
+ActivateUserSearch.setSearchAsOff = function ()
+{
+    document.onkeydown = null;
+    ActivateUserSearch.isSearchOn = false;
+}
 
-ActivateUserSearch.isSearchOn = false;
+ActivateUserSearch.setSearchAsOn = function () {
+    document.onkeydown = ActivateUserSearch;
+    ActivateUserSearch.isSearchOn = true;
+}
+
+ActivateUserSearch.getSearch = function ()
+{
+    ActivateUserSearch.isSearchOn = searchStatus;
+}
+ActivateUserSearch.isSearchOn = true;
 ActivateUserSearch.AutoSuggest = {};
 document.onkeydown = ActivateUserSearch;
