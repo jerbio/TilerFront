@@ -6,6 +6,7 @@ using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Net;
+using Microsoft.AspNet.Identity.EntityFramework;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web;
@@ -59,6 +60,17 @@ namespace TilerFront.Controllers
             return user;
         }
 
+
+        public async Task SaveUser(ApplicationUser user)
+        {
+            
+            var store = new UserStore<ApplicationUser>(db);
+
+            var manager = new ApplicationUserManager(store);
+            await manager.UpdateAsync(user);
+            var ctx = store.Context;
+            await ctx.SaveChangesAsync();
+        }
 
         /*
         [NonAction]

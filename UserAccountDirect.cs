@@ -10,7 +10,7 @@ namespace TilerFront
     public class UserAccountDirect:UserAccount
     {
         Models.ApplicationUser sessionUser;
-        //private LogControlDirect UserLog;
+        LogControlDirect UserLog;
 
         public UserAccountDirect(Models.ApplicationUser user)
         {
@@ -57,12 +57,12 @@ namespace TilerFront
         {
             return await UserLog.DeleteLog();
         }
-        /*
-        override async public Task CommitEventToLog(IEnumerable<CalendarEvent> AllEvents, string LatestID, string LogFile = "")
+        
+        async public Task CommitEventToLog(IEnumerable<CalendarEvent> AllEvents, string LatestID, string LogFile = "")
         {
-            await UserLog.WriteToLog(AllEvents, LatestID, LogFile);
+            await UserLog.WriteToLog(AllEvents,sessionUser, LatestID, LogFile);
         }
-        */
+        
         override public bool DeleteAllCalendarEvents()
         {
             bool retValue = false;

@@ -1,0 +1,262 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ScheduleLog>
+  <LastIDCounter>6</LastIDCounter>
+  <referenceDay>12:00 AM</referenceDay>
+  <EventSchedules>
+    <EventSchedule>
+      <Recurrence />
+      <MiscData>
+        <TypeSelection>0</TypeSelection>
+        <UserNote />
+      </MiscData>
+      <UIParams>
+        <Type>0</Type>
+        <Color>
+          <UserSelection>-1</UserSelection>
+          <Blue>127</Blue>
+          <Green>127</Green>
+          <Red>127</Red>
+          <Opacity>1</Opacity>
+        </Color>
+        <Visible>True</Visible>
+      </UIParams>
+      <Location>
+        <CheckCalendarEvent>0</CheckCalendarEvent>
+        <isNull>False</isNull>
+        <Description>School</Description>
+        <Address>engineering, potrero, malabon, metro manila, philippines</Address>
+        <YCoordinate>120.9947346</YCoordinate>
+        <XCoordinate>14.6683954</XCoordinate>
+      </Location>
+      <Enabled>True</Enabled>
+      <ID>1_7_0_0</ID>
+      <Name>Data Mining Class</Name>
+      <StartTime>1/15/2015 12:30:00 PM</StartTime>
+      <PreDeadline>00:00:00</PreDeadline>
+      <PrepTime>00:00:00</PrepTime>
+      <Deadline>1/15/2015 3:45:00 PM</Deadline>
+      <Split>1</Split>
+      <Duration>03:15:00</Duration>
+      <RigidFlag>True</RigidFlag>
+      <EventSubSchedules>
+        <EventSubSchedule>
+          <ConflictProfile>
+            <ConflictIDs />
+            <Flag>False</Flag>
+            <Type>0</Type>
+          </ConflictProfile>
+          <MiscData>
+            <TypeSelection>0</TypeSelection>
+            <UserNote />
+          </MiscData>
+          <UIParams>
+            <Type>1</Type>
+            <Color>
+              <UserSelection>2</UserSelection>
+              <Blue>128</Blue>
+              <Green>255</Green>
+              <Red>38</Red>
+              <Opacity>1</Opacity>
+            </Color>
+            <Visible>True</Visible>
+          </UIParams>
+          <Location>
+            <CheckCalendarEvent>0</CheckCalendarEvent>
+            <isNull>False</isNull>
+            <Description>School</Description>
+            <Address>engineering, potrero, malabon, metro manila, philippines</Address>
+            <YCoordinate>120.9947346</YCoordinate>
+            <XCoordinate>14.6683954</XCoordinate>
+          </Location>
+          <Complete>False</Complete>
+          <Enabled>True</Enabled>
+          <ID>1_7_0_2</ID>
+          <ThirdPartyID />
+          <PrepTime>00:00:00</PrepTime>
+          <ActiveStartTime>1/15/2015 12:30:00 PM</ActiveStartTime>
+          <ActiveEndTime>1/15/2015 3:45:00 PM</ActiveEndTime>
+          <Duration>03:15:00</Duration>
+          <StartTime>1/15/2015 12:30:00 PM</StartTime>
+          <EndTime>1/15/2015 3:45:00 PM</EndTime>
+        </EventSubSchedule>
+      </EventSubSchedules>
+      <RepetitionFlag>False</RepetitionFlag>
+      <Completed>False</Completed>
+    </EventSchedule>
+    <EventSchedule>
+      <Recurrence />
+      <MiscData>
+        <TypeSelection>0</TypeSelection>
+        <UserNote />
+      </MiscData>
+      <UIParams>
+        <Type>0</Type>
+        <Color>
+          <UserSelection>-1</UserSelection>
+          <Blue>127</Blue>
+          <Green>127</Green>
+          <Red>127</Red>
+          <Opacity>1</Opacity>
+        </Color>
+        <Visible>True</Visible>
+      </UIParams>
+      <Location>
+        <CheckCalendarEvent>0</CheckCalendarEvent>
+        <isNull>False</isNull>
+        <Description />
+        <Address />
+        <YCoordinate>120.9947346</YCoordinate>
+        <XCoordinate>14.6683954</XCoordinate>
+      </Location>
+      <Enabled>True</Enabled>
+      <ID>3_7_0_0</ID>
+      <Name>Calc Study Time</Name>
+      <StartTime>1/15/2015 2:59:00 PM</StartTime>
+      <PreDeadline>00:00:00</PreDeadline>
+      <PrepTime>00:00:00</PrepTime>
+      <Deadline>1/16/2015 5:00:00 PM</Deadline>
+      <Split>1</Split>
+      <Duration>03:00:00</Duration>
+      <RigidFlag>False</RigidFlag>
+      <EventSubSchedules>
+        <EventSubSchedule>
+          <ConflictProfile>
+            <ConflictIDs />
+            <Flag>False</Flag>
+            <Type>0</Type>
+          </ConflictProfile>
+          <MiscData>
+            <TypeSelection>0</TypeSelection>
+            <UserNote />
+          </MiscData>
+          <UIParams>
+            <Type>1</Type>
+            <Color>
+              <UserSelection>3</UserSelection>
+              <Blue>0</Blue>
+              <Green>0</Green>
+              <Red>255</Red>
+              <Opacity>1</Opacity>
+            </Color>
+            <Visible>True</Visible>
+          </UIParams>
+          <Location>
+            <CheckCalendarEvent>0</CheckCalendarEvent>
+            <isNull>False</isNull>
+            <Description />
+            <Address />
+            <YCoordinate>120.9947346</YCoordinate>
+            <XCoordinate>14.6683954</XCoordinate>
+          </Location>
+          <Complete>False</Complete>
+          <Enabled>True</Enabled>
+          <ID>3_7_0_4</ID>
+          <ThirdPartyID />
+          <PrepTime>00:00:00</PrepTime>
+          <ActiveStartTime>1/15/2015 6:12:00 PM</ActiveStartTime>
+          <ActiveEndTime>1/15/2015 9:12:00 PM</ActiveEndTime>
+          <Duration>03:00:00</Duration>
+          <StartTime>1/15/2015 6:12:00 PM</StartTime>
+          <EndTime>1/15/2015 9:12:00 PM</EndTime>
+        </EventSubSchedule>
+      </EventSubSchedules>
+      <RepetitionFlag>False</RepetitionFlag>
+      <Completed>False</Completed>
+    </EventSchedule>
+    <EventSchedule>
+      <Recurrence />
+      <MiscData>
+        <TypeSelection>0</TypeSelection>
+        <UserNote />
+      </MiscData>
+      <UIParams>
+        <Type>1</Type>
+        <Color>
+          <UserSelection>6</UserSelection>
+          <Blue>33</Blue>
+          <Green>255</Green>
+          <Red>125</Red>
+          <Opacity>1</Opacity>
+        </Color>
+        <Visible>True</Visible>
+      </UIParams>
+      <Location>
+        <CheckCalendarEvent>0</CheckCalendarEvent>
+        <isNull>True</isNull>
+        <Description />
+        <Address />
+        <YCoordinate>1.79769313486232E+308</YCoordinate>
+        <XCoordinate>1.79769313486232E+308</XCoordinate>
+      </Location>
+      <Enabled>True</Enabled>
+      <ID>5_7_0_0</ID>
+      <Name>Meeting</Name>
+      <StartTime>1/15/2015 4:00:00 PM</StartTime>
+      <PreDeadline>00:00:00</PreDeadline>
+      <PrepTime>00:00:00</PrepTime>
+      <Deadline>1/15/2015 6:00:00 PM</Deadline>
+      <Split>1</Split>
+      <Duration>02:00:00</Duration>
+      <RigidFlag>True</RigidFlag>
+      <EventSubSchedules>
+        <EventSubSchedule>
+          <ConflictProfile>
+            <ConflictIDs />
+            <Flag>False</Flag>
+            <Type>0</Type>
+          </ConflictProfile>
+          <MiscData>
+            <TypeSelection>0</TypeSelection>
+            <UserNote />
+          </MiscData>
+          <UIParams>
+            <Type>1</Type>
+            <Color>
+              <UserSelection>6</UserSelection>
+              <Blue>33</Blue>
+              <Green>255</Green>
+              <Red>125</Red>
+              <Opacity>1</Opacity>
+            </Color>
+            <Visible>True</Visible>
+          </UIParams>
+          <Location>
+            <CheckCalendarEvent>0</CheckCalendarEvent>
+            <isNull>True</isNull>
+            <Description />
+            <Address />
+            <YCoordinate>1.79769313486232E+308</YCoordinate>
+            <XCoordinate>1.79769313486232E+308</XCoordinate>
+          </Location>
+          <Complete>False</Complete>
+          <Enabled>True</Enabled>
+          <ID>5_7_0_6</ID>
+          <ThirdPartyID />
+          <PrepTime>00:00:00</PrepTime>
+          <ActiveStartTime>1/15/2015 4:00:00 PM</ActiveStartTime>
+          <ActiveEndTime>1/15/2015 6:00:00 PM</ActiveEndTime>
+          <Duration>02:00:00</Duration>
+          <StartTime>1/15/2015 4:00:00 PM</StartTime>
+          <EndTime>1/15/2015 6:00:00 PM</EndTime>
+        </EventSubSchedule>
+      </EventSubSchedules>
+      <RepetitionFlag>False</RepetitionFlag>
+      <Completed>False</Completed>
+    </EventSchedule>
+  </EventSchedules>
+  <LocationCache>
+    <Locations>
+      <Location>
+        <CachedName>school</CachedName>
+        <LocationID>2</LocationID>
+        <CheckCalendarEvent>0</CheckCalendarEvent>
+        <isNull>False</isNull>
+        <Description>School</Description>
+        <Address>engineering, potrero, malabon, metro manila, philippines</Address>
+        <YCoordinate>120.9947346</YCoordinate>
+        <XCoordinate>14.6683954</XCoordinate>
+      </Location>
+    </Locations>
+    <LastID>2</LastID>
+  </LocationCache>
+</ScheduleLog>

@@ -1,0 +1,228 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ScheduleLog>
+  <LastIDCounter>7</LastIDCounter>
+  <referenceDay>12:00 AM</referenceDay>
+  <EventSchedules>
+    <EventSchedule>
+      <Recurrence />
+      <MiscData>
+        <TypeSelection>0</TypeSelection>
+        <UserNote />
+      </MiscData>
+      <UIParams>
+        <Type>0</Type>
+        <Color>
+          <Blue>127</Blue>
+          <Green>127</Green>
+          <Red>127</Red>
+          <Opacity>1</Opacity>
+        </Color>
+        <Visible>True</Visible>
+      </UIParams>
+      <Location>
+        <CheckCalendarEvent>0</CheckCalendarEvent>
+        <isNull>False</isNull>
+        <Description>Client Location</Description>
+        <Address>bae systems, merrimack, nh 03054, usa</Address>
+        <YCoordinate>-71.4884001</YCoordinate>
+        <XCoordinate>42.8131429</XCoordinate>
+      </Location>
+      <Enabled>True</Enabled>
+      <ID>1</ID>
+      <Name>Arrive client site</Name>
+      <StartTime>8/18/2014 6:00:00 PM</StartTime>
+      <PreDeadline>00:00:00</PreDeadline>
+      <PrepTime>00:00:00</PrepTime>
+      <Deadline>8/19/2014 11:59:00 PM</Deadline>
+      <Split>1</Split>
+      <Duration>00:00:00</Duration>
+      <RigidFlag>False</RigidFlag>
+      <EventSubSchedules>
+        <EventSubSchedule>
+          <MiscData>
+            <TypeSelection>0</TypeSelection>
+            <UserNote />
+          </MiscData>
+          <UIParams>
+            <Type>0</Type>
+            <Color>
+              <Blue>127</Blue>
+              <Green>127</Green>
+              <Red>127</Red>
+              <Opacity>1</Opacity>
+            </Color>
+            <Visible>True</Visible>
+          </UIParams>
+          <Location>
+            <CheckCalendarEvent>0</CheckCalendarEvent>
+            <isNull>False</isNull>
+            <Description>Client Location</Description>
+            <Address>bae systems, merrimack, nh 03054, usa</Address>
+            <YCoordinate>-71.4884001</YCoordinate>
+            <XCoordinate>42.8131429</XCoordinate>
+          </Location>
+          <Complete>False</Complete>
+          <Enabled>True</Enabled>
+          <ID>1_2</ID>
+          <ThirdPartyID />
+          <PrepTime>00:00:00</PrepTime>
+          <ActiveStartTime>8/19/2014 11:59:00 PM</ActiveStartTime>
+          <ActiveEndTime>8/19/2014 11:59:00 PM</ActiveEndTime>
+          <Duration>00:00:00</Duration>
+          <StartTime>8/19/2014 11:59:00 PM</StartTime>
+          <EndTime>8/19/2014 11:59:00 PM</EndTime>
+        </EventSubSchedule>
+      </EventSubSchedules>
+      <RepetitionFlag>False</RepetitionFlag>
+      <Completed>False</Completed>
+    </EventSchedule>
+    <EventSchedule>
+      <Recurrence />
+      <MiscData>
+        <TypeSelection>0</TypeSelection>
+        <UserNote />
+      </MiscData>
+      <UIParams>
+        <Type>0</Type>
+        <Color>
+          <Blue>127</Blue>
+          <Green>127</Green>
+          <Red>127</Red>
+          <Opacity>1</Opacity>
+        </Color>
+        <Visible>True</Visible>
+      </UIParams>
+      <Location>
+        <CheckCalendarEvent>0</CheckCalendarEvent>
+        <isNull>True</isNull>
+        <Description>mdm</Description>
+        <Address>Train</Address>
+        <YCoordinate>1.79769313486232E+308</YCoordinate>
+        <XCoordinate>1.79769313486232E+308</XCoordinate>
+      </Location>
+      <Enabled>True</Enabled>
+      <ID>3</ID>
+      <Name>Visio Design</Name>
+      <StartTime>8/18/2014 2:30:00 PM</StartTime>
+      <PreDeadline>00:00:00</PreDeadline>
+      <PrepTime>00:00:00</PrepTime>
+      <Deadline>8/19/2014 11:59:00 PM</Deadline>
+      <Split>1</Split>
+      <Duration>00:05:00</Duration>
+      <RigidFlag>False</RigidFlag>
+      <EventSubSchedules>
+        <EventSubSchedule>
+          <MiscData>
+            <TypeSelection>0</TypeSelection>
+            <UserNote />
+          </MiscData>
+          <UIParams>
+            <Type>0</Type>
+            <Color>
+              <Blue>127</Blue>
+              <Green>127</Green>
+              <Red>127</Red>
+              <Opacity>1</Opacity>
+            </Color>
+            <Visible>True</Visible>
+          </UIParams>
+          <Location>
+            <CheckCalendarEvent>0</CheckCalendarEvent>
+            <isNull>True</isNull>
+            <Description>mdm</Description>
+            <Address>Train</Address>
+            <YCoordinate>1.79769313486232E+308</YCoordinate>
+            <XCoordinate>1.79769313486232E+308</XCoordinate>
+          </Location>
+          <Complete>False</Complete>
+          <Enabled>True</Enabled>
+          <ID>3_4</ID>
+          <ThirdPartyID />
+          <PrepTime>00:00:00</PrepTime>
+          <ActiveStartTime>8/18/2014 8:09:22 AM</ActiveStartTime>
+          <ActiveEndTime>8/18/2014 8:14:22 AM</ActiveEndTime>
+          <Duration>00:05:00</Duration>
+          <StartTime>8/18/2014 8:09:22 AM</StartTime>
+          <EndTime>8/18/2014 8:14:22 AM</EndTime>
+        </EventSubSchedule>
+      </EventSubSchedules>
+      <RepetitionFlag>False</RepetitionFlag>
+      <Completed>False</Completed>
+    </EventSchedule>
+  </EventSchedules>
+  <LocationCache>
+    <Locations>
+      <Location>
+        <CachedName>client location</CachedName>
+        <LocationID>2</LocationID>
+        <CheckCalendarEvent>0</CheckCalendarEvent>
+        <isNull>False</isNull>
+        <Description>Client Location</Description>
+        <Address>bae systems, merrimack, nh 03054, usa</Address>
+        <YCoordinate>-71.4884001</YCoordinate>
+        <XCoordinate>42.8131429</XCoordinate>
+      </Location>
+      <Location>
+        <CachedName>client location</CachedName>
+        <LocationID>3</LocationID>
+        <CheckCalendarEvent>0</CheckCalendarEvent>
+        <isNull>False</isNull>
+        <Description>Client Location</Description>
+        <Address>bae systems, merrimack, nh 03054, usa</Address>
+        <YCoordinate>-71.4884001</YCoordinate>
+        <XCoordinate>42.8131429</XCoordinate>
+      </Location>
+      <Location>
+        <CachedName>client location</CachedName>
+        <LocationID>4</LocationID>
+        <CheckCalendarEvent>0</CheckCalendarEvent>
+        <isNull>False</isNull>
+        <Description>Client Location</Description>
+        <Address>bae systems, merrimack, nh 03054, usa</Address>
+        <YCoordinate>-71.4884001</YCoordinate>
+        <XCoordinate>42.8131429</XCoordinate>
+      </Location>
+      <Location>
+        <CachedName>mdm</CachedName>
+        <LocationID>5</LocationID>
+        <CheckCalendarEvent>0</CheckCalendarEvent>
+        <isNull>False</isNull>
+        <Description>mdm</Description>
+        <Address>Train</Address>
+        <YCoordinate>1.79769313486232E+308</YCoordinate>
+        <XCoordinate>1.79769313486232E+308</XCoordinate>
+      </Location>
+      <Location>
+        <CachedName>client location</CachedName>
+        <LocationID>6</LocationID>
+        <CheckCalendarEvent>0</CheckCalendarEvent>
+        <isNull>False</isNull>
+        <Description>Client Location</Description>
+        <Address>bae systems, merrimack, nh 03054, usa</Address>
+        <YCoordinate>-71.4884001</YCoordinate>
+        <XCoordinate>42.8131429</XCoordinate>
+      </Location>
+      <Location>
+        <CachedName>mdm</CachedName>
+        <LocationID>7</LocationID>
+        <CheckCalendarEvent>0</CheckCalendarEvent>
+        <isNull>True</isNull>
+        <Description>mdm</Description>
+        <Address>Train</Address>
+        <YCoordinate>1.79769313486232E+308</YCoordinate>
+        <XCoordinate>1.79769313486232E+308</XCoordinate>
+      </Location>
+      <Location>
+        <CachedName>client location</CachedName>
+        <LocationID>8</LocationID>
+        <CheckCalendarEvent>0</CheckCalendarEvent>
+        <isNull>False</isNull>
+        <Description>Client Location</Description>
+        <Address>bae systems, merrimack, nh 03054, usa</Address>
+        <YCoordinate>-71.4884001</YCoordinate>
+        <XCoordinate>42.8131429</XCoordinate>
+      </Location>
+    </Locations>
+    <LastID>8</LastID>
+  </LocationCache>
+</ScheduleLog>

@@ -32,6 +32,8 @@ C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Microsoft.Web.Infra
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\My24HourTimerWPF.exe
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Newtonsoft.Json.dll
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Owin.dll
+C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\SendGrid.SmtpApi.dll
+C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\SendGridMail.dll
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\System.Net.Http.Formatting.dll
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\System.Web.Helpers.dll
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\System.Web.Http.dll
@@ -45,6 +47,9 @@ C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\System.Web.WebPages
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\TilerElements.dll
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\WebGrease.dll
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Google.Maps.dll
+C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Antlr3.Runtime.pdb
+C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\EntityFramework.xml
+C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\EntityFramework.SqlServer.xml
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Microsoft.ApplicationInsights.xml
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Microsoft.ApplicationInsights.Extensibility.RuntimeTelemetry.pdb
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Microsoft.ApplicationInsights.Extensibility.RuntimeTelemetry.xml
@@ -55,6 +60,7 @@ C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Microsoft.Threading
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Microsoft.Threading.Tasks.Extensions.xml
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Microsoft.Threading.Tasks.Extensions.Desktop.xml
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\My24HourTimerWPF.pdb
+C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Newtonsoft.Json.xml
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\System.Web.Helpers.xml
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\System.Web.Mvc.xml
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\System.Web.Optimization.xml
@@ -63,13 +69,9 @@ C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\System.Web.WebPages
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\System.Web.WebPages.Deployment.xml
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\System.Web.WebPages.Razor.xml
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\TilerElements.pdb
-C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Antlr3.Runtime.pdb
-C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Newtonsoft.Json.xml
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\System.Net.Http.Formatting.xml
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\System.Web.Http.xml
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\System.Web.Http.WebHost.xml
-C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\EntityFramework.xml
-C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\EntityFramework.SqlServer.xml
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Microsoft.AspNet.Identity.Core.xml
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Microsoft.AspNet.Identity.Owin.xml
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Microsoft.AspNet.Identity.EntityFramework.xml
@@ -83,9 +85,10 @@ C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Microsoft.Owin.Secu
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Microsoft.Owin.Security.Twitter.xml
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Microsoft.Owin.Security.MicrosoftAccount.xml
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Google.Maps.pdb
+C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.Migrations.init.resources
+C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.Migrations.Initial.resources
+C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.csproj.GenerateResource.Cache
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\ApplicationInsights.config
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.dll
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.pdb
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.csprojResolveAssemblyReference.cache
-C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.Migrations.init.resources
-C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.csproj.GenerateResource.Cache

@@ -54,15 +54,16 @@ namespace TilerFront
             //   consumerKey: "",
             //   consumerSecret: "");
 
-            //app.UseFacebookAuthentication(
-            //   appId: "",
-            //   appSecret: "");
+            app.UseFacebookAuthentication(
+               appId: "1530915617167749",
+               appSecret: "c68800eb9d3bf8eb9fd20ac1891cda5b");
 
-            //app.UseGoogleAuthentication(new GoogleOAuth2AuthenticationOptions()
-            //{
-            //    ClientId = "",
-            //    ClientSecret = ""
-            //});
+            app.UseGoogleAuthentication(new GoogleOAuth2AuthenticationOptions()
+            {
+                ClientId = "518133740160-i5ie6s4h802048gujtmui1do8h2lqlfj.apps.googleusercontent.com",
+                ClientSecret = "NKRal5rA8NM5qHnmiigU6kWh"
+            });
+            
         }
     }
 }

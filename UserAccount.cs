@@ -137,9 +137,9 @@ namespace TilerFront
             UserLog.WriteToLog(MyCalEvent);
         }
         */
-        virtual async public Task  CommitEventToLog(IEnumerable<CalendarEvent> AllEvents,string LatestID,string LogFile="")
+        virtual async public Task  CommitEventToLogOld(IEnumerable<CalendarEvent> AllEvents,string LatestID,string LogFile="")
         {
-            await UserLog.WriteToLog(AllEvents, LatestID, LogFile);
+            await UserLog.WriteToLogOld(AllEvents, LatestID, LogFile);
         }
 #if ForceReadFromXml
 #else

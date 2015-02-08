@@ -1,0 +1,3412 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ScheduleLog>
+  <LastIDCounter>369</LastIDCounter>
+  <referenceDay>7:00 AM</referenceDay>
+  <EventSchedules>
+    <EventSchedule>
+      <Recurrence>
+        <RepeatCalendarEvents>
+          <RepeatCalendarEvent>
+            <Recurrence />
+            <MiscData>
+              <TypeSelection>0</TypeSelection>
+              <UserNote />
+            </MiscData>
+            <UIParams>
+              <Type>0</Type>
+              <Color>
+                <UserSelection>-1</UserSelection>
+                <Blue>127</Blue>
+                <Green>127</Green>
+                <Red>127</Red>
+                <Opacity>1</Opacity>
+              </Color>
+              <Visible>True</Visible>
+            </UIParams>
+            <Location>
+              <CheckCalendarEvent>0</CheckCalendarEvent>
+              <isNull>False</isNull>
+              <Description>School</Description>
+              <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+              <YCoordinate>-105.2627072</YCoordinate>
+              <XCoordinate>40.0071657</XCoordinate>
+            </Location>
+            <Enabled>True</Enabled>
+            <ID>204_5_228_0</ID>
+            <Name>Calculus</Name>
+            <StartTime>12/12/2014 10:00:00 AM</StartTime>
+            <PreDeadline>00:00:00</PreDeadline>
+            <PrepTime>00:00:00</PrepTime>
+            <Deadline>12/12/2014 10:45:00 AM</Deadline>
+            <Split>1</Split>
+            <Duration>00:45:00</Duration>
+            <RigidFlag>True</RigidFlag>
+            <EventSubSchedules>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>1</Type>
+                  <Color>
+                    <UserSelection>7</UserSelection>
+                    <Blue>160</Blue>
+                    <Green>237</Green>
+                    <Red>255</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>School</Description>
+                  <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+                  <YCoordinate>-105.2627072</YCoordinate>
+                  <XCoordinate>40.0071657</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>204_5_228_229</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>12/12/2014 10:00:00 AM</ActiveStartTime>
+                <ActiveEndTime>12/12/2014 10:45:00 AM</ActiveEndTime>
+                <Duration>00:45:00</Duration>
+                <StartTime>12/12/2014 10:00:00 AM</StartTime>
+                <EndTime>12/12/2014 10:45:00 AM</EndTime>
+              </EventSubSchedule>
+            </EventSubSchedules>
+            <RepetitionFlag>False</RepetitionFlag>
+            <Completed>False</Completed>
+          </RepeatCalendarEvent>
+          <RepeatCalendarEvent>
+            <Recurrence />
+            <MiscData>
+              <TypeSelection>0</TypeSelection>
+              <UserNote />
+            </MiscData>
+            <UIParams>
+              <Type>0</Type>
+              <Color>
+                <UserSelection>-1</UserSelection>
+                <Blue>127</Blue>
+                <Green>127</Green>
+                <Red>127</Red>
+                <Opacity>1</Opacity>
+              </Color>
+              <Visible>True</Visible>
+            </UIParams>
+            <Location>
+              <CheckCalendarEvent>0</CheckCalendarEvent>
+              <isNull>False</isNull>
+              <Description>School</Description>
+              <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+              <YCoordinate>-105.2627072</YCoordinate>
+              <XCoordinate>40.0071657</XCoordinate>
+            </Location>
+            <Enabled>True</Enabled>
+            <ID>204_5_226_0</ID>
+            <Name>Calculus</Name>
+            <StartTime>12/5/2014 10:00:00 AM</StartTime>
+            <PreDeadline>00:00:00</PreDeadline>
+            <PrepTime>00:00:00</PrepTime>
+            <Deadline>12/5/2014 10:45:00 AM</Deadline>
+            <Split>1</Split>
+            <Duration>00:45:00</Duration>
+            <RigidFlag>True</RigidFlag>
+            <EventSubSchedules>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>1</Type>
+                  <Color>
+                    <UserSelection>7</UserSelection>
+                    <Blue>160</Blue>
+                    <Green>237</Green>
+                    <Red>255</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>School</Description>
+                  <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+                  <YCoordinate>-105.2627072</YCoordinate>
+                  <XCoordinate>40.0071657</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>204_5_226_227</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>12/5/2014 10:00:00 AM</ActiveStartTime>
+                <ActiveEndTime>12/5/2014 10:45:00 AM</ActiveEndTime>
+                <Duration>00:45:00</Duration>
+                <StartTime>12/5/2014 10:00:00 AM</StartTime>
+                <EndTime>12/5/2014 10:45:00 AM</EndTime>
+              </EventSubSchedule>
+            </EventSubSchedules>
+            <RepetitionFlag>False</RepetitionFlag>
+            <Completed>False</Completed>
+          </RepeatCalendarEvent>
+          <RepeatCalendarEvent>
+            <Recurrence />
+            <MiscData>
+              <TypeSelection>0</TypeSelection>
+              <UserNote />
+            </MiscData>
+            <UIParams>
+              <Type>0</Type>
+              <Color>
+                <UserSelection>-1</UserSelection>
+                <Blue>127</Blue>
+                <Green>127</Green>
+                <Red>127</Red>
+                <Opacity>1</Opacity>
+              </Color>
+              <Visible>True</Visible>
+            </UIParams>
+            <Location>
+              <CheckCalendarEvent>0</CheckCalendarEvent>
+              <isNull>False</isNull>
+              <Description>School</Description>
+              <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+              <YCoordinate>-105.2627072</YCoordinate>
+              <XCoordinate>40.0071657</XCoordinate>
+            </Location>
+            <Enabled>True</Enabled>
+            <ID>204_5_224_0</ID>
+            <Name>Calculus</Name>
+            <StartTime>11/28/2014 10:00:00 AM</StartTime>
+            <PreDeadline>00:00:00</PreDeadline>
+            <PrepTime>00:00:00</PrepTime>
+            <Deadline>11/28/2014 10:45:00 AM</Deadline>
+            <Split>1</Split>
+            <Duration>00:45:00</Duration>
+            <RigidFlag>True</RigidFlag>
+            <EventSubSchedules>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>1</Type>
+                  <Color>
+                    <UserSelection>7</UserSelection>
+                    <Blue>160</Blue>
+                    <Green>237</Green>
+                    <Red>255</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>School</Description>
+                  <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+                  <YCoordinate>-105.2627072</YCoordinate>
+                  <XCoordinate>40.0071657</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>204_5_224_225</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>11/28/2014 10:00:00 AM</ActiveStartTime>
+                <ActiveEndTime>11/28/2014 10:45:00 AM</ActiveEndTime>
+                <Duration>00:45:00</Duration>
+                <StartTime>11/28/2014 10:00:00 AM</StartTime>
+                <EndTime>11/28/2014 10:45:00 AM</EndTime>
+              </EventSubSchedule>
+            </EventSubSchedules>
+            <RepetitionFlag>False</RepetitionFlag>
+            <Completed>False</Completed>
+          </RepeatCalendarEvent>
+          <RepeatCalendarEvent>
+            <Recurrence />
+            <MiscData>
+              <TypeSelection>0</TypeSelection>
+              <UserNote />
+            </MiscData>
+            <UIParams>
+              <Type>0</Type>
+              <Color>
+                <UserSelection>-1</UserSelection>
+                <Blue>127</Blue>
+                <Green>127</Green>
+                <Red>127</Red>
+                <Opacity>1</Opacity>
+              </Color>
+              <Visible>True</Visible>
+            </UIParams>
+            <Location>
+              <CheckCalendarEvent>0</CheckCalendarEvent>
+              <isNull>False</isNull>
+              <Description>School</Description>
+              <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+              <YCoordinate>-105.2627072</YCoordinate>
+              <XCoordinate>40.0071657</XCoordinate>
+            </Location>
+            <Enabled>True</Enabled>
+            <ID>204_3_218_0</ID>
+            <Name>Calculus</Name>
+            <StartTime>12/10/2014 10:00:00 AM</StartTime>
+            <PreDeadline>00:00:00</PreDeadline>
+            <PrepTime>00:00:00</PrepTime>
+            <Deadline>12/10/2014 10:45:00 AM</Deadline>
+            <Split>1</Split>
+            <Duration>00:45:00</Duration>
+            <RigidFlag>True</RigidFlag>
+            <EventSubSchedules>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>1</Type>
+                  <Color>
+                    <UserSelection>7</UserSelection>
+                    <Blue>160</Blue>
+                    <Green>237</Green>
+                    <Red>255</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>School</Description>
+                  <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+                  <YCoordinate>-105.2627072</YCoordinate>
+                  <XCoordinate>40.0071657</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>204_3_218_219</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>12/10/2014 10:00:00 AM</ActiveStartTime>
+                <ActiveEndTime>12/10/2014 10:45:00 AM</ActiveEndTime>
+                <Duration>00:45:00</Duration>
+                <StartTime>12/10/2014 10:00:00 AM</StartTime>
+                <EndTime>12/10/2014 10:45:00 AM</EndTime>
+              </EventSubSchedule>
+            </EventSubSchedules>
+            <RepetitionFlag>False</RepetitionFlag>
+            <Completed>False</Completed>
+          </RepeatCalendarEvent>
+          <RepeatCalendarEvent>
+            <Recurrence />
+            <MiscData>
+              <TypeSelection>0</TypeSelection>
+              <UserNote />
+            </MiscData>
+            <UIParams>
+              <Type>0</Type>
+              <Color>
+                <UserSelection>-1</UserSelection>
+                <Blue>127</Blue>
+                <Green>127</Green>
+                <Red>127</Red>
+                <Opacity>1</Opacity>
+              </Color>
+              <Visible>True</Visible>
+            </UIParams>
+            <Location>
+              <CheckCalendarEvent>0</CheckCalendarEvent>
+              <isNull>False</isNull>
+              <Description>School</Description>
+              <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+              <YCoordinate>-105.2627072</YCoordinate>
+              <XCoordinate>40.0071657</XCoordinate>
+            </Location>
+            <Enabled>True</Enabled>
+            <ID>204_3_216_0</ID>
+            <Name>Calculus</Name>
+            <StartTime>12/3/2014 10:00:00 AM</StartTime>
+            <PreDeadline>00:00:00</PreDeadline>
+            <PrepTime>00:00:00</PrepTime>
+            <Deadline>12/3/2014 10:45:00 AM</Deadline>
+            <Split>1</Split>
+            <Duration>00:45:00</Duration>
+            <RigidFlag>True</RigidFlag>
+            <EventSubSchedules>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>1</Type>
+                  <Color>
+                    <UserSelection>7</UserSelection>
+                    <Blue>160</Blue>
+                    <Green>237</Green>
+                    <Red>255</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>School</Description>
+                  <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+                  <YCoordinate>-105.2627072</YCoordinate>
+                  <XCoordinate>40.0071657</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>204_3_216_217</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>12/3/2014 10:00:00 AM</ActiveStartTime>
+                <ActiveEndTime>12/3/2014 10:45:00 AM</ActiveEndTime>
+                <Duration>00:45:00</Duration>
+                <StartTime>12/3/2014 10:00:00 AM</StartTime>
+                <EndTime>12/3/2014 10:45:00 AM</EndTime>
+              </EventSubSchedule>
+            </EventSubSchedules>
+            <RepetitionFlag>False</RepetitionFlag>
+            <Completed>False</Completed>
+          </RepeatCalendarEvent>
+          <RepeatCalendarEvent>
+            <Recurrence />
+            <MiscData>
+              <TypeSelection>0</TypeSelection>
+              <UserNote />
+            </MiscData>
+            <UIParams>
+              <Type>0</Type>
+              <Color>
+                <UserSelection>-1</UserSelection>
+                <Blue>127</Blue>
+                <Green>127</Green>
+                <Red>127</Red>
+                <Opacity>1</Opacity>
+              </Color>
+              <Visible>True</Visible>
+            </UIParams>
+            <Location>
+              <CheckCalendarEvent>0</CheckCalendarEvent>
+              <isNull>False</isNull>
+              <Description>School</Description>
+              <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+              <YCoordinate>-105.2627072</YCoordinate>
+              <XCoordinate>40.0071657</XCoordinate>
+            </Location>
+            <Enabled>True</Enabled>
+            <ID>204_1_210_0</ID>
+            <Name>Calculus</Name>
+            <StartTime>12/8/2014 10:00:00 AM</StartTime>
+            <PreDeadline>00:00:00</PreDeadline>
+            <PrepTime>00:00:00</PrepTime>
+            <Deadline>12/8/2014 10:45:00 AM</Deadline>
+            <Split>1</Split>
+            <Duration>00:45:00</Duration>
+            <RigidFlag>True</RigidFlag>
+            <EventSubSchedules>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>1</Type>
+                  <Color>
+                    <UserSelection>7</UserSelection>
+                    <Blue>160</Blue>
+                    <Green>237</Green>
+                    <Red>255</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>School</Description>
+                  <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+                  <YCoordinate>-105.2627072</YCoordinate>
+                  <XCoordinate>40.0071657</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>204_1_210_211</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>12/8/2014 10:00:00 AM</ActiveStartTime>
+                <ActiveEndTime>12/8/2014 10:45:00 AM</ActiveEndTime>
+                <Duration>00:45:00</Duration>
+                <StartTime>12/8/2014 10:00:00 AM</StartTime>
+                <EndTime>12/8/2014 10:45:00 AM</EndTime>
+              </EventSubSchedule>
+            </EventSubSchedules>
+            <RepetitionFlag>False</RepetitionFlag>
+            <Completed>False</Completed>
+          </RepeatCalendarEvent>
+          <RepeatCalendarEvent>
+            <Recurrence />
+            <MiscData>
+              <TypeSelection>0</TypeSelection>
+              <UserNote />
+            </MiscData>
+            <UIParams>
+              <Type>0</Type>
+              <Color>
+                <UserSelection>-1</UserSelection>
+                <Blue>127</Blue>
+                <Green>127</Green>
+                <Red>127</Red>
+                <Opacity>1</Opacity>
+              </Color>
+              <Visible>True</Visible>
+            </UIParams>
+            <Location>
+              <CheckCalendarEvent>0</CheckCalendarEvent>
+              <isNull>False</isNull>
+              <Description>School</Description>
+              <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+              <YCoordinate>-105.2627072</YCoordinate>
+              <XCoordinate>40.0071657</XCoordinate>
+            </Location>
+            <Enabled>True</Enabled>
+            <ID>204_1_208_0</ID>
+            <Name>Calculus</Name>
+            <StartTime>12/1/2014 10:00:00 AM</StartTime>
+            <PreDeadline>00:00:00</PreDeadline>
+            <PrepTime>00:00:00</PrepTime>
+            <Deadline>12/1/2014 10:45:00 AM</Deadline>
+            <Split>1</Split>
+            <Duration>00:45:00</Duration>
+            <RigidFlag>True</RigidFlag>
+            <EventSubSchedules>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>1</Type>
+                  <Color>
+                    <UserSelection>7</UserSelection>
+                    <Blue>160</Blue>
+                    <Green>237</Green>
+                    <Red>255</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>School</Description>
+                  <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+                  <YCoordinate>-105.2627072</YCoordinate>
+                  <XCoordinate>40.0071657</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>204_1_208_209</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>12/1/2014 10:00:00 AM</ActiveStartTime>
+                <ActiveEndTime>12/1/2014 10:45:00 AM</ActiveEndTime>
+                <Duration>00:45:00</Duration>
+                <StartTime>12/1/2014 10:00:00 AM</StartTime>
+                <EndTime>12/1/2014 10:45:00 AM</EndTime>
+              </EventSubSchedule>
+            </EventSubSchedules>
+            <RepetitionFlag>False</RepetitionFlag>
+            <Completed>False</Completed>
+          </RepeatCalendarEvent>
+        </RepeatCalendarEvents>
+        <RepeatCountOfLowerLayer>0</RepeatCountOfLowerLayer>
+        <RepeatDays />
+        <RepeatDay>7</RepeatDay>
+        <RepeatFrequency>WEEKLY</RepeatFrequency>
+        <RepeatEndDate>12/13/2014 12:00:00 AM</RepeatEndDate>
+        <RepeatStartDate>11/28/2014 12:00:00 AM</RepeatStartDate>
+      </Recurrence>
+      <MiscData>
+        <TypeSelection>0</TypeSelection>
+        <UserNote />
+      </MiscData>
+      <UIParams>
+        <Type>0</Type>
+        <Color>
+          <UserSelection>-1</UserSelection>
+          <Blue>127</Blue>
+          <Green>127</Green>
+          <Red>127</Red>
+          <Opacity>1</Opacity>
+        </Color>
+        <Visible>True</Visible>
+      </UIParams>
+      <Location>
+        <CheckCalendarEvent>0</CheckCalendarEvent>
+        <isNull>False</isNull>
+        <Description>School</Description>
+        <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+        <YCoordinate>-105.2627072</YCoordinate>
+        <XCoordinate>40.0071657</XCoordinate>
+      </Location>
+      <Enabled>True</Enabled>
+      <ID>204_7_0_0</ID>
+      <Name>Calculus</Name>
+      <StartTime>11/28/2014 10:00:00 AM</StartTime>
+      <PreDeadline>00:00:00</PreDeadline>
+      <PrepTime>00:00:00</PrepTime>
+      <Deadline>12/13/2014 10:45:00 AM</Deadline>
+      <Split>1</Split>
+      <Duration>00:45:00</Duration>
+      <RigidFlag>True</RigidFlag>
+      <EventSubSchedules />
+      <RepetitionFlag>True</RepetitionFlag>
+      <Completed>False</Completed>
+    </EventSchedule>
+    <EventSchedule>
+      <Recurrence>
+        <RepeatCalendarEvents>
+          <RepeatCalendarEvent>
+            <Recurrence />
+            <MiscData>
+              <TypeSelection>0</TypeSelection>
+              <UserNote />
+            </MiscData>
+            <UIParams>
+              <Type>0</Type>
+              <Color>
+                <UserSelection>-1</UserSelection>
+                <Blue>127</Blue>
+                <Green>127</Green>
+                <Red>127</Red>
+                <Opacity>1</Opacity>
+              </Color>
+              <Visible>True</Visible>
+            </UIParams>
+            <Location>
+              <CheckCalendarEvent>0</CheckCalendarEvent>
+              <isNull>False</isNull>
+              <Description>School</Description>
+              <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+              <YCoordinate>-105.2627072</YCoordinate>
+              <XCoordinate>40.0071657</XCoordinate>
+            </Location>
+            <Enabled>True</Enabled>
+            <ID>238_7_253_0</ID>
+            <Name>Study Calculus</Name>
+            <StartTime>12/12/2014 12:00:00 AM</StartTime>
+            <PreDeadline>00:00:00</PreDeadline>
+            <PrepTime>00:00:00</PrepTime>
+            <Deadline>12/18/2014 11:59:00 PM</Deadline>
+            <Split>4</Split>
+            <Duration>07:00:00</Duration>
+            <RigidFlag>False</RigidFlag>
+            <EventSubSchedules>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>1</Type>
+                  <Color>
+                    <UserSelection>7</UserSelection>
+                    <Blue>160</Blue>
+                    <Green>237</Green>
+                    <Red>255</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>School</Description>
+                  <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+                  <YCoordinate>-105.2627072</YCoordinate>
+                  <XCoordinate>40.0071657</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>238_7_253_257</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>12/18/2014 10:14:00 PM</ActiveStartTime>
+                <ActiveEndTime>12/18/2014 11:59:00 PM</ActiveEndTime>
+                <Duration>01:45:00</Duration>
+                <StartTime>12/18/2014 10:14:00 PM</StartTime>
+                <EndTime>12/18/2014 11:59:00 PM</EndTime>
+              </EventSubSchedule>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>1</Type>
+                  <Color>
+                    <UserSelection>7</UserSelection>
+                    <Blue>160</Blue>
+                    <Green>237</Green>
+                    <Red>255</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>School</Description>
+                  <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+                  <YCoordinate>-105.2627072</YCoordinate>
+                  <XCoordinate>40.0071657</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>238_7_253_256</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>12/18/2014 3:59:00 PM</ActiveStartTime>
+                <ActiveEndTime>12/18/2014 5:44:00 PM</ActiveEndTime>
+                <Duration>01:45:00</Duration>
+                <StartTime>12/18/2014 3:59:00 PM</StartTime>
+                <EndTime>12/18/2014 5:44:00 PM</EndTime>
+              </EventSubSchedule>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>1</Type>
+                  <Color>
+                    <UserSelection>7</UserSelection>
+                    <Blue>160</Blue>
+                    <Green>237</Green>
+                    <Red>255</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>School</Description>
+                  <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+                  <YCoordinate>-105.2627072</YCoordinate>
+                  <XCoordinate>40.0071657</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>238_7_253_255</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>12/18/2014 12:44:00 PM</ActiveStartTime>
+                <ActiveEndTime>12/18/2014 2:29:00 PM</ActiveEndTime>
+                <Duration>01:45:00</Duration>
+                <StartTime>12/18/2014 12:44:00 PM</StartTime>
+                <EndTime>12/18/2014 2:29:00 PM</EndTime>
+              </EventSubSchedule>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>1</Type>
+                  <Color>
+                    <UserSelection>7</UserSelection>
+                    <Blue>160</Blue>
+                    <Green>237</Green>
+                    <Red>255</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>School</Description>
+                  <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+                  <YCoordinate>-105.2627072</YCoordinate>
+                  <XCoordinate>40.0071657</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>238_7_253_254</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>12/18/2014 9:29:00 AM</ActiveStartTime>
+                <ActiveEndTime>12/18/2014 11:14:00 AM</ActiveEndTime>
+                <Duration>01:45:00</Duration>
+                <StartTime>12/18/2014 9:29:00 AM</StartTime>
+                <EndTime>12/18/2014 11:14:00 AM</EndTime>
+              </EventSubSchedule>
+            </EventSubSchedules>
+            <RepetitionFlag>False</RepetitionFlag>
+            <Completed>False</Completed>
+          </RepeatCalendarEvent>
+          <RepeatCalendarEvent>
+            <Recurrence />
+            <MiscData>
+              <TypeSelection>0</TypeSelection>
+              <UserNote />
+            </MiscData>
+            <UIParams>
+              <Type>0</Type>
+              <Color>
+                <UserSelection>-1</UserSelection>
+                <Blue>127</Blue>
+                <Green>127</Green>
+                <Red>127</Red>
+                <Opacity>1</Opacity>
+              </Color>
+              <Visible>True</Visible>
+            </UIParams>
+            <Location>
+              <CheckCalendarEvent>0</CheckCalendarEvent>
+              <isNull>False</isNull>
+              <Description>School</Description>
+              <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+              <YCoordinate>-105.2627072</YCoordinate>
+              <XCoordinate>40.0071657</XCoordinate>
+            </Location>
+            <Enabled>True</Enabled>
+            <ID>238_7_248_0</ID>
+            <Name>Study Calculus</Name>
+            <StartTime>12/5/2014 12:00:00 AM</StartTime>
+            <PreDeadline>00:00:00</PreDeadline>
+            <PrepTime>00:00:00</PrepTime>
+            <Deadline>12/11/2014 11:59:00 PM</Deadline>
+            <Split>4</Split>
+            <Duration>07:00:00</Duration>
+            <RigidFlag>False</RigidFlag>
+            <EventSubSchedules>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>1</Type>
+                  <Color>
+                    <UserSelection>7</UserSelection>
+                    <Blue>160</Blue>
+                    <Green>237</Green>
+                    <Red>255</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>School</Description>
+                  <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+                  <YCoordinate>-105.2627072</YCoordinate>
+                  <XCoordinate>40.0071657</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>238_7_248_252</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>12/11/2014 10:14:00 PM</ActiveStartTime>
+                <ActiveEndTime>12/11/2014 11:59:00 PM</ActiveEndTime>
+                <Duration>01:45:00</Duration>
+                <StartTime>12/11/2014 10:14:00 PM</StartTime>
+                <EndTime>12/11/2014 11:59:00 PM</EndTime>
+              </EventSubSchedule>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>1</Type>
+                  <Color>
+                    <UserSelection>7</UserSelection>
+                    <Blue>160</Blue>
+                    <Green>237</Green>
+                    <Red>255</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>School</Description>
+                  <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+                  <YCoordinate>-105.2627072</YCoordinate>
+                  <XCoordinate>40.0071657</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>238_7_248_251</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>12/11/2014 3:59:00 PM</ActiveStartTime>
+                <ActiveEndTime>12/11/2014 5:44:00 PM</ActiveEndTime>
+                <Duration>01:45:00</Duration>
+                <StartTime>12/11/2014 3:59:00 PM</StartTime>
+                <EndTime>12/11/2014 5:44:00 PM</EndTime>
+              </EventSubSchedule>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>1</Type>
+                  <Color>
+                    <UserSelection>7</UserSelection>
+                    <Blue>160</Blue>
+                    <Green>237</Green>
+                    <Red>255</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>School</Description>
+                  <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+                  <YCoordinate>-105.2627072</YCoordinate>
+                  <XCoordinate>40.0071657</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>238_7_248_250</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>12/11/2014 12:44:00 PM</ActiveStartTime>
+                <ActiveEndTime>12/11/2014 2:29:00 PM</ActiveEndTime>
+                <Duration>01:45:00</Duration>
+                <StartTime>12/11/2014 12:44:00 PM</StartTime>
+                <EndTime>12/11/2014 2:29:00 PM</EndTime>
+              </EventSubSchedule>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>1</Type>
+                  <Color>
+                    <UserSelection>7</UserSelection>
+                    <Blue>160</Blue>
+                    <Green>237</Green>
+                    <Red>255</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>School</Description>
+                  <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+                  <YCoordinate>-105.2627072</YCoordinate>
+                  <XCoordinate>40.0071657</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>238_7_248_249</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>12/11/2014 9:29:00 AM</ActiveStartTime>
+                <ActiveEndTime>12/11/2014 11:14:00 AM</ActiveEndTime>
+                <Duration>01:45:00</Duration>
+                <StartTime>12/11/2014 9:29:00 AM</StartTime>
+                <EndTime>12/11/2014 11:14:00 AM</EndTime>
+              </EventSubSchedule>
+            </EventSubSchedules>
+            <RepetitionFlag>False</RepetitionFlag>
+            <Completed>False</Completed>
+          </RepeatCalendarEvent>
+          <RepeatCalendarEvent>
+            <Recurrence />
+            <MiscData>
+              <TypeSelection>0</TypeSelection>
+              <UserNote />
+            </MiscData>
+            <UIParams>
+              <Type>0</Type>
+              <Color>
+                <UserSelection>-1</UserSelection>
+                <Blue>127</Blue>
+                <Green>127</Green>
+                <Red>127</Red>
+                <Opacity>1</Opacity>
+              </Color>
+              <Visible>True</Visible>
+            </UIParams>
+            <Location>
+              <CheckCalendarEvent>0</CheckCalendarEvent>
+              <isNull>False</isNull>
+              <Description>School</Description>
+              <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+              <YCoordinate>-105.2627072</YCoordinate>
+              <XCoordinate>40.0071657</XCoordinate>
+            </Location>
+            <Enabled>True</Enabled>
+            <ID>238_7_243_0</ID>
+            <Name>Study Calculus</Name>
+            <StartTime>11/28/2014 12:00:00 AM</StartTime>
+            <PreDeadline>00:00:00</PreDeadline>
+            <PrepTime>00:00:00</PrepTime>
+            <Deadline>12/4/2014 11:59:00 PM</Deadline>
+            <Split>4</Split>
+            <Duration>07:00:00</Duration>
+            <RigidFlag>False</RigidFlag>
+            <EventSubSchedules>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>1</Type>
+                  <Color>
+                    <UserSelection>7</UserSelection>
+                    <Blue>160</Blue>
+                    <Green>237</Green>
+                    <Red>255</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>School</Description>
+                  <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+                  <YCoordinate>-105.2627072</YCoordinate>
+                  <XCoordinate>40.0071657</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>238_7_243_247</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>11/28/2014 9:15:00 PM</ActiveStartTime>
+                <ActiveEndTime>11/28/2014 11:00:00 PM</ActiveEndTime>
+                <Duration>01:45:00</Duration>
+                <StartTime>11/28/2014 9:15:00 PM</StartTime>
+                <EndTime>11/28/2014 11:00:00 PM</EndTime>
+              </EventSubSchedule>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>1</Type>
+                  <Color>
+                    <UserSelection>7</UserSelection>
+                    <Blue>160</Blue>
+                    <Green>237</Green>
+                    <Red>255</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>School</Description>
+                  <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+                  <YCoordinate>-105.2627072</YCoordinate>
+                  <XCoordinate>40.0071657</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>238_7_243_246</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>11/28/2014 7:30:00 PM</ActiveStartTime>
+                <ActiveEndTime>11/28/2014 9:15:00 PM</ActiveEndTime>
+                <Duration>01:45:00</Duration>
+                <StartTime>11/28/2014 7:30:00 PM</StartTime>
+                <EndTime>11/28/2014 9:15:00 PM</EndTime>
+              </EventSubSchedule>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>1</Type>
+                  <Color>
+                    <UserSelection>7</UserSelection>
+                    <Blue>160</Blue>
+                    <Green>237</Green>
+                    <Red>255</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>School</Description>
+                  <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+                  <YCoordinate>-105.2627072</YCoordinate>
+                  <XCoordinate>40.0071657</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>238_7_243_245</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>11/28/2014 5:45:00 PM</ActiveStartTime>
+                <ActiveEndTime>11/28/2014 7:30:00 PM</ActiveEndTime>
+                <Duration>01:45:00</Duration>
+                <StartTime>11/28/2014 5:45:00 PM</StartTime>
+                <EndTime>11/28/2014 7:30:00 PM</EndTime>
+              </EventSubSchedule>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>1</Type>
+                  <Color>
+                    <UserSelection>7</UserSelection>
+                    <Blue>160</Blue>
+                    <Green>237</Green>
+                    <Red>255</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>School</Description>
+                  <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+                  <YCoordinate>-105.2627072</YCoordinate>
+                  <XCoordinate>40.0071657</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>238_7_243_244</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>11/28/2014 4:00:00 PM</ActiveStartTime>
+                <ActiveEndTime>11/28/2014 5:45:00 PM</ActiveEndTime>
+                <Duration>01:45:00</Duration>
+                <StartTime>11/28/2014 4:00:00 PM</StartTime>
+                <EndTime>11/28/2014 5:45:00 PM</EndTime>
+              </EventSubSchedule>
+            </EventSubSchedules>
+            <RepetitionFlag>False</RepetitionFlag>
+            <Completed>False</Completed>
+          </RepeatCalendarEvent>
+        </RepeatCalendarEvents>
+        <RepeatCountOfLowerLayer>0</RepeatCountOfLowerLayer>
+        <RepeatDays />
+        <RepeatDay>7</RepeatDay>
+        <RepeatFrequency>WEEKLY</RepeatFrequency>
+        <RepeatEndDate>12/13/2014 12:00:00 AM</RepeatEndDate>
+        <RepeatStartDate>11/28/2014 12:00:00 AM</RepeatStartDate>
+      </Recurrence>
+      <MiscData>
+        <TypeSelection>0</TypeSelection>
+        <UserNote />
+      </MiscData>
+      <UIParams>
+        <Type>0</Type>
+        <Color>
+          <UserSelection>-1</UserSelection>
+          <Blue>127</Blue>
+          <Green>127</Green>
+          <Red>127</Red>
+          <Opacity>1</Opacity>
+        </Color>
+        <Visible>True</Visible>
+      </UIParams>
+      <Location>
+        <CheckCalendarEvent>0</CheckCalendarEvent>
+        <isNull>False</isNull>
+        <Description>School</Description>
+        <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+        <YCoordinate>-105.2627072</YCoordinate>
+        <XCoordinate>40.0071657</XCoordinate>
+      </Location>
+      <Enabled>True</Enabled>
+      <ID>238_7_0_0</ID>
+      <Name>Study Calculus</Name>
+      <StartTime>11/28/2014 12:00:00 AM</StartTime>
+      <PreDeadline>00:00:00</PreDeadline>
+      <PrepTime>00:00:00</PrepTime>
+      <Deadline>12/13/2014 11:59:00 PM</Deadline>
+      <Split>4</Split>
+      <Duration>07:00:00</Duration>
+      <RigidFlag>False</RigidFlag>
+      <EventSubSchedules />
+      <RepetitionFlag>True</RepetitionFlag>
+      <Completed>False</Completed>
+    </EventSchedule>
+    <EventSchedule>
+      <Recurrence />
+      <MiscData>
+        <TypeSelection>0</TypeSelection>
+        <UserNote />
+      </MiscData>
+      <UIParams>
+        <Type>0</Type>
+        <Color>
+          <UserSelection>-1</UserSelection>
+          <Blue>127</Blue>
+          <Green>127</Green>
+          <Red>127</Red>
+          <Opacity>1</Opacity>
+        </Color>
+        <Visible>True</Visible>
+      </UIParams>
+      <Location>
+        <CheckCalendarEvent>0</CheckCalendarEvent>
+        <isNull>False</isNull>
+        <Description>Grocery Store</Description>
+        <Address>king soopers pharmacy, 1650 30th street, boulder, co 80302, usa</Address>
+        <YCoordinate>-105.251789</YCoordinate>
+        <XCoordinate>40.0157896</XCoordinate>
+      </Location>
+      <Enabled>True</Enabled>
+      <ID>263_7_0_0</ID>
+      <Name>Grocery Shopping</Name>
+      <StartTime>11/28/2014 11:59:00 AM</StartTime>
+      <PreDeadline>00:00:00</PreDeadline>
+      <PrepTime>00:00:00</PrepTime>
+      <Deadline>11/29/2014 11:59:00 PM</Deadline>
+      <Split>1</Split>
+      <Duration>00:46:00</Duration>
+      <RigidFlag>False</RigidFlag>
+      <EventSubSchedules>
+        <EventSubSchedule>
+          <ConflictProfile>
+            <ConflictIDs />
+            <Flag>False</Flag>
+            <Type>0</Type>
+          </ConflictProfile>
+          <MiscData>
+            <TypeSelection>0</TypeSelection>
+            <UserNote />
+          </MiscData>
+          <UIParams>
+            <Type>1</Type>
+            <Color>
+              <UserSelection>5</UserSelection>
+              <Blue>255</Blue>
+              <Green>0</Green>
+              <Red>255</Red>
+              <Opacity>1</Opacity>
+            </Color>
+            <Visible>True</Visible>
+          </UIParams>
+          <Location>
+            <CheckCalendarEvent>0</CheckCalendarEvent>
+            <isNull>False</isNull>
+            <Description>Grocery Store</Description>
+            <Address>king soopers pharmacy, 1650 30th street, boulder, co 80302, usa</Address>
+            <YCoordinate>-105.251789</YCoordinate>
+            <XCoordinate>40.0157896</XCoordinate>
+          </Location>
+          <Complete>False</Complete>
+          <Enabled>True</Enabled>
+          <ID>263_7_0_264</ID>
+          <ThirdPartyID />
+          <PrepTime>00:00:00</PrepTime>
+          <ActiveStartTime>11/29/2014 5:00:00 AM</ActiveStartTime>
+          <ActiveEndTime>11/29/2014 5:46:00 AM</ActiveEndTime>
+          <Duration>00:46:00</Duration>
+          <StartTime>11/29/2014 5:00:00 AM</StartTime>
+          <EndTime>11/29/2014 5:46:00 AM</EndTime>
+        </EventSubSchedule>
+      </EventSubSchedules>
+      <RepetitionFlag>False</RepetitionFlag>
+      <Completed>False</Completed>
+    </EventSchedule>
+    <EventSchedule>
+      <Recurrence>
+        <RepeatCalendarEvents>
+          <RepeatCalendarEvent>
+            <Recurrence />
+            <MiscData>
+              <TypeSelection>0</TypeSelection>
+              <UserNote />
+            </MiscData>
+            <UIParams>
+              <Type>0</Type>
+              <Color>
+                <UserSelection>-1</UserSelection>
+                <Blue>127</Blue>
+                <Green>127</Green>
+                <Red>127</Red>
+                <Opacity>1</Opacity>
+              </Color>
+              <Visible>True</Visible>
+            </UIParams>
+            <Location>
+              <CheckCalendarEvent>0</CheckCalendarEvent>
+              <isNull>False</isNull>
+              <Description>School</Description>
+              <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+              <YCoordinate>-105.2627072</YCoordinate>
+              <XCoordinate>40.0071657</XCoordinate>
+            </Location>
+            <Enabled>True</Enabled>
+            <ID>265_5_289_0</ID>
+            <Name>Class: Biology</Name>
+            <StartTime>12/12/2014 1:00:00 PM</StartTime>
+            <PreDeadline>00:00:00</PreDeadline>
+            <PrepTime>00:00:00</PrepTime>
+            <Deadline>12/12/2014 1:45:00 PM</Deadline>
+            <Split>1</Split>
+            <Duration>00:45:00</Duration>
+            <RigidFlag>True</RigidFlag>
+            <EventSubSchedules>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>1</Type>
+                  <Color>
+                    <UserSelection>1</UserSelection>
+                    <Blue>255</Blue>
+                    <Green>221</Green>
+                    <Red>135</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>School</Description>
+                  <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+                  <YCoordinate>-105.2627072</YCoordinate>
+                  <XCoordinate>40.0071657</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>265_5_289_290</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>12/12/2014 1:00:00 PM</ActiveStartTime>
+                <ActiveEndTime>12/12/2014 1:45:00 PM</ActiveEndTime>
+                <Duration>00:45:00</Duration>
+                <StartTime>12/12/2014 1:00:00 PM</StartTime>
+                <EndTime>12/12/2014 1:45:00 PM</EndTime>
+              </EventSubSchedule>
+            </EventSubSchedules>
+            <RepetitionFlag>False</RepetitionFlag>
+            <Completed>False</Completed>
+          </RepeatCalendarEvent>
+          <RepeatCalendarEvent>
+            <Recurrence />
+            <MiscData>
+              <TypeSelection>0</TypeSelection>
+              <UserNote />
+            </MiscData>
+            <UIParams>
+              <Type>0</Type>
+              <Color>
+                <UserSelection>-1</UserSelection>
+                <Blue>127</Blue>
+                <Green>127</Green>
+                <Red>127</Red>
+                <Opacity>1</Opacity>
+              </Color>
+              <Visible>True</Visible>
+            </UIParams>
+            <Location>
+              <CheckCalendarEvent>0</CheckCalendarEvent>
+              <isNull>False</isNull>
+              <Description>School</Description>
+              <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+              <YCoordinate>-105.2627072</YCoordinate>
+              <XCoordinate>40.0071657</XCoordinate>
+            </Location>
+            <Enabled>True</Enabled>
+            <ID>265_5_287_0</ID>
+            <Name>Class: Biology</Name>
+            <StartTime>12/5/2014 1:00:00 PM</StartTime>
+            <PreDeadline>00:00:00</PreDeadline>
+            <PrepTime>00:00:00</PrepTime>
+            <Deadline>12/5/2014 1:45:00 PM</Deadline>
+            <Split>1</Split>
+            <Duration>00:45:00</Duration>
+            <RigidFlag>True</RigidFlag>
+            <EventSubSchedules>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>1</Type>
+                  <Color>
+                    <UserSelection>1</UserSelection>
+                    <Blue>255</Blue>
+                    <Green>221</Green>
+                    <Red>135</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>School</Description>
+                  <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+                  <YCoordinate>-105.2627072</YCoordinate>
+                  <XCoordinate>40.0071657</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>265_5_287_288</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>12/5/2014 1:00:00 PM</ActiveStartTime>
+                <ActiveEndTime>12/5/2014 1:45:00 PM</ActiveEndTime>
+                <Duration>00:45:00</Duration>
+                <StartTime>12/5/2014 1:00:00 PM</StartTime>
+                <EndTime>12/5/2014 1:45:00 PM</EndTime>
+              </EventSubSchedule>
+            </EventSubSchedules>
+            <RepetitionFlag>False</RepetitionFlag>
+            <Completed>False</Completed>
+          </RepeatCalendarEvent>
+          <RepeatCalendarEvent>
+            <Recurrence />
+            <MiscData>
+              <TypeSelection>0</TypeSelection>
+              <UserNote />
+            </MiscData>
+            <UIParams>
+              <Type>0</Type>
+              <Color>
+                <UserSelection>-1</UserSelection>
+                <Blue>127</Blue>
+                <Green>127</Green>
+                <Red>127</Red>
+                <Opacity>1</Opacity>
+              </Color>
+              <Visible>True</Visible>
+            </UIParams>
+            <Location>
+              <CheckCalendarEvent>0</CheckCalendarEvent>
+              <isNull>False</isNull>
+              <Description>School</Description>
+              <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+              <YCoordinate>-105.2627072</YCoordinate>
+              <XCoordinate>40.0071657</XCoordinate>
+            </Location>
+            <Enabled>True</Enabled>
+            <ID>265_5_285_0</ID>
+            <Name>Class: Biology</Name>
+            <StartTime>11/28/2014 1:00:00 PM</StartTime>
+            <PreDeadline>00:00:00</PreDeadline>
+            <PrepTime>00:00:00</PrepTime>
+            <Deadline>11/28/2014 1:45:00 PM</Deadline>
+            <Split>1</Split>
+            <Duration>00:45:00</Duration>
+            <RigidFlag>True</RigidFlag>
+            <EventSubSchedules>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>1</Type>
+                  <Color>
+                    <UserSelection>1</UserSelection>
+                    <Blue>255</Blue>
+                    <Green>221</Green>
+                    <Red>135</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>School</Description>
+                  <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+                  <YCoordinate>-105.2627072</YCoordinate>
+                  <XCoordinate>40.0071657</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>265_5_285_286</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>11/28/2014 1:00:00 PM</ActiveStartTime>
+                <ActiveEndTime>11/28/2014 1:45:00 PM</ActiveEndTime>
+                <Duration>00:45:00</Duration>
+                <StartTime>11/28/2014 1:00:00 PM</StartTime>
+                <EndTime>11/28/2014 1:45:00 PM</EndTime>
+              </EventSubSchedule>
+            </EventSubSchedules>
+            <RepetitionFlag>False</RepetitionFlag>
+            <Completed>False</Completed>
+          </RepeatCalendarEvent>
+          <RepeatCalendarEvent>
+            <Recurrence />
+            <MiscData>
+              <TypeSelection>0</TypeSelection>
+              <UserNote />
+            </MiscData>
+            <UIParams>
+              <Type>0</Type>
+              <Color>
+                <UserSelection>-1</UserSelection>
+                <Blue>127</Blue>
+                <Green>127</Green>
+                <Red>127</Red>
+                <Opacity>1</Opacity>
+              </Color>
+              <Visible>True</Visible>
+            </UIParams>
+            <Location>
+              <CheckCalendarEvent>0</CheckCalendarEvent>
+              <isNull>False</isNull>
+              <Description>School</Description>
+              <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+              <YCoordinate>-105.2627072</YCoordinate>
+              <XCoordinate>40.0071657</XCoordinate>
+            </Location>
+            <Enabled>True</Enabled>
+            <ID>265_3_279_0</ID>
+            <Name>Class: Biology</Name>
+            <StartTime>12/10/2014 1:00:00 PM</StartTime>
+            <PreDeadline>00:00:00</PreDeadline>
+            <PrepTime>00:00:00</PrepTime>
+            <Deadline>12/10/2014 1:45:00 PM</Deadline>
+            <Split>1</Split>
+            <Duration>00:45:00</Duration>
+            <RigidFlag>True</RigidFlag>
+            <EventSubSchedules>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>1</Type>
+                  <Color>
+                    <UserSelection>1</UserSelection>
+                    <Blue>255</Blue>
+                    <Green>221</Green>
+                    <Red>135</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>School</Description>
+                  <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+                  <YCoordinate>-105.2627072</YCoordinate>
+                  <XCoordinate>40.0071657</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>265_3_279_280</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>12/10/2014 1:00:00 PM</ActiveStartTime>
+                <ActiveEndTime>12/10/2014 1:45:00 PM</ActiveEndTime>
+                <Duration>00:45:00</Duration>
+                <StartTime>12/10/2014 1:00:00 PM</StartTime>
+                <EndTime>12/10/2014 1:45:00 PM</EndTime>
+              </EventSubSchedule>
+            </EventSubSchedules>
+            <RepetitionFlag>False</RepetitionFlag>
+            <Completed>False</Completed>
+          </RepeatCalendarEvent>
+          <RepeatCalendarEvent>
+            <Recurrence />
+            <MiscData>
+              <TypeSelection>0</TypeSelection>
+              <UserNote />
+            </MiscData>
+            <UIParams>
+              <Type>0</Type>
+              <Color>
+                <UserSelection>-1</UserSelection>
+                <Blue>127</Blue>
+                <Green>127</Green>
+                <Red>127</Red>
+                <Opacity>1</Opacity>
+              </Color>
+              <Visible>True</Visible>
+            </UIParams>
+            <Location>
+              <CheckCalendarEvent>0</CheckCalendarEvent>
+              <isNull>False</isNull>
+              <Description>School</Description>
+              <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+              <YCoordinate>-105.2627072</YCoordinate>
+              <XCoordinate>40.0071657</XCoordinate>
+            </Location>
+            <Enabled>True</Enabled>
+            <ID>265_3_277_0</ID>
+            <Name>Class: Biology</Name>
+            <StartTime>12/3/2014 1:00:00 PM</StartTime>
+            <PreDeadline>00:00:00</PreDeadline>
+            <PrepTime>00:00:00</PrepTime>
+            <Deadline>12/3/2014 1:45:00 PM</Deadline>
+            <Split>1</Split>
+            <Duration>00:45:00</Duration>
+            <RigidFlag>True</RigidFlag>
+            <EventSubSchedules>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>1</Type>
+                  <Color>
+                    <UserSelection>1</UserSelection>
+                    <Blue>255</Blue>
+                    <Green>221</Green>
+                    <Red>135</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>School</Description>
+                  <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+                  <YCoordinate>-105.2627072</YCoordinate>
+                  <XCoordinate>40.0071657</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>265_3_277_278</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>12/3/2014 1:00:00 PM</ActiveStartTime>
+                <ActiveEndTime>12/3/2014 1:45:00 PM</ActiveEndTime>
+                <Duration>00:45:00</Duration>
+                <StartTime>12/3/2014 1:00:00 PM</StartTime>
+                <EndTime>12/3/2014 1:45:00 PM</EndTime>
+              </EventSubSchedule>
+            </EventSubSchedules>
+            <RepetitionFlag>False</RepetitionFlag>
+            <Completed>False</Completed>
+          </RepeatCalendarEvent>
+          <RepeatCalendarEvent>
+            <Recurrence />
+            <MiscData>
+              <TypeSelection>0</TypeSelection>
+              <UserNote />
+            </MiscData>
+            <UIParams>
+              <Type>0</Type>
+              <Color>
+                <UserSelection>-1</UserSelection>
+                <Blue>127</Blue>
+                <Green>127</Green>
+                <Red>127</Red>
+                <Opacity>1</Opacity>
+              </Color>
+              <Visible>True</Visible>
+            </UIParams>
+            <Location>
+              <CheckCalendarEvent>0</CheckCalendarEvent>
+              <isNull>False</isNull>
+              <Description>School</Description>
+              <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+              <YCoordinate>-105.2627072</YCoordinate>
+              <XCoordinate>40.0071657</XCoordinate>
+            </Location>
+            <Enabled>True</Enabled>
+            <ID>265_1_271_0</ID>
+            <Name>Class: Biology</Name>
+            <StartTime>12/8/2014 1:00:00 PM</StartTime>
+            <PreDeadline>00:00:00</PreDeadline>
+            <PrepTime>00:00:00</PrepTime>
+            <Deadline>12/8/2014 1:45:00 PM</Deadline>
+            <Split>1</Split>
+            <Duration>00:45:00</Duration>
+            <RigidFlag>True</RigidFlag>
+            <EventSubSchedules>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>1</Type>
+                  <Color>
+                    <UserSelection>1</UserSelection>
+                    <Blue>255</Blue>
+                    <Green>221</Green>
+                    <Red>135</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>School</Description>
+                  <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+                  <YCoordinate>-105.2627072</YCoordinate>
+                  <XCoordinate>40.0071657</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>265_1_271_272</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>12/8/2014 1:00:00 PM</ActiveStartTime>
+                <ActiveEndTime>12/8/2014 1:45:00 PM</ActiveEndTime>
+                <Duration>00:45:00</Duration>
+                <StartTime>12/8/2014 1:00:00 PM</StartTime>
+                <EndTime>12/8/2014 1:45:00 PM</EndTime>
+              </EventSubSchedule>
+            </EventSubSchedules>
+            <RepetitionFlag>False</RepetitionFlag>
+            <Completed>False</Completed>
+          </RepeatCalendarEvent>
+          <RepeatCalendarEvent>
+            <Recurrence />
+            <MiscData>
+              <TypeSelection>0</TypeSelection>
+              <UserNote />
+            </MiscData>
+            <UIParams>
+              <Type>0</Type>
+              <Color>
+                <UserSelection>-1</UserSelection>
+                <Blue>127</Blue>
+                <Green>127</Green>
+                <Red>127</Red>
+                <Opacity>1</Opacity>
+              </Color>
+              <Visible>True</Visible>
+            </UIParams>
+            <Location>
+              <CheckCalendarEvent>0</CheckCalendarEvent>
+              <isNull>False</isNull>
+              <Description>School</Description>
+              <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+              <YCoordinate>-105.2627072</YCoordinate>
+              <XCoordinate>40.0071657</XCoordinate>
+            </Location>
+            <Enabled>True</Enabled>
+            <ID>265_1_269_0</ID>
+            <Name>Class: Biology</Name>
+            <StartTime>12/1/2014 1:00:00 PM</StartTime>
+            <PreDeadline>00:00:00</PreDeadline>
+            <PrepTime>00:00:00</PrepTime>
+            <Deadline>12/1/2014 1:45:00 PM</Deadline>
+            <Split>1</Split>
+            <Duration>00:45:00</Duration>
+            <RigidFlag>True</RigidFlag>
+            <EventSubSchedules>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>1</Type>
+                  <Color>
+                    <UserSelection>1</UserSelection>
+                    <Blue>255</Blue>
+                    <Green>221</Green>
+                    <Red>135</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>School</Description>
+                  <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+                  <YCoordinate>-105.2627072</YCoordinate>
+                  <XCoordinate>40.0071657</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>265_1_269_270</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>12/1/2014 1:00:00 PM</ActiveStartTime>
+                <ActiveEndTime>12/1/2014 1:45:00 PM</ActiveEndTime>
+                <Duration>00:45:00</Duration>
+                <StartTime>12/1/2014 1:00:00 PM</StartTime>
+                <EndTime>12/1/2014 1:45:00 PM</EndTime>
+              </EventSubSchedule>
+            </EventSubSchedules>
+            <RepetitionFlag>False</RepetitionFlag>
+            <Completed>False</Completed>
+          </RepeatCalendarEvent>
+        </RepeatCalendarEvents>
+        <RepeatCountOfLowerLayer>0</RepeatCountOfLowerLayer>
+        <RepeatDays />
+        <RepeatDay>7</RepeatDay>
+        <RepeatFrequency>WEEKLY</RepeatFrequency>
+        <RepeatEndDate>12/13/2014 12:00:00 AM</RepeatEndDate>
+        <RepeatStartDate>11/28/2014 12:00:00 AM</RepeatStartDate>
+      </Recurrence>
+      <MiscData>
+        <TypeSelection>0</TypeSelection>
+        <UserNote />
+      </MiscData>
+      <UIParams>
+        <Type>0</Type>
+        <Color>
+          <UserSelection>-1</UserSelection>
+          <Blue>127</Blue>
+          <Green>127</Green>
+          <Red>127</Red>
+          <Opacity>1</Opacity>
+        </Color>
+        <Visible>True</Visible>
+      </UIParams>
+      <Location>
+        <CheckCalendarEvent>0</CheckCalendarEvent>
+        <isNull>False</isNull>
+        <Description>School</Description>
+        <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+        <YCoordinate>-105.2627072</YCoordinate>
+        <XCoordinate>40.0071657</XCoordinate>
+      </Location>
+      <Enabled>True</Enabled>
+      <ID>265_7_0_0</ID>
+      <Name>Class: Biology</Name>
+      <StartTime>11/28/2014 1:00:00 PM</StartTime>
+      <PreDeadline>00:00:00</PreDeadline>
+      <PrepTime>00:00:00</PrepTime>
+      <Deadline>12/13/2014 1:45:00 PM</Deadline>
+      <Split>1</Split>
+      <Duration>00:45:00</Duration>
+      <RigidFlag>True</RigidFlag>
+      <EventSubSchedules />
+      <RepetitionFlag>True</RepetitionFlag>
+      <Completed>False</Completed>
+    </EventSchedule>
+    <EventSchedule>
+      <Recurrence>
+        <RepeatCalendarEvents>
+          <RepeatCalendarEvent>
+            <Recurrence />
+            <MiscData>
+              <TypeSelection>0</TypeSelection>
+              <UserNote />
+            </MiscData>
+            <UIParams>
+              <Type>0</Type>
+              <Color>
+                <UserSelection>-1</UserSelection>
+                <Blue>127</Blue>
+                <Green>127</Green>
+                <Red>127</Red>
+                <Opacity>1</Opacity>
+              </Color>
+              <Visible>True</Visible>
+            </UIParams>
+            <Location>
+              <CheckCalendarEvent>0</CheckCalendarEvent>
+              <isNull>False</isNull>
+              <Description>School</Description>
+              <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+              <YCoordinate>-105.2627072</YCoordinate>
+              <XCoordinate>40.0071657</XCoordinate>
+            </Location>
+            <Enabled>True</Enabled>
+            <ID>303_7_330_0</ID>
+            <Name>study Biology</Name>
+            <StartTime>12/12/2014 12:00:00 AM</StartTime>
+            <PreDeadline>00:00:00</PreDeadline>
+            <PrepTime>00:00:00</PrepTime>
+            <Deadline>12/18/2014 11:59:00 PM</Deadline>
+            <Split>8</Split>
+            <Duration>12:00:00</Duration>
+            <RigidFlag>False</RigidFlag>
+            <EventSubSchedules>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>1</Type>
+                  <Color>
+                    <UserSelection>2</UserSelection>
+                    <Blue>128</Blue>
+                    <Green>255</Green>
+                    <Red>38</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>School</Description>
+                  <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+                  <YCoordinate>-105.2627072</YCoordinate>
+                  <XCoordinate>40.0071657</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>303_7_330_338</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>12/18/2014 8:44:00 PM</ActiveStartTime>
+                <ActiveEndTime>12/18/2014 10:14:00 PM</ActiveEndTime>
+                <Duration>01:30:00</Duration>
+                <StartTime>12/18/2014 8:44:00 PM</StartTime>
+                <EndTime>12/18/2014 10:14:00 PM</EndTime>
+              </EventSubSchedule>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>1</Type>
+                  <Color>
+                    <UserSelection>2</UserSelection>
+                    <Blue>128</Blue>
+                    <Green>255</Green>
+                    <Red>38</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>School</Description>
+                  <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+                  <YCoordinate>-105.2627072</YCoordinate>
+                  <XCoordinate>40.0071657</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>303_7_330_337</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>12/18/2014 7:14:00 PM</ActiveStartTime>
+                <ActiveEndTime>12/18/2014 8:44:00 PM</ActiveEndTime>
+                <Duration>01:30:00</Duration>
+                <StartTime>12/18/2014 7:14:00 PM</StartTime>
+                <EndTime>12/18/2014 8:44:00 PM</EndTime>
+              </EventSubSchedule>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>1</Type>
+                  <Color>
+                    <UserSelection>2</UserSelection>
+                    <Blue>128</Blue>
+                    <Green>255</Green>
+                    <Red>38</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>School</Description>
+                  <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+                  <YCoordinate>-105.2627072</YCoordinate>
+                  <XCoordinate>40.0071657</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>303_7_330_336</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>12/18/2014 5:44:00 PM</ActiveStartTime>
+                <ActiveEndTime>12/18/2014 7:14:00 PM</ActiveEndTime>
+                <Duration>01:30:00</Duration>
+                <StartTime>12/18/2014 5:44:00 PM</StartTime>
+                <EndTime>12/18/2014 7:14:00 PM</EndTime>
+              </EventSubSchedule>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>1</Type>
+                  <Color>
+                    <UserSelection>2</UserSelection>
+                    <Blue>128</Blue>
+                    <Green>255</Green>
+                    <Red>38</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>School</Description>
+                  <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+                  <YCoordinate>-105.2627072</YCoordinate>
+                  <XCoordinate>40.0071657</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>303_7_330_335</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>12/18/2014 2:29:00 PM</ActiveStartTime>
+                <ActiveEndTime>12/18/2014 3:59:00 PM</ActiveEndTime>
+                <Duration>01:30:00</Duration>
+                <StartTime>12/18/2014 2:29:00 PM</StartTime>
+                <EndTime>12/18/2014 3:59:00 PM</EndTime>
+              </EventSubSchedule>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>1</Type>
+                  <Color>
+                    <UserSelection>2</UserSelection>
+                    <Blue>128</Blue>
+                    <Green>255</Green>
+                    <Red>38</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>School</Description>
+                  <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+                  <YCoordinate>-105.2627072</YCoordinate>
+                  <XCoordinate>40.0071657</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>303_7_330_334</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>12/18/2014 11:14:00 AM</ActiveStartTime>
+                <ActiveEndTime>12/18/2014 12:44:00 PM</ActiveEndTime>
+                <Duration>01:30:00</Duration>
+                <StartTime>12/18/2014 11:14:00 AM</StartTime>
+                <EndTime>12/18/2014 12:44:00 PM</EndTime>
+              </EventSubSchedule>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>1</Type>
+                  <Color>
+                    <UserSelection>2</UserSelection>
+                    <Blue>128</Blue>
+                    <Green>255</Green>
+                    <Red>38</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>School</Description>
+                  <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+                  <YCoordinate>-105.2627072</YCoordinate>
+                  <XCoordinate>40.0071657</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>303_7_330_333</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>12/18/2014 7:59:00 AM</ActiveStartTime>
+                <ActiveEndTime>12/18/2014 9:29:00 AM</ActiveEndTime>
+                <Duration>01:30:00</Duration>
+                <StartTime>12/18/2014 7:59:00 AM</StartTime>
+                <EndTime>12/18/2014 9:29:00 AM</EndTime>
+              </EventSubSchedule>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>1</Type>
+                  <Color>
+                    <UserSelection>2</UserSelection>
+                    <Blue>128</Blue>
+                    <Green>255</Green>
+                    <Red>38</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>School</Description>
+                  <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+                  <YCoordinate>-105.2627072</YCoordinate>
+                  <XCoordinate>40.0071657</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>303_7_330_332</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>12/18/2014 6:29:00 AM</ActiveStartTime>
+                <ActiveEndTime>12/18/2014 7:59:00 AM</ActiveEndTime>
+                <Duration>01:30:00</Duration>
+                <StartTime>12/18/2014 6:29:00 AM</StartTime>
+                <EndTime>12/18/2014 7:59:00 AM</EndTime>
+              </EventSubSchedule>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>1</Type>
+                  <Color>
+                    <UserSelection>2</UserSelection>
+                    <Blue>128</Blue>
+                    <Green>255</Green>
+                    <Red>38</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>School</Description>
+                  <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+                  <YCoordinate>-105.2627072</YCoordinate>
+                  <XCoordinate>40.0071657</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>303_7_330_331</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>12/18/2014 4:59:00 AM</ActiveStartTime>
+                <ActiveEndTime>12/18/2014 6:29:00 AM</ActiveEndTime>
+                <Duration>01:30:00</Duration>
+                <StartTime>12/18/2014 4:59:00 AM</StartTime>
+                <EndTime>12/18/2014 6:29:00 AM</EndTime>
+              </EventSubSchedule>
+            </EventSubSchedules>
+            <RepetitionFlag>False</RepetitionFlag>
+            <Completed>False</Completed>
+          </RepeatCalendarEvent>
+          <RepeatCalendarEvent>
+            <Recurrence />
+            <MiscData>
+              <TypeSelection>0</TypeSelection>
+              <UserNote />
+            </MiscData>
+            <UIParams>
+              <Type>0</Type>
+              <Color>
+                <UserSelection>-1</UserSelection>
+                <Blue>127</Blue>
+                <Green>127</Green>
+                <Red>127</Red>
+                <Opacity>1</Opacity>
+              </Color>
+              <Visible>True</Visible>
+            </UIParams>
+            <Location>
+              <CheckCalendarEvent>0</CheckCalendarEvent>
+              <isNull>False</isNull>
+              <Description>School</Description>
+              <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+              <YCoordinate>-105.2627072</YCoordinate>
+              <XCoordinate>40.0071657</XCoordinate>
+            </Location>
+            <Enabled>True</Enabled>
+            <ID>303_7_321_0</ID>
+            <Name>study Biology</Name>
+            <StartTime>12/5/2014 12:00:00 AM</StartTime>
+            <PreDeadline>00:00:00</PreDeadline>
+            <PrepTime>00:00:00</PrepTime>
+            <Deadline>12/11/2014 11:59:00 PM</Deadline>
+            <Split>8</Split>
+            <Duration>12:00:00</Duration>
+            <RigidFlag>False</RigidFlag>
+            <EventSubSchedules>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>1</Type>
+                  <Color>
+                    <UserSelection>2</UserSelection>
+                    <Blue>128</Blue>
+                    <Green>255</Green>
+                    <Red>38</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>School</Description>
+                  <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+                  <YCoordinate>-105.2627072</YCoordinate>
+                  <XCoordinate>40.0071657</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>303_7_321_329</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>12/11/2014 8:44:00 PM</ActiveStartTime>
+                <ActiveEndTime>12/11/2014 10:14:00 PM</ActiveEndTime>
+                <Duration>01:30:00</Duration>
+                <StartTime>12/11/2014 8:44:00 PM</StartTime>
+                <EndTime>12/11/2014 10:14:00 PM</EndTime>
+              </EventSubSchedule>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>1</Type>
+                  <Color>
+                    <UserSelection>2</UserSelection>
+                    <Blue>128</Blue>
+                    <Green>255</Green>
+                    <Red>38</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>School</Description>
+                  <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+                  <YCoordinate>-105.2627072</YCoordinate>
+                  <XCoordinate>40.0071657</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>303_7_321_328</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>12/11/2014 7:14:00 PM</ActiveStartTime>
+                <ActiveEndTime>12/11/2014 8:44:00 PM</ActiveEndTime>
+                <Duration>01:30:00</Duration>
+                <StartTime>12/11/2014 7:14:00 PM</StartTime>
+                <EndTime>12/11/2014 8:44:00 PM</EndTime>
+              </EventSubSchedule>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>1</Type>
+                  <Color>
+                    <UserSelection>2</UserSelection>
+                    <Blue>128</Blue>
+                    <Green>255</Green>
+                    <Red>38</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>School</Description>
+                  <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+                  <YCoordinate>-105.2627072</YCoordinate>
+                  <XCoordinate>40.0071657</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>303_7_321_327</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>12/11/2014 5:44:00 PM</ActiveStartTime>
+                <ActiveEndTime>12/11/2014 7:14:00 PM</ActiveEndTime>
+                <Duration>01:30:00</Duration>
+                <StartTime>12/11/2014 5:44:00 PM</StartTime>
+                <EndTime>12/11/2014 7:14:00 PM</EndTime>
+              </EventSubSchedule>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>1</Type>
+                  <Color>
+                    <UserSelection>2</UserSelection>
+                    <Blue>128</Blue>
+                    <Green>255</Green>
+                    <Red>38</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>School</Description>
+                  <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+                  <YCoordinate>-105.2627072</YCoordinate>
+                  <XCoordinate>40.0071657</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>303_7_321_326</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>12/11/2014 2:29:00 PM</ActiveStartTime>
+                <ActiveEndTime>12/11/2014 3:59:00 PM</ActiveEndTime>
+                <Duration>01:30:00</Duration>
+                <StartTime>12/11/2014 2:29:00 PM</StartTime>
+                <EndTime>12/11/2014 3:59:00 PM</EndTime>
+              </EventSubSchedule>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>1</Type>
+                  <Color>
+                    <UserSelection>2</UserSelection>
+                    <Blue>128</Blue>
+                    <Green>255</Green>
+                    <Red>38</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>School</Description>
+                  <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+                  <YCoordinate>-105.2627072</YCoordinate>
+                  <XCoordinate>40.0071657</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>303_7_321_325</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>12/11/2014 11:14:00 AM</ActiveStartTime>
+                <ActiveEndTime>12/11/2014 12:44:00 PM</ActiveEndTime>
+                <Duration>01:30:00</Duration>
+                <StartTime>12/11/2014 11:14:00 AM</StartTime>
+                <EndTime>12/11/2014 12:44:00 PM</EndTime>
+              </EventSubSchedule>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>1</Type>
+                  <Color>
+                    <UserSelection>2</UserSelection>
+                    <Blue>128</Blue>
+                    <Green>255</Green>
+                    <Red>38</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>School</Description>
+                  <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+                  <YCoordinate>-105.2627072</YCoordinate>
+                  <XCoordinate>40.0071657</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>303_7_321_324</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>12/11/2014 7:59:00 AM</ActiveStartTime>
+                <ActiveEndTime>12/11/2014 9:29:00 AM</ActiveEndTime>
+                <Duration>01:30:00</Duration>
+                <StartTime>12/11/2014 7:59:00 AM</StartTime>
+                <EndTime>12/11/2014 9:29:00 AM</EndTime>
+              </EventSubSchedule>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>1</Type>
+                  <Color>
+                    <UserSelection>2</UserSelection>
+                    <Blue>128</Blue>
+                    <Green>255</Green>
+                    <Red>38</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>School</Description>
+                  <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+                  <YCoordinate>-105.2627072</YCoordinate>
+                  <XCoordinate>40.0071657</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>303_7_321_323</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>12/11/2014 6:29:00 AM</ActiveStartTime>
+                <ActiveEndTime>12/11/2014 7:59:00 AM</ActiveEndTime>
+                <Duration>01:30:00</Duration>
+                <StartTime>12/11/2014 6:29:00 AM</StartTime>
+                <EndTime>12/11/2014 7:59:00 AM</EndTime>
+              </EventSubSchedule>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>1</Type>
+                  <Color>
+                    <UserSelection>2</UserSelection>
+                    <Blue>128</Blue>
+                    <Green>255</Green>
+                    <Red>38</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>School</Description>
+                  <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+                  <YCoordinate>-105.2627072</YCoordinate>
+                  <XCoordinate>40.0071657</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>303_7_321_322</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>12/11/2014 4:59:00 AM</ActiveStartTime>
+                <ActiveEndTime>12/11/2014 6:29:00 AM</ActiveEndTime>
+                <Duration>01:30:00</Duration>
+                <StartTime>12/11/2014 4:59:00 AM</StartTime>
+                <EndTime>12/11/2014 6:29:00 AM</EndTime>
+              </EventSubSchedule>
+            </EventSubSchedules>
+            <RepetitionFlag>False</RepetitionFlag>
+            <Completed>False</Completed>
+          </RepeatCalendarEvent>
+          <RepeatCalendarEvent>
+            <Recurrence />
+            <MiscData>
+              <TypeSelection>0</TypeSelection>
+              <UserNote />
+            </MiscData>
+            <UIParams>
+              <Type>0</Type>
+              <Color>
+                <UserSelection>-1</UserSelection>
+                <Blue>127</Blue>
+                <Green>127</Green>
+                <Red>127</Red>
+                <Opacity>1</Opacity>
+              </Color>
+              <Visible>True</Visible>
+            </UIParams>
+            <Location>
+              <CheckCalendarEvent>0</CheckCalendarEvent>
+              <isNull>False</isNull>
+              <Description>School</Description>
+              <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+              <YCoordinate>-105.2627072</YCoordinate>
+              <XCoordinate>40.0071657</XCoordinate>
+            </Location>
+            <Enabled>True</Enabled>
+            <ID>303_7_312_0</ID>
+            <Name>study Biology</Name>
+            <StartTime>11/28/2014 12:00:00 AM</StartTime>
+            <PreDeadline>00:00:00</PreDeadline>
+            <PrepTime>00:00:00</PrepTime>
+            <Deadline>12/4/2014 11:59:00 PM</Deadline>
+            <Split>8</Split>
+            <Duration>12:00:00</Duration>
+            <RigidFlag>False</RigidFlag>
+            <EventSubSchedules>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>1</Type>
+                  <Color>
+                    <UserSelection>2</UserSelection>
+                    <Blue>128</Blue>
+                    <Green>255</Green>
+                    <Red>38</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>School</Description>
+                  <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+                  <YCoordinate>-105.2627072</YCoordinate>
+                  <XCoordinate>40.0071657</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>303_7_312_320</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>11/29/2014 8:58:00 AM</ActiveStartTime>
+                <ActiveEndTime>11/29/2014 10:28:00 AM</ActiveEndTime>
+                <Duration>01:30:00</Duration>
+                <StartTime>11/29/2014 8:58:00 AM</StartTime>
+                <EndTime>11/29/2014 10:28:00 AM</EndTime>
+              </EventSubSchedule>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>1</Type>
+                  <Color>
+                    <UserSelection>2</UserSelection>
+                    <Blue>128</Blue>
+                    <Green>255</Green>
+                    <Red>38</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>School</Description>
+                  <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+                  <YCoordinate>-105.2627072</YCoordinate>
+                  <XCoordinate>40.0071657</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>303_7_312_319</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>11/29/2014 7:16:00 AM</ActiveStartTime>
+                <ActiveEndTime>11/29/2014 8:46:00 AM</ActiveEndTime>
+                <Duration>01:30:00</Duration>
+                <StartTime>11/29/2014 7:16:00 AM</StartTime>
+                <EndTime>11/29/2014 8:46:00 AM</EndTime>
+              </EventSubSchedule>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>1</Type>
+                  <Color>
+                    <UserSelection>2</UserSelection>
+                    <Blue>128</Blue>
+                    <Green>255</Green>
+                    <Red>38</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>School</Description>
+                  <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+                  <YCoordinate>-105.2627072</YCoordinate>
+                  <XCoordinate>40.0071657</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>303_7_312_318</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>11/29/2014 5:46:00 AM</ActiveStartTime>
+                <ActiveEndTime>11/29/2014 7:16:00 AM</ActiveEndTime>
+                <Duration>01:30:00</Duration>
+                <StartTime>11/29/2014 5:46:00 AM</StartTime>
+                <EndTime>11/29/2014 7:16:00 AM</EndTime>
+              </EventSubSchedule>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>1</Type>
+                  <Color>
+                    <UserSelection>2</UserSelection>
+                    <Blue>128</Blue>
+                    <Green>255</Green>
+                    <Red>38</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>School</Description>
+                  <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+                  <YCoordinate>-105.2627072</YCoordinate>
+                  <XCoordinate>40.0071657</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>303_7_312_317</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>11/29/2014 3:30:00 AM</ActiveStartTime>
+                <ActiveEndTime>11/29/2014 5:00:00 AM</ActiveEndTime>
+                <Duration>01:30:00</Duration>
+                <StartTime>11/29/2014 3:30:00 AM</StartTime>
+                <EndTime>11/29/2014 5:00:00 AM</EndTime>
+              </EventSubSchedule>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>1</Type>
+                  <Color>
+                    <UserSelection>2</UserSelection>
+                    <Blue>128</Blue>
+                    <Green>255</Green>
+                    <Red>38</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>School</Description>
+                  <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+                  <YCoordinate>-105.2627072</YCoordinate>
+                  <XCoordinate>40.0071657</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>303_7_312_316</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>11/29/2014 2:00:00 AM</ActiveStartTime>
+                <ActiveEndTime>11/29/2014 3:30:00 AM</ActiveEndTime>
+                <Duration>01:30:00</Duration>
+                <StartTime>11/29/2014 2:00:00 AM</StartTime>
+                <EndTime>11/29/2014 3:30:00 AM</EndTime>
+              </EventSubSchedule>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>1</Type>
+                  <Color>
+                    <UserSelection>2</UserSelection>
+                    <Blue>128</Blue>
+                    <Green>255</Green>
+                    <Red>38</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>School</Description>
+                  <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+                  <YCoordinate>-105.2627072</YCoordinate>
+                  <XCoordinate>40.0071657</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>303_7_312_315</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>11/29/2014 12:30:00 AM</ActiveStartTime>
+                <ActiveEndTime>11/29/2014 2:00:00 AM</ActiveEndTime>
+                <Duration>01:30:00</Duration>
+                <StartTime>11/29/2014 12:30:00 AM</StartTime>
+                <EndTime>11/29/2014 2:00:00 AM</EndTime>
+              </EventSubSchedule>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>1</Type>
+                  <Color>
+                    <UserSelection>2</UserSelection>
+                    <Blue>128</Blue>
+                    <Green>255</Green>
+                    <Red>38</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>School</Description>
+                  <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+                  <YCoordinate>-105.2627072</YCoordinate>
+                  <XCoordinate>40.0071657</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>303_7_312_314</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>11/28/2014 11:00:00 PM</ActiveStartTime>
+                <ActiveEndTime>11/29/2014 12:30:00 AM</ActiveEndTime>
+                <Duration>01:30:00</Duration>
+                <StartTime>11/28/2014 11:00:00 PM</StartTime>
+                <EndTime>11/29/2014 12:30:00 AM</EndTime>
+              </EventSubSchedule>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>1</Type>
+                  <Color>
+                    <UserSelection>2</UserSelection>
+                    <Blue>128</Blue>
+                    <Green>255</Green>
+                    <Red>38</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>School</Description>
+                  <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+                  <YCoordinate>-105.2627072</YCoordinate>
+                  <XCoordinate>40.0071657</XCoordinate>
+                </Location>
+                <Complete>True</Complete>
+                <Enabled>True</Enabled>
+                <ID>303_7_312_313</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>11/28/2014 12:42:00 PM</ActiveStartTime>
+                <ActiveEndTime>11/28/2014 2:12:00 PM</ActiveEndTime>
+                <Duration>01:30:00</Duration>
+                <StartTime>11/28/2014 12:42:00 PM</StartTime>
+                <EndTime>11/28/2014 2:12:00 PM</EndTime>
+              </EventSubSchedule>
+            </EventSubSchedules>
+            <RepetitionFlag>False</RepetitionFlag>
+            <Completed>False</Completed>
+          </RepeatCalendarEvent>
+        </RepeatCalendarEvents>
+        <RepeatCountOfLowerLayer>0</RepeatCountOfLowerLayer>
+        <RepeatDays />
+        <RepeatDay>7</RepeatDay>
+        <RepeatFrequency>WEEKLY</RepeatFrequency>
+        <RepeatEndDate>12/13/2014 12:00:00 AM</RepeatEndDate>
+        <RepeatStartDate>11/28/2014 12:00:00 AM</RepeatStartDate>
+      </Recurrence>
+      <MiscData>
+        <TypeSelection>0</TypeSelection>
+        <UserNote />
+      </MiscData>
+      <UIParams>
+        <Type>0</Type>
+        <Color>
+          <UserSelection>-1</UserSelection>
+          <Blue>127</Blue>
+          <Green>127</Green>
+          <Red>127</Red>
+          <Opacity>1</Opacity>
+        </Color>
+        <Visible>True</Visible>
+      </UIParams>
+      <Location>
+        <CheckCalendarEvent>0</CheckCalendarEvent>
+        <isNull>False</isNull>
+        <Description>School</Description>
+        <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+        <YCoordinate>-105.2627072</YCoordinate>
+        <XCoordinate>40.0071657</XCoordinate>
+      </Location>
+      <Enabled>True</Enabled>
+      <ID>303_7_0_0</ID>
+      <Name>study Biology</Name>
+      <StartTime>11/28/2014 12:00:00 AM</StartTime>
+      <PreDeadline>00:00:00</PreDeadline>
+      <PrepTime>00:00:00</PrepTime>
+      <Deadline>12/13/2014 11:59:00 PM</Deadline>
+      <Split>8</Split>
+      <Duration>12:00:00</Duration>
+      <RigidFlag>False</RigidFlag>
+      <EventSubSchedules />
+      <RepetitionFlag>True</RepetitionFlag>
+      <Completed>False</Completed>
+    </EventSchedule>
+    <EventSchedule>
+      <Recurrence>
+        <RepeatCalendarEvents>
+          <RepeatCalendarEvent>
+            <Recurrence />
+            <MiscData>
+              <TypeSelection>0</TypeSelection>
+              <UserNote />
+            </MiscData>
+            <UIParams>
+              <Type>0</Type>
+              <Color>
+                <UserSelection>-1</UserSelection>
+                <Blue>127</Blue>
+                <Green>127</Green>
+                <Red>127</Red>
+                <Opacity>1</Opacity>
+              </Color>
+              <Visible>True</Visible>
+            </UIParams>
+            <Location>
+              <CheckCalendarEvent>0</CheckCalendarEvent>
+              <isNull>False</isNull>
+              <Description>School</Description>
+              <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+              <YCoordinate>-105.2627072</YCoordinate>
+              <XCoordinate>40.0071657</XCoordinate>
+            </Location>
+            <Enabled>True</Enabled>
+            <ID>348_7_350_0</ID>
+            <Name>Team meeting</Name>
+            <StartTime>11/28/2014 2:30:00 PM</StartTime>
+            <PreDeadline>00:00:00</PreDeadline>
+            <PrepTime>00:00:00</PrepTime>
+            <Deadline>11/28/2014 4:00:00 PM</Deadline>
+            <Split>1</Split>
+            <Duration>01:30:00</Duration>
+            <RigidFlag>True</RigidFlag>
+            <EventSubSchedules>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>1</Type>
+                  <Color>
+                    <UserSelection>1</UserSelection>
+                    <Blue>221</Blue>
+                    <Green>255</Green>
+                    <Red>135</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>School</Description>
+                  <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+                  <YCoordinate>-105.2627072</YCoordinate>
+                  <XCoordinate>40.0071657</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>348_7_350_351</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>11/28/2014 2:30:00 PM</ActiveStartTime>
+                <ActiveEndTime>11/28/2014 4:00:00 PM</ActiveEndTime>
+                <Duration>01:30:00</Duration>
+                <StartTime>11/28/2014 2:30:00 PM</StartTime>
+                <EndTime>11/28/2014 4:00:00 PM</EndTime>
+              </EventSubSchedule>
+            </EventSubSchedules>
+            <RepetitionFlag>False</RepetitionFlag>
+            <Completed>False</Completed>
+          </RepeatCalendarEvent>
+          <RepeatCalendarEvent>
+            <Recurrence />
+            <MiscData>
+              <TypeSelection>0</TypeSelection>
+              <UserNote />
+            </MiscData>
+            <UIParams>
+              <Type>0</Type>
+              <Color>
+                <UserSelection>-1</UserSelection>
+                <Blue>127</Blue>
+                <Green>127</Green>
+                <Red>127</Red>
+                <Opacity>1</Opacity>
+              </Color>
+              <Visible>True</Visible>
+            </UIParams>
+            <Location>
+              <CheckCalendarEvent>0</CheckCalendarEvent>
+              <isNull>False</isNull>
+              <Description>School</Description>
+              <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+              <YCoordinate>-105.2627072</YCoordinate>
+              <XCoordinate>40.0071657</XCoordinate>
+            </Location>
+            <Enabled>True</Enabled>
+            <ID>348_7_352_0</ID>
+            <Name>Team meeting</Name>
+            <StartTime>12/5/2014 2:30:00 PM</StartTime>
+            <PreDeadline>00:00:00</PreDeadline>
+            <PrepTime>00:00:00</PrepTime>
+            <Deadline>12/5/2014 4:00:00 PM</Deadline>
+            <Split>1</Split>
+            <Duration>01:30:00</Duration>
+            <RigidFlag>True</RigidFlag>
+            <EventSubSchedules>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>1</Type>
+                  <Color>
+                    <UserSelection>1</UserSelection>
+                    <Blue>221</Blue>
+                    <Green>255</Green>
+                    <Red>135</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>School</Description>
+                  <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+                  <YCoordinate>-105.2627072</YCoordinate>
+                  <XCoordinate>40.0071657</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>348_7_352_353</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>12/5/2014 2:30:00 PM</ActiveStartTime>
+                <ActiveEndTime>12/5/2014 4:00:00 PM</ActiveEndTime>
+                <Duration>01:30:00</Duration>
+                <StartTime>12/5/2014 2:30:00 PM</StartTime>
+                <EndTime>12/5/2014 4:00:00 PM</EndTime>
+              </EventSubSchedule>
+            </EventSubSchedules>
+            <RepetitionFlag>False</RepetitionFlag>
+            <Completed>False</Completed>
+          </RepeatCalendarEvent>
+          <RepeatCalendarEvent>
+            <Recurrence />
+            <MiscData>
+              <TypeSelection>0</TypeSelection>
+              <UserNote />
+            </MiscData>
+            <UIParams>
+              <Type>0</Type>
+              <Color>
+                <UserSelection>-1</UserSelection>
+                <Blue>127</Blue>
+                <Green>127</Green>
+                <Red>127</Red>
+                <Opacity>1</Opacity>
+              </Color>
+              <Visible>True</Visible>
+            </UIParams>
+            <Location>
+              <CheckCalendarEvent>0</CheckCalendarEvent>
+              <isNull>False</isNull>
+              <Description>School</Description>
+              <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+              <YCoordinate>-105.2627072</YCoordinate>
+              <XCoordinate>40.0071657</XCoordinate>
+            </Location>
+            <Enabled>True</Enabled>
+            <ID>348_7_354_0</ID>
+            <Name>Team meeting</Name>
+            <StartTime>12/12/2014 2:30:00 PM</StartTime>
+            <PreDeadline>00:00:00</PreDeadline>
+            <PrepTime>00:00:00</PrepTime>
+            <Deadline>12/12/2014 4:00:00 PM</Deadline>
+            <Split>1</Split>
+            <Duration>01:30:00</Duration>
+            <RigidFlag>True</RigidFlag>
+            <EventSubSchedules>
+              <EventSubSchedule>
+                <ConflictProfile>
+                  <ConflictIDs />
+                  <Flag>False</Flag>
+                  <Type>0</Type>
+                </ConflictProfile>
+                <MiscData>
+                  <TypeSelection>0</TypeSelection>
+                  <UserNote />
+                </MiscData>
+                <UIParams>
+                  <Type>1</Type>
+                  <Color>
+                    <UserSelection>1</UserSelection>
+                    <Blue>221</Blue>
+                    <Green>255</Green>
+                    <Red>135</Red>
+                    <Opacity>1</Opacity>
+                  </Color>
+                  <Visible>True</Visible>
+                </UIParams>
+                <Location>
+                  <CheckCalendarEvent>0</CheckCalendarEvent>
+                  <isNull>False</isNull>
+                  <Description>School</Description>
+                  <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+                  <YCoordinate>-105.2627072</YCoordinate>
+                  <XCoordinate>40.0071657</XCoordinate>
+                </Location>
+                <Complete>False</Complete>
+                <Enabled>True</Enabled>
+                <ID>348_7_354_355</ID>
+                <ThirdPartyID />
+                <PrepTime>00:00:00</PrepTime>
+                <ActiveStartTime>12/12/2014 2:30:00 PM</ActiveStartTime>
+                <ActiveEndTime>12/12/2014 4:00:00 PM</ActiveEndTime>
+                <Duration>01:30:00</Duration>
+                <StartTime>12/12/2014 2:30:00 PM</StartTime>
+                <EndTime>12/12/2014 4:00:00 PM</EndTime>
+              </EventSubSchedule>
+            </EventSubSchedules>
+            <RepetitionFlag>False</RepetitionFlag>
+            <Completed>False</Completed>
+          </RepeatCalendarEvent>
+        </RepeatCalendarEvents>
+        <RepeatCountOfLowerLayer>0</RepeatCountOfLowerLayer>
+        <RepeatDays />
+        <RepeatDay>7</RepeatDay>
+        <RepeatFrequency>WEEKLY</RepeatFrequency>
+        <RepeatEndDate>12/13/2014 12:00:00 AM</RepeatEndDate>
+        <RepeatStartDate>11/28/2014 12:00:00 AM</RepeatStartDate>
+      </Recurrence>
+      <MiscData>
+        <TypeSelection>0</TypeSelection>
+        <UserNote />
+      </MiscData>
+      <UIParams>
+        <Type>0</Type>
+        <Color>
+          <UserSelection>-1</UserSelection>
+          <Blue>127</Blue>
+          <Green>127</Green>
+          <Red>127</Red>
+          <Opacity>1</Opacity>
+        </Color>
+        <Visible>True</Visible>
+      </UIParams>
+      <Location>
+        <CheckCalendarEvent>0</CheckCalendarEvent>
+        <isNull>False</isNull>
+        <Description>School</Description>
+        <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+        <YCoordinate>-105.2627072</YCoordinate>
+        <XCoordinate>40.0071657</XCoordinate>
+      </Location>
+      <Enabled>True</Enabled>
+      <ID>348_7_0_0</ID>
+      <Name>Team meeting</Name>
+      <StartTime>11/28/2014 2:30:00 PM</StartTime>
+      <PreDeadline>00:00:00</PreDeadline>
+      <PrepTime>00:00:00</PrepTime>
+      <Deadline>12/13/2014 4:00:00 PM</Deadline>
+      <Split>1</Split>
+      <Duration>01:30:00</Duration>
+      <RigidFlag>True</RigidFlag>
+      <EventSubSchedules />
+      <RepetitionFlag>True</RepetitionFlag>
+      <Completed>False</Completed>
+    </EventSchedule>
+  </EventSchedules>
+  <LocationCache>
+    <Locations>
+      <Location>
+        <CachedName>school</CachedName>
+        <LocationID>2</LocationID>
+        <CheckCalendarEvent>0</CheckCalendarEvent>
+        <isNull>False</isNull>
+        <Description>School</Description>
+        <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+        <YCoordinate>-105.2627072</YCoordinate>
+        <XCoordinate>40.0071657</XCoordinate>
+      </Location>
+      <Location>
+        <CachedName>home</CachedName>
+        <LocationID>3</LocationID>
+        <CheckCalendarEvent>0</CheckCalendarEvent>
+        <isNull>False</isNull>
+        <Description>Home</Description>
+        <Address>williams village, 3275 apache road, boulder, co 80303, usa</Address>
+        <YCoordinate>-105.2507675</YCoordinate>
+        <XCoordinate>39.9976924</XCoordinate>
+      </Location>
+      <Location>
+        <CachedName>gym</CachedName>
+        <LocationID>4</LocationID>
+        <CheckCalendarEvent>0</CheckCalendarEvent>
+        <isNull>False</isNull>
+        <Description>Gym</Description>
+        <Address>folsom field, 2400 colorado avenue, boulder, co 80302, usa</Address>
+        <YCoordinate>-105.2669388</YCoordinate>
+        <XCoordinate>40.0094149</XCoordinate>
+      </Location>
+      <Location>
+        <CachedName>grocery store</CachedName>
+        <LocationID>5</LocationID>
+        <CheckCalendarEvent>0</CheckCalendarEvent>
+        <isNull>False</isNull>
+        <Description>Grocery Store</Description>
+        <Address>king soopers pharmacy, 1650 30th street, boulder, co 80302, usa</Address>
+        <YCoordinate>-105.251789</YCoordinate>
+        <XCoordinate>40.0157896</XCoordinate>
+      </Location>
+    </Locations>
+    <LastID>5</LastID>
+  </LocationCache>
+</ScheduleLog>

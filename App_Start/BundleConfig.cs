@@ -54,7 +54,6 @@ namespace TilerFront
                     "~/Scripts/moment.min.js",
                     "~/Scripts/fullcalendar.min.js",
                     "~/Scripts/WebControl.js",
-                    "~/Scripts/MonthOverviewIni.js",
                     "~/Scripts/HomePageControl.js",
                     "~/Scripts/SelectedEvent.js",
                     "~/Scripts/AddNewEvent_Desktop0.js",
@@ -65,6 +64,11 @@ namespace TilerFront
                     "~/Scripts/datepair.js",
                     "~/Scripts/heartcode-canvasloader-min-0.9.1.js"
                       ));
+
+            bundles.Add(new ScriptBundle("~/Content/TilerDesktopJS").Include(
+                    "~/Scripts/MonthOverviewIni.js"
+                      ));
+            
         }
     }
 }

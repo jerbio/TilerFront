@@ -1,0 +1,226 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ScheduleLog>
+  <LastIDCounter>11</LastIDCounter>
+  <referenceDay>12:00 AM</referenceDay>
+  <EventSchedules>
+    <EventSchedule>
+      <Recurrence />
+      <MiscData>
+        <TypeSelection>0</TypeSelection>
+        <UserNote />
+      </MiscData>
+      <UIParams>
+        <Type>0</Type>
+        <Color>
+          <Blue>127</Blue>
+          <Green>127</Green>
+          <Red>127</Red>
+          <Opacity>1</Opacity>
+        </Color>
+        <Visible>True</Visible>
+      </UIParams>
+      <Location>
+        <CheckCalendarEvent>0</CheckCalendarEvent>
+        <isNull>False</isNull>
+        <Description>other home</Description>
+        <Address>3003 Valmont Road, Boulder, CO 80301, USA</Address>
+        <YCoordinate>-105.250556</YCoordinate>
+        <XCoordinate>40.030965</XCoordinate>
+      </Location>
+      <Enabled>True</Enabled>
+      <ID>1</ID>
+      <Name>New event</Name>
+      <StartTime>7/10/2014 6:50:00 AM</StartTime>
+      <PreDeadline>00:00:00</PreDeadline>
+      <PrepTime>00:00:00</PrepTime>
+      <Deadline>7/12/2014 11:59:00 PM</Deadline>
+      <Split>1</Split>
+      <Duration>01:00:00</Duration>
+      <RigidFlag>False</RigidFlag>
+      <EventSubSchedules>
+        <EventSubSchedule>
+          <MiscData>
+            <TypeSelection>0</TypeSelection>
+            <UserNote />
+          </MiscData>
+          <UIParams>
+            <Type>0</Type>
+            <Color>
+              <Blue>127</Blue>
+              <Green>127</Green>
+              <Red>127</Red>
+              <Opacity>1</Opacity>
+            </Color>
+            <Visible>True</Visible>
+          </UIParams>
+          <Location>
+            <CheckCalendarEvent>0</CheckCalendarEvent>
+            <isNull>False</isNull>
+            <Description>other home</Description>
+            <Address>3003 Valmont Road, Boulder, CO 80301, USA</Address>
+            <YCoordinate>-105.250556</YCoordinate>
+            <XCoordinate>40.030965</XCoordinate>
+          </Location>
+          <Complete>False</Complete>
+          <Enabled>True</Enabled>
+          <ID>1_2</ID>
+          <ThirdPartyID />
+          <PrepTime>00:00:00</PrepTime>
+          <ActiveStartTime>7/10/2014 6:59:42 AM</ActiveStartTime>
+          <ActiveEndTime>7/10/2014 7:59:42 AM</ActiveEndTime>
+          <Duration>01:00:00</Duration>
+          <StartTime>7/10/2014 6:59:42 AM</StartTime>
+          <EndTime>7/10/2014 7:59:42 AM</EndTime>
+        </EventSubSchedule>
+      </EventSubSchedules>
+      <RepetitionFlag>False</RepetitionFlag>
+      <Completed>False</Completed>
+    </EventSchedule>
+    <EventSchedule>
+      <Recurrence />
+      <MiscData>
+        <TypeSelection>0</TypeSelection>
+        <UserNote />
+      </MiscData>
+      <UIParams>
+        <Type>0</Type>
+        <Color>
+          <Blue>127</Blue>
+          <Green>127</Green>
+          <Red>127</Red>
+          <Opacity>1</Opacity>
+        </Color>
+        <Visible>True</Visible>
+      </UIParams>
+      <Location>
+        <CheckCalendarEvent>0</CheckCalendarEvent>
+        <isNull>False</isNull>
+        <Description>Work</Description>
+        <Address>Engineering Center, Boulder, CO 80305, USA</Address>
+        <YCoordinate>-105.2628183</YCoordinate>
+        <XCoordinate>40.0067912</XCoordinate>
+      </Location>
+      <Enabled>True</Enabled>
+      <ID>3</ID>
+      <Name>rigid event</Name>
+      <StartTime>7/10/2014 7:00:00 AM</StartTime>
+      <PreDeadline>00:00:00</PreDeadline>
+      <PrepTime>00:00:00</PrepTime>
+      <Deadline>7/10/2014 8:59:00 AM</Deadline>
+      <Split>1</Split>
+      <Duration>01:59:00</Duration>
+      <RigidFlag>True</RigidFlag>
+      <EventSubSchedules>
+        <EventSubSchedule>
+          <MiscData>
+            <TypeSelection>0</TypeSelection>
+            <UserNote />
+          </MiscData>
+          <UIParams>
+            <Type>0</Type>
+            <Color>
+              <Blue>127</Blue>
+              <Green>127</Green>
+              <Red>127</Red>
+              <Opacity>1</Opacity>
+            </Color>
+            <Visible>True</Visible>
+          </UIParams>
+          <Location>
+            <CheckCalendarEvent>0</CheckCalendarEvent>
+            <isNull>False</isNull>
+            <Description>Work</Description>
+            <Address>Engineering Center, Boulder, CO 80305, USA</Address>
+            <YCoordinate>-105.2628183</YCoordinate>
+            <XCoordinate>40.0067912</XCoordinate>
+          </Location>
+          <Complete>False</Complete>
+          <Enabled>False</Enabled>
+          <ID>3_4</ID>
+          <ThirdPartyID />
+          <PrepTime>00:00:00</PrepTime>
+          <ActiveStartTime>7/10/2014 7:00:00 AM</ActiveStartTime>
+          <ActiveEndTime>7/10/2014 8:59:00 AM</ActiveEndTime>
+          <Duration>01:59:00</Duration>
+          <StartTime>7/10/2014 7:00:00 AM</StartTime>
+          <EndTime>7/10/2014 8:59:00 AM</EndTime>
+        </EventSubSchedule>
+      </EventSubSchedules>
+      <RepetitionFlag>False</RepetitionFlag>
+      <Completed>False</Completed>
+    </EventSchedule>
+    <EventSchedule>
+      <Recurrence />
+      <MiscData>
+        <TypeSelection>0</TypeSelection>
+        <UserNote />
+      </MiscData>
+      <UIParams>
+        <Type>0</Type>
+        <Color>
+          <Blue>0</Blue>
+          <Green>0</Green>
+          <Red>0</Red>
+          <Opacity>0</Opacity>
+        </Color>
+        <Visible>True</Visible>
+      </UIParams>
+      <Location>
+        <CheckCalendarEvent>0</CheckCalendarEvent>
+        <isNull>True</isNull>
+        <Description />
+        <Address />
+        <YCoordinate>1.79769313486232E+308</YCoordinate>
+        <XCoordinate>1.79769313486232E+308</XCoordinate>
+      </Location>
+      <Enabled>True</Enabled>
+      <ID>9</ID>
+      <Name>New Rigid</Name>
+      <StartTime>7/9/2014 7:05:00 AM</StartTime>
+      <PreDeadline>00:00:00.0000240</PreDeadline>
+      <PrepTime>00:00:00</PrepTime>
+      <Deadline>7/9/2014 11:59:00 AM</Deadline>
+      <Split>1</Split>
+      <Duration>04:54:00</Duration>
+      <RigidFlag>True</RigidFlag>
+      <EventSubSchedules>
+        <EventSubSchedule>
+          <MiscData>
+            <TypeSelection>0</TypeSelection>
+            <UserNote />
+          </MiscData>
+          <UIParams>
+            <Type>0</Type>
+            <Color>
+              <Blue>0</Blue>
+              <Green>0</Green>
+              <Red>0</Red>
+              <Opacity>0</Opacity>
+            </Color>
+            <Visible>True</Visible>
+          </UIParams>
+          <Location>
+            <CheckCalendarEvent>0</CheckCalendarEvent>
+            <isNull>True</isNull>
+            <Description />
+            <Address />
+            <YCoordinate>1.79769313486232E+308</YCoordinate>
+            <XCoordinate>1.79769313486232E+308</XCoordinate>
+          </Location>
+          <Complete>False</Complete>
+          <Enabled>True</Enabled>
+          <ID>9_10</ID>
+          <ThirdPartyID />
+          <PrepTime>00:00:00</PrepTime>
+          <ActiveStartTime>7/9/2014 7:05:00 AM</ActiveStartTime>
+          <ActiveEndTime>7/9/2014 11:59:00 AM</ActiveEndTime>
+          <Duration>04:54:00</Duration>
+          <StartTime>7/9/2014 7:05:00 AM</StartTime>
+          <EndTime>7/9/2014 11:59:00 AM</EndTime>
+        </EventSubSchedule>
+      </EventSubSchedules>
+      <RepetitionFlag>False</RepetitionFlag>
+      <Completed>False</Completed>
+    </EventSchedule>
+  </EventSchedules>
+</ScheduleLog>

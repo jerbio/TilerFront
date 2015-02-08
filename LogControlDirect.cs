@@ -231,10 +231,11 @@ namespace TilerFront
             }
         }
         */
-        async public Task<bool> WriteToLog(IEnumerable<CalendarEvent> AllEvents, string LatestID, string LogFile = "")
+        async public Task<bool> WriteToLog(IEnumerable<CalendarEvent> AllEvents, Models.ApplicationUser myUser, string LatestID, string LogFile = "")
         {
             Task<bool>  retValue;
-            
+            myUser.LastChange = DateTime.Now;
+            Task SaveChangesToDB = new Controllers.UserController().SaveUser(myUser);
 #if ForceReadFromXml
 #else
             if (useCassandra)
@@ -297,7 +298,7 @@ namespace TilerFront
                     Thread.Sleep(160);
                 }
             }
-
+            await SaveChangesToDB;
             return await retValue;
         }
 

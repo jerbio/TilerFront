@@ -260,7 +260,7 @@ namespace TilerFront
             }
         }
         */
-        async public Task<bool> WriteToLog(IEnumerable<CalendarEvent> AllEvents, string LatestID, string LogFile = "")
+        async public Task<bool> WriteToLogOld(IEnumerable<CalendarEvent> AllEvents, string LatestID, string LogFile = "")
         {
             Task<bool>  retValue;
             
