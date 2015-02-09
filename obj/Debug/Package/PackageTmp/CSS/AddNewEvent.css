@@ -1,0 +1,875 @@
+﻿
+.TabContent 
+{
+    position:absolute;
+    width:100%;
+    font-family: 'Muli', sans-serif;
+    height:100%;
+    transition:left .5s;
+}
+
+.InActiveTabContentDark
+{
+    position:absolute;
+    top:0%;
+    left:100%;
+    visibility:hidden;
+}
+
+.ActiveTabContentDark
+{
+    position:absolute;
+    top:0%;
+    visibility:visible;
+    left:0%;
+}
+
+.InActiveTabContentLight
+{
+    position:absolute;
+    top:0%;
+    left:100%;
+    //visibility:hidden;
+}
+
+.ActiveTabContentLight
+{
+    position:absolute;
+    top:0%;
+    visibility:visible;
+    left:0%;
+}
+
+.SectionCompletionButton 
+{
+    width: 95%;
+    transform:translateY(-100%);
+    height:8%;
+    left:2.5%;
+    position:absolute;
+    top:100%;
+    display:table;
+    font-size:1em;
+    text-align:center;
+    border:rgb(40,40,40);
+}
+
+#AddNewEventContainer 
+{
+    width:100%;
+    height:100%;
+    position:absolute;
+    overflow-x:hidden;
+}
+
+#TabTitleContainer 
+{
+    position:fixed;
+    height:15%;
+    width:100%;
+    top:0%;
+    overflow:hidden;
+}
+
+#TabContentContainer 
+{
+    position:absolute;
+    height:85%;
+    width:100%;
+    top:15%;
+    min-height:500px;
+}
+
+#RangeTabContainer {
+    position:absolute;
+    left:85%;
+    width:15%;
+    height:100%;
+    font-size:15px;
+}
+
+.TabTitleText /*media*/
+{
+    display: table-cell; 
+    vertical-align: middle; 
+    text-align: center; 
+    overflow:hidden;
+    text-overflow:ellipsis;
+    font-family: 'Metrophobic', sans-serif;
+    font-size:1em;
+}
+
+.TabTitle
+{
+    position:absolute;
+    display: table;
+    width:70%;
+    font-family: 'Metrophobic', sans-serif;
+    height:100%;
+    overflow:hidden;
+    text-align:center;
+}
+
+.ActiveTabTitleDark
+{
+    
+}
+
+.InActiveTabTitleDark
+{
+    
+}
+
+.ActiveTabTitleLight
+{
+    
+}
+
+.InActiveTabTitleLight
+{
+    
+}
+
+#NameTabTitle 
+{
+    position:absolute;
+    left:15%;
+    width:70%;
+    font-size:15px;
+}
+
+#NameTabContent 
+{
+    //background-color:green;
+}
+
+#RangeTabContent 
+{
+    //background-color:orange;
+}
+
+#RecurrenceTabContent 
+{
+    //background-color:red;
+}
+
+#RecurrenceTabTitle 
+{
+    position:absolute;
+    //left:33%;
+    //border-left:3px solid rgb(255,255,255);
+    //border-right:3px solid rgb(255,255,255);
+}
+
+#RangeTabTitle 
+{
+    position:absolute;
+    //left:66%;
+}
+
+#CancelTabContainer 
+{
+    position:absolute;
+    left:0%;
+    height:100%;
+    width:15%;
+    font-size:.75em;
+}
+
+#CancelTabTitleText 
+{
+    position:absolute;
+    width:100%;
+    top:100%;
+    margin-top:-.75em;
+    display: none;
+}
+
+#CancelTabContent 
+{
+    position:absolute;
+    width:40px;
+    height:40px;
+    top:50%;
+    margin-top:-20px;
+    left:50%;
+    margin-left:-20px;
+    
+}
+
+.InputTextFont 
+{
+    font-size:10px;
+}
+
+.recurrenceButton 
+{
+    //width:24%;
+    height:100%;
+    display:table;
+    border:2px solid rgb(120,120,120);
+    border-radius:3px;
+    font-family: 'Metrophobic', sans-serif;
+}
+
+.ActiveRecurrenceButton
+{
+    background-color:rgba(217,217,217,1);
+    color:rgba(50,50,50,1);
+}
+
+.InActiveRecurrenceButton
+{
+    background-color:rgba(50,50,50,1);
+    color:rgba(217,217,217,1);
+}
+
+#RecurrenceButtonContainer 
+{
+    position:absolute;
+    top:5%;
+    width:90%;
+    height:5%;
+    left:5%;
+}
+
+#dailyRecurrenceButton
+{
+    left:0%;
+}
+
+#weeklyRecurrenceButton
+{
+    left:25%;
+}
+
+#monthlyRecurrenceButton
+{
+    left:50%;
+}
+
+#yearlyRecurrenceButton
+{
+    left:75%;
+}
+
+/*Day Preference */
+
+#DayPreferenceContainer 
+{
+    position:absolute;
+    top:30%;
+    border-top:2px solid rgb(120,120,120);
+    border-bottom:2px solid rgb(120,120,120);
+    width:90%;
+    left:5%;
+    height: 30%;
+    border-radius:3px;
+    display:none;
+}
+
+.DayPreferenceRadioButtonContainer 
+{
+    position:absolute;
+    height:25%;
+    width:95%;
+    left:5%;
+    font-family: 'Metrophobic', sans-serif;
+    font-size:30px;
+}
+
+#BussinessHourInputContainer 
+{
+    top:10%;
+}
+
+
+#AnyHourTimeContainer 
+{
+    top:45%;
+}
+
+#CustomHourTimeContainer 
+{
+    top:80%;
+}
+
+label {  
+    display: inline-block;  
+    cursor: pointer;  
+    position: relative;  
+    padding-left: 25px;  
+    margin-right: 30px;  
+    font-size: 30px;  
+}  
+
+input[type=radio] {  
+    display: none;  
+} 
+
+label:before
+{
+    content: "";  
+    display: inline-block;  
+  
+    width: 30px;  
+    height: 30px;  
+  
+    margin-right: 10px;  
+    position: absolute;  
+    left: -10px;  
+    bottom: 1px;  
+    background-color: #aaa;  
+    box-shadow: inset 0px 2px 3px 0px rgba(0, 0, 0, .3), 0px 1px 0px 0px rgba(255, 255, 255, .8);  
+
+}
+
+label:before {  
+    border-radius: 15px; 
+    top:6px; 
+    display:table;
+}  
+
+input[type=radio]:checked + label:before {  
+    content: "\2022";  
+    display:table-cell;
+    color: #f3f3f3;  
+    font-size: 80px;  
+    vertical-align: middle;
+    text-align: center;  
+    line-height: 15px;  
+}
+
+
+#EnableRecurrenceButtonContainer 
+{
+    left: 100%;
+    transform: translate(-100%,-50%);
+    top: 50%;
+}
+
+
+
+#EnableRecurrenceContainer 
+{
+    position:absolute;
+    height:50px;
+    top:5%;
+    left:15%;
+    width:70%;
+}
+
+#EnableRecurrenceLabel 
+{
+    left:0%;
+    position:absolute;
+    width:80%;
+    height:100%;
+    font-family: 'Metrophobic', sans-serif;
+    font-size:12px;
+    line-height: 24px;
+    font-weight: 800;
+    display:table;
+}
+
+#EnabledRecurrenceContainer 
+{
+    position:absolute;
+    top:10%;
+    left:10%;
+    width:80%;
+    height:90%;
+}
+
+/*Day of week start*/
+.DayofWeekCircle /*media*/
+{
+    width:28px;
+    height:28px;
+    margin-left:-14px;
+    border-radius:28px;
+    border: 3px solid rgb(127,127,127);
+    font-family: 'Muli', sans-serif;
+    font-size:1em;
+    opacity:0;
+    transition:opacity 1s box-shadow .7s;
+    position:absolute;
+    text-align:center;
+    display:table;
+    top:28px;
+    box-sizing:border-box;
+}
+
+.DayOfWeekLetter
+{
+    display: table-cell; 
+    vertical-align: middle; 
+    text-align: center; 
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+.SelectedDayOfWeek /*media*/
+{
+    box-shadow: rgb(120,120,120) 0px 0px 3px 3px;
+}
+
+.deSelectedDayOfWeek 
+{
+    box-shadow: none;
+}
+
+.DaysOfTheWeekContainer /*media*/
+{
+    position:absolute;
+    height:7.5%;
+    width:90%;
+    left:2.5%;
+    z-index:20;
+    visibility:visible;
+    
+}
+
+#DaysOfTheWeekContainer 
+{
+    top:17.5%;
+    //visibility:hidden;
+}
+
+/*Day of week End*/
+
+#RepetitionRangeContainer 
+{
+    position:absolute;
+    top:70%;
+    width:80%;
+    height:10%;
+    left:10%;
+    font-family: 'Muli', sans-serif;
+    
+}
+
+.DateInputLabel 
+{
+    position:absolute;
+    left:0%;
+    width:20%;
+    line-height:6px;
+    font-size:8px;
+    height:100%;
+    top:50%;
+}
+
+.DateInputData
+{
+    position:absolute;
+    left:30%;
+    width:60%;
+    height:100%;
+    background-color:rgba(200,200,200,.3);
+    border-bottom: solid 2px gray;
+    font-size:1em;
+}
+
+#RepetitionRangeContainerStartContainer {
+    position:absolute;
+    top:0%;
+    height:40%;
+    width:100%;
+    visibility:hidden;
+}
+
+#RepetitionRangeContainerEndContainer {
+    position:absolute;
+    top:50%;
+    height:40%;
+    width:100%;
+}
+
+
+
+#NameTabContent 
+{
+
+    font-family: 'Muli', sans-serif;
+}
+
+
+/*Auto Scheduling Section Start*/
+
+#EnableAAutoScheduleContainer
+{
+    position:absolute;
+    top:60%;
+    width:70%;
+    height:25%;
+    left:15%;
+    //border:solid 3px green;
+    font-family: 'Muli', sans-serif;
+}
+
+#EnableAutoSchedulerButton 
+{
+    position:absolute;
+    left:100%;
+    //z-index:3;
+    transform:translate(-50%,0);
+}
+
+#EnableAAutoScheduleContainerLabel 
+{
+    position:absolute;
+    width:75%;
+    top:0%;
+    height:100%;
+    font-size:8px;
+}
+
+#AutoScheduleContainerDataContainer 
+{
+    position:absolute;
+    
+    top:1em;
+    width:100%;
+    height:95%;
+    
+    overflow:hidden;
+}
+
+#AutoScheduleDurationContainer
+{
+    position:absolute;
+    width:40%;
+    //left:5%;
+    height:100%;
+}
+#AutoScheduleDurationContainer_Text
+{
+    position:absolute;
+    width:100%;
+    height:100%;
+    border-bottom:3px solid gray;
+    font-size:.85em;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+#AutoScheduleContainerDataContainerSlider 
+{
+    position:absolute;
+    
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    transition: all .5s
+}
+
+.DisableSliderTop 
+{
+    position:absolute;
+    top:-100%;
+}
+
+.EnableSliderTop 
+{
+    position:absolute;
+    top:0%;
+}
+
+
+.InputBox 
+{
+    width:300px;
+    background-color:rgba(200, 200, 200, 0.1);
+    border: 2px solid #323232;
+    height:8%;
+    top:50%;
+    margin-top:-35px;
+    font-size:30px;
+}
+
+.InputLabel 
+{
+    position:absolute;
+    top:50%;
+    margin-top:-.5em;
+    height:1em;
+    font-size:40px;
+}
+
+#AutoScheduleCountContainer
+{
+    position:absolute;
+    left:100%;
+    transform:translateX(-100%);
+    width:3em;
+    top:10%;
+    height:40%;
+}
+
+#AutoScheduleTimeCOnstraintContainer
+{
+    position:absolute;
+    top:50%;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+}
+
+#AutoScheduleRangeConstraintContainer 
+{
+    position:absolute;
+    width:70%;
+    left:15%;
+    height:32%;
+    top:30%;
+    transition: all .5s;
+    overflow:hidden;
+}
+
+.AutoScheduleTimeRange 
+{
+    width:100%;
+}
+
+#AutoScheduleRangeConstraintContainerStart 
+{
+    position:absolute;
+    height:45%;
+}
+
+#AutoScheduleRangeConstraintContainerEnd 
+{   
+    position:absolute;
+    height:50%;
+    width:50%;
+    top:10%;
+}
+
+#AutoScheduleRangeConstraintContainerEnd a {
+    position:absolute;
+    left:100%;
+    top:0;
+    transform:translateX(-100%);
+}
+
+#AutoScheduleRangeConstraintContainerStart a {
+    position:absolute;
+    left:100%;
+    top:0;
+    transform:translateX(-300%);
+}
+
+
+
+.TimePicker 
+{
+    width:100%;
+    font-size:10px;
+    text-align:left;
+    position:absolute;
+    height:50%;
+    //background-color: transparent;
+    border:none;
+    //border-bottom:solid white 3px;
+    font-family: 'Muli', sans-serif;
+}
+
+.DatePicker 
+{
+    width:100%;
+    font-size:10px;
+    position:absolute;
+    height:50%;
+    text-align:left;
+    font-family: 'Muli', sans-serif;
+    top:50%;
+    margin-top:6px;/*Because of border from timepicker*/
+    border:none;
+    //background-color: transparent;
+}
+
+.RangeLabel 
+{
+    position:absolute;
+    width:100%;
+    text-align:center;
+    top:70%;
+    font-size:25px;
+}
+/*Auto Scheduling Section End*/
+
+
+.ActiveTabTitleDark
+{
+    //background-color:rgba(25,25,25,1);
+    //box-shadow:rgba(20,20,20,.6) 0px 0px 18px 18px;
+    left:15%;
+    z-index:1;
+}
+
+.InActiveTabTitleDark
+{
+    //background-color:rgb(168,168,168);
+    left:100%;
+    z-index:0;
+}
+
+.ActiveTabTitleLight
+{
+    //background-color:rgb(168,168,168);
+    //box-shadow:rgba(20,20,20,.6) 0px 0px 18px 18px;
+    left:15%;
+    z-index:4;
+}
+
+.InActiveTabTitleLight
+{
+    //background-color:rgba(25,25,25,1);
+    left:100%;
+    z-index:0;
+}
+
+.LocationTag 
+{
+    position:absolute;
+    font-weight:900;
+    left:5%;
+    width:25%;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    //line-height:100%;
+}
+
+.LocationAddress 
+{
+    position:absolute;
+    //font-weight:900;
+    left:30%;
+    width:65%;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    //line-height:100%;
+}
+
+#ContainerDateElement 
+{
+    position:absolute;
+    display:none;
+    width:100%;
+    height:100%;
+    //background-color:red;
+    z-index:10;
+}
+
+#DatePickerTitle
+{
+    position:absolute;
+    width:100%;
+    top:0.5em;
+    height:1em;
+    text-align:center;
+}
+
+#DatePickerButtonContainer 
+{
+    position:absolute;
+    left:15%;
+    top:20%;
+    width:70%;
+    min-height:200px;
+    height:40%;
+    border-radius:20px;
+    overflow:hidden;
+}
+
+#DatePickerOptionContainer 
+{
+    position:absolute;
+    height:100%;
+    width:100%;
+    background-color:rgba(10, 10, 10, 0.9);
+}
+
+#AllButtonsContainer 
+{
+    position:absolute;
+    top:10%;
+    top:27%;
+    width:100%;
+    height:46%;
+    
+    //background-color:green;
+}
+
+.DateSelectionButton 
+{
+    position:absolute;
+    height:20%;
+    font-size: 10px;
+    min-height:40px;
+    min-width:80px;
+
+    width:20%;
+    left:50%;
+}
+
+#EndOfToday 
+{
+    top:0;
+    transform:translateX(-110%);
+}
+
+#EndOfTomorrow 
+{
+    
+    
+    transform:translateX(10%)
+}
+
+#EndOfWeek 
+{
+    top:50%;
+    transform:translateX(-110%);
+    
+}
+
+#EndOfMonth 
+{   
+    transform:translateX(10%);
+    top:50%;
+    
+}
+
+#SelectDate 
+{
+    position:absolute;
+    left:50%;
+    width:6em;
+    margin-left:-3em;
+}
+
+#SelectDateContainer 
+{
+    position:absolute;
+    top:80%;
+    width:100%;
+    height:100%;
+    padding-right:0;//padding because of jquery adds some padding to the parent element
+}
+
+
+#SelectDateContainer a 
+{
+    position:absolute;
+    left:50%;
+    margin-left:4em;
+    transform:translateY(-50%);
+    
+}
+
+
+
+/*Media Queries For Desktop*/
+
+/* Styles */

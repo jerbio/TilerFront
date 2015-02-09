@@ -1,0 +1,571 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ScheduleLog>
+  <LastIDCounter>56</LastIDCounter>
+  <referenceDay>12:00 AM</referenceDay>
+  <EventSchedules>
+    <EventSchedule>
+      <Recurrence />
+      <MiscData>
+        <TypeSelection>0</TypeSelection>
+        <UserNote />
+      </MiscData>
+      <UIParams>
+        <Type>0</Type>
+        <Color>
+          <UserSelection>-1</UserSelection>
+          <Blue>127</Blue>
+          <Green>127</Green>
+          <Red>127</Red>
+          <Opacity>1</Opacity>
+        </Color>
+        <Visible>True</Visible>
+      </UIParams>
+      <Location>
+        <CheckCalendarEvent>0</CheckCalendarEvent>
+        <isNull>False</isNull>
+        <Description />
+        <Address />
+        <YCoordinate>-105.3505482</YCoordinate>
+        <XCoordinate>40.083319</XCoordinate>
+      </Location>
+      <Enabled>False</Enabled>
+      <ID>1_7_0_0</ID>
+      <Name>Grocery Shopping</Name>
+      <StartTime>11/15/2014 9:00:00 AM</StartTime>
+      <PreDeadline>00:00:00</PreDeadline>
+      <PrepTime>00:00:00</PrepTime>
+      <Deadline>11/15/2014 11:59:00 AM</Deadline>
+      <Split>1</Split>
+      <Duration>01:00:00</Duration>
+      <RigidFlag>False</RigidFlag>
+      <EventSubSchedules>
+        <EventSubSchedule>
+          <ConflictProfile>
+            <ConflictIDs />
+            <Flag>False</Flag>
+            <Type>0</Type>
+          </ConflictProfile>
+          <MiscData>
+            <TypeSelection>0</TypeSelection>
+            <UserNote />
+          </MiscData>
+          <UIParams>
+            <Type>1</Type>
+            <Color>
+              <UserSelection>4</UserSelection>
+              <Blue>0</Blue>
+              <Green>255</Green>
+              <Red>0</Red>
+              <Opacity>1</Opacity>
+            </Color>
+            <Visible>True</Visible>
+          </UIParams>
+          <Location>
+            <CheckCalendarEvent>0</CheckCalendarEvent>
+            <isNull>False</isNull>
+            <Description />
+            <Address />
+            <YCoordinate>-105.3505482</YCoordinate>
+            <XCoordinate>40.083319</XCoordinate>
+          </Location>
+          <Complete>False</Complete>
+          <Enabled>False</Enabled>
+          <ID>1_7_0_2</ID>
+          <ThirdPartyID />
+          <PrepTime>00:00:00</PrepTime>
+          <ActiveStartTime>11/15/2014 10:59:00 AM</ActiveStartTime>
+          <ActiveEndTime>11/15/2014 11:59:00 AM</ActiveEndTime>
+          <Duration>01:00:00</Duration>
+          <StartTime>11/15/2014 10:59:00 AM</StartTime>
+          <EndTime>11/15/2014 11:59:00 AM</EndTime>
+        </EventSubSchedule>
+      </EventSubSchedules>
+      <RepetitionFlag>False</RepetitionFlag>
+      <Completed>False</Completed>
+    </EventSchedule>
+    <EventSchedule>
+      <Recurrence />
+      <MiscData>
+        <TypeSelection>0</TypeSelection>
+        <UserNote />
+      </MiscData>
+      <UIParams>
+        <Type>0</Type>
+        <Color>
+          <UserSelection>-1</UserSelection>
+          <Blue>127</Blue>
+          <Green>127</Green>
+          <Red>127</Red>
+          <Opacity>1</Opacity>
+        </Color>
+        <Visible>True</Visible>
+      </UIParams>
+      <Location>
+        <CheckCalendarEvent>0</CheckCalendarEvent>
+        <isNull>False</isNull>
+        <Description />
+        <Address />
+        <YCoordinate>-105.3505482</YCoordinate>
+        <XCoordinate>40.083319</XCoordinate>
+      </Location>
+      <Enabled>True</Enabled>
+      <ID>3_7_0_0</ID>
+      <Name>Work out</Name>
+      <StartTime>11/15/2014 9:30:00 AM</StartTime>
+      <PreDeadline>00:00:00</PreDeadline>
+      <PrepTime>00:00:00</PrepTime>
+      <Deadline>11/15/2014 11:59:00 PM</Deadline>
+      <Split>1</Split>
+      <Duration>01:01:00</Duration>
+      <RigidFlag>False</RigidFlag>
+      <EventSubSchedules>
+        <EventSubSchedule>
+          <ConflictProfile>
+            <ConflictIDs />
+            <Flag>False</Flag>
+            <Type>0</Type>
+          </ConflictProfile>
+          <MiscData>
+            <TypeSelection>0</TypeSelection>
+            <UserNote />
+          </MiscData>
+          <UIParams>
+            <Type>1</Type>
+            <Color>
+              <UserSelection>6</UserSelection>
+              <Blue>33</Blue>
+              <Green>255</Green>
+              <Red>125</Red>
+              <Opacity>1</Opacity>
+            </Color>
+            <Visible>True</Visible>
+          </UIParams>
+          <Location>
+            <CheckCalendarEvent>0</CheckCalendarEvent>
+            <isNull>False</isNull>
+            <Description />
+            <Address />
+            <YCoordinate>-105.3505482</YCoordinate>
+            <XCoordinate>40.083319</XCoordinate>
+          </Location>
+          <Complete>False</Complete>
+          <Enabled>True</Enabled>
+          <ID>3_7_0_4</ID>
+          <ThirdPartyID />
+          <PrepTime>00:00:00</PrepTime>
+          <ActiveStartTime>11/15/2014 4:12:00 PM</ActiveStartTime>
+          <ActiveEndTime>11/15/2014 5:13:00 PM</ActiveEndTime>
+          <Duration>01:01:00</Duration>
+          <StartTime>11/15/2014 4:12:00 PM</StartTime>
+          <EndTime>11/15/2014 5:13:00 PM</EndTime>
+        </EventSubSchedule>
+      </EventSubSchedules>
+      <RepetitionFlag>False</RepetitionFlag>
+      <Completed>False</Completed>
+    </EventSchedule>
+    <EventSchedule>
+      <Recurrence />
+      <MiscData>
+        <TypeSelection>0</TypeSelection>
+        <UserNote />
+      </MiscData>
+      <UIParams>
+        <Type>0</Type>
+        <Color>
+          <UserSelection>-1</UserSelection>
+          <Blue>127</Blue>
+          <Green>127</Green>
+          <Red>127</Red>
+          <Opacity>1</Opacity>
+        </Color>
+        <Visible>True</Visible>
+      </UIParams>
+      <Location>
+        <CheckCalendarEvent>0</CheckCalendarEvent>
+        <isNull>False</isNull>
+        <Description />
+        <Address />
+        <YCoordinate>-105.3505482</YCoordinate>
+        <XCoordinate>40.083319</XCoordinate>
+      </Location>
+      <Enabled>True</Enabled>
+      <ID>5_7_0_0</ID>
+      <Name>House showing </Name>
+      <StartTime>11/15/2014 9:30:00 AM</StartTime>
+      <PreDeadline>00:00:00</PreDeadline>
+      <PrepTime>00:00:00</PrepTime>
+      <Deadline>11/15/2014 11:30:00 AM</Deadline>
+      <Split>1</Split>
+      <Duration>02:00:00</Duration>
+      <RigidFlag>True</RigidFlag>
+      <EventSubSchedules>
+        <EventSubSchedule>
+          <ConflictProfile>
+            <ConflictIDs />
+            <Flag>False</Flag>
+            <Type>0</Type>
+          </ConflictProfile>
+          <MiscData>
+            <TypeSelection>0</TypeSelection>
+            <UserNote />
+          </MiscData>
+          <UIParams>
+            <Type>1</Type>
+            <Color>
+              <UserSelection>3</UserSelection>
+              <Blue>0</Blue>
+              <Green>0</Green>
+              <Red>255</Red>
+              <Opacity>1</Opacity>
+            </Color>
+            <Visible>True</Visible>
+          </UIParams>
+          <Location>
+            <CheckCalendarEvent>0</CheckCalendarEvent>
+            <isNull>False</isNull>
+            <Description />
+            <Address />
+            <YCoordinate>-105.3505482</YCoordinate>
+            <XCoordinate>40.083319</XCoordinate>
+          </Location>
+          <Complete>False</Complete>
+          <Enabled>True</Enabled>
+          <ID>5_7_0_6</ID>
+          <ThirdPartyID />
+          <PrepTime>00:00:00</PrepTime>
+          <ActiveStartTime>11/15/2014 9:30:00 AM</ActiveStartTime>
+          <ActiveEndTime>11/15/2014 11:30:00 AM</ActiveEndTime>
+          <Duration>02:00:00</Duration>
+          <StartTime>11/15/2014 9:30:00 AM</StartTime>
+          <EndTime>11/15/2014 11:30:00 AM</EndTime>
+        </EventSubSchedule>
+      </EventSubSchedules>
+      <RepetitionFlag>False</RepetitionFlag>
+      <Completed>False</Completed>
+    </EventSchedule>
+    <EventSchedule>
+      <Recurrence />
+      <MiscData>
+        <TypeSelection>0</TypeSelection>
+        <UserNote />
+      </MiscData>
+      <UIParams>
+        <Type>0</Type>
+        <Color>
+          <UserSelection>-1</UserSelection>
+          <Blue>127</Blue>
+          <Green>127</Green>
+          <Red>127</Red>
+          <Opacity>1</Opacity>
+        </Color>
+        <Visible>True</Visible>
+      </UIParams>
+      <Location>
+        <CheckCalendarEvent>0</CheckCalendarEvent>
+        <isNull>False</isNull>
+        <Description />
+        <Address />
+        <YCoordinate>-105.3505482</YCoordinate>
+        <XCoordinate>40.083319</XCoordinate>
+      </Location>
+      <Enabled>False</Enabled>
+      <ID>13_7_0_0</ID>
+      <Name>House showing II</Name>
+      <StartTime>11/10/2014 2:00:00 PM</StartTime>
+      <PreDeadline>00:00:00</PreDeadline>
+      <PrepTime>00:00:00</PrepTime>
+      <Deadline>11/10/2014 4:00:00 PM</Deadline>
+      <Split>1</Split>
+      <Duration>02:00:00</Duration>
+      <RigidFlag>True</RigidFlag>
+      <EventSubSchedules>
+        <EventSubSchedule>
+          <ConflictProfile>
+            <ConflictIDs />
+            <Flag>False</Flag>
+            <Type>0</Type>
+          </ConflictProfile>
+          <MiscData>
+            <TypeSelection>0</TypeSelection>
+            <UserNote />
+          </MiscData>
+          <UIParams>
+            <Type>0</Type>
+            <Color>
+              <UserSelection>-1</UserSelection>
+              <Blue>127</Blue>
+              <Green>127</Green>
+              <Red>127</Red>
+              <Opacity>1</Opacity>
+            </Color>
+            <Visible>True</Visible>
+          </UIParams>
+          <Location>
+            <CheckCalendarEvent>0</CheckCalendarEvent>
+            <isNull>False</isNull>
+            <Description />
+            <Address />
+            <YCoordinate>-105.3505482</YCoordinate>
+            <XCoordinate>40.083319</XCoordinate>
+          </Location>
+          <Complete>False</Complete>
+          <Enabled>False</Enabled>
+          <ID>13_7_0_14</ID>
+          <ThirdPartyID />
+          <PrepTime>00:00:00</PrepTime>
+          <ActiveStartTime>11/10/2014 2:00:00 PM</ActiveStartTime>
+          <ActiveEndTime>11/10/2014 4:00:00 PM</ActiveEndTime>
+          <Duration>02:00:00</Duration>
+          <StartTime>11/10/2014 2:00:00 PM</StartTime>
+          <EndTime>11/10/2014 4:00:00 PM</EndTime>
+        </EventSubSchedule>
+      </EventSubSchedules>
+      <RepetitionFlag>False</RepetitionFlag>
+      <Completed>False</Completed>
+    </EventSchedule>
+    <EventSchedule>
+      <Recurrence />
+      <MiscData>
+        <TypeSelection>0</TypeSelection>
+        <UserNote />
+      </MiscData>
+      <UIParams>
+        <Type>0</Type>
+        <Color>
+          <UserSelection>-1</UserSelection>
+          <Blue>127</Blue>
+          <Green>127</Green>
+          <Red>127</Red>
+          <Opacity>1</Opacity>
+        </Color>
+        <Visible>True</Visible>
+      </UIParams>
+      <Location>
+        <CheckCalendarEvent>0</CheckCalendarEvent>
+        <isNull>False</isNull>
+        <Description />
+        <Address />
+        <YCoordinate>-105.3505482</YCoordinate>
+        <XCoordinate>40.083319</XCoordinate>
+      </Location>
+      <Enabled>True</Enabled>
+      <ID>33_7_0_0</ID>
+      <Name>House showing</Name>
+      <StartTime>11/15/2014 2:00:00 PM</StartTime>
+      <PreDeadline>00:00:00</PreDeadline>
+      <PrepTime>00:00:00</PrepTime>
+      <Deadline>11/15/2014 4:00:00 PM</Deadline>
+      <Split>1</Split>
+      <Duration>02:00:00</Duration>
+      <RigidFlag>True</RigidFlag>
+      <EventSubSchedules>
+        <EventSubSchedule>
+          <ConflictProfile>
+            <ConflictIDs />
+            <Flag>False</Flag>
+            <Type>0</Type>
+          </ConflictProfile>
+          <MiscData>
+            <TypeSelection>0</TypeSelection>
+            <UserNote />
+          </MiscData>
+          <UIParams>
+            <Type>0</Type>
+            <Color>
+              <UserSelection>-1</UserSelection>
+              <Blue>127</Blue>
+              <Green>127</Green>
+              <Red>127</Red>
+              <Opacity>1</Opacity>
+            </Color>
+            <Visible>True</Visible>
+          </UIParams>
+          <Location>
+            <CheckCalendarEvent>0</CheckCalendarEvent>
+            <isNull>False</isNull>
+            <Description />
+            <Address />
+            <YCoordinate>-105.3505482</YCoordinate>
+            <XCoordinate>40.083319</XCoordinate>
+          </Location>
+          <Complete>False</Complete>
+          <Enabled>True</Enabled>
+          <ID>33_7_0_34</ID>
+          <ThirdPartyID />
+          <PrepTime>00:00:00</PrepTime>
+          <ActiveStartTime>11/15/2014 2:00:00 PM</ActiveStartTime>
+          <ActiveEndTime>11/15/2014 4:00:00 PM</ActiveEndTime>
+          <Duration>02:00:00</Duration>
+          <StartTime>11/15/2014 2:00:00 PM</StartTime>
+          <EndTime>11/15/2014 4:00:00 PM</EndTime>
+        </EventSubSchedule>
+      </EventSubSchedules>
+      <RepetitionFlag>False</RepetitionFlag>
+      <Completed>False</Completed>
+    </EventSchedule>
+    <EventSchedule>
+      <Recurrence />
+      <MiscData>
+        <TypeSelection>0</TypeSelection>
+        <UserNote />
+      </MiscData>
+      <UIParams>
+        <Type>0</Type>
+        <Color>
+          <UserSelection>-1</UserSelection>
+          <Blue>127</Blue>
+          <Green>127</Green>
+          <Red>127</Red>
+          <Opacity>1</Opacity>
+        </Color>
+        <Visible>True</Visible>
+      </UIParams>
+      <Location>
+        <CheckCalendarEvent>0</CheckCalendarEvent>
+        <isNull>False</isNull>
+        <Description />
+        <Address />
+        <YCoordinate>-105.3505482</YCoordinate>
+        <XCoordinate>40.083319</XCoordinate>
+      </Location>
+      <Enabled>True</Enabled>
+      <ID>35_7_0_0</ID>
+      <Name>Game with son</Name>
+      <StartTime>11/15/2014 12:00:00 PM</StartTime>
+      <PreDeadline>00:00:00</PreDeadline>
+      <PrepTime>00:00:00</PrepTime>
+      <Deadline>11/15/2014 1:00:00 PM</Deadline>
+      <Split>1</Split>
+      <Duration>01:00:00</Duration>
+      <RigidFlag>True</RigidFlag>
+      <EventSubSchedules>
+        <EventSubSchedule>
+          <ConflictProfile>
+            <ConflictIDs />
+            <Flag>False</Flag>
+            <Type>0</Type>
+          </ConflictProfile>
+          <MiscData>
+            <TypeSelection>0</TypeSelection>
+            <UserNote />
+          </MiscData>
+          <UIParams>
+            <Type>1</Type>
+            <Color>
+              <UserSelection>8</UserSelection>
+              <Blue>61</Blue>
+              <Green>103</Green>
+              <Red>255</Red>
+              <Opacity>1</Opacity>
+            </Color>
+            <Visible>True</Visible>
+          </UIParams>
+          <Location>
+            <CheckCalendarEvent>0</CheckCalendarEvent>
+            <isNull>False</isNull>
+            <Description />
+            <Address />
+            <YCoordinate>-105.3505482</YCoordinate>
+            <XCoordinate>40.083319</XCoordinate>
+          </Location>
+          <Complete>False</Complete>
+          <Enabled>True</Enabled>
+          <ID>35_7_0_36</ID>
+          <ThirdPartyID />
+          <PrepTime>00:00:00</PrepTime>
+          <ActiveStartTime>11/15/2014 12:00:00 PM</ActiveStartTime>
+          <ActiveEndTime>11/15/2014 1:00:00 PM</ActiveEndTime>
+          <Duration>01:00:00</Duration>
+          <StartTime>11/15/2014 12:00:00 PM</StartTime>
+          <EndTime>11/15/2014 1:00:00 PM</EndTime>
+        </EventSubSchedule>
+      </EventSubSchedules>
+      <RepetitionFlag>False</RepetitionFlag>
+      <Completed>False</Completed>
+    </EventSchedule>
+    <EventSchedule>
+      <Recurrence />
+      <MiscData>
+        <TypeSelection>0</TypeSelection>
+        <UserNote />
+      </MiscData>
+      <UIParams>
+        <Type>1</Type>
+        <Color>
+          <UserSelection>4</UserSelection>
+          <Blue>255</Blue>
+          <Green>0</Green>
+          <Red>0</Red>
+          <Opacity>1</Opacity>
+        </Color>
+        <Visible>True</Visible>
+      </UIParams>
+      <Location>
+        <CheckCalendarEvent>0</CheckCalendarEvent>
+        <isNull>True</isNull>
+        <Description />
+        <Address />
+        <YCoordinate>1.79769313486232E+308</YCoordinate>
+        <XCoordinate>1.79769313486232E+308</XCoordinate>
+      </Location>
+      <Enabled>True</Enabled>
+      <ID>55_7_0_0</ID>
+      <Name>Grocery shopping </Name>
+      <StartTime>11/15/2014 10:24:00 AM</StartTime>
+      <PreDeadline>00:00:00</PreDeadline>
+      <PrepTime>00:00:00</PrepTime>
+      <Deadline>11/15/2014 11:59:00 PM</Deadline>
+      <Split>1</Split>
+      <Duration>01:00:00</Duration>
+      <RigidFlag>False</RigidFlag>
+      <EventSubSchedules>
+        <EventSubSchedule>
+          <ConflictProfile>
+            <ConflictIDs />
+            <Flag>False</Flag>
+            <Type>0</Type>
+          </ConflictProfile>
+          <MiscData>
+            <TypeSelection>0</TypeSelection>
+            <UserNote />
+          </MiscData>
+          <UIParams>
+            <Type>1</Type>
+            <Color>
+              <UserSelection>4</UserSelection>
+              <Blue>255</Blue>
+              <Green>0</Green>
+              <Red>0</Red>
+              <Opacity>1</Opacity>
+            </Color>
+            <Visible>True</Visible>
+          </UIParams>
+          <Location>
+            <CheckCalendarEvent>0</CheckCalendarEvent>
+            <isNull>True</isNull>
+            <Description />
+            <Address />
+            <YCoordinate>1.79769313486232E+308</YCoordinate>
+            <XCoordinate>1.79769313486232E+308</XCoordinate>
+          </Location>
+          <Complete>False</Complete>
+          <Enabled>True</Enabled>
+          <ID>55_7_0_56</ID>
+          <ThirdPartyID />
+          <PrepTime>00:00:00</PrepTime>
+          <ActiveStartTime>11/15/2014 1:00:00 PM</ActiveStartTime>
+          <ActiveEndTime>11/15/2014 2:00:00 PM</ActiveEndTime>
+          <Duration>01:00:00</Duration>
+          <StartTime>11/15/2014 1:00:00 PM</StartTime>
+          <EndTime>11/15/2014 2:00:00 PM</EndTime>
+        </EventSubSchedule>
+      </EventSubSchedules>
+      <RepetitionFlag>False</RepetitionFlag>
+      <Completed>False</Completed>
+    </EventSchedule>
+  </EventSchedules>
+  <LocationCache>
+    <Locations />
+    <LastID>1</LastID>
+  </LocationCache>
+</ScheduleLog>

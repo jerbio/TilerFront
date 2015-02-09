@@ -456,7 +456,7 @@ namespace TilerFront.Controllers
                     LogControlDirect newLog = new LogControlDirect(model, CurrentLogLocation);
                     newLog.genereateNewLogFile(model.Id);
                     newLog.UpdateReferenceDay(profileData.Item2);
-                    NewLogCreationSuccess = await newLog.WriteToLog(profileData.Item1.Values,model, OldUserAccount.LastEventTopNodeID.ToString());
+                    NewLogCreationSuccess = await newLog.WriteToLog(profileData.Item1.Values, OldUserAccount.LastEventTopNodeID.ToString());
                 }
                 
                 //*/

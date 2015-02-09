@@ -1,15 +1,13 @@
 ﻿"use strict"
 
-
-
-$(function ()
+function slideProcrastinateEventModal()
 {
-  
-});
-    
+    $('#ProcrastinateEventModal').slideToggle(500);
+}
 $(document).ready(function () {
     $('body').hide();
     LaunchMonthTicker();
+    document.getElementById("ControlPanelProcrastinateButton").onclick = slideProcrastinateEventModal;
     InitializeMonthlyOverview();
 });
 
@@ -334,7 +332,7 @@ function InitiateGrid(refDate)
         {
             return;
         }
-        
+        StopPullingData();
         monthViewResetData();
         var DataHolder = { Data: "" };
         PopulateTotalSubEvents(DataHolder, global_WeekGrid);
@@ -1360,8 +1358,15 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
             var nayButton = getDomOrCreateNew("NayToConfirmDelete");
             var completeButton = getDomOrCreateNew("ControlPanelCompleteButton");
             var deleteButton = getDomOrCreateNew("ControlPanelDeleteButton");
-            var DeleteMessage =getDomOrCreateNew( "DeleteMessage")
+            var DeleteMessage = getDomOrCreateNew("DeleteMessage")
+            var ProcatinationButton = getDomOrCreateNew("submitProcatination");
+            
             closeControlPanel();
+            ProcatinationButton.onclick = function () {
+                debugger;
+                procrastinateEvent();
+                slideProcrastinateEventModal();
+            }
             $('#ControlPanelContainer').slideDown(500);
             function resetButtons()
             {
@@ -1382,6 +1387,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
 
             $('#ControlPanelCloseButton').click(closeControlPanel)
 
+            
             function deleteSubevent()//triggers the yea / nay deletion of events
             {
                 DeleteMessage.innerHTML = "Sure you want to delete \"" + SubEvent.Name + "\"?"
@@ -1444,7 +1450,42 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                 resetButtons();
             }
 
-            
+            function procrastinateEvent()
+            {
+                var HourInput = getDomOrCreateNew("procrastinateHours").value == "" ? 0 : getDomOrCreateNew("procrastinateHours").value;
+                var MinInput = getDomOrCreateNew("procrastinateMins").value == "" ? 0 : getDomOrCreateNew("procrastinateMins").value;
+                var DayInput = getDomOrCreateNew("procrastinateDays").value == "" ? 0 : getDomOrCreateNew("procrastinateDays").value;
+                debugger;
+                var TimeZone = new Date().getTimezoneOffset();
+                var NowData = { UserName: UserCredentials.UserName, UserID: UserCredentials.ID, EventID: SubEvent.ID, DurationDays: DayInput, DurationHours: HourInput, DurationMins: MinInput, TimeZoneOffset: TimeZone };
+                //var URL= "RootWagTap/time.top?WagCommand=2";
+                var URL = global_refTIlerUrl + "Schedule/Event/Procrastinate";
+                var HandleNEwPage = new LoadingScreenControl("Tiler is Postponing  :)");
+                HandleNEwPage.Launch();
+                $.ajax({
+                    type: "POST",
+                    url: URL,
+                    data: NowData,
+                    // DO NOT SET CONTENT TYPE to json
+                    // contentType: "application/json; charset=utf-8", 
+                    // DataType needs to stay, otherwise the response object
+                    // will be treated as a single string
+                    dataType: "json",
+                    success: function (response) {
+                        alert(response);
+                        getRefreshedData();
+                    },
+                    error: function () {
+                        var NewMessage = "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
+                        var ExitAfter = { ExitNow: true, Delay: 1000 };
+                        HandleNEwPage.UpdateMessage(NewMessage, ExitAfter, InitializeHomePage);
+                    }
+                }).done(function (data) {
+                    HandleNEwPage.Hide();
+                    triggerUIUPdate();//hack alert
+                    
+                });
+            }
 
             function markAsComplete()
             {
@@ -1587,11 +1628,6 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
         var UpdateDeadline = getDomOrCreateNew(UpdateDeadlineID, "button");
     }
 
-    function DeleteSubEvent()
-    {
-
-      var x = SubEvent.Name;
-    }
 
     function DeleteCurrentRepetition()
     {

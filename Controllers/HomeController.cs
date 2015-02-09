@@ -8,7 +8,7 @@ using System.Web.Mvc;
 
 namespace TilerFront.Controllers
 {
-    [RequireHttps]
+    //[RequireHttps]
     public class HomeController : Controller
     {
         public ActionResult Index()

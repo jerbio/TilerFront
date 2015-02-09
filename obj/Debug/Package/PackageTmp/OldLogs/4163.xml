@@ -1,0 +1,461 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ScheduleLog>
+  <LastIDCounter>75</LastIDCounter>
+  <referenceDay>12:00 AM</referenceDay>
+  <EventSchedules>
+    <EventSchedule>
+      <Recurrence />
+      <MiscData>
+        <TypeSelection>0</TypeSelection>
+        <UserNote />
+      </MiscData>
+      <UIParams>
+        <Type>0</Type>
+        <Color>
+          <Blue>127</Blue>
+          <Green>127</Green>
+          <Red>127</Red>
+          <Opacity>1</Opacity>
+        </Color>
+        <Visible>True</Visible>
+      </UIParams>
+      <Location>
+        <CheckCalendarEvent>0</CheckCalendarEvent>
+        <isNull>False</isNull>
+        <Description>mike</Description>
+        <Address>hères, france</Address>
+        <YCoordinate>0.0007429</YCoordinate>
+        <XCoordinate>43.552293</XCoordinate>
+      </Location>
+      <Enabled>True</Enabled>
+      <ID>1_7_0_0</ID>
+      <Name>test</Name>
+      <StartTime>10/20/2014 2:03:00 PM</StartTime>
+      <PreDeadline>00:00:00</PreDeadline>
+      <PrepTime>00:00:00</PrepTime>
+      <Deadline>10/21/2014 11:59:00 PM</Deadline>
+      <Split>1</Split>
+      <Duration>1.09:56:00</Duration>
+      <RigidFlag>True</RigidFlag>
+      <EventSubSchedules>
+        <EventSubSchedule>
+          <ConflictProfile>
+            <ConflictIDs />
+            <Flag>False</Flag>
+            <Type>0</Type>
+          </ConflictProfile>
+          <MiscData>
+            <TypeSelection>0</TypeSelection>
+            <UserNote />
+          </MiscData>
+          <UIParams>
+            <Type>0</Type>
+            <Color>
+              <Blue>127</Blue>
+              <Green>127</Green>
+              <Red>127</Red>
+              <Opacity>1</Opacity>
+            </Color>
+            <Visible>True</Visible>
+          </UIParams>
+          <Location>
+            <CheckCalendarEvent>0</CheckCalendarEvent>
+            <isNull>False</isNull>
+            <Description>mike</Description>
+            <Address>hères, france</Address>
+            <YCoordinate>0.0007429</YCoordinate>
+            <XCoordinate>43.552293</XCoordinate>
+          </Location>
+          <Complete>False</Complete>
+          <Enabled>True</Enabled>
+          <ID>1_7_0_2</ID>
+          <ThirdPartyID />
+          <PrepTime>00:00:00</PrepTime>
+          <ActiveStartTime>10/21/2014 10:45:00 AM</ActiveStartTime>
+          <ActiveEndTime>10/22/2014 8:41:00 PM</ActiveEndTime>
+          <Duration>1.09:56:00</Duration>
+          <StartTime>10/21/2014 10:45:00 AM</StartTime>
+          <EndTime>10/22/2014 8:41:00 PM</EndTime>
+        </EventSubSchedule>
+      </EventSubSchedules>
+      <RepetitionFlag>False</RepetitionFlag>
+      <Completed>False</Completed>
+    </EventSchedule>
+    <EventSchedule>
+      <Recurrence />
+      <MiscData>
+        <TypeSelection>0</TypeSelection>
+        <UserNote />
+      </MiscData>
+      <UIParams>
+        <Type>0</Type>
+        <Color>
+          <Blue>127</Blue>
+          <Green>127</Green>
+          <Red>127</Red>
+          <Opacity>1</Opacity>
+        </Color>
+        <Visible>True</Visible>
+      </UIParams>
+      <Location>
+        <CheckCalendarEvent>0</CheckCalendarEvent>
+        <isNull>False</isNull>
+        <Description />
+        <Address>cuba</Address>
+        <YCoordinate>-77.781167</YCoordinate>
+        <XCoordinate>21.521757</XCoordinate>
+      </Location>
+      <Enabled>True</Enabled>
+      <ID>4_7_0_0</ID>
+      <Name>class</Name>
+      <StartTime>10/21/2014 12:00:00 PM</StartTime>
+      <PreDeadline>00:00:00</PreDeadline>
+      <PrepTime>00:00:00</PrepTime>
+      <Deadline>10/22/2014 11:59:00 PM</Deadline>
+      <Split>1</Split>
+      <Duration>1.11:59:00</Duration>
+      <RigidFlag>True</RigidFlag>
+      <EventSubSchedules>
+        <EventSubSchedule>
+          <ConflictProfile>
+            <ConflictIDs />
+            <Flag>False</Flag>
+            <Type>0</Type>
+          </ConflictProfile>
+          <MiscData>
+            <TypeSelection>0</TypeSelection>
+            <UserNote />
+          </MiscData>
+          <UIParams>
+            <Type>0</Type>
+            <Color>
+              <Blue>127</Blue>
+              <Green>127</Green>
+              <Red>127</Red>
+              <Opacity>1</Opacity>
+            </Color>
+            <Visible>True</Visible>
+          </UIParams>
+          <Location>
+            <CheckCalendarEvent>0</CheckCalendarEvent>
+            <isNull>False</isNull>
+            <Description />
+            <Address>cuba</Address>
+            <YCoordinate>-77.781167</YCoordinate>
+            <XCoordinate>21.521757</XCoordinate>
+          </Location>
+          <Complete>False</Complete>
+          <Enabled>True</Enabled>
+          <ID>4_7_0_5</ID>
+          <ThirdPartyID />
+          <PrepTime>00:00:00</PrepTime>
+          <ActiveStartTime>10/21/2014 10:44:00 AM</ActiveStartTime>
+          <ActiveEndTime>10/22/2014 10:43:00 PM</ActiveEndTime>
+          <Duration>1.11:59:00</Duration>
+          <StartTime>10/21/2014 10:44:00 AM</StartTime>
+          <EndTime>10/22/2014 10:43:00 PM</EndTime>
+        </EventSubSchedule>
+      </EventSubSchedules>
+      <RepetitionFlag>False</RepetitionFlag>
+      <Completed>False</Completed>
+    </EventSchedule>
+    <EventSchedule>
+      <Recurrence />
+      <MiscData>
+        <TypeSelection>0</TypeSelection>
+        <UserNote />
+      </MiscData>
+      <UIParams>
+        <Type>0</Type>
+        <Color>
+          <Blue>127</Blue>
+          <Green>127</Green>
+          <Red>127</Red>
+          <Opacity>1</Opacity>
+        </Color>
+        <Visible>True</Visible>
+      </UIParams>
+      <Location>
+        <CheckCalendarEvent>0</CheckCalendarEvent>
+        <isNull>False</isNull>
+        <Description />
+        <Address>formosa province, argentina</Address>
+        <YCoordinate>-58.7373634</YCoordinate>
+        <XCoordinate>-25.3945969</XCoordinate>
+      </Location>
+      <Enabled>False</Enabled>
+      <ID>13_7_0_0</ID>
+      <Name>rew</Name>
+      <StartTime>10/21/2014 3:00:00 AM</StartTime>
+      <PreDeadline>00:00:00</PreDeadline>
+      <PrepTime>00:00:00</PrepTime>
+      <Deadline>10/22/2014 4:00:00 PM</Deadline>
+      <Split>1</Split>
+      <Duration>00:00:00</Duration>
+      <RigidFlag>False</RigidFlag>
+      <EventSubSchedules>
+        <EventSubSchedule>
+          <ConflictProfile>
+            <ConflictIDs />
+            <Flag>False</Flag>
+            <Type>0</Type>
+          </ConflictProfile>
+          <MiscData>
+            <TypeSelection>0</TypeSelection>
+            <UserNote />
+          </MiscData>
+          <UIParams>
+            <Type>0</Type>
+            <Color>
+              <Blue>127</Blue>
+              <Green>127</Green>
+              <Red>127</Red>
+              <Opacity>1</Opacity>
+            </Color>
+            <Visible>True</Visible>
+          </UIParams>
+          <Location>
+            <CheckCalendarEvent>0</CheckCalendarEvent>
+            <isNull>False</isNull>
+            <Description />
+            <Address>formosa province, argentina</Address>
+            <YCoordinate>-58.7373634</YCoordinate>
+            <XCoordinate>-25.3945969</XCoordinate>
+          </Location>
+          <Complete>False</Complete>
+          <Enabled>True</Enabled>
+          <ID>13_7_0_14</ID>
+          <ThirdPartyID />
+          <PrepTime>00:00:00</PrepTime>
+          <ActiveStartTime>10/21/2014 10:47:00 AM</ActiveStartTime>
+          <ActiveEndTime>10/21/2014 10:47:00 AM</ActiveEndTime>
+          <Duration>00:00:00</Duration>
+          <StartTime>10/21/2014 10:47:00 AM</StartTime>
+          <EndTime>10/21/2014 10:47:00 AM</EndTime>
+        </EventSubSchedule>
+      </EventSubSchedules>
+      <RepetitionFlag>False</RepetitionFlag>
+      <Completed>False</Completed>
+    </EventSchedule>
+    <EventSchedule>
+      <Recurrence />
+      <MiscData>
+        <TypeSelection>0</TypeSelection>
+        <UserNote />
+      </MiscData>
+      <UIParams>
+        <Type>0</Type>
+        <Color>
+          <Blue>127</Blue>
+          <Green>127</Green>
+          <Red>127</Red>
+          <Opacity>1</Opacity>
+        </Color>
+        <Visible>True</Visible>
+      </UIParams>
+      <Location>
+        <CheckCalendarEvent>0</CheckCalendarEvent>
+        <isNull>False</isNull>
+        <Description>now</Description>
+        <Address>hères, france</Address>
+        <YCoordinate>0.0007429</YCoordinate>
+        <XCoordinate>43.552293</XCoordinate>
+      </Location>
+      <Enabled>True</Enabled>
+      <ID>57_7_0_0</ID>
+      <Name>now</Name>
+      <StartTime>10/31/2014 12:15:00 PM</StartTime>
+      <PreDeadline>00:00:00</PreDeadline>
+      <PrepTime>00:00:00</PrepTime>
+      <Deadline>10/31/2014 3:00:00 PM</Deadline>
+      <Split>2</Split>
+      <Duration>00:00:00</Duration>
+      <RigidFlag>False</RigidFlag>
+      <EventSubSchedules>
+        <EventSubSchedule>
+          <ConflictProfile>
+            <ConflictIDs />
+            <Flag>False</Flag>
+            <Type>0</Type>
+          </ConflictProfile>
+          <MiscData>
+            <TypeSelection>0</TypeSelection>
+            <UserNote />
+          </MiscData>
+          <UIParams>
+            <Type>0</Type>
+            <Color>
+              <Blue>127</Blue>
+              <Green>127</Green>
+              <Red>127</Red>
+              <Opacity>1</Opacity>
+            </Color>
+            <Visible>True</Visible>
+          </UIParams>
+          <Location>
+            <CheckCalendarEvent>0</CheckCalendarEvent>
+            <isNull>False</isNull>
+            <Description>now</Description>
+            <Address>hères, france</Address>
+            <YCoordinate>0.0007429</YCoordinate>
+            <XCoordinate>43.552293</XCoordinate>
+          </Location>
+          <Complete>False</Complete>
+          <Enabled>True</Enabled>
+          <ID>57_7_0_59</ID>
+          <ThirdPartyID />
+          <PrepTime>00:00:00</PrepTime>
+          <ActiveStartTime>10/31/2014 3:00:00 PM</ActiveStartTime>
+          <ActiveEndTime>10/31/2014 3:00:00 PM</ActiveEndTime>
+          <Duration>00:00:00</Duration>
+          <StartTime>10/31/2014 3:00:00 PM</StartTime>
+          <EndTime>10/31/2014 3:00:00 PM</EndTime>
+        </EventSubSchedule>
+        <EventSubSchedule>
+          <ConflictProfile>
+            <ConflictIDs />
+            <Flag>False</Flag>
+            <Type>0</Type>
+          </ConflictProfile>
+          <MiscData>
+            <TypeSelection>0</TypeSelection>
+            <UserNote />
+          </MiscData>
+          <UIParams>
+            <Type>0</Type>
+            <Color>
+              <Blue>127</Blue>
+              <Green>127</Green>
+              <Red>127</Red>
+              <Opacity>1</Opacity>
+            </Color>
+            <Visible>True</Visible>
+          </UIParams>
+          <Location>
+            <CheckCalendarEvent>0</CheckCalendarEvent>
+            <isNull>False</isNull>
+            <Description>now</Description>
+            <Address>hères, france</Address>
+            <YCoordinate>0.0007429</YCoordinate>
+            <XCoordinate>43.552293</XCoordinate>
+          </Location>
+          <Complete>False</Complete>
+          <Enabled>True</Enabled>
+          <ID>57_7_0_58</ID>
+          <ThirdPartyID />
+          <PrepTime>00:00:00</PrepTime>
+          <ActiveStartTime>10/31/2014 3:00:00 PM</ActiveStartTime>
+          <ActiveEndTime>10/31/2014 3:00:00 PM</ActiveEndTime>
+          <Duration>00:00:00</Duration>
+          <StartTime>10/31/2014 3:00:00 PM</StartTime>
+          <EndTime>10/31/2014 3:00:00 PM</EndTime>
+        </EventSubSchedule>
+      </EventSubSchedules>
+      <RepetitionFlag>False</RepetitionFlag>
+      <Completed>False</Completed>
+    </EventSchedule>
+    <EventSchedule>
+      <Recurrence />
+      <MiscData>
+        <TypeSelection>0</TypeSelection>
+        <UserNote />
+      </MiscData>
+      <UIParams>
+        <Type>0</Type>
+        <Color>
+          <Blue>0</Blue>
+          <Green>0</Green>
+          <Red>0</Red>
+          <Opacity>0</Opacity>
+        </Color>
+        <Visible>True</Visible>
+      </UIParams>
+      <Location>
+        <CheckCalendarEvent>0</CheckCalendarEvent>
+        <isNull>False</isNull>
+        <Description />
+        <Address>hères, france</Address>
+        <YCoordinate>0.0007429</YCoordinate>
+        <XCoordinate>43.552293</XCoordinate>
+      </Location>
+      <Enabled>True</Enabled>
+      <ID>67_7_0_0</ID>
+      <Name>test</Name>
+      <StartTime>10/31/2014 1:15:00 PM</StartTime>
+      <PreDeadline>00:00:00</PreDeadline>
+      <PrepTime>00:00:00</PrepTime>
+      <Deadline>10/31/2014 2:45:00 PM</Deadline>
+      <Split>1</Split>
+      <Duration>01:30:00</Duration>
+      <RigidFlag>True</RigidFlag>
+      <EventSubSchedules>
+        <EventSubSchedule>
+          <ConflictProfile>
+            <ConflictIDs />
+            <Flag>False</Flag>
+            <Type>0</Type>
+          </ConflictProfile>
+          <MiscData>
+            <TypeSelection>0</TypeSelection>
+            <UserNote />
+          </MiscData>
+          <UIParams>
+            <Type>0</Type>
+            <Color>
+              <Blue>0</Blue>
+              <Green>0</Green>
+              <Red>0</Red>
+              <Opacity>0</Opacity>
+            </Color>
+            <Visible>True</Visible>
+          </UIParams>
+          <Location>
+            <CheckCalendarEvent>0</CheckCalendarEvent>
+            <isNull>False</isNull>
+            <Description />
+            <Address>hères, france</Address>
+            <YCoordinate>0.0007429</YCoordinate>
+            <XCoordinate>43.552293</XCoordinate>
+          </Location>
+          <Complete>False</Complete>
+          <Enabled>True</Enabled>
+          <ID>67_7_0_68</ID>
+          <ThirdPartyID />
+          <PrepTime>00:00:00</PrepTime>
+          <ActiveStartTime>10/31/2014 1:15:00 PM</ActiveStartTime>
+          <ActiveEndTime>10/31/2014 2:45:00 PM</ActiveEndTime>
+          <Duration>01:30:00</Duration>
+          <StartTime>10/31/2014 1:15:00 PM</StartTime>
+          <EndTime>10/31/2014 2:45:00 PM</EndTime>
+        </EventSubSchedule>
+      </EventSubSchedules>
+      <RepetitionFlag>False</RepetitionFlag>
+      <Completed>False</Completed>
+    </EventSchedule>
+  </EventSchedules>
+  <LocationCache>
+    <Locations>
+      <Location>
+        <CachedName>mike</CachedName>
+        <LocationID>2</LocationID>
+        <CheckCalendarEvent>0</CheckCalendarEvent>
+        <isNull>False</isNull>
+        <Description>mike</Description>
+        <Address>hères, france</Address>
+        <YCoordinate>0.0007429</YCoordinate>
+        <XCoordinate>43.552293</XCoordinate>
+      </Location>
+      <Location>
+        <CachedName>now</CachedName>
+        <LocationID>3</LocationID>
+        <CheckCalendarEvent>0</CheckCalendarEvent>
+        <isNull>False</isNull>
+        <Description>now</Description>
+        <Address>hères, france</Address>
+        <YCoordinate>0.0007429</YCoordinate>
+        <XCoordinate>43.552293</XCoordinate>
+      </Location>
+    </Locations>
+    <LastID>3</LastID>
+  </LocationCache>
+</ScheduleLog>

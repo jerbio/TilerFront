@@ -49,13 +49,19 @@ namespace TilerFront.Controllers
 
         async public Task<ApplicationUser> GetUser(string ID,string userName)
         {
-            ApplicationUser user = await db.Users.SingleAsync(obj => obj.Id == ID);
-            if (user != null)
-            { 
-                if(user.UserName.ToLower()!=userName.ToLower())
+            List<ApplicationUser> AllUsers = await db.Users.Where(obj => obj.Id == ID).ToListAsync();
+
+            ApplicationUser user = null;
+            if (AllUsers.Count > 0)
+            {
+                if (user != null)
                 {
-                    user = null;
+                    if (user.UserName.ToLower() != userName.ToLower())
+                    {
+                        user = null;
+                    }
                 }
+                user = AllUsers[0];
             }
             return user;
         }

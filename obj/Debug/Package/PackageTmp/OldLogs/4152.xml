@@ -1,0 +1,178 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ScheduleLog>
+  <LastIDCounter>9</LastIDCounter>
+  <referenceDay>12:00 AM</referenceDay>
+  <EventSchedules>
+    <EventSchedule>
+      <Recurrence />
+      <MiscData>
+        <TypeSelection>0</TypeSelection>
+        <UserNote />
+      </MiscData>
+      <UIParams>
+        <Type>0</Type>
+        <Color>
+          <Blue>127</Blue>
+          <Green>127</Green>
+          <Red>127</Red>
+          <Opacity>1</Opacity>
+        </Color>
+        <Visible>True</Visible>
+      </UIParams>
+      <Location>
+        <CheckCalendarEvent>0</CheckCalendarEvent>
+        <isNull>False</isNull>
+        <Description>School </Description>
+        <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+        <YCoordinate>-105.2628183</YCoordinate>
+        <XCoordinate>40.0067912</XCoordinate>
+      </Location>
+      <Enabled>False</Enabled>
+      <ID>1_7_0_0</ID>
+      <Name>New evebt</Name>
+      <StartTime>10/10/2014 6:47:00 AM</StartTime>
+      <PreDeadline>00:00:00</PreDeadline>
+      <PrepTime>00:00:00</PrepTime>
+      <Deadline>10/11/2014 11:59:00 PM</Deadline>
+      <Split>1</Split>
+      <Duration>00:22:00</Duration>
+      <RigidFlag>False</RigidFlag>
+      <EventSubSchedules>
+        <EventSubSchedule>
+          <ConflictProfile>
+            <ConflictIDs />
+            <Flag>False</Flag>
+            <Type>0</Type>
+          </ConflictProfile>
+          <MiscData>
+            <TypeSelection>0</TypeSelection>
+            <UserNote />
+          </MiscData>
+          <UIParams>
+            <Type>0</Type>
+            <Color>
+              <Blue>127</Blue>
+              <Green>127</Green>
+              <Red>127</Red>
+              <Opacity>1</Opacity>
+            </Color>
+            <Visible>True</Visible>
+          </UIParams>
+          <Location>
+            <CheckCalendarEvent>0</CheckCalendarEvent>
+            <isNull>False</isNull>
+            <Description>School </Description>
+            <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+            <YCoordinate>-105.2628183</YCoordinate>
+            <XCoordinate>40.0067912</XCoordinate>
+          </Location>
+          <Complete>False</Complete>
+          <Enabled>False</Enabled>
+          <ID>1_7_0_2</ID>
+          <ThirdPartyID />
+          <PrepTime>00:00:00</PrepTime>
+          <ActiveStartTime>10/10/2014 7:10:00 AM</ActiveStartTime>
+          <ActiveEndTime>10/10/2014 7:32:00 AM</ActiveEndTime>
+          <Duration>00:22:00</Duration>
+          <StartTime>10/10/2014 7:10:00 AM</StartTime>
+          <EndTime>10/10/2014 7:32:00 AM</EndTime>
+        </EventSubSchedule>
+      </EventSubSchedules>
+      <RepetitionFlag>False</RepetitionFlag>
+      <Completed>False</Completed>
+    </EventSchedule>
+    <EventSchedule>
+      <Recurrence />
+      <MiscData>
+        <TypeSelection>0</TypeSelection>
+        <UserNote />
+      </MiscData>
+      <UIParams>
+        <Type>0</Type>
+        <Color>
+          <Blue>127</Blue>
+          <Green>127</Green>
+          <Red>127</Red>
+          <Opacity>1</Opacity>
+        </Color>
+        <Visible>True</Visible>
+      </UIParams>
+      <Location>
+        <CheckCalendarEvent>0</CheckCalendarEvent>
+        <isNull>False</isNull>
+        <Description>School </Description>
+        <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+        <YCoordinate>-105.2628183</YCoordinate>
+        <XCoordinate>40.0067912</XCoordinate>
+      </Location>
+      <Enabled>True</Enabled>
+      <ID>6_7_0_0</ID>
+      <Name>Another event </Name>
+      <StartTime>10/10/2014 6:49:00 AM</StartTime>
+      <PreDeadline>00:00:00</PreDeadline>
+      <PrepTime>00:00:00</PrepTime>
+      <Deadline>10/11/2014 11:59:00 PM</Deadline>
+      <Split>1</Split>
+      <Duration>00:48:00</Duration>
+      <RigidFlag>False</RigidFlag>
+      <EventSubSchedules>
+        <EventSubSchedule>
+          <ConflictProfile>
+            <ConflictIDs />
+            <Flag>False</Flag>
+            <Type>0</Type>
+          </ConflictProfile>
+          <MiscData>
+            <TypeSelection>0</TypeSelection>
+            <UserNote />
+          </MiscData>
+          <UIParams>
+            <Type>0</Type>
+            <Color>
+              <Blue>127</Blue>
+              <Green>127</Green>
+              <Red>127</Red>
+              <Opacity>1</Opacity>
+            </Color>
+            <Visible>True</Visible>
+          </UIParams>
+          <Location>
+            <CheckCalendarEvent>0</CheckCalendarEvent>
+            <isNull>False</isNull>
+            <Description>School </Description>
+            <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+            <YCoordinate>-105.2628183</YCoordinate>
+            <XCoordinate>40.0067912</XCoordinate>
+          </Location>
+          <Complete>False</Complete>
+          <Enabled>True</Enabled>
+          <ID>6_7_0_7</ID>
+          <ThirdPartyID />
+          <PrepTime>00:00:00</PrepTime>
+          <ActiveStartTime>10/10/2014 6:49:00 AM</ActiveStartTime>
+          <ActiveEndTime>10/10/2014 7:37:00 AM</ActiveEndTime>
+          <Duration>00:48:00</Duration>
+          <StartTime>10/10/2014 6:49:00 AM</StartTime>
+          <EndTime>10/10/2014 7:37:00 AM</EndTime>
+        </EventSubSchedule>
+      </EventSubSchedules>
+      <RepetitionFlag>False</RepetitionFlag>
+      <Completed>False</Completed>
+    </EventSchedule>
+  </EventSchedules>
+  <LocationCache>
+    <Locations>
+      <Location>
+        <CachedName>school </CachedName>
+        <LocationID>2</LocationID>
+        <CheckCalendarEvent>0</CheckCalendarEvent>
+        <isNull>False</isNull>
+        <Description>School </Description>
+        <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+        <YCoordinate>-105.2628183</YCoordinate>
+        <XCoordinate>40.0067912</XCoordinate>
+      </Location>
+    </Locations>
+    <LastID>2</LastID>
+  </LocationCache>
+</ScheduleLog>

@@ -1,0 +1,182 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ScheduleLog>
+  <LastIDCounter>4</LastIDCounter>
+  <referenceDay>9:00 AM</referenceDay>
+  <EventSchedules>
+    <EventSchedule>
+      <Recurrence />
+      <MiscData>
+        <TypeSelection>0</TypeSelection>
+        <UserNote />
+      </MiscData>
+      <UIParams>
+        <Type>0</Type>
+        <Color>
+          <UserSelection>-1</UserSelection>
+          <Blue>127</Blue>
+          <Green>127</Green>
+          <Red>127</Red>
+          <Opacity>1</Opacity>
+        </Color>
+        <Visible>True</Visible>
+      </UIParams>
+      <Location>
+        <CheckCalendarEvent>0</CheckCalendarEvent>
+        <isNull>False</isNull>
+        <Description>FUCK</Description>
+        <Address>studio, at tarh, markaz kafr el-dawar, beheira, egypt</Address>
+        <YCoordinate>30.0798239</YCoordinate>
+        <XCoordinate>31.278455</XCoordinate>
+      </Location>
+      <Enabled>True</Enabled>
+      <ID>1_7_0_0</ID>
+      <Name>2120 Drawings Due </Name>
+      <StartTime>11/11/2014 3:02:00 PM</StartTime>
+      <PreDeadline>00:00:00</PreDeadline>
+      <PrepTime>00:00:00</PrepTime>
+      <Deadline>11/12/2014 3:02:00 AM</Deadline>
+      <Split>1</Split>
+      <Duration>12:00:00</Duration>
+      <RigidFlag>True</RigidFlag>
+      <EventSubSchedules>
+        <EventSubSchedule>
+          <ConflictProfile>
+            <ConflictIDs />
+            <Flag>False</Flag>
+            <Type>0</Type>
+          </ConflictProfile>
+          <MiscData>
+            <TypeSelection>0</TypeSelection>
+            <UserNote />
+          </MiscData>
+          <UIParams>
+            <Type>1</Type>
+            <Color>
+              <UserSelection>3</UserSelection>
+              <Blue>0</Blue>
+              <Green>0</Green>
+              <Red>255</Red>
+              <Opacity>1</Opacity>
+            </Color>
+            <Visible>True</Visible>
+          </UIParams>
+          <Location>
+            <CheckCalendarEvent>0</CheckCalendarEvent>
+            <isNull>False</isNull>
+            <Description>FUCK</Description>
+            <Address>studio, at tarh, markaz kafr el-dawar, beheira, egypt</Address>
+            <YCoordinate>30.0798239</YCoordinate>
+            <XCoordinate>31.278455</XCoordinate>
+          </Location>
+          <Complete>False</Complete>
+          <Enabled>True</Enabled>
+          <ID>1_7_0_2</ID>
+          <ThirdPartyID />
+          <PrepTime>00:00:00</PrepTime>
+          <ActiveStartTime>11/11/2014 3:02:00 PM</ActiveStartTime>
+          <ActiveEndTime>11/12/2014 3:02:00 AM</ActiveEndTime>
+          <Duration>12:00:00</Duration>
+          <StartTime>11/11/2014 3:02:00 PM</StartTime>
+          <EndTime>11/12/2014 3:02:00 AM</EndTime>
+        </EventSubSchedule>
+      </EventSubSchedules>
+      <RepetitionFlag>False</RepetitionFlag>
+      <Completed>False</Completed>
+    </EventSchedule>
+    <EventSchedule>
+      <Recurrence />
+      <MiscData>
+        <TypeSelection>0</TypeSelection>
+        <UserNote />
+      </MiscData>
+      <UIParams>
+        <Type>1</Type>
+        <Color>
+          <UserSelection>4</UserSelection>
+          <Blue>255</Blue>
+          <Green>0</Green>
+          <Red>0</Red>
+          <Opacity>1</Opacity>
+        </Color>
+        <Visible>True</Visible>
+      </UIParams>
+      <Location>
+        <CheckCalendarEvent>0</CheckCalendarEvent>
+        <isNull>False</isNull>
+        <Description />
+        <Address>studio, at tarh, markaz kafr el-dawar, beheira, egypt</Address>
+        <YCoordinate>30.0798239</YCoordinate>
+        <XCoordinate>31.278455</XCoordinate>
+      </Location>
+      <Enabled>True</Enabled>
+      <ID>3_7_0_0</ID>
+      <Name>2120 Model Due </Name>
+      <StartTime>11/13/2014 6:12:00 PM</StartTime>
+      <PreDeadline>00:00:00</PreDeadline>
+      <PrepTime>00:00:00</PrepTime>
+      <Deadline>11/14/2014 6:12:00 PM</Deadline>
+      <Split>1</Split>
+      <Duration>09:00:00</Duration>
+      <RigidFlag>False</RigidFlag>
+      <EventSubSchedules>
+        <EventSubSchedule>
+          <ConflictProfile>
+            <ConflictIDs />
+            <Flag>False</Flag>
+            <Type>0</Type>
+          </ConflictProfile>
+          <MiscData>
+            <TypeSelection>0</TypeSelection>
+            <UserNote />
+          </MiscData>
+          <UIParams>
+            <Type>1</Type>
+            <Color>
+              <UserSelection>4</UserSelection>
+              <Blue>255</Blue>
+              <Green>0</Green>
+              <Red>0</Red>
+              <Opacity>1</Opacity>
+            </Color>
+            <Visible>True</Visible>
+          </UIParams>
+          <Location>
+            <CheckCalendarEvent>0</CheckCalendarEvent>
+            <isNull>False</isNull>
+            <Description />
+            <Address>studio, at tarh, markaz kafr el-dawar, beheira, egypt</Address>
+            <YCoordinate>30.0798239</YCoordinate>
+            <XCoordinate>31.278455</XCoordinate>
+          </Location>
+          <Complete>False</Complete>
+          <Enabled>True</Enabled>
+          <ID>3_7_0_4</ID>
+          <ThirdPartyID />
+          <PrepTime>00:00:00</PrepTime>
+          <ActiveStartTime>11/13/2014 6:12:00 PM</ActiveStartTime>
+          <ActiveEndTime>11/14/2014 3:12:00 AM</ActiveEndTime>
+          <Duration>09:00:00</Duration>
+          <StartTime>11/13/2014 6:12:00 PM</StartTime>
+          <EndTime>11/14/2014 3:12:00 AM</EndTime>
+        </EventSubSchedule>
+      </EventSubSchedules>
+      <RepetitionFlag>False</RepetitionFlag>
+      <Completed>False</Completed>
+    </EventSchedule>
+  </EventSchedules>
+  <LocationCache>
+    <Locations>
+      <Location>
+        <CachedName>fuck</CachedName>
+        <LocationID>2</LocationID>
+        <CheckCalendarEvent>0</CheckCalendarEvent>
+        <isNull>False</isNull>
+        <Description>FUCK</Description>
+        <Address>studio, at tarh, markaz kafr el-dawar, beheira, egypt</Address>
+        <YCoordinate>30.0798239</YCoordinate>
+        <XCoordinate>31.278455</XCoordinate>
+      </Location>
+    </Locations>
+    <LastID>2</LastID>
+  </LocationCache>
+</ScheduleLog>

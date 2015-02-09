@@ -288,10 +288,10 @@ function SignInUser(UserName,Password)
             }
         },
         error: function (err) {
-            debugger;
+            //debugger;
 
-            /*var myError = err;
-            var step = "err";*/
+            showRegistrationError(err);
+            setTimeout(hideRegistrationError, 6000);
         }
 
     }).done(function (data) {

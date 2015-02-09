@@ -8,7 +8,7 @@ namespace TilerFront.DTOs
 {
     public abstract class VerifiedUser
     {
-        public string UserName;
-        public int UserID;
+        public string UserName { get; set; }
+        public string UserID { get; set; }
     }
 }

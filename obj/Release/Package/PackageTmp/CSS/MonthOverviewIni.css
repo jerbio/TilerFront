@@ -243,7 +243,9 @@ body {
   left:0;
   top:14.5%;
   width:100%;
-  height:80%;
+  height:83%;
+  border-bottom: 1px solid black;
+  padding-bottom: 2px;
   //background-color:rgba(20,255,20,.3);
 }
 
@@ -251,17 +253,18 @@ body {
 #ControlPanelContainer 
 {
   position:absolute;
-  background-color: rgba(255,255,255, 0.5);
+  background-color: #fff; 
   bottom:0;
+  z-index: 80;
   width:100%;
   border-top: 1px solid black;
-  height:14%;
+  height: 8.6%;
   display: none;
 }
 
 #InfoContainer 
 {
-  margin-top: 30px
+  margin-top: 1.7%;
 }
 
 #ControlPanelNameOfSubevent, 
@@ -295,11 +298,12 @@ body {
 
 #InputContainer
 {
-  position:absolute;
-  right: 30px;
-  width: 250px;
-  top: 0;
-  height:100%;
+    position: absolute;
+    right: 30px;
+    width: 313px;
+    top: 50%;
+    height: auto;
+    transform: translateY(-70%);
 }
 
 .ControlPanelButton {
@@ -326,13 +330,16 @@ body {
 }
 #Header .ControlPanelButton:hover { background-position: -135px -45px; }
 
-#ControlPanelCloseButton:hover {background-position: 0 -45px;}
+#ControlPanelCloseButton {background-position: -315px 0px;}
+#ControlPanelCloseButton:hover {background-position: -315px -45px;}
 #ControlPanelDeleteButton { background-position: -45px 0; }
 #ControlPanelDeleteButton:hover { background-position: -45px -45px;}
 #ControlPanelLocationButton { background-position: -90px 0; }
 #ControlPanelLocationButton:hover { background-position: -90px -45px; }
 #ControlPanelCompleteButton { background-position: -180px 0; }
 #ControlPanelCompleteButton:hover { background-position: -180px -45px; }
+#ControlPanelProcrastinateButton { background-position: -270px 0; }
+#ControlPanelProcrastinateButton:hover { background-position: -270px -45px; }
 #ControlPanelSearchButton { 
   right: 87px;
   top: -5px;
@@ -465,6 +472,7 @@ body {
 .ListElementDataContentContainer 
 {
     position:absolute;
+    cursor: pointer;
     width:80%;
     height:100%;
     border-radius:10px;
@@ -554,15 +562,18 @@ body {
     height: 60px;
 }
 
+
+
 #ConfirmDeleteModal {
-  height: 14%;
+  height: 100%;
   width: 100%;
   background-color: white;
   z-index: 1;
-  position: fixed;
-  bottom: 0;
+  position: absolute;
+  top: 0;
   display: none;
 }
+/*
 #ConfirmDeleteModal div {
   margin-top: 3%;
   width: 651px;
@@ -570,10 +581,75 @@ body {
   margin-right: auto;
 
 }
-
-
-#DeleteMessage {
+*/
+#ConfirmContent {
     position:absolute;
-    top:0;
-    text-align:center;
+    width:100%;
+    height:100%;
+    margin:0;
+}
+
+
+#YeaToConfirmDelete
+{
+    left: 50%;
+    top:2em;
+    transform: translateX(-200%);
+    position: absolute;
+    margin:0;
+}
+
+#NayToConfirmDelete
+{
+    left: 50%;
+    top:2em;
+    transform: translateX(50%);
+    position: absolute;
+    margin:0;
+}
+
+#DeleteMessage 
+{
+position: absolute;
+top: 0;
+text-align: center;
+width: 100%;
+}
+
+#TimeBar {
+  position: fixed;
+  height: 60.8%;
+  background-color: #fff;
+  width: 49px;
+  padding-bottom: 1px;
+  border-right: black 1px solid;
+  border-top: black 1px solid;
+  border-bottom: black 1px solid;
+  left: 0;
+  top: 30.2%;
+}
+#TimeBar ul {
+  list-style: none;
+  margin: 0;
+  height: 100%;
+  padding-left: 10px;
+}
+#TimeBar ul li {
+  display: block;
+  font-family: 'texreg', Helvetica, sans-serif;
+  font-variant: small-caps;
+  font-size: .6em;
+  width: 75px;
+  height:  4.16666%;
+}
+
+#ProcrastinateEventModal {
+  display: none;
+  width: 100%;
+  z-index: 79;
+  height: 69.6%;
+  background-color: white;
+  bottom: 0;
+  position: fixed;
+  border-top: 1px solid black;
 }

@@ -275,6 +275,7 @@
     <Compile Include="Startup.cs" />
     <Compile Include="UserAccount.cs" />
     <Compile Include="UserAccountDirect.cs" />
+    <Content Include="MonthOverView.html" />
     <Content Include="Views\Home\Claims.cshtml" />
   </ItemGroup>
   <ItemGroup>
@@ -457,6 +458,7 @@
     <Content Include="Scripts\heartcode-canvasloader-min-0.9.1.js" />
     <Content Include="Scripts\HomePageControl.js" />
     <Content Include="Scripts\IndexIni.js" />
+    <None Include="Properties\PublishProfiles\mytilerkid.pubxml" />
     <None Include="Scripts\jquery-2.1.3.intellisense.js" />
     <Content Include="Scripts\jquery-2.1.3.js" />
     <Content Include="Scripts\jquery-2.1.3.min.js" />

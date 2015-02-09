@@ -60,7 +60,10 @@ namespace TilerFront
         
         async public Task CommitEventToLog(IEnumerable<CalendarEvent> AllEvents, string LatestID, string LogFile = "")
         {
-            await UserLog.WriteToLog(AllEvents,sessionUser, LatestID, LogFile);
+            await UserLog.WriteToLog(AllEvents, LatestID, LogFile);
+            sessionUser.LastChange = DateTime.Now;
+            Task SaveChangesToDB = new Controllers.UserController().SaveUser(sessionUser);
+            await SaveChangesToDB;
         }
         
         override public bool DeleteAllCalendarEvents()

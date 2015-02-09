@@ -1,9 +1,22 @@
 ﻿"use strict"
 
 
+var Debug = true;
+var DebugLocal = false;
+
 //var global_refTIlerUrl = "http://localhost:53201/api/";
 //var global_refTIlerUrl = "http://tilersmart.azurewebsites.net/api/";
-var global_refTIlerUrl = window.location.origin+"/api/";
+var global_refTIlerUrl = window.location.origin + "/api/";
+if (Debug)
+{
+    global_refTIlerUrl = "http://mytilerKid.azurewebsites.net/api/";
+    if(DebugLocal)
+    {
+        global_refTIlerUrl = "http://localhost:11919/api/";
+    }
+}
+
+
 var UserTheme = { Light: new Theme("Light"), Dark: new Theme("Dark") };
 var CurrentTheme = UserTheme.Light;
 var UserCredentials = {UserName:"",ID:"", Name:""};
@@ -94,16 +107,17 @@ function GetCookieValue()//verifies that user has cookies
     }
     if (CookieValue == "")
     {
-        /*
-        CookieValue = {};
-        CookieValue.UserName = "jerbio";
-        CookieValue.UserID = 18;
-        //*/
+        if (Debug)
+            {
         ///*
+            CookieValue = { UserName: "jerbio", UserID: "d350ba4d-fe0b-445c-bed6-b6411c2156b3" }
+        //*/
+        /*
         CookieValue = {};
         CookieValue.UserName = "jackostalk@gmail.com";
         CookieValue.UserID = 4167;
         //*/
+        }
     }
 
     return CookieValue;

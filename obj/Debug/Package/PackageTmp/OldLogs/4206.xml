@@ -1,0 +1,102 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ScheduleLog>
+  <LastIDCounter>2</LastIDCounter>
+  <referenceDay>2/3/2015 12:00:00 AM +00:00</referenceDay>
+  <EventSchedules>
+    <EventSchedule>
+      <Recurrence />
+      <MiscData>
+        <TypeSelection>0</TypeSelection>
+        <UserNote />
+      </MiscData>
+      <UIParams>
+        <Type>0</Type>
+        <Color>
+          <UserSelection>-1</UserSelection>
+          <Blue>127</Blue>
+          <Green>127</Green>
+          <Red>127</Red>
+          <Opacity>1</Opacity>
+        </Color>
+        <Visible>True</Visible>
+      </UIParams>
+      <Location>
+        <CheckCalendarEvent>0</CheckCalendarEvent>
+        <isNull>False</isNull>
+        <Description>the house</Description>
+        <Address>christ cathedral, saint aldate's, oxford, oxfordshire ox1 1dp, uk</Address>
+        <YCoordinate>-1.2555806</YCoordinate>
+        <XCoordinate>51.7501222</XCoordinate>
+      </Location>
+      <Enabled>True</Enabled>
+      <ID>1_7_0_0</ID>
+      <Name>poop</Name>
+      <StartTime>2/3/2015 12:00:00 AM +00:00</StartTime>
+      <PreDeadline>00:00:00.0000120</PreDeadline>
+      <PrepTime>00:00:00</PrepTime>
+      <Deadline>2/18/2015 11:59:00 PM +00:00</Deadline>
+      <Split>1</Split>
+      <Duration>23:12:00</Duration>
+      <RigidFlag>False</RigidFlag>
+      <EventSubSchedules>
+        <EventSubSchedule>
+          <ConflictProfile>
+            <ConflictIDs />
+            <Flag>False</Flag>
+            <Type>0</Type>
+          </ConflictProfile>
+          <MiscData>
+            <TypeSelection>0</TypeSelection>
+            <UserNote />
+          </MiscData>
+          <UIParams>
+            <Type>0</Type>
+            <Color>
+              <UserSelection>0</UserSelection>
+              <Blue>255</Blue>
+              <Green>0</Green>
+              <Red>255</Red>
+              <Opacity>1</Opacity>
+            </Color>
+            <Visible>True</Visible>
+          </UIParams>
+          <Location>
+            <CheckCalendarEvent>0</CheckCalendarEvent>
+            <isNull>False</isNull>
+            <Description>the house</Description>
+            <Address>christ cathedral, saint aldate's, oxford, oxfordshire ox1 1dp, uk</Address>
+            <YCoordinate>-1.2555806</YCoordinate>
+            <XCoordinate>51.7501222</XCoordinate>
+          </Location>
+          <Complete>False</Complete>
+          <Enabled>True</Enabled>
+          <ID>1_7_0_2</ID>
+          <ThirdPartyID />
+          <PrepTime>00:00:00</PrepTime>
+          <ActiveStartTime>2/18/2015 12:47:00 AM +00:00</ActiveStartTime>
+          <ActiveEndTime>2/18/2015 11:59:00 PM +00:00</ActiveEndTime>
+          <Duration>23:12:00</Duration>
+          <StartTime>2/18/2015 12:47:00 AM +00:00</StartTime>
+          <EndTime>2/18/2015 11:59:00 PM +00:00</EndTime>
+        </EventSubSchedule>
+      </EventSubSchedules>
+      <RepetitionFlag>False</RepetitionFlag>
+      <Completed>False</Completed>
+    </EventSchedule>
+  </EventSchedules>
+  <LocationCache>
+    <Locations>
+      <Location>
+        <CachedName>the house</CachedName>
+        <LocationID>2</LocationID>
+        <CheckCalendarEvent>0</CheckCalendarEvent>
+        <isNull>False</isNull>
+        <Description>the house</Description>
+        <Address>christ cathedral, saint aldate's, oxford, oxfordshire ox1 1dp, uk</Address>
+        <YCoordinate>-1.2555806</YCoordinate>
+        <XCoordinate>51.7501222</XCoordinate>
+      </Location>
+    </Locations>
+    <LastID>2</LastID>
+  </LocationCache>
+</ScheduleLog>

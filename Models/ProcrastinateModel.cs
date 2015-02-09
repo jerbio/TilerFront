@@ -7,10 +7,7 @@ namespace TilerFront.Models
 {
     public class ProcrastinateModel : AuthorizedUser
     {
-        public string UserName { get; set; }
-        public string UserID { get; set; }
-        public bool MobileFlag { get; set; }
-        public int TimeZoneOffset { get; set; }
+        
 
         public long DurationDays { get; set; }
         public long DurationHours { get; set; }
