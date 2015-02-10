@@ -236,6 +236,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="LogControlDebug.cs" />
     <Compile Include="LogControlDirect.cs" />
     <Compile Include="LogControl.cs" />
     <Compile Include="Migrations\201502060707423_init.cs" />
@@ -274,6 +275,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="UserAccount.cs" />
+    <Compile Include="UserAccountDebug.cs" />
     <Compile Include="UserAccountDirect.cs" />
     <Content Include="MonthOverView.html" />
     <Content Include="Views\Home\Claims.cshtml" />

@@ -1,7 +1,7 @@
 ﻿"use strict"
 
 
-var Debug = true;
+var Debug = false;
 var DebugLocal = false;
 
 //var global_refTIlerUrl = "http://localhost:53201/api/";

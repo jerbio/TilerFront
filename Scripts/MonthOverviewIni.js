@@ -1,13 +1,10 @@
 ﻿"use strict"
 
-function slideProcrastinateEventModal()
-{
-    $('#ProcrastinateEventModal').slideToggle(500);
-}
+
 $(document).ready(function () {
     $('body').hide();
     LaunchMonthTicker();
-    document.getElementById("ControlPanelProcrastinateButton").onclick = slideProcrastinateEventModal;
+    
     InitializeMonthlyOverview();
 });
 
@@ -23,6 +20,313 @@ var global_ClearRefreshDataInterval = 0;
 var global_ColorAugmentation=0;
 var refreshCounter = 1000000;
 var global_refreshDataInterval = 60000;
+var global_multiSelect;
+
+
+function RevealControlPanelSection(SelectedEvents) {
+    /*var ControlPanelNameOfSubeventInfo = document.getElementById("ControlPanelNameOfSubeventInfo");
+    ControlPanelNameOfSubeventInfo.innerHTML = ""
+    var ControlPanelDeadlineOfSubeventInfo = document.getElementById("ControlPanelDeadlineOfSubeventInfo");
+    ControlPanelDeadlineOfSubeventInfo.innerHTML = ""
+    var ControlPanelSubEventTimeInfo = document.getElementById("ControlPanelSubEventTimeInfo");
+    ControlPanelSubEventTimeInfo.innerHTML = ""*/
+
+    
+    var yeaButton = getDomOrCreateNew("YeaToConfirmDelete");
+    var nayButton = getDomOrCreateNew("NayToConfirmDelete");
+    var completeButton = getDomOrCreateNew("ControlPanelCompleteButton");
+    var deleteButton = getDomOrCreateNew("ControlPanelDeleteButton");
+    var DeleteMessage = getDomOrCreateNew("DeleteMessage")
+    var ProcatinationButton = getDomOrCreateNew("submitProcatination");
+    var ControlPanelCloseButton = getDomOrCreateNew("ControlPanelCloseButton");
+    var ProcrastinateEventModalContainer = getDomOrCreateNew("ProcrastinateEventModal");
+    var ControlPanelProcrastinateButton = getDomOrCreateNew("ControlPanelProcrastinateButton")
+    var ModalDelete = getDomOrCreateNew("ConfirmDeleteModal")
+    var MultiSelectPanel = getDomOrCreateNew("MultiSelectPanel")
+    var ControlPanelContainer = getDomOrCreateNew("ControlPanelContainer");
+
+    if (Object.keys(SelectedEvents).length < 1) {
+        $(MultiSelectPanel).addClass("hideMultiSelectPanel");
+        closeControlPanel();
+        return;
+    }
+
+    $(MultiSelectPanel).removeClass("hideMultiSelectPanel");
+
+    renderSubEventsClickEvents.BottomPanelIsOpen = true;
+
+    $('#ControlPanelContainer').slideDown(500);
+
+    function resetButtons() {
+        yeaButton.onclick = null;
+        nayButton.onclick = null;
+        ControlPanelProcrastinateButton.onclick = null;
+    }
+
+    function closeModalDelete() {
+        $('#ConfirmDeleteModal').slideUp(500);
+    }
+
+    function closeProcrastinatePanel() {
+        $(ProcrastinateEventModalContainer).slideUp(500);
+    }
+    function closeControlPanel() {
+        resetButtons();
+        closeModalDelete();
+        closeProcrastinatePanel();
+        deleteButton.onclick = null;
+        completeButton.onclick = null;
+        $('#ControlPanelContainer').slideUp(500);
+        $(MultiSelectPanel).addClass("hideMultiSelectPanel");
+        renderSubEventsClickEvents.BottomPanelIsOpen = false;
+        document.removeEventListener("keydown", containerKeyPress);
+        getRefreshedData.enableDataRefresh();
+    }
+
+
+    function deleteSubevent()//triggers the yea / nay deletion of events
+    {
+        //debugger;
+        DeleteMessage.innerHTML = "Sure you want to delete " + Object.keys(SelectedEvents).length + " Events?"
+        yeaButton.onclick = yeaDeleteSubEvent;
+        nayButton.onclick = nayDeleteSubEvent;
+        yeaButton.focus();
+        $('#ConfirmDeleteModal').slideDown(500);
+        ModalDelete.isRevealed = true;
+    }
+
+    function containerKeyPress(e) {
+        e.stopPropagation();
+        if (e.which == 27)//escape key press
+        {
+            closeControlPanel();
+        }
+
+        if ((e.which == 8) || (e.which == 46))//bkspc/delete key pressed
+        {
+            deleteSubevent();
+        }
+    }
+
+    function yeaDeleteSubEvent()//triggers the deletion of subevent
+    {
+        SendMessage();
+        function SendMessage() {
+            var TimeZone = new Date().getTimezoneOffset();
+            var AllIds = Object.keys(SelectedEvents).join(',');
+
+            var DeletionEvent = {
+                UserName: UserCredentials.UserName, UserID: UserCredentials.ID, EventID: AllIds, TimeZoneOffset: TimeZone
+            };
+            //var URL = "RootWagTap/time.top?WagCommand=6"
+            var URL = global_refTIlerUrl + "Schedule/Events";
+            var HandleNEwPage = new LoadingScreenControl("Tiler is Deleting your event :)");
+            HandleNEwPage.Launch();
+
+            $.ajax({
+                type: "DELETE",
+                url: URL,
+                data: DeletionEvent,
+                // DO NOT SET CONTENT TYPE to json
+                // contentType: "application/json; charset=utf-8", 
+                // DataType needs to stay, otherwise the response object
+                // will be treated as a single string
+                success: function (response) {
+                    //InitializeHomePage();
+                    //alert("alert 0-b");
+                },
+                error: function () {
+                    var NewMessage = "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
+                    var ExitAfter = {
+                        ExitNow: true, Delay: 1000
+                    };
+                    HandleNEwPage.UpdateMessage(NewMessage, ExitAfter, InitializeHomePage);
+                }
+            }).done(function (data) {
+                HandleNEwPage.Hide();
+                triggerUIUPdate();//hack alert
+                getRefreshedData();
+            });
+        }
+        function triggerUIUPdate() {
+            //alert("we are deleting " + SubEvent.ID);
+            //$('#ConfirmDeleteModal').slideToggle();
+            //$('#ControlPanelContainer').slideUp(500);
+            resetButtons();
+            closeControlPanel();
+        }
+
+    }
+    function nayDeleteSubEvent()//ignores deletion of events
+    {
+        closeModalDelete();
+        resetButtons();
+    }
+
+    function markAsComplete() {
+        SendMessage();
+        function SendMessage() {
+            var TimeZone = new Date().getTimezoneOffset();
+            var Url;
+            //Url="RootWagTap/time.top?WagCommand=7";
+            Url = global_refTIlerUrl + "Schedule/Events/Complete";
+            var HandleNEwPage = new LoadingScreenControl("Tiler is updating your schedule ...");
+            HandleNEwPage.Launch();
+            var AllIds = Object.keys(SelectedEvents).join(',');
+            var MarkAsCompleteData = {
+                UserName: UserCredentials.UserName, UserID: UserCredentials.ID, EventID: AllIds, TimeZoneOffset: TimeZone
+            };
+            $.ajax({
+                type: "POST",
+                url: Url,
+                data: MarkAsCompleteData,
+                // DO NOT SET CONTENT TYPE to json
+                // contentType: "application/json; charset=utf-8", 
+                // DataType needs to stay, otherwise the response object
+                // will be treated as a single string
+                //dataType: "json",
+                success: function (response) {
+                    //alert(response);
+                    var myContainer = (response);
+                    if (myContainer.Error.code == 0) {
+                        //exitSelectedEventScreen();
+                    }
+                    else {
+                        alert("error detected with marking as complete");
+                    }
+
+                },
+                error: function (err) {
+                    var myError = err;
+                    var step = "err";
+                    var NewMessage = "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
+                    var ExitAfter = {
+                        ExitNow: true, Delay: 1000
+                    };
+                    HandleNEwPage.UpdateMessage(NewMessage, ExitAfter, InitializeHomePage);
+                    //InitializeHomePage();
+
+
+                }
+
+            }).done(function (data) {
+                HandleNEwPage.Hide();
+                triggerUIUPdate();//hack alert
+                getRefreshedData();
+            });
+        }
+        function triggerUIUPdate() {
+            resetButtons();
+            closeControlPanel();
+        }
+
+    }
+    completeButton.onclick = markAsComplete;
+
+    document.addEventListener("keydown", containerKeyPress);
+   
+    MultiSelectPanel.innerHTML = Object.keys(SelectedEvents).length+" Events Selected"
+    ControlPanelCloseButton.onclick = closeControlPanel;
+    deleteButton.onclick = deleteSubevent;
+    if (ModalDelete.isRevealed)
+    {
+        deleteSubevent();
+    }
+}
+
+
+function multiSelect()
+{
+        var SelecedIDs = {};
+        var EnableChange = true;
+        var CallBackFunctions = [];
+
+        var AddElement = function (EventID)
+        {
+            getRefreshedData.disableDataRefresh();
+            if (SelecedIDs[EventID] == null)
+            {
+                var IniID=BindClickOfSideBarToCLick.ActiveID;
+                if (IniID!=null)
+                {
+                    BindClickOfSideBarToCLick.reset();
+                    AddElement(IniID);
+                }
+                
+                var SubEvent = global_DictionaryOfSubEvents[EventID];
+                SelecedIDs[EventID] = SubEvent;
+                SelectElement(EventID);
+            }
+            else
+            {
+                RemoveELement(EventID)
+            }
+            
+            Change();
+        }
+
+        var RemoveELement = function (EventID) {
+            var SubEvent = SelecedIDs[EventID];
+            
+            if (SubEvent == null)
+            {
+                alert("oops Jay there is some discrepancy with your multiselect");
+            }
+            DeselectEleemnt(EventID);
+            delete SelecedIDs[EventID];
+            
+            BindClickOfSideBarToCLick.reset();
+            Change();
+        }
+
+        var DisableChangeDetection = true;
+
+        var resetAllElement = function () {
+            EnableChange = false;
+            while (Object.keys(SelecedIDs).length > 0)
+            {
+                RemoveELement(Object.keys(SelecedIDs)[0])
+            }
+            EnableChange = true;
+            Change();
+            getRefreshedData.enableDataRefresh();
+        }
+
+        var SelectElement = function (EventID)
+        {
+            var SubEvent = SelecedIDs[EventID];
+            SubEvent.gridDoms.forEach(HighlightSubEvent);
+        }
+
+        var DeselectEleemnt = function (EventID)
+        {
+            var SubEvent = SelecedIDs[EventID];
+            SubEvent.gridDoms.forEach(dehighlightSubEvent);
+        }
+
+        var Change = function ()
+        {
+            
+            if ((EnableChange))
+            {
+                CallBackFunctions.forEach(function (myFunc) { myFunc(SelecedIDs) });
+            }
+        }
+        this.AddElement = AddElement;
+        this.DeselectEleemnt = DeselectEleemnt;
+        this.SelectElement = SelectElement;
+        this.resetAllElement = resetAllElement;
+        this.RemoveELement = RemoveELement;
+        this.getAllSelectedElements = function () { SelecedIDs }
+        this.AddCallBack = function (CallBack)
+        {
+            CallBackFunctions.push(CallBack);
+        }
+    
+}
+
+global_multiSelect = new multiSelect();
+global_multiSelect.AddCallBack(RevealControlPanelSection);
 
 var FormatTime = function(date){
   var d = date;
@@ -325,20 +629,35 @@ function InitiateGrid(refDate)
 
 
 
-    function getRefreshedData()//RangeData)
+
+function getRefreshedData()//RangeData)
+{
+    //setTimeout(refreshIframe,200);
+    if (--refreshCounter < 0)//debugging counter. THis allows us to set a max number of refreshes before stopping calls to backend
     {
-        //setTimeout(refreshIframe,200);
-        if (--refreshCounter < 0)//debugging counter. THis allows us to set a max number of refreshes before stopping calls to backend
-        {
-            return;
-        }
-        StopPullingData();
-        monthViewResetData();
-        var DataHolder = { Data: "" };
+        return;
+    }
+    StopPullingData();
+    monthViewResetData();
+    var DataHolder = { Data: "" };
+    if (getRefreshedData.isEnabled)
+    {
         PopulateTotalSubEvents(DataHolder, global_WeekGrid);
+    }
         global_ClearRefreshDataInterval = setTimeout(getRefreshedData, global_refreshDataInterval);
         return global_ClearRefreshDataInterval;
-    }
+}
+getRefreshedData.isEnabled = true;
+
+getRefreshedData.disableDataRefresh = function ()
+{
+    getRefreshedData.isEnabled = false;
+}
+
+getRefreshedData.enableDataRefresh = function ()
+{
+    getRefreshedData.isEnabled = true;
+}
 
     function getEventsInterferringInRange(StartDate, EndDate)
     {
@@ -618,6 +937,7 @@ function InitiateGrid(refDate)
                 $(ListElementDataContentContainer.Dom).addClass("ListElementDataContentContainer");
                 ListElementDataContentContainer.Dom.appendChild(TimeDataPerListElement.Dom);
                 ListElementDataContentContainer.Dom.appendChild(NameDataPerListElement.Dom);
+                global_DictionaryOfSubEvents[ID].gridDoms.push(ListElementDataContentContainer.Dom)
 
 
                 var EventLockContainer = getDomOrCreateNew("EventLockContainer" + ID);
@@ -728,10 +1048,11 @@ function InitiateGrid(refDate)
     }
 
 
-    function BindClickOfSideBarToCLick(MyArray, FullContainer, Index, CLickedBar)
+    function BindClickOfSideBarToCLick(MyArray, FullContainer, Index, CLickedBar,EventID)
     {
         return function ()
         {
+            global_multiSelect.resetAllElement();
             if (BindClickOfSideBarToCLick.elementResetHeight != null)
             {
                 BindClickOfSideBarToCLick.reset();
@@ -750,13 +1071,14 @@ function InitiateGrid(refDate)
             $(ExpandElement).addClass("FullColorAugmentation");
 
             //ExpandElement.style.backgroundColor = "yellow";
-            $(FullContainer.DataElement.Dom).addClass("selectedElements");
+            HighlightSubEvent(FullContainer.DataElement.Dom);
+            //$(FullContainer.DataElement.Dom).addClass("selectedElements");
             var resetArray = new Array();
             BindClickOfSideBarToCLick.previousIndex = Index;
             
 
             var AllPreviousSelection = $(".selectedDayElements");
-
+            
 
             for(var i=0;i<AllPreviousSelection.length;i++)
             {
@@ -784,6 +1106,7 @@ function InitiateGrid(refDate)
                 MyArray[i].refSubEvent.Dom.style.top = CurrentTop + "px";
             }
             BindClickOfSideBarToCLick.resetArray = resetArray;
+            BindClickOfSideBarToCLick.ActiveID = EventID;
         }
     }
 
@@ -791,15 +1114,17 @@ function InitiateGrid(refDate)
     {
         //BindClickOfSideBarToCLick.ExpandElement.style.height = BindClickOfSideBarToCLick.elementResetHeight + "px";
         //BindClickOfSideBarToCLick.ExpandElement.style.backgroundColor = "transparent";
-        BindClickOfSideBarToCLick.ExpandElement.style.top = (BindClickOfSideBarToCLick.previousIndex * 20) + "px";
-        $(BindClickOfSideBarToCLick.clickedBar).removeClass("selectedElements")
-        $(BindClickOfSideBarToCLick.DataElement).removeClass("selectedElements")
-        $(BindClickOfSideBarToCLick.ExpandElement).removeClass("FullColorAugmentation");
-        BindClickOfSideBarToCLick.resetArray.forEach(function (obj)
-        {
-            obj.DomElement.style.top = (obj.index*20) + "px";
-        })
-        BindClickOfSideBarToCLick.elementResetHeight = null;
+        if (BindClickOfSideBarToCLick.ActiveID != null) {
+            BindClickOfSideBarToCLick.ExpandElement.style.top = (BindClickOfSideBarToCLick.previousIndex * 20) + "px";
+            $(BindClickOfSideBarToCLick.clickedBar).removeClass("selectedElements")
+            $(BindClickOfSideBarToCLick.DataElement).removeClass("selectedElements")
+            $(BindClickOfSideBarToCLick.ExpandElement).removeClass("FullColorAugmentation");
+            BindClickOfSideBarToCLick.resetArray.forEach(function (obj) {
+                obj.DomElement.style.top = (obj.index * 20) + "px";
+            })
+            BindClickOfSideBarToCLick.elementResetHeight = null;
+            BindClickOfSideBarToCLick.ActiveID = null;
+        }
         
     }
     
@@ -820,79 +1145,97 @@ function InitiateGrid(refDate)
         return retValue;
     }
 
-    function prepUiSlideFunc(DayOfWeek,ID, MyArray,Index)
+
+    function HighlightSubEvent(Dom)
     {
-        return function ()
-        {
-            DayOfWeek.UISpecs[ID].Dom.style.left = DayOfWeek.LeftPercent + DayOfWeek.widtPct+ "%";
-            DayOfWeek.UISpecs[ID].Dom.style.height = DayOfWeek.UISpecs[ID].css.height + "%";
-            //DayOfWeek.UISpecs[ID].Dom.style.minHeight = (global_DayHeight * (1 / 24)) + "px";//1/24 because we want the minimum to be the size of an hour
-                
-            DayOfWeek.UISpecs[ID].Dom.style.marginLeft = (-(DayOfWeek.UISpecs[ID].css.left+17)+"px");
-            //DayOfWeek.UISpecs[ID].Dom.style.width = DayOfWeek.UISpecs[ID].css.width + "%";
-            DayOfWeek.UISpecs[ID].Dom.style.top = DayOfWeek.UISpecs[ID].css.top + "%";
-            if (DayOfWeek.UISpecs[ID].IDindex==0)
-            {
-                    //triggers change to List elements UI elements
-                    DayOfWeek.UISpecs[ID].refrenceListElement.Dom.style.top = (Index * 20) + "px";
-                    DayOfWeek.UISpecs[ID].refrenceListElement.Dom.style.marginTop = (20) + "px";
-                    $(DayOfWeek.UISpecs[ID].refrenceListElement.Dom).removeClass("FullColorAugmentation");
-                DayOfWeek.UISpecs[ID].refrenceListElement.Dom.style.left = DayOfWeek.LeftPercent + "%";
-                if (global_DictionaryOfSubEvents[ID].ColorSelection > 0)
-                {
-                    //$(DayOfWeek.UISpecs[ID].refrenceListElement.Dom).addClass(global_AllColorClasses[global_DictionaryOfSubEvents[ID].ColorSelection].cssClass);
-                    $(DayOfWeek.UISpecs[ID].DataElement.Dom).addClass(global_AllColorClasses[global_DictionaryOfSubEvents[ID].ColorSelection].cssClass);
-                }
-                
-            }
-            var BindToThis = BindClickOfSideBarToCLick(MyArray, DayOfWeek.UISpecs[ID], Index, DayOfWeek.UISpecs[ID].Dom);
-            
-
-            //if statement ensures that only elements with IDIndex generate the function. This ensures that the selected element shows on the left side of the page.
-            if ((global_DictionaryOfSubEvents[ID].Bind == null) && (DayOfWeek.UISpecs[ID].IDindex == 0))
-            {
-                global_DictionaryOfSubEvents[ID].Bind = BindToThis;
-            }
-            /*
-
-            function triggerClick(e) {
-                if(e!=null)
-                {
-                    e.stopPropagation();
-                }
-                global_DictionaryOfSubEvents[ID].Bind()
-            };
-            //$(DayOfWeek.UISpecs[ID].Dom).click(triggerClick);
-            (DayOfWeek.UISpecs[ID].Dom).onclick=(triggerClick);
-
-            $(DayOfWeek.UISpecs[ID].refrenceListElement.Dom).click
-            (
-                function (e) 
-                { 
-                    e.stopPropagation();
-                    triggerClick();
-                    //$(DayOfWeek.UISpecs[ID].Dom).trigger("click");
-                }
-            )//clicking of the named element triggers a click on the
-            */
-
-            function call_renderSubEventsClickEvents(e) { e.stopPropagation(); renderSubEventsClickEvents(ID) }
-            DayOfWeek.UISpecs[ID].refrenceListElement.Dom.onclick = call_renderSubEventsClickEvents;
-        }
-        
+        $(Dom).addClass("selectedElements");
     }
 
-    function renderSubEventsClickEvents(SubEventID)
-    {
+function dehighlightSubEvent(Dom)
+{
+    $(Dom).removeClass("selectedElements");
+}
+function prepUiSlideFunc(DayOfWeek, ID, MyArray, Index)
+{
+    return function () {
+        DayOfWeek.UISpecs[ID].Dom.style.left = DayOfWeek.LeftPercent + DayOfWeek.widtPct + "%";
+        DayOfWeek.UISpecs[ID].Dom.style.height = DayOfWeek.UISpecs[ID].css.height + "%";
+        //DayOfWeek.UISpecs[ID].Dom.style.minHeight = (global_DayHeight * (1 / 24)) + "px";//1/24 because we want the minimum to be the size of an hour
+
+        DayOfWeek.UISpecs[ID].Dom.style.marginLeft = (- (DayOfWeek.UISpecs[ID].css.left + 17) + "px");
+        //DayOfWeek.UISpecs[ID].Dom.style.width = DayOfWeek.UISpecs[ID].css.width + "%";
+        DayOfWeek.UISpecs[ID].Dom.style.top = DayOfWeek.UISpecs[ID].css.top + "%";
+        if (DayOfWeek.UISpecs[ID].IDindex ==0) {
+            //triggers change to List elements UI elements
+                DayOfWeek.UISpecs[ID].refrenceListElement.Dom.style.top = (Index * 20) + "px";
+                DayOfWeek.UISpecs[ID].refrenceListElement.Dom.style.marginTop = (20) + "px";
+                $(DayOfWeek.UISpecs[ID].refrenceListElement.Dom).removeClass("FullColorAugmentation");
+            DayOfWeek.UISpecs[ID].refrenceListElement.Dom.style.left = DayOfWeek.LeftPercent + "%";
+            if (global_DictionaryOfSubEvents[ID].ColorSelection > 0) {
+                //$(DayOfWeek.UISpecs[ID].refrenceListElement.Dom).addClass(global_AllColorClasses[global_DictionaryOfSubEvents[ID].ColorSelection].cssClass);
+                $(DayOfWeek.UISpecs[ID].DataElement.Dom).addClass(global_AllColorClasses[global_DictionaryOfSubEvents[ID].ColorSelection].cssClass);
+        }
+
+    }
+        var BindToThis = BindClickOfSideBarToCLick(MyArray, DayOfWeek.UISpecs[ID], Index, DayOfWeek.UISpecs[ID].Dom,ID);
+
+
+        //if statement ensures that only elements with IDIndex generate the function. This ensures that the selected element shows on the left side of the page.
+        if ((global_DictionaryOfSubEvents[ID].Bind == null) && (DayOfWeek.UISpecs[ID].IDindex == 0)) {
+            global_DictionaryOfSubEvents[ID].Bind = BindToThis;
+    }
+        /*
+
+        function triggerClick(e) {
+            if(e!=null)
+            {
+                e.stopPropagation();
+            }
+            global_DictionaryOfSubEvents[ID].Bind()
+        };
+        //$(DayOfWeek.UISpecs[ID].Dom).click(triggerClick);
+        (DayOfWeek.UISpecs[ID].Dom).onclick=(triggerClick);
+
+        $(DayOfWeek.UISpecs[ID].refrenceListElement.Dom).click
+        (
+            function (e) 
+            { 
+                e.stopPropagation();
+                triggerClick();
+                //$(DayOfWeek.UISpecs[ID].Dom).trigger("click");
+            }
+        )//clicking of the named element triggers a click on the
+        */
+
+        function call_renderSubEventsClickEvents(e)
+        {
+            e.stopPropagation();
+            if (e.ctrlKey)
+            {
+                global_multiSelect.AddElement(ID);
+                return;
+            }
+            
+            
+            renderSubEventsClickEvents(ID)
+        }
+        DayOfWeek.UISpecs[ID].refrenceListElement.Dom.onclick = call_renderSubEventsClickEvents;
+    }
+
+}
+
+
+
+        function renderSubEventsClickEvents(SubEventID) {
         global_DictionaryOfSubEvents[SubEventID].Bind();
         global_DictionaryOfSubEvents[SubEventID].showBottomPanel();
     }
+    renderSubEventsClickEvents.BottomPanelIsOpen = false;
 
 
-function renderUIChanges(DayOfWeek)
-{
-    for (var ID in DayOfWeek.UISpecs)
-    {
+
+        function renderUIChanges(DayOfWeek) {
+    for (var ID in DayOfWeek.UISpecs) {
         DayOfWeek.UISpecs[ID].Dom.Active = false;
 
 
@@ -912,61 +1255,58 @@ function renderUIChanges(DayOfWeek)
         }
     
         */
+        }
     }
-}
 
 
 
-function genFunctionForSelectCalendarRange(ArrayOfCalendars, RefDate)
-{
-    /*AllRanges[Index].Start = RangeOfWeek.Start;
-    AllRanges[Index].End = RangeOfWeek.End;*/
+        function genFunctionForSelectCalendarRange(ArrayOfCalendars, RefDate) {
+            /*AllRanges[Index].Start = RangeOfWeek.Start;
+            AllRanges[Index].End = RangeOfWeek.End;*/
 
-    return function ()
-    {
-        ArrayOfCalendars.forEach(function (eachRange)
-        {
+    return function () {
+        ArrayOfCalendars.forEach(function (eachRange) {
             if ((RefDate.getTime() >= eachRange.Start) && (RefDate.getTime() < eachRange.End)) {
                 $(eachRange.Dom).show();
             }
-            else
-            {
+            else {
                 $(eachRange.Dom).hide();
-            }
-                
+        }
+
             //$(eachRange.Dom).show();
         })
-            
-    }
-}
 
-function PopulateUI(ParentDom,refDate)// draws up the container and gathers all possible calendar within range.
-{
+        }
+    }
+
+        function PopulateUI(ParentDom, refDate)// draws up the container and gathers all possible calendar within range.
+        {
     var StartWeekDateInMS = new Date(refDate);
     var StartOfWeekDay = StartWeekDateInMS.getDay();
     $(ParentDom).empty();
 
-    StartOfWeekDay = 0 - StartOfWeekDay;
+    StartOfWeekDay = 0 -StartOfWeekDay;
     var StartOfRange = new Date((StartWeekDateInMS.getTime() + (StartOfWeekDay * OneDayInMs)));
     StartOfRange.setHours(0, 0, 0, 0);
     var EndOfRange = new Date(StartOfRange.getTime() + (OneWeekInMs * global_RangeMultiplier));//sets the range to be used for query
-    global_CurrentRange = { Start: StartOfRange, End: EndOfRange };
+    global_CurrentRange = { Start: StartOfRange, End: EndOfRange
+        };
 
-    var ScheduleRange = { Start: StartOfRange, End: EndOfRange };
-    //getRangeofSchedule();
+    var ScheduleRange = { Start: StartOfRange, End: EndOfRange
+        };
+            //getRangeofSchedule();
     var CurrentWeek = ScheduleRange.Start;
     var AllRanges = new Array();
     var AllWeekData = getDomOrCreateNew("CurrentWeekContainer");
     var index = 0;
-    while (CurrentWeek < ScheduleRange.End)
-    {
+    while (CurrentWeek < ScheduleRange.End) {
         //debugger;
-        CurrentWeek = CurrentWeek.dst() ? new Date(Number(CurrentWeek.getTime()) + OneHourInMs) : CurrentWeek;
-        var MyRange = { Start: CurrentWeek, End: new Date(Number(CurrentWeek) + Number(OneWeekInMs)) };
-            
+        CurrentWeek = CurrentWeek.dst() ? new Date(Number(CurrentWeek.getTime()) +OneHourInMs) : CurrentWeek;
+        var MyRange = { Start: CurrentWeek, End: new Date(Number(CurrentWeek) + Number(OneWeekInMs))
+    };
+
         var CurrentWeekDOm = genDivForEachWeek(MyRange, AllRanges);
-        if (!CurrentWeekDOm.status)
-        {
+        if (!CurrentWeekDOm.status) {
             AllWeekData.Dom.appendChild(CurrentWeekDOm.Dom);
             var translatePercent = 100 * index;
             CurrentWeekDOm.Dom.style.transform = 'translateX(' + translatePercent + '%)';
@@ -977,31 +1317,29 @@ function PopulateUI(ParentDom,refDate)// draws up the container and gathers all 
             //var ctx = CurrentWeekDOm.Dom.getContext("2d");
             CurrentWeekDOm.index = index;
             CurrentWeek = new Date(Number(CurrentWeek) + Number(OneWeekInMs));
-        }
-        ++index;
     }
-    
+        ++index;
+        }
+
     ParentDom.appendChild(AllWeekData.Dom);
     global_DayHeight = $(AllWeekData.Dom).height();
     global_WeekWidth = $(AllWeekData.Dom).width();
     global_DayTop = $(AllWeekData.Dom).offset().top;
-    AllRanges.Start=StartOfRange;
-    AllRanges.End=EndOfRange;
+    AllRanges.Start =StartOfRange;
+    AllRanges.End =EndOfRange;
     return AllRanges;
-}
+    }
 
-function LaunchMonthTicker()
-{
+        function LaunchMonthTicker() {
     var CurrDate = new Date();
     CurrDate = new Date(CurrDate.getFullYear(), CurrDate.getMonth(), 1);
     var MonthTickerData = generateAMonthBar(CurrDate);
     var MonthBarContainer = getDomOrCreateNew("MonthBar");
     MonthBarContainer.Dom.appendChild(MonthTickerData.Month.Dom);
-}
+    }
 
-function generateAMonthBar(MonthStart)
-{
-    //debugger;
+        function generateAMonthBar(MonthStart) {
+            //debugger;
     var WholeMonthCOntainer = getDomOrCreateNew("MonthArrayContainer");
     var MonthSelectButton = getDomOrCreateNew("MonthButton");
     $(MonthSelectButton.Dom).addClass("MonthButton")
@@ -1021,36 +1359,34 @@ function generateAMonthBar(MonthStart)
             //debugger;
             scrollToDay(obj.StartDate);
             dayTicker.Dom.style.left = obj.left + "%";
-        }
+    }
         $(obj.Dom).click(CallBackFunc);
-        if ((new Date() >= obj.StartDate) && (new Date() < obj.EndDate))
-        {
-            setTimeout(function () { CallBackFunc() },200);
-        }
-        
+        if ((new Date() >= obj.StartDate) && (new Date() < obj.EndDate)) {
+            setTimeout(function () { CallBackFunc() }, 200);
+    }
+
     });
 
-    var retVAlue = { Days: AllDayDivs, Month: WholeMonthCOntainer, MonthButton: MonthSelectButton, DayContainer: AllDayContainer }
+    var retVAlue = { Days: AllDayDivs, Month: WholeMonthCOntainer, MonthButton: MonthSelectButton, DayContainer: AllDayContainer
+        }
     return retVAlue;
-}
+    }
 
 
-function genDaysForMonthBar(MonthStart)
-{
-    //function creates the day divs in the month bar 
-    var Month = MonthStart.getMonth() + 1;
-    var IniMonth=Month;
+        function genDaysForMonthBar(MonthStart) {
+            //function creates the day divs in the month bar 
+    var Month = MonthStart.getMonth() +1;
+    var IniMonth =Month;
     var Day = MonthStart.getDate();
     var AllDayDiivs = new Array();
     var i = 0;
-    while (IniMonth==Month)
-    {
+    while (IniMonth ==Month) {
         var MyDivContainer = getDomOrCreateNew("MonthBarDayWeekContainer" + genDaysForMonthBar.Day++);
         var MyDay = getDomOrCreateNew("MonthBarDay" + genDaysForMonthBar.Day++);
         var MyDivWeekDay = getDomOrCreateNew("MonthBarDayOfWeek" + genDaysForMonthBar.Day++);
         MyDay.Dom.innerHTML = Day;
-        MyDivWeekDay.Dom.innerHTML =WeekDays[ MonthStart.getDay()][0];
-        
+        MyDivWeekDay.Dom.innerHTML =WeekDays[MonthStart.getDay()][0];
+
         MyDivContainer.Dom.appendChild(MyDay.Dom);
         MyDivContainer.Dom.appendChild(MyDivWeekDay.Dom);
 
@@ -1060,134 +1396,124 @@ function genDaysForMonthBar(MonthStart)
         var LeftPosition = (i++ * 3.22);
         MyDivContainer.Dom.style.left = LeftPosition + "%";
         MyDivContainer.left = LeftPosition
-        
+
 
         MyDivContainer.StartDate = MonthStart;
-        MonthStart = new Date(MonthStart.getFullYear(), MonthStart.getMonth(),++Day);
-        MyDivContainer.EndDate = new Date( MonthStart.getTime()-1);
+        MonthStart = new Date(MonthStart.getFullYear(), MonthStart.getMonth(), ++Day);
+        MyDivContainer.EndDate = new Date(MonthStart.getTime() -1);
         AllDayDiivs.push(MyDivContainer);
-        
-        
-        Month = MonthStart.getMonth() + 1;
-    }
+
+
+        Month = MonthStart.getMonth() +1;
+        }
 
     return AllDayDiivs;
-}
+    }
 
 genDaysForMonthBar.Day = 0;
 
 generateAMonthBar.counter = 0;
 
-function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range to assign a subEvent. THe range could be a week, month ,or day. It returns an array for the corresponding range it might fall within
-{
-    //var AllRangeData = new Array();
+        function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range to assign a subEvent. THe range could be a week, month ,or day. It returns an array for the corresponding range it might fall within
+        {
+            //var AllRangeData = new Array();
     var i = 0;
 
     var verfyDate = new Date(2014, 5, 18, 0, 0, 0, 0);
-        
+
 
     SubEvent.CurrentIndex = 0;
     var SubEventStart = new Date(Number(SubEvent.SubCalStartDate));
     var SubEventEnd = new Date(Number(SubEvent.SubCalEndDate));
     var ValidRange = new Array();
 
-    for (i in AllRangeData)
-    {
+    for (i in AllRangeData) {
         var rangeElement = AllRangeData[i]
         var StartDate = new Date(Number(rangeElement.Start));
         var EndDate = new Date(Number(rangeElement.End));
 
-        if (((SubEvent.ID === "11792_7_11978_11979")))
-        {
+        if (((SubEvent.ID === "11792_7_11978_11979"))) {
             var a = 9;
-        }
+    }
 
 
-        if ((SubEventStart >= StartDate) && (SubEventStart <= EndDate))
-        {
+        if ((SubEventStart >= StartDate) && (SubEventStart <= EndDate)) {
             ValidRange.push(rangeElement);
             rangeElement.SubEventsCollection[SubEvent.ID] = (SubEvent);
 
-            if (rangeElement.UISpecs[SubEvent.ID] == null)
-            {
-                rangeElement.UISpecs[SubEvent.ID] = { css: {},IDindex: SubEvent.CurrentIndex,OldIDindex:null,Enabled:true,Dom:null}
+            if (rangeElement.UISpecs[SubEvent.ID] == null) {
+                rangeElement.UISpecs[SubEvent.ID] = { css: { }, IDindex: SubEvent.CurrentIndex, OldIDindex: null, Enabled: true, Dom: null
             }
+        }
             rangeElement.UISpecs[SubEvent.ID].Start = SubEvent.SubCalStartDate.getTime();
             rangeElement.UISpecs[SubEvent.ID].IDindex = SubEvent.CurrentIndex;
             rangeElement.UISpecs[SubEvent.ID].Enabled = true;
             rangeElement.UISpecs[SubEvent.ID].Dom = null;
 
-        }
-        if ((SubEventEnd >= StartDate) && (SubEventEnd <= EndDate))
-        {
-            if (ValidRange.indexOf(rangeElement) < 0)
-            {
+    }
+        if ((SubEventEnd >= StartDate) && (SubEventEnd <= EndDate)) {
+            if (ValidRange.indexOf(rangeElement) < 0) {
                 ValidRange.push(rangeElement);
 
                 if (rangeElement.UISpecs[SubEvent.ID] == null) {
-                    rangeElement.UISpecs[SubEvent.ID] = { css: {}, IDindex: SubEvent.CurrentIndex, OldIDindex: null, Enabled: true, Dom: null }
+                    rangeElement.UISpecs[SubEvent.ID] = { css: { }, IDindex: SubEvent.CurrentIndex, OldIDindex: null, Enabled: true, Dom: null
                 }
+            }
 
                 rangeElement.SubEventsCollection[SubEvent.ID] = SubEvent;
                 rangeElement.UISpecs[SubEvent.ID].IDindex = SubEvent.CurrentIndex;
                 rangeElement.UISpecs[SubEvent.ID].Enabled = true;
                 rangeElement.UISpecs[SubEvent.ID].Dom = null;
                 rangeElement.UISpecs[SubEvent.ID].Start = SubEvent.SubCalStartDate.getTime();
-            }
         }
     }
+        }
 
 
-    if (ValidRange.length > 0)
-    {
+    if (ValidRange.length > 0) {
         return ValidRange;
-    }
+        }
 
     return ValidRange;
-}
-
-    
+    }
 
 
-    function getMyDom(SubEvent, Range)
-    {
+
+
+        function getMyDom(SubEvent, Range) {
         var referenceStart = new Date(Range.Start);
-        //referenceStart.setHours(refStart.Hour, refStart.Minute);
+            //referenceStart.setHours(refStart.Hour, refStart.Minute);
         var referenceEnd = new Date(Range.End);
-        //referenceEnd.setHours(refEnd.Hour, refEnd.Minute);
+            //referenceEnd.setHours(refEnd.Hour, refEnd.Minute);
         var SubCalCalEventStart = new Date(SubEvent.SubCalStartDate);
         var SubCalCalEventEnd = new Date(SubEvent.SubCalEndDate);
-        if ((SubEvent.gridDoms == undefined) || (SubEvent.gridDoms == null))
-        {
+        if ((SubEvent.gridDoms == undefined) || (SubEvent.gridDoms == null)) {
             SubEvent.gridDoms = new Array();
         }
 
-        if (SubCalCalEventStart > referenceStart)
-        {
+        if (SubCalCalEventStart > referenceStart) {
             referenceStart = SubCalCalEventStart;
         }
 
-        if (referenceEnd > SubCalCalEventEnd)
-        {
+        if (referenceEnd > SubCalCalEventEnd) {
             referenceEnd = SubCalCalEventEnd;
         }
 
-        if (SubEvent.ID == "269_293_297")
-        {
+        if (SubEvent.ID == "269_293_297") {
             var z = 981;
         }
 
-        var totalDuration = referenceEnd - referenceStart;
+        var totalDuration = referenceEnd -referenceStart;
         var percentHeight = (totalDuration / OneDayInMs) * 100;
 
         var percentTop = ((referenceStart - new Date(Range.Start)) / OneDayInMs) * 100;
-        function call_renderSubEventsClickEvents(e)
-        {
+            function call_renderSubEventsClickEvents(e) {
             e.stopPropagation();
             renderSubEventsClickEvents(SubEvent.ID)
         }
         if (Range.UISpecs[SubEvent.ID].Enabled) {
-            Range.UISpecs[SubEvent.ID].css = { height: 0, top: 0 };
+            Range.UISpecs[SubEvent.ID].css = { height: 0, top: 0
+        };
             Range.UISpecs[SubEvent.ID].css.height = percentHeight;
             Range.UISpecs[SubEvent.ID].css.top = percentTop;
             Range.UISpecs[SubEvent.ID].Enabled = true;
@@ -1200,67 +1526,61 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
             Range.UISpecs[SubEvent.ID].Dom = EventDom.Dom
             Range.UISpecs[SubEvent.ID].Dom.Enabled = true;
             SubEvent.gridDoms.push(EventDom.Dom);
-            
+
             $(EventDom.Dom).addClass("gridSubevent");
             //debugger;
-            if (SubEvent.ColorSelection > 0)
-            {
+            if (SubEvent.ColorSelection > 0) {
                 //debugger;
                 $(EventDom.Dom).addClass(global_AllColorClasses[SubEvent.ColorSelection].cssClass);
-            }
+        }
             $(EventDom.Dom).addClass("SameSubEvent" + SubEvent.ID);
 
             //$(EventDom.Dom).click(prepOnClickOfCalendarElement(SubEvent, EventDom.Dom));
             global_DictionaryOfSubEvents[SubEvent.ID].showBottomPanel = prepOnClickOfCalendarElement(SubEvent, EventDom.Dom);
 
 
-            
-            EventDom.Dom.onclick  = call_renderSubEventsClickEvents;
+
+            EventDom.Dom.onclick = call_renderSubEventsClickEvents;
             //EventDom.Dom.innerHTML = SubEvent.Name
         }
-        else
-        {
+        else {
             if (!Range.UISpecs[SubEvent.ID].Enabled)//checks if it is active
             {
-                Range.UISpecs[SubEvent.ID].Dom.outerHTML="";
+                Range.UISpecs[SubEvent.ID].Dom.outerHTML ="";
                 //Range.UISpecs[SubEvent.ID].Dom.style.height = 0;
                 var retValue = delete Range.UISpecs[SubEvent.ID];
                 //toBeDeletedDom.Dom.parentElement.removeChild(toBeDeletedDom.Dom);
-            }
+        }
         }
     }
 
     var global_previousSelectedSubCalEvent = new Array();
-    function prepOnClickOfCalendarElement(SubEvent,Dom)
-    {
-        return function ()
-        {
+        function prepOnClickOfCalendarElement(SubEvent, Dom) {
+        return function () {
             //event.stopPropagation();
-            for (var i = 0; i < global_previousSelectedSubCalEvent.length; i++)
-            {
+            for (var i = 0; i < global_previousSelectedSubCalEvent.length; i++) {
                 var myDom = global_previousSelectedSubCalEvent[i];
                 $(myDom).removeClass("SelectedWeekGridSubcalEvent");
                 //global_previousSelectedSubCalEvent.pop();
-            }
+        }
             global_previousSelectedSubCalEvent = new Array();
             var AllDomsOfTheSameSubevent = $(".SameSubEvent" + SubEvent.ID);
-            for (var i = 0; i < AllDomsOfTheSameSubevent.length; i++)
-            {
+            for (var i = 0; i < AllDomsOfTheSameSubevent.length; i++) {
                 var myDom = AllDomsOfTheSameSubevent[i]
                 $(myDom).addClass("SelectedWeekGridSubcalEvent");
                 global_previousSelectedSubCalEvent.push(myDom);
-            }
-              
+        }
+
               var ControlPanelNameOfSubeventInfo = document.getElementById("ControlPanelNameOfSubeventInfo");
               var ControlPanelDeadlineOfSubeventInfo = document.getElementById("ControlPanelDeadlineOfSubeventInfo");
               var ControlPanelSubEventTimeInfo = document.getElementById("ControlPanelSubEventTimeInfo");
 
 
-              
-              var FormatTime = function(date){
+
+              var FormatTime = function (date) {
               var d = date;
               var TimeHours = d.getHours();
-              var TimeMinutes = d.getMinutes(); 
+              var TimeMinutes = d.getMinutes();
               var TimeMM = TimeMinutes;
               var TimeHH = TimeHours;
               var AMPM = 'am';
@@ -1269,24 +1589,24 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
               var date_number = d.getDate();
               var year = d.getYear();
 
-              if (TimeMinutes <= 9){
-                TimeMM = '0' + TimeMinutes
+              if (TimeMinutes <= 9) {
+                TimeMM = '0' +TimeMinutes
               }
-              if (TimeHours >= 12 && TimeMinutes >= 0){
-                if (TimeHours >= 13){
-                  TimeHH = TimeHours - 12;
-                }  
+              if (TimeHours >= 12 && TimeMinutes >= 0) {
+                if (TimeHours >= 13) {
+                  TimeHH = TimeHours -12;
+              }
                 AMPM = 'pm';
-              } else if(TimeHours === 12 && TimeMinutes === 0) {
+              } else if (TimeHours === 12 && TimeMinutes === 0) {
                 TimeHH = 'Noon';
                 AMPM = '';
                 TimeMM = '';
-              } else if(TimeHours === 24 && TimeMinutes === 0) {
+              } else if (TimeHours === 24 && TimeMinutes === 0) {
                 TimeHH = 'Midnight';
-                AMPM= '';
+                AMPM = '';
                 TimeMM = '';
               }
-              switch (d.getMonth()){
+              switch (d.getMonth()) {
                 case 0:
                   month = "Jan";
                   break;
@@ -1347,9 +1667,10 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                   day = "Saturday";
                   break;
               }
-              var a = { hour:TimeHH, minute:TimeMM, merid:AMPM, day:day, mon:month, date:date_number, year:year }
+              var a = { hour: TimeHH, minute: TimeMM, merid: AMPM, day: day, mon: month, date: date_number, year: year
+              }
               return a;
-            };
+        };
             var StartDate = FormatTime(SubEvent.SubCalStartDate);
             var EndDate = FormatTime(SubEvent.SubCalEndDate);
             var Deadline = FormatTime(SubEvent.SubCalCalEventEnd);
@@ -1360,88 +1681,146 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
             var deleteButton = getDomOrCreateNew("ControlPanelDeleteButton");
             var DeleteMessage = getDomOrCreateNew("DeleteMessage")
             var ProcatinationButton = getDomOrCreateNew("submitProcatination");
-            
-            closeControlPanel();
+            var ControlPanelCloseButton = getDomOrCreateNew("ControlPanelCloseButton");
+            var ProcrastinateEventModalContainer = getDomOrCreateNew("ProcrastinateEventModal");
+            var ControlPanelProcrastinateButton = getDomOrCreateNew("ControlPanelProcrastinateButton")
+            var ControlPanelLocationButton = getDomOrCreateNew("ControlPanelLocationButton")
+            var ModalDelete = getDomOrCreateNew("ConfirmDeleteModal")
+            var MultiSelectPanel = getDomOrCreateNew("MultiSelectPanel");
+            if (!renderSubEventsClickEvents.BottomPanelIsOpen) {
+                closeControlPanel();
+            }
+
+            var LauchLocation = function ()
+            {
+                debugger;
+                var googleMapsURL = "https://www.google.com/maps/place/";
+                var fullURL = googleMapsURL + SubEvent.SubCalAddress
+                if (SubEvent.SubCalAddress) {
+                    var win = window.open(fullURL, '_blank');
+                    win.focus();
+                }
+                else
+                {
+                    $(MultiSelectPanel).removeClass("hideMultiSelectPanel");
+                    MultiSelectPanel.innerHTML = "Oops tiler could not find an address :X &#x1f603;";
+                    setTimeout(function () { $(MultiSelectPanel).addClass("hideMultiSelectPanel"); }, 3000);
+                    
+                    
+                }
+                
+            }
+
+            ControlPanelLocationButton.onclick = LauchLocation;
+
             ProcatinationButton.onclick = function () {
                 debugger;
                 procrastinateEvent();
-                slideProcrastinateEventModal();
-            }
+                closeProcrastinatePanel();
+        }
             $('#ControlPanelContainer').slideDown(500);
-            function resetButtons()
-            {
+            function resetButtons() {
                 yeaButton.onclick = null;
                 nayButton.onclick = null;
+                ControlPanelProcrastinateButton.onclick = null;
+        }
+
+            function slideOpenProcrastinateEventModal() {
+                ProcrastinateEventModalContainer.focus();
+                $(ProcrastinateEventModalContainer).slideDown(500);
+                ProcrastinateEventModalContainer.onkeydown = ProcrastinateEventModalContainer;
+                function procrastinateContainerKeyPress(e) {
+                    e.stopPropagation();
+                    if (e.which == 27)//escape key press
+                    {
+                        closeProcrastinatePanel();
+                }
             }
 
+        }
 
-            function closeControlPanel()
-            {
+            ControlPanelProcrastinateButton.onclick = slideOpenProcrastinateEventModal;
+
+
+            function closeControlPanel() {
                 resetButtons();
                 closeModalDelete();
+                closeProcrastinatePanel();
                 deleteButton.onclick = null;
                 completeButton.onclick = null;
                 $('#ControlPanelContainer').slideUp(500);
-            }
+                renderSubEventsClickEvents.BottomPanelIsOpen = false;
+                getRefreshedData.enableDataRefresh();
+        }
+
+            function closeProcrastinatePanel() {
+                $(ProcrastinateEventModalContainer).slideUp(500);
+        }
+
+            ControlPanelCloseButton.onclick = closeControlPanel
 
 
-            $('#ControlPanelCloseButton').click(closeControlPanel)
 
-            
             function deleteSubevent()//triggers the yea / nay deletion of events
             {
                 DeleteMessage.innerHTML = "Sure you want to delete \"" + SubEvent.Name + "\"?"
 
                 yeaButton.onclick = yeaDeleteSubEvent;
                 nayButton.onclick = nayDeleteSubEvent;
+                yeaButton.focus();
                 $('#ConfirmDeleteModal').slideDown(500);
+                ModalDelete.isRevealed = true;
+            }
+
+            if (ModalDelete.isRevealed) {
+                deleteSubevent();
             }
 
             function yeaDeleteSubEvent()//triggers the deletion of subevent
             {
                 SendMessage();
-                function SendMessage()
-                {
+                function SendMessage() {
                     var TimeZone = new Date().getTimezoneOffset();
-                    var DeletionEvent = { UserName: UserCredentials.UserName, UserID: UserCredentials.ID, EventID: SubEvent.ID, TimeZoneOffset: TimeZone };
+                    var DeletionEvent = { UserName: UserCredentials.UserName, UserID: UserCredentials.ID, EventID: SubEvent.ID, TimeZoneOffset: TimeZone
+                };
                     //var URL = "RootWagTap/time.top?WagCommand=6"
                     var URL = global_refTIlerUrl + "Schedule/Event";
                     var HandleNEwPage = new LoadingScreenControl("Tiler is Deleting your event :)");
                     HandleNEwPage.Launch();
 
                     $.ajax({
-                        type: "DELETE",
-                        url: URL,
-                        data: DeletionEvent,
+                            type: "DELETE",
+                            url: URL,
+                            data: DeletionEvent,
                         // DO NOT SET CONTENT TYPE to json
                         // contentType: "application/json; charset=utf-8", 
                         // DataType needs to stay, otherwise the response object
                         // will be treated as a single string
-                        success: function (response) {
-                            //InitializeHomePage();
-                            //alert("alert 0-b");
-                        },
-                        error: function () {
+                            success: function (response) {
+                                //InitializeHomePage();
+                                //alert("alert 0-b");
+                    },
+                            error: function () {
                             var NewMessage = "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
-                            var ExitAfter = { ExitNow: true, Delay: 1000 };
+                            var ExitAfter = { ExitNow: true, Delay: 1000
+                            };
                             HandleNEwPage.UpdateMessage(NewMessage, ExitAfter, InitializeHomePage);
-                        }
+                    }
                     }).done(function (data) {
                         HandleNEwPage.Hide();
                         triggerUIUPdate();//hack alert
                         getRefreshedData();
                     });
-                }
-                function triggerUIUPdate()
-                {
+            }
+                function triggerUIUPdate() {
                     //alert("we are deleting " + SubEvent.ID);
                     //$('#ConfirmDeleteModal').slideToggle();
                     //$('#ControlPanelContainer').slideUp(500);
                     resetButtons();
                     closeControlPanel();
-                }
-                
             }
+
+        }
 
 
             function nayDeleteSubEvent()//ignores deletion of events
@@ -1450,48 +1829,47 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                 resetButtons();
             }
 
-            function procrastinateEvent()
-            {
+            function procrastinateEvent() {
                 var HourInput = getDomOrCreateNew("procrastinateHours").value == "" ? 0 : getDomOrCreateNew("procrastinateHours").value;
                 var MinInput = getDomOrCreateNew("procrastinateMins").value == "" ? 0 : getDomOrCreateNew("procrastinateMins").value;
                 var DayInput = getDomOrCreateNew("procrastinateDays").value == "" ? 0 : getDomOrCreateNew("procrastinateDays").value;
                 debugger;
                 var TimeZone = new Date().getTimezoneOffset();
-                var NowData = { UserName: UserCredentials.UserName, UserID: UserCredentials.ID, EventID: SubEvent.ID, DurationDays: DayInput, DurationHours: HourInput, DurationMins: MinInput, TimeZoneOffset: TimeZone };
+                var NowData = { UserName: UserCredentials.UserName, UserID: UserCredentials.ID, EventID: SubEvent.ID, DurationDays: DayInput, DurationHours: HourInput, DurationMins: MinInput, TimeZoneOffset: TimeZone
+            };
                 //var URL= "RootWagTap/time.top?WagCommand=2";
                 var URL = global_refTIlerUrl + "Schedule/Event/Procrastinate";
                 var HandleNEwPage = new LoadingScreenControl("Tiler is Postponing  :)");
                 HandleNEwPage.Launch();
                 $.ajax({
-                    type: "POST",
-                    url: URL,
-                    data: NowData,
+                        type: "POST",
+                        url: URL,
+                        data: NowData,
                     // DO NOT SET CONTENT TYPE to json
                     // contentType: "application/json; charset=utf-8", 
                     // DataType needs to stay, otherwise the response object
                     // will be treated as a single string
-                    dataType: "json",
-                    success: function (response) {
+                        dataType: "json",
+                        success: function (response) {
                         alert(response);
                         getRefreshedData();
-                    },
-                    error: function () {
+                },
+                        error: function () {
                         var NewMessage = "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
-                        var ExitAfter = { ExitNow: true, Delay: 1000 };
+                        var ExitAfter = { ExitNow: true, Delay: 1000
+                        };
                         HandleNEwPage.UpdateMessage(NewMessage, ExitAfter, InitializeHomePage);
-                    }
+                }
                 }).done(function (data) {
                     HandleNEwPage.Hide();
                     triggerUIUPdate();//hack alert
-                    
-                });
-            }
 
-            function markAsComplete()
-            {
+                });
+        }
+
+            function markAsComplete() {
                 SendMessage();
-                function SendMessage()
-                {
+                function SendMessage() {
                     var TimeZone = new Date().getTimezoneOffset();
                     var Url;
                     //Url="RootWagTap/time.top?WagCommand=7";
@@ -1499,18 +1877,19 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                     var HandleNEwPage = new LoadingScreenControl("Tiler is updating your schedule ...");
                     HandleNEwPage.Launch();
 
-                    var MarkAsCompleteData = { UserName: UserCredentials.UserName, UserID: UserCredentials.ID, EventID: SubEvent.ID, TimeZoneOffset: TimeZone };
+                    var MarkAsCompleteData = { UserName: UserCredentials.UserName, UserID: UserCredentials.ID, EventID: SubEvent.ID, TimeZoneOffset: TimeZone
+                };
                     $.ajax({
-                        type: "POST",
-                        url: Url,
-                        data: MarkAsCompleteData,
+                            type: "POST",
+                            url: Url,
+                            data: MarkAsCompleteData,
                         // DO NOT SET CONTENT TYPE to json
                         // contentType: "application/json; charset=utf-8", 
                         // DataType needs to stay, otherwise the response object
                         // will be treated as a single string
                         //dataType: "json",
-                        success: function (response) {
-                            //alert(response);
+                            success: function (response) {
+                                //alert(response);
                             var myContainer = (response);
                             if (myContainer.Error.code == 0) {
                                 //exitSelectedEventScreen();
@@ -1519,290 +1898,293 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                                 alert("error detected with marking as complete");
                             }
 
-                        },
-                        error: function (err) {
+                    },
+                            error: function (err) {
                             var myError = err;
                             var step = "err";
                             var NewMessage = "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
-                            var ExitAfter = { ExitNow: true, Delay: 1000 };
+                            var ExitAfter = { ExitNow: true, Delay: 1000
+                            };
                             HandleNEwPage.UpdateMessage(NewMessage, ExitAfter, InitializeHomePage);
-                            //InitializeHomePage();
+                                //InitializeHomePage();
 
 
-                        }
+                    }
 
                     }).done(function (data) {
                         HandleNEwPage.Hide();
                         triggerUIUPdate();//hack alert
                         getRefreshedData();
                     });
-                }
-                function triggerUIUPdate()
-                {
+            }
+                function triggerUIUPdate() {
                     resetButtons();
                     closeControlPanel();
-                }
-                
             }
 
-            function closeModalDelete()
-            {
+        }
+
+            function closeModalDelete() {
                 DeleteMessage.innerHTML = "Sure you want to delete ?"
                 $('#ConfirmDeleteModal').slideUp(500);
-            }
+                ModalDelete.isRevealed = false;
+        }
             deleteButton.onclick = deleteSubevent;
             completeButton.onclick = markAsComplete;
-            
-            /*
-            $('#YeaToConfirmDelete').click(function () {
-                $('#ConfirmDeleteModal').slideToggle();
-                $('#ControlPanelContainer').slideUp(500);
-            })
-            
 
-            $('#NayToConfirmDelete').click(function () {
-                //deleteEvent();
-                $('#ConfirmDeleteModal').slideToggle();
-                $('#ControlPanelContainer').slideUp(500);
-            })
-            */
+            var ControlPanelContainer = getDomOrCreateNew("ControlPanelContainer");
+            ControlPanelContainer.focus();
+
+            function containerKeyPress(e) {
+                e.stopPropagation();
+                if (e.which == 27)//escape key press
+                {
+                    closeControlPanel();
+            }
+
+                if ((e.which == 8) || (e.which == 46))//bkspc/delete key pressed
+                {
+                    deleteSubevent();
+            }
+        }
+            //debugger;
+            ControlPanelContainer.onkeydown = containerKeyPress;
+
+            renderSubEventsClickEvents.BottomPanelIsOpen = true;
 
             ControlPanelNameOfSubeventInfo.innerHTML = SubEvent.Name;
             ControlPanelDeadlineOfSubeventInfo.innerHTML = Deadline.hour + ' ' + Deadline.minute + ' ' + Deadline.merid + ' // ' + Deadline.day + ', ' + Deadline.mon + ' ' + Deadline.date;
-            ControlPanelSubEventTimeInfo.innerHTML = StartDate.hour + ' ' + StartDate.minute + ' ' + StartDate.merid + ' &mdash; ' + EndDate.hour + ' ' + EndDate.minute + ' ' + EndDate.merid; 
+            ControlPanelSubEventTimeInfo.innerHTML = StartDate.hour + ' ' + StartDate.minute + ' ' + StartDate.merid + ' &mdash; ' + EndDate.hour + ' ' + EndDate.minute + ' ' + EndDate.merid;
             var SubEventName = SubEvent.Name;
-            $(document).keyup(function(e){
-              if (e == 46){
+            $(document).keyup(function (e) {
+              if (e == 46) {
                 deleteEvent();
-              };
+            };
             });
-              
-        }
-    }
-
-
-
-    function PopulateYourself(RangeData)
-    {
-        var StartDate = new Date(Number(this.SubCalStartDate));
-        var EndDate = new Date(Number(this.SubCalEndDate));
-        this.RangeCounter = new Array();
-        this.Dom = { DomA: getDomOrCreateNew("EventDOMA" + this.ID), DomB: getDomOrCreateNew("EventDOMB" + this.ID) };
-
-
-        var i=0;
-        for(;i<RangeData.length;i++)
-        {
-            if ((StartDate >= new Date(Number(RangeData[i].Start))) && (StartDate <= new Date(Number(RangeData[i].End))))
-            {
-                this.RangeCounter.push(RangeData[i]);
-            }
-
-            if ((EndDate >= new Date(Number(RangeData[i].Start))) && (EndDate <= new Date(Number(RangeData[i].End)))) {
-                this.RangeCounter.push(RangeData[i]);
-            }
-        }
-
-
-
-        if (this.RangeCounter[0] != this.RangeCounter[1])
-        {
 
         }
-        else
-        {
+    }
+
+
+        function StopPullingData() {
+    clearTimeout(global_ClearRefreshDataInterval);
+    }
+
+
+        function PauseDataPolling(PauseByMs) {
+    if (PauseByMs ==undefined) {
+        PauseByMs = 300000;
+        }
+
+    getRefreshedData.isEnabled = false;
+    }
+
+
+        function PopulateYourself(RangeData) {
+    var StartDate = new Date(Number(this.SubCalStartDate));
+    var EndDate = new Date(Number(this.SubCalEndDate));
+    this.RangeCounter = new Array();
+    this.Dom = { DomA: getDomOrCreateNew("EventDOMA" + this.ID), DomB: getDomOrCreateNew("EventDOMB" + this.ID)
+        };
+
+
+    var i =0;
+    for (; i <RangeData.length; i++) {
+        if ((StartDate >= new Date(Number(RangeData[i].Start))) && (StartDate <= new Date(Number(RangeData[i].End)))) {
+            this.RangeCounter.push(RangeData[i]);
+    }
+
+        if ((EndDate >= new Date(Number(RangeData[i].Start))) && (EndDate <= new Date(Number(RangeData[i].End)))) {
+            this.RangeCounter.push(RangeData[i]);
+    }
+        }
+
+
+
+    if (this.RangeCounter[0] != this.RangeCounter[1]) {
+
+    }
+    else {
 
         }
-    
-    }
-
-
-    function PopulateInputContainerOption(SubEvent)
-    {
 
     }
 
-    function UpdateDeadline()
-    {
-        var UpdateDeadlineID = "UpdateDeadline";
-        var UpdateDeadline = getDomOrCreateNew(UpdateDeadlineID, "button");
-    }
 
-
-    function DeleteCurrentRepetition()
-    {
+        function PopulateInputContainerOption(SubEvent) {
 
     }
 
-    function DeleteCurrentRepetition()
-    {
+        function UpdateDeadline() {
+    var UpdateDeadlineID = "UpdateDeadline";
+    var UpdateDeadline = getDomOrCreateNew(UpdateDeadlineID, "button");
+    }
+
+
+        function DeleteCurrentRepetition() {
 
     }
 
-    function getRangeofSchedule()
-    {
-        var CalStartRange = null;
-        var CalEndRange = null;
-        if (TotalSubEventList.length > 0)
-        {
-            CalStartRange = new Date(TotalSubEventList[0].SubCalStartDate);
-            CalEndRange = new Date(TotalSubEventList[TotalSubEventList.length - 1].SubCalEndDate);
+        function DeleteCurrentRepetition() {
+
+    }
+
+        function getRangeofSchedule() {
+    var CalStartRange = null;
+    var CalEndRange = null;
+    if (TotalSubEventList.length > 0) {
+        CalStartRange = new Date(TotalSubEventList[0].SubCalStartDate);
+        CalEndRange = new Date(TotalSubEventList[TotalSubEventList.length -1].SubCalEndDate);
         }
-        var earliestDayIndex = CalStartRange.getDay();
-        var earliestMonth = CalStartRange.getMonth();
-        var earliestYear= CalStartRange.getFullYear();
+    var earliestDayIndex = CalStartRange.getDay();
+    var earliestMonth = CalStartRange.getMonth();
+    var earliestYear = CalStartRange.getFullYear();
 
-        var latestDayIndex = CalEndRange.getDay();
-        var latestMonth = CalStartRange.getMonth();
-        var latestYear = CalStartRange.getFullYear();
+    var latestDayIndex = CalEndRange.getDay();
+    var latestMonth = CalStartRange.getMonth();
+    var latestYear = CalStartRange.getFullYear();
 
-        var TimeSpanInDayMS=earliestDayIndex*OneDayInMs;
+    var TimeSpanInDayMS = earliestDayIndex *OneDayInMs;
 
-        var CalStartDay = Number(CalStartRange) - Number(TimeSpanInDayMS);
-        CalStartDay = new Date(CalStartDay);
-        CalStartDay.setHours(0, 0, 0, 0);
+    var CalStartDay = Number(CalStartRange) - Number(TimeSpanInDayMS);
+    CalStartDay = new Date(CalStartDay);
+    CalStartDay.setHours(0, 0, 0, 0);
 
 
-        var EndTimeSpanInDayMS = ((7 - latestDayIndex) % 7) * OneDayInMs;
+    var EndTimeSpanInDayMS = ((7 - latestDayIndex) % 7) * OneDayInMs;
 
-        var CalEndDay =Number( CalEndRange )+ Number(EndTimeSpanInDayMS);
-        CalEndDay = new Date(CalEndDay);
-        CalEndDay.setHours(0, 0, 0, 0);
+    var CalEndDay =Number(CalEndRange) + Number(EndTimeSpanInDayMS);
+    CalEndDay = new Date(CalEndDay);
+    CalEndDay.setHours(0, 0, 0, 0);
 
-        return { Start: CalStartDay, End: CalEndDay }
+    return { Start: CalStartDay, End: CalEndDay
+        }
 
     }
 
 
-    function genDivForEachWeek(RangeOfWeek,AllRanges)//generates each week container giving the range of the week
-    {
-        var DayIndex = 0;
-        var widthPercent = 14.1;
-        var refDate = new Date(RangeOfWeek.Start);
-        var WeekID = Number(RangeOfWeek.Start) + "_" + Number(RangeOfWeek.End)
-        var WeekRange = getDomOrCreateNew(WeekID);
-        var WeekRenderPlaneID = WeekID+"RenderPlane"
-        var RenderPlane = getDomOrCreateNew(WeekRenderPlaneID);
-        $(RenderPlane.Dom).addClass("renderPlane");
-        var prev;
-
-        BindAddNewEventToClick(WeekRange);
-        
-        var StartOfDay = new Date(RangeOfWeek.Start);
-        StartOfDay = StartOfDay.dst() ? new Date(Number(StartOfDay.getTime())) : StartOfDay + OneHourInMs;
-        if (!WeekRange.status)
+        function genDivForEachWeek(RangeOfWeek, AllRanges)//generates each week container giving the range of the week
         {
-            var DaysOfWeekDoms = new Array();
-            WeekDays.forEach(
-                function (DayOfWeek)
-                {
-                    var myDay = generateDayContainer();
-                    myDay.renderPlane = RenderPlane;
-                    myDay.widtPct = widthPercent;
-                    myDay.Start = new Date(StartOfDay);//set start of day property
-                    var TotalMilliseconds = myDay.Start.getTime();
-                    TotalMilliseconds += OneDayInMs
+    var DayIndex = 0;
+    var widthPercent = 14.1;
+    var refDate = new Date(RangeOfWeek.Start);
+    var WeekID = Number(RangeOfWeek.Start) + "_" + Number(RangeOfWeek.End)
+    var WeekRange = getDomOrCreateNew(WeekID);
+    var WeekRenderPlaneID = WeekID +"RenderPlane"
+    var RenderPlane = getDomOrCreateNew(WeekRenderPlaneID);
+    $(RenderPlane.Dom).addClass("renderPlane");
+    var prev;
+
+    BindAddNewEventToClick(WeekRange);
+
+    var StartOfDay = new Date(RangeOfWeek.Start);
+    StartOfDay = StartOfDay.dst() ? new Date(Number(StartOfDay.getTime())) : StartOfDay +OneHourInMs;
+    if (!WeekRange.status) {
+        var DaysOfWeekDoms = new Array();
+        WeekDays.forEach(
+            function (DayOfWeek) {
+                var myDay = generateDayContainer();
+                myDay.renderPlane = RenderPlane;
+                myDay.widtPct = widthPercent;
+                myDay.Start = new Date(StartOfDay);//set start of day property
+                var TotalMilliseconds = myDay.Start.getTime();
+                TotalMilliseconds += OneDayInMs
+                StartOfDay = new Date(TotalMilliseconds);
+                if (StartOfDay.getHours() != 0) {
+                    TotalMilliseconds += OneHourInMs;
                     StartOfDay = new Date(TotalMilliseconds);
-                    if (StartOfDay.getHours() != 0)
-                    {
-                        TotalMilliseconds += OneHourInMs;
-                        StartOfDay = new Date(TotalMilliseconds);
-                    }
-                    myDay.End = new Date(TotalMilliseconds - 1);
-                    
-                    var currDate = new Date(Number(refDate.getTime()) + Number(DayIndex * OneDayInMs))
-                    if (new Date().dst())
-                    {
-                        currDate = new Date(Number(currDate.getTime()) + OneHourInMs);
-                       // myDay.End = new Date(Number(myDay.End.getTime()) + OneHourInMs);
-                    }
-                    prev = currDate;
-                    var Month = currDate.getMonth() + 1;
-                    var Day = currDate.getDate();
-                    myDay.NameOfDayContainer.Dom.innerHTML = "<p>" + DayOfWeek.substring(0, 2) + "<p class='dateOfDay'>"+myDay.Start.getDate()
-                      ;;
-                   //   + "<br/><span>" + Month + "/" + Day + "</span></p>";;
-                
+            }
+                myDay.End = new Date(TotalMilliseconds -1);
 
-                    myDay.SubEventsCollection = {};
-                    BindClickTOStartOfDay(myDay);
-                    myDay.UISpecs = {};
-                    $(myDay.Parent.Dom).addClass(DayOfWeek + "DayContainer");
-                    WeekRange.Dom.appendChild(myDay.Parent.Dom);
-                    myDay.LeftPercent = (DayIndex * widthPercent);
-                    
-                    DayIndex += 1;
-                    DaysOfWeekDoms.push(myDay);
-                });
+                var currDate = new Date(Number(refDate.getTime()) + Number(DayIndex * OneDayInMs))
+                if (new Date().dst()) {
+                    currDate = new Date(Number(currDate.getTime()) +OneHourInMs);
+                    // myDay.End = new Date(Number(myDay.End.getTime()) + OneHourInMs);
+            }
+                prev = currDate;
+                var Month = currDate.getMonth() +1;
+                var Day = currDate.getDate();
+                myDay.NameOfDayContainer.Dom.innerHTML = "<p>" + DayOfWeek.substring(0, 2) + "<p class='dateOfDay'>" +myDay.Start.getDate()
+                ;;
+                //   + "<br/><span>" + Month + "/" + Day + "</span></p>";;
 
-            WeekRange.DaysOfWeek = DaysOfWeekDoms;
-            var Index=AllRanges.length//gets index, because it gets the index bewfore the push
-            AllRanges.push(WeekRange);
-            AllRanges[Index].Start = RangeOfWeek.Start;
-            AllRanges[Index].End = RangeOfWeek.End;
-            AllRanges[Index].UISpecs = {};
-            AllRanges[Index].SubEventsCollection = {};
-        }
-        WeekRange.renderPlane = RenderPlane;
-        
-        //binds click event to creation of new event
-        
 
-        WeekRange.Dom.appendChild(RenderPlane.Dom);
-    
-        return WeekRange;
-    }
+                myDay.SubEventsCollection = {
+            };
+                BindClickTOStartOfDay(myDay);
+                myDay.UISpecs = {
+            };
+                $(myDay.Parent.Dom).addClass(DayOfWeek + "DayContainer");
+                WeekRange.Dom.appendChild(myDay.Parent.Dom);
+                myDay.LeftPercent = (DayIndex * widthPercent);
 
-    //function creates Bind a click event to the render plane to enable addition of new events
-    function BindAddNewEventToClick(Week)
-    {
-        var RenderPlaneDom = Week.Dom;
-        $(RenderPlaneDom).click(function (e)
-        {
-            var posX = $(this).offset().left, posY = $(this).offset().top;
-            var left = e.pageX - posX;
-            var top = e.pageY - posY;
-            var height = $(RenderPlaneDom).height();
-            var width = $(RenderPlaneDom).width();
-            //debugger;
-            
-            //alert(width);
-            generateModal(left, top, height, width, Week.Start, this);
-            e.stopPropagation();
+                DayIndex += 1;
+                DaysOfWeekDoms.push(myDay);
         });
+
+        WeekRange.DaysOfWeek = DaysOfWeekDoms;
+        var Index =AllRanges.length//gets index, because it gets the index bewfore the push
+        AllRanges.push(WeekRange);
+        AllRanges[Index].Start = RangeOfWeek.Start;
+        AllRanges[Index].End = RangeOfWeek.End;
+        AllRanges[Index].UISpecs = {
+    };
+        AllRanges[Index].SubEventsCollection = {
+    };
+        }
+    WeekRange.renderPlane = RenderPlane;
+
+            //binds click event to creation of new event
+
+
+    WeekRange.Dom.appendChild(RenderPlane.Dom);
+
+    return WeekRange;
     }
-    function BindClickTOStartOfDay(myDay)
-    {
-        function CallBackFunc()
-        {
-            refreshIframe(myDay.Start, myDay.End);
+
+        //function creates Bind a click event to the render plane to enable addition of new events
+        function BindAddNewEventToClick(Week) {
+    var RenderPlaneDom = Week.Dom;
+    $(RenderPlaneDom).click(function (e) {
+        var posX = $(this).offset().left, posY = $(this).offset().top;
+        var left = e.pageX -posX;
+        var top = e.pageY -posY;
+        var height = $(RenderPlaneDom).height();
+        var width = $(RenderPlaneDom).width();
+        //debugger;
+
+        //alert(width);
+        generateModal(left, top, height, width, Week.Start, this);
+        e.stopPropagation();
+    });
+    }
+        function BindClickTOStartOfDay(myDay) {
+            function CallBackFunc() {
+        refreshIframe(myDay.Start, myDay.End);
         }
 
-        $(myDay.NameOfDayContainer.Dom).click(CallBackFunc);
+    $(myDay.NameOfDayContainer.Dom).click(CallBackFunc);
     }
 
 
-    function BindDatePicker(InputDom, format)
-    {
-        if (format == null)
-        {
-            format = 'm/d/yyyy';
+        function BindDatePicker(InputDom, format) {
+    if (format == null) {
+        format = 'm/d/yyyy';
         }
-        ///*
-        $(InputDom).datepicker({
-            'format': format,
-            'autoclose': true
-        });
-        //*/
+            ///*
+    $(InputDom).datepicker({
+        'format': format,
+        'autoclose': true
+    });
+            //*/
 
-        return $(InputDom).datepicker();
+    return $(InputDom).datepicker();
     }
 
-    function BindTimePicker(InputDom)
-    {
-        $(InputDom).timepicker({
-            'showDuration': true,
-            'timeFormat': 'g:ia'
-        });
+        function BindTimePicker(InputDom) {
+    $(InputDom).timepicker({
+        'showDuration': true,
+        'timeFormat': 'g:ia'
+    });
 
     }

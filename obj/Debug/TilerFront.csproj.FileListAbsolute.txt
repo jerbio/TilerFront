@@ -92,3 +92,5 @@ C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\ApplicationIn
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.dll
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.pdb
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.csprojResolveAssemblyReference.cache
+C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Microsoft.Owin.Hosting.dll
+C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Microsoft.Owin.Hosting.xml

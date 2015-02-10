@@ -10,6 +10,7 @@ using Microsoft.AspNet.Identity;
 using System.Web.Http.Description;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
+using Microsoft.AspNet.Identity.EntityFramework;
 using TilerFront.Models;
 
 
@@ -108,6 +109,7 @@ namespace TilerFront.Controllers
             }
         }
 
+        // POST: /Account/SignIn
         [HttpPost]
         [AllowAnonymous]
         [ResponseType(typeof(PostBackStruct))]
@@ -191,27 +193,37 @@ namespace TilerFront.Controllers
 
         async public Task<UserAccountDirect> LoginStatic(LoginViewModel model)
         {
-            ApplicationUser myUser=null;
-            UserAccountDirect retValue = new UserAccountDirect(null);
+            
+            UserAccountDirect RetValue = null;
+            string LoopBackUrl = "";
+            
             if (!ModelState.IsValid)
             {
-                return retValue;
+                string AllErrors = string.Join("\n", ModelState.Values.SelectMany(obj => obj.Errors.Select(obj1 => obj1.ErrorMessage)));
+                return RetValue;
             }
+
+
+
             
+
+            // This doesn't count login failures towards account lockout
+            // To enable password failures to trigger account lockout, change to shouldLockout: true
             var result = await SignInManager.PasswordSignInAsync(model.Username, model.Password, model.RememberMe, shouldLockout: false);
+
             switch (result)
             {
                 case SignInStatus.Success:
                     {
-                        string UserID = SignInManager.GetVerifiedUserId();
-                        myUser = await new UserController().GetUser(UserID, model.Username);
-                        retValue = new UserAccountDirect(myUser);
-                        await retValue.Login();
-                        return retValue;
+                        UserController myUserCtrl = new UserController();
+                        ApplicationUser SessionUser = await myUserCtrl.GetUser(User.Identity.GetUserId(), User.Identity.GetUserName());
+                        RetValue = new UserAccountDirect(SessionUser);
+                        return RetValue;   
                     }
-                
                 default:
-                    return retValue;
+                    {
+                        return RetValue;
+                    }
             }
 
         }

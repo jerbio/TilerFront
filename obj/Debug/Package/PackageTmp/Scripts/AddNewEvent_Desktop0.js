@@ -256,7 +256,7 @@ function CloseModal()
 
 function generateAddEventContainer(x,y,height,Container,refStartTime)
 {
-    StopPullingData();
+    getRefreshedData.isEnabled = false;
     ActivateUserSearch.setSearchAsOff();
     var NewEventcontainer = getDomOrCreateNew("AddNewEventContainer");
 
@@ -633,14 +633,11 @@ function GenerateTileRepetition()
 }
 
 
-function StopPullingData()
-{
-    clearTimeout(global_ClearRefreshDataInterval);
-}
+
 //handles the whole addition of tiled events. Handles the UI component and tabbing
 function AddTiledEvent()
 {
-    StopPullingData();
+    getRefreshedData.isEnabled = false;
     ActivateUserSearch.setSearchAsOff();
     var InvisiblePanelID = "AddEventPanel";
     var InvisiblePanel = getDomOrCreateNew(InvisiblePanelID);

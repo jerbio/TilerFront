@@ -121,6 +121,21 @@ namespace TilerFront.Controllers
         }
 
 
+        [HttpPost]
+        [ResponseType(typeof(PostBackStruct))]
+        [Route("api/Schedule/Events/Complete")]
+        public async Task<IHttpActionResult> CompleteSubCalendarEvents([FromBody]getEventModel UserData)
+        {
+            UserAccountDirect myUser = await UserData.getUserAccount();
+            await myUser.Login();
+            My24HourTimerWPF.Schedule MySchedule = new My24HourTimerWPF.Schedule(myUser, new DateTime(UserData.getRefNow().Ticks));
+            IEnumerable<string> AllEVentIDs = UserData.EventID.Split(',');
+            MySchedule.markSubEventsAsComplete(AllEVentIDs);
+            PostBackData myPostData = new PostBackData("\"Success\"", 0);
+            return Ok(myPostData.getPostBack);
+        }
+
+
 
         [HttpPost]
         [ResponseType(typeof(PostBackStruct))]
@@ -170,6 +185,36 @@ namespace TilerFront.Controllers
         [ResponseType(typeof(PostBackStruct))]
         [Route("api/Schedule/Event")]
         public async Task<IHttpActionResult> HandleOptionsEvent([FromBody]getEventModel myUser)
+        {
+            return Ok();
+        }
+
+
+        [HttpDelete]
+        [ResponseType(typeof(PostBackStruct))]
+        [Route("api/Schedule/Events")]
+        public async Task<IHttpActionResult> DeleteEvents([FromBody]getEventModel myUser)
+        {
+            UserAccountDirect retrievedUser = await myUser.getUserAccount();
+            await retrievedUser.Login();
+            PostBackData retValue;
+            if (retrievedUser.Status)
+            {
+                My24HourTimerWPF.Schedule MySchedule = new My24HourTimerWPF.Schedule(retrievedUser, new DateTime(myUser.getRefNow().Ticks));
+                IEnumerable<string> AllEVentIDs = myUser.EventID.Split(',');
+                MySchedule.deleteSubCalendarEvents(AllEVentIDs);
+                retValue = new PostBackData("\"Success\"", 0);
+            }
+            else
+            {
+                retValue = new PostBackData("", 1);
+            }
+            return Ok(retValue.getPostBack);
+        }
+        [HttpOptions]
+        [ResponseType(typeof(PostBackStruct))]
+        [Route("api/Schedule/Events")]
+        public async Task<IHttpActionResult> HandleOptionsEvents([FromBody]getEventModel myUser)
         {
             return Ok();
         }

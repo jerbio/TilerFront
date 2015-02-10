@@ -29,6 +29,12 @@ namespace TilerFront
         Tuple<bool, string, DateTimeOffset, long> ScheduleMetadata;
         public static bool useCassandra=false;
         Models.ApplicationUser SessionUser;
+        public LogControlDirect()
+        {
+            ScheduleMetadata = new Tuple<bool, string, DateTimeOffset, long>(false, "", new DateTimeOffset(), 0);
+            useCassandra=false;
+            SessionUser= new Models.ApplicationUser();
+        }
         public LogControlDirect(Models.ApplicationUser User, string logLocation="")
         {
             if (!string.IsNullOrEmpty(logLocation))
