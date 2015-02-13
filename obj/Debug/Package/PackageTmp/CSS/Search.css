@@ -145,11 +145,8 @@
 
 .NowIcon_Search 
 {
-    position:absolute;
     height:24px;
     width:24px;
     left:50%;
-    margin-left:-14px;
     top:50%;
-    margin-top:-8px;
 }

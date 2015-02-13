@@ -326,7 +326,9 @@ input:focus:-ms-input-placeholder { color:rgba(0,0,0, 0.2); }
   -o-transition: all .2s linear;
   transition: all .2s linear;
   margin: 3px 0;
-  display: block; }
+  //display: block; 
+
+}
 .InvisibleAddEventPanel { opacity: 0; }
 .OnFocusDropDownElement { background-color: yellow !important; }
 

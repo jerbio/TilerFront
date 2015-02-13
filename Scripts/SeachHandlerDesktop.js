@@ -1,5 +1,6 @@
 ﻿function ActivateUserSearch(e)
 {
+    e.stopPropagation();
     var SearchInput = getDomOrCreateNew("SearchBar");
     var SearchContainer = getDomOrCreateNew("SearchBarAndContentContainer");
     if (e.shiftKey || e.ctrlKey || e.altKey || (!ActivateUserSearch.isSearchOn))
@@ -10,11 +11,7 @@
     {
         if (ActivateUserSearch.isActive)
         {
-            $(SearchContainer.Dom).removeClass("FullScreenSearchContainer");
-            SearchInput.Dom.value = "";
-            ActivateUserSearch.AutoSuggest.clear();
-            SearchInput.Dom.blur();
-            ActivateUserSearch.isActive = false;
+            ActivateUserSearch.ClearSearch();
             return;
         }
         else
@@ -40,9 +37,23 @@
     SearchContainer.Dom.appendChild(AutoSuggestSearch.getAutoSuggestControlContainer());
     SearchInput.Dom.focus();
     $(SearchContainer.Dom).addClass("FullScreenSearchContainer");
+    //SearchContainer.onkeydown = ActivateUserSearch;
+    //SearchInput.onkeydown = ActivateUserSearch;
     ActivateUserSearch.isActive = true;
+    getRefreshedData.disableDataRefresh();
+    //ActivateUserSearch.setSearchAsOff();
+    ActivateUserSearch.ClearSearch = function () {
+        $(SearchContainer.Dom).removeClass("FullScreenSearchContainer");
+        SearchInput.Dom.value = "";
+        ActivateUserSearch.AutoSuggest.clear();
+        SearchInput.Dom.blur();
+        ActivateUserSearch.isActive = false;
+        getRefreshedData.enableDataRefresh(true);
+    }
     
 }
+
+
 
 ActivateUserSearch.setSearchAsOff = function ()
 {
@@ -104,6 +115,8 @@ function CallBackFunctionForReturnedValuesDesktop(data, DomContainer) {
     if (data.length == 0 || data.length == null || data.length == undefined) {
         return;
     }
+
+
 
     data.forEach(resolveEachRetrievedEvent);
     function resolveEachRetrievedEvent(CalendarEvent) {
@@ -196,7 +209,8 @@ function CallBackFunctionForReturnedValuesDesktop(data, DomContainer) {
 
 
 
-    function PopulateDoNowButtonDom(MyCalendarEVent) {
+    function PopulateDoNowButtonDom(MyCalendarEVent)
+    {
         var DoNowButtonOfSearchedEventContainerID = "DoNowButtonOfSearchedEventContainer" + CallBackFunctionForReturnedValuesDesktop.counter
         var DoNowButtonOfSearchedEventContainer = getDomOrCreateNew(DoNowButtonOfSearchedEventContainerID);
         var DoNowButtonOfSearchedEventImageID = "DoNowButtonOfSearchedEventImage" + CallBackFunctionForReturnedValuesDesktop.counter
@@ -210,17 +224,164 @@ function CallBackFunctionForReturnedValuesDesktop(data, DomContainer) {
         $(IconSetContainer).addClass("IconSetSearch");
         $(MyIconSet.getCloseButton()).addClass("setAsDisplayNone");
         $(MyIconSet.getLocationButton()).addClass("setAsDisplayNone");
+        $(MyIconSet.getProcrastinateButton()).addClass("setAsDisplayNone");
         
+        var DeleteButton = MyIconSet.getDeleteButton();
+        DeleteButton.onclick = function () { DeleteTrigger(DoNowButtonOfSearchedEventContainer, MyCalendarEVent, function () { }) }
+        var CompletionButton = MyIconSet.getCompleteButton();
+        CompletionButton.onclick = function () {
+            prepCompletion(MyCalendarEVent)();
+        }
+
+
         DoNowButtonOfSearchedEventContainer.Dom.appendChild(DoNowButtonOfSearchedEventImage.Dom)
         DoNowButtonOfSearchedEventContainer.Dom.appendChild(MyIconSet.getIconSetContainer());
 
+        
+
+        function DeleteTrigger(Container,Event, Exit)
+        {
+            var DeletionSelectionID = "DeleteCalEventContainer" + CallBackFunctionForReturnedValuesDesktop.counter
+            var DeletionSelection = getDomOrCreateNew(DeletionSelectionID)
+            $(DeletionSelection).addClass("DeleteSearchContainer");
+            var DeletionMessageID = "DeletionMessage" + CallBackFunctionForReturnedValuesDesktop.counter;
+            var DeletionMessage = getDomOrCreateNew(DeletionMessageID)
+            DeletionMessage.innerHTML = "Sure you want to delete \"" + Event.CalendarName + "\"";
+            
+            var YayDeleteButtonID = "YayDeleteButton" + +CallBackFunctionForReturnedValuesDesktop.counter;
+            var YayDeleteButton = getDomOrCreateNew(YayDeleteButtonID, "button");
+            YayDeleteButton.innerHTML = "Yea"
+            var NayDeleteButtonID = "NayDeleteButton" + +CallBackFunctionForReturnedValuesDesktop.counter;
+            var NayDeleteButton = getDomOrCreateNew(NayDeleteButtonID, "button");
+            NayDeleteButton.innerHTML="Nay"
+            DeletionSelection.appendChild(DeletionMessage);
+            DeletionSelection.appendChild(YayDeleteButton);
+            DeletionSelection.appendChild(NayDeleteButton);
+            YayDeleteButton.onclick = function ()
+            {
+                //debugger;
+                prepDeletion(Event)();
+                CleanUP();
+            }
+
+            NayDeleteButton.onclick = function () {
+                CleanUP();
+            }
+
+            function CleanUP()
+            {
+                if (DeletionSelection.parentElement != null) {
+                    DeletionSelection.parentElement.removeChild(DeletionSelection)
+                }
+                Exit();
+            }
+
+            Container.appendChild(DeletionSelection);
+            
+            
+        }
+        function ProcratinateEvent(Container,Event, Exit)
+        {
+            var ProcrastinationContainerID = "ProcrastinationContainer" + CallBackFunctionForReturnedValuesDesktop.counter
+            var ProcrastinationContainer = getDomOrCreateNew(ProcrastinationContainerID);
+            var HourInputBoxID = "ProcrastinateHourInputBox" + CallBackFunctionForReturnedValuesDesktop.counter;
+            var HourInputBox = getDomOrCreateNew(HourInputBoxID,"input");
+            var MinInputBoxID = "ProcrastinateMinInputBox" + CallBackFunctionForReturnedValuesDesktop.counter;
+            var MinInputBox = getDomOrCreateNew(MinInputBoxID, "input");
+            var DayInputBoxID = "ProcrastinateDayInputBox" + CallBackFunctionForReturnedValuesDesktop.counter;
+            var DayInputBox = getDomOrCreateNew(DayInputBoxID, "input");
+            var SubmitID = "ProcrastinateSubmit" + CallBackFunctionForReturnedValuesDesktop.counter;
+            var SubmitBox = getDomOrCreateNew(SubmitID, "input");
+            ProcrastinationContainer.appendChild(HourInputBox);
+            ProcrastinationContainer.appendChild(MinInputBox);
+            ProcrastinationContainer.appendChild(DayInputBox);
+            ProcrastinationContainer.appendChild(SubmitBox);
+            Container.appendChild(ProcrastinationContainer);
+
+
+            function CleanUP()
+            {
+                if (ProcrastinationContainer.parentElement != null) {
+                    ProcrastinationContainer.parentElement.removeChild(ProcrastinationContainer)
+                }
+                Exit()
+            }
+        }
         $(DoNowButtonOfSearchedEventImage.Dom).click(genFunctionCallForCalendarEventNow(MyCalendarEVent.ID))
-
-
         $(DoNowButtonOfSearchedEventContainer.Dom).addClass("DoNowButtonOfSearchedEventContainer");
         return DoNowButtonOfSearchedEventContainer;
     }
 
+
+    function prepDeletion(Event)
+    {
+        return function ()
+        {
+            /*
+            alert("before marking as deleted");
+            return;
+            */
+            var HandleNEwPage = new LoadingScreenControl("Tiler is Deleting The Event " + Event.CalendarName);
+            HandleNEwPage.Launch();
+            var deletionFailure = function ()
+            {
+                var NewMessage = "Oh No!!! Tiler is having issues modifying your schedule. Please try again Later :(";
+                var ExitAfter = { ExitNow: true, Delay: 1000 };
+                HandleNEwPage.UpdateMessage(NewMessage, ExitAfter);
+                //debugger;
+                ActivateUserSearch.ClearSearch();
+            }
+
+            var deletionSuccess = function () {
+                HandleNEwPage.Hide();
+                //debugger;
+                ActivateUserSearch.ClearSearch();
+            }
+
+            var doneDeletion = function()
+            {
+                HandleNEwPage.Hide();
+                //debugger;
+                ActivateUserSearch.ClearSearch();
+            }
+
+            deleteCalendarEvent(Event.ID, deletionSuccess, deletionFailure, doneDeletion);
+        }
+    }
+
+    function prepCompletion(Event) {
+        return function () {
+            /*
+            alert("before marking as complete");
+            return;
+            */
+            var HandleNEwPage = new LoadingScreenControl("Tiler is Marking \"" + Event.CalendarName + "\" as complete :)");
+            HandleNEwPage.Launch();
+            var completionFailure = function () {
+                var NewMessage = "Oh No!!! Tiler is having issues modifying your schedule. Please try again Later :(";
+                var ExitAfter = { ExitNow: true, Delay: 1000 };
+                HandleNEwPage.UpdateMessage(NewMessage, ExitAfter);
+                //debugger;
+                ActivateUserSearch.ClearSearch();
+            }
+
+            var completionSuccess = function () {
+                HandleNEwPage.Hide();
+                //debugger;
+                ActivateUserSearch.ClearSearch();
+            }
+
+            var doneCompletion = function () {
+                HandleNEwPage.Hide();
+                //debugger;
+                ActivateUserSearch.ClearSearch();
+            }
+
+            completeCalendarEvent(Event.ID, completionSuccess, completionFailure, doneCompletion);
+        }
+    }
+
+    
 
     function genFunctionCallForCalendarEventNow(CalendarEventID) {
         return function () {
@@ -237,6 +398,10 @@ function CallBackFunctionForReturnedValuesDesktop(data, DomContainer) {
                 type: "POST",
                 url: Url,
                 data: NowData,
+                success: function () {
+                    HandleNEwPage.Hide();
+                    ActivateUserSearch.ClearSearch();
+                },
                 error: function (err) {
                     var NewMessage = "Oh No!!! Tiler is having issues modifying your schedule. Please try again Later :(";
                     var ExitAfter = { ExitNow: true, Delay: 1000 };
@@ -247,9 +412,7 @@ function CallBackFunctionForReturnedValuesDesktop(data, DomContainer) {
                 // DataType needs to stay, otherwise the response object
                 // will be treated as a single string
             }).done(function (data) {
-                if (InitializeHomePage != null) {
-                    InitializeHomePage();
-                }
+                ActivateUserSearch.ClearSearch();
             });
         }
     }

@@ -296,14 +296,14 @@ body {
   font-family: 'texbold';
 }
 
-#InputContainer
+.ControlPanelIconSetContainer
 {
     position: absolute;
     right: 30px;
     width: 313px;
     top: 50%;
     height: auto;
-    transform: translateY(-70%);
+    transform: translateY(-50%);
 }
 
 .ControlPanelButton {
@@ -311,7 +311,7 @@ body {
   width: 45px;
   height: 45px;
   display: inline-block;
-  margin-top: 26px;
+//  margin-top: 26px;
   margin-left: 14px;
   cursor: pointer;
 }
@@ -330,16 +330,16 @@ body {
 }
 #Header .ControlPanelButton:hover { background-position: -135px -45px; }
 
-#ControlPanelCloseButton {background-position: -315px 0px;}
-#ControlPanelCloseButton:hover {background-position: -315px -45px;}
-#ControlPanelDeleteButton { background-position: -45px 0; }
-#ControlPanelDeleteButton:hover { background-position: -45px -45px;}
-#ControlPanelLocationButton { background-position: -90px 0; }
-#ControlPanelLocationButton:hover { background-position: -90px -45px; }
-#ControlPanelCompleteButton { background-position: -180px 0; }
-#ControlPanelCompleteButton:hover { background-position: -180px -45px; }
-#ControlPanelProcrastinateButton { background-position: -270px 0; }
-#ControlPanelProcrastinateButton:hover { background-position: -270px -45px; }
+.ControlPanelCloseButton {background-position: -315px 0px;}
+.ControlPanelCloseButton:hover {background-position: -315px -45px;}
+.ControlPanelDeleteButton { background-position: -45px 0; }
+.ControlPanelDeleteButton:hover { background-position: -45px -45px;}
+.ControlPanelLocationButton { background-position: -90px 0; }
+.ControlPanelLocationButton:hover { background-position: -90px -45px; }
+.ControlPanelCompleteButton { background-position: -180px 0; }
+.ControlPanelCompleteButton:hover { background-position: -180px -45px; }
+.ControlPanelProcrastinateButton { background-position: -270px 0; }
+.ControlPanelProcrastinateButton:hover { background-position: -270px -45px; }
 #ControlPanelSearchButton { 
   right: 87px;
   top: -5px;
@@ -668,4 +668,9 @@ width: 100%;
 .hideMultiSelectPanel 
 {
     display:none;
+}
+
+.setAsDisplayNone 
+{
+    display:none !important;
 }

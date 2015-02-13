@@ -51,10 +51,30 @@
 .NowIcon {
   width: 45px;
   height: 45px;
-  position: static;
+  display:inline-block;
+}
+
+.NowIcon_Search
+{
+    position:relative;
+}
+
+.IconSetSearch {
+    display:inline-block;
+}
+
+.IconSetSearch div 
+{
+    transition:none;    
+    display:inline-block;
 }
 
 
+.DeleteSearchContainer {
+    position:absolute;
+    height:auto;
+    width:100%;
+}
 
 
 

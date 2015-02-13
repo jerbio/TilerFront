@@ -28,14 +28,13 @@ $(document).ready(function () {
 
 function RevealControlPanelSection(SelectedEvents)
 {
-    
     var yeaButton = getDomOrCreateNew("YeaToConfirmDelete");
     var nayButton = getDomOrCreateNew("NayToConfirmDelete");
     var completeButton = RevealControlPanelSection.IconSet.getCompleteButton();
-    var deleteButton = RevealControlPanelSection.IconSet.getCloseButton();
+    var deleteButton = RevealControlPanelSection.IconSet.getDeleteButton();
     var DeleteMessage = getDomOrCreateNew("DeleteMessage")
     var ProcatinationButton = getDomOrCreateNew("submitProcatination");
-    var ControlPanelCloseButton = RevealControlPanelSection.IconSet.getDeleteButton();
+    var ControlPanelCloseButton = RevealControlPanelSection.IconSet.getCloseButton();
     
     var ProcrastinateEventModalContainer = getDomOrCreateNew("ProcrastinateEventModal");
     var ControlPanelProcrastinateButton = RevealControlPanelSection.IconSet.getProcrastinateButton();
@@ -749,9 +748,14 @@ getRefreshedData.disableDataRefresh = function ()
     getRefreshedData.isEnabled = false;
 }
 
-getRefreshedData.enableDataRefresh = function ()
+getRefreshedData.enableDataRefresh = function (pullLatest)
 {
     getRefreshedData.isEnabled = true;
+    if (pullLatest)
+    {
+        getRefreshedData();
+    }
+
 }
 
     function getEventsInterferringInRange(StartDate, EndDate)

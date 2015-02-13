@@ -1,7 +1,7 @@
 ﻿"use strict"
 
 
-var Debug = true;
+var Debug = false;
 var DebugLocal = false;
 
 //var global_refTIlerUrl = "http://localhost:53201/api/";
@@ -114,8 +114,8 @@ function GetCookieValue()//verifies that user has cookies
         //*/
         /*
         CookieValue = {};
-        CookieValue.UserName = "jackostalk@gmail.com";
-        CookieValue.UserID = 4167;
+        CookieValue.UserName = "jackostalk";
+        CookieValue.UserID = "9c255a35-098c-417a-9a3a-c8b9e59b7f10";
         //*/
         }
     }
@@ -592,7 +592,6 @@ function procrastinateSubEvent(ID, Day, Hour, Minute,CallBackSuccess,CallBackFai
     {
         ProcrastinateRequest.done(CallBackDone);
     }
-    
 }
 
 
@@ -683,6 +682,35 @@ function deleteCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure, 
         // contentType: "application/json; charset=utf-8", 
         // DataType needs to stay, otherwise the response object
         // will be treated as a single string
+        success: CallBackSuccess,
+        error: CallBackFailure
+    });
+
+    if (CallBackDone != undefined) {
+        AjaxRequest.done(CallBackDone);
+    }
+}
+
+function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure, CallBackDone)
+{
+
+    var TimeZone = new Date().getTimezoneOffset();
+    var Url;
+    //Url="RootWagTap/time.top?WagCommand=7";
+    Url = global_refTIlerUrl + "CalendarEvent/Complete";
+    var HandleNEwPage = new LoadingScreenControl("Tiler is updating your schedule ...");
+    HandleNEwPage.Launch();
+
+    var MarkAsCompleteData = { UserName: UserCredentials.UserName, UserID: UserCredentials.ID, EventID: CalendarEventID, TimeZoneOffset: TimeZone };
+    var AjaxRequest = $.ajax({
+        type: "POST",
+        url: Url,
+        data: MarkAsCompleteData,
+        // DO NOT SET CONTENT TYPE to json
+        // contentType: "application/json; charset=utf-8", 
+        // DataType needs to stay, otherwise the response object
+        // will be treated as a single string
+        //dataType: "json",
         success: CallBackSuccess,
         error: CallBackFailure
     });
@@ -1513,7 +1541,7 @@ function deleteCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure, 
             var returnedValueContainer = getDomOrCreateNew(returnedValueContainerID);
             $(returnedValueContainer.Dom).addClass("returnedValueContainer");
             //$(returnedValueContainer.Dom).addClass(CurrentTheme.ContentSection);
-            $(InputBar.Dom).on('input', prepCall(InputBar.Dom, Url, Method, returnedValueContainer))
+            (InputBar.Dom).onkeyup = prepCall(InputBar.Dom, Url, Method, returnedValueContainer);
         
 
             var retValue = { InputBar: InputBar, returnedValue: returnedValueContainer };

@@ -32,7 +32,7 @@ namespace TilerFront.Controllers
 
                 LogControl LogAccess = myUserAccount.ScheduleData;
                 Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, Location_Elements>> ProfileData =await LogAccess.getProfileInfo(TimelineForData);
-                IEnumerable<CalendarEvent> ScheduleData = ProfileData.Item1.Values.Where(obj=>obj.isEnabled);
+                IEnumerable<CalendarEvent> ScheduleData = ProfileData.Item1.Values.Where(obj=>obj.isActive);
                 IEnumerable<CalendarEvent> NonRepeatingEvents = ScheduleData.Where(obj => !obj.RepetitionStatus);
                 //IEnumerable<CalendarEvent> RepeatingEvents = ScheduleData.Where(obj => obj.RepetitionStatus).SelectMany(obj => obj.Repeat.RecurringCalendarEvents);
                 IList<UserSchedule.repeatedEventData> RepeatingEvents = ScheduleData.AsParallel().Where(obj => obj.RepetitionStatus).
