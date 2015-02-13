@@ -515,12 +515,15 @@ var FormatTime = function(date){
 
 function generateDayContainer()
 {
-    ++generateDayContainer.id;
-    var DayContainer = getDomOrCreateNew("DayContainer" + generateDayContainer.id);
+    var myID =++generateDayContainer.id;
+    var DayContainer = getDomOrCreateNew("DayContainer" + myID);
+    
+    DayContainer.onmouseover = onMouseIn;
+    DayContainer.onmouseout = onMouseOut;
+    
     $(DayContainer.Dom).addClass("DayContainer");
-    $(DayContainer.Dom).addClass("DayContainer");
-    var NameOfDayContainer = getDomOrCreateNew("NameOfDayContainer" + generateDayContainer.id);
-    var DayTimeContainer = getDomOrCreateNew("DayTimeContainer" + generateDayContainer.id);
+    var NameOfDayContainer = getDomOrCreateNew("NameOfDayContainer" + myID);
+    var DayTimeContainer = getDomOrCreateNew("DayTimeContainer" + myID);
 
     $(NameOfDayContainer.Dom).addClass("NameOfDayContainer");
     DayContainer.Dom.appendChild(NameOfDayContainer.Dom);
@@ -529,27 +532,70 @@ function generateDayContainer()
     var NumberOfShaders = 24;
     var TotalTopElement = 0;
     var ConstTopIncrement = 2;
-    /*for (; NumberOfShaders > 0; --NumberOfShaders)
-    {
-        var shadeContainer = getDomOrCreateNew("shadeContainer" + generateDayContainer.id + "" + NumberOfShaders);
-        DayTimeContainer.Dom.appendChild(shadeContainer.Dom);
-        if (NumberOfShaders % 2)
-        {
-            $(shadeContainer.Dom).addClass("DarkerShade");
-        }
-        else
-        {
-            $(shadeContainer.Dom).addClass("LighterShade");
-        }
 
-        $(shadeContainer.Dom).addClass("shadeContainer");
-        shadeContainer.Dom.style.top = TotalTopElement + "%";
-        
+    for (; NumberOfShaders > 0; --NumberOfShaders) {
+        var shadeContainer = getDomOrCreateNew("shadeContainer" + myID + "" + NumberOfShaders);
+        DayTimeContainer.Dom.appendChild(shadeContainer.Dom);
         TotalTopElement += 4.1667;
-    }*/
+        shadeContainer.Dom.style.top = TotalTopElement + "%";
+        $(shadeContainer.Dom).addClass("shadeContainer");
+    }
+    function onMouseIn()
+    {
+        //debugger;
+        setTimeout(function ()
+        {
+            //debugger;
+            
+            NumberOfShaders = 24;
+            for (; NumberOfShaders > 0; --NumberOfShaders)
+            {
+                var shadeContainer = getDomOrCreateNew("shadeContainer" + myID + "" + NumberOfShaders);
+                if (NumberOfShaders % 2) {
+                    $(shadeContainer.Dom).addClass("DarkerShade");
+                }
+                else {
+                    $(shadeContainer.Dom).addClass("LighterShade");
+                }
+            }
+                
+                //shadeContainer.Dom.style.top = TotalTopElement + "%";
+        })
+    }
+
+    function onMouseOut()
+    {
+        setTimeout(function () {
+            //debugger;
+            //return;
+            NumberOfShaders = 24;
+            for (; NumberOfShaders > 0; --NumberOfShaders)
+            {
+                var shadeContainer = getDomOrCreateNew("shadeContainer" + myID + "" + NumberOfShaders);
+                if (NumberOfShaders % 2) {
+                    $(shadeContainer.Dom).removeClass("DarkerShade");
+                }
+                else {
+                    $(shadeContainer.Dom).removeClass("LighterShade");
+                }
+
+                //$(shadeContainer.Dom).removeClass("shadeContainer");
+                
+
+            }
+        })
+        
+    }
+
+    ///*
+    
+    //*/
 
     var EventDayContainer = getDomOrCreateNew("EventDayContainer" + generateDayContainer.id);
+    //DayContainer.onmou = function () { alert("Hey Jay") };
+    
     $(EventDayContainer.Dom).addClass("EventDayContainer");
+    
     DayTimeContainer.Dom.appendChild(EventDayContainer.Dom);
     return { Parent: DayContainer, EventDayContainer: EventDayContainer, NameOfDayContainer: NameOfDayContainer }
 }
@@ -958,14 +1004,8 @@ getRefreshedData.enableDataRefresh = function (pullLatest)
                     {
                         var subEvent = weekDay.SubEventsCollection[myKey];
                         getMyDom(subEvent, weekDay);
+                        
                     }
-
-                    /*
-                    weekDay.SubEventsCollection.forEach(
-                        function (subEvent) {
-                            getMyDom(subEvent, weekDay);
-                        })
-                    */
                 });
             });
 
@@ -1278,6 +1318,16 @@ function prepUiSlideFunc(DayOfWeek, ID, MyArray, Index)
 
     }
         var BindToThis = BindClickOfSideBarToCLick(MyArray, DayOfWeek.UISpecs[ID], Index, DayOfWeek.UISpecs[ID].Dom,ID);
+        var Range = global_DictionaryOfSubEvents[ID].Day;
+        DayOfWeek.UISpecs[ID].refrenceListElement.Dom.onmouseover = function () {
+            //debugger;
+            Range.Parent.onmouseover();
+        }
+
+        DayOfWeek.UISpecs[ID].refrenceListElement.Dom.onmouseout = function () {
+            //debugger;
+            Range.Parent.onmouseout();
+        }
 
 
         //if statement ensures that only elements with IDIndex generate the function. This ensures that the selected element shows on the left side of the page.
@@ -1672,7 +1722,19 @@ generateAMonthBar.counter = 0;
 
             //$(EventDom.Dom).click(prepOnClickOfCalendarElement(SubEvent, EventDom.Dom));
             global_DictionaryOfSubEvents[SubEvent.ID].showBottomPanel = prepOnClickOfCalendarElement(SubEvent, EventDom.Dom);
+            global_DictionaryOfSubEvents[SubEvent.ID].Day = Range;
 
+            EventDom.Dom.onmouseover = function () {
+                //debugger;
+                Range.Parent.onmouseover();
+            }
+
+            EventDom.Dom.onmouseout = function () {
+                //debugger;
+                Range.Parent.onmouseout();
+            }
+
+            //global_DictionaryOfSubEvents[SubEvent.ID].
 
 
             EventDom.Dom.onclick = call_renderSubEventsClickEvents;
@@ -2224,6 +2286,7 @@ generateAMonthBar.counter = 0;
     //StartOfDay = StartOfDay.dst() ? new Date(Number(StartOfDay.getTime())) : StartOfDay +OneHourInMs;
     if (!WeekRange.status) {
         var DaysOfWeekDoms = new Array();
+        //WeekRange.Dom.appendChild(RenderPlane.Dom);
         WeekDays.forEach(
             function (DayOfWeek) {
                 var myDay = generateDayContainer();
@@ -2258,7 +2321,8 @@ generateAMonthBar.counter = 0;
                 myDay.UISpecs = {
             };
                 $(myDay.Parent.Dom).addClass(DayOfWeek + "DayContainer");
-                WeekRange.Dom.appendChild(myDay.Parent.Dom);
+                RenderPlane.appendChild(myDay.Parent.Dom);
+                //WeekRange.Dom.appendChild(myDay.Parent.Dom);
                 myDay.LeftPercent = (DayIndex * widthPercent);
 
                 DayIndex += 1;
