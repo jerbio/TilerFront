@@ -253,6 +253,7 @@ body {
 #ControlPanelContainer 
 {
   position:absolute;
+  outline: none;
   background-color: #fff; 
   bottom:0;
   z-index: 80;
@@ -264,7 +265,9 @@ body {
 
 #InfoContainer 
 {
-  margin-top: 1.7%;
+  margin-top: calc((7% - 25px)/4);
+  -webkit-margin-top: calc((7% - 25px)/4);
+  -moz-margin-top: calc((7% - 25px)/4);
 }
 
 #ControlPanelNameOfSubevent, 
@@ -298,12 +301,19 @@ body {
 
 .ControlPanelIconSetContainer
 {
-    position: absolute;
-    right: 30px;
-    width: 313px;
-    top: 50%;
-    height: auto;
+    position: fixed;
+    top: 39%;
+    width: 281px;
+    right: 5%;
+    height: 49px;
+    padding: 5px;
+    background-color: yellow;
+    border-top: 1px solid #000;
     transform: translateY(-50%);
+    -webkit-box-shadow: 10px 10px 30px 0px rgba(128,128,128,1);
+    -moz-box-shadow: 10px 10px 30px 0px rgba(128,128,128,1);
+    box-shadow: 10px 10px 30px 0px rgba(128,128,128,1);
+    outline: none;
 }
 
 .ControlPanelButton {
@@ -315,20 +325,26 @@ body {
   margin-left: 14px;
   cursor: pointer;
 }
+.ControlPanelButton:first-child { margin-left: 0; }
 
 #Header {
   width: 100%;
   position: relative;
   top: 0;
+  height: 12.5%;
 }
 
 #Header .ControlPanelButton {
-  margin-top: 20px;
-  position: absolute;
-  right: 30px;
-  background-position: -135px 0; 
+  top: calc((12.5% - 45px)/2);
+  -webkit-top: calc((12.5% - 45px)/2);
+  -moz-top: calc((12.5% - 45px)/2);
+  position: fixed;
 }
-#Header .ControlPanelButton:hover { background-position: -135px -45px; }
+#Header #AddEventButton { background-position: -135px 0; right: 30px; }
+#Header #AddEventButton:hover { background-position: -135px -45px; }
+
+#Header #ControlPanelSearchButton { right: 95px; }
+
 
 .ControlPanelCloseButton {background-position: -315px 0px;}
 .ControlPanelCloseButton:hover {background-position: -315px -45px;}
@@ -340,11 +356,7 @@ body {
 .ControlPanelCompleteButton:hover { background-position: -180px -45px; }
 .ControlPanelProcrastinateButton { background-position: -270px 0; }
 .ControlPanelProcrastinateButton:hover { background-position: -270px -45px; }
-#ControlPanelSearchButton { 
-  right: 87px;
-  top: -5px;
-  position: absolute;
-  background-position: -225px 0; }
+#ControlPanelSearchButton { background-position: -225px 0; }
 #ControlPanelSearchButton:hover { background-position: -225px -45px; }
 
 /*
@@ -618,15 +630,17 @@ width: 100%;
 
 #TimeBar {
   position: fixed;
-  height: 60.8%;
-  background-color: #fff;
+  height: calc(62.25% + 3px);
+  -webkit-height: calc(62.25% + 3px);
+  -moz-height: calc(62.25% + 3px);
+  background-color: transparent;
   width: 49px;
   padding-bottom: 1px;
-  border-right: black 1px solid;
-  border-top: black 1px solid;
-  border-bottom: black 1px solid;
-  left: 0;
-  top: 30.2%;
+  border-left: #000 1px solid;
+  border-top: #000 1px solid;
+  border-bottom: #000 1px solid;
+  right: 0;
+  top: 30.5%;
 }
 #TimeBar ul {
   list-style: none;
@@ -647,19 +661,60 @@ width: 100%;
   display: none;
   width: 100%;
   z-index: 79;
-  height: 69.6%;
+  height: 14%;
   background-color: white;
   bottom: 0;
   position: fixed;
   border-top: 1px solid black;
 }
+#ProcrastinateEventModal .SubmitButton {
+  margin-left: 45px !important;
+}
+#ProcrastinateEventInputContainer {
+  width: auto;
+  float: right;
+  margin-right: 30px;
+  margin-top: calc((8% - 62px)/2);
+  -moz-margin-top: calc((8% - 62px)/2);
+  -webkit-margin-top: calc((8% - 62px)/2);
+}
+#ProcrastinateEventModal div {
+  display: inline-block;
+}
+#ProcrastinateEventModal input {
+  font-size: 32px;
+  width: 50px;
+  color: black;
+  border: none;
+  border-bottom: 1px solid #ccc;
+  font-family: 'texbold';
+  margin-left: 20px;
+}
 
+#ProcrastinateEventModal input:focus {
+    background-color: yellow;
+    outline: none;
+} 
+
+#ProcrastinateEventModal span {
+  font-size: 32px;
+  font-family: 'texbold';
+  color: #ccc;
+  display: inline;
+}
+
+#ProcrastinateHeading {
+  font-family: 'texbold';
+  font-size: 16px;
+}
 
 #MultiSelectPanel 
 {
     position:absolute;
     height:100%;
     width: calc(100% - 283px);
+    -moz-width: calc(100% - 283px);
+    -webkit-width: calc(100% - 283px);
     top: 0;
     background: white;
     text-align:center;
@@ -674,3 +729,5 @@ width: 100%;
 {
     display:none !important;
 }
+
+#logoutForm { position: fixed; }
