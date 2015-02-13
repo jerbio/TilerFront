@@ -35,11 +35,20 @@ namespace TilerFront.Models
            }
         }
 
-        async public Task<UserAccountDirect> getUserAccount()
+        async public Task<UserAccountDirect> getUserAccount(bool Passive=true)
         {
             Controllers.UserController myUserController = new Controllers.UserController();
-            ApplicationUser User = await myUserController.GetUser(UserID, UserName);
-            return new UserAccountDirect(User);
+            ApplicationUser User ;
+
+            if (Passive)
+            {
+                User = new ApplicationUser() { UserName = UserName, Id = UserID,FullName="" };
+            }
+            else
+            {
+                User = await myUserController.GetUser(UserID, UserName);
+            }
+            return new UserAccountDirect(User, Passive);
         }
     }
 }

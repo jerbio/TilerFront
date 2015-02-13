@@ -480,7 +480,11 @@ function BindAddButton()
     $(AddButton).click(newAdd);
     function newAdd()
     {
-        addNewEvent(0, 0, 0, newDate);
+        var HeaderContainer = getDomOrCreateNew("Header")
+        var height = $(HeaderContainer).height();
+        var width = $(HeaderContainer).width();
+        generateModal(width/2, 0, 1, width, new Date(), HeaderContainer,true)
+        //addNewEvent(0, 0, 0, newDate);
     }
 
 
@@ -1226,11 +1230,14 @@ function prepUiSlideFunc(DayOfWeek, ID, MyArray, Index)
 
 
 
-        function renderSubEventsClickEvents(SubEventID) {
-        global_DictionaryOfSubEvents[SubEventID].Bind();
-        global_DictionaryOfSubEvents[SubEventID].showBottomPanel();
-    }
-    renderSubEventsClickEvents.BottomPanelIsOpen = false;
+
+
+function renderSubEventsClickEvents(SubEventID)
+{
+    global_DictionaryOfSubEvents[SubEventID].Bind();
+    global_DictionaryOfSubEvents[SubEventID].showBottomPanel();
+}
+renderSubEventsClickEvents.BottomPanelIsOpen = false;
 
 
 
@@ -1338,8 +1345,9 @@ function prepUiSlideFunc(DayOfWeek, ID, MyArray, Index)
     MonthBarContainer.Dom.appendChild(MonthTickerData.Month.Dom);
     }
 
-        function generateAMonthBar(MonthStart) {
-            //debugger;
+function generateAMonthBar(MonthStart)
+{
+//debugger;
     var WholeMonthCOntainer = getDomOrCreateNew("MonthArrayContainer");
     var MonthSelectButton = getDomOrCreateNew("MonthButton");
     $(MonthSelectButton.Dom).addClass("MonthButton")
@@ -1370,45 +1378,78 @@ function prepUiSlideFunc(DayOfWeek, ID, MyArray, Index)
     var retVAlue = { Days: AllDayDivs, Month: WholeMonthCOntainer, MonthButton: MonthSelectButton, DayContainer: AllDayContainer
         }
     return retVAlue;
+}
+
+function MonthSelection()
+{
+    var AllMonthSelections = [];
+    var MonthSelection = { CurrentMonth: null, Index:-1 };
+
+    function ShowMonthList()
+    {
+        
+        
+    }
+    var MonthID=0
+
+    function genCallBackForEachMonth(Month)
+    {
+        var myMonthID = MonthID++;
+        var monthStringID = Month + myMonthID;
+        var MonthSelectionDiv = getDomOrCreateNew(monthStringID);
+        MonthSelectionDiv.innerHTML = Month;
     }
 
-
-        function genDaysForMonthBar(MonthStart) {
-            //function creates the day divs in the month bar 
-    var Month = MonthStart.getMonth() +1;
-    var IniMonth =Month;
-    var Day = MonthStart.getDate();
-    var AllDayDiivs = new Array();
-    var i = 0;
-    while (IniMonth ==Month) {
-        var MyDivContainer = getDomOrCreateNew("MonthBarDayWeekContainer" + genDaysForMonthBar.Day++);
-        var MyDay = getDomOrCreateNew("MonthBarDay" + genDaysForMonthBar.Day++);
-        var MyDivWeekDay = getDomOrCreateNew("MonthBarDayOfWeek" + genDaysForMonthBar.Day++);
-        MyDay.Dom.innerHTML = Day;
-        MyDivWeekDay.Dom.innerHTML =WeekDays[MonthStart.getDay()][0];
-
-        MyDivContainer.Dom.appendChild(MyDay.Dom);
-        MyDivContainer.Dom.appendChild(MyDivWeekDay.Dom);
-
-        $(MyDay.Dom).addClass("MonthBarDay");
-        $(MyDivWeekDay.Dom).addClass("MonthBarWeekDay")
-        $(MyDivContainer.Dom).addClass("MonthBarDayWeekContainer");
-        var LeftPosition = (i++ * 3.22);
-        MyDivContainer.Dom.style.left = LeftPosition + "%";
-        MyDivContainer.left = LeftPosition
-
-
-        MyDivContainer.StartDate = MonthStart;
-        MonthStart = new Date(MonthStart.getFullYear(), MonthStart.getMonth(), ++Day);
-        MyDivContainer.EndDate = new Date(MonthStart.getTime() -1);
-        AllDayDiivs.push(MyDivContainer);
-
-
-        Month = MonthStart.getMonth() +1;
+    function PrepFunctionForClick(MonthDom, MonthIndex)
+    {
+        return function ()
+        {
+            if (MonthSelection.Index>-1)
+            {
+                $(MonthSelection.CurrentMonth).removeClass("SelectedMonth");
+            }
+            MonthSelection.CurrentMonth = MonthDom;
+            MonthSelection.Index = MonthIndex;
         }
-
-    return AllDayDiivs;
     }
+}
+
+    function genDaysForMonthBar(MonthStart) {
+        //function creates the day divs in the month bar 
+var Month = MonthStart.getMonth() +1;
+var IniMonth =Month;
+var Day = MonthStart.getDate();
+var AllDayDiivs = new Array();
+var i = 0;
+while (IniMonth ==Month) {
+    var MyDivContainer = getDomOrCreateNew("MonthBarDayWeekContainer" + genDaysForMonthBar.Day++);
+    var MyDay = getDomOrCreateNew("MonthBarDay" + genDaysForMonthBar.Day++);
+    var MyDivWeekDay = getDomOrCreateNew("MonthBarDayOfWeek" + genDaysForMonthBar.Day++);
+    MyDay.Dom.innerHTML = Day;
+    MyDivWeekDay.Dom.innerHTML =WeekDays[MonthStart.getDay()][0];
+
+    MyDivContainer.Dom.appendChild(MyDay.Dom);
+    MyDivContainer.Dom.appendChild(MyDivWeekDay.Dom);
+
+    $(MyDay.Dom).addClass("MonthBarDay");
+    $(MyDivWeekDay.Dom).addClass("MonthBarWeekDay")
+    $(MyDivContainer.Dom).addClass("MonthBarDayWeekContainer");
+    var LeftPosition = (i++ * 3.22);
+    MyDivContainer.Dom.style.left = LeftPosition + "%";
+    MyDivContainer.left = LeftPosition
+
+
+    MyDivContainer.StartDate = MonthStart;
+    MonthStart = new Date(MonthStart.getFullYear(), MonthStart.getMonth(), ++Day);
+    MyDivContainer.EndDate = new Date(MonthStart.getTime() -1);
+    AllDayDiivs.push(MyDivContainer);
+
+
+    Month = MonthStart.getMonth() +1;
+    }
+
+return AllDayDiivs;
+}
 
 genDaysForMonthBar.Day = 0;
 
@@ -1851,7 +1892,6 @@ generateAMonthBar.counter = 0;
                     // will be treated as a single string
                         dataType: "json",
                         success: function (response) {
-                        alert(response);
                         getRefreshedData();
                 },
                         error: function () {
@@ -2078,7 +2118,7 @@ generateAMonthBar.counter = 0;
     BindAddNewEventToClick(WeekRange);
 
     var StartOfDay = new Date(RangeOfWeek.Start);
-    StartOfDay = StartOfDay.dst() ? new Date(Number(StartOfDay.getTime())) : StartOfDay +OneHourInMs;
+    //StartOfDay = StartOfDay.dst() ? new Date(Number(StartOfDay.getTime())) : StartOfDay +OneHourInMs;
     if (!WeekRange.status) {
         var DaysOfWeekDoms = new Array();
         WeekDays.forEach(

@@ -1,13 +1,5 @@
 ﻿"use strict"
 
-
-$(document).ready(function () {
-    $('body').hide();
-    LaunchMonthTicker();
-    
-    InitializeMonthlyOverview();
-});
-
 var global_DictionaryOfSubEvents = {};
 var global_RemovedElemnts = {};
 var global_WeekGrid;
@@ -17,34 +9,43 @@ var global_DayTop;
 var global_RangeMultiplier = 4;//range for number of weeks to be specified for calculation
 var global_CurrentRange;
 var global_ClearRefreshDataInterval = 0;
-var global_ColorAugmentation=0;
+var global_ColorAugmentation = 0;
 var refreshCounter = 1000000;
 var global_refreshDataInterval = 60000;
 var global_multiSelect;
+var global_ControlPanelIconSet = new IconSet();
+$(global_ControlPanelIconSet.getIconSetContainer()).addClass("ControlPanelIconSetContainer");
+
+$(document).ready(function () {
+    $('body').hide();
+    LaunchMonthTicker();
+    
+    InitializeMonthlyOverview();
+});
 
 
-function RevealControlPanelSection(SelectedEvents) {
-    /*var ControlPanelNameOfSubeventInfo = document.getElementById("ControlPanelNameOfSubeventInfo");
-    ControlPanelNameOfSubeventInfo.innerHTML = ""
-    var ControlPanelDeadlineOfSubeventInfo = document.getElementById("ControlPanelDeadlineOfSubeventInfo");
-    ControlPanelDeadlineOfSubeventInfo.innerHTML = ""
-    var ControlPanelSubEventTimeInfo = document.getElementById("ControlPanelSubEventTimeInfo");
-    ControlPanelSubEventTimeInfo.innerHTML = ""*/
 
+
+function RevealControlPanelSection(SelectedEvents)
+{
     
     var yeaButton = getDomOrCreateNew("YeaToConfirmDelete");
     var nayButton = getDomOrCreateNew("NayToConfirmDelete");
-    var completeButton = getDomOrCreateNew("ControlPanelCompleteButton");
-    var deleteButton = getDomOrCreateNew("ControlPanelDeleteButton");
+    var completeButton = RevealControlPanelSection.IconSet.getCompleteButton();
+    var deleteButton = RevealControlPanelSection.IconSet.getCloseButton();
     var DeleteMessage = getDomOrCreateNew("DeleteMessage")
     var ProcatinationButton = getDomOrCreateNew("submitProcatination");
-    var ControlPanelCloseButton = getDomOrCreateNew("ControlPanelCloseButton");
+    var ControlPanelCloseButton = RevealControlPanelSection.IconSet.getDeleteButton();
+    
     var ProcrastinateEventModalContainer = getDomOrCreateNew("ProcrastinateEventModal");
-    var ControlPanelProcrastinateButton = getDomOrCreateNew("ControlPanelProcrastinateButton")
+    var ControlPanelProcrastinateButton = RevealControlPanelSection.IconSet.getProcrastinateButton();
+    $(ControlPanelProcrastinateButton).addClass("setAsDisplayNone");
+    $(RevealControlPanelSection.IconSet.getLocationButton()).addClass("setAsDisplayNone");
     var ModalDelete = getDomOrCreateNew("ConfirmDeleteModal")
     var MultiSelectPanel = getDomOrCreateNew("MultiSelectPanel")
     var ControlPanelContainer = getDomOrCreateNew("ControlPanelContainer");
-
+    var IconSetContainer = RevealControlPanelSection.IconSet.getIconSetContainer();
+    
     if (Object.keys(SelectedEvents).length < 1) {
         $(MultiSelectPanel).addClass("hideMultiSelectPanel");
         closeControlPanel();
@@ -52,9 +53,8 @@ function RevealControlPanelSection(SelectedEvents) {
     }
 
     $(MultiSelectPanel).removeClass("hideMultiSelectPanel");
-
     renderSubEventsClickEvents.BottomPanelIsOpen = true;
-
+    ControlPanelContainer.appendChild(IconSetContainer);
     $('#ControlPanelContainer').slideDown(500);
 
     function resetButtons() {
@@ -79,8 +79,15 @@ function RevealControlPanelSection(SelectedEvents) {
         $('#ControlPanelContainer').slideUp(500);
         $(MultiSelectPanel).addClass("hideMultiSelectPanel");
         renderSubEventsClickEvents.BottomPanelIsOpen = false;
-        document.removeEventListener("keydown", containerKeyPress);
+        document.onkeydown = null;
         getRefreshedData.enableDataRefresh();
+        $(ControlPanelProcrastinateButton).removeClass("setAsDisplayNone");
+        $(RevealControlPanelSection.IconSet.getLocationButton()).removeClass("setAsDisplayNone");
+        if (IconSetContainer.parentNode!=null)
+        {
+            IconSetContainer.parentNode.removeChild(IconSetContainer);
+        }
+        
     }
 
 
@@ -223,7 +230,8 @@ function RevealControlPanelSection(SelectedEvents) {
     }
     completeButton.onclick = markAsComplete;
 
-    document.addEventListener("keydown", containerKeyPress);
+    //document.removeEventListener("keydown", containerKeyPress);//this is here just to avooid duplicate addition of the same keypress event
+    document.onkeydown = containerKeyPress
    
     MultiSelectPanel.innerHTML = Object.keys(SelectedEvents).length+" Events Selected"
     ControlPanelCloseButton.onclick = closeControlPanel;
@@ -233,12 +241,78 @@ function RevealControlPanelSection(SelectedEvents) {
         deleteSubevent();
     }
 }
+RevealControlPanelSection.IconSet = global_ControlPanelIconSet;
+function IconSet()
+{
+    var myID = IconSet.ID++;
+    var IconSetContainerID = "IconSetContainer"+myID
+    var IconSetContainer = getDomOrCreateNew(IconSetContainerID);
+    //$(IconSetContainer).addClass("ControlPanelIconSetContainer");
+    var LocationIconID = "ControlPanelLocationButton" + myID;
+    var LocationIcon = getDomOrCreateNew(LocationIconID);
+    $(LocationIcon).addClass("ControlPanelButton");
+    $(LocationIcon).addClass("ControlPanelLocationButton");
+    var ProcrastinateIconID = "ControlPanelProcrastinateButton" + myID;
+    var ProcrastinateIcon = getDomOrCreateNew(ProcrastinateIconID);
+    $(ProcrastinateIcon).addClass("ControlPanelButton");
+    $(ProcrastinateIcon).addClass("ControlPanelProcrastinateButton");
+
+    var DeleteIconID = "ControlPanelDeleteButton" + myID;
+    var DeleteIcon = getDomOrCreateNew(DeleteIconID);
+    $(DeleteIcon).addClass("ControlPanelButton");
+    $(DeleteIcon).addClass("ControlPanelDeleteButton");
+
+    var CompleteIconID = "ControlPanelCompleteButton" + myID;
+    var CompleteIcon = getDomOrCreateNew(CompleteIconID);
+    $(CompleteIcon).addClass("ControlPanelButton");
+    $(CompleteIcon).addClass("ControlPanelCompleteButton");
+
+    var CloseIconID = "ControlPanelCloseButton" + myID;
+    var CloseIcon = getDomOrCreateNew(CloseIconID);
+    $(CloseIcon).addClass("ControlPanelButton");
+    $(CloseIcon).addClass("ControlPanelCloseButton");
+
+    this.getCloseButton = function ()
+    {
+        return CloseIcon;
+    }
+
+    this.getLocationButton = function () {
+        return LocationIcon;
+    }
+
+
+    this.getDeleteButton = function () {
+        return DeleteIcon;
+    }
+
+    this.getCompleteButton = function () {
+        return CompleteIcon;
+    }
+
+    this.getProcrastinateButton = function () {
+        return ProcrastinateIcon;
+    }
+
+    this.getIconSetContainer = function () {
+        return IconSetContainer;
+    }
+
+    IconSetContainer.appendChild(LocationIcon)
+    IconSetContainer.appendChild(ProcrastinateIcon)
+    IconSetContainer.appendChild(DeleteIcon)
+    IconSetContainer.appendChild(CompleteIcon)
+    IconSetContainer.appendChild(CloseIcon)
+}
+
+IconSet.ID=0;
 
 
 function multiSelect()
 {
         var SelecedIDs = {};
         var EnableChange = true;
+        var CallBackDict = {};
         var CallBackFunctions = [];
 
         var AddElement = function (EventID)
@@ -309,7 +383,10 @@ function multiSelect()
             
             if ((EnableChange))
             {
-                CallBackFunctions.forEach(function (myFunc) { myFunc(SelecedIDs) });
+                CallBackFunctions.forEach(
+                    function (myFunc) {
+                        myFunc(SelecedIDs)
+                    });
             }
         }
         this.AddElement = AddElement;
@@ -318,15 +395,29 @@ function multiSelect()
         this.resetAllElement = resetAllElement;
         this.RemoveELement = RemoveELement;
         this.getAllSelectedElements = function () { SelecedIDs }
-        this.AddCallBack = function (CallBack)
+        this.addCallBack = function (CallBack)
         {
-            CallBackFunctions.push(CallBack);
+            if (CallBackDict[CallBack] == undefined)
+            {
+                CallBackFunctions.push(CallBack);
+                CallBackDict[CallBack] = CallBack;
+            }
+        }
+
+        this.removeCallBack = function (CallBack)
+        {
+            delete CallBackDict[CallBack];
+            var funcIndex = CallBackFunctions.indexOf(CallBack);
+            if (funcIndex > -1)
+            {
+                CallBackFunctions.splice(funcIndex, 1);
+            }
         }
     
 }
 
 global_multiSelect = new multiSelect();
-global_multiSelect.AddCallBack(RevealControlPanelSection);
+
 
 var FormatTime = function(date){
   var d = date;
@@ -480,7 +571,11 @@ function BindAddButton()
     $(AddButton).click(newAdd);
     function newAdd()
     {
-        addNewEvent(0, 0, 0, newDate);
+        var HeaderContainer = getDomOrCreateNew("Header")
+        var height = $(HeaderContainer).height();
+        var width = $(HeaderContainer).width();
+        generateModal(width/2, 0, 1, width, new Date(), HeaderContainer,true)
+        //addNewEvent(0, 0, 0, newDate);
     }
 
 
@@ -1053,6 +1148,7 @@ getRefreshedData.enableDataRefresh = function ()
         return function ()
         {
             global_multiSelect.resetAllElement();
+            global_multiSelect.removeCallBack(RevealControlPanelSection);
             if (BindClickOfSideBarToCLick.elementResetHeight != null)
             {
                 BindClickOfSideBarToCLick.reset();
@@ -1185,7 +1281,6 @@ function prepUiSlideFunc(DayOfWeek, ID, MyArray, Index)
             global_DictionaryOfSubEvents[ID].Bind = BindToThis;
     }
         /*
-
         function triggerClick(e) {
             if(e!=null)
             {
@@ -1212,11 +1307,10 @@ function prepUiSlideFunc(DayOfWeek, ID, MyArray, Index)
             e.stopPropagation();
             if (e.ctrlKey)
             {
+                global_multiSelect.addCallBack(RevealControlPanelSection);
                 global_multiSelect.AddElement(ID);
                 return;
             }
-            
-            
             renderSubEventsClickEvents(ID)
         }
         DayOfWeek.UISpecs[ID].refrenceListElement.Dom.onclick = call_renderSubEventsClickEvents;
@@ -1226,11 +1320,14 @@ function prepUiSlideFunc(DayOfWeek, ID, MyArray, Index)
 
 
 
-        function renderSubEventsClickEvents(SubEventID) {
-        global_DictionaryOfSubEvents[SubEventID].Bind();
-        global_DictionaryOfSubEvents[SubEventID].showBottomPanel();
-    }
-    renderSubEventsClickEvents.BottomPanelIsOpen = false;
+
+
+function renderSubEventsClickEvents(SubEventID)
+{
+    global_DictionaryOfSubEvents[SubEventID].Bind();
+    global_DictionaryOfSubEvents[SubEventID].showBottomPanel();
+}
+renderSubEventsClickEvents.BottomPanelIsOpen = false;
 
 
 
@@ -1338,8 +1435,9 @@ function prepUiSlideFunc(DayOfWeek, ID, MyArray, Index)
     MonthBarContainer.Dom.appendChild(MonthTickerData.Month.Dom);
     }
 
-        function generateAMonthBar(MonthStart) {
-            //debugger;
+function generateAMonthBar(MonthStart)
+{
+//debugger;
     var WholeMonthCOntainer = getDomOrCreateNew("MonthArrayContainer");
     var MonthSelectButton = getDomOrCreateNew("MonthButton");
     $(MonthSelectButton.Dom).addClass("MonthButton")
@@ -1370,45 +1468,78 @@ function prepUiSlideFunc(DayOfWeek, ID, MyArray, Index)
     var retVAlue = { Days: AllDayDivs, Month: WholeMonthCOntainer, MonthButton: MonthSelectButton, DayContainer: AllDayContainer
         }
     return retVAlue;
+}
+
+function MonthSelection()
+{
+    var AllMonthSelections = [];
+    var MonthSelection = { CurrentMonth: null, Index:-1 };
+
+    function ShowMonthList()
+    {
+        
+        
+    }
+    var MonthID=0
+
+    function genCallBackForEachMonth(Month)
+    {
+        var myMonthID = MonthID++;
+        var monthStringID = Month + myMonthID;
+        var MonthSelectionDiv = getDomOrCreateNew(monthStringID);
+        MonthSelectionDiv.innerHTML = Month;
     }
 
-
-        function genDaysForMonthBar(MonthStart) {
-            //function creates the day divs in the month bar 
-    var Month = MonthStart.getMonth() +1;
-    var IniMonth =Month;
-    var Day = MonthStart.getDate();
-    var AllDayDiivs = new Array();
-    var i = 0;
-    while (IniMonth ==Month) {
-        var MyDivContainer = getDomOrCreateNew("MonthBarDayWeekContainer" + genDaysForMonthBar.Day++);
-        var MyDay = getDomOrCreateNew("MonthBarDay" + genDaysForMonthBar.Day++);
-        var MyDivWeekDay = getDomOrCreateNew("MonthBarDayOfWeek" + genDaysForMonthBar.Day++);
-        MyDay.Dom.innerHTML = Day;
-        MyDivWeekDay.Dom.innerHTML =WeekDays[MonthStart.getDay()][0];
-
-        MyDivContainer.Dom.appendChild(MyDay.Dom);
-        MyDivContainer.Dom.appendChild(MyDivWeekDay.Dom);
-
-        $(MyDay.Dom).addClass("MonthBarDay");
-        $(MyDivWeekDay.Dom).addClass("MonthBarWeekDay")
-        $(MyDivContainer.Dom).addClass("MonthBarDayWeekContainer");
-        var LeftPosition = (i++ * 3.22);
-        MyDivContainer.Dom.style.left = LeftPosition + "%";
-        MyDivContainer.left = LeftPosition
-
-
-        MyDivContainer.StartDate = MonthStart;
-        MonthStart = new Date(MonthStart.getFullYear(), MonthStart.getMonth(), ++Day);
-        MyDivContainer.EndDate = new Date(MonthStart.getTime() -1);
-        AllDayDiivs.push(MyDivContainer);
-
-
-        Month = MonthStart.getMonth() +1;
+    function PrepFunctionForClick(MonthDom, MonthIndex)
+    {
+        return function ()
+        {
+            if (MonthSelection.Index>-1)
+            {
+                $(MonthSelection.CurrentMonth).removeClass("SelectedMonth");
+            }
+            MonthSelection.CurrentMonth = MonthDom;
+            MonthSelection.Index = MonthIndex;
         }
-
-    return AllDayDiivs;
     }
+}
+
+    function genDaysForMonthBar(MonthStart) {
+        //function creates the day divs in the month bar 
+var Month = MonthStart.getMonth() +1;
+var IniMonth =Month;
+var Day = MonthStart.getDate();
+var AllDayDiivs = new Array();
+var i = 0;
+while (IniMonth ==Month) {
+    var MyDivContainer = getDomOrCreateNew("MonthBarDayWeekContainer" + genDaysForMonthBar.Day++);
+    var MyDay = getDomOrCreateNew("MonthBarDay" + genDaysForMonthBar.Day++);
+    var MyDivWeekDay = getDomOrCreateNew("MonthBarDayOfWeek" + genDaysForMonthBar.Day++);
+    MyDay.Dom.innerHTML = Day;
+    MyDivWeekDay.Dom.innerHTML =WeekDays[MonthStart.getDay()][0];
+
+    MyDivContainer.Dom.appendChild(MyDay.Dom);
+    MyDivContainer.Dom.appendChild(MyDivWeekDay.Dom);
+
+    $(MyDay.Dom).addClass("MonthBarDay");
+    $(MyDivWeekDay.Dom).addClass("MonthBarWeekDay")
+    $(MyDivContainer.Dom).addClass("MonthBarDayWeekContainer");
+    var LeftPosition = (i++ * 3.22);
+    MyDivContainer.Dom.style.left = LeftPosition + "%";
+    MyDivContainer.left = LeftPosition
+
+
+    MyDivContainer.StartDate = MonthStart;
+    MonthStart = new Date(MonthStart.getFullYear(), MonthStart.getMonth(), ++Day);
+    MyDivContainer.EndDate = new Date(MonthStart.getTime() -1);
+    AllDayDiivs.push(MyDivContainer);
+
+
+    Month = MonthStart.getMonth() +1;
+    }
+
+return AllDayDiivs;
+}
 
 genDaysForMonthBar.Day = 0;
 
@@ -1677,22 +1808,28 @@ generateAMonthBar.counter = 0;
 
             var yeaButton = getDomOrCreateNew("YeaToConfirmDelete");
             var nayButton = getDomOrCreateNew("NayToConfirmDelete");
-            var completeButton = getDomOrCreateNew("ControlPanelCompleteButton");
-            var deleteButton = getDomOrCreateNew("ControlPanelDeleteButton");
+            var completeButton = global_ControlPanelIconSet.getCompleteButton();
+            var deleteButton = global_ControlPanelIconSet.getDeleteButton();
             var DeleteMessage = getDomOrCreateNew("DeleteMessage")
             var ProcatinationButton = getDomOrCreateNew("submitProcatination");
-            var ControlPanelCloseButton = getDomOrCreateNew("ControlPanelCloseButton");
+            var ControlPanelCloseButton = global_ControlPanelIconSet.getCloseButton();
             var ProcrastinateEventModalContainer = getDomOrCreateNew("ProcrastinateEventModal");
-            var ControlPanelProcrastinateButton = getDomOrCreateNew("ControlPanelProcrastinateButton")
-            var ControlPanelLocationButton = getDomOrCreateNew("ControlPanelLocationButton")
+            var ControlPanelProcrastinateButton = global_ControlPanelIconSet.getProcrastinateButton();
+            var ControlPanelLocationButton = global_ControlPanelIconSet.getLocationButton();
             var ModalDelete = getDomOrCreateNew("ConfirmDeleteModal")
+            var ControlPanelContainer = getDomOrCreateNew("ControlPanelContainer");
             var MultiSelectPanel = getDomOrCreateNew("MultiSelectPanel");
-            if (!renderSubEventsClickEvents.BottomPanelIsOpen) {
+            
+            /*if (renderSubEventsClickEvents.BottomPanelIsOpen) {
                 closeControlPanel();
-            }
+            }*/
+            
+            var IconSetContainer = global_ControlPanelIconSet.getIconSetContainer();
+            $(ControlPanelContainer ).slideDown(500);
+            ControlPanelContainer.appendChild(IconSetContainer);
 
-            var LauchLocation = function ()
-            {
+
+            var LauchLocation = function () {
                 debugger;
                 var googleMapsURL = "https://www.google.com/maps/place/";
                 var fullURL = googleMapsURL + SubEvent.SubCalAddress
@@ -1700,15 +1837,14 @@ generateAMonthBar.counter = 0;
                     var win = window.open(fullURL, '_blank');
                     win.focus();
                 }
-                else
-                {
+                else {
                     $(MultiSelectPanel).removeClass("hideMultiSelectPanel");
                     MultiSelectPanel.innerHTML = "Oops tiler could not find an address :X &#x1f603;";
                     setTimeout(function () { $(MultiSelectPanel).addClass("hideMultiSelectPanel"); }, 3000);
-                    
-                    
+
+
                 }
-                
+
             }
 
             ControlPanelLocationButton.onclick = LauchLocation;
@@ -1717,8 +1853,9 @@ generateAMonthBar.counter = 0;
                 debugger;
                 procrastinateEvent();
                 closeProcrastinatePanel();
-        }
-            $('#ControlPanelContainer').slideDown(500);
+            }
+
+
             function resetButtons() {
                 yeaButton.onclick = null;
                 nayButton.onclick = null;
@@ -1748,9 +1885,12 @@ generateAMonthBar.counter = 0;
                 closeProcrastinatePanel();
                 deleteButton.onclick = null;
                 completeButton.onclick = null;
-                $('#ControlPanelContainer').slideUp(500);
+                $(ControlPanelContainer).slideUp(500);
                 renderSubEventsClickEvents.BottomPanelIsOpen = false;
                 getRefreshedData.enableDataRefresh();
+                if (IconSetContainer.parentNode != null) {
+                    IconSetContainer.parentNode.removeChild(IconSetContainer);
+                }
         }
 
             function closeProcrastinatePanel() {
@@ -1851,7 +1991,6 @@ generateAMonthBar.counter = 0;
                     // will be treated as a single string
                         dataType: "json",
                         success: function (response) {
-                        alert(response);
                         getRefreshedData();
                 },
                         error: function () {
@@ -2078,7 +2217,7 @@ generateAMonthBar.counter = 0;
     BindAddNewEventToClick(WeekRange);
 
     var StartOfDay = new Date(RangeOfWeek.Start);
-    StartOfDay = StartOfDay.dst() ? new Date(Number(StartOfDay.getTime())) : StartOfDay +OneHourInMs;
+    //StartOfDay = StartOfDay.dst() ? new Date(Number(StartOfDay.getTime())) : StartOfDay +OneHourInMs;
     if (!WeekRange.status) {
         var DaysOfWeekDoms = new Array();
         WeekDays.forEach(

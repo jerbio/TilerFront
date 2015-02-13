@@ -31,7 +31,7 @@ namespace TilerFront.Controllers
         [ResponseType(typeof(PostBackStruct))]
         public async Task<IHttpActionResult> GetCalEvent(string id,[FromUri]AuthorizedUser myUser )
         {
-            UserAccount retrievedUser = new UserAccount(myUser.UserName, myUser.UserID);
+            UserAccountDirect retrievedUser = await myUser.getUserAccount();
             await retrievedUser.Login();
             TilerElements.CalendarEvent retrievedCalendarEvent = retrievedUser.ScheduleData.getCalendarEventWithID(id);
             PostBackData retValue = new PostBackData(retrievedCalendarEvent.ToCalEvent(), 0);
@@ -46,13 +46,14 @@ namespace TilerFront.Controllers
         [Route("api/CalendarEvent/Name")]
         public async Task<IHttpActionResult> CalEventName([FromUri]NameSearchModel myUser)
         {
-            UserAccount retrievedUser = new UserAccount(myUser.UserName, myUser.UserID);
+            UserAccountDirect retrievedUser = await myUser.getUserAccount();
             await retrievedUser.Login();
+            string phrase = myUser.Data;
 
             PostBackData retValue = new PostBackData("", 4);
             if (retrievedUser.Status)
             {
-                IEnumerable<CalendarEvent> retrievedCalendarEvents = retrievedUser.ScheduleData.getCalendarEventWithName(myUser.Data).Where(obj=>obj.isActive);
+                IEnumerable<CalendarEvent> retrievedCalendarEvents = retrievedUser.ScheduleData.getCalendarEventWithName(phrase).Where(obj => obj.isActive);
                 retValue = new PostBackData(retrievedCalendarEvents.Select(obj => obj.ToCalEvent()).ToList(), 0);
             }
             

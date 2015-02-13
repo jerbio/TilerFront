@@ -82,7 +82,7 @@
 
     
     
-    <div id="ControlPanelContainer">
+    <div id="ControlPanelContainer" tabindex="1">
       <div id="InfoContainer">
         <div id="ControlPanelNameOfSubevent">
           <div class="InfoControlPanel" id="ControlPanelNameOfSubeventInfo"></div>
@@ -93,35 +93,35 @@
         <div id="ControlPanelDeadlineOfSubevent">
           Deadline:
           <div class="InfoControlPanel" id="ControlPanelDeadlineOfSubeventInfo"></div>
-          <div id="ControlPanelProcrastinateButton"></div>
         </div>
       </div>
       <div id="InputContainer">
         <div class="ControlPanelButton" id="ControlPanelLocationButton"></div>
-        <div onclick="slideProcrastinateEventModal();" class="ControlPanelButton" id="ControlPanelProcrastinateButton"></div>
+        <div class="ControlPanelButton" id="ControlPanelProcrastinateButton" ></div>
         <div class="ControlPanelButton" id="ControlPanelDeleteButton"></div>
         <div class="ControlPanelButton" id="ControlPanelCompleteButton"></div>
         <div class="ControlPanelButton" id="ControlPanelCloseButton"></div>
       </div>
-    <div id="ProcrastinateEventModal">
-      Procrastinate this by
-      <div>
-        <span>H</span>
-        <input id="procrastinateHours" type="number">
-        <span>M</span>
-        <input id="procrastinateMins" type="number">
-        <span>D</span>
-        <input id="procrastinateDays" type="number">
-        <input id="submitProcatination" type="submit">
-      </div>
-    </div>
-    <div id="ConfirmDeleteModal">
-        <div id="ConfirmContent">
-            <span id="DeleteMessage">Sure you want to delete this?</span>
-            <button class="SubmitButton" id="YeaToConfirmDelete">Yea</button>
-            <button class="SubmitButton" id="NayToConfirmDelete">Nay</button>
+        <div id="ProcrastinateEventModal" tabindex="1">
+            Procrastinate this by
+            <div>
+                <span>H</span>
+                <input id="procrastinateHours" type="number">
+                <span>M</span>
+                <input id="procrastinateMins" type="number">
+                <span>D</span>
+                <input id="procrastinateDays" type="number">
+                <input id="submitProcatination" type="submit">
+            </div>
         </div>
-    </div>
+        <div id="ConfirmDeleteModal">
+            <div id="ConfirmContent">
+                <span id="DeleteMessage">Sure you want to delete this?</span>
+                <button class="SubmitButton" id="YeaToConfirmDelete">Yea</button>
+                <button class="SubmitButton" id="NayToConfirmDelete">Nay</button>
+            </div>
+        </div>
+        <div class='hideMultiSelectPanel' id="MultiSelectPanel"></div>
     </div>
     <div id="LoadingScreenPanel"></div>
   </body>

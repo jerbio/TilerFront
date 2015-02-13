@@ -653,3 +653,19 @@ width: 100%;
   position: fixed;
   border-top: 1px solid black;
 }
+
+
+#MultiSelectPanel 
+{
+    position:absolute;
+    height:100%;
+    width: calc(100% - 283px);
+    top: 0;
+    background: white;
+    text-align:center;
+}
+
+.hideMultiSelectPanel 
+{
+    display:none;
+}

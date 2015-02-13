@@ -533,6 +533,7 @@ function Theme(color)
 
 function getTimeStringFromDate(date)
 {
+    
     var myString = new Date(date).toLocaleString();
     //var TimeZoneOffset=new Date().getTimezoneOffset()/60;
     var hours = date.getHours();
@@ -1417,7 +1418,7 @@ function AutoSuggestControl(Url,Method, GenerateEachDomCallBack, UserInputBox)
             {
                 clearTimeout(TimerResetID);
             }
-            TimerResetID = setTimeout(prepCalToBackEnd(InputDom, url, Method, SuggestedValuesContainer,e), 300);
+            TimerResetID = setTimeout(prepCalToBackEnd(InputDom, url, Method, SuggestedValuesContainer,e), 50);
         }
     }
 

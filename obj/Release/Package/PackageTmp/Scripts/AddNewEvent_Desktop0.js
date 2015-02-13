@@ -152,7 +152,7 @@ function SubmitTile(Name, Address, Splits, Hour, Minutes, Deadline, Repetition, 
 }
 
 
-function generateModal(x, y, height, width,WeekStart, RenderPlane)
+function generateModal(x, y, height, width,WeekStart, RenderPlane,UseCurrentTime)
 {
     //return;
 
@@ -176,15 +176,27 @@ function generateModal(x, y, height, width,WeekStart, RenderPlane)
     }
     $(AddEvent.Dom).click(function () {
         (modalAddDom.Dom.parentElement.removeChild(modalAddDom.Dom));
-        var floatalTime = y / height;
-        var Hour = Math.floor((floatalTime) * 24);
+        var floatalTime = 0;
+        var Hour = 0
         var Min = 0;
-        var WeekDayIndex = Math.floor(x / weekDayWidth);
-        var myDate = new Date(WeekStart);
-        var NewDay = myDate.getDate() + WeekDayIndex
-        myDate.setDate(NewDay);
-        myDate.setHours(Hour);
-        myDate.setMinutes(0);;
+        var WeekDayIndex = 0;
+        var myDate = new Date(new Date().getTime() + OneHourInMs);
+        myDate.setMinutes(0);
+        var NewDay = 0;
+        if(!UseCurrentTime)
+        {
+            floatalTime = y / height;
+            Hour = Math.floor((floatalTime) * 24);
+            Min = 0;
+            WeekDayIndex = Math.floor(x / weekDayWidth);
+            myDate = new Date(WeekStart);
+            NewDay = myDate.getDate() + WeekDayIndex
+            myDate.setDate(NewDay);
+            myDate.setHours(Hour);
+            myDate.setMinutes(0);
+        }
+        
+
         addNewEvent(x, y, height, myDate);
     });
 
@@ -256,7 +268,7 @@ function CloseModal()
 
 function generateAddEventContainer(x,y,height,Container,refStartTime)
 {
-    StopPullingData();
+    getRefreshedData.disableDataRefresh();
     ActivateUserSearch.setSearchAsOff();
     var NewEventcontainer = getDomOrCreateNew("AddNewEventContainer");
 
@@ -268,7 +280,7 @@ function generateAddEventContainer(x,y,height,Container,refStartTime)
         if (e.keyCode == 27)
         {
             getRefreshedData();
-            CloseEventAddition()
+            CloseEventAddition();
             
         }
         e.stopPropagation();
@@ -283,6 +295,7 @@ function generateAddEventContainer(x,y,height,Container,refStartTime)
                 NewEventcontainer.Dom.parentElement.removeChild(NewEventcontainer.Dom);
             }
         }
+        getRefreshedData.enableDataRefresh();
         ActivateUserSearch.setSearchAsOn();
     }
     $(document).keyup(removePanel);
@@ -353,15 +366,18 @@ function generateDurationSliderContainer()
     var DurationExplanation = getDomOrCreateNew("DurationExplanation", "span");
     DurationExplanation.Dom.innerHTML = "<p>Duration of the event</p>";
     var DurationContainer = getDomOrCreateNew("DurationContainer");
-    var HourSliderValue = getDomOrCreateNew("HourSliderValue","input");
+    var HourSliderValue = getDomOrCreateNew("HourSliderValue", "input");
+    HourSliderValue.setAttribute("type", "number")
     HourSliderValue.Dom.value=0;
     var HourLabel = getDomOrCreateNew("HourLabel", "span");
     HourLabel.Dom.innerHTML="H";
     var MinSliderValue = getDomOrCreateNew("MinSliderValue", "input");
+    MinSliderValue.setAttribute("type", "number")
     MinSliderValue.Dom.value = 0;
     var MinLabel = getDomOrCreateNew("MinLabel", "span");
     MinLabel.Dom.innerHTML="M";
     var DaySliderValue = getDomOrCreateNew("DaySliderValue", "input");
+    DaySliderValue.setAttribute("type","number")
     DaySliderValue.Dom.value = 0;
     var DayLabel = getDomOrCreateNew("DayLabel", "span");
     DayLabel.Dom.innerHTML="D"
@@ -397,7 +413,7 @@ function generateStartContainer(refDate)
     var CurrentDate = CurrentDate.month_num+1 + '/' + CurrentDate.date + '/' + CurrentDate.year;
 
     StartDateInput.Dom.setAttribute("placeholder", CurrentDate);
-
+    debugger;
     StartTimeInputContainer.Dom.appendChild(StartTimeInput.Dom);
     StartDateInputContainer.Dom.appendChild(StartDateInput.Dom);
     BindDatePicker(StartDateInput.Dom);
@@ -633,14 +649,11 @@ function GenerateTileRepetition()
 }
 
 
-function StopPullingData()
-{
-    clearTimeout(global_ClearRefreshDataInterval);
-}
+
 //handles the whole addition of tiled events. Handles the UI component and tabbing
 function AddTiledEvent()
 {
-    StopPullingData();
+    getRefreshedData.disableDataRefresh();
     ActivateUserSearch.setSearchAsOff();
     var InvisiblePanelID = "AddEventPanel";
     var InvisiblePanel = getDomOrCreateNew(InvisiblePanelID);
@@ -914,6 +927,7 @@ function AddTiledEvent()
 
     function Exit()///forces the removal of the Div
     {
+        getRefreshedData.enableDataRefresh();
         if (modalTileEvent != null)
         {
             $(modalTileEvent.Dom).empty();
@@ -1680,7 +1694,7 @@ function BindSubmitClick(Name, Address, AddressNick, Splits, Start, End, EventNo
 
     var EventStart = Start.getDateTimeData();
     var EventEnd = End.getDateTimeData();
-    var DurationInMS = (parseInt(EventDuration.Days) * OneDayInMs) + (parseInt(EventDuration.Hours) * OneHourInMs) + (parseInt(EventDuration.Mins) * OneMinInMs)
+    var DurationInMS = (parseInt((!EventDuration.Days) ? 0 : EventDuration.Days) * OneDayInMs) + (parseInt((!EventDuration.Hours) ? 0 : EventDuration.Hours) * OneHourInMs) + (parseInt((!EventDuration.Mins) ? 0 : EventDuration.Mins) * OneMinInMs)
     if (DurationInMS == 0) {
         alert("Oops please provide a duration for \"" + EventName + "\"");
         return null;
@@ -1746,6 +1760,7 @@ function BindSubmitClick(Name, Address, AddressNick, Splits, Start, End, EventNo
 
     }).done(function (data) {
         HandleNEwPage.Hide();
+        getRefreshedData.enableDataRefresh();
         getRefreshedData();
         CloseEventAddition();
     });

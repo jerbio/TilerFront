@@ -51,7 +51,7 @@
 
 
 
-    <div id="ControlPanelContainer">
+    <div id="ControlPanelContainer" tabindex="1">
         <div id="InfoContainer">
             <div id="ControlPanelNameOfSubevent">
                 <div class="InfoControlPanel" id="ControlPanelNameOfSubeventInfo"></div>
@@ -62,17 +62,16 @@
             <div id="ControlPanelDeadlineOfSubevent">
                 Deadline:
                 <div class="InfoControlPanel" id="ControlPanelDeadlineOfSubeventInfo"></div>
-                <div id="ControlPanelProcrastinateButton"></div>
             </div>
         </div>
         <div id="InputContainer">
             <div class="ControlPanelButton" id="ControlPanelLocationButton"></div>
-            <div onclick="slideProcrastinateEventModal();" class="ControlPanelButton" id="ControlPanelProcrastinateButton"></div>
+            <div class="ControlPanelButton" id="ControlPanelProcrastinateButton"></div>
             <div class="ControlPanelButton" id="ControlPanelDeleteButton"></div>
             <div class="ControlPanelButton" id="ControlPanelCompleteButton"></div>
             <div class="ControlPanelButton" id="ControlPanelCloseButton"></div>
         </div>
-        <div id="ProcrastinateEventModal">
+        <div id="ProcrastinateEventModal" tabindex="1">
             Procrastinate this by
             <div>
                 <span>H</span>
@@ -91,6 +90,7 @@
                 <button class="SubmitButton" id="NayToConfirmDelete">Nay</button>
             </div>
         </div>
+        <div class='hideMultiSelectPanel' id="MultiSelectPanel"></div>
     </div>
     <div id="LoadingScreenPanel"></div>
 </body>

@@ -29,27 +29,39 @@ namespace TilerFront
         Tuple<bool, string, DateTimeOffset, long> ScheduleMetadata;
         public static bool useCassandra=false;
         Models.ApplicationUser SessionUser;
+        bool PassiveInitialization = false;
         public LogControlDirect()
         {
             ScheduleMetadata = new Tuple<bool, string, DateTimeOffset, long>(false, "", new DateTimeOffset(), 0);
             useCassandra=false;
             SessionUser= new Models.ApplicationUser();
         }
-        public LogControlDirect(Models.ApplicationUser User, string logLocation="")
+        public LogControlDirect(Models.ApplicationUser User, string logLocation="", bool Passive=false)
         {
             if (!string.IsNullOrEmpty(logLocation))
             {
                 WagTapLogLocation = logLocation;
             }
+            PassiveInitialization = Passive;
             SessionUser = User;
             LogStatus = false;
             CachedLocation = new Dictionary<string, Location_Elements>();
+            if (PassiveInitialization)
+            {
+                CurrentLog = SessionUser.Id.ToString() + ".xml";
+                LogStatus = true;
+            }
 
         }
+
+
         #region Functions
         override async public Task Initialize()
         {
-            
+            if (PassiveInitialization)
+            {
+                return;
+            }
             CurrentLog = "";
             //if (VerifiedUser.Item1)
             {

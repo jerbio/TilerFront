@@ -12,13 +12,24 @@ namespace TilerFront
         Models.ApplicationUser sessionUser;
         LogControlDirect UserLog;
 
-        public UserAccountDirect(Models.ApplicationUser user)
+        public UserAccountDirect(Models.ApplicationUser user, bool Passive=false)
         {
             sessionUser = user;
-            
-            UserLog = new LogControlDirect(sessionUser);
-            
+            UserLog = new LogControlDirect(sessionUser, "", Passive);
         }
+
+        /*
+        public UserAccountDirect(string UserName,string USerID, bool Passive)
+        {
+            if (!Passive)
+            {
+                sessionUser = new Models.ApplicationUser();
+                sessionUser.UserName = UserName;
+                sessionUser.Id = USerID;
+            }
+
+            UserLog = new LogControlDirect(sessionUser, "", Passive);
+        }*/
 
         public override async System.Threading.Tasks.Task<bool> Login()
         {
@@ -31,6 +42,8 @@ namespace TilerFront
             }
             return UserLog.Status;
         }
+
+        
 
 
         override protected Dictionary<string, CalendarEvent> getAllCalendarElements(TimeLine RangeOfLookup, string desiredDirectory = "")

@@ -348,12 +348,10 @@ function RegisterUser(FullName, UserName, Password,PassWordConfirmation, Email)
             debugger;
             var myContainer = response
             //myContainer= JSON.parse(myContainer);
-            if (myContainer.Error.code == 0)
-            {
-                LaunchLoggedUser(myContainer.Content);
+            if (myContainer.Error.code == 0) {
+                LaunchLoggedUser(myContainer.Error.Message);
             }
-            else
-            {
+            else {
                 showRegistrationError(myContainer.Error.Message);
                 setTimeout(hideRegistrationError, 6000);
             }

@@ -70,6 +70,9 @@
                 <span id="SignInError" class="regformError"></span>
                 <div id="SignInAndSocialContainer">
                     <button id="SignInButton">Sign In</button>
+                    <p>
+                        @Html.ActionLink("Forgot your password?", "ForgotPassword","Account")
+                    </p>
                     @{
                         var loginProviders = Context.GetOwinContext().Authentication.GetExternalAuthenticationTypes();
                         if (loginProviders.Count() != 0)
