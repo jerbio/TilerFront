@@ -524,7 +524,7 @@ function generateDayContainer()
     $(DayContainer.Dom).addClass("DayContainer");
     var NameOfDayContainer = getDomOrCreateNew("NameOfDayContainer" + myID);
     var DayTimeContainer = getDomOrCreateNew("DayTimeContainer" + myID);
-
+    $(DayTimeContainer).addClass("setAsDisplayNone");
     $(NameOfDayContainer.Dom).addClass("NameOfDayContainer");
     DayContainer.Dom.appendChild(NameOfDayContainer.Dom);
     DayContainer.Dom.appendChild(DayTimeContainer.Dom);
@@ -536,8 +536,15 @@ function generateDayContainer()
     for (; NumberOfShaders > 0; --NumberOfShaders) {
         var shadeContainer = getDomOrCreateNew("shadeContainer" + myID + "" + NumberOfShaders);
         DayTimeContainer.Dom.appendChild(shadeContainer.Dom);
-        TotalTopElement += 4.1667;
         shadeContainer.Dom.style.top = TotalTopElement + "%";
+        TotalTopElement += 4.1667;
+        if (NumberOfShaders % 2) {
+            $(shadeContainer.Dom).addClass("DarkerShade");
+        }
+        else {
+            $(shadeContainer.Dom).addClass("LighterShade");
+        }
+
         $(shadeContainer.Dom).addClass("shadeContainer");
     }
     function onMouseIn()
@@ -545,19 +552,16 @@ function generateDayContainer()
         //debugger;
         setTimeout(function ()
         {
+            $(DayTimeContainer).removeClass("setAsDisplayNone");
+
             //debugger;
-            
+            /*
             NumberOfShaders = 24;
             for (; NumberOfShaders > 0; --NumberOfShaders)
             {
                 var shadeContainer = getDomOrCreateNew("shadeContainer" + myID + "" + NumberOfShaders);
-                if (NumberOfShaders % 2) {
-                    $(shadeContainer.Dom).addClass("DarkerShade");
-                }
-                else {
-                    $(shadeContainer.Dom).addClass("LighterShade");
-                }
-            }
+                
+            }*/
                 
                 //shadeContainer.Dom.style.top = TotalTopElement + "%";
         })
@@ -568,6 +572,9 @@ function generateDayContainer()
         setTimeout(function () {
             //debugger;
             //return;
+            $(DayTimeContainer).addClass("setAsDisplayNone");
+
+            /*
             NumberOfShaders = 24;
             for (; NumberOfShaders > 0; --NumberOfShaders)
             {
@@ -582,7 +589,7 @@ function generateDayContainer()
                 //$(shadeContainer.Dom).removeClass("shadeContainer");
                 
 
-            }
+            }*/
         })
         
     }
