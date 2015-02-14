@@ -11,8 +11,10 @@
     <div id="Header">
         <span class="TilerLogo"></span>
         <div id="AddEventButton" class="ControlPanelButton"></div>
+        <input id="SearchBar">
+        <div class="ControlPanelButton" id="ControlPanelSearchButton"></div>
     </div>
-    <div id="SearchBarAndContentContainer"><input id="SearchBar"><span class="ControlPanelButton" id="ControlPanelSearchButton"></span></div>
+    <div id="SearchBarAndContentContainer"></div>
     <div id="MonthBar"></div>
     <div id="AddEventPanel"></div>
     <div id="FullWeekContainer"> </div>
@@ -72,15 +74,18 @@
             <div class="ControlPanelButton ControlPanelCloseButton"></div>
         </div>-->
         <div id="ProcrastinateEventModal" tabindex="1">
-            Procrastinate this by
-            <div>
-                <span>H</span>
-                <input id="procrastinateHours" type="number">
-                <span>M</span>
-                <input id="procrastinateMins" type="number">
-                <span>D</span>
-                <input id="procrastinateDays" type="number">
-                <input id="submitProcatination" type="submit">
+            <div id="ProcrastinateEventInputContainer">
+                <div id="ProcrastinateHeading">Procrastinate this by</div>
+                <div id="ProcrastinateInputAndSubmit">
+                    <input maxlength="2" id="procrastinateHours" autofocus type="text">
+
+                    <span>H</span>
+                    <input maxlength="2" id="procrastinateMins" type="text">
+                    <span>M</span>
+                    <input maxlength="2" id="procrastinateDays" type="text">
+                    <span>D</span>
+                    <button id="submitProcatination" class="SubmitButton">Push It</button>
+                </div>
             </div>
         </div>
         <div id="ConfirmDeleteModal">

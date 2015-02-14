@@ -1,7 +1,8 @@
 ﻿function ActivateUserSearch(e)
 {
+//    debugger;
     e.stopPropagation();
-    var SearchInput = getDomOrCreateNew("SearchBar");
+    var SearchInput = getDomOrCreateNew("SearchBarInput");
     var SearchContainer = getDomOrCreateNew("SearchBarAndContentContainer");
     if (e.shiftKey || e.ctrlKey || e.altKey || (!ActivateUserSearch.isSearchOn))
     {
@@ -26,7 +27,7 @@
         return;
     }
 
-    if((e.which<46)||(e.which>90))
+    if(((e.which<46)||(e.which>90))&&(e.which!=1))
     {
         return;
     }
@@ -73,12 +74,19 @@ ActivateUserSearch.getSearch = function ()
 ActivateUserSearch.isSearchOn = true;
 ActivateUserSearch.isActive = false;
 document.onkeydown = ActivateUserSearch;
+setTimeout(function () {
+    document.getElementById("SearchBar").onclick = ActivateUserSearch;
+}, 1000);
+
+
+
+
 
 function EventSearch(InputDon)
 {
     var isSearchOn = true;
     var isSearchActive = false;
-    var SearchInput = getDomOrCreateNew("SearchBar");
+    var SearchInput = getDomOrCreateNew("SearchBarInput");
     var SearchContainer = getDomOrCreateNew("SearchBarAndContentContainer");
     var url = global_refTIlerUrl + "CalendarEvent/Name";
     var AutoSuggestSearch = new AutoSuggestControl(url, "GET", CallBackFunctionForReturnedValuesDesktop, SearchInput.Dom);

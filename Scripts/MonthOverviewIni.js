@@ -1194,6 +1194,29 @@ getRefreshedData.enableDataRefresh = function (pullLatest)
     }
 
 
+    function PositionIconSet(DayContainer, SubEventDom)
+    {
+        var IconSetContainer = global_ControlPanelIconSet.getIconSetContainer();
+        var documentWidth = $(document).width();
+        var buffer = 40;
+        var widthOfIconSet = $(IconSetContainer).width()
+        var heightOfIconSet = $(IconSetContainer).height()
+        var widthOfDayContainer = $(DayContainer).width();
+        var leftOfDayContainer = $(DayContainer).offset().left;
+        var RightBorder = leftOfDayContainer + widthOfDayContainer + widthOfIconSet;
+        
+        var LeftOffset=0
+        if (RightBorder > documentWidth) {
+            LeftOffset = leftOfDayContainer - widthOfIconSet - buffer
+        }
+        else
+        {
+            LeftOffset = leftOfDayContainer + widthOfDayContainer + 40;
+        }
+
+
+    }
+
     function BindClickOfSideBarToCLick(MyArray, FullContainer, Index, CLickedBar,EventID)
     {
         return function ()
@@ -1223,6 +1246,8 @@ getRefreshedData.enableDataRefresh = function (pullLatest)
             var resetArray = new Array();
             BindClickOfSideBarToCLick.previousIndex = Index;
             
+            
+
 
             var AllPreviousSelection = $(".selectedDayElements");
             

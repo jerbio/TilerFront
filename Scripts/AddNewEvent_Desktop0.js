@@ -311,7 +311,9 @@ function generateAddEventContainer(x,y,height,Container,refStartTime)
     var EndDom = generateEndContainer();
     var SubmitButton = generateSubmitButton();
     var SplitCount = splitInputText();
-    var ColorPicker = generateColorPickerContainer()
+    var ColorPicker = generateColorPickerContainer();
+    var recurrence = createCalEventRecurrence();
+
   //  var EnableTiler = generateTilerEnabled(EndDom.Selector.Container, SplitCount.Selector.Container);
 
     NewEventcontainer.Dom.appendChild(NameDom.Selector.Container);
@@ -321,15 +323,16 @@ function generateAddEventContainer(x,y,height,Container,refStartTime)
     NewEventcontainer.Dom.appendChild(LocationDom.Selector.Container);
     NewEventcontainer.Dom.appendChild(ColorPicker.Selector.Container);
     //NewEventcontainer.Dom.appendChild(EnableTiler.Selector.Container);
+    NewEventcontainer.Dom.appendChild(recurrence.Content);
     NewEventcontainer.Dom.appendChild(SubmitButton.Selector.Container);
-    //NewEventcontainer.Dom.appendChild(SplitCount.Selector.Container);
+    
     
     
     
     
 
     $(SubmitButton.Selector.Button.Dom).click(function () {
-        BindSubmitClick(NameDom.Selector.Input.Dom.value, LocationDom.Selector.Address.Dom.value, LocationDom.Selector.NickName.Dom.value, SplitCount.Selector.Input.Dom.value, StartDom, EndDom, DurationDom, null, true, ColorPicker.Selector.getColor(), CloseEventAddition)
+        BindSubmitClick(NameDom.Selector.Input.Dom.value, LocationDom.Selector.Address.Dom.value, LocationDom.Selector.NickName.Dom.value, SplitCount.Selector.Input.Dom.value, StartDom, EndDom, DurationDom, null, true, ColorPicker.Selector.getColor(), CloseEventAddition, recurrence)
     })
     //var RepetitionDom = generateRepetitionContainer();
 }
@@ -413,7 +416,6 @@ function generateStartContainer(refDate)
     var CurrentDate = CurrentDate.month_num+1 + '/' + CurrentDate.date + '/' + CurrentDate.year;
 
     StartDateInput.Dom.setAttribute("placeholder", CurrentDate);
-    debugger;
     StartTimeInputContainer.Dom.appendChild(StartTimeInput.Dom);
     StartDateInputContainer.Dom.appendChild(StartDateInput.Dom);
     BindDatePicker(StartDateInput.Dom);
@@ -843,7 +845,7 @@ function AddTiledEvent()
     };
     
     var Hour = new TileInputBox({
-        LabelAfter: "H", Message: {
+        LabelAfter: "Hr", Message: {
             Index: 3,
             LoopBack: function (value) {
                 var message = "";
@@ -866,7 +868,7 @@ function AddTiledEvent()
         }, InputCss: { width: "1em" }
     }, undefined, undefined, Exit, undefined, null, AutoSentence)
     var Min = new TileInputBox({
-        LabelAfter: "M", Message: {
+        LabelAfter: "Min ", Message: {
             Index: 4,
             LoopBack: function (value) {
                 var message = "";
@@ -893,7 +895,8 @@ function AddTiledEvent()
 
 
     var Element3 = {
-        LabelBefore: "It will Take", Message: {
+        LabelBefore: "It will Take",
+        Message: {
             Index: 2,
             LoopBack: function (value) {
                 var message = "";
@@ -1126,12 +1129,13 @@ function SendDataToBackEnd()
 function TileInputBox(TabElement, ModalContainer, SendTile, Exit, HideInput, getDataFunction, SenetenceCompletion)
 {
     var LabelBefore = TabElement.LabelBefore == null ? "" : TabElement.LabelBefore;
+    LabelBefore+=" "
     var LabelAfter = TabElement.LabelAfter == null ? "" : TabElement.LabelAfter;
     var myTabElement = TabElement;
-    
-    var InputBoxLabelBeforeID = "InputBoxLabelBefore" + ++TileInputBox.ID;
-    var InputBoxLabelAfterID = "InputBoxLabelAfter" + ++TileInputBox.ID;
-    var MyID = "TileInputID" + TileInputBox.ID;
+    var myTIleInputID = TileInputBox.ID++
+    var InputBoxLabelBeforeID = "InputBoxLabelBefore" + myTIleInputID;
+    var InputBoxLabelAfterID = "InputBoxLabelAfter" + myTIleInputID;
+    var MyID = "TileInputID" + myTIleInputID;
     TabElement.ID = MyID;
     var meTHis = this;
     TileInputBox.Dictionary[MyID] = { TabElement: myTabElement, Me: meTHis };
@@ -1146,7 +1150,7 @@ function TileInputBox(TabElement, ModalContainer, SendTile, Exit, HideInput, get
 
     TabElement.isInFocus = false;
     var NextElement = { Data: TabElement.NextElement }
-    var InputBoxID = "InputBox" + TileInputBox.ID++;
+    var InputBoxID = "InputBox" + myTIleInputID;
     this.NextElement = NextElement.Data;
     NextElement.Previous = this;
     var InputBox = getDomOrCreateNew(InputBoxID, "input");
@@ -1156,11 +1160,11 @@ function TileInputBox(TabElement, ModalContainer, SendTile, Exit, HideInput, get
         return;
     }
     
-    var labelAndInputContainerID = "labelAndInputContainer" + TileInputBox.ID;;
+    var labelAndInputContainerID = "labelAndInputContainer" + myTIleInputID;;
     var labelAndInputContainer = getDomOrCreateNew(labelAndInputContainerID);
 
     
-    var invisibleSpan = getDomOrCreateNew("measureSpan" + TileInputBox.ID, "span");
+    var invisibleSpan = getDomOrCreateNew("measureSpan" + myTIleInputID, "span");
     $(invisibleSpan.Dom).addClass("invisibleSpan");
     //labelAndInputContainer.Dom.appendChild(invisibleSpan.Dom);
     $(InputBox.Dom).addClass("TileInput");
@@ -1242,7 +1246,7 @@ function TileInputBox(TabElement, ModalContainer, SendTile, Exit, HideInput, get
             }
             
             //function MonitorNavigation()
-            
+            $(Container).removeClass("setAsDisplayNone");
             var myInput = dropDown.getInputBox();
             TabElement.DropDown.Index = 0;
             TabElement.DropDown.CurrentOnFocus = null;
@@ -1294,6 +1298,7 @@ function TileInputBox(TabElement, ModalContainer, SendTile, Exit, HideInput, get
             TabElement.DropDown.CleanUp = function () {
                 var SuggestedValueContainer = dropDown.getSuggestedValueContainer();
                 $(SuggestedValueContainer).empty();
+                $(SuggestedValueContainer).addClass("setAsDisplayNone");
                 TabElement.DropDown.status = false;
             }
 
@@ -1414,7 +1419,12 @@ function TileInputBox(TabElement, ModalContainer, SendTile, Exit, HideInput, get
     
     var getAllElements=function()
     {
-        var retValue = [InputBoxLabelBefore, InputBox, InputBoxLabelAfter,InputDataDomain.Dom, invisibleSpan];
+
+        var retValue = [InputBoxLabelBefore, InputBox, InputBoxLabelAfter, InputDataDomain.Dom, invisibleSpan];
+        if (InputBox == InputDataDomain)
+        {
+            retValue = [InputBoxLabelBefore, InputBox, InputBoxLabelAfter, invisibleSpan];
+        }
         for (var i = 0; i < OtherElements.length; i++)
         {
             retValue.push(OtherElements[i]);
@@ -1441,6 +1451,13 @@ function TileInputBox(TabElement, ModalContainer, SendTile, Exit, HideInput, get
     var ResizeInputTrim = function ()
     {
         var value = $(InputBox.Dom).val();
+        if (!(value.trim()))
+        {
+            $(InputBox.Dom).addClass("EmptyTileInput");
+            return 0;
+        }
+
+        $(InputBox.Dom).removeClass("EmptyTileInput");
         var span = invisibleSpan.Dom;
         span.innerHTML = value;
         var span_width = $(span).width() + 8;
@@ -1584,6 +1601,14 @@ function TileInputBox(TabElement, ModalContainer, SendTile, Exit, HideInput, get
         TabElement.SubTileInputBox.forEach(InsertEachElement);
     }
     */
+    function focusInputBox()
+    {
+        if(InputBox!=null)
+        {
+            InputBox.focus();
+        }
+    }
+
     unReveal();
     if (TabElement.DefaultText!=null)
     {
@@ -1604,7 +1629,8 @@ function TileInputBox(TabElement, ModalContainer, SendTile, Exit, HideInput, get
         InputDataDomain.Dom = null;
     }
     
-    //this.FullContainer = labelAndInputContainer;
+    InputBoxLabelBefore.onclick = focusInputBox
+    InputBoxLabelAfter.onclick = focusInputBox
 }
 
 TileInputBox.ID = 0;
@@ -1681,10 +1707,15 @@ function generateSubmitButton()
 }
 
 
-function BindSubmitClick(Name, Address, AddressNick, Splits, Start, End, EventNonRigidDurationHolder, RepetitionEnd, RigidFlag, CalendarColor,CloseEventAddition)
+function BindSubmitClick(Name, Address, AddressNick, Splits, Start, End, EventNonRigidDurationHolder, RepetitionEnd, RigidFlag, CalendarColor,CloseEventAddition,EventRepetition)
 {
     var EventLocation = new Location(AddressNick, Address);
     var EventName = Name;
+    var EventName = Name;
+    if (!EventName) {
+        alert("Oops your Event needs a name");
+        return null;
+    }
     if (Splits == "")
     {
         Splits = 1;
@@ -1716,7 +1747,18 @@ function BindSubmitClick(Name, Address, AddressNick, Splits, Start, End, EventNo
     var DatePickerValue = Month + "/" + Day + "/" + Year;
 
     var RepetitionStart = DatePickerValue;
-    var RepetitionEnd = RepetitionStart;
+    var RepetitionEnd = EventRepetition.RepeatEnd.value;
+
+    if (EventRepetition.RepetitionStatus.status) {
+        EventRepetition.RepetitionSelection.forEach(function (Selection)
+        {
+            Selection.Dom = null;
+            if (Selection.status)
+            {
+                repeteOpitonSelect = Selection;
+            }
+        });
+    }
 
     var NewEvent = new CalEventData(EventName, EventLocation, Splits, CalendarColor, EventDuration, EventStart, EventEnd, repeteOpitonSelect, RepetitionStart, RepetitionEnd, RigidFlag);
     NewEvent.RepeatData = null;
@@ -1761,8 +1803,472 @@ function BindSubmitClick(Name, Address, AddressNick, Splits, Start, End, EventNo
 
     }).done(function (data) {
         HandleNEwPage.Hide();
-        getRefreshedData.enableDataRefresh();
-        getRefreshedData();
+        getRefreshedData.enableDataRefresh(true);
         CloseEventAddition();
     });
+}
+
+
+function createCalEventRecurrence()
+{
+    
+    var RecurrenceTabContentID = "RecurrenceTabContent";
+    var RecurrenceTabContent = getDomOrCreateNew(RecurrenceTabContentID);
+    RecurrenceTabContent.Misc = { Selection: null };
+    var EventrepeatStatus;
+    var EventRepetitionSelection;
+    var EventRepeatStart;
+    var EventRepeatEnd;
+    
+    $(RecurrenceTabContent.Dom).addClass("TabContent");
+
+    //Enable Recurrence
+    var EnableRecurrenceContainerID = "EnableRecurrenceContainer";
+    var EnableRecurrenceContainer = getDomOrCreateNew(EnableRecurrenceContainerID);
+
+    var EnableRecurrenceLabelID = "EnableRecurrenceLabel";
+    var EnableRecurrenceLabel = getDomOrCreateNew(EnableRecurrenceLabelID,"label");
+    EnableRecurrenceContainer.Dom.appendChild(EnableRecurrenceLabel.Dom);
+    $(EnableRecurrenceContainer.Dom).addClass(CurrentTheme.FontColor);
+    EnableRecurrenceLabel.Dom.innerHTML = "Do you want this event to recurr?"
+
+    /*var EnableRecurrenceButtonContainerID = "EnableRecurrenceButtonContainer";
+    var EnableRecurrenceButtonContainer = getDomOrCreateNew(EnableRecurrenceButtonContainerID);
+
+
+    EnableRecurrenceContainer.Dom.appendChild(EnableRecurrenceButtonContainer.Dom);
+    $(EnableRecurrenceButtonContainer.Dom).addClass("EnableButtonContainer");*/
+
+    var EnableRecurrenceButtonID = "EnableRecurrenceButton";
+    var EnableRecurrenceButton = generateMyButton(ButtonClick, EnableRecurrenceButtonID);// getDomOrCreateNew(EnableRecurrenceButtonID);
+    $(EnableRecurrenceButton.Dom).addClass("EnableButton");
+    EnableRecurrenceContainer.Dom.appendChild(EnableRecurrenceButton);
+    EnableRecurrenceButton.status = 0;
+    EventrepeatStatus = EnableRecurrenceButton;
+
+
+    //Enabled Recurring Settings
+    var EnabledRecurrenceContainerID = "EnabledRecurrenceContainer";
+    var EnabledRecurrenceContainer = getDomOrCreateNew(EnabledRecurrenceContainerID);
+
+
+    var EnableRecurrenceYesTextID = "EnableRecurrenceYesText";
+    /*var EnableRecurrenceYesText = getDomOrCreateNew(EnableRecurrenceYesTextID);
+    EnableRecurrenceButtonContainer.Dom.appendChild(EnableRecurrenceYesText.Dom);
+    $(EnableRecurrenceYesText.Dom).addClass("EnableButtonChoiceText");
+    $(EnableRecurrenceYesText.Dom).addClass("EnableButtonChoiceYeaText");
+
+
+    var EnableRecurrenceNoTextID = "EnableRecurrenceNoText";
+    var EnableRecurrenceNoText = getDomOrCreateNew(EnableRecurrenceNoTextID);
+    EnableRecurrenceButtonContainer.Dom.appendChild(EnableRecurrenceNoText.Dom);
+    //EnableRecurrenceButtonContainer.Dom.appendChild(EnableRecurrenceButton.Dom);//appending after because of z-index effect
+    $(EnableRecurrenceNoText.Dom).addClass("EnableButtonChoiceText");
+    $(EnableRecurrenceNoText.Dom).addClass("EnableButtonChoiceNayText");*/
+
+    RecurrenceTabContent.Dom.appendChild(EnableRecurrenceContainer.Dom);
+
+//    $(EnableRecurrenceContainer.Dom).click(genFunctionForButtonClick(EnableRecurrenceButton, EnabledRecurrenceContainer));
+    EventrepeatStatus = EnabledRecurrenceContainer;
+
+    EnableRecurrenceButton.SetAsOff();
+
+    
+    function ButtonClick () 
+    {
+        switch (EnableRecurrenceButton.status) {
+            case 0:
+                {
+                    $(EnabledRecurrenceContainer.Dom).hide();
+                    EnabledRecurrenceContainer.status = 0;
+                }
+                break;
+            case 1:
+                {
+                    $(EnabledRecurrenceContainer.Dom).show();
+                    EnabledRecurrenceContainer.status = 1;
+                }
+                break;
+        }
+    }
+    
+
+
+
+
+
+
+    /*Recurrence Button Start*/
+    var RecurrenceButtonContainerID = "RecurrenceButtonContainer"
+    var RecurrenceButtonContainer = getDomOrCreateNew(RecurrenceButtonContainerID);
+
+    var dailyRecurrenceButtonID = "dailyRecurrenceButton";
+    var dailyRecurrenceButton = getDomOrCreateNew(dailyRecurrenceButtonID,"button");
+    dailyRecurrenceButton.Range = OneDayInMs;
+    dailyRecurrenceButton.Type = { Name: "Daily", Index: 0 };
+    dailyRecurrenceButton.Misc = null;
+    var dailyRecurrenceButtonTextID = "dailyRecurrenceButtonText";
+    var dailyRecurrenceButtonText = getDomOrCreateNew(dailyRecurrenceButtonTextID);
+    dailyRecurrenceButtonText.Dom.innerHTML = "Daily"
+    $(dailyRecurrenceButton.Dom).addClass("recurrenceButton");
+    $(dailyRecurrenceButton.Dom).addClass("SubmitButton")
+    $(dailyRecurrenceButtonText.Dom).addClass("CentreAlignedName");
+    $(dailyRecurrenceButton.Dom).append(dailyRecurrenceButtonText.Dom);
+
+
+    var weeklyRecurrenceButtonID = "weeklyRecurrenceButton";
+    var weeklyRecurrenceButton = getDomOrCreateNew(weeklyRecurrenceButtonID, "button");
+    weeklyRecurrenceButton.Range = OneWeekInMs;
+    weeklyRecurrenceButton.Type = { Name: "Weekly", Index: 1 };
+    weeklyRecurrenceButton.Misc = null;
+    var weeklyRecurrenceButtonTextID = "weeklyRecurrenceButtonText";
+    var weeklyRecurrenceButtonText = getDomOrCreateNew(weeklyRecurrenceButtonTextID);
+    $(weeklyRecurrenceButton.Dom).addClass("recurrenceButton");
+    $(weeklyRecurrenceButton.Dom).addClass("SubmitButton")
+    $(weeklyRecurrenceButtonText.Dom).addClass("CentreAlignedName");
+    weeklyRecurrenceButtonText.Dom.innerHTML = "Weekly"
+    $(weeklyRecurrenceButton.Dom).append(weeklyRecurrenceButtonText.Dom);
+
+
+    var monthlyRecurrenceButtonID = "monthlyRecurrenceButton";
+    var monthlyRecurrenceButton = getDomOrCreateNew(monthlyRecurrenceButtonID, "button");
+    monthlyRecurrenceButton.Range = FourWeeksInMs;
+    monthlyRecurrenceButton.Type = { Name: "Monthly", Index: 2 };
+    var monthlyRecurrenceButtonTextID = "monthlyRecurrenceButtonText";
+    var monthlyRecurrenceButtonText = getDomOrCreateNew(monthlyRecurrenceButtonTextID);
+    $(monthlyRecurrenceButton.Dom).addClass("recurrenceButton");
+    $(monthlyRecurrenceButton.Dom).addClass("SubmitButton")
+    monthlyRecurrenceButtonText.Dom.innerHTML = "Monthly"
+    $(monthlyRecurrenceButtonText.Dom).addClass("CentreAlignedName");
+    $(monthlyRecurrenceButton.Dom).append(monthlyRecurrenceButtonText.Dom);
+
+
+    var yearlyRecurrenceButtonID = "yearlyRecurrenceButton";
+    var yearlyRecurrenceButton = getDomOrCreateNew(yearlyRecurrenceButtonID, "button");
+    yearlyRecurrenceButton.Range = OneYearInMs;
+    yearlyRecurrenceButton.Type = { Name: "Yearly", Index: 3 };
+    yearlyRecurrenceButton.Misc = null;
+    var yearlyRecurrenceButtonTextID = "yearlyRecurrenceButtonText";
+    var yearlyRecurrenceButtonText = getDomOrCreateNew(yearlyRecurrenceButtonTextID);
+    $(yearlyRecurrenceButton.Dom).addClass("recurrenceButton");
+    $(yearlyRecurrenceButton.Dom).addClass("SubmitButton")
+    yearlyRecurrenceButtonText.Dom.innerHTML = "Yearly"
+    $(yearlyRecurrenceButtonText.Dom).addClass("CentreAlignedName");
+    $(yearlyRecurrenceButton.Dom).append(yearlyRecurrenceButtonText.Dom);
+
+    /*
+    $(dailyRecurrenceButton.Dom).addClass(CurrentTheme.AlternateContentSection);
+    $(weeklyRecurrenceButton.Dom).addClass(CurrentTheme.AlternateContentSection);
+    $(monthlyRecurrenceButton.Dom).addClass(CurrentTheme.AlternateContentSection);
+    $(yearlyRecurrenceButton.Dom).addClass(CurrentTheme.AlternateContentSection);
+
+    $(dailyRecurrenceButton.Dom).addClass(CurrentTheme.AlternateFontColor);
+    $(weeklyRecurrenceButton.Dom).addClass(CurrentTheme.AlternateFontColor);
+    $(monthlyRecurrenceButton.Dom).addClass(CurrentTheme.AlternateFontColor);
+    $(yearlyRecurrenceButton.Dom).addClass(CurrentTheme.AlternateFontColor);*/
+
+    var DaysOfTheWeekContainerID = "DaysOfTheWeekContainer";
+    var DaysOfTheWeekContainer = getDomOrCreateNew(DaysOfTheWeekContainerID);
+    $(DaysOfTheWeekContainer.Dom).addClass("DaysOfTheWeekContainer");
+    var DaysOfTheWeek = generateDayOfWeekRepetitionDom();
+    weeklyRecurrenceButton.Misc = DaysOfTheWeek
+    DaysOfTheWeek.AllDoms.forEach(function (eachDom) { DaysOfTheWeekContainer.Dom.appendChild(eachDom.Dom) });
+    $(DaysOfTheWeekContainer.Dom).addClass(CurrentTheme.FontColor);
+
+
+    var AllDoms = [dailyRecurrenceButton, weeklyRecurrenceButton, monthlyRecurrenceButton, yearlyRecurrenceButton];//order of AllDOms matters, smallest range to largest to maintain correctness of application
+
+    EventRepetitionSelection = AllDoms;//globals Access
+
+
+    function DisableAllDomData() {
+        AllDoms.forEach(function (eachDomCombo) { $(eachDomCombo.Dom).addClass("InActiveRecurrenceButton"); eachDomCombo.status = false });
+    }
+
+
+
+
+    function createDomEnablingFunction(DomCombo, Index, RecurrenceTabContent, DayOfTheWeekContainer, RevealDayOfWeekCircles, EventRange) {
+        var var1 = DaysOfTheWeekContainer;
+        var CallBack = function () {
+            DisableAllDomData();
+            $(DomCombo.Dom).removeClass("InActiveRecurrenceButton");
+            $(DomCombo.Dom).addClass("ActiveRecurrenceButton");
+            DomCombo.status = true;
+            RecurrenceTabContent.Misc.Selection = Index;
+            var var2 = var1;
+            if (Index != 1)//checks if weekly is selected 
+            {
+                $(var2.Dom).hide();
+            }
+            else {
+                var2.Dom.style.visible = "visible";
+                $(var2.Dom).show();
+                RevealDayOfWeekCircles();
+            }
+        }
+
+        return CallBack;
+    }
+
+
+    $(dailyRecurrenceButton.Dom).click(createDomEnablingFunction(AllDoms[0], 0, RecurrenceTabContent, DaysOfTheWeekContainer, DaysOfTheWeek.RevealDayOfWeek));
+    $(weeklyRecurrenceButton.Dom).click(createDomEnablingFunction(AllDoms[1], 1, RecurrenceTabContent, DaysOfTheWeekContainer, DaysOfTheWeek.RevealDayOfWeek));
+    $(monthlyRecurrenceButton.Dom).click(createDomEnablingFunction(AllDoms[2], 2, RecurrenceTabContent, DaysOfTheWeekContainer, DaysOfTheWeek.RevealDayOfWeek));
+    $(yearlyRecurrenceButton.Dom).click(createDomEnablingFunction(AllDoms[3], 3, RecurrenceTabContent, DaysOfTheWeekContainer, DaysOfTheWeek.RevealDayOfWeek));
+
+
+
+
+
+
+    /*RecurrenceButtonContainer.Dom.appendChild(dailyRecurrenceButton.Dom);
+    RecurrenceButtonContainer.Dom.appendChild(weeklyRecurrenceButton.Dom);
+    RecurrenceButtonContainer.Dom.appendChild(monthlyRecurrenceButton.Dom);
+    RecurrenceButtonContainer.Dom.appendChild(yearlyRecurrenceButton.Dom);*/
+    /*Recurrence Button End*/
+
+
+
+    /*Recurrence Day Preference Container Start*/
+    var DayPreferenceContainerID = "DayPreferenceContainer";
+    var DayPreferenceContainer = getDomOrCreateNew(DayPreferenceContainerID);
+
+    var BussinessHourContainerID = "BussinessHourInputContainer";
+    var BussinessHourInputContainer = getDomOrCreateNew(BussinessHourContainerID);
+    $(BussinessHourInputContainer.Dom).addClass(CurrentTheme.FontColor);
+    $(BussinessHourInputContainer.Dom).addClass("DayPreferenceRadioButtonContainer")
+
+    var BussinessHourRadioID = "BussinessHourRadio";
+    var BussinessHourRadio = getDomOrCreateNew(BussinessHourRadioID, "input");
+    BussinessHourRadio.Dom.setAttribute("type", "radio");
+    BussinessHourRadio.Dom.setAttribute("value", "0");
+    BussinessHourRadio.Dom.setAttribute("name", "DayPreference");
+    var BussinessHourRadioLabelID = "BussinessHourRadioLabel"
+    var BussinessHourRadioLabel = getDomOrCreateNew(BussinessHourRadioLabelID, "label");
+    BussinessHourRadioLabel.Dom.setAttribute("for", "BussinessHourRadio");
+    BussinessHourRadioLabel.Dom.innerHTML = "Business Hours";
+
+
+    BussinessHourInputContainer.Dom.appendChild(BussinessHourRadio.Dom)
+    BussinessHourInputContainer.Dom.appendChild(BussinessHourRadioLabel.Dom)
+
+
+    var AnyHourTimeContainerID = "AnyHourTimeContainer";
+    var AnyHourTimeContainer = getDomOrCreateNew(AnyHourTimeContainerID);
+    $(AnyHourTimeContainer.Dom).addClass(CurrentTheme.FontColor);
+    $(AnyHourTimeContainer.Dom).addClass("DayPreferenceRadioButtonContainer")
+    var AnytimeID = "AnyHourTimeRadio";
+    var Anytime = getDomOrCreateNew(AnytimeID, "input");
+    Anytime.Dom.setAttribute("type", "radio");
+    Anytime.Dom.setAttribute("value", "1");
+    Anytime.Dom.setAttribute("name", "DayPreference");
+    var AnytimeLabelID = "AnytimeLabel"
+    var AnytimeLabel = getDomOrCreateNew(AnytimeLabelID, "label");
+    AnytimeLabel.Dom.setAttribute("for", "AnyHourTimeRadio");
+    AnytimeLabel.Dom.innerHTML = "AnyTime";
+
+    AnyHourTimeContainer.Dom.appendChild(Anytime.Dom)
+    AnyHourTimeContainer.Dom.appendChild(AnytimeLabel.Dom)
+
+    var CustomHourTimeContainerID = "CustomHourTimeContainer";
+    var CustomHourTimeContainer = getDomOrCreateNew(CustomHourTimeContainerID);
+    $(CustomHourTimeContainer.Dom).addClass(CurrentTheme.FontColor);
+    $(CustomHourTimeContainer.Dom).addClass("DayPreferenceRadioButtonContainer")
+    var CustomtimeID = "CustomHourTimeRadio";
+    var Customtime = getDomOrCreateNew(CustomtimeID, "input");
+    Customtime.Dom.setAttribute("type", "radio");
+    Customtime.Dom.setAttribute("value", "1");
+    Customtime.Dom.setAttribute("name", "DayPreference");
+    var CustomtimeLabelID = "CustomtimeLabel"
+    var CustomtimeLabel = getDomOrCreateNew(CustomtimeLabelID, "label");
+    CustomtimeLabel.Dom.setAttribute("for", "CustomHourTimeRadio");
+    CustomtimeLabel.Dom.innerHTML = "CustomTime";
+    $(CustomtimeLabel.Dom).addClass("DayPreferenceLabel");
+
+    CustomHourTimeContainer.Dom.appendChild(Customtime.Dom)
+    CustomHourTimeContainer.Dom.appendChild(CustomtimeLabel.Dom)
+
+
+    DayPreferenceContainer.Dom.appendChild(BussinessHourInputContainer.Dom)
+
+    DayPreferenceContainer.Dom.appendChild(AnyHourTimeContainer.Dom)
+
+    DayPreferenceContainer.Dom.appendChild(CustomHourTimeContainer.Dom)
+
+    /*Repeat event container Start*/
+    var RepetitionRangeCOntainerID = "RepetitionRangeContainer";
+    var RepetitionRangeCOntainer = getDomOrCreateNew(RepetitionRangeCOntainerID);
+    $(RepetitionRangeCOntainer.Dom).addClass(CurrentTheme.FontColor);
+    var RepetitionRangeContainerStartContainerID = "RepetitionRangeContainerStartContainer";
+    var RepetitionRangeContainerStartContainer = getDomOrCreateNew(RepetitionRangeContainerStartContainerID);
+    var RepetitionRangeContainerStartContainerLabelID = "RepetitionRangeContainerStartContainerLabel";
+    var RepetitionRangeContainerStartContainerLabel = getDomOrCreateNew(RepetitionRangeContainerStartContainerLabelID);
+    RepetitionRangeContainerStartContainerLabel.Dom.innerHTML = "Repeat Start:";
+    $(RepetitionRangeContainerStartContainerLabel.Dom).addClass("DateInputLabel");
+    var RepetitionRangeContainerStartInputID = "RepetitionRangeContainerStartInput";
+    var RepetitionRangeContainerStartInput = getDomOrCreateNew(RepetitionRangeContainerStartInputID, "input");
+    $(RepetitionRangeContainerStartContainer.Dom).append(RepetitionRangeContainerStartContainerLabel.Dom);
+    $(RepetitionRangeContainerStartContainer.Dom).append(RepetitionRangeContainerStartInput.Dom);
+    $(RepetitionRangeContainerStartInput.Dom).addClass("DateInputData");
+    //$(RepetitionRangeContainerStartInput.Dom).datepicker();
+    EventRepeatStart = RepetitionRangeContainerStartInput;
+
+    //RepetitionRangeCOntainer.Dom.appendChild(RepetitionRangeContainerStartContainer.Dom);
+
+
+    var RepetitionRangeContainerEndContainerID = "RepetitionRangeContainerEndContainer";
+    var RepetitionRangeContainerEndContainer = getDomOrCreateNew(RepetitionRangeContainerEndContainerID);
+    var RepetitionRangeContainerEndContainerLabelID = "RepetitionRangeContainerEndContainerLabel";
+    var RepetitionRangeContainerEndContainerLabel = getDomOrCreateNew(RepetitionRangeContainerEndContainerLabelID,"label");
+    RepetitionRangeContainerEndContainerLabel.Dom.innerHTML = "Repeat End:";
+    $(RepetitionRangeContainerEndContainerLabel.Dom).addClass("DateInputLabel");
+
+    var RepetitionRangeContainerEndInputID = "RepetitionRangeContainerEndInput";
+    var RepetitionRangeContainerEndInput = getDomOrCreateNew(RepetitionRangeContainerEndInputID, "input");
+
+
+    $(RepetitionRangeContainerEndContainer.Dom).append(RepetitionRangeContainerEndContainerLabel.Dom);
+    $(RepetitionRangeContainerEndContainer.Dom).append(RepetitionRangeContainerEndInput.Dom);
+    $(RepetitionRangeContainerEndInput.Dom).addClass("DateInputData");
+    //$(RepetitionRangeContainerEndInput.Dom).datepicker();
+    EventRepeatEnd = RepetitionRangeContainerEndInput;
+    BindDatePicker(RepetitionRangeContainerEndInput);
+    RepetitionRangeContainerEndInput.onkeyup = (function (e) { e.stopPropagation;})
+
+    RepetitionRangeCOntainer.Dom.appendChild(RepetitionRangeContainerEndContainer.Dom);
+
+    /*Repeat event container End*/
+
+    var RecurrenceSectionCompletionID = "RecurrenceSectionCompletion";
+    var RecurrenceSectionCompletion = getDomOrCreateNew(RecurrenceSectionCompletionID);
+    $(RecurrenceSectionCompletion.Dom).addClass("SectionCompletionButton");
+    $(RecurrenceSectionCompletion.Dom).addClass(CurrentTheme.AlternateContentSection);
+
+
+
+    /*Recurrence Day Preference Container End*/
+    EnabledRecurrenceContainer.Dom.appendChild(RecurrenceButtonContainer.Dom)
+    EnabledRecurrenceContainer.Dom.appendChild(DaysOfTheWeekContainer.Dom);
+    //EnabledRecurrenceContainer.Dom.appendChild(DayPreferenceContainer.Dom)
+    EnabledRecurrenceContainer.Dom.appendChild(RepetitionRangeCOntainer.Dom);
+
+    RecurrenceTabContent.Dom.appendChild(EnabledRecurrenceContainer.Dom)
+    RecurrenceTabContent.Dom.appendChild(RecurrenceSectionCompletion.Dom);
+    createDomEnablingFunction(AllDoms[3], 3, RecurrenceTabContent, DaysOfTheWeekContainer, DaysOfTheWeek.RevealDayOfWeek)();//defaults call to yearly
+
+
+    function generateDayOfWeekRepetitionDom() {
+        var i = 0;
+        var AllDoms = new Array();
+        for (i = 0; i < WeekDays.length; i++) {
+            AllDoms.push(createDoms(WeekDays[i], i));
+        }
+
+        var retValue = { AllDoms: AllDoms, RevealDayOfWeek: createRevealFunction(AllDoms) };
+
+        function createDoms(DayOfWeek, index) {
+            var DayDomID = DayOfWeek + "Recurrence";
+            var DayDom = getDomOrCreateNew(DayDomID, "span");
+
+            //DayDom.Dom.innerHTML = "<p class=\"DayOfWeekLetter\">" + DayOfWeek[0] + "</p>";
+            DayDom.Dom.innerHTML = DayOfWeek[0];
+            DayDom.DayOfWeekIndex = index;
+            DayDom.Dom.style.left = ((index * 14.29) + (14.29 / 2)) + "%";
+            DayDom.setAttribute('tabindex', 0)
+            DayDom.onkeypress = keyEntry
+            $(DayDom.Dom).addClass("DayofWeekCircle");
+            DayDom.status = 0;
+            $(DayDom.Dom).click(generateFunctionForSelectedDayofWeek(DayDom));
+            generateFunctionForSelectedDayofWeek(DayDom);
+            function generateFunctionForSelectedDayofWeek(DayDom) {
+                return function () {
+                    DayDom.status += 1;
+                    DayDom.status %= 2;
+                    switch (DayDom.status) {
+                        case 0:
+                            {
+                                $(DayDom.Dom).removeClass("SelectedDayOfWeek");
+                                $(DayDom.Dom).addClass("deSelectedDayOfWeek");
+                            }
+                            break;
+                        case 1:
+                            {
+                                $(DayDom.Dom).removeClass("deSelectedDayOfWeek");
+                                $(DayDom.Dom).addClass("SelectedDayOfWeek");
+                            }
+                            break;
+                    }
+                }
+            }
+
+
+            function keyEntry(e)
+            {
+                if (e.which == 32) {
+                    $(e.target).trigger("click");
+                    return;
+                }
+            }
+            return DayDom;
+        }
+
+
+        function createRevealFunction(AllDoms) {//creates function that slowly displays the day of the week circles
+            return function () {
+                var i = 0;
+                AllDoms.forEach(function (myDom) {
+                    setTimeout(function () { myDom.Dom.style.opacity = 1; myDom.Dom.style.top = "0px"; }, i * 200);
+                }
+                )
+            }
+        }
+
+        return retValue;
+    }
+
+
+
+    
+
+
+
+    
+    function LaunchTab(MiscData) {
+        //var CurrentRange = MiscData[0].Content.getCurrentRangeOfAutoContainer();
+        var i = 0;
+        var NumbeOfValids = new Array();
+        for (i; i < AllDoms.length; i++) {
+            //if (CurrentRange < AllDoms[i].Range)
+            {
+                RecurrenceButtonContainer.Dom.appendChild(AllDoms[i].Dom)
+                NumbeOfValids.push(AllDoms[i]);
+            }
+        }
+
+        var PercentageWidth = parseInt(100 / NumbeOfValids.length);
+
+        for (i = 0; i < NumbeOfValids.length; i++)//takes advantage of order of AllDOms. Its arranged from smallest range to bigger
+        {
+            /*NumbeOfValids[i].Dom.style.width = (PercentageWidth - 1) + "%";
+            NumbeOfValids[i].Dom.style.left = (i * PercentageWidth) + "%";*/
+        }
+
+        /*$(RecurrenceTabContent.Dom).addClass(CurrentTheme.ActiveTabContent);
+        $(RecurrenceTabTitle.Dom).removeClass(CurrentTheme.AlternateFontColor);
+        $(RecurrenceTabTitle.Dom).addClass(CurrentTheme.FontColor);
+        $(RecurrenceTabTitle.Dom).addClass(CurrentTheme.ContentSection);
+
+        $(RecurrenceTabTitle.Dom).removeClass(CurrentTheme.InActiveTabTitle);
+        $(RecurrenceTabTitle.Dom).addClass(CurrentTheme.ActiveTabTitle);*/
+    }
+    
+    LaunchTab();
+
+    var retValue =
+    {
+        Content: RecurrenceTabContent, Completion: RecurrenceSectionCompletion, RepetitionStatus: EventrepeatStatus, RepetitionSelection: EventRepetitionSelection, RepetitionStart: EventRepeatStart, RepeatEnd: EventRepeatEnd
+    };
+
+    return retValue;
 }

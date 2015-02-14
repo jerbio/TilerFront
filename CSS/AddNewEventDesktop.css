@@ -12,6 +12,7 @@ p { margin: 0}
   left:0;
   top: 0;
   padding: 20px 0 0 20px;
+  overflow:auto;
 }
 
 #AddNewEventContainer input {
@@ -299,12 +300,14 @@ input:focus:-ms-input-placeholder { color:rgba(0,0,0, 0.2); }
 
 .ModalTileContainer label { 
   color: #C2C1C1;
-  margin-right: 12px; }
+  //margin-right: 12px;
+
+}
 .ModalTileContainer input { 
   font-family: 'texbold';
   font-size: 20px;
   padding-left: 5px;
-  margin-right: 15px;
+  //margin-right: 15px;
   width: auto;
   max-width: 100%;
   border: none; }
@@ -434,4 +437,89 @@ input:focus:-ms-input-placeholder { color:rgba(0,0,0, 0.2); }
     width: 100%;
 }
 
+#EnableRecurrenceLabel {
+    display:inline-block;
+}
 
+#EnableRecurrenceButton {
+    display:inline-block;
+}
+
+#EnabledRecurrenceContainer 
+{
+    top:10%;
+    left:10%;
+    width:80%;
+    height:90%;
+}
+
+
+.recurrenceButton {
+    position:relative;
+    //width:40px;
+    display:inline-block;
+    margin: 10px;
+    padding: 10px;
+}
+
+.DayOfWeekLetter
+{
+    display: table-cell; 
+    vertical-align: middle; 
+    text-align: center; 
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+.DayofWeekCircle
+{
+    width:48px;
+    height:48px;
+    margin:5px;
+    border-radius:28px;
+    border: 1px solid rgb(127,127,127);
+    font-family: 'Muli', sans-serif;
+    font-size:1em;
+    opacity:0;
+    transition:opacity 1s box-shadow .7s;
+    //position:absolute;
+    text-align:center;
+    display:inline-block;
+    top:28px;
+    box-sizing:border-box;
+    line-height: 48px;
+    cursor: pointer;
+}
+
+.SelectedDayOfWeek /*media*/
+{
+    box-shadow: yellow 0px 0px 3px 3px;
+}
+
+.deSelectedDayOfWeek 
+{
+    box-shadow: none;
+}
+
+.ActiveRecurrenceButton
+{
+    background-color:yellow;
+    //color:rgba(50,50,50,1);
+}
+
+.InActiveRecurrenceButton
+{
+    background-color:transparent;
+    //color:rgba(217,217,217,1);
+}
+
+#RecurrenceTabContent {
+    margin:40px;
+
+}
+
+.EmptyTileInput 
+{
+    width:10px;
+    background-color:rgba(10,10,10,.1);
+}

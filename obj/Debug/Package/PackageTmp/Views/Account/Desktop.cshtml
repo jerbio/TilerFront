@@ -10,9 +10,16 @@
 <body>
     <div id="Header">
         <span class="TilerLogo"></span>
-        <div id="AddEventButton" class="ControlPanelButton"></div>
+        <div class="RightHeaderElement" id="RightHeaderElement">
+            <div id="SearchBar">
+                <input id="SearchBarInput">
+                <div class="ControlPanelButton" id="ControlPanelSearchButton"></div>
+            </div>
+            <div class="ControlPanelButton" id="AddEventButton"></div>
+
+        </div>
     </div>
-    <div id="SearchBarAndContentContainer"><input id="SearchBar"><span class="ControlPanelButton" id="ControlPanelSearchButton"></span></div>
+    <div id="SearchBarAndContentContainer"></div>
     <div id="MonthBar"></div>
     <div id="AddEventPanel"></div>
     <div id="FullWeekContainer"> </div>
@@ -64,23 +71,19 @@
                 <div class="InfoControlPanel" id="ControlPanelDeadlineOfSubeventInfo"></div>
             </div>
         </div>
-        <!--<div class="IconSetContainer">
-            <div class="ControlPanelButton ControlPanelLocationButton" ></div>
-            <div class="ControlPanelButton ControlPanelProcrastinateButton" ></div>
-            <div class="ControlPanelButton ControlPanelDeleteButton" ></div>
-            <div class="ControlPanelButton ControlPanelCompleteButton"></div>
-            <div class="ControlPanelButton ControlPanelCloseButton"></div>
-        </div>-->
         <div id="ProcrastinateEventModal" tabindex="1">
-            Procrastinate this by
-            <div>
-                <span>H</span>
-                <input id="procrastinateHours" type="number">
-                <span>M</span>
-                <input id="procrastinateMins" type="number">
-                <span>D</span>
-                <input id="procrastinateDays" type="number">
-                <input id="submitProcatination" type="submit">
+            <div id="ProcrastinateEventInputContainer">
+                <div id="ProcrastinateHeading">Procrastinate this by</div>
+                <div id="ProcrastinateInputAndSubmit">
+                    <input maxlength="2" id="procrastinateHours" autofocus type="text">
+
+                    <span>H</span>
+                    <input maxlength="2" id="procrastinateMins" type="text">
+                    <span>M</span>
+                    <input maxlength="2" id="procrastinateDays" type="text">
+                    <span>D</span>
+                    <button id="submitProcatination" class="SubmitButton">Push It</button>
+                </div>
             </div>
         </div>
         <div id="ConfirmDeleteModal">
@@ -93,8 +96,7 @@
         <div class='hideMultiSelectPanel' id="MultiSelectPanel"></div>
     </div>
     <div id="LoadingScreenPanel"></div>
-</body>
-</html>
+</body></html>
 
 
 

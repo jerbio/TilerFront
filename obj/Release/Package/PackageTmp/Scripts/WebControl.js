@@ -1,7 +1,7 @@
 ﻿"use strict"
 
 
-var Debug = false;
+var Debug = true;
 var DebugLocal = false;
 
 //var global_refTIlerUrl = "http://localhost:53201/api/";
@@ -109,10 +109,10 @@ function GetCookieValue()//verifies that user has cookies
     {
         if (Debug)
             {
-        ///*
+        /*
             CookieValue = { UserName: "jerbio", UserID: "d350ba4d-fe0b-445c-bed6-b6411c2156b3" }
         //*/
-        /*
+        ///*
         CookieValue = {};
         CookieValue.UserName = "jackostalk";
         CookieValue.UserID = "9c255a35-098c-417a-9a3a-c8b9e59b7f10";

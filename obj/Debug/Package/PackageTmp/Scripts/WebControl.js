@@ -233,7 +233,7 @@ function getHomePageDomContainer()
 
 
 /*
-*Utility functions Start
+*Function generates a desired HTML element. The default it a Div. First arguement is the desited ID, returns Null if an ID is not provided. Second arguement is desired DOM type e.g span, label, button etc
 
 */
 function getDomOrCreateNew(DomID, DomType)
@@ -1864,6 +1864,8 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
             ColorContainer.data = myClass;
             $(ColorContainer.Selector.myColor).addClass(myClass.cssClass);
             $(ColorContainer.Selector.Container).addClass(ColorPicker);
+            ColorContainer.Selector.Container.setAttribute('tabindex', 0)
+            ColorContainer.Selector.Container.onkeypress = keyEntry
             AllColors.push(ColorContainer);
             ColorContainer.Selector.Container.style.left = (Left * 33) + "%";
             ColorContainer.Selector.Container.style.top = (Top * 33) + "%";
@@ -1876,6 +1878,15 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
         }
 
         $(AllColors[0].Selector.Container).trigger("click");
+
+        function keyEntry(e)
+        {
+            if (e.which == 32)
+            {
+                $(e.target).trigger("click");
+                return;
+            }
+        }
 
         function genMoveOuterOrb(j) {
             return function () {

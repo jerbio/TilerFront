@@ -15,20 +15,38 @@
     background-color: #fff;
 }
 
-#SearchBar
+#RightHeaderElement 
 {
     position:absolute;
     top: 29px;
-    //padding:40px 0px;
-    width:40%;
+    width: 30%;
     right: 94px;
     height:40px;
+}
+
+
+#SearchBar 
+{
+    
+   width: 75%;
+    padding-bottom: 3px;
+    z-index: 11;
+    position: absolute;
+    height: 100%;
+    left: 20%;
+
+}
+
+#SearchBarInput
+{
+    font-size: 24px;
+    height:100%;
+    outline: none;
+    width:100%;
     border: 0;
     border-bottom: 1px solid black;
-    padding-bottom: 3px;
-    outline: none;
     font-family: 'texbold', Helvetica, sans-serif;
-    font-size: 24px;
+    position:absolute;
 }
 #TopPanelContainer {
   margin-top: 12%;
