@@ -86,11 +86,9 @@ p { margin: 0}
   -o-transition: all .2s ease-in-out;
   -moz-transition: all .2s ease-in-out;
   transition: all .2s ease-in-out;
-  margin-left: 19px;
   cursor: pointer;
-  margin-top: -8px;
-  margin-left: 95px;
 }
+#SubmitButtonContainer { margin-left: 95px; margin-top: -8px; }
 .SubmitButton:focus,
   .SubmitButton:hover {
   border: 1px transparent solid;
@@ -188,22 +186,18 @@ input:focus:-ms-input-placeholder { color:rgba(0,0,0, 0.2); }
 
 #AddModalDom {
     position:absolute;
-    height:150px;
-    width:450px;
-    background-color: #efefef;
+    height: 90px;
+    width: 370px;
+    background-color: #fff;
+    border: 1px solid #eee;
     z-index:1000;
+    -webkit-box-shadow: 10px 10px 30px 0px rgba(128,128,128,1);
+    -moz-box-shadow: 10px 10px 30px 0px rgba(128,128,128,1);
+    box-shadow: 10px 10px 30px 0px rgba(128,128,128,1);
 }
-
-.ModalButton 
-{
-    position:absolute;
-    top:5%;
-    width:40%;
-    height:40%;
-}
-
+#AddModalDom button { margin: 15px }
+#AddModalDom:focus { outline: none; }
 #AddTileDom { left:5%; }
-
 #AddEventDom { left:55%; }
 
 .labelAndInputContainer 

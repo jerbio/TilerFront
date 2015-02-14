@@ -161,12 +161,12 @@ function generateModal(x, y, height, width,WeekStart, RenderPlane,UseCurrentTime
     var weekDayWidth = $($(".DayContainer")[0]).width();
     var AddTile = getDomOrCreateNew("AddTileDom", "button");
     var AddEvent = getDomOrCreateNew("AddEventDom", "button");
-    AddEvent.Dom.innerHTML=("Add New Event");
-    AddTile.Dom.innerHTML=("Add New Tile");
+    AddEvent.Dom.innerHTML=("New Event");
+    AddTile.Dom.innerHTML=("New Tile");
     modalAddDom.Dom.appendChild(AddEvent.Dom);
     modalAddDom.Dom.appendChild(AddTile.Dom);
-    $(AddTile.Dom).addClass("ModalButton");
-    $(AddEvent.Dom).addClass("ModalButton");
+    $(AddTile.Dom).addClass("SubmitButton");
+    $(AddEvent.Dom).addClass("SubmitButton");
 
     modalAddDom.Dom.style.left = x + "px";
     modalAddDom.Dom.style.top = y + "px";
@@ -1674,6 +1674,7 @@ function generateSubmitButton()
     var SubmitButtonContainer = getDomOrCreateNew("SubmitButtonContainer");
     var SubmitButton = getDomOrCreateNew("SubmitButton", "Button");
     SubmitButton.Dom.innerHTML = "Add New Event";
+    $(SubmitButton.Dom).addClass('SubmitButton');
     SubmitButtonContainer.Dom.appendChild(SubmitButton.Dom);
     SubmitButtonContainer.Selector = { Container: SubmitButtonContainer.Dom, Button: SubmitButton };
     return SubmitButtonContainer;
