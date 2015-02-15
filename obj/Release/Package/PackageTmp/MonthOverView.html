@@ -41,9 +41,14 @@
   <body>
     <div id="Header">
         <span class="TilerLogo"></span>
-        <div id="AddEventButton" class="ControlPanelButton"></div>
-        <input id="SearchBar">
-        <div class="ControlPanelButton" id="ControlPanelSearchButton"></div>
+        <div class="RightHeaderElement" id="RightHeaderElement" >
+            <div id="SearchBar">
+                <input id="SearchBarInput">
+                <div class="ControlPanelButton" id="ControlPanelSearchButton"></div>
+            </div>
+            <div class="ControlPanelButton" id="AddEventButton"></div>
+                
+            </div>
     </div>
     <div id="SearchBarAndContentContainer"></div>
     <div id="MonthBar"></div>
@@ -97,13 +102,6 @@
           <div class="InfoControlPanel" id="ControlPanelDeadlineOfSubeventInfo"></div>
         </div>
       </div>
-        <!--<div class="IconSetContainer">
-            <div class="ControlPanelButton ControlPanelLocationButton" ></div>
-            <div class="ControlPanelButton ControlPanelProcrastinateButton" ></div>
-            <div class="ControlPanelButton ControlPanelDeleteButton" ></div>
-            <div class="ControlPanelButton ControlPanelCompleteButton"></div>
-            <div class="ControlPanelButton ControlPanelCloseButton"></div>
-        </div>-->
         <div id="ProcrastinateEventModal" tabindex="1">
           <div id="ProcrastinateEventInputContainer">
             <div id="ProcrastinateHeading">Procrastinate this by</div>

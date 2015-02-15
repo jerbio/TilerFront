@@ -339,15 +339,25 @@ body {
 }
 
 #Header .ControlPanelButton {
-  top: calc((12.5% - 45px)/2);
+  /*top: calc((12.5% - 45px)/2);
   -webkit-top: calc((12.5% - 45px)/2);
   -moz-top: calc((12.5% - 45px)/2);
-  position: fixed;
+  position: fixed;*/
 }
-#Header #AddEventButton { background-position: -135px 0; right: 30px; }
+#Header #AddEventButton 
+{ 
+    background-position: -135px 0;
+    left: 100%;
+    position: absolute; 
+}
 #Header #AddEventButton:hover { background-position: -135px -45px; }
 
-#Header #ControlPanelSearchButton { right: 95px; }
+#Header #ControlPanelSearchButton 
+{ 
+    left: 100%;
+    position: absolute;
+    margin: 0 -45px; 
+}
 
 
 .ControlPanelCloseButton {background-position: -315px 0px;}

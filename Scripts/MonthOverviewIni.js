@@ -1084,7 +1084,7 @@ getRefreshedData.enableDataRefresh = function (pullLatest)
                 ListElementDataContentContainer.Dom.appendChild(TimeDataPerListElement.Dom);
                 ListElementDataContentContainer.Dom.appendChild(NameDataPerListElement.Dom);
                 global_DictionaryOfSubEvents[ID].gridDoms.push(ListElementDataContentContainer.Dom)
-
+                
 
                 var EventLockContainer = getDomOrCreateNew("EventLockContainer" + ID);
                 $(EventLockContainer.Dom).addClass("EventLockContainer");
@@ -1102,7 +1102,7 @@ getRefreshedData.enableDataRefresh = function (pullLatest)
                 ListElementContainer.Dom.appendChild(ListElementDataContentContainer.Dom);
                 ListElementContainer.Dom.appendChild(EventLockContainer.Dom);
                 DayOfWeek.UISpecs[ID].DataElement=ListElementDataContentContainer
-
+                global_DictionaryOfSubEvents[ID].ListRefElement = ListElementContainer;
 
 
                 IntersectingArrayData.push({ Start: DayOfWeek.UISpecs[ID].Start, Data: DayOfWeek.UISpecs[ID], ID: ID, Count: 0, top: TopPixels,refSubEvent:ListElementContainer })
@@ -1196,24 +1196,28 @@ getRefreshedData.enableDataRefresh = function (pullLatest)
 
     function PositionIconSet(DayContainer, SubEventDom)
     {
+        //debugger;
+        DayContainer = DayContainer.Parent;
         var IconSetContainer = global_ControlPanelIconSet.getIconSetContainer();
         var documentWidth = $(document).width();
         var buffer = 40;
         var widthOfIconSet = $(IconSetContainer).width()
         var heightOfIconSet = $(IconSetContainer).height()
         var widthOfDayContainer = $(DayContainer).width();
-        var leftOfDayContainer = $(DayContainer).offset().left;
-        var RightBorder = leftOfDayContainer + widthOfDayContainer + widthOfIconSet;
-        
+        var widthOfListSubEvent = $(SubEventDom).width();
+        var leftOfDayContainer = $(SubEventDom).offset().left;
+        var RightBorder = leftOfDayContainer + widthOfListSubEvent + widthOfIconSet;
+        var topOfSubEvent = $(SubEventDom).offset().top;
         var LeftOffset=0
         if (RightBorder > documentWidth) {
-            LeftOffset = leftOfDayContainer - widthOfIconSet - buffer
+            LeftOffset = leftOfDayContainer - widthOfIconSet// - buffer
         }
         else
         {
-            LeftOffset = leftOfDayContainer + widthOfDayContainer + 40;
+            LeftOffset = leftOfDayContainer + widthOfListSubEvent + buffer;
         }
-
+        IconSetContainer.style.top = topOfSubEvent + "px";
+        IconSetContainer.style.left = LeftOffset + "px";
 
     }
 
@@ -1412,6 +1416,10 @@ function renderSubEventsClickEvents(SubEventID)
 {
     global_DictionaryOfSubEvents[SubEventID].Bind();
     global_DictionaryOfSubEvents[SubEventID].showBottomPanel();
+
+    var DayContainer=global_DictionaryOfSubEvents[SubEventID].Day
+    var refSubEvent = global_DictionaryOfSubEvents[SubEventID].ListRefElement
+    PositionIconSet(DayContainer, refSubEvent)
 }
 renderSubEventsClickEvents.BottomPanelIsOpen = false;
 

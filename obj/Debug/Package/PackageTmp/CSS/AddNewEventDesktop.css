@@ -521,5 +521,5 @@ input:focus:-ms-input-placeholder { color:rgba(0,0,0, 0.2); }
 .EmptyTileInput 
 {
     width:10px;
-    background-color:gray;
+    background-color:rgba(10,10,10,.1);
 }
