@@ -83,11 +83,10 @@ body {
 {
   position:absolute;
   width:14.3%;
-  height: 100%;
   overflow:hidden;
-  height: 120% !important;
+  height: 116.279069767% !important;
   overflow: hidden;
-  top: -20%;
+  top: -16.6666666667%;
 }
 
 .SundayDayContainer
@@ -176,7 +175,7 @@ body {
 {
   position:absolute;
   top: 14%;
-  height:90%;
+  height:86%;
   width:100%;
 }
 
@@ -243,14 +242,13 @@ body {
 }
 
 .renderPlane {
-  position:absolute;
-  left:0;
-  top:14.5%;
-  width:100%;
-  height:83%;
-  border-bottom: 1px solid black;
-  padding-bottom: 2px;
-  //background-color:rgba(20,255,20,.3);
+    position: absolute;
+    left: 0;
+    top: 14%;
+    width: 100%;
+    height: 86%;
+    padding: 2px;
+    box-sizing: border-box;
 }
 
 /*Conrol panel Container*/
@@ -409,38 +407,44 @@ body {
   position:absolute;
   height: 100%;
   width:100%;
-  top:10%;
-  height:90%;
+}
+
+
+.DayOfTime 
+{
+    position:absolute;
+    top:14%;
+    width: 8%;
+    max-width:49px;
+    height:calc(86% - 16px);
+    font-family: 'texreg', Helvetica, sans-serif;
+    font-variant: small-caps;
+    font-size: .6em;
 }
 
 #leftDayOfTime {
-  display: none;
-  position:absolute;
-  top:10%;
   text-align:right;
-  width:10%;
-  height:100%;
   overflow-x: visible;
   overflow-y:hidden;
-  box-shadow: 10px 0px 25px rgb(136, 136, 136);
+  box-shadow: 2px 0px 2px rgb(136, 136, 136);
+  
 }
 
 #rightDayOfTime {
-  position:absolute;
-  display: none;
-  top:10%;
-  left:90%;
-  width:10%;
+  left:100%;
   text-align:left;
-  height:100%;
   overflow-x: visible;
   overflow-y:hidden;
-  box-shadow: -10px 0px 25px rgb(136, 136, 136);
+  box-shadow: -2px 0px 2px rgb(136, 136, 136);
+  transform:translateX(-100%);
+  
 }
 .TimeOfDay 
 {
     height:4.1667%;
-    width:100%;
+    width:calc(100% - 4px);
+    margin:0 2px 0 2px;
+
 }
 
 .weekContainer 
@@ -516,13 +520,14 @@ body {
 
 .MonthButton 
 {
-    width:3em;
+    width: 3em;
     left: 20px;
-    height:1em;
-    top:50%;
-    margin:0 auto;
-    margin-top:-.8em;
-    position:absolute;
+    height: 100%;
+    top: 50%;
+    /* margin: 0 auto; */
+    margin-top: -1.5em;
+    position: absolute;
+    cursor:pointer;
 }
 
 .MonthBarDay 
@@ -546,6 +551,7 @@ body {
 }
 
 #AllDayContainer {
+    /*
     position:absolute;
     left:4em;
     width:90%;
@@ -553,8 +559,113 @@ body {
     //top:50%;
     //margin:0 auto;
     //margin-top:-.8em;
+    text-align:center;*/
+}
+
+#MonthArrayContainer {
+    position:absolute;
+    left:4em;
+    width:90%;
+    height:100%;
     text-align:center;
-    
+}
+.MultipleBarSelectionContainer
+{
+    //display:none;
+}
+
+#AllMonthsContainer {
+    height:50%;
+    width:100%;
+    position:absolute;
+    overflow:hidden;
+    background:inherit;
+}
+
+#MonthSelected 
+{
+    position:absolute;
+    width:8.33333%;
+}
+
+#AllYearContainer {
+    position:absolute;
+    height:50%;
+    top:50%;
+    width:100%;
+    background:inherit;
+}
+
+.YearBarDom {
+    width:14.2857142857%;
+    height:100%;
+    text-align:center;
+    display:inline-block;
+}
+#YearDomContainer {
+    position:absolute;
+    width:128.5714285714%;
+    height:100%;
+    left:-14.28%;
+}
+
+.MonthBar 
+{
+    position:absolute;
+    width:8.33333%;
+    height:100%;
+    cursor:pointer;
+}
+
+
+.MonthSelected {
+    background:yellow;//rgba(20,50,45,.2);
+    border:solid rgb(250,250,250) 1px;
+    box-sizing:border-box;
+}
+
+.YearSelected
+{
+    //position:absolute;
+    background: yellow;//rgba(20,50,45,.2);
+    border:solid rgb(250,250,250) 1px;
+    box-sizing:border-box;
+}
+
+
+.yearScrollButton 
+{
+    position:absolute;
+    width:5%;
+    height:100%;
+    background:gray;
+}
+
+#RightYearScrollButoon {
+    left:100%;
+    transform:translateX(-100%);
+}
+
+.innerArrow {
+    border:white solid 3px;
+    background:transparent;
+    border-top:none;
+    border-left:none;
+    position: absolute;
+    height: 18px;
+    width: 18px;
+    top: 8px;
+    left: 24px;
+}
+
+#RightInnerArrow
+{
+    transform: rotate(-45deg);
+}
+
+#LeftInnerArrow
+{
+    transform: rotate(135deg);
 }
 
 .MonthBarDayWeekContainer {
@@ -569,6 +680,7 @@ body {
 .MonthBarDayWeekContainer:hover .MonthBarDay {
   color: #cccccc;
 }
+
 
 .ColorAugmentation 
 {
@@ -654,7 +766,9 @@ width: 100%;
   border-top: #000 1px solid;
   border-bottom: #000 1px solid;
   right: 0;
-  top: 30.5%;
+  height:86%;
+  top: 14%;
+  display:none;
 }
 #TimeBar ul {
   list-style: none;

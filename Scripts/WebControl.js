@@ -1,7 +1,7 @@
 ﻿"use strict"
 
 
-var Debug = false;
+var Debug = true;
 var DebugLocal = false;
 
 //var global_refTIlerUrl = "http://localhost:53201/api/";
@@ -56,7 +56,7 @@ var purpleClass = { cssClass: "purpleOrb", r: 255, g: 0, b: 255, a: 1, Selection
 var ldonBoysClass = { cssClass: "ldonBoysOrb", r: 255, g: 103, b: 61, a: 1, Selection: 8 };
 
 var global_AllColorClasses = [defaultColorClass, oriClass, storyClass, redClass, greenClass, purpleClass, SkeleClass, mariClass, ldonBoysClass]
-
+var global_ExitManager = new OutOfFocusManager();
 Date.prototype.stdTimezoneOffset = function () {
     var jan = new Date(this.getFullYear(), 0, 1);
     var jul = new Date(this.getFullYear(), 6, 1);
@@ -229,6 +229,63 @@ function getNewDividerDom() {
 function getHomePageDomContainer()
 {
     return getDomOrCreateNew("HomePageContainer");
+}
+
+function getNextMont(now)
+{
+    now = new Date(now.getFullYear(), now.getMonth(), 1);
+    var retValue 
+    if (now.getMonth() == 11) {
+        retValue = new Date(now.getFullYear() + 1, 0, 1);
+    } else {
+        retValue = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+    }
+    return retValue;
+}
+
+function OutOfFocusManager()
+{
+    var AllCallBackFunc = [];
+    var CurrIndex = -1;
+    function triggerLastExit()
+    {
+        if (CurrIndex >= 0)
+        {
+            if (!AllCallBackFunc[CurrIndex].isNotExitable)
+            {
+                AllCallBackFunc[CurrIndex]();
+            }
+        }
+    }
+
+    function triggerLastExitAndPop()
+    {
+        if (CurrIndex >= 0)
+        {
+            triggerLastExit();
+            AllCallBackFunc.pop();
+            --CurrIndex;
+        }
+    }
+
+    function checkKeyBoardTrigger(e)
+    {
+        if (e.which == 27)
+        {
+            triggerLastExitAndPop();
+        }
+    }
+
+    function addNewExit(NewCallBAckFunc)
+    {
+        AllCallBackFunc.push(NewCallBAckFunc);
+        ++CurrIndex;
+    }
+
+    document.onkeydown = checkKeyBoardTrigger;
+    //this.triggerLastExit = triggerLastExit;
+    this.triggerLastExitAndPop = triggerLastExitAndPop;
+    this.addNewExit = addNewExit;
 }
 
 

@@ -143,10 +143,9 @@ function SubmitTile(Name, Address, Splits, Hour, Minutes, Deadline, Repetition, 
 
     }).done(function (data) {
         HandleNEwPage.Hide();
-        AddTiledEvent.Exit();
+        global_ExitManager.triggerLastExitAndPop();
         getRefreshedData();
-        
-
+        affirmNewEvent(data);
     });
 
 }
@@ -155,7 +154,7 @@ function SubmitTile(Name, Address, Splits, Hour, Minutes, Deadline, Repetition, 
 function generateModal(x, y, height, width,WeekStart, RenderPlane,UseCurrentTime)
 {
     //return;
-
+    global_ExitManager.triggerLastExitAndPop();
     var modalAddDom = getDomOrCreateNew("AddModalDom");
     
     var weekDayWidth = $($(".DayContainer")[0]).width();
@@ -170,10 +169,6 @@ function generateModal(x, y, height, width,WeekStart, RenderPlane,UseCurrentTime
 
     modalAddDom.Dom.style.left = x + "px";
     modalAddDom.Dom.style.top = y + "px";
-    if (AddTiledEvent.Exit != undefined)
-    {
-        AddTiledEvent.Exit();
-    }
     $(AddEvent.Dom).click(function () {
         (modalAddDom.Dom.parentElement.removeChild(modalAddDom.Dom));
         var floatalTime = 0;
@@ -216,15 +211,20 @@ function generateModal(x, y, height, width,WeekStart, RenderPlane,UseCurrentTime
         event.stopPropagation();
     });
 
-    function removePanel(e) {
+    /*function removePanel(e) {
         if (e.which == 27) {
             $(document).off("keydown", document, removePanel);
             CloseModal();
         }
         e.stopPropagation();
+    }*/
+
+    function removePanel()
+    {
+        CloseModal();
     }
 
-    
+    global_ExitManager.addNewExit(removePanel);
     modalAddDom.Dom.onblur = function ()//closes modal add when the modal panels is out of focus
     {
         function isDescendant(parent, child) {
@@ -240,8 +240,8 @@ function generateModal(x, y, height, width,WeekStart, RenderPlane,UseCurrentTime
         
         setTimeout(function () {
             if (!isDescendant(modalAddDom, document.activeElement)) {
-                $(document).off("keydown", document, removePanel);
-                CloseModal();
+                //$(document).off("keydown", document, removePanel);
+                global_ExitManager.triggerLastExitAndPop();
             }
         }, 1);
 
@@ -249,7 +249,8 @@ function generateModal(x, y, height, width,WeekStart, RenderPlane,UseCurrentTime
 
         
     };
-    $(document).keydown(removePanel);
+    //$(document).keydown(removePanel);
+    
     RenderPlane.appendChild(modalAddDom.Dom);
     $(modalAddDom.Dom).attr('tabindex', 0).focus();
 
@@ -268,6 +269,7 @@ function CloseModal()
 
 function generateAddEventContainer(x,y,height,Container,refStartTime)
 {
+    global_ExitManager.triggerLastExitAndPop();
     getRefreshedData.disableDataRefresh();
     ActivateUserSearch.setSearchAsOff();
     var NewEventcontainer = getDomOrCreateNew("AddNewEventContainer");
@@ -275,9 +277,10 @@ function generateAddEventContainer(x,y,height,Container,refStartTime)
     $(NewEventcontainer.Dom).click(function (event) {//stops clicking of add event from propagating
         event.stopPropagation();
     });
+    /*
     function removePanel(e)
     {
-        if (e.keyCode == 27)
+        //if (e.keyCode == 27)
         {
             getRefreshedData();
             CloseEventAddition();
@@ -285,11 +288,12 @@ function generateAddEventContainer(x,y,height,Container,refStartTime)
         }
         e.stopPropagation();
     }
+    */
     
 
     function CloseEventAddition()
     {
-        $(document).off("keyup", document, removePanel);
+        //$(document).off("keyup", document, removePanel);
         if (NewEventcontainer != null) {
             if (NewEventcontainer.Dom.parentElement != null) {
                 NewEventcontainer.Dom.parentElement.removeChild(NewEventcontainer.Dom);
@@ -298,7 +302,9 @@ function generateAddEventContainer(x,y,height,Container,refStartTime)
         getRefreshedData.enableDataRefresh();
         ActivateUserSearch.setSearchAsOn();
     }
-    $(document).keyup(removePanel);
+    //$(document).keyup(removePanel);
+
+    global_ExitManager.addNewExit(CloseEventAddition);
 
     //myClickManager.AddNewElement(NewEventcontainer.Dom);
     //NewEventcontainer.Dom.style.left = x+"px";
@@ -332,7 +338,7 @@ function generateAddEventContainer(x,y,height,Container,refStartTime)
     
 
     $(SubmitButton.Selector.Button.Dom).click(function () {
-        BindSubmitClick(NameDom.Selector.Input.Dom.value, LocationDom.Selector.Address.Dom.value, LocationDom.Selector.NickName.Dom.value, SplitCount.Selector.Input.Dom.value, StartDom, EndDom, DurationDom, null, true, ColorPicker.Selector.getColor(), CloseEventAddition, recurrence)
+        BindSubmitClick(NameDom.Selector.Input.Dom.value, LocationDom.Selector.Address.Dom.value, LocationDom.Selector.NickName.Dom.value, SplitCount.Selector.Input.Dom.value, StartDom, EndDom, DurationDom, null, true, ColorPicker.Selector.getColor(), global_ExitManager.triggerLastExitAndPop, recurrence)
     })
     //var RepetitionDom = generateRepetitionContainer();
 }
@@ -514,13 +520,13 @@ function InactiveSlider(InActiveDom, ActiveDom,ButtonElements)
     $(AllInputDataContainer.Dom).addClass("HideInactiveElement");
 
     var AllTileElements = [];//Stores TileInputBox objects
-    var LastElement = new TileInputBox(AllInputData[AllInputData.length - 1], AllInputDataContainer, undefined, AddTiledEvent.Exit);
+    var LastElement = new TileInputBox(AllInputData[AllInputData.length - 1], AllInputDataContainer, undefined, global_ExitManager.triggerLastExitAndPop);
     AllTileElements.push(LastElement);
 
     for (var i = AllInputData.length - 2, j = AllInputData.length - 1; i >= 0; i--, j--)
     {
         AllInputData[i].NextElement = LastElement;
-        LastElement = new TileInputBox(AllInputData[i], AllInputDataContainer, undefined, AddTiledEvent.Exit);
+        LastElement = new TileInputBox(AllInputData[i], AllInputDataContainer, undefined, global_ExitManager.triggerLastExitAndPop);
         AllTileElements.push(LastElement);
     }
 
@@ -655,6 +661,7 @@ function GenerateTileRepetition()
 //handles the whole addition of tiled events. Handles the UI component and tabbing
 function AddTiledEvent()
 {
+    global_ExitManager.triggerLastExitAndPop();
     getRefreshedData.disableDataRefresh();
     ActivateUserSearch.setSearchAsOff();
     var InvisiblePanelID = "AddEventPanel";
@@ -866,7 +873,7 @@ function AddTiledEvent()
                 return message;
             }
         }, InputCss: { width: "1em" }
-    }, undefined, undefined, Exit, undefined, null, AutoSentence)
+    }, undefined, undefined, global_ExitManager.triggerLastExitAndPop, undefined, null, AutoSentence)
     var Min = new TileInputBox({
         LabelAfter: "Min ", Message: {
             Index: 4,
@@ -888,8 +895,8 @@ function AddTiledEvent()
                 return message;
             }
         }, InputCss: { width: "1em" }
-    }, undefined, undefined, Exit, undefined, null, AutoSentence)
-    var Day = new TileInputBox({ LabelAfter: "D", InputCss: { width: "1em" } }, undefined, undefined, Exit)
+    }, undefined, undefined, global_ExitManager.triggerLastExitAndPop, undefined, null, AutoSentence)
+    var Day = new TileInputBox({ LabelAfter: "D", InputCss: { width: "1em" } }, undefined, undefined, global_ExitManager.triggerLastExitAndPop)
     //var AllTimeLements = [Hour, Min, Day];
     var AllTimeLements = [Hour, Min];
 
@@ -942,7 +949,7 @@ function AddTiledEvent()
         ActivateUserSearch.setSearchAsOn();
     }
 
-    
+    global_ExitManager.addNewExit(Exit);
 
     var AllTileElements = [];
 
@@ -953,18 +960,20 @@ function AddTiledEvent()
                 SendData()
             }
         })
-    AddTiledEvent.Exit = Exit;
+
+    
+    AddTiledEvent.Exit = global_ExitManager.triggerLastExitAndPop;
     AllInputData.push(Element1);
     AllInputData.push(Element2);
     AllInputData.push(Element3);
     AllInputData.push(Element4);
-    var LastElement = new TileInputBox(AllInputData[AllInputData.length - 1], ModalContentContainer, DoneButton, Exit, undefined, null, AutoSentence);
+    var LastElement = new TileInputBox(AllInputData[AllInputData.length - 1], ModalContentContainer, DoneButton, global_ExitManager.triggerLastExitAndPop, undefined, null, AutoSentence);
     AllTileElements.push(LastElement);
     
     for (var i = AllInputData.length-2, j = AllInputData.length - 1; i >= 0; i--, j--)
     {
         AllInputData[i].NextElement = LastElement;
-        LastElement = new TileInputBox(AllInputData[i], ModalContentContainer, DoneButton, Exit, undefined, null, AutoSentence);
+        LastElement = new TileInputBox(AllInputData[i], ModalContentContainer, DoneButton, global_ExitManager.triggerLastExitAndPop, undefined, null, AutoSentence);
         AllTileElements.push(LastElement);
     }
 
@@ -1034,7 +1043,7 @@ function AddTiledEvent()
     }
 
 
-
+    /*
     function UIAddTileUITrigger(e)
     {
         if (e.which == 27)//escape key press
@@ -1044,7 +1053,7 @@ function AddTiledEvent()
         }
         
     }
-    
+    */
     
     TileInputBox.Send = SendData;
     
@@ -1052,7 +1061,7 @@ function AddTiledEvent()
     ModalDoneContentContainer.Dom.appendChild(TileInputBox.DoneButton.GetDom());
 
     InvisiblePanel.Dom.appendChild(modalTileEvent.Dom);
-    document.addEventListener("keydown", UIAddTileUITrigger);
+    //document.addEventListener("keydown", UIAddTileUITrigger);
     //debugger;
     FirstElement.reveal();
     FirstElement.forceFocus();
@@ -1509,7 +1518,7 @@ function TileInputBox(TabElement, ModalContainer, SendTile, Exit, HideInput, get
         }
         if (e.which == 27)//escape key press
         {
-            AddTiledEvent.Exit()
+            Exit()
         }
 
         if ((e.which == 38))
@@ -1707,7 +1716,7 @@ function generateSubmitButton()
 }
 
 
-function BindSubmitClick(Name, Address, AddressNick, Splits, Start, End, EventNonRigidDurationHolder, RepetitionEnd, RigidFlag, CalendarColor,CloseEventAddition,EventRepetition)
+function BindSubmitClick(Name, Address, AddressNick, Splits, Start, End, EventNonRigidDurationHolder, RepetitionEnd, RigidFlag, CalendarColor,ExitAdditionScreen,EventRepetition)
 {
     var EventLocation = new Location(AddressNick, Address);
     var EventName = Name;
@@ -1792,6 +1801,9 @@ function BindSubmitClick(Name, Address, AddressNick, Splits, Start, End, EventNo
             //CurrentTheme.TransitionOldContainer();
             //$(myContainer).empty();
             //myContainer.outerHTML = "";
+            var b = 3;
+            
+            
         },
         error: function (err) {
             //var myError = err;
@@ -1801,13 +1813,38 @@ function BindSubmitClick(Name, Address, AddressNick, Splits, Start, End, EventNo
             HandleNEwPage.UpdateMessage(NewMessage, ExitAfter, function () { });
         }
 
-    }).done(function (data) {
+    }).done(function (response)
+    {
         HandleNEwPage.Hide();
         getRefreshedData.enableDataRefresh(true);
-        CloseEventAddition();
+        affirmNewEvent(response);
+        ExitAdditionScreen();
     });
 }
 
+
+function affirmNewEvent(response)
+{
+    var StartOfEvent;
+    var EventID;
+    function retValue() {
+        global_GoToDay(StartOfEvent);
+        renderSubEventsClickEvents(EventID);
+    }
+    if (response.Error.code == 0) {
+        StartOfEvent = new Date(response.Content.SubCalCalEventStart + global_TimeZone_ms);
+        EventID = response.Content.ID;
+
+        if (global_GoToDay(StartOfEvent)) {
+            setTimeout(function () { renderSubEventsClickEvents(EventID); }, 5000);
+            return;
+        }
+        else {
+            populateMonth(StartOfEvent);
+            setTimeout(retValue, 12000);
+        }
+    }
+}
 
 function createCalEventRecurrence()
 {

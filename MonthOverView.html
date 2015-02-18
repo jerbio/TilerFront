@@ -51,7 +51,13 @@
             </div>
     </div>
     <div id="SearchBarAndContentContainer"></div>
-    <div id="MonthBar"></div>
+    <div id="MonthBar">
+        <div id="MonthButton"></div>
+        <div id="MonthArrayContainer">
+            <div id="AllDayContainer"></div>
+            <div id="MonthYearContainer"></div>
+        </div>
+    </div>
     <div id="AddEventPanel"></div>
     <div id="FullWeekContainer"> </div>
     <div id="TimeBar">
@@ -106,12 +112,12 @@
           <div id="ProcrastinateEventInputContainer">
             <div id="ProcrastinateHeading">Procrastinate this by</div>
             <div id="ProcrastinateInputAndSubmit">
-              <input maxlength="2" id="procrastinateHours" autofocus type="text">
+              <input maxlength="2" id="procrastinateHours" autofocus type="number">
 
               <span>H</span>
-              <input maxlength="2" id="procrastinateMins" type="text">
+                <input maxlength="2" id="procrastinateMins" type="number">
               <span>M</span>
-              <input maxlength="2" id="procrastinateDays" type="text">
+                <input maxlength="2" id="procrastinateDays" type="number">
               <span>D</span>
               <button id="submitProcatination" class="SubmitButton">Push It</button>
             </div>

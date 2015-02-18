@@ -689,7 +689,7 @@ input
     background-image:url(../img/Icons/ticker.png);
     width:18px;
     height:25px;
-    z-index:1;
+    //z-index:1;
 }
 
 #DayTicker 
@@ -701,7 +701,16 @@ input
     transform: translateX(-50%);
 }
 
+#MonthArrayContainer 
+{
+    overflow:hidden;
+}
 
+#MonthYearContainer 
+{
+    height:100%;
+    background:white;
+}
 
 
 #SelectColorButton 

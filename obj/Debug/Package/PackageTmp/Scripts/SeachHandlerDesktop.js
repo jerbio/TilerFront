@@ -1,6 +1,6 @@
 ﻿function ActivateUserSearch(e)
 {
-//    debugger;
+    //    debugger;
     e.stopPropagation();
     var SearchInput = getDomOrCreateNew("SearchBarInput");
     var SearchContainer = getDomOrCreateNew("SearchBarAndContentContainer");
@@ -8,8 +8,13 @@
     {
         return;
     }
+
+
     if (e.which == 27)
     {
+        return;
+
+        /*
         if (ActivateUserSearch.isActive)
         {
             ActivateUserSearch.ClearSearch();
@@ -19,6 +24,7 @@
         {
             return;
         }
+        */
     }
 
 
@@ -26,12 +32,12 @@
     {
         return;
     }
-
-    if(((e.which<46)||(e.which>90))&&(e.which!=1))
+    //debugger;
+    if(((e.which<48)||(e.which>90))&&(e.which!=1))
     {
         return;
     }
-
+    global_ExitManager.triggerLastExitAndPop();
     var url = global_refTIlerUrl + "CalendarEvent/Name";
     var AutoSuggestSearch = new AutoSuggestControl(url, "GET", CallBackFunctionForReturnedValuesDesktop, SearchInput.Dom);
     ActivateUserSearch.AutoSuggest = AutoSuggestSearch;
@@ -51,19 +57,19 @@
         ActivateUserSearch.isActive = false;
         getRefreshedData.enableDataRefresh(true);
     }
-    
+    global_ExitManager.addNewExit(ActivateUserSearch.ClearSearch);
 }
 
 
 
 ActivateUserSearch.setSearchAsOff = function ()
 {
-    document.onkeydown = null;
+    //document.onkeydown = null;
     ActivateUserSearch.isSearchOn = false;
 }
 
 ActivateUserSearch.setSearchAsOn = function () {
-    document.onkeydown = ActivateUserSearch;
+    //document.onkeydown = ActivateUserSearch;
     ActivateUserSearch.isSearchOn = true;
 }
 
@@ -73,7 +79,7 @@ ActivateUserSearch.getSearch = function ()
 }
 ActivateUserSearch.isSearchOn = true;
 ActivateUserSearch.isActive = false;
-document.onkeydown = ActivateUserSearch;
+$(document).on("keydown", ActivateUserSearch);
 setTimeout(function () {
     document.getElementById("SearchBar").onclick = ActivateUserSearch;
 }, 1000);
