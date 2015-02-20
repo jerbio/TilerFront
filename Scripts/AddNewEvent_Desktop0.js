@@ -9,11 +9,11 @@ function addNewEvent(x, y, height, refStart)
 }
 
 
-function prepSendTile(NameInput, AddressInput, SpliInput, HourInput, MinuteInput, DeadlineInput, RepetitionInput, RepetitionFlag)
+function prepSendTile(NameInput, AddressInput, SpliInput, HourInput, MinuteInput, DeadlineInput, RepetitionInput, RepetitionFlag, ColorSelection)
 {
     return function ()
     {
-        var calendarColor = global_AllColorClasses[0];
+        var calendarColor = ColorSelection;
         
         SubmitTile(NameInput.value, AddressInput.value, SpliInput.value, HourInput.value, MinuteInput.value, DeadlineInput.value, RepetitionInput.value, calendarColor, RepetitionFlag);
     }
@@ -46,7 +46,7 @@ function SubmitTile(Name, Address, Splits, Hour, Minutes, Deadline, Repetition, 
     EventStart.Date = new Date(Start.getFullYear(), Start.getMonth(), Start.getDate());
     EventStart.Time = { Hour: 0, Minute: 0 };
     var End = new Date(Deadline);
-    
+    CalendarColor = { r: CalendarColor.r, g: CalendarColor.g, b: CalendarColor.b, s: CalendarColor.Selection, o: CalendarColor.a };
 
     var EventDuration = { Days: 0, Hours: Hour, Mins: Minutes };
 
@@ -327,9 +327,10 @@ function generateAddEventContainer(x,y,height,Container,refStartTime)
     NewEventcontainer.Dom.appendChild(DurationDom.Selector.Container);
     //NewEventcontainer.Dom.appendChild(EndDom.Selector.Container);
     NewEventcontainer.Dom.appendChild(LocationDom.Selector.Container);
+    NewEventcontainer.Dom.appendChild(recurrence.Content);
     NewEventcontainer.Dom.appendChild(ColorPicker.Selector.Container);
     //NewEventcontainer.Dom.appendChild(EnableTiler.Selector.Container);
-    NewEventcontainer.Dom.appendChild(recurrence.Content);
+    
     NewEventcontainer.Dom.appendChild(SubmitButton.Selector.Container);
     
     
@@ -688,9 +689,13 @@ function AddTiledEvent()
     var ModalDoneContentContainer = getDomOrCreateNew(ModalDoneContainerID);//Contains the done section
     var ModalActiveOptionsContainerID = "ModalActiveOptionsContainer"
     var ModalActiveOptionsContainer = getDomOrCreateNew(ModalActiveOptionsContainerID);//Contains the options when turned on
+    var ColorPicker = generateColorPickerContainer(null, true);
+    
 
     ActiveContainer.Dom.appendChild(ModalContentContainer.Dom);
     ActiveContainer.Dom.appendChild(ModalActiveOptionsContainer.Dom)
+
+    ActiveContainer.Dom.appendChild(ColorPicker.Selector.Container);
     ActiveContainer.Dom.appendChild(ModalDoneContentContainer.Dom)
     
 
@@ -1030,8 +1035,8 @@ function AddTiledEvent()
     {
         var Splits = RepetionSlider.getAllElements()[0].TileInput;
         var RepetionChoice = RepetionSlider.getAllElements()[1].TileInput;
-
-        var SendIt = prepSendTile(Element1.TileInput.getInputDom(), Element2.TileInput.getInputDom(), Splits.getInputDom(), Hour.getInputDom(), Min.getInputDom(), Element4.TileInput.getInputDom(), RepetionChoice.getInputDom(), RepetionSlider.getStatus());
+        var myColor = ColorPicker.Selector.getColor();
+        var SendIt = prepSendTile(Element1.TileInput.getInputDom(), Element2.TileInput.getInputDom(), Splits.getInputDom(), Hour.getInputDom(), Min.getInputDom(), Element4.TileInput.getInputDom(), RepetionChoice.getInputDom(), RepetionSlider.getStatus(), myColor);
         if (TileInputBox.DoneButton.getStatus()) {
             SendIt();
             //AddTiledEvent.Exit();

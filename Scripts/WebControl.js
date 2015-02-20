@@ -1906,10 +1906,20 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
 
 
 
-    function generateColorPickerContainer(loopBackFunction) {
+    function generateColorPickerContainer(loopBackFunction,isHorizontalPicker) {
         var ColorPickerContainer = getDomOrCreateNew("ColorPickerContainer");
-
-        var ColorPicker = "ColorPicker"; loopBackFunction
+        
+        isHorizontalPicker = true;
+        var ColorPicker = "";
+        if (isHorizontalPicker) {
+            ColorPicker = "HorizontalColorPicker";
+            $(ColorPickerContainer).addClass("HorizontalColorPickerContainer")
+        }
+        else
+        {
+            ColorPicker = "ColorPicker";
+        }
+         //loopBackFunction
 
         var AllColors = new Array();
         for (var i = 0; i < global_AllColorClasses.length; i++) {
@@ -1924,8 +1934,8 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
             ColorContainer.Selector.Container.setAttribute('tabindex', 0)
             ColorContainer.Selector.Container.onkeypress = keyEntry
             AllColors.push(ColorContainer);
-            ColorContainer.Selector.Container.style.left = (Left * 33) + "%";
-            ColorContainer.Selector.Container.style.top = (Top * 33) + "%";
+            //ColorContainer.Selector.Container.style.left = (Left * 33) + "%";
+            //ColorContainer.Selector.Container.style.top = (Top * 33) + "%";
             ColorPickerContainer.Dom.appendChild(ColorContainer.Selector.Container);
         }
 

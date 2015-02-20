@@ -89,7 +89,7 @@ p { margin: 0}
   transition: all .2s ease-in-out;
   cursor: pointer;
 }
-#SubmitButtonContainer { margin-left: 95px; margin-top: -8px; }
+#SubmitButtonContainer { margin-left: 95px; margin-top: 8px; }
 .SubmitButton:focus,
   .SubmitButton:hover {
   border: 1px transparent solid;
@@ -118,26 +118,27 @@ input:focus:-ms-input-placeholder { color:rgba(0,0,0, 0.2); }
 
 #ColorPickerContainer 
 {
-    position:static;
+    position:relative;
     width: 200px;
     height: 200px;
-    transform:translateY(-10%);
+    //transform:translateY(-10%);
     margin-top: 44px;
     margin-left: 100px;
 }
 
 .ColorPicker 
 {
-    position:absolute;
+    position:relative;
     border-radius:50%;
     width:33%;
     height:33%;
     box-sizing:border-box;
+    display:inline-block;
 }
 
 .innerColor 
 {
-    position:absolute;
+    position:relative;
     top:10%;
     left:10%;
     height:80%;
@@ -150,16 +151,37 @@ input:focus:-ms-input-placeholder { color:rgba(0,0,0, 0.2); }
 .OuterBlackColor 
 {
     position:absolute;
-    top:2.5%;
-    left:2.5%;
-    height:95%;
+    top:0;
+    left:0;
+    height:100%;
     border-radius:50%;
-    width:95%;
+    width:100%;
     fill:transparent;
     box-sizing:border-box;
 }
+.HorizontalColorPicker {
+    
+    width: 11.11111111%;
+    height: 100%;
+    position: relative;
+    box-sizing:border-box;
+    display: inline-block;
+}
 
-.addCircleAround { border: 3px solid black; }
+.HorizontalColorPickerContainer 
+{
+    width: 300px !important;
+    height: 33.3333333px !important;
+    top:0 !important;
+    left:150px !important;
+    margin-top:0 !important;
+    margin-left:0 !important;
+}
+
+
+.addCircleAround { border: 3px solid black; 
+                   outline:none;
+}
 .removeCircleAround { border:none; }
 
 .DisableTiler { display:none; }
