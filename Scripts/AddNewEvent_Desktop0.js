@@ -161,10 +161,13 @@ function generateModal(x, y, height, width,WeekStart, RenderPlane,UseCurrentTime
     var weekDayWidth = $($(".DayContainer")[0]).width();
     var AddTile = getDomOrCreateNew("AddTileDom", "button");
     var AddEvent = getDomOrCreateNew("AddEventDom", "button");
+    var SpanEscape = getDomOrCreateNew("SpanEscape", "span");
+    SpanEscape.Dom.innerHTML=("Press Escape to escape.");
     AddEvent.Dom.innerHTML=("New Event");
     AddTile.Dom.innerHTML=("New Tile");
     modalAddDom.Dom.appendChild(AddEvent.Dom);
     modalAddDom.Dom.appendChild(AddTile.Dom);
+    modalAddDom.Dom.appendChild(SpanEscape.Dom);
     $(AddTile.Dom).addClass("SubmitButton");
     $(AddEvent.Dom).addClass("SubmitButton");
 
@@ -321,9 +324,9 @@ function generateAddEventContainer(x,y,height,Container,refStartTime)
     NewEventcontainer.Dom.appendChild(DurationDom.Selector.Container);
     //NewEventcontainer.Dom.appendChild(EndDom.Selector.Container);
     NewEventcontainer.Dom.appendChild(LocationDom.Selector.Container);
-    NewEventcontainer.Dom.appendChild(ColorPicker.Selector.Container);
     //NewEventcontainer.Dom.appendChild(EnableTiler.Selector.Container);
     NewEventcontainer.Dom.appendChild(recurrence.Content);
+    NewEventcontainer.Dom.appendChild(ColorPicker.Selector.Container);
     NewEventcontainer.Dom.appendChild(SubmitButton.Selector.Container);
     
     
@@ -1830,7 +1833,7 @@ function createCalEventRecurrence()
     var EnableRecurrenceLabel = getDomOrCreateNew(EnableRecurrenceLabelID,"label");
     EnableRecurrenceContainer.Dom.appendChild(EnableRecurrenceLabel.Dom);
     $(EnableRecurrenceContainer.Dom).addClass(CurrentTheme.FontColor);
-    EnableRecurrenceLabel.Dom.innerHTML = "Do you want this event to recurr?"
+    EnableRecurrenceLabel.Dom.innerHTML = "Do you want this event to recurr?<br/> <span class='PressSpacebar'>Press Spacebar to toggle and/or br/>to select a color below.</span>"
 
     /*var EnableRecurrenceButtonContainerID = "EnableRecurrenceButtonContainer";
     var EnableRecurrenceButtonContainer = getDomOrCreateNew(EnableRecurrenceButtonContainerID);

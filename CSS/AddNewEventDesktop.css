@@ -89,7 +89,7 @@ p { margin: 0}
   transition: all .2s ease-in-out;
   cursor: pointer;
 }
-#SubmitButtonContainer { margin-left: 95px; margin-top: -8px; }
+#SubmitButtonContainer { margin-left: 95px; margin-top: 3px; margin-bottom: 80px; }
 .SubmitButton:focus,
   .SubmitButton:hover {
   border: 1px transparent solid;
@@ -187,16 +187,17 @@ input:focus:-ms-input-placeholder { color:rgba(0,0,0, 0.2); }
 
 #AddModalDom {
     position:absolute;
-    height: 90px;
+    height: 130px;
     width: 370px;
     background-color: #fff;
     border: 1px solid #eee;
-    z-index:1000;
+    z-index:999;
     -webkit-box-shadow: 10px 10px 30px 0px rgba(128,128,128,1);
     -moz-box-shadow: 10px 10px 30px 0px rgba(128,128,128,1);
     box-shadow: 10px 10px 30px 0px rgba(128,128,128,1);
 }
 #AddModalDom button { margin: 15px }
+#AddModalDom span { margin-left: 15px }
 #AddModalDom:focus { outline: none; }
 #AddTileDom { left:5%; }
 #AddEventDom { left:55%; }
@@ -439,10 +440,12 @@ input:focus:-ms-input-placeholder { color:rgba(0,0,0, 0.2); }
 
 #EnableRecurrenceLabel {
     display:inline-block;
+    font-family: 'texbold';
 }
 
 #EnableRecurrenceButton {
     display:inline-block;
+    margin-left: 83px;
 }
 
 #EnabledRecurrenceContainer 
@@ -458,7 +461,8 @@ input:focus:-ms-input-placeholder { color:rgba(0,0,0, 0.2); }
     position:relative;
     //width:40px;
     display:inline-block;
-    margin: 10px;
+    margin-top:20px;
+    margin-right: 34px;
     padding: 10px;
 }
 
@@ -494,6 +498,7 @@ input:focus:-ms-input-placeholder { color:rgba(0,0,0, 0.2); }
 .SelectedDayOfWeek /*media*/
 {
     box-shadow: yellow 0px 0px 3px 3px;
+    outline: none;
 }
 
 .deSelectedDayOfWeek 
@@ -513,13 +518,20 @@ input:focus:-ms-input-placeholder { color:rgba(0,0,0, 0.2); }
     //color:rgba(217,217,217,1);
 }
 
-#RecurrenceTabContent {
-    margin:40px;
-
-}
-
+#RecurrenceTabContent { margin: 20px }
+#RepetitionRangeContainerEndInput { width: 271px; margin-top: 20px; }
+#DaysOfTheWeekContainer { margin-top: 20px; margin-left:-5px}
+.DayofWeekCircle { outline: none; }
+.DayofWeekCircle:active { outline: none;}
 .EmptyTileInput 
 {
     width:10px;
     background-color:rgba(10,10,10,.1);
+}
+.PressSpacebar {
+  color: #656464;
+  font-family: 'texreg';
+  font-size: 14px;
+  display: block;
+  line-height: 20px;
 }

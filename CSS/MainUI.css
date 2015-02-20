@@ -148,7 +148,7 @@ body {
 .LockedIcon 
 {
     position: absolute;
-    background-image:url(../img/Icons/Locked.svg);
+    background-image:url(../img/Icons/locked2.svg);
     background-size: 100% 100%;
     background-repeat:no-repeat;
 }
