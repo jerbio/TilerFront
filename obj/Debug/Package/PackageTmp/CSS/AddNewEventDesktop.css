@@ -89,7 +89,8 @@ p { margin: 0}
   transition: all .2s ease-in-out;
   cursor: pointer;
 }
-#SubmitButtonContainer { margin-left: 95px; margin-top: -8px; }
+
+#SubmitButtonContainer { margin-left: 95px; margin-top: 3px; margin-bottom: 80px; }
 .SubmitButton:focus,
   .SubmitButton:hover {
   border: 1px transparent solid;
@@ -118,26 +119,27 @@ input:focus:-ms-input-placeholder { color:rgba(0,0,0, 0.2); }
 
 #ColorPickerContainer 
 {
-    position:static;
+    position:relative;
     width: 200px;
     height: 200px;
-    transform:translateY(-10%);
+    //transform:translateY(-10%);
     margin-top: 44px;
     margin-left: 100px;
 }
 
 .ColorPicker 
 {
-    position:absolute;
+    position:relative;
     border-radius:50%;
     width:33%;
     height:33%;
     box-sizing:border-box;
+    display:inline-block;
 }
 
 .innerColor 
 {
-    position:absolute;
+    position:relative;
     top:10%;
     left:10%;
     height:80%;
@@ -150,16 +152,37 @@ input:focus:-ms-input-placeholder { color:rgba(0,0,0, 0.2); }
 .OuterBlackColor 
 {
     position:absolute;
-    top:2.5%;
-    left:2.5%;
-    height:95%;
+    top:0;
+    left:0;
+    height:100%;
     border-radius:50%;
-    width:95%;
+    width:100%;
     fill:transparent;
     box-sizing:border-box;
 }
+.HorizontalColorPicker {
+    
+    width: 11.11111111%;
+    height: 100%;
+    position: relative;
+    box-sizing:border-box;
+    display: inline-block;
+}
 
-.addCircleAround { border: 3px solid black; }
+.HorizontalColorPickerContainer 
+{
+    width: 300px !important;
+    height: 33.3333333px !important;
+    top:0 !important;
+    left:150px !important;
+    margin-top:0 !important;
+    margin-left:0 !important;
+}
+
+
+.addCircleAround { border: 3px solid black; 
+                   outline:none;
+}
 .removeCircleAround { border:none; }
 
 .DisableTiler { display:none; }
@@ -187,16 +210,17 @@ input:focus:-ms-input-placeholder { color:rgba(0,0,0, 0.2); }
 
 #AddModalDom {
     position:absolute;
-    height: 90px;
+    height: 130px;
     width: 370px;
     background-color: #fff;
     border: 1px solid #eee;
-    z-index:1000;
+    z-index:999;
     -webkit-box-shadow: 10px 10px 30px 0px rgba(128,128,128,1);
     -moz-box-shadow: 10px 10px 30px 0px rgba(128,128,128,1);
     box-shadow: 10px 10px 30px 0px rgba(128,128,128,1);
 }
 #AddModalDom button { margin: 15px }
+#AddModalDom span { margin-left: 15px }
 #AddModalDom:focus { outline: none; }
 #AddTileDom { left:5%; }
 #AddEventDom { left:55%; }
@@ -433,16 +457,18 @@ input:focus:-ms-input-placeholder { color:rgba(0,0,0, 0.2); }
 #ModalSenetenceContainer
 {
     padding: 25px 50px;
-    background: yellow;
+    //background: yellow;
     width: 100%;
 }
 
 #EnableRecurrenceLabel {
     display:inline-block;
+    font-family: 'texbold';
 }
 
 #EnableRecurrenceButton {
     display:inline-block;
+    margin-left: 83px;
 }
 
 #EnabledRecurrenceContainer 
@@ -458,7 +484,8 @@ input:focus:-ms-input-placeholder { color:rgba(0,0,0, 0.2); }
     position:relative;
     //width:40px;
     display:inline-block;
-    margin: 10px;
+    margin-top:20px;
+    margin-right: 34px;
     padding: 10px;
 }
 
@@ -494,6 +521,7 @@ input:focus:-ms-input-placeholder { color:rgba(0,0,0, 0.2); }
 .SelectedDayOfWeek /*media*/
 {
     box-shadow: yellow 0px 0px 3px 3px;
+    outline: none;
 }
 
 .deSelectedDayOfWeek 
@@ -513,13 +541,20 @@ input:focus:-ms-input-placeholder { color:rgba(0,0,0, 0.2); }
     //color:rgba(217,217,217,1);
 }
 
-#RecurrenceTabContent {
-    margin:40px;
-
-}
-
+#RecurrenceTabContent { margin: 20px }
+#RepetitionRangeContainerEndInput { width: 271px; margin-top: 20px; }
+#DaysOfTheWeekContainer { margin-top: 20px; margin-left:-5px}
+.DayofWeekCircle { outline: none; }
+.DayofWeekCircle:active { outline: none;}
 .EmptyTileInput 
 {
     width:10px;
     background-color:rgba(10,10,10,.1);
+}
+.PressSpacebar {
+  color: #656464;
+  font-family: 'texreg';
+  font-size: 14px;
+  display: block;
+  line-height: 20px;
 }

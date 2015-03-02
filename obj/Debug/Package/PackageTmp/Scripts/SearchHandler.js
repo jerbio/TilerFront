@@ -31,6 +31,7 @@ function CallBackFunctionForReturnedValues(data, DomContainer) {
 
 
     function generateDOM(myCalendarEvent) {
+        debugger
         var retrievedEventContainerID = "retrievedEvent" + CallBackFunctionForReturnedValues.counter
         var retrievedEventContainer = getDomOrCreateNew(retrievedEventContainerID);
 
@@ -116,9 +117,9 @@ function CallBackFunctionForReturnedValues(data, DomContainer) {
         var DoNowButtonOfSearchedEventImageID = "DoNowButtonOfSearchedEventImage" + CallBackFunctionForReturnedValues.counter
         var DoNowButtonOfSearchedEventImage = getDomOrCreateNew(DoNowButtonOfSearchedEventImageID);
 
-
-        $(DoNowButtonOfSearchedEventImage.Dom).addClass("NowIcon");
         $(DoNowButtonOfSearchedEventImage.Dom).addClass("NowIcon_Search");
+        $(DoNowButtonOfSearchedEventImage.Dom).addClass("NowIcon");
+        
         //$(DoNowButtonOfSearchedEventImage.Dom).addClass("SearchIcon");
 
 
@@ -164,12 +165,9 @@ function CallBackFunctionForReturnedValues(data, DomContainer) {
             });
         }
     }
-
-
-
-    CallBackFunctionForReturnedValues.counter = 0;
-    //alert(data.length);
 }
+
+CallBackFunctionForReturnedValues.counter = 0;
 
 function generateSearchBarContainer(ParentDom)
 {

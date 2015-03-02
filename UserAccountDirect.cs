@@ -10,12 +10,13 @@ namespace TilerFront
     public class UserAccountDirect:UserAccount
     {
         Models.ApplicationUser sessionUser;
-        LogControlDirect UserLog;
+        //LogControl UserLog;
 
         public UserAccountDirect(Models.ApplicationUser user, bool Passive=false)
         {
             sessionUser = user;
             UserLog = new LogControlDirect(sessionUser, "", Passive);
+            ID = sessionUser.Id;
         }
 
         /*
@@ -37,7 +38,6 @@ namespace TilerFront
             
             if (ctx != null)
             {
-                UserLog = new LogControlDirect(sessionUser);
                 await UserLog.Initialize();
             }
             return UserLog.Status;
@@ -73,7 +73,7 @@ namespace TilerFront
         
         async public Task CommitEventToLog(IEnumerable<CalendarEvent> AllEvents, string LatestID, string LogFile = "")
         {
-            await UserLog.WriteToLog(AllEvents, LatestID, LogFile);
+            await ((LogControlDirect)UserLog).WriteToLog(AllEvents, LatestID, LogFile);
             sessionUser.LastChange = DateTime.Now;
             Task SaveChangesToDB = new Controllers.UserController().SaveUser(sessionUser);
             await SaveChangesToDB;

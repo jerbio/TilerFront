@@ -357,8 +357,13 @@ function populateSearchOptionDom(Dom)
         LogOutButton.Dom.innerHTML = "LogOut";
         $(LogOutButton.Dom).addClass(CurrentTheme.BorderColor);
         $(LogOutButton.Dom).addClass(CurrentTheme.FontColor);
-        $(LogOutButton.Dom).click(LogOut);
-        Dom.appendChild(LogOutButton.Dom)
+        $(LogOutButton.Dom).click(function () {
+            //LogOut();
+            LogOutButton.submit();
+        });
+        var LogOutContainer = getDomOrCreateNew("logoutForm");
+        LogOutContainer.appendChild(LogOutButton.Dom)
+        Dom.appendChild(LogOutContainer.Dom)
 
 
         var LoggedLogoContainerID = "LoggedLogoContainer";
@@ -384,7 +389,7 @@ function populateSearchOptionDom(Dom)
         var NameProfileInfoContainer = getDomOrCreateNew(NameProfileInfoContainerID);
         var NameProfileInfoContainerContentID = "NameProfileInfoContainerContent";
         var NameProfileInfoContainerContent = getDomOrCreateNew(NameProfileInfoContainerContentID,"span");
-        NameProfileInfoContainerContent.Dom.innerHTML = "Hey, " + UserCredentials.Name + "-";
+        NameProfileInfoContainerContent.Dom.innerHTML = UserCredentials.Name ==null? "Hello":"Hello" + UserCredentials.Name + "-";
         NameProfileInfoContainer.Dom.appendChild(NameProfileInfoContainerContent.Dom);
 
 
@@ -434,7 +439,7 @@ function populateSearchOptionDom(Dom)
     function LogOut()
     {
         delete_cookie();
-        window.location.href=("index.html")
+        window.location.href = ("/Account/LogOff")
     }
 
     function getTimeStr(dt) {

@@ -1,6 +1,4 @@
-﻿//#define readfromBeforeInsertionFixingStiticRestricted
-
-#define UseDefaultLocation
+﻿#define UseDefaultLocation
 
 using System;
 using System.Collections.Generic;
@@ -14,6 +12,7 @@ using System.Threading.Tasks;
 #if ForceReadFromXml
 #else
 using CassandraUserLog;
+using TilerSearch;
 #endif
 
 
@@ -22,13 +21,13 @@ namespace TilerFront
 {
     public class LogControl
     {
-        int ID;
+        protected string ID;
         protected string UserName;
         string NameOfUser;
 
         protected static string WagTapLogLocation = "WagTapCalLogs\\";
-        DBControl LogDBDataAccess;
-        protected string LastIDNumber;
+        protected DBControl LogDBDataAccess;
+        protected long LastIDNumber;
         protected int LastLocationID;
         protected string CurrentLog;
         protected bool LogStatus;
@@ -37,22 +36,31 @@ namespace TilerFront
 
 #if ForceReadFromXml
 #else
-        CassandraUserLog.CassandraLog myCassandraAccess;
+        protected CassandraUserLog.CassandraLog myCassandraAccess;
+        protected TilerSearch.EventNameSearchHandler NameSearcher;
+        protected LocationSearchHandler LocationSearcher;
 #endif
         Tuple<bool, string, DateTimeOffset, long> ScheduleMetadata;
         
-
-        public static bool useCassandra=false;
+#if ForceReadFromXml
+#else
+        public static bool useCassandra=true;
+#endif
 
         protected LogControl()
         { 
-            ID=0;
+            ID="";
             UserName="";
             NameOfUser="";
-            LastIDNumber=0.ToString();
+            LastIDNumber = 0;
             LastLocationID= 0;
             CurrentLog="";
             LogStatus=false;
+#if ForceReadFromXml
+#else
+            NameSearcher = new EventNameSearchHandler();
+            LocationSearcher = new LocationSearchHandler();
+#endif
             Dictionary<string, Location_Elements> CachedLocation = new Dictionary<string, Location_Elements>();
         }
 
@@ -69,11 +77,11 @@ namespace TilerFront
         #region Functions
         virtual async public Task Initialize()
         {
-            Tuple<bool, int, string> VerifiedUser = LogDBDataAccess.LogIn();
+            Tuple<bool, string, string> VerifiedUser = LogDBDataAccess.LogIn();
             CurrentLog = "";
             if (VerifiedUser.Item1)
             {
-                Tuple<bool, string, DateTimeOffset, long> resultofLatestChange = LogDBDataAccess.getLatestChanges(VerifiedUser.Item2);
+                Tuple<bool, string, DateTimeOffset, long> resultofLatestChange = await LogDBDataAccess.getLatestChanges(VerifiedUser.Item2);
                 ID = VerifiedUser.Item2;
 #if ForceReadFromXml
 #else
@@ -91,8 +99,8 @@ namespace TilerFront
 
 #else
                     Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, Location_Elements>> tempProfileData = await getProfileInfo();
-                    LogDBDataAccess.CreateLatestChange(this.ID, new DateTimeOffset(), Convert.ToInt64(LastIDNumber));
-                    resultofLatestChange = LogDBDataAccess.getLatestChanges(VerifiedUser.Item2);
+                    await LogDBDataAccess.CreateLatestChange(this.ID, new DateTimeOffset(), Convert.ToInt64(LastIDNumber));
+                    resultofLatestChange = await LogDBDataAccess.getLatestChanges(VerifiedUser.Item2);
                     myCassandraAccess.BatchMigrateXMLToCassandra(this);
 #endif
                 }
@@ -107,7 +115,7 @@ namespace TilerFront
                     LogStatus = File.Exists(LogDir);
 #else
                     LogStatus = true;
-                    LastIDNumber = resultofLatestChange.Item4.ToString();
+                    LastIDNumber = resultofLatestChange.Item4;
                     useCassandra = true;
 #endif
 
@@ -127,8 +135,31 @@ namespace TilerFront
         {
             return WagTapLogLocation;
         }
+
+        
 #if ForceReadFromXml
 #else
+        async internal Task BatchMigrateXML()
+        {
+            bool oldCassandraValue = useCassandra;
+            useCassandra=false;
+
+            getAllCalendarFromXml(new TimeLine());//empty TImeline, just doing this to force initialization of LastIDNumber
+            Task<bool> createLatestChange = LogDBDataAccess.CreateLatestChange(ID, DateTimeOffset.Now, LastIDNumber);
+            
+            Task AddAllEvents = NameSearcher.Add(getAllCalendarFromXml(new TimeLine(new DateTimeOffset(1970, 1, 1, 0, 0, 0, new TimeSpan()), new DateTimeOffset(2970, 1, 1, 0, 0, 0, new TimeSpan()))), ID);
+            Task<Dictionary<string, Location_Elements>> LocationCache = (getLocationCache());
+            Task AddAllLocations = LocationSearcher.Add((await LocationCache).Values, ID);
+            myCassandraAccess.BatchMigrateXMLToCassandra(this);
+
+            bool status = await createLatestChange;
+            await AddAllEvents;
+            await AddAllLocations;
+            useCassandra = oldCassandraValue;
+            return;
+
+            
+        }
         public Task<bool> CommitToCassadra(IEnumerable<CalendarEvent> AllCalEvents)
         {
             return myCassandraAccess.Commit(AllCalEvents);
@@ -151,10 +182,13 @@ namespace TilerFront
         {
             
             CustomErrors retValue = new CustomErrors(false, "success");
+#if ForceReadFromXml
+#else
             if (useCassandra)
             {
                 return retValue;
             }
+#endif
             try
             {
 
@@ -198,10 +232,13 @@ namespace TilerFront
 
         public void UpdateReferenceDay(DateTimeOffset referenceDay, string LogFile = "")
         {
+#if ForceReadFromXml
+#else
             if (useCassandra)
             {
                 return;
             }
+#endif
             if (LogFile == "")
             { LogFile = WagTapLogLocation + CurrentLog; }
             XmlDocument xmldoc = new XmlDocument();
@@ -270,8 +307,8 @@ namespace TilerFront
             {
                 retValue =  myCassandraAccess.Commit(AllEvents);
                 LogDBDataAccess.WriteLatestData(DateTime.Now,Convert.ToInt64( LatestID), ID);
-                await retValue;
-                return;
+                bool boolRetValue = await retValue;
+                return boolRetValue;
             }
 #endif
 
@@ -748,10 +785,13 @@ namespace TilerFront
 
         public void deleteAllCalendarEvets(string dirString = "")
         {
+#if ForceReadFromXml
+#else
             if(useCassandra)
             {
                 return;
             }
+#endif
             if (string.IsNullOrEmpty(dirString))
             {
                 dirString = WagTapLogLocation + CurrentLog;
@@ -854,13 +894,19 @@ namespace TilerFront
             }
         }
 
-        public DateTimeOffset getDayReferenceTime(string NameOfFile = "")
+        virtual public DateTimeOffset getDayReferenceTime(string NameOfFile = "")
         {
-            if(useCassandra)
-            { 
-                return ScheduleMetadata.Item3;
+#if ForceReadFromXml
+#else
+            if (useCassandra)
+            {
+#if LocalDebug
+                return new DateTimeOffset(1970, 1, 1, 16, 0, 0, new TimeSpan());
+#else
+                return SessionUser.LastChange;
+#endif
             }
-            
+#endif       
             XmlDocument doc = getLogDataStore(NameOfFile);
             XmlNode node = doc.DocumentElement.SelectSingleNode("/ScheduleLog/referenceDay");
             DateTimeOffset retValue = DateTimeOffset.Parse(node.InnerText);
@@ -903,14 +949,18 @@ namespace TilerFront
             return doc;
         }
 
-        async private Task<Dictionary<string, Location_Elements>> getLocationCache(string NameOfFile = "")
+        async protected Task<Dictionary<string, Location_Elements>> getLocationCache(string NameOfFile = "")
         {
             Dictionary<string, Location_Elements> retValue = new Dictionary<string, Location_Elements>();
 #if ForceReadFromXml
 #else
             if (useCassandra)
             {
-                retValue = await myCassandraAccess.getAllCachedLocations();
+                Task<Tuple<bool, string, DateTimeOffset, long>> gettingLatesData = LogDBDataAccess.getLatestChanges(ID);
+                Task<Dictionary<string, Location_Elements>> gettingLocationCache = myCassandraAccess.getAllCachedLocations();
+                Tuple<bool, string, DateTimeOffset, long> LatesData =await gettingLatesData;
+                LastIDNumber = LatesData.Item4;
+                retValue = await gettingLocationCache;
                 return retValue;
             }
 #endif
@@ -961,7 +1011,7 @@ namespace TilerFront
 
             XmlNode node = doc.DocumentElement.SelectSingleNode("/ScheduleLog/LastIDCounter");
             string LastUsedIndex = node.InnerText;
-            LastIDNumber = LastUsedIndex;
+            LastIDNumber =Convert.ToInt64( LastUsedIndex);
             DateTimeOffset userReferenceDay;
             XmlNode EventSchedulesNodes = doc.DocumentElement.SelectSingleNode("/ScheduleLog/EventSchedules");
 
@@ -1471,8 +1521,10 @@ namespace TilerFront
                 
                 Dictionary<string, CalendarEvent> AllScheduleData = this.getAllCalendarFromXml(RangeOfLookup);
                 DateTimeOffset ReferenceTime = getDayReferenceTime();
-                Dictionary<string, Location_Elements>  LocationCache = await TaskLocationCache;
-                populateDefaultLocation(LocationCache);
+                Dictionary<string, Location_Elements> LocationCache = await TaskLocationCache;
+                await populateDefaultLocation(LocationCache);
+                
+                
                 retValue = new Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, Location_Elements>>(AllScheduleData, ReferenceTime, LocationCache);
             }
             else
@@ -1485,7 +1537,7 @@ namespace TilerFront
 
         
 
-        async void populateDefaultLocation(Dictionary<string, Location_Elements> locations = null)
+        async Task populateDefaultLocation(Dictionary<string, Location_Elements> locations = null)
         {
             double xLocation = 40.083319;
             double yLocation = -105.3505482;
@@ -1511,7 +1563,9 @@ namespace TilerFront
             yLocation = locations.Values.Average(obj => obj.YCoordinate);
 
             retValue = new Location_Elements(xLocation, yLocation, -1);
+            Location_Elements.InitializeDefaultLongLat(xLocation, yLocation);
             DefaultLocation = retValue;
+            
         }
 
         #region Cassandra Functions
@@ -1545,7 +1599,7 @@ namespace TilerFront
             }
         }
 
-        public int LoggedUserID
+        public string LoggedUserID
         {
             get
             {

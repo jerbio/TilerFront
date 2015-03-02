@@ -63,10 +63,11 @@
 
 .retrievedEvent 
 {
-    position:absolute;
+    position:relative;
     width:100%;
     overflow:hidden;
     border-bottom:4px white solid;
+    height:45px;
 }
 
 .TopPanelContainer 
@@ -80,13 +81,16 @@
 .NameOfSearchedEventContainer 
 {
     position:absolute;
-    width:60%;
+    width: calc(100% - 35px);
     height:100%;
     top:0;
     overflow:hidden;
     text-overflow:ellipsis;
     text-align:left;
-    //background-color:blue;
+    white-space:nowrap;
+    line-height:30px;
+    font-size:12px;
+    padding-left:2px;
 }
 
 .DeadlineOfSearchedEventContainer 
@@ -125,10 +129,10 @@
 .DoNowButtonOfSearchedEventContainer
 {
     position:absolute;
-    width:13.33%;
-    left:86.67%;
-    height:100%;
-    //background-color: brown;
+    width: 26px;
+    height: 26px;
+    right: 0;
+    top: 2px;
 }
 
 
@@ -145,8 +149,8 @@
 
 .NowIcon_Search 
 {
-    height:24px;
-    width:24px;
-    left:50%;
-    top:50%;
+    height:100%;
+    width:100%;
+    //left:50%;
+    //top:50%;
 }

@@ -1906,10 +1906,20 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
 
 
 
-    function generateColorPickerContainer(loopBackFunction) {
+    function generateColorPickerContainer(loopBackFunction,isHorizontalPicker) {
         var ColorPickerContainer = getDomOrCreateNew("ColorPickerContainer");
-
-        var ColorPicker = "ColorPicker"; loopBackFunction
+        
+        //isHorizontalPicker = true;
+        var ColorPicker = "";
+        if (isHorizontalPicker) {
+            ColorPicker = "HorizontalColorPicker";
+            $(ColorPickerContainer).addClass("HorizontalColorPickerContainer")
+        }
+        else
+        {
+            ColorPicker = "ColorPicker";
+        }
+         //loopBackFunction
 
         var AllColors = new Array();
         for (var i = 0; i < global_AllColorClasses.length; i++) {
@@ -1924,8 +1934,8 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
             ColorContainer.Selector.Container.setAttribute('tabindex', 0)
             ColorContainer.Selector.Container.onkeypress = keyEntry
             AllColors.push(ColorContainer);
-            ColorContainer.Selector.Container.style.left = (Left * 33) + "%";
-            ColorContainer.Selector.Container.style.top = (Top * 33) + "%";
+            //ColorContainer.Selector.Container.style.left = (Left * 33) + "%";
+            //ColorContainer.Selector.Container.style.top = (Top * 33) + "%";
             ColorPickerContainer.Dom.appendChild(ColorContainer.Selector.Container);
         }
 
@@ -1947,7 +1957,6 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
 
         function genMoveOuterOrb(j) {
             return function () {
-                //debugger;
                 for (var i = 0; i < AllColors.length; i++) {
                     var MyCOntainer = AllColors[i];
                     MyCOntainer.Selected = false;
@@ -1955,8 +1964,14 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
                     $(MyCOntainer.Selector.OuterOrb).removeClass("addCircleAround");
                 }
                 AllColors[j].Selected = true;
-                //debugger;
                 $(AllColors[j].Selector.OuterOrb).addClass("addCircleAround");
+
+                if (loopBackFunction!=null)
+                {
+                    var ColorData = { ColorIndex: j, ColorClass: global_AllColorClasses[j].cssClass };
+                    loopBackFunction(ColorData);
+                }
+
             }
         }
 
@@ -1981,6 +1996,7 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
         var innerColor = getDomOrCreateNew("innerColor" + ID);
         $(innerColor.Dom).addClass("innerColor");
         $(OuterBlackColor.Dom).addClass("OuterBlackColor");
+
 
 
         ColorPickerContainer.Dom.appendChild(OuterBlackColor.Dom);

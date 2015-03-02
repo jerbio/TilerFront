@@ -17,7 +17,7 @@ namespace TilerFront
     {
         
         protected LogControl UserLog;
-        int ID;
+        protected string ID="";
         protected string Name;
         protected string Username;
         string Password;
@@ -27,14 +27,14 @@ namespace TilerFront
             Username = "";
             Password = "";
         }
-
+        /*
         public UserAccount(string UserName, string PassWord)
         {
             this.Username = UserName;
             this.Password = TilerFront.DBControl.encryptString(PassWord);
         }
-
-        public UserAccount(string UserName, int UserID)
+        */
+        public UserAccount(string UserName, string UserID)
         {
             this.Username = UserName;
             this.ID = UserID;
@@ -43,7 +43,7 @@ namespace TilerFront
 
         virtual public async Task<bool> Login()
         {
-            if(ID==0)
+            if(string.IsNullOrEmpty(ID))
             {
                 UserAccountDBAccess = new DBControl(Username, Password);
                 UserLog = new LogControl(UserAccountDBAccess);
@@ -60,17 +60,17 @@ namespace TilerFront
             return UserLog.Status;
         }
 
-        
 
 
-        async virtual public Task<Tuple<int, CustomErrors>> RegisterOld(string FirstName, string LastName, string Email, string UserName, string PassWord)
+
+        async virtual public Task<Tuple<string, CustomErrors>> RegisterOld(string FirstName, string LastName, string Email, string UserName, string PassWord)
         {
             CustomErrors retValue = new CustomErrors(false,"success");
             { 
                 PassWord=(DBControl.encryptString(PassWord));
             }
             UserAccountDBAccess = new DBControl(UserName, PassWord);
-            Tuple<int, CustomErrors> registrationStatus = await UserAccountDBAccess.RegisterUser(FirstName, LastName, Email);//, UserName, PassWord);
+            Tuple<string, CustomErrors> registrationStatus = await UserAccountDBAccess.RegisterUser(FirstName, LastName, Email);//, UserName, PassWord);
             retValue = registrationStatus.Item2;
             UserLog = new LogControl(UserAccountDBAccess);
             await UserLog.Initialize();
@@ -86,7 +86,7 @@ namespace TilerFront
                 }
             }
 
-            Tuple<int, CustomErrors> RetValue = new Tuple<int, CustomErrors>(registrationStatus.Item1, retValue);
+            Tuple<string, CustomErrors> RetValue = new Tuple<string, CustomErrors>(registrationStatus.Item1, retValue);
 
             return RetValue;
         }
@@ -141,8 +141,14 @@ namespace TilerFront
         {
             await UserLog.WriteToLogOld(AllEvents, LatestID, LogFile);
         }
+
+        
 #if ForceReadFromXml
 #else
+        async public Task batchMigrateXML()
+        {
+            await UserLog.BatchMigrateXML();
+        }
         /// <summary>
         /// This inserts a new entry cassandra into cassandra and updates the search engines. Use this when writing data to cassandra db.
         /// </summary>
@@ -151,8 +157,10 @@ namespace TilerFront
 
         virtual async public Task AddNewEventToLog(CalendarEvent newCalEvent)
         {
-            LogControl.useCassandra
-            await UserLog.AddNewEventToCassandra(newCalEvent);
+            if(LogControl.useCassandra)
+            {
+                await UserLog.AddNewEventToCassandra(newCalEvent);
+            }
         }
 #endif
 
@@ -180,7 +188,7 @@ namespace TilerFront
             }
         }
 
-        public int UserID
+        public string UserID
         {
             get 
             {

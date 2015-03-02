@@ -18,6 +18,7 @@ var global_GoToDay;
 $(global_ControlPanelIconSet.getIconSetContainer()).addClass("ControlPanelIconSetContainer");
 
 $(document).ready(function () {
+    $(document).tooltip({ track: true });
     $('body').hide();
     InitializeMonthlyOverview();
 });
@@ -266,25 +267,30 @@ function IconSet()
     //$(IconSetContainer).addClass("ControlPanelIconSetContainer");
     var LocationIconID = "ControlPanelLocationButton" + myID;
     var LocationIcon = getDomOrCreateNew(LocationIconID);
+    LocationIcon.setAttribute("Title","Location");
     $(LocationIcon).addClass("ControlPanelButton");
     $(LocationIcon).addClass("ControlPanelLocationButton");
     var ProcrastinateIconID = "ControlPanelProcrastinateButton" + myID;
     var ProcrastinateIcon = getDomOrCreateNew(ProcrastinateIconID);
+    ProcrastinateIcon.setAttribute("Title", "Procrastinate");
     $(ProcrastinateIcon).addClass("ControlPanelButton");
     $(ProcrastinateIcon).addClass("ControlPanelProcrastinateButton");
 
     var DeleteIconID = "ControlPanelDeleteButton" + myID;
     var DeleteIcon = getDomOrCreateNew(DeleteIconID);
+    DeleteIcon.setAttribute("Title", "Trash");
     $(DeleteIcon).addClass("ControlPanelButton");
     $(DeleteIcon).addClass("ControlPanelDeleteButton");
 
     var CompleteIconID = "ControlPanelCompleteButton" + myID;
     var CompleteIcon = getDomOrCreateNew(CompleteIconID);
+    CompleteIcon.setAttribute("Title", "Mark as complete");
     $(CompleteIcon).addClass("ControlPanelButton");
     $(CompleteIcon).addClass("ControlPanelCompleteButton");
 
     var CloseIconID = "ControlPanelCloseButton" + myID;
     var CloseIcon = getDomOrCreateNew(CloseIconID);
+    CloseIcon.setAttribute("Title", "Close Panel");
     $(CloseIcon).addClass("ControlPanelButton");
     $(CloseIcon).addClass("ControlPanelCloseButton");
 
@@ -589,6 +595,7 @@ function generateDayContainer()
     
     $(DayContainer.Dom).addClass("DayContainer");
     var NameOfDayContainer = getDomOrCreateNew("NameOfDayContainer" + myID);
+    NameOfDayContainer.onclick = function (e) { e.stopPropagation(); };
     var DayTimeContainer = getDomOrCreateNew("DayTimeContainer" + myID);
     $(DayTimeContainer).addClass("setAsDisplayNone");
     $(NameOfDayContainer.Dom).addClass("NameOfDayContainer");
@@ -2101,6 +2108,13 @@ generateAMonthBar.counter = 0;
             SubEvent.gridDoms.push(EventDom.Dom);
 
             $(EventDom.Dom).addClass("gridSubevent");
+            
+            $(EventDom.Dom).hover(function () {
+               //setTimeout(function () { debugger; },100)
+                
+            });
+
+            EventDom.setAttribute("Title", SubEvent.SubCalStartDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + " - " + SubEvent.SubCalEndDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
             //debugger;
             if (SubEvent.ColorSelection > 0) {
                 //debugger;
@@ -2784,7 +2798,8 @@ generateAMonthBar.counter = 0;
         function BindAddNewEventToClick(Week) {
     var RenderPlaneDom = Week.Dom;
     $(RenderPlaneDom).click(function (e) {
-        var posX = $(this).offset().left, posY = $(this).offset().top;
+        var posX = $(this).offset().left
+        var posY = $(this).offset().top;
         var left = e.pageX -posX;
         var top = e.pageY -posY;
         var height = $(RenderPlaneDom).height();
@@ -2792,6 +2807,7 @@ generateAMonthBar.counter = 0;
         //debugger;
 
         //alert(width);
+        //getDomOrCreateNew("CurrentWeekContainer")
         generateModal(left, top, height, width, Week.Start, this);
         e.stopPropagation();
     });

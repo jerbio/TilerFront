@@ -156,7 +156,7 @@ function generateModal(x, y, height, width,WeekStart, RenderPlane,UseCurrentTime
     //return;
     global_ExitManager.triggerLastExitAndPop();
     var modalAddDom = getDomOrCreateNew("AddModalDom");
-    
+    $(modalAddDom).addClass("setAsDisplayNone");//adding this so that motion unnecesary reposition isnt noticed. It'll get removed at the end of func
     var weekDayWidth = $($(".DayContainer")[0]).width();
     var AddTile = getDomOrCreateNew("AddTileDom", "button");
     var AddEvent = getDomOrCreateNew("AddEventDom", "button");
@@ -169,9 +169,21 @@ function generateModal(x, y, height, width,WeekStart, RenderPlane,UseCurrentTime
     modalAddDom.Dom.appendChild(SpanEscape.Dom);
     $(AddTile.Dom).addClass("SubmitButton");
     $(AddEvent.Dom).addClass("SubmitButton");
+    RenderPlane.appendChild(modalAddDom.Dom);
+    var modalHeight = ($(modalAddDom).height());
+    var modalWidth= ($(modalAddDom).width());
+    var MaxY = height -modalHeight;
+    var MaxX = width -modalWidth;
+    var modalXPos = x > MaxX?(x-modalWidth):x;
+    var modalYPos = y > MaxY ?(y-modalHeight):y;
+    if (height<10)// hack to ensure selection of add button
+    {
+        modalYPos = 0;
+    }
+    
 
-    modalAddDom.Dom.style.left = x + "px";
-    modalAddDom.Dom.style.top = y + "px";
+    modalAddDom.Dom.style.left = modalXPos + "px";
+    modalAddDom.Dom.style.top = modalYPos + "px";
     $(AddEvent.Dom).click(function () {
         (modalAddDom.Dom.parentElement.removeChild(modalAddDom.Dom));
         var floatalTime = 0;
@@ -183,7 +195,7 @@ function generateModal(x, y, height, width,WeekStart, RenderPlane,UseCurrentTime
         var NewDay = 0;
         if(!UseCurrentTime)
         {
-            floatalTime = y / height;
+            floatalTime = (y - ($(".NameOfDayContainer:first").height())) / (height - ($(".NameOfDayContainer:first").height()));// Hack alert the sutractions are hacks to make it work within the UIrenderplace.
             Hour = Math.floor((floatalTime) * 24);
             Min = 0;
             WeekDayIndex = Math.floor(x / weekDayWidth);
@@ -252,9 +264,9 @@ function generateModal(x, y, height, width,WeekStart, RenderPlane,UseCurrentTime
 
         
     };
-    //$(document).keydown(removePanel);
+    $(modalAddDom).removeClass("setAsDisplayNone");
     
-    RenderPlane.appendChild(modalAddDom.Dom);
+    
     $(modalAddDom.Dom).attr('tabindex', 0).focus();
 
 }
@@ -692,14 +704,25 @@ function AddTiledEvent()
     var ModalDoneContentContainer = getDomOrCreateNew(ModalDoneContainerID);//Contains the done section
     var ModalActiveOptionsContainerID = "ModalActiveOptionsContainer"
     var ModalActiveOptionsContainer = getDomOrCreateNew(ModalActiveOptionsContainerID);//Contains the options when turned on
-    var ColorPicker = generateColorPickerContainer(null, true);
+    
+
+    function changeSummaryBackgroundColor(ColorData)
+    {
+        if (changeSummaryBackgroundColor.CurrentColor != null)
+        {
+            $(AutoSentence.getContainer()).removeClass(changeSummaryBackgroundColor.CurrentColor);
+        }
+        changeSummaryBackgroundColor.CurrentColor = ColorData.ColorClass;
+        $(AutoSentence.getContainer()).addClass(changeSummaryBackgroundColor.CurrentColor);
+    }
+    changeSummaryBackgroundColor.CurrentColor = null;
+
+    
     
 
     ActiveContainer.Dom.appendChild(ModalContentContainer.Dom);
     ActiveContainer.Dom.appendChild(ModalActiveOptionsContainer.Dom)
-
-    ActiveContainer.Dom.appendChild(ColorPicker.Selector.Container);
-    ActiveContainer.Dom.appendChild(ModalDoneContentContainer.Dom)
+    
     
 
     ModalActiveOptionsContainer.addOptions = function (NewOption)
@@ -765,8 +788,15 @@ function AddTiledEvent()
         this.UpdateAutoSentence = updateSentence;
     }
 
+
+
     var AutoSentence = new sentenceCompletion();
-    var AutoSentenceCOntainer= AutoSentence.getContainer()
+    var AutoSentenceCOntainer = AutoSentence.getContainer();
+
+    var ColorPicker = generateColorPickerContainer(changeSummaryBackgroundColor, true);//this has to be placed after AutoSentence  initialization in order to ensure that changeSummaryBackgroundColor doesnt make a call to null in the function changeSummaryBackgroundColor
+    ActiveContainer.Dom.appendChild(ColorPicker.Selector.Container);//ColorPicker.Selector.Container has to be inserted before the done button container to ensure insertion before done
+    ActiveContainer.Dom.appendChild(ModalDoneContentContainer.Dom)
+
 
     modalTileEvent.Dom.appendChild(ActiveContainer.Dom);
     modalTileEvent.Dom.appendChild(InActiveContainer.Dom);

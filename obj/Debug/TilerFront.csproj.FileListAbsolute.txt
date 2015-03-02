@@ -47,7 +47,6 @@ C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\System.Web.WebPages
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\TilerElements.dll
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\WebGrease.dll
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Google.Maps.dll
-C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Microsoft.Owin.Hosting.dll
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Antlr3.Runtime.pdb
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\EntityFramework.xml
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\EntityFramework.SqlServer.xml
@@ -86,7 +85,6 @@ C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Microsoft.Owin.Secu
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Microsoft.Owin.Security.Twitter.xml
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Microsoft.Owin.Security.MicrosoftAccount.xml
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Google.Maps.pdb
-C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Microsoft.Owin.Hosting.xml
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.csprojResolveAssemblyReference.cache
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.Migrations.init.resources
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.Migrations.Initial.resources
@@ -94,3 +92,5 @@ C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.cs
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\ApplicationInsights.config
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.dll
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.pdb
+C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Microsoft.Owin.Hosting.dll
+C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Microsoft.Owin.Hosting.xml

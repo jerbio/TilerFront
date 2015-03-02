@@ -1,7 +1,7 @@
 ﻿"use strict"
 
 
-var Debug = false;
+var Debug = true;
 var DebugLocal = false;
 
 //var global_refTIlerUrl = "http://localhost:53201/api/";
@@ -1957,7 +1957,6 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
 
         function genMoveOuterOrb(j) {
             return function () {
-                //debugger;
                 for (var i = 0; i < AllColors.length; i++) {
                     var MyCOntainer = AllColors[i];
                     MyCOntainer.Selected = false;
@@ -1965,8 +1964,14 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
                     $(MyCOntainer.Selector.OuterOrb).removeClass("addCircleAround");
                 }
                 AllColors[j].Selected = true;
-                //debugger;
                 $(AllColors[j].Selector.OuterOrb).addClass("addCircleAround");
+
+                if (loopBackFunction!=null)
+                {
+                    var ColorData = { ColorIndex: j, ColorClass: global_AllColorClasses[j].cssClass };
+                    loopBackFunction(ColorData);
+                }
+
             }
         }
 
@@ -1991,6 +1996,7 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
         var innerColor = getDomOrCreateNew("innerColor" + ID);
         $(innerColor.Dom).addClass("innerColor");
         $(OuterBlackColor.Dom).addClass("OuterBlackColor");
+
 
 
         ColorPickerContainer.Dom.appendChild(OuterBlackColor.Dom);

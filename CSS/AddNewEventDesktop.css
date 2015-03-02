@@ -457,7 +457,7 @@ input:focus:-ms-input-placeholder { color:rgba(0,0,0, 0.2); }
 #ModalSenetenceContainer
 {
     padding: 25px 50px;
-    background: yellow;
+    //background: yellow;
     width: 100%;
 }
 

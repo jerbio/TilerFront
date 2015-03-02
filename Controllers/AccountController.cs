@@ -305,14 +305,15 @@ namespace TilerFront.Controllers
             {
                 var user = new ApplicationUser { UserName = model.Username, Email = model.Email, FullName = model.FullName, LastChange = DateTime.Now};
                 var logGenerationresult = await generateLog(user);
-                var result = logGenerationresult.Item1;
-                if (result.Succeeded)
-                {
-                    result = await UserManager.CreateAsync(user, model.Password);
+                //var result = logGenerationresult.Item1;
+                //if (result.Succeeded)
+                //{
+                    var result = await UserManager.CreateAsync(user, model.Password);
 
                     if (result.Succeeded)
                     {
                         await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
+                        /*
                         if (logGenerationresult.Item2 > 0)
                         {
                             string CurrentLogLocation = LogControl.getLogLocation();
@@ -326,6 +327,7 @@ namespace TilerFront.Controllers
                             await OldUserAccount.DeleteLog();
                             LogControl.UpdateLogLocation(CurrentLogLocation);
                         }
+                        */
                         string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
                         var callbackUrl = Url.Action("ConfirmEmail", "Account",
                            new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
@@ -349,7 +351,7 @@ namespace TilerFront.Controllers
                         LogControlDirect LogToBedeleted = new LogControlDirect(user);
                         await LogToBedeleted.DeleteLog();
                     }
-                }
+                //}
                 AddErrors(result);
             }
 
@@ -380,6 +382,7 @@ namespace TilerFront.Controllers
                     if (result.Succeeded)
                     {
                         await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
+                        /*
                         if (logGenerationresult.Item2 > 0)
                         {
                             string CurrentLogLocation = LogControl.getLogLocation();
@@ -393,6 +396,7 @@ namespace TilerFront.Controllers
                             await OldUserAccount.DeleteLog();
                             LogControl.UpdateLogLocation(CurrentLogLocation);
                         }
+                        */
                         string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
                         var callbackUrl = Url.Action("ConfirmEmail", "Account",
                            new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
@@ -449,6 +453,7 @@ namespace TilerFront.Controllers
             int OldID = -1;
             if (ExistInOldDB.Item1)
             {
+                /*
                 OldID = ExistInOldDB.Item2;
                 DBControl newDB = new DBControl(model.UserName, model.PasswordHash);
                 LogControl OldLog = new LogControl(newDB);
@@ -522,6 +527,13 @@ namespace TilerFront.Controllers
             return View();
         }
 
+
+        [Authorize]
+        public ActionResult Mobile()
+        {
+            ViewBag.Message = "Welcome To Tiler";
+            return View();
+        }
 
 
 
@@ -676,7 +688,8 @@ namespace TilerFront.Controllers
                     // If the user does not have an account, then prompt the user to create an account
                     ViewBag.ReturnUrl = returnUrl;
                     ViewBag.LoginProvider = loginInfo.Login.LoginProvider;
-                    return View("ExternalLoginConfirmation", new ExternalLoginConfirmationViewModel { Email = loginInfo.Email });
+                    return await ExternalLoginConfirmation(new ExternalLoginConfirmationViewModel { Email = loginInfo.Email }, returnUrl);
+                    //return View("ExternalLoginConfirmation", new ExternalLoginConfirmationViewModel { Email = loginInfo.Email });
             }
         }
 

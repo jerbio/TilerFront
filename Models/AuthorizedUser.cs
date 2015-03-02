@@ -9,9 +9,6 @@ namespace TilerFront.Models
 {
     public class AuthorizedUser : DTOs.VerifiedUser
     {
-
-
-        
         public bool MobileFlag { get; set; }
         public int TimeZoneOffset { get; set; }
 

@@ -227,14 +227,18 @@ body {
 
 
 .NowIcon {
-        position: absolute;
-    width:243px;
-    height:243px;
+    position: absolute;
     background-image:url(../img/Icons/NowButton.svg);
     background-size: 100% 100%;
     background-repeat:no-repeat;
 }
 
+.ImgIcon
+{
+    width:243px;
+    height:243px;
+
+}
 .AddButtonLight
 {
     position: absolute;

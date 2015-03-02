@@ -9,11 +9,11 @@ function addNewEvent(x, y, height, refStart)
 }
 
 
-function prepSendTile(NameInput, AddressInput, SpliInput, HourInput, MinuteInput, DeadlineInput, RepetitionInput, RepetitionFlag)
+function prepSendTile(NameInput, AddressInput, SpliInput, HourInput, MinuteInput, DeadlineInput, RepetitionInput, RepetitionFlag, ColorSelection)
 {
     return function ()
     {
-        var calendarColor = global_AllColorClasses[0];
+        var calendarColor = ColorSelection;
         
         SubmitTile(NameInput.value, AddressInput.value, SpliInput.value, HourInput.value, MinuteInput.value, DeadlineInput.value, RepetitionInput.value, calendarColor, RepetitionFlag);
     }
@@ -46,7 +46,7 @@ function SubmitTile(Name, Address, Splits, Hour, Minutes, Deadline, Repetition, 
     EventStart.Date = new Date(Start.getFullYear(), Start.getMonth(), Start.getDate());
     EventStart.Time = { Hour: 0, Minute: 0 };
     var End = new Date(Deadline);
-    
+    CalendarColor = { r: CalendarColor.r, g: CalendarColor.g, b: CalendarColor.b, s: CalendarColor.Selection, o: CalendarColor.a };
 
     var EventDuration = { Days: 0, Hours: Hour, Mins: Minutes };
 
@@ -156,19 +156,31 @@ function generateModal(x, y, height, width,WeekStart, RenderPlane,UseCurrentTime
     //return;
     global_ExitManager.triggerLastExitAndPop();
     var modalAddDom = getDomOrCreateNew("AddModalDom");
-    
+    $(modalAddDom).addClass("setAsDisplayNone");//adding this so that motion unnecesary reposition isnt noticed. It'll get removed at the end of func
     var weekDayWidth = $($(".DayContainer")[0]).width();
     var AddTile = getDomOrCreateNew("AddTileDom", "button");
     var AddEvent = getDomOrCreateNew("AddEventDom", "button");
+    var SpanEscape = getDomOrCreateNew("SpanEscape", "span");
+    SpanEscape.Dom.innerHTML=("Press Escape to Exit.");
     AddEvent.Dom.innerHTML=("New Event");
     AddTile.Dom.innerHTML=("New Tile");
     modalAddDom.Dom.appendChild(AddEvent.Dom);
     modalAddDom.Dom.appendChild(AddTile.Dom);
+    modalAddDom.Dom.appendChild(SpanEscape.Dom);
     $(AddTile.Dom).addClass("SubmitButton");
     $(AddEvent.Dom).addClass("SubmitButton");
+    RenderPlane.appendChild(modalAddDom.Dom);
+    var modalHeight = ($(modalAddDom).height());
+    var modalWidth= ($(modalAddDom).width());
+    var MaxY = height -modalHeight;
+    var MaxX = width -modalWidth;
+    var modalXPos = x > MaxX?(x-modalWidth):x;
+    var modalYPos = y > MaxY ?(y-modalHeight):y;
 
-    modalAddDom.Dom.style.left = x + "px";
-    modalAddDom.Dom.style.top = y + "px";
+    
+
+    modalAddDom.Dom.style.left = modalXPos + "px";
+    modalAddDom.Dom.style.top = modalYPos + "px";
     $(AddEvent.Dom).click(function () {
         (modalAddDom.Dom.parentElement.removeChild(modalAddDom.Dom));
         var floatalTime = 0;
@@ -180,7 +192,7 @@ function generateModal(x, y, height, width,WeekStart, RenderPlane,UseCurrentTime
         var NewDay = 0;
         if(!UseCurrentTime)
         {
-            floatalTime = y / height;
+            floatalTime = (y - ($(".NameOfDayContainer:first").height())) / (height - ($(".NameOfDayContainer:first").height()));// Hack alert the sutractions are hacks to make it work within the UIrenderplace.
             Hour = Math.floor((floatalTime) * 24);
             Min = 0;
             WeekDayIndex = Math.floor(x / weekDayWidth);
@@ -249,9 +261,9 @@ function generateModal(x, y, height, width,WeekStart, RenderPlane,UseCurrentTime
 
         
     };
-    //$(document).keydown(removePanel);
+    $(modalAddDom).removeClass("setAsDisplayNone");
     
-    RenderPlane.appendChild(modalAddDom.Dom);
+    
     $(modalAddDom.Dom).attr('tabindex', 0).focus();
 
 }
@@ -327,9 +339,10 @@ function generateAddEventContainer(x,y,height,Container,refStartTime)
     NewEventcontainer.Dom.appendChild(DurationDom.Selector.Container);
     //NewEventcontainer.Dom.appendChild(EndDom.Selector.Container);
     NewEventcontainer.Dom.appendChild(LocationDom.Selector.Container);
-    NewEventcontainer.Dom.appendChild(ColorPicker.Selector.Container);
-    //NewEventcontainer.Dom.appendChild(EnableTiler.Selector.Container);
+
     NewEventcontainer.Dom.appendChild(recurrence.Content);
+    NewEventcontainer.Dom.appendChild(ColorPicker.Selector.Container);
+
     NewEventcontainer.Dom.appendChild(SubmitButton.Selector.Container);
     
     
@@ -688,10 +701,25 @@ function AddTiledEvent()
     var ModalDoneContentContainer = getDomOrCreateNew(ModalDoneContainerID);//Contains the done section
     var ModalActiveOptionsContainerID = "ModalActiveOptionsContainer"
     var ModalActiveOptionsContainer = getDomOrCreateNew(ModalActiveOptionsContainerID);//Contains the options when turned on
+    
+
+    function changeSummaryBackgroundColor(ColorData)
+    {
+        if (changeSummaryBackgroundColor.CurrentColor != null)
+        {
+            $(AutoSentence.getContainer()).removeClass(changeSummaryBackgroundColor.CurrentColor);
+        }
+        changeSummaryBackgroundColor.CurrentColor = ColorData.ColorClass;
+        $(AutoSentence.getContainer()).addClass(changeSummaryBackgroundColor.CurrentColor);
+    }
+    changeSummaryBackgroundColor.CurrentColor = null;
+
+    
+    
 
     ActiveContainer.Dom.appendChild(ModalContentContainer.Dom);
     ActiveContainer.Dom.appendChild(ModalActiveOptionsContainer.Dom)
-    ActiveContainer.Dom.appendChild(ModalDoneContentContainer.Dom)
+    
     
 
     ModalActiveOptionsContainer.addOptions = function (NewOption)
@@ -757,8 +785,15 @@ function AddTiledEvent()
         this.UpdateAutoSentence = updateSentence;
     }
 
+
+
     var AutoSentence = new sentenceCompletion();
-    var AutoSentenceCOntainer= AutoSentence.getContainer()
+    var AutoSentenceCOntainer = AutoSentence.getContainer();
+
+    var ColorPicker = generateColorPickerContainer(changeSummaryBackgroundColor, true);//this has to be placed after AutoSentence  initialization in order to ensure that changeSummaryBackgroundColor doesnt make a call to null in the function changeSummaryBackgroundColor
+    ActiveContainer.Dom.appendChild(ColorPicker.Selector.Container);//ColorPicker.Selector.Container has to be inserted before the done button container to ensure insertion before done
+    ActiveContainer.Dom.appendChild(ModalDoneContentContainer.Dom)
+
 
     modalTileEvent.Dom.appendChild(ActiveContainer.Dom);
     modalTileEvent.Dom.appendChild(InActiveContainer.Dom);
@@ -1030,8 +1065,8 @@ function AddTiledEvent()
     {
         var Splits = RepetionSlider.getAllElements()[0].TileInput;
         var RepetionChoice = RepetionSlider.getAllElements()[1].TileInput;
-
-        var SendIt = prepSendTile(Element1.TileInput.getInputDom(), Element2.TileInput.getInputDom(), Splits.getInputDom(), Hour.getInputDom(), Min.getInputDom(), Element4.TileInput.getInputDom(), RepetionChoice.getInputDom(), RepetionSlider.getStatus());
+        var myColor = ColorPicker.Selector.getColor();
+        var SendIt = prepSendTile(Element1.TileInput.getInputDom(), Element2.TileInput.getInputDom(), Splits.getInputDom(), Hour.getInputDom(), Min.getInputDom(), Element4.TileInput.getInputDom(), RepetionChoice.getInputDom(), RepetionSlider.getStatus(), myColor);
         if (TileInputBox.DoneButton.getStatus()) {
             SendIt();
             //AddTiledEvent.Exit();
@@ -1867,7 +1902,7 @@ function createCalEventRecurrence()
     var EnableRecurrenceLabel = getDomOrCreateNew(EnableRecurrenceLabelID,"label");
     EnableRecurrenceContainer.Dom.appendChild(EnableRecurrenceLabel.Dom);
     $(EnableRecurrenceContainer.Dom).addClass(CurrentTheme.FontColor);
-    EnableRecurrenceLabel.Dom.innerHTML = "Do you want this event to recurr?"
+    EnableRecurrenceLabel.Dom.innerHTML = "Do you want this event to recurr?<br/> <span class='PressSpacebar'>Press Spacebar to toggle and/or to select a color below.</span>"
 
     /*var EnableRecurrenceButtonContainerID = "EnableRecurrenceButtonContainer";
     var EnableRecurrenceButtonContainer = getDomOrCreateNew(EnableRecurrenceButtonContainerID);

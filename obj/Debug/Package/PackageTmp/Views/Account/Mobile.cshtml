@@ -1,0 +1,24 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Tiler Desktop</title>
+    @Scripts.Render("~/Content/TilerMobileJS")
+    @Styles.Render("~/Content/TilerMobileCss")
+    <script>
+    YUI_config = {
+        debug: true,
+        combine: true,
+        comboBase: '../Scripts/YuiCombo/'
+    };
+    </script>
+</head>
+<body class="yui3-skin-sam">
+    <div id="CalBodyContainer">
+        <!--<div id="ScheduleContainer"></div>-->
+    </div>
+    <div id="SearchPanelOverlay">
+
+    </div>
+    <div id="LoadingScreenPanel"></div>
+</body>
+</html>

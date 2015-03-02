@@ -82,11 +82,12 @@ body {
 .DayContainer
 {
   position:absolute;
-  width:14.3%;
+  width:calc(100% / 7);
   overflow:hidden;
   height: 116.279069767% !important;
   overflow: hidden;
   top: -16.6666666667%;
+  box-sizing:border-box;
 }
 
 .SundayDayContainer
@@ -99,42 +100,42 @@ body {
 .MondayDayContainer
 {
   position:absolute;
-  left:14.1%;
+  left:calc(1 * (100% / 7));
   height: 100%;
 }
 
 .TuesdayDayContainer
 {
   position:absolute;
-  left:28.2%;
+  left:calc(2 * (100% / 7));
   height: 100%;
 }
 
 .WednesdayDayContainer
 {
   position:absolute;
-  left:42.3%;
+  left:calc(3 * (100% / 7));
   height: 100%;
 }
 
 .ThursdayDayContainer
 {
   position:absolute;
-  left:56.4%;
+  left:calc(4 * (100% / 7));
   height: 100%;
 }
 
 .FridayDayContainer
 {
   position:absolute;
-  left:70.5%;
+  left:calc(5 * (100% / 7));
   height: 100%;
 }
 
 .SaturdayDayContainer
 {
   position:absolute;
-  left:84.6%;
+  left:calc(6 * (100% / 7));
   height: 100%;
 }
 
@@ -227,6 +228,7 @@ body {
   text-overflow:ellipsis;
   font-size:0.65em;
   white-space:nowrap;
+  box-sizing:border-box;
   border:white 1px solid;
   border-radius:7px;
   width:17px;

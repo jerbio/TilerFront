@@ -20,9 +20,10 @@ namespace TilerFront
                                    "database=WagtapUserAccounts; " +
                                    "connection timeout=30");
         */
-        protected static SqlConnection Wagtap = new SqlConnection("Server=tcp:gjjadsh2tt.database.windows.net,1433;Database=DatabaseWaggy;User ID=wagtap@gjjadsh2tt;Password=Tagwapadminazure007#;Trusted_Connection=False;Encrypt=True;Connection Timeout=30;");
-
-        int ID;
+        protected static string DatabaseName = "mytiler_db";
+        protected static SqlConnection Wagtap = new SqlConnection("Server=tcp:gjjadsh2tt.database.windows.net,1433;Database=" + DatabaseName + ";User ID=wagtap@gjjadsh2tt;Password=Tagwapadminazure007#;Trusted_Connection=False;Encrypt=True;Connection Timeout=30;");
+        
+        protected string ID;
         protected string UserName;
         string UserPassword;
 
@@ -30,7 +31,7 @@ namespace TilerFront
         {
             UserName = "";
             UserPassword = "";
-            ID = 0;
+            ID = "";
         }
         /*
         public DBControl(UserAccount verifiedUser)
@@ -41,23 +42,23 @@ namespace TilerFront
                 
             }
         }*/
-
+        /*
         public DBControl(string UserName, string Password)
         {
             this.UserName =  UserName.ToLower();
             this.UserPassword = Password;
         }
+        */
 
-
-        public DBControl(string UserName, int UserID)
+        public DBControl(string UserName, string UserID)
         {
             this.UserName = UserName.ToLower();
             ID = UserID;
         }
 
-        public Tuple<bool, int,string> LogIn()//(string UserName, string Password)
+        public Tuple<bool, string,string> LogIn()//(string UserName, string Password)
         {
-            Tuple<bool, int,string> retValue;
+            Tuple<bool, string, string> retValue;
             string NamerOfUser = "";
             try
             {
@@ -74,7 +75,7 @@ namespace TilerFront
             {
                 SqlDataReader myReader = null;
                 SqlCommand myCommand;
-                if (this.ID == 0)//checks if ID has been initialized
+                if ( string.IsNullOrEmpty(this.ID ))//checks if ID has been initialized
                 {
                     myCommand = new SqlCommand("select ID from DatabaseWaggy.dbo.UserLog where DatabaseWaggy.dbo.UserLog.UserName = '" + UserName + "' and DatabaseWaggy.dbo.UserLog.Password = '" + UserPassword + "'", Wagtap);
                     myReader = myCommand.ExecuteReader();
@@ -82,10 +83,11 @@ namespace TilerFront
                     while (myReader.Read())
                     {
                         ID = myReader["ID"].ToString();
-                        this.ID = Convert.ToInt32(ID);
+                        this.ID = (ID);
                     }
                     myReader.Close();
-                    if (this.ID != 0)
+                    //if (this.ID != 0)
+                    if (!string.IsNullOrEmpty(this.ID))
                     {
                         SqlCommand InsertUserInfo = new SqlCommand("select FirstName from DatabaseWaggy.dbo.UserInfo where DatabaseWaggy.dbo.UserInfo.ID =" + this.ID + "", Wagtap);
                         myReader = InsertUserInfo.ExecuteReader();
@@ -102,15 +104,15 @@ namespace TilerFront
                 {
                     myCommand = new SqlCommand("select ID from DatabaseWaggy.dbo.UserLog where DatabaseWaggy.dbo.UserLog.UserName = '" + UserName + "' and DatabaseWaggy.dbo.UserLog.ID = " + this.ID + "", Wagtap);
                     myReader = myCommand.ExecuteReader();
-                    this.ID = 0;
+                    this.ID = "";
                     ID = "";
                     while (myReader.Read())
                     {
                         ID = myReader["ID"].ToString();
-                        this.ID = Convert.ToInt32(ID);
+                        this.ID = ID;
                     }
                     myReader.Close();
-                    if (this.ID != 0)
+                    if (!string.IsNullOrEmpty(this.ID))// != 0)
                     {
                         SqlCommand InsertUserInfo = new SqlCommand("select FirstName from DatabaseWaggy.dbo.UserInfo where DatabaseWaggy.dbo.UserInfo.ID =" + this.ID + "", Wagtap);
                         myReader = InsertUserInfo.ExecuteReader();
@@ -133,11 +135,11 @@ namespace TilerFront
 
             if (string.IsNullOrEmpty(ID))
             {
-                retValue = new Tuple<bool, int,string>(false, 0,"");
+                retValue = new Tuple<bool, string,string>(false, "","");
             }
             else
             {
-                retValue = new Tuple<bool, int, string>(true, this.ID, NamerOfUser);
+                retValue = new Tuple<bool, string, string>(true, this.ID, NamerOfUser);
             }
 
             Wagtap.Close();
@@ -145,16 +147,17 @@ namespace TilerFront
             return retValue;
         }
 
-        public bool CreateLatestChange(int userID, DateTimeOffset timeOfDay, long LastUserID=1)
+        async public Task<bool> CreateLatestChange(string userID, DateTimeOffset timeOfDay, long LastUserID=1)
         {
                 //"Insert into DatabaseWaggy.dbo.UserLog (UserName,Password,Active) values ('" + this.UserName + "','" + this.UserPassword + "','" + 1 + "') select ID from DatabaseWaggy.dbo.UserLog where DatabaseWaggy.dbo.UserLog.UserName='" + this.UserName + "'"
             bool retValue = false;
 
-            DateTime dateData = timeOfDay.DateTime.Add(WebApiConfig.StartOfTimeTimeSpan);
+            DateTimeOffset dateData = timeOfDay.UtcDateTime;//.DateTime.Add(WebApiConfig.StartOfTimeTimeSpan);
             string LatestHash = encryptString(DateTimeOffset.Now.ToString()).Substring(0,50);
             LatestHash=LatestHash.Replace("\'", "").Replace("\"", "");
-            string GetExtraData = "select ChangeHash from DatabaseWaggy.dbo.UserLatestChange where DatabaseWaggy.dbo.UserLatestChange.UserID=" + userID;
-            string QueryString = @"Insert into DatabaseWaggy.dbo.UserLatestChange (UserID,ChangeHash,TimeOfDay,LastUsedID) values (" + userID + ",'" + LatestHash + "', \'" + dateData.ToString() + "\' ," + LastUserID + ")";
+            
+            string GetExtraData = "select ChangeHash from "+DatabaseName+".dbo.UserLatestChange where "+DatabaseName+".dbo.UserLatestChange.UserID=\'" + userID+"\'";
+            string QueryString = @"Insert into " + DatabaseName + ".dbo.UserLatestChange (UserID,ChangeHash,LastChange,LastUsedID) values (\'" + userID + "\','" + LatestHash + "', \'" + dateData.ToString() + "\' ," + LastUserID + ")";
             QueryString += GetExtraData;
             
             try
@@ -174,7 +177,7 @@ namespace TilerFront
                 SqlCommand InserUName_UPwd = new SqlCommand(QueryString, Wagtap);
 
                 //'"select ID from DatabaseWaggy.dbo.UserLog where DatabaseWaggy.dbo.UserLog.UserName = '" + UserName + "' and DatabaseWaggy.dbo.UserLog.Password = '" + Password + "'", Wagtap);
-                myReader = InserUName_UPwd.ExecuteReader();
+                myReader =await InserUName_UPwd.ExecuteReaderAsync(); //ExecuteReader();
 
                 while (myReader.Read())
                 {
@@ -203,9 +206,9 @@ namespace TilerFront
 
         }
 
-        async public Task<Tuple<int, CustomErrors>> RegisterUser(string FirstName, string LastName, string Email)//, string UserName, string Password)
+        async public Task<Tuple<string, CustomErrors>> RegisterUser(string FirstName, string LastName, string Email)//, string UserName, string Password)
         {
-            Tuple<int, CustomErrors> retValue;
+            Tuple<string, CustomErrors> retValue;
             try
             {
                 Wagtap.Open();
@@ -221,7 +224,8 @@ namespace TilerFront
             {
                 SqlDataReader myReader = null;
                 SqlCommand InserUName_UPwd = new SqlCommand("Insert into DatabaseWaggy.dbo.UserLog (UserName,Password,Active) values ('" + this.UserName + "','" + this.UserPassword + "','" + 1 + "') select ID from DatabaseWaggy.dbo.UserLog where DatabaseWaggy.dbo.UserLog.UserName='" + this.UserName + "'", Wagtap);
-                int ID_NUmb = 0;
+                //int ID_NUmb = 0;
+                string ID_NUmb = "";
 
                 //'"select ID from DatabaseWaggy.dbo.UserLog where DatabaseWaggy.dbo.UserLog.UserName = '" + UserName + "' and DatabaseWaggy.dbo.UserLog.Password = '" + Password + "'", Wagtap);
                 myReader  = await InserUName_UPwd.ExecuteReaderAsync();
@@ -230,19 +234,21 @@ namespace TilerFront
                 while (myReader.Read())
                 {
                     ID = myReader["ID"].ToString();
-                    ID_NUmb = Convert.ToInt32(ID);
+                    //ID_NUmb = Convert.ToInt32(ID);
+                    ID_NUmb = ID;
                     this.ID = ID_NUmb;
                 }
                 myReader.Close();
 
-                if (ID_NUmb != 0)
+                //if (ID_NUmb != 0)
+                if (!string.IsNullOrEmpty(ID_NUmb))
                 {
                     SqlCommand InsertUserInfo = new SqlCommand("Insert into DatabaseWaggy.dbo.UserInfo (ID,FirstName,LastName,Email) values (" + ID_NUmb + ",'" + FirstName + "','" + LastName + "','" + Email + "');", Wagtap);
                     myReader = InsertUserInfo.ExecuteReader();
                 }
                 else
                 {
-                    retValue = new Tuple<int,CustomErrors>(0, new CustomErrors(true, "User Already Exist", 10001000));
+                    retValue = new Tuple<string,CustomErrors>("", new CustomErrors(true, "User Already Exist", 10001000));
                 }
 
             }
@@ -254,22 +260,22 @@ namespace TilerFront
 
             DateTimeOffset myDateTimeOffset = WebApiConfig.JSStartTime;
 
-            bool latestChange = CreateLatestChange(this.ID,myDateTimeOffset );
+            bool latestChange =await CreateLatestChange(this.ID,myDateTimeOffset );
 
             if (string.IsNullOrEmpty(ID)||!latestChange)
             {
                 if (!latestChange)
                 {
-                    retValue = new Tuple<int, CustomErrors>(0, new CustomErrors(true, "Issues registering new user, latestchange", 30001001));
+                    retValue = new Tuple<string, CustomErrors>("", new CustomErrors(true, "Issues registering new user, latestchange", 30001001));
                 }
                 else
                 {
-                    retValue = new Tuple<int, CustomErrors>(0, new CustomErrors(true, "Issues registering new user", 30001000));
+                    retValue = new Tuple<string, CustomErrors>("", new CustomErrors(true, "Issues registering new user", 30001000));
                 }
             }
             else
             {
-                retValue = new Tuple<int, CustomErrors>(this.ID, new CustomErrors(false, "success"));
+                retValue = new Tuple<string, CustomErrors>(this.ID, new CustomErrors(false, "success"));
             }
 
             
@@ -277,7 +283,7 @@ namespace TilerFront
             return retValue;
         }
 
-        public bool WriteLatestData(DateTime referenceTimeOFDay, long LastEventID, int UserID)
+        async public Task<bool> WriteLatestData(DateTime referenceTimeOFDay, long LastEventID, string UserID)
         {
             bool retValue = false;
             string LatestHash = encryptString(DateTimeOffset.Now.ToString()).Substring(0,50);
@@ -293,8 +299,8 @@ namespace TilerFront
 
 
             string changeHash = "";
-            string GetExtraData = " select ChangeHash from DatabaseWaggy.dbo.UserLatestChange where DatabaseWaggy.dbo.UserLatestChange.UserID=" + UserID;
-            string QueryString = @"UPDATE DatabaseWaggy.dbo.UserLatestChange SET ChangeHash='" + LatestHash + "', TimeOfDay= \'" + referenceTimeOFDay + "\', LastUsedID= " + LastEventID + " WHERE UserID=" + UserID;
+            string GetExtraData = " select ChangeHash from "+DatabaseName+".dbo.UserLatestChange where "+DatabaseName+".dbo.UserLatestChange.UserID=\'" + UserID+"\'";
+            string QueryString = @"UPDATE " + DatabaseName + ".dbo.UserLatestChange SET ChangeHash='" + LatestHash + "', LastChange= \'" + referenceTimeOFDay + "\', LastUsedID= " + LastEventID + " WHERE UserID=\'" + UserID + "\'";
             try
             {
                 SqlDataReader myReader = null;
@@ -304,7 +310,8 @@ namespace TilerFront
                 {
                     myCommand = new SqlCommand(QueryString, Wagtap);
                     myReader = myCommand.ExecuteReader();
-                    this.ID = 0;
+                    //this.ID = 0;
+                    this.ID = "";
                     while (myReader.Read())
                     {
                         changeHash = myReader["ChangeHash"].ToString();
@@ -324,9 +331,9 @@ namespace TilerFront
 
             if (!retValue)
             {
-                if (CreateLatestChange(UserID, referenceTimeOFDay, UserID))
+                if (await CreateLatestChange(UserID, referenceTimeOFDay, LastEventID))
                 {
-                    retValue = WriteLatestData(referenceTimeOFDay, LastEventID, UserID);
+                    retValue = await WriteLatestData(referenceTimeOFDay, LastEventID, UserID);
                 }
             }
             
@@ -335,14 +342,14 @@ namespace TilerFront
         }
 
 
-        public Tuple<bool, string, DateTimeOffset, long> getLatestChanges(long userID)
+        async public Task<Tuple<bool, string, DateTimeOffset, long>> getLatestChanges(string userID)
         {
             Tuple<bool, string, DateTimeOffset, long> retValue;
             string LatestHash = "";
             DateTimeOffset TImeOfDay = new DateTimeOffset();
             long LastUsedID = 0;
             bool status = false;
-            string QUerryString = "select * from DatabaseWaggy.dbo.UserLatestChange where UserID = " + userID;
+            string QUerryString = "select * from " + DatabaseName + ".dbo.UserLatestChange where UserID = \'" + userID + "\'";
             try
             {
                 Wagtap.Open();
@@ -361,12 +368,14 @@ namespace TilerFront
                 
                 {
                     myCommand = new SqlCommand(QUerryString, Wagtap);
-                    myReader = myCommand.ExecuteReader();
+
+                    myReader = await myCommand.ExecuteReaderAsync().ConfigureAwait(false); ;
+                    //myReader = myCommand.ExecuteReader();
                     myCommand.CommandText = "";
                     while (myReader.Read())
                     {
                         LatestHash = myReader["ChangeHash"].ToString();
-                        TImeOfDay = DateTimeOffset.Parse(myReader["TimeOfDay"].ToString());
+                        TImeOfDay = DateTimeOffset.Parse(myReader["LastChange"].ToString());
                         LastUsedID = Convert.ToInt64(myReader["LastUsedID"].ToString());
                         status = true;
                     }
@@ -493,7 +502,7 @@ namespace TilerFront
         {
             CustomErrors retValue;
 
-            Tuple<bool,int,string> LoginStatus=LogIn();
+            Tuple<bool,string,string> LoginStatus=LogIn();
             if (!LoginStatus.Item1)
             {
                 retValue = new CustomErrors(true, "invalid user",1);
@@ -517,7 +526,7 @@ namespace TilerFront
                 SqlCommand deleteUserInfo = new SqlCommand("DELETE FROM DatabaseWaggy.dbo.UserInfo  where ID=" + ID, Wagtap);
                 myReader = deleteUserInfo.ExecuteReader();
                 myReader.Close();
-                deleteUserInfo = new SqlCommand("DELETE FROM DatabaseWaggy.dbo.UserLatestChange where UserID=" + ID, Wagtap);
+                deleteUserInfo = new SqlCommand("DELETE FROM "+DatabaseName+".dbo.UserLatestChange where UserID=\'" + ID+"\'", Wagtap);
                 myReader = deleteUserInfo.ExecuteReader();
                 myReader.Close();
                 deleteUserInfo.CommandText = "DELETE FROM DatabaseWaggy.dbo.UserLog where ID=" + ID + " AND UserName=\'" + UserName + "\'";

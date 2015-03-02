@@ -196,13 +196,15 @@ body {
 .DarkerShade 
 {
   position:absolute;
-  background-color:rgba(100,100,100,.2);
+  border-bottom: 1px solid rgb(202, 241, 255); 
+  cursor: pointer;
 }
 
 .LighterShade 
 {
   position:absolute;
-  background-color:rgba(200,200,200,.2);
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
 }
 
 .EventDayContainer 
@@ -242,6 +244,16 @@ body {
 }
 
 .renderPlane {
+position: absolute;
+    left: 0;
+    top: 14%;
+    width: 100%;
+    height: 86%;
+    padding: 2px;
+    box-sizing: border-box;
+
+/*
+<<<<<<< HEAD
     position: absolute;
     left: 0;
     top: 14%;
@@ -249,6 +261,18 @@ body {
     height: 86%;
     padding: 2px;
     box-sizing: border-box;
+=======
+    
+  position:absolute;
+  left:0;
+  cursor: pointer;
+  top:14.5%;
+  width:100%;
+  height:83%;
+  border-bottom: 1px solid black;
+  padding-bottom: 2px;
+  //background-color:rgba(20,255,20,.3);
+/*>>>>>>> e5cb8506ad4d32507c63315d56156ba841ffb2a1*/
 }
 
 /*Conrol panel Container*/
@@ -423,6 +447,7 @@ body {
 }
 
 #leftDayOfTime {
+  display:none;
   text-align:right;
   overflow-x: visible;
   overflow-y:hidden;
@@ -435,7 +460,8 @@ body {
   text-align:left;
   overflow-x: visible;
   overflow-y:hidden;
-  box-shadow: -2px 0px 2px rgb(136, 136, 136);
+  border-left:2px solid black;
+  //box-shadow: -2px 0px 2px rgb(136, 136, 136);
   transform:translateX(-100%);
   
 }
@@ -462,8 +488,6 @@ body {
     font-size:12px;
     overflow: hidden;
     transition:all .1s;
-    //margin-left:10px;
-    border:white 1px solid;
 }
 
 
@@ -504,7 +528,7 @@ body {
     position:absolute;
     cursor: pointer;
     width:80%;
-    height:100%;
+    height:90%;
     border-radius:10px;
     left:20%;
 }

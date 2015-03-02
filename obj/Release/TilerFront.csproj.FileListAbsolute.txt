@@ -92,5 +92,3 @@ C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Release\TilerFront.
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Release\TilerFront.pdb
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Release\TilerFront.csprojResolveAssemblyReference.cache
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Release\TilerFront.Migrations.Initial.resources
-C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Microsoft.Owin.Hosting.dll
-C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Microsoft.Owin.Hosting.xml
