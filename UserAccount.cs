@@ -100,9 +100,9 @@ namespace TilerFront
             return retValue;
         }
 
-        virtual protected DateTimeOffset getDayReferenceTime(string desiredDirectory = "")
+        virtual async protected Task<DateTimeOffset> getDayReferenceTime(string desiredDirectory = "")
         {
-            DateTimeOffset retValue =  UserLog.getDayReferenceTime(desiredDirectory);
+            DateTimeOffset retValue = await  UserLog.getDayReferenceTime(desiredDirectory);
             return retValue;
         }
 
@@ -129,7 +129,7 @@ namespace TilerFront
 
         virtual public void UpdateReferenceDayTime(DateTimeOffset referenceTime)
         {
-            UserLog.UpdateReferenceDay(referenceTime);
+            UserLog.UpdateReferenceDayInXMLLog(referenceTime);
         }
         /*
         public void CommitEventToLog(CalendarEvent MyCalEvent)
@@ -139,7 +139,7 @@ namespace TilerFront
         */
         virtual async public Task  CommitEventToLogOld(IEnumerable<CalendarEvent> AllEvents,string LatestID,string LogFile="")
         {
-            await UserLog.WriteToLogOld(AllEvents, LatestID, LogFile);
+            await UserLog.WriteToLogOld(AllEvents, LatestID, LogFile).ConfigureAwait(false);
         }
 
         

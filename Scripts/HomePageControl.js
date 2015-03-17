@@ -39,16 +39,15 @@ function InitializeHomePage(DomContainer)
     */
     var occupy = "occupy";
     var preppePostdData = { UserName: verifiedUser.UserName, UserID: verifiedUser.UserID };
-    retrieveUserSchedule(myurl, preppePostdData);
+    retrieveUserSchedule(myurl, preppePostdData,generateCalendarEvents);
 }
-
 
 
 function getGetParameter(name) {
     if (name = (new RegExp('[?&]' + encodeURIComponent(name) + '=([^&]*)')).exec(location.search))
         return decodeURIComponent(name[1]);
 }
-function retrieveUserSchedule(myurl, UserEntry)
+function retrieveUserSchedule(myurl, UserEntry,SuccessCallBack)
 {
     //$.get(myurl, generateCalendarEvents);
     var TimeZone = new Date().getTimezoneOffset();
@@ -69,7 +68,7 @@ function retrieveUserSchedule(myurl, UserEntry)
         // DataType needs to stay, otherwise the response object
         // will be treated as a single string
         //dataType: "json",
-        success: generateCalendarEvents,
+        success: SuccessCallBack,
         error: function (err) {
             var myError = err;
             var step = "err";
@@ -79,20 +78,21 @@ function retrieveUserSchedule(myurl, UserEntry)
         HandleNEwPage.Hide();
         var a = 1;
     });
+}
 
 
-    function generateCalendarEvents(data) {
-        //alert(typeof (data));
-        //var JsonData = JSON.parse(data);
-        var JsonData = (data);
 
-        generateLoggedInUserAccountUI(JsonData.Content);
-        //return JsonData;
-    }
+function generateCalendarEvents(data) {
+    //alert(typeof (data));
+    //var JsonData = JSON.parse(data);
+    var JsonData = (data);
 
-    function generateLoggedInUserAccountUI(UserSchedule) {
-        generateHomePage(UserSchedule);
-    }
+    generateLoggedInUserAccountUI(JsonData.Content);
+    //return JsonData;
+}
+
+function generateLoggedInUserAccountUI(UserSchedule) {
+    generateHomePage(UserSchedule);
 }
 
 function generateHomePage(UserSchedule) {
@@ -107,7 +107,7 @@ function generateHomePage(UserSchedule) {
     CurrentTheme.TransitionNewContainer(HomePageContainer.Dom);
     var HomePageDoms = generateHomePageDoms(HomePageContainer.Dom);
     var MiddleContentDom = HomePageDoms[1].childNodes[1];//second index selection selects content section
-    var AllNonrepeatingNonEvents = generateNonRepeatEvents(UserSchedule.Schedule.NonRepeatCalendarEvent, MiddleContentDom);
+    var AllNonrepeatingNonEvents = generateNonRepeatEvents(UserSchedule.Schedule.NonRepeatCalendarEvent);
     var AllRepeatEventDoms = generateRepeatEvents(UserSchedule.Schedule.RepeatCalendarEvent);
     InitializeMiddleDomUI(MiddleContentDom);
     
@@ -237,8 +237,9 @@ function populateHomePageFooter(Dom)
 
 
 
-function generateProcrastinateAllFunction(TimeData)
+function generateProcrastinateAllFunction(TimeData,CallBack)
 {
+
     var TimeZone = new Date().getTimezoneOffset();
     TimeData = TimeData.ToTimeSpan();
     var NowData = { DurationDays: TimeData.Days, DurationHours: TimeData.Hours, DurationMins: TimeData.Mins, UserName: UserCredentials.UserName, UserID: UserCredentials.ID, TimeZoneOffset: TimeZone };
@@ -256,13 +257,14 @@ function generateProcrastinateAllFunction(TimeData)
         // will be treated as a single string
     }).done(function (data) {
         HandleNEwPage.Hide();
-        InitializeHomePage();//hack alert
+        RefreshSubEventsMainDivSubEVents(CallBack);
+        //InitializeHomePage();//hack alert
         //alert("alert 1-");
     });
 }
 
 
-function prepFunctionForCompletionOfEvent(EventID) {
+function prepFunctionForCompletionOfEvent(EventID, CallBack) {
     return function () {
 
         var TimeZone = new Date().getTimezoneOffset();
@@ -306,7 +308,8 @@ function prepFunctionForCompletionOfEvent(EventID) {
 
         }).done(function (data) {
             HandleNEwPage.Hide();
-            InitializeHomePage();//hack alert
+            RefreshSubEventsMainDivSubEVents(CallBack);
+            //InitializeHomePage();//hack alert
         });
     }
 }
@@ -357,9 +360,10 @@ function populateSearchOptionDom(Dom)
         LogOutButton.Dom.innerHTML = "LogOut";
         $(LogOutButton.Dom).addClass(CurrentTheme.BorderColor);
         $(LogOutButton.Dom).addClass(CurrentTheme.FontColor);
-        $(LogOutButton.Dom).click(function () {
+        //$(LogOutButton.Dom).click(function () {
+        (LogOutButton.Dom).onclick=(function () {
             //LogOut();
-            LogOutButton.submit();
+            //LogOutButton.submit();
         });
         var LogOutContainer = getDomOrCreateNew("logoutForm");
         LogOutContainer.appendChild(LogOutButton.Dom)
@@ -509,7 +513,7 @@ function populateSearchOptionDom(Dom)
         $(EventDom_ContainerB.Dom).addClass("EventDomContainerB");
         //$(EventDom_ContainerB.Dom).addClass(CurrentTheme.AlternateFontColor);
 
-        EventDom.Dom.appendChild(EventDom_ContainerC.Dom);
+        
         $(EventDom_ContainerC.Dom).addClass("SliderBand");
         //$(EventDom_ContainerC.Dom).addClass(CurrentTheme.ContentSection);
         $(EventDom_ContainerC.Dom).addClass(CurrentTheme.BorderColor);
@@ -524,9 +528,10 @@ function populateSearchOptionDom(Dom)
         //"EventDomContainer"
         "EventDomContainerA"
         "EventDomContainerB"
-        $(EventDom_ContainerC.Dom).click(generateFunctionForSliderClick());
-        var deleteCallbackFunction = genFunctionCallForDeletion(myEvent.ID, EventDom_ContainerB.Dom);
-        var markAsCompleteCallBackFunction = prepFunctionForCompletionOfEvent(myEvent.ID);
+        EventDom_ContainerC.Dom.onclick =generateFunctionForSliderClick()
+        //$(EventDom_ContainerC.Dom).click(generateFunctionForSliderClick());
+        var deleteCallbackFunction = genFunctionCallForDeletion(myEvent.ID, EventDom_ContainerB.Dom,triggerClickOfEventDom_ContainerCWhenDisablePanelIsClicked);
+        var markAsCompleteCallBackFunction = prepFunctionForCompletionOfEvent(myEvent.ID, triggerClickOfEventDom_ContainerCWhenDisablePanelIsClicked);
 
         function triggerClickOfEventDom_ContainerCWhenDisablePanelIsClicked()
         {
@@ -584,8 +589,8 @@ function populateSearchOptionDom(Dom)
                     $(addButton).removeClass("rotateToAdd");
                     $(Complete_ProcrastinateAllIcon).addClass(CurrentTheme.CompleteIcon);
                     $(Complete_ProcrastinateAllIcon).removeClass(CurrentTheme.ProcrastinateAllIcon);
-                    EventDom.Dom.style.zIndex = 100;
-                    DisablePanel.style.zIndex = 10;
+                    EventDom.Dom.style.zIndex = 1;
+                    //DisablePanel.style.zIndex = 10;
                     $(DisablePanel).show();
                     DisablePanel.addEventListener("click", triggerClickOfEventDom_ContainerCWhenDisablePanelIsClicked);
                 }
@@ -753,18 +758,24 @@ function populateSearchOptionDom(Dom)
         var EventProcrastinateImageContainer = getDomOrCreateNew("EventProcrastinateImageContainer" + myEvent.ID);
         var EventProcrastinateTextContainer = getDomOrCreateNew("EventProcrastinateTextContainer" + myEvent.ID);
 
-        $(EventProcrastinateContainer.Dom).click(function () {
-
+        //$(EventProcrastinateContainer.Dom).click(function () {
+        (EventProcrastinateContainer.Dom).onclick=(function () {
             var myEventID = myEvent.ID;
-            ProcrastinateOnEvent(myEventID, EventDom_ContainerA.Dom);
+            ProcrastinateOnEvent(myEventID, EventDom_ContainerA.Dom, function () {
+                triggerClickOfEventDom_ContainerCWhenDisablePanelIsClicked();
+            });
         });
 
-
-        $(EventDescription.Dom).click(function () {
+        EventDescription.Dom.onclick = function () {
             var myEventID = myEvent.ID;
 
             LaunchSubEventSelection(myEventID, myEvent);
-        });
+        };
+        /*$(EventDescription.Dom).click(function () {
+            var myEventID = myEvent.ID;
+
+            LaunchSubEventSelection(myEventID, myEvent);
+        });*/
 
         var EventDom_ContainerB_ElementContainer = getDomOrCreateNew("EventDom_ContainerB_ElementContainer" + myEvent.ID);
         $(EventDom_ContainerB_ElementContainer.Dom).addClass("EventDom_ContainerB_ElementContainer");
@@ -821,7 +832,8 @@ function populateSearchOptionDom(Dom)
         $(EventDirectionsContainer.Dom).addClass("EventDirectionsContainer");
         $(EventDirectionsButton.Dom).addClass("EventDirectionsButton");
         //$(EventDirectionsButton.Dom).addClass("DirectionsIcon");
-        $(EventDirectionsContainer.Dom).click(getDirectionsCallBack(myEvent.ID, CurrentTheme));
+        //$(EventDirectionsContainer.Dom).click(getDirectionsCallBack(myEvent.ID, CurrentTheme));
+        (EventDirectionsContainer.Dom).onclick=(getDirectionsCallBack(myEvent.ID, CurrentTheme));
 
 
 
@@ -854,7 +866,8 @@ function populateSearchOptionDom(Dom)
         $(EventNowContainer.Dom).addClass("EventNowContainer");
         $(EventNowButton.Dom).addClass("EventNowButton");
         //$(EventNowButton.Dom).addClass("NowIcon");
-        $(EventNowContainer.Dom).click(genFunctionCallForNow(myEvent.ID,EventDom_ContainerB.Dom));
+        //$(EventNowContainer.Dom).click(genFunctionCallForNow(myEvent.ID, EventDom_ContainerB.Dom, triggerClickOfEventDom_ContainerCWhenDisablePanelIsClicked));
+        (EventNowContainer.Dom).onclick=(genFunctionCallForNow(myEvent.ID, EventDom_ContainerB.Dom, triggerClickOfEventDom_ContainerCWhenDisablePanelIsClicked));
 
 
         //Delete Button
@@ -865,7 +878,8 @@ function populateSearchOptionDom(Dom)
         var EventDeleteButton = getDomOrCreateNew("EventDeleteButton" + myEvent.ID);
         //$(EventDom_ContainerB.Dom).append(EventDeleteContainer.Dom);
         $(EventDeleteContainer.Dom).append(EventDeleteButton.Dom);
-        $(EventDeleteContainer.Dom).click(genFunctionCallForDeletion(myEvent.ID, EventDom_ContainerB.Dom));
+        //$(EventDeleteContainer.Dom).click(genFunctionCallForDeletion(myEvent.ID, EventDom_ContainerB.Dom));
+        (EventDeleteContainer.Dom).onclick=(genFunctionCallForDeletion(myEvent.ID, EventDom_ContainerB.Dom));
 
 
 
@@ -892,7 +906,7 @@ function populateSearchOptionDom(Dom)
 
         EventLockContainer.Dom.appendChild(EventLockImgContainer.Dom)
         EventDom.Dom.appendChild(EventLockContainer.Dom);
-    
+        EventDom.Dom.appendChild(EventDom_ContainerC.Dom);
 
 
 
@@ -1001,7 +1015,7 @@ function populateSearchOptionDom(Dom)
     }
 
 
-    function ProcrastinateOnEvent(EventID, ParentDom)
+    function ProcrastinateOnEvent(EventID, ParentDom,CallBack)
     {
         //$(ParentDom).empty();
         var EventProcrastinateButtonContainer;// = document.getElementById("EventProcrastinateButtonContainer" + EventID);
@@ -1033,8 +1047,9 @@ function populateSearchOptionDom(Dom)
 
         //$(ActiveEventProcratination).css({ "background-color:": "rgba(10,10,10,.8)" });
         EventProcrastinateButtonContainer.appendChild(EventBackButton);
-        $(EventBackButton).click(function () {
-            var myEventProcrastinateButtonContainer = EventProcrastinateContainer.Dom;
+
+        var closeProcrastinateContainer = function () {
+            var myEventProcrastinateButtonContainer = getDomOrCreateNew("EventProcrastinateContainerSelected" + EventID);
             //alert("empty....");
             //myEventProcrastinateButtonContainer.innerHTML = "";
             $(myEventProcrastinateButtonContainer).empty();
@@ -1042,11 +1057,29 @@ function populateSearchOptionDom(Dom)
             CurrentTheme.TransitionOldContainer();
 
             //$(ParentDom).children().show();
+
+        }
+        //$(EventBackButton).click(closeProcrastinateContainer)
+        EventBackButton.onclick =closeProcrastinateContainer;
+          /*
+            (function () {
+            var myEventProcrastinateButtonContainer = EventProcrastinateContainer.Dom;
+            //alert("empty....");
+                //myEventProcrastinateButtonContainer.innerHTML = "";
+            $(myEventProcrastinateButtonContainer).empty();
+            myEventProcrastinateButtonContainer.outerHTML = "";
+            CurrentTheme.TransitionOldContainer();
+
+                //$(ParentDom).children().show();
+
+            });
+        */
+
         
-        });
 
-
-        $(EventUpdateButton).click(function () {
+        //$(EventUpdateButton).click
+            EventUpdateButton.onclick=(function () {
+            closeProcrastinateContainer();
             var TimeData = CurrentDial.ToTimeSpan();
 
             var TimeZone = new Date().getTimezoneOffset();
@@ -1076,8 +1109,8 @@ function populateSearchOptionDom(Dom)
                 }
             }).done(function (data) {
                 HandleNEwPage.Hide()
-                InitializeHomePage();//hack alert
-                //alert("alert 1-");
+                RefreshSubEventsMainDivSubEVents(CallBack);
+                //InitializeHomePage();//hack alert
             });
 
             return;
@@ -1108,7 +1141,8 @@ function populateSearchOptionDom(Dom)
         var DayTextBox = getDomOrCreateNew("ProcrastinateDayInput" + EventID);
         DayTextBox.Dom.innerHTML= "<p>Day(s)</p>";
         DayTextBox.Dom.setAttribute("class", "ProcrastinateInput ProcrastinateDayInput");
-        $(DayTextBox.Dom).click(function ()
+        //$(DayTextBox.Dom).click(function ()
+        (DayTextBox.Dom).onclick=(function ()
         {
             //var CurrentDayValue = new Dial(0, 1, 24, "Day(s)", "Hour(s)", 24 * 2, 0);
             var CurrentDayValue = new Dial(0, 1, 1, 24 * 2);
@@ -1124,7 +1158,8 @@ function populateSearchOptionDom(Dom)
         var HourTextBox = getDomOrCreateNew("ProcrastinateHourInput" + EventID);
         HourTextBox.Dom.setAttribute("class", "ProcrastinateInput ProcrastinateHourInput");
         HourTextBox.Dom.innerHTML = "<p>Hour(s)</p>";
-        $(HourTextBox.Dom).click(function () {
+        //$(HourTextBox.Dom).click(function () {
+        (HourTextBox.Dom).onclick=(function () {
             //var CurrentHourValue = new Dial(0, 5, 60, "Hour(s)", "min(s)", 60 * 2, 1);
             var CurrentHourValue = new Dial(0, 5,0, 60*2);
             CurrentDial = CurrentHourValue;
@@ -1270,7 +1305,7 @@ function populateSearchOptionDom(Dom)
     }
 
 
-    function genFunctionCallForNow(EventID,ParentDom)
+    function genFunctionCallForNow(EventID,ParentDom,CallBack)
     {
         return function ()
         {
@@ -1303,15 +1338,15 @@ function populateSearchOptionDom(Dom)
                     HandleNEwPage.UpdateMessage(NewMessage, ExitAfter, InitializeHomePage);
                 }
             }).done(function (data) {
-                InitializeHomePage();//hack alert
-                //alert("alert 1-a");
+                RefreshSubEventsMainDivSubEVents(CallBack);
+                //InitializeHomePage();//hack alert
             });
         }
     }
 
 
 
-    function genFunctionCallForDeletion(EventID, ParentDom)
+    function genFunctionCallForDeletion(EventID, ParentDom,CallBack)
     {
         function retValue() {
             var deletionConfirmationDom = getDomOrCreateNew("deletionConfirmationDom" + EventID);
@@ -1335,7 +1370,8 @@ function populateSearchOptionDom(Dom)
 
             var deletionConfirmationDomYes = getDomOrCreateNew("deletionConfirmationDomYes" + EventID);
             $(deletionConfirmationDomYes.Dom).addClass("deletionConfirmationDomYes");
-            $(deletionConfirmationDomYes.Dom).click(generateFunctionForYes(EventID));
+            //$(deletionConfirmationDomYes.Dom).click(generateFunctionForYes(EventID, CallBack));
+            (deletionConfirmationDomYes.Dom).onclick=(generateFunctionForYes(EventID, CallBack));
 
         
 
@@ -1345,7 +1381,8 @@ function populateSearchOptionDom(Dom)
 
             var deletionConfirmationDomNo = getDomOrCreateNew("deletionConfirmationDomNo" + EventID);
             $(deletionConfirmationDomNo.Dom).addClass("deletionConfirmationDomNo");
-            $(deletionConfirmationDomNo.Dom).click(generateFunctionForNo(deletionConfirmationDom.Dom));
+            //$(deletionConfirmationDomNo.Dom).click(generateFunctionForNo(deletionConfirmationDom.Dom));
+            (deletionConfirmationDomNo.Dom).onclick=(generateFunctionForNo(deletionConfirmationDom.Dom));
             deletionConfirmationDomNo.Dom.innerHTML = "No";
 
 
@@ -1366,7 +1403,7 @@ function populateSearchOptionDom(Dom)
         return retValue;
     }
 
-    function generateFunctionForYes(EventID)
+    function generateFunctionForYes(EventID, CallBack)
     {
         return function()
         {
@@ -1396,7 +1433,8 @@ function populateSearchOptionDom(Dom)
                     HandleNEwPage.UpdateMessage(NewMessage, ExitAfter, InitializeHomePage);
                 }
             }).done(function (data) {
-                InitializeHomePage();//hack alert
+                RefreshSubEventsMainDivSubEVents(CallBack);
+                //InitializeHomePage();//hack alert
             });
         }
     }
@@ -1413,7 +1451,7 @@ function populateSearchOptionDom(Dom)
         AllRepeatSchedules.forEach(function (EachRepeatEvent) { EachRepeatEvent.RepeatCalendarEvents.forEach(CalendarCreateDomElement) });
     }
 
-    function generateNonRepeatEvents(AllNonRepeatingEvents, Dom) {
+    function generateNonRepeatEvents(AllNonRepeatingEvents) {
         AllNonRepeatingEvents.forEach(CalendarCreateDomElement);
     
     
@@ -1426,7 +1464,7 @@ function populateSearchOptionDom(Dom)
     function InitializeMiddleDomUI(Dom)
     {
         var CurrentTopPercent = 0;
-        var TopIncrement = 85;
+        var TopIncrement = 0;
         ActiveSubEvents.sort(function (a, b) { return (a.SubCalStartDate) - (b.SubCalStartDate) });
         /*AllNonRepeatingEvents.forEach(
             function (CalendarEvent)
@@ -1451,16 +1489,196 @@ function populateSearchOptionDom(Dom)
             function (SubCalEvent)
             {
                 Dom.appendChild(SubCalEvent.Dom.Dom);
-                SubCalEvent.Dom.Dom.style.top = "100%";
+                //SubCalEvent.Dom.Dom.style.top = "100%";
                 var myFunc = generateAFunction(CurrentTopPercent, SubCalEvent.Dom.Dom);
                 deferredCall(CurrentTopPercent * 1, myFunc);
-                CurrentTopPercent += TopIncrement;
+                //CurrentTopPercent += TopIncrement;
             }
         )
 
         //global_RenderedList = ActiveSubEvents;
     }
 
+    function RefreshSubEventsMainDivSubEVents(CallBack)
+    {
+        //debugger;
+        var curentActiveElements = ActiveSubEvents;
+        Dictionary_OfSubEvents = {};
+        Dictionary_OfCalendarData = {};
+        ActiveSubEvents = [];
+        TotalSubEventList = [];
+        sortOutData.OldActiveEvents = curentActiveElements;
+        getNewData(sortOutData.OldActiveEvents);
+        if (CallBack!=null)
+        {
+            CallBack();
+        }
+    }
+    
+
+    function getNewData(OldActiveEvents)
+    {
+        var myurl = global_refTIlerUrl + "Schedule";
+        var verifiedUser = GetCookieValue();
+        var preppePostdData = { UserName: verifiedUser.UserName, UserID: verifiedUser.UserID };
+        retrieveUserSchedule(myurl, preppePostdData, sortOutData);
+    }
+
+    function sortOutData(PostData)
+    {
+        var UserSchedule = PostData.Content;
+        var AllNonrepeatingNonEvents = generateNonRepeatEvents(UserSchedule.Schedule.NonRepeatCalendarEvent);
+        var AllRepeatEventDoms = generateRepeatEvents(UserSchedule.Schedule.RepeatCalendarEvent);
+        
+        //adds all transition to all subcal elements
+        for (var i = 0; i < sortOutData.OldActiveEvents.length; i++)
+        {
+            $(sortOutData.OldActiveEvents[i].Dom).addClass("EventDomContainerTransition");
+        }
+
+
+        //adds all transition to all subcal elements
+        for (var i = 0; i < ActiveSubEvents.length; i++) {
+            $(ActiveSubEvents[i].Dom).addClass("EventDomContainerTransition");
+        }
+
+        var ToBeDeletedDict = {};
+        var JustNewEventsDict = {};
+        
+        var DictOfOldEvents = eventsToDict(sortOutData.OldActiveEvents);
+        var DictOfNewEvents = eventsToDict(ActiveSubEvents);
+        
+        var DeleteAllLaterFuncs = [];
+        populateNewEleemnts();
+        deleteOldEvents();
+        refreshOldEventsData();
+        reOrderOldEvents();
+        spliceInNewData();
+        setTimeout(function ()
+        {
+            for (var i = 0; i < DeleteAllLaterFuncs.length; i++)
+            {
+                DeleteAllLaterFuncs[i]();
+            }
+        }, 3000);
+        function eventsToDict(ArrayOfSubs)
+        {
+            var retValue = {};
+            for (var i = 0 ;i< ArrayOfSubs.length; i++)
+            {
+                retValue[ArrayOfSubs[i].ID] = ArrayOfSubs[i];
+            }
+            return retValue;
+        }
+        function populateNewEleemnts()
+        {
+            for (var Id in DictOfNewEvents)
+            {
+                if (DictOfOldEvents[Id] == null)
+                {
+                    JustNewEventsDict[Id] = DictOfNewEvents[Id];
+                }
+            }
+        }
+        
+        function deleteOldEvents()
+        {
+            var AllIDsToBeDeleted = []
+            var i = 0;
+            for (var Id in DictOfOldEvents)
+            {
+                ++i;
+
+                //$(DictOfOldEvents[Id].Dom).removeClass("EventDomContainerBeneath");
+                if (DictOfNewEvents[Id] == null)
+                {
+                    var toBeDeletedDom = DictOfOldEvents[Id].Dom;
+                    HideHeight(toBeDeletedDom,i);
+                    //debugger;
+                    DeleteAllLaterFuncs.push(DeleteLater(toBeDeletedDom));
+                    AllIDsToBeDeleted.push(Id);
+                    ToBeDeletedDict[Id] = DictOfNewEvents[Id];
+                }
+            }
+
+            function HideHeight(toBeDeletedDom, i)
+            {
+                setTimeout(function ()
+                {
+                    $(toBeDeletedDom.Dom).addClass("HideEventDescriptionContainer")
+                }, (i * 0));
+            }
+
+            function DeleteLater(toBeDeletedDom)
+            {
+                return function ()
+                {
+                    $(toBeDeletedDom.Dom).removeClass("HideEventDescriptionContainer");
+                    $(toBeDeletedDom.Dom).removeClass("RevealEventDescriptionContainer");
+                    toBeDeletedDom.Dom.parentElement.removeChild(toBeDeletedDom.Dom);
+                }
+            }
+            
+            for (var i = 0; i < AllIDsToBeDeleted.length; i++)
+            {
+                delete DictOfOldEvents[AllIDsToBeDeleted[i]];
+            }
+            
+        }
+
+        function refreshOldEventsData()
+        {
+            for (var Id in DictOfOldEvents)
+            {
+                DictOfOldEvents[Id] = DictOfNewEvents[Id];
+            }
+        }
+
+        function reOrderOldEvents()
+        {
+            var arrayOfOldEvents = [];
+            for (var Id in DictOfOldEvents)
+            {
+                arrayOfOldEvents.push(DictOfOldEvents[Id]);
+            }
+            arrayOfOldEvents.sort(function (a, b) { return (a.SubCalStartDate) - (b.SubCalStartDate) });
+            if (arrayOfOldEvents.length>0)
+            {
+                var nextElement = arrayOfOldEvents[0].Dom
+                for (var i = 1 ; i < arrayOfOldEvents.length; i++)
+                {
+                    $(arrayOfOldEvents[i].Dom).insertAfter(nextElement.Dom);
+                    nextElement = arrayOfOldEvents[i].Dom;
+                }
+                
+            }
+
+        }
+
+        function spliceInNewData()
+        {
+            var arrayOfOldEvents = ActiveSubEvents;
+            arrayOfOldEvents.sort(function (a, b) { return (a.SubCalStartDate) - (b.SubCalStartDate) });
+            if (arrayOfOldEvents.length > 0)
+            {
+                var nextElement = arrayOfOldEvents[0].Dom
+                for (var i = 1 ; i < arrayOfOldEvents.length; i++)
+                {
+                    deferredRevealCall(nextElement, i)
+                    $(arrayOfOldEvents[i].Dom).insertAfter(nextElement.Dom);
+                    nextElement = arrayOfOldEvents[i].Dom;
+                }
+                
+            }
+
+            function deferredRevealCall(nextElement, i)
+            {
+                setTimeout(function () { $(nextElement).addClass("RevealEventDescriptionContainer"); }, i * 200);
+            }
+        }
+
+    }
+    sortOutData.OldActiveEvents = [];
 
     function ResolveDelta(NewActiveSubevent)
     {
@@ -1476,15 +1694,24 @@ function populateSearchOptionDom(Dom)
     {
 
         var myFunc = function () {
+            /*
             var myPercent = vara;
             //alert(myPercent);
             var stringDelay = myPercent + "px";
             //var myDom = SubCalEvent.Dom.Dom
             myDom.style.top = stringDelay;
+            */
+            $(myDom).addClass("RevealEventDescriptionContainer")
+            addTransition(myDom);
         }
         return myFunc;
     }
 
+    /*Funciton adds transition effects to subcalevents elements. Delays using timeout*/
+    function addTransition(myDom)
+    {
+        setTimeout(function () { $(myDom).addClass("EventDomContainerTransition"); }, 1000);
+    }
     function deferredCall(TimeOut, functionToCall)
     {
         setTimeout(functionToCall, TimeOut);
@@ -1502,7 +1729,7 @@ function populateSearchOptionDom(Dom)
         UIColor.B = CalendarEvent.BColor;
         UIColor.O = CalendarEvent.OColor;
         UIColor.S = CalendarEvent.ColorSelection;
-        var CalendarData = { CompletedEvents: CalendarEvent.NumberOfCompletedTasks, DeletedEvents: CalendarEvent.NumberOfDeletedEvents, TotalNumberOfEvents: CalendarEvent.NumberOfSubEvents, UI: UIColor };
+        var CalendarData = { CompletedEvents: CalendarEvent.NumberOfCompletedTasks, DeletedEvents: CalendarEvent.NumberOfDeletedEvents, TotalNumberOfEvents: CalendarEvent.NumberOfSubEvents, UI: UIColor, Rigid: CalendarEvent.Rigid };
         Dictionary_OfCalendarData[CalendarEvent.ID] = CalendarData;
         var i = 0;
         for (; i < CalendarEvent.AllSubCalEvents.length; i++)

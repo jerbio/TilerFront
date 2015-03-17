@@ -77,14 +77,14 @@ namespace TilerFront
                 retValue.Address = CalendarEventEntry.myLocation.Address;
                 retValue.Longitude = CalendarEventEntry.myLocation.YCoordinate;
                 retValue.Latitude = CalendarEventEntry.myLocation.XCoordinate;
-                retValue.NumberOfSubEvents = CalendarEventEntry.AllSubEvents.Count();
+                retValue.NumberOfSubEvents = CalendarEventEntry.AllSubEvents.Count();// CalendarEventEntry.NumberOfSplit;// AllSubEvents.Count();
                 retValue.RColor = CalendarEventEntry.UIParam.UIColor.R;
                 retValue.GColor = CalendarEventEntry.UIParam.UIColor.G;
                 retValue.BColor = CalendarEventEntry.UIParam.UIColor.B;
                 retValue.OColor = CalendarEventEntry.UIParam.UIColor.O;
                 retValue.ColorSelection = CalendarEventEntry.UIParam.UIColor.User;
-                retValue.NumberOfCompletedTasks = CalendarEventEntry.AllSubEvents.Where(obj => obj.isComplete).Count();
-                retValue.NumberOfDeletedEvents = retValue.NumberOfSubEvents - CalendarEventEntry.EnabledSubEvents.Count();
+                retValue.NumberOfCompletedTasks = CalendarEventEntry.CompletionCount;
+                retValue.NumberOfDeletedEvents = CalendarEventEntry.DeletionCount;
 
                 TimeSpan FreeTimeLeft = CalendarEventEntry.RangeSpan - CalendarEventEntry.ActiveDuration;
                 long TickTier1 = (long)(FreeTimeLeft.Ticks * (.667));

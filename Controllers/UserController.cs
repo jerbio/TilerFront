@@ -160,13 +160,13 @@ namespace TilerFront.Controllers
         [Route("api/User/Location")]
         public async Task<IHttpActionResult> Location([FromUri]NameSearchModel SearchData)
         {
-            UserAccountDirect retrievedUser = await SearchData.getUserAccount();
+            UserAccountDirect retrievedUser = await SearchData.getUserAccountDirect();
             await retrievedUser.Login();
 
             PostBackData retValue = new PostBackData("", 4);
             if (retrievedUser.Status)
             {
-                IEnumerable<TilerElements.Location_Elements> retrievedCalendarEvents = await retrievedUser.ScheduleData.getCachedLocationByName(SearchData.Data);
+                IEnumerable<TilerElements.Location_Elements> retrievedCalendarEvents = await retrievedUser.ScheduleLogControl.getCachedLocationByName(SearchData.Data);
                 retValue = new PostBackData(retrievedCalendarEvents.Select(obj => obj.ToLocationModel()).ToList(), 0);
             }
 

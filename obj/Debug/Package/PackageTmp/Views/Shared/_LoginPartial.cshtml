@@ -12,7 +12,7 @@
     {
     @Html.AntiForgeryToken()
 
-    <div class="nav navbar-nav navbar-right">
+    <div class="nav navbar-nav navbar-right" style="display:none;">
         <span>
             @Html.ActionLink("Hello " + User.Identity.Name+ "!", "Index", "Manage", routeValues: null, htmlAttributes: new { title = "Manage" })
         </span>

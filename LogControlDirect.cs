@@ -8,7 +8,10 @@ using System.Xml;
 using System.IO;
 using System.Threading;
 using TilerElements;
+using System.Web;
 using System.Threading.Tasks;
+using Microsoft.AspNet.Identity.Owin;
+using Microsoft.AspNet.Identity; 
 #if ForceReadFromXml
 #else
 using CassandraUserLog;
@@ -24,6 +27,7 @@ namespace TilerFront
         //public static bool useCassandra=false;
         Models.ApplicationUser SessionUser;
         bool PassiveInitialization = false;
+        bool forcedLogin = false;
         public LogControlDirect()
         {
             ScheduleMetadata = new Tuple<bool, string, DateTimeOffset, long>(false, "", new DateTimeOffset(), 0);
@@ -58,6 +62,30 @@ namespace TilerFront
             }
 
         }
+
+        public async Task<Models.ApplicationUser> forceLogin()
+        {
+            Models.ApplicationUser retValue = null;
+            
+            
+            if (SessionUser != null)
+            {
+                HttpContext myContext = HttpContext.Current;
+                ApplicationUserManager UserManager = myContext.GetOwinContext().GetUserManager<ApplicationUserManager>();
+                try
+                {
+                    retValue = await UserManager.FindByIdAsync(SessionUser.Id).ConfigureAwait(false);
+                    forcedLogin = true;
+                }
+                catch (Exception e)
+                {
+                    ;
+                }
+                
+            }
+            return retValue;
+        }
+
 
 
         #region Functions
@@ -185,7 +213,7 @@ namespace TilerFront
         public async Task<CustomErrors> DeleteLog()
         {
             CustomErrors retValue = new CustomErrors(false, "Success");
-            await Initialize();
+            await Initialize().ConfigureAwait(false);
             try
             {
                 string NameOfFile = WagTapLogLocation + CurrentLog;
@@ -199,7 +227,27 @@ namespace TilerFront
             return retValue;
         }
 
-        public void UpdateReferenceDay(DateTimeOffset referenceDay, string LogFile = "")
+        async public override Task<DateTimeOffset> getDayReferenceTime(string NameOfFile = "")
+        {
+            if(!forcedLogin)
+            {
+                SessionUser = await forceLogin().ConfigureAwait(false);
+            }
+            DateTimeOffset retValue = new DateTimeOffset(SessionUser.LastChange);
+            return retValue;
+        }
+
+        async public  Task<DateTimeOffset> getDayReferenceTimeFromXml(string NameOfFile = "")
+        {
+            return await base.getDayReferenceTime(NameOfFile);
+        }
+
+        /// <summary>
+        /// Function does nothing because updating start of day gets triggered in the manage controller
+        /// </summary>
+        /// <param name="referenceDay"></param>
+        /// <param name="LogFile"></param>
+        override public void UpdateReferenceDayInXMLLog(DateTimeOffset referenceDay, string LogFile = "")
         {
 #if ForceReadFromXml
 #else
@@ -208,6 +256,7 @@ namespace TilerFront
                 return;
             }
 #endif
+            /*
             if (LogFile == "")
             { LogFile = WagTapLogLocation + CurrentLog; }
             XmlDocument xmldoc = new XmlDocument();
@@ -224,7 +273,7 @@ namespace TilerFront
             {
                 refNode.InnerText = refDayNode.InnerText;
             }
-            xmldoc.Save(LogFile);
+            xmldoc.Save(LogFile);*/
             return;
         }
 

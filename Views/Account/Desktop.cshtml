@@ -7,10 +7,22 @@
     @Scripts.Render("~/Content/TilerDesktopJS")
     @Styles.Render("~/Content/TilerDesktopCss")
 </head>
-
 <body>
     <div id="Header">
-        <span class="TilerLogo"></span>
+        <div id="TilerManager">
+            <div id="LogoButton" class="TilerLogo"></div>
+            <div id="MenuContainer">
+                <div id="ManageMenuContainer" class="MenuElementContainer">
+                    <span id="ManageIcon"></span>
+                    <span>Manage</span>
+                </div>
+                <div id="LogoutMenuContainer" class="MenuElementContainer">
+                    <span id="LogoutIcon"></span>
+                    <span>Logout</span>
+                </div>
+            </div>
+
+        </div>
         <div class="RightHeaderElement" id="RightHeaderElement">
             <div id="SearchBar">
                 <input id="SearchBarInput">
@@ -67,14 +79,16 @@
 
     <div id="ControlPanelContainer" tabindex="1">
         <div id="InfoContainer">
-            <div id="ControlPanelNameOfSubevent">
+            <div id="ControlPanelNameOfSubevent" class="SubEventInformationContainer">
+                <label id="SelectedSubEventLabel" class="InfoContainerLabel">Name</label>
                 <div class="InfoControlPanel" id="ControlPanelNameOfSubeventInfo"></div>
             </div>
-            <div id="ControlPanelSubEventTime">
+            <div id="ControlPanelSubEventTime" class="SubEventInformationContainer">
+                <label id="SelectedSubEventLabel" class="InfoContainerLabel">Date &amp; Time</label>
                 <div class="InfoControlPanel" id="ControlPanelSubEventTimeInfo"></div>
             </div>
-            <div id="ControlPanelDeadlineOfSubevent">
-                Deadline:
+            <div id="ControlPanelDeadlineOfSubevent" class="SubEventInformationContainer">
+                <label class="InfoContainerLabel">Deadline</label>
                 <div class="InfoControlPanel" id="ControlPanelDeadlineOfSubeventInfo"></div>
             </div>
         </div>
@@ -90,12 +104,13 @@
                     <input maxlength="2" id="procrastinateDays" type="number">
                     <span>D</span>
                     <button id="submitProcatination" class="SubmitButton">Push It</button>
+                    <button id="cancelProcatination" class="SubmitButton">Cancel</button>
                 </div>
             </div>
         </div>
         <div id="ConfirmDeleteModal">
             <div id="ConfirmContent">
-                <span id="DeleteMessage">Sure you want to delete this?</span>
+                <div id="DeleteMessage">Sure you want to delete this?</div>
                 <button class="SubmitButton" id="YeaToConfirmDelete">Yea</button>
                 <button class="SubmitButton" id="NayToConfirmDelete">Nay</button>
             </div>

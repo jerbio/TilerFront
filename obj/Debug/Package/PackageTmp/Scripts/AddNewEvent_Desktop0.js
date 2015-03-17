@@ -8,18 +8,30 @@ function addNewEvent(x, y, height, refStart)
     
 }
 
+function generatePostBackDataForTimeRestriction(RestrictionSlider)
+{
+    debugger;
+    var RestrictionStatusButtonStatus = RestrictionSlider.getStatus();
+    var RestrictionStart = RestrictionSlider.getStart();
+    var RestrictionEnd = RestrictionSlider.getEnd();
+    var RestrictionWorkWeek = RestrictionSlider.isWorkWeek();
+    var retValue = { isRestriction: RestrictionStatusButtonStatus, Start: RestrictionStart, End: RestrictionEnd, isWorkWeek: RestrictionWorkWeek }
+    return retValue;
+}
 
-function prepSendTile(NameInput, AddressInput, SpliInput, HourInput, MinuteInput, DeadlineInput, RepetitionInput, RepetitionFlag, ColorSelection)
+
+function prepSendTile(NameInput, AddressInput, SpliInput, HourInput, MinuteInput, DeadlineInput, RepetitionInput, RepetitionFlag, ColorSelection,TimeRestrictions)
 {
     return function ()
     {
         var calendarColor = ColorSelection;
+        var restrictionData = generatePostBackDataForTimeRestriction(TimeRestrictions);
         
-        SubmitTile(NameInput.value, AddressInput.value, SpliInput.value, HourInput.value, MinuteInput.value, DeadlineInput.value, RepetitionInput.value, calendarColor, RepetitionFlag);
+        SubmitTile(NameInput.value, AddressInput.value, SpliInput.value, HourInput.value, MinuteInput.value, DeadlineInput.value, RepetitionInput.value, calendarColor, RepetitionFlag,restrictionData);
     }
 }
 
-function SubmitTile(Name, Address, Splits, Hour, Minutes, Deadline, Repetition, CalendarColor,RepetitionFlag)
+function SubmitTile(Name, Address, Splits, Hour, Minutes, Deadline, Repetition, CalendarColor,RepetitionFlag,TimeRestrictions)
 {
     var DictOfData = {};
     DictOfData["day"] = { Range: OneDayInMs, Type: { Name: "Daily", Index: 0 }, Misc: null }
@@ -95,7 +107,7 @@ function SubmitTile(Name, Address, Splits, Hour, Minutes, Deadline, Repetition, 
     EventEnd.Date = new Date(End.getFullYear(), End.getMonth(), End.getDate());
     EventEnd.Time = { Hour: 23, Minute: 59 };
     
-    var NewEvent = new CalEventData(EventName, EventLocation, Splits, CalendarColor, EventDuration, EventStart, EventEnd, repeteOpitonSelect, RepetitionStart, RepetitionEnd, false);
+    var NewEvent = new CalEventData(EventName, EventLocation, Splits, CalendarColor, EventDuration, EventStart, EventEnd, repeteOpitonSelect, RepetitionStart, RepetitionEnd, false,TimeRestrictions);
     //NewEvent.RepeatData = null;
     if (NewEvent == null) {
         return;
@@ -154,7 +166,16 @@ function SubmitTile(Name, Address, Splits, Hour, Minutes, Deadline, Repetition, 
 function generateModal(x, y, height, width,WeekStart, RenderPlane,UseCurrentTime)
 {
     //return;
+    
+
+    if (generateModal.isOn)
+    {
+        global_ExitManager.triggerLastExitAndPop();
+        generateModal.isOn = false;
+        return;
+    }
     global_ExitManager.triggerLastExitAndPop();
+    generateModal.isOn = true;
     var modalAddDom = getDomOrCreateNew("AddModalDom");
     $(modalAddDom).addClass("setAsDisplayNone");//adding this so that motion unnecesary reposition isnt noticed. It'll get removed at the end of func
     var weekDayWidth = $($(".DayContainer")[0]).width();
@@ -270,10 +291,11 @@ function generateModal(x, y, height, width,WeekStart, RenderPlane,UseCurrentTime
     $(modalAddDom.Dom).attr('tabindex', 0).focus();
 
 }
-
+generateModal.isOn = false;
 
 function CloseModal()
 {
+    //generateModal.isOn = false;
     var myAddPanel = getDomOrCreateNew("AddModalDom");
     if (myAddPanel.Dom.parentElement != null)
     {
@@ -314,12 +336,13 @@ function generateAddEventContainer(x,y,height,Container,refStartTime)
                 NewEventcontainer.Dom.parentElement.removeChild(NewEventcontainer.Dom);
             }
         }
+        $(ColorPicker.Selector.Container).removeClass("ColorPickerContainerRigid");
         getRefreshedData.enableDataRefresh();
         ActivateUserSearch.setSearchAsOn();
     }
     //$(document).keyup(removePanel);
 
-    global_ExitManager.addNewExit(CloseEventAddition);
+    
 
     //myClickManager.AddNewElement(NewEventcontainer.Dom);
     //NewEventcontainer.Dom.style.left = x+"px";
@@ -333,8 +356,9 @@ function generateAddEventContainer(x,y,height,Container,refStartTime)
     var SubmitButton = generateSubmitButton();
     var SplitCount = splitInputText();
     var ColorPicker = generateColorPickerContainer();
+    $(ColorPicker.Selector.Container).addClass("ColorPickerContainerRigid");
     var recurrence = createCalEventRecurrence();
-
+    global_ExitManager.addNewExit(CloseEventAddition);
   //  var EnableTiler = generateTilerEnabled(EndDom.Selector.Container, SplitCount.Selector.Container);
 
     NewEventcontainer.Dom.appendChild(NameDom.Selector.Container);
@@ -502,8 +526,9 @@ function AddToTileContainer(TileInptObject, Container) {
 }
 
 //Handles the activities of sliders. Sliders show up beneath the done button
-function InactiveSlider(InActiveDom, ActiveDom,ButtonElements)
+function InactiveSlider(InActiveDom, ActiveDom, ButtonElements, AutoSentence)
 {
+    //debugger;
     var InactiveSliderID =  InactiveSlider.ID++;
     var ButtonSlide = generateMyButton(LoopBackFunction);
     var InActiveMessage = ButtonElements.InActiveMessage;
@@ -536,13 +561,13 @@ function InactiveSlider(InActiveDom, ActiveDom,ButtonElements)
     $(AllInputDataContainer.Dom).addClass("HideInactiveElement");
 
     var AllTileElements = [];//Stores TileInputBox objects
-    var LastElement = new TileInputBox(AllInputData[AllInputData.length - 1], AllInputDataContainer, undefined, global_ExitManager.triggerLastExitAndPop);
+    var LastElement = new TileInputBox(AllInputData[AllInputData.length - 1], AllInputDataContainer, undefined, global_ExitManager.triggerLastExitAndPop, undefined, null, AutoSentence);
     AllTileElements.push(LastElement);
 
     for (var i = AllInputData.length - 2, j = AllInputData.length - 1; i >= 0; i--, j--)
     {
         AllInputData[i].NextElement = LastElement;
-        LastElement = new TileInputBox(AllInputData[i], AllInputDataContainer, undefined, global_ExitManager.triggerLastExitAndPop);
+        LastElement = new TileInputBox(AllInputData[i], AllInputDataContainer, undefined, global_ExitManager.triggerLastExitAndPop, undefined, null, AutoSentence);
         AllTileElements.push(LastElement);
     }
 
@@ -648,26 +673,172 @@ function InactiveSlider(InActiveDom, ActiveDom,ButtonElements)
 InactiveSlider.ID = 0;
 
 
+function cleanUpTimeRestriction(TimeRestrictionSlider)
+{
+    var TimeRestrictionAllElements = TimeRestrictionSlider.getAllElements();
+    //for (var i = 0; i < TimeRestrictionAllElements.length; i++)
+    {
+        var StartInputDom = TimeRestrictionAllElements[0].TileInput.getInputDom();
+        BindTimePicker(StartInputDom);
+        $(StartInputDom).addClass(".TimeInput")
+        var EndInputDom = TimeRestrictionAllElements[1].TileInput.getInputDom();
+        BindTimePicker(EndInputDom);
+        $(EndInputDom).addClass(".TimeInput")
+        var WorkDayLabel = TimeRestrictionAllElements[2].TileInput.getLabelAfter()
+        var WorkDayCheckBox = TimeRestrictionAllElements[2].TileInput.getInputDom()
+        
+
+        var parentDom = WorkDayCheckBox.parentElement;
+        var WorkDayDom = getDomOrCreateNew("WorkDayDom")
+        WorkDayDom.appendChild(WorkDayCheckBox)
+        WorkDayDom.appendChild(WorkDayLabel);
+        parentDom.appendChild(WorkDayDom);
+        WorkDayCheckBox.onclick = onCheckBoxChange;
+        
+
+        function onCheckBoxChange(e)
+        {
+            if (this.checked)
+            {
+                triggerChangeInTime();
+            }
+            function triggerChangeInTime()
+            {
+                StartInputDom.value = "9:00 am"
+                EndInputDom.value = "6:00 pm"
+            }
+        }
+    }
+
+    TimeRestrictionSlider.getStart= function()
+    {
+        var retValue= StartInputDom.value;
+        return retValue;
+    }
+
+    TimeRestrictionSlider.getEnd= function()
+    {
+        var retValue= EndInputDom.value;
+        return retValue;
+    }
+
+    TimeRestrictionSlider.isWorkWeek = function ()
+    {
+        var retValue = WorkDayCheckBox.checked;
+        return retValue;
+    }
+    
+
+    
+}
 
 
-function PopulateSliders(AcitveSection, InAcitveSection)
+
+function PopulateSliders(AcitveSection, InAcitveSection, AutoSentence)
 {
     var RepetionSliderData = GenerateTileRepetition();
-    var RepetitionSlider = new InactiveSlider(InAcitveSection.Dom,AcitveSection.Dom, RepetionSliderData);
+    var RepetitionSlider = new InactiveSlider(InAcitveSection.Dom, AcitveSection.Dom, RepetionSliderData, AutoSentence);
+    var TimeRestriction = generateTimeRestriction();
+    var TimeRestrictionSlider = new InactiveSlider(InAcitveSection.Dom, AcitveSection.Dom, TimeRestriction, AutoSentence);
+    cleanUpTimeRestriction(TimeRestrictionSlider);
 
-    return RepetitionSlider;
+    var RetValue = { RepetitionSlider: RepetitionSlider, TimeRestrictionSlider: TimeRestrictionSlider }
+
+    return RetValue;
 }
 
 function GenerateTileRepetition()
 {
-    var CountElementData = { LabelBefore: "I need to do this" };
-    var PerElementData = { LabelBefore: "times per", DefaultText: "Day/Week/Month/Year", DropDown: { url: [{ repetition: "Day" }, { repetition: "Week" }, { repetition: "Month" }, { repetition: "Year" }, { repetition: "Decade" }], LookOut: "repetition" } };
+    var CountElementData = {
+        LabelBefore: "I need to do this",
+        Message:
+        {
+            Index: 5,
+            LoopBack: function (value) {
+                var message = "";
+                var invalidMessage = false;
+                if (value != "")
+                {
+                    value = Number(value);
+                    switch(value)
+                    {
+                        case 1:
+                            {
+                                value="once";
+                            }
+                            break;
+                        case 2:
+                            {
+                                value = "twice";
+                            }
+                            break;
+
+                        case 3:
+                            {
+                                value = "thrice";
+                            }
+                            break;
+                        default:
+                            {
+                                if (typeof (value) === "number") {
+                                    value = value + " times";
+                                }
+                                else
+                                {
+                                    invalidMessage = true;
+                                }
+
+                                
+                            }
+                            break;
+                    }
+                    if (!invalidMessage)
+                    {
+                        message = " I need to do this " + value;
+                    }
+                }
+
+                return message;
+            }
+        }
+    };
+    var PerElementData = { LabelBefore: "times per",Message:
+        {
+            Index: 6,
+            LoopBack: function (value) {
+                var message = "";
+                var invalidMessage = false;
+                if (value != "")
+                {
+                    {
+                        message = " per " + value;
+                    }
+                }
+
+                return message;
+            }
+        }, DefaultText: "Day/Week/Month/Year", DropDown: { url: [{ repetition: "Day" }, { repetition: "Week" }, { repetition: "Month" }, { repetition: "Year" }, { repetition: "Decade" }], LookOut: "repetition" } };
 
     var ButtonElements = [];
     ButtonElements.push(CountElementData);
     ButtonElements.push(PerElementData);
     var InActiveMessage = "Repeatedly? Currently: No";
     var ActiveMessage = "Repeatedly";
+    var RetValue = { InActiveMessage: InActiveMessage, ActiveMessage: ActiveMessage, ButtonElements: ButtonElements }
+    return RetValue;
+}
+
+function generateTimeRestriction()
+{
+    var StartTime = { LabelBefore: "Start Time" };
+    var EndTime = { LabelBefore: "End Time" };
+    var WorkDays = { LabelAfter: "Work days and Work Hours", DoNothing: true, InputType: "checkbox" };
+    var ButtonElements = [];
+    ButtonElements.push(StartTime);
+    ButtonElements.push(EndTime);
+    ButtonElements.push(WorkDays);
+    var InActiveMessage = "Time Restrictions? Currently: No";
+    var ActiveMessage = "Time Of Day Resrictions";
     var RetValue = { InActiveMessage: InActiveMessage, ActiveMessage: ActiveMessage, ButtonElements: ButtonElements }
     return RetValue;
 }
@@ -736,6 +907,10 @@ function AddTiledEvent()
         var ModalSenetenceContainer = getDomOrCreateNew(ModalSenetenceContainerID);
         var FullSentenceContentID = "FullSentenceContent"
         var FullSentenceContent = getDomOrCreateNew(FullSentenceContentID);
+        var SummaryTitle = getDomOrCreateNew("SummaryContentAutoCompletion");
+        SummaryTitle.innerHTML = "Summary";
+
+        ModalSenetenceContainer.appendChild(SummaryTitle);
         ModalSenetenceContainer.appendChild(FullSentenceContent);
         hideAutoSentence();
         var Messages = {};
@@ -796,7 +971,7 @@ function AddTiledEvent()
     var ColorPicker = generateColorPickerContainer(changeSummaryBackgroundColor, true);//this has to be placed after AutoSentence  initialization in order to ensure that changeSummaryBackgroundColor doesnt make a call to null in the function changeSummaryBackgroundColor
     ActiveContainer.Dom.appendChild(ColorPicker.Selector.Container);//ColorPicker.Selector.Container has to be inserted before the done button container to ensure insertion before done
     ActiveContainer.Dom.appendChild(ModalDoneContentContainer.Dom)
-
+    $(ColorPicker.Selector.Container).addClass("HorizontalColorPickerContainerTiledEvent");
 
     modalTileEvent.Dom.appendChild(ActiveContainer.Dom);
     modalTileEvent.Dom.appendChild(InActiveContainer.Dom);
@@ -870,7 +1045,7 @@ function AddTiledEvent()
 
                     return message;
                 }
-        }
+        },DefaultText: "Task"
     };
     var Element2 = {
         LabelBefore: "at",
@@ -955,7 +1130,7 @@ function AddTiledEvent()
     };
     var Element4 = {
         LabelBefore: "and I need to get it done by", Message: {
-            Index: 5,
+            Index: 7,
             LoopBack: function (value) {
                 var message = "";
                 if (value != "") {
@@ -966,10 +1141,12 @@ function AddTiledEvent()
 
                 return message;
             }
-        }, TriggerDone: true
+        }, DefaultText: "Deadline", TriggerDone: true
     };
     //debugger;
-    var RepetionSlider=PopulateSliders(ModalActiveOptionsContainer, InActiveContainer);
+    var SliderData = PopulateSliders(ModalActiveOptionsContainer, InActiveContainer,AutoSentence);
+    var RepetionSlider = SliderData.RepetitionSlider;
+    var TimeRestrictionSlider = SliderData.TimeRestrictionSlider;
     InActiveContainer.Hide();
 
 
@@ -984,6 +1161,7 @@ function AddTiledEvent()
                 (modalTileEvent.Dom.parentElement.removeChild(modalTileEvent.Dom));
             }
         }
+        $(ColorPicker.Selector.Container).removeClass("HorizontalColorPickerContainerTiledEvent");
         ActivateUserSearch.setSearchAsOn();
     }
 
@@ -1069,7 +1247,7 @@ function AddTiledEvent()
         var Splits = RepetionSlider.getAllElements()[0].TileInput;
         var RepetionChoice = RepetionSlider.getAllElements()[1].TileInput;
         var myColor = ColorPicker.Selector.getColor();
-        var SendIt = prepSendTile(Element1.TileInput.getInputDom(), Element2.TileInput.getInputDom(), Splits.getInputDom(), Hour.getInputDom(), Min.getInputDom(), Element4.TileInput.getInputDom(), RepetionChoice.getInputDom(), RepetionSlider.getStatus(), myColor);
+        var SendIt = prepSendTile(Element1.TileInput.getInputDom(), Element2.TileInput.getInputDom(), Splits.getInputDom(), Hour.getInputDom(), Min.getInputDom(), Element4.TileInput.getInputDom(), RepetionChoice.getInputDom(), RepetionSlider.getStatus(), myColor,TimeRestrictionSlider);
         if (TileInputBox.DoneButton.getStatus()) {
             SendIt();
             //AddTiledEvent.Exit();
@@ -1220,10 +1398,9 @@ function TileInputBox(TabElement, ModalContainer, SendTile, Exit, HideInput, get
     //$(labelAndInputContainer.Dom).addClass("labelAndInputContainer");
     
     var OtherElements = [];
+    
 
-    GenerateAutoSuggest();
-    GenerateAlreadyCreatedBoxes();
-    DeployInputSettings();
+    
 
     //fuction generates and binds all elements for a drop down menu option
     function GenerateAutoSuggest()
@@ -1593,6 +1770,7 @@ function TileInputBox(TabElement, ModalContainer, SendTile, Exit, HideInput, get
     function onFocus()//triigers reveal of next element when the tab button is pressed
     {
         $(InputBox.Dom).addClass("FocusTileEvent");
+        $(InputBox.Dom).removeClass("OutFocusTileInputBox ")
         tabfunction();
         InputBox.Dom.addEventListener("keydown", KeyEntry);
         TabElement.isInFocus = true;
@@ -1605,6 +1783,7 @@ function TileInputBox(TabElement, ModalContainer, SendTile, Exit, HideInput, get
     function outFocus()
     {
         $(InputBox.Dom).removeClass("FocusTileEvent");
+        $(InputBox.Dom).addClass("OutFocusTileInputBox ")
         TabElement.isInFocus = false;
         setTimeout(function () { ResizeInputTrim(); }, 0);
     }
@@ -1648,6 +1827,11 @@ function TileInputBox(TabElement, ModalContainer, SendTile, Exit, HideInput, get
         TabElement.SubTileInputBox.forEach(InsertEachElement);
     }
     */
+
+    if (TabElement.InputType != undefined)
+    {
+        (InputBox).setAttribute("type", TabElement.InputType)
+    }
     function focusInputBox()
     {
         if(InputBox!=null)
@@ -1656,11 +1840,20 @@ function TileInputBox(TabElement, ModalContainer, SendTile, Exit, HideInput, get
         }
     }
 
-    unReveal();
+
+    if (!TabElement.DoNothing) {
+        GenerateAutoSuggest();
+        GenerateAlreadyCreatedBoxes();
+        DeployInputSettings();
+        unReveal();
+    }
+
+    
     if (TabElement.DefaultText!=null)
     {
         InputBox.Dom.setAttribute("placeholder", TabElement.DefaultText);
     }
+
     $(InputBox.Dom).focus(onFocus)
     $(InputBox.Dom).focusout(outFocus);
 

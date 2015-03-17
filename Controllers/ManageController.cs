@@ -61,6 +61,7 @@ namespace TilerFront.Controllers
                 : message == ManageMessageId.Error ? "An error has occurred."
                 : message == ManageMessageId.AddPhoneSuccess ? "Your phone number was added."
                 : message == ManageMessageId.RemovePhoneSuccess ? "Your phone number was removed."
+                : message == ManageMessageId.StartOfDaySuccess ? "Tiler has updated the end of your day."
                 : "";
 
             var userId = User.Identity.GetUserId();
@@ -243,6 +244,43 @@ namespace TilerFront.Controllers
         }
 
         //
+        // GET: /Manage/ChangeStartOfDay
+        public ActionResult ChangeStartOfDay()
+        {
+            return View();
+        }
+
+        //
+        // POST: /Manage/ChangeStartOfDay
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> ChangeStartOfDay(ChangeStartOfDayModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+            string TimeString = model.TimeOfDay + WebApiConfig.JSStartTime.Date.ToShortDateString();
+            var result= IdentityResult.Failed(new string[]{"Invalid Time Start Of Time"});
+
+            DateTimeOffset TimeOfDay = new DateTimeOffset();
+            if (DateTimeOffset.TryParse(TimeString,out TimeOfDay))
+            { 
+                
+                ApplicationUser myUser = await UserManager.FindByIdAsync(User.Identity.GetUserId());
+                myUser.LastChange=TimeOfDay.DateTime;
+                result= await UserManager.UpdateAsync(myUser);
+            }
+
+            if(result.Succeeded)
+            {
+                return RedirectToAction("Index", new { Message = ManageMessageId.StartOfDaySuccess });
+            }
+            AddErrors(result);
+            return View(model);
+        }
+
+        //
         // GET: /Manage/SetPassword
         public ActionResult SetPassword()
         {
@@ -379,6 +417,7 @@ namespace TilerFront.Controllers
             SetPasswordSuccess,
             RemoveLoginSuccess,
             RemovePhoneSuccess,
+            StartOfDaySuccess,
             Error
         }
 

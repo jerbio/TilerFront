@@ -15,22 +15,31 @@ namespace TilerFront.Controllers
 {
     //[EnableCors(origins: "*", headers: "accept, authorization, origin", methods: "DELETE,PUT,POST,GET")]
     //[EnableCors("*", "*", "*",)]
+    /// <summary>
+    /// Represents a users schedule. Provides access to schedule creation, modification and deletion
+    /// </summary>
     public class ScheduleController : ApiController
     {
+        
         // GET api/schedule
+        /// <summary>
+        /// Retrieve Events within a time frame. Required elements are UserID and UserName. Provided starttime and Endtime for the range of the schedule allows for retrieval of schedule within a timerange
+        /// </summary>
+        /// <param name="myAuthorizedUser"></param>
+        /// <returns></returns>
         [ResponseType(typeof(PostBackStruct))]
         public async Task<IHttpActionResult> GetSchedule([FromUri] getScheduleModel myAuthorizedUser)
         {
-            UserAccountDirect myUserAccount = await myAuthorizedUser.getUserAccount();
+            UserAccountDirect myUserAccount = await myAuthorizedUser.getUserAccountDirect();
             await myUserAccount.Login();
             PostBackData returnPostBack;
             if (myUserAccount.Status)
             {
                 DateTimeOffset StartTime = new DateTimeOffset(myAuthorizedUser.StartRange * TimeSpan.TicksPerMillisecond, new TimeSpan()).AddYears(1969).Add(-myAuthorizedUser.getTImeSpan);
                 DateTimeOffset EndTime = new DateTimeOffset(myAuthorizedUser.EndRange * TimeSpan.TicksPerMillisecond, new TimeSpan()).AddYears(1969).Add(-myAuthorizedUser.getTImeSpan);
-                TimeLine TimelineForData = new TimeLine(StartTime, EndTime);
+                TimeLine TimelineForData = new TimeLine(StartTime.AddYears(-100), EndTime.AddYears(100));
 
-                LogControl LogAccess = myUserAccount.ScheduleData;
+                LogControl LogAccess = myUserAccount.ScheduleLogControl;
                 Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, Location_Elements>> ProfileData =await LogAccess.getProfileInfo(TimelineForData);
                 IEnumerable<CalendarEvent> ScheduleData = ProfileData.Item1.Values.Where(obj=>obj.isActive);
                 IEnumerable<CalendarEvent> NonRepeatingEvents = ScheduleData.Where(obj => !obj.RepetitionStatus);
@@ -71,6 +80,12 @@ namespace TilerFront.Controllers
             return Ok("return");
         }
 
+
+        /// <summary>
+        /// Modify user schedule. It clears out time frame. Procrastinates all Subcalendar events, essentially freeing up sometime.
+        /// </summary>
+        /// <param name="UserData"></param>
+        /// <returns></returns>
         [HttpPost]
         [ResponseType(typeof(PostBackStruct))]
         [Route("api/Schedule/ProcrastinateAll")]
@@ -81,7 +96,7 @@ namespace TilerFront.Controllers
             
             TimeDuration ProcrastinateDuration = UserData.ProcrastinateDuration;
             TimeSpan fullTimeSpan = myAuthorizedUser.getTImeSpan;
-            UserAccountDirect myUserAccount = await UserData.getUserAccount();
+            UserAccountDirect myUserAccount = await UserData.getUserAccountDirect();
             My24HourTimerWPF.Schedule MySchedule = new My24HourTimerWPF.Schedule(myUserAccount, new DateTime(myAuthorizedUser.getRefNow().Ticks));
             Tuple<CustomErrors, Dictionary<string, CalendarEvent>> ScheduleUpdateMessage = MySchedule.ProcrastinateAll(ProcrastinateDuration.TotalTimeSpan);
             MySchedule.UpdateWithProcrastinateSchedule(ScheduleUpdateMessage.Item2);
@@ -98,7 +113,7 @@ namespace TilerFront.Controllers
             AuthorizedUser myAuthorizedUser = UserData.User;
             TimeDuration ProcrastinateDuration = UserData.ProcrastinateDuration;
             TimeSpan fullTimeSpan = myAuthorizedUser.getTImeSpan;
-            UserAccountDirect myUser = await UserData.getUserAccount();
+            UserAccountDirect myUser = await UserData.getUserAccountDirect();
             await myUser.Login();
             My24HourTimerWPF.Schedule MySchedule = new My24HourTimerWPF.Schedule(myUser, new DateTime(myAuthorizedUser.getRefNow().Ticks));
             Tuple<CustomErrors, Dictionary<string, CalendarEvent>> ScheduleUpdateMessage = MySchedule.ProcrastinateJustAnEvent(UserData.EventID, ProcrastinateDuration.TotalTimeSpan);
@@ -112,7 +127,7 @@ namespace TilerFront.Controllers
         [Route("api/Schedule/Event/Complete")]
         public async Task<IHttpActionResult> CompleteSubCalendarEvent([FromBody]getEventModel UserData)
         {
-            UserAccountDirect myUser = await UserData.getUserAccount();
+            UserAccountDirect myUser = await UserData.getUserAccountDirect();
             await myUser.Login();
             My24HourTimerWPF.Schedule MySchedule = new My24HourTimerWPF.Schedule(myUser, new DateTime(UserData.getRefNow().Ticks));
             MySchedule.markSubEventAsCompleteCalendarEventAndReadjust(UserData.EventID);
@@ -126,7 +141,7 @@ namespace TilerFront.Controllers
         [Route("api/Schedule/Events/Complete")]
         public async Task<IHttpActionResult> CompleteSubCalendarEvents([FromBody]getEventModel UserData)
         {
-            UserAccountDirect myUser = await UserData.getUserAccount();
+            UserAccountDirect myUser = await UserData.getUserAccountDirect();
             await myUser.Login();
             My24HourTimerWPF.Schedule MySchedule = new My24HourTimerWPF.Schedule(myUser, new DateTime(UserData.getRefNow().Ticks));
             IEnumerable<string> AllEVentIDs = UserData.EventID.Split(',');
@@ -142,7 +157,7 @@ namespace TilerFront.Controllers
         [Route("api/Schedule/Event/Now")]
         public async Task<IHttpActionResult> Now([FromBody]getEventModel myUser)
         {
-            UserAccountDirect retrievedUser = await myUser.getUserAccount();// new UserAccountDirect(myUser.UserName, myUser.UserID);
+            UserAccountDirect retrievedUser = await myUser.getUserAccountDirect();// new UserAccountDirect(myUser.UserName, myUser.UserID);
             await retrievedUser.Login();
             PostBackData retValue;
             if (retrievedUser.Status)
@@ -166,7 +181,7 @@ namespace TilerFront.Controllers
         [Route("api/Schedule/Event")]
         public async Task<IHttpActionResult> DeleteEvent([FromBody]getEventModel myUser)
         {
-            UserAccountDirect retrievedUser = await myUser.getUserAccount();
+            UserAccountDirect retrievedUser = await myUser.getUserAccountDirect();
             await retrievedUser.Login();
             PostBackData retValue;
             if (retrievedUser.Status)
@@ -195,7 +210,7 @@ namespace TilerFront.Controllers
         [Route("api/Schedule/Events")]
         public async Task<IHttpActionResult> DeleteEvents([FromBody]getEventModel myUser)
         {
-            UserAccountDirect retrievedUser = await myUser.getUserAccount();
+            UserAccountDirect retrievedUser = await myUser.getUserAccountDirect();
             await retrievedUser.Login();
             PostBackData retValue;
             if (retrievedUser.Status)
@@ -261,6 +276,10 @@ namespace TilerFront.Controllers
             string RepeatFrequency = newEvent.RepeatFrequency; ;
 
 
+            string restrictionPreference = newEvent.isRestricted;
+
+            bool restrictionFlag = Convert.ToBoolean(restrictionPreference);
+
             string StartTime = StartHour + ":" + StartMins;
             string EndTime = EndHour + ":" + EndMins;
 
@@ -308,7 +327,7 @@ namespace TilerFront.Controllers
                 EndDateEntry = RepeatEnd;
             }
 
-            UserAccountDirect myUser = await newEvent.getUserAccount();
+            UserAccountDirect myUser = await newEvent.getUserAccountDirect();
             PostBackData retValue;
             await myUser.Login();
 
@@ -317,7 +336,24 @@ namespace TilerFront.Controllers
             if (myUser.Status)
             {
                 My24HourTimerWPF.Schedule MySchedule = new My24HourTimerWPF.Schedule(myUser, new DateTime(newEvent.getRefNow().Ticks));
-                CalendarEvent newCalendarEvent = new CalendarEvent(Name, StartTime, StartDateEntry, EndTime, EndDateEntry, Count, "", EventDuration, MyRepetition, true, RigidScheduleFlag, "", true, EventLocation, true, new EventDisplay(true, userColor, userColor.User<1?0:1), new MiscData(), false);
+                CalendarEvent newCalendarEvent;
+                if(restrictionFlag )
+                {
+                    string TimeString = StartDateEntry.LocalDateTime.ToShortDateString() + " " + StartTime;
+                    DateTimeOffset StartDateTime = DateTimeOffset.Parse(TimeString);
+                    TimeString = EndDateEntry.LocalDateTime.ToShortDateString() + " " + EndTime;
+                    DateTimeOffset EndDateTime = DateTimeOffset.Parse(TimeString);
+
+
+                    RestrictionProfile myRestrictionProfile = CreateRestrictionProfile(newEvent.RestrictionStart, newEvent.RestrictionEnd, newEvent.isWorkWeek);
+                    newCalendarEvent = new CalendarEventRestricted(Name, StartDateTime, EndDateTime, myRestrictionProfile, TimeSpan.Parse(EventDuration), MyRepetition, false, true, Convert.ToInt32(Count), RigidScheduleFlag, new Location_Elements(), new TimeSpan(0, 15, 0), new TimeSpan(0, 15, 0), new EventDisplay(true, userColor, userColor.User < 1 ? 0 : 1), new MiscData());
+                }
+                else
+                {
+                    newCalendarEvent = new CalendarEvent(Name, StartTime, StartDateEntry, EndTime, EndDateEntry, Count, "", EventDuration, MyRepetition, true, RigidScheduleFlag, "", true, EventLocation, true, new EventDisplay(true, userColor, userColor.User<1?0:1), new MiscData(), false);
+                }
+
+                
                 newCalendarEvent.Repeat.PopulateRepetitionParameters(newCalendarEvent);
                 string BeforemyName = newCalendarEvent.ToString(); //BColor + " -- " + Count + " -- " + DurationDays + " -- " + DurationHours + " -- " + DurationMins + " -- " + EndDay + " -- " + EndHour + " -- " + EndMins + " -- " + EndMonth + " -- " + EndYear + " -- " + GColor + " -- " + LocationAddress + " -- " + LocationTag + " -- " + Name + " -- " + RColor + " -- " + RepeatData + " -- " + RepeatEndDay + " -- " + RepeatEndMonth + " -- " + RepeatEndYear + " -- " + RepeatStartDay + " -- " + RepeatStartMonth + " -- " + RepeatStartYear + " -- " + RepeatType + " -- " + RepeatWeeklyData + " -- " + Rigid + " -- " + StartDay + " -- " + StartHour + " -- " + StartMins + " -- " + StartMonth + " -- " + StartYear;
                 string AftermyName = newCalendarEvent.ToString();
@@ -336,7 +372,7 @@ namespace TilerFront.Controllers
                 else
 #endif
                 {
-                    MySchedule.AddToScheduleAndCommit(newCalendarEvent);
+                    await MySchedule.AddToScheduleAndCommit(newCalendarEvent);
                 }
 
 
@@ -352,8 +388,47 @@ namespace TilerFront.Controllers
             return Ok(retValue.getPostBack);
         }
 
+        RestrictionProfile CreateRestrictionProfile(string Start, string End,string workWeek, string DaySelection="")
+        { 
+            DateTimeOffset RestrictStart = DateTimeOffset.Parse(Start);
+            DateTimeOffset RestrictEnd = DateTimeOffset.Parse(End);
+            
+            bool WorkWeekFlag = Convert.ToBoolean(workWeek);
 
+            List<mTuple<bool, DayOfWeek>> allElements = (new mTuple<bool, System.DayOfWeek>[7]).ToList();
+            allElements[(int)DayOfWeek.Sunday] = new mTuple<bool, System.DayOfWeek>(false, DayOfWeek.Sunday);
+            allElements[(int)DayOfWeek.Monday] = new mTuple<bool, System.DayOfWeek>(false, DayOfWeek.Monday);
+            allElements[(int)DayOfWeek.Tuesday] = new mTuple<bool, System.DayOfWeek>(false, DayOfWeek.Tuesday);
+            allElements[(int)DayOfWeek.Wednesday] = new mTuple<bool, System.DayOfWeek>(false, DayOfWeek.Wednesday);
+            allElements[(int)DayOfWeek.Thursday] = new mTuple<bool, System.DayOfWeek>(false, DayOfWeek.Thursday);
+            allElements[(int)DayOfWeek.Friday] = new mTuple<bool, System.DayOfWeek>(false, DayOfWeek.Friday);
+            allElements[(int)DayOfWeek.Saturday] = new mTuple<bool, System.DayOfWeek>(false, DayOfWeek.Saturday);
+
+
+            DayOfWeek[] selectedDaysOftheweek = { };
+
+            if (!string.IsNullOrEmpty(DaySelection))
+            {
+                selectedDaysOftheweek = DaySelection.Split(',').Where(obj => !String.IsNullOrEmpty(obj)).Select(obj => RestrictionProfile.AllDaysOfWeek[Convert.ToInt32(obj)]).ToArray();
+            }
+            else 
+            {
+                selectedDaysOftheweek = RestrictionProfile.AllDaysOfWeek.ToArray();
+            }
+            RestrictionProfile retValue;
+            if (WorkWeekFlag)
+            {
+                retValue = new RestrictionProfile(7, DayOfWeek.Monday, RestrictStart, RestrictEnd);
+            }
+            else
+            {
+                RestrictionTimeLine  RestrictionTimeLine = new TilerElements.RestrictionTimeLine(RestrictStart,RestrictEnd);
+                retValue = new RestrictionProfile(selectedDaysOftheweek, RestrictionTimeLine);
+            }
+            return retValue;
+        }
         
+
         // PUT api/schedule/5
         //[NonAction]
         public async Task<IHttpActionResult> Put(int id, [FromBody]string value)

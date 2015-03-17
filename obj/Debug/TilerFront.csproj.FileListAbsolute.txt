@@ -4,6 +4,7 @@ C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Microsoft.Applicati
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\TilerFront.dll.config
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\TilerFront.dll
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\TilerFront.pdb
+C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\XmlDocument.xml
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Antlr3.Runtime.dll
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\EntityFramework.dll
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\EntityFramework.SqlServer.dll
@@ -61,17 +62,17 @@ C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Microsoft.Threading
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Microsoft.Threading.Tasks.Extensions.Desktop.xml
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\My24HourTimerWPF.pdb
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Newtonsoft.Json.xml
+C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\System.Net.Http.Formatting.xml
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\System.Web.Helpers.xml
+C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\System.Web.Http.xml
+C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\System.Web.Http.WebHost.xml
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\System.Web.Mvc.xml
-C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\System.Web.Optimization.xml
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\System.Web.Razor.xml
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\System.Web.WebPages.xml
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\System.Web.WebPages.Deployment.xml
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\System.Web.WebPages.Razor.xml
+C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\System.Web.Optimization.xml
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\TilerElements.pdb
-C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\System.Net.Http.Formatting.xml
-C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\System.Web.Http.xml
-C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\System.Web.Http.WebHost.xml
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Microsoft.AspNet.Identity.Core.xml
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Microsoft.AspNet.Identity.Owin.xml
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Microsoft.AspNet.Identity.EntityFramework.xml
@@ -92,5 +93,3 @@ C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.cs
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\ApplicationInsights.config
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.dll
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.pdb
-C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Microsoft.Owin.Hosting.dll
-C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Microsoft.Owin.Hosting.xml

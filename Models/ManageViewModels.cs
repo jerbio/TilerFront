@@ -58,6 +58,14 @@ namespace TilerFront.Models
         public string ConfirmPassword { get; set; }
     }
 
+    public class ChangeStartOfDayModel
+    {
+        [Required]
+        [Display(Name = "Time Of Day")]
+        [StringLength(7, ErrorMessage = "In valid time provided", MinimumLength = 6)]
+        public string TimeOfDay { get; set; }
+    }
+
     public class AddPhoneNumberViewModel
     {
         [Required]

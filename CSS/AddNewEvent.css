@@ -868,7 +868,22 @@ input[type=radio]:checked + label:before {
     
 }
 
+.InputBarAndContentContainer {
+    z-index:0;
 
+}
+
+#ColorPickerContainer {
+    left:50%;
+    margin-left:-150px;
+    top:50%;
+    margin-top:-150px;
+}
+
+.ColorPicker {
+    position:relative;
+    display:inline-block;
+}
 
 /*Media Queries For Desktop*/
 

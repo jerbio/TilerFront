@@ -9,6 +9,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Description;
+using TilerElements;
 using TilerFront.Models;
 
 namespace TilerFront.Controllers
@@ -134,5 +135,39 @@ namespace TilerFront.Controllers
             return db.SubCalEvents.Count(e => e.ID == id) > 0;
         }
         */
+
+
+        [HttpPost]
+        [ResponseType(typeof(PostBackStruct))]
+        [Route("api/SubCalendarEvent/Update")]
+        public async Task<IHttpActionResult> UpdateCalEvent([FromBody]EditSubCalEventModel myUser)
+        {
+            UserAccountDirect retrievedUser = await myUser.getUserAccountDirect(); //new UserAccountDirect(myUser.UserName, myUser.UserID);
+            await retrievedUser.Login();
+            PostBackData retValue;
+            if (retrievedUser.Status)
+            {
+                My24HourTimerWPF.Schedule NewSchedule = new My24HourTimerWPF.Schedule(retrievedUser, new DateTime(myUser.getRefNow().Ticks));
+                long StartLong = Convert.ToInt64(myUser.Start);
+                long EndLong = Convert.ToInt64(myUser.End);
+                long LongBegin = Convert.ToInt64(myUser.CalStart);
+                long LongDeadline = Convert.ToInt64(myUser.CalEnd);
+                DateTimeOffset newStart = WebApiConfig.JSStartTime.AddMilliseconds(StartLong);
+                DateTimeOffset newEnd = WebApiConfig.JSStartTime.AddMilliseconds(EndLong);
+                DateTimeOffset Begin = WebApiConfig.JSStartTime.AddMilliseconds(LongBegin);
+                DateTimeOffset Deadline = WebApiConfig.JSStartTime.AddMilliseconds(LongDeadline);
+                int SplitCount = (int)myUser.Split;
+                //TimeSpan SpanPerSplit = TimeSpan.FromMilliseconds(myUser.Duration);
+                Tuple<CustomErrors, Dictionary<string, CalendarEvent>> ScheduleUpdateMessage = NewSchedule.BundleChangeUpdate(myUser.EventID,myUser.EventName, newStart, newEnd,Begin,Deadline, SplitCount);//, SpanPerSplit);
+                await NewSchedule.UpdateWithProcrastinateSchedule(ScheduleUpdateMessage.Item2).ConfigureAwait(false);
+                retValue = new PostBackData(ScheduleUpdateMessage.Item1);
+            }
+            else
+            {
+                retValue = new PostBackData("", 1);
+            }
+
+            return Ok(retValue.getPostBack);
+        }
     }
 }

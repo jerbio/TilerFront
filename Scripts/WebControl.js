@@ -1,7 +1,7 @@
 ﻿"use strict"
 
 
-var Debug = true;
+var Debug = false;
 var DebugLocal = false;
 
 //var global_refTIlerUrl = "http://localhost:53201/api/";
@@ -12,7 +12,7 @@ if (Debug)
     global_refTIlerUrl = "http://mytilerKid.azurewebsites.net/api/";
     if(DebugLocal)
     {
-        global_refTIlerUrl = "http://localhost:11919/api/";
+        global_refTIlerUrl = "https://localhost:44302/api/";
     }
 }
 
@@ -562,6 +562,7 @@ function Theme(color)
     function HideCurrentContainer(SlideRight)
     {
         CurrentContainer = GetCurrentContainer();
+        /*
         if (CurrentContainer != null)
         {
             if (SlideRight===true)
@@ -573,6 +574,7 @@ function Theme(color)
                 CurrentContainer.style.left = "-100%";
             }
         }
+        */
     }
 
     function GetCurrentContainer()
@@ -587,6 +589,25 @@ function Theme(color)
     }
 }
 
+function formatTimePortionOfStringToRightFormat(TimeString)
+{
+
+    //"jkjkjkj".
+    TimeString = TimeString.toLocaleLowerCase().split("");
+    var IndexOfA = TimeString.indexOf("a");
+    var IndexOfB = TimeString.indexOf("p");
+    var myIndex = IndexOfA > IndexOfB ? IndexOfA : IndexOfB;
+    var TimeCOncat = [];
+    var retValue = "";
+    var i = 0;
+    for (; i < myIndex; i++)
+    {
+        retValue+=TimeString[i]
+    }
+    retValue += (" " + TimeString[i] + "m");
+    return retValue;
+
+}
 
 function getTimeStringFromDate(date)
 {
@@ -1299,7 +1320,7 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
         this.Address = Address;
     }
 
-    function CalEventData(eventName, eventLocation, eventCounts, eventColor, eventDuration, eventStart, eventEnd, eventRepeatData, eventRepeatStart, eventRepeatEnd, rigidFlag)
+    function CalEventData(eventName, eventLocation, eventCounts, eventColor, eventDuration, eventStart, eventEnd, eventRepeatData, eventRepeatStart, eventRepeatEnd, rigidFlag, RestrictionData)
     {
         this.Name = eventName;
         this.LocationTag = eventLocation.Tag;
@@ -1325,7 +1346,28 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
         this.StartYear = eventStart.Date.getFullYear();
         this.EndYear = eventEnd.Date.getFullYear();
 
-    
+        var isRestricted = false;
+        var RestrictionStart = "12:00am"
+        var RestrictionEnd = "12:00am"
+        var isWorkWeek = false;
+
+        if (RestrictionData != null)
+        {
+            if (RestrictionData.isRestriction)
+            {
+                isRestricted = true;
+                RestrictionStart = RestrictionData.Start;
+                RestrictionEnd = RestrictionData.End;
+                isWorkWeek = RestrictionData.isWorkWeek;
+            }
+        }
+
+
+        this.isRestricted = isRestricted;
+        this.RestrictionStart = RestrictionStart;
+        this.RestrictionEnd = RestrictionEnd;
+        this.isWorkWeek = isWorkWeek;
+
         this.RepeatData = eventRepeatData;
         var RepeatType = "";
         this.RepeatType = "";
@@ -1941,7 +1983,7 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
 
         for (var i = 0; i < AllColors.length; i++) {
             var MyCOntainer = AllColors[i];
-            $(MyCOntainer.Selector.Container).click(genMoveOuterOrb(i))
+            (MyCOntainer.Selector.Container).onclick=(genMoveOuterOrb(i))
         }
 
         $(AllColors[0].Selector.Container).trigger("click");
@@ -2005,6 +2047,137 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
         ColorPickerContainer.Selector = { Container: ColorPickerContainer.Dom, OuterOrb: OuterBlackColor.Dom, myColor: innerColor.Dom }
         return ColorPickerContainer;
     }
+    
+    function generateCompletionMap(SelectedEvent)
+{
+    var CompletionMapID = "CompletionMap";
+    var CompletionMap = getDomOrCreateNew(CompletionMapID);
+    //$(CompletionMap.Dom).addClass("SubEventNonLabelSection");
+    //$(CompletionMap.Dom).addClass(CurrentTheme.ContentSection)
+    //$(CompletionMap.Dom).addClass(CurrentTheme.FontColor);
+
+    generatePieChart(CompletionMap, SelectedEvent);
+
+    
+
+
+
+
+    function generatePieChart(getDomObj, myEvent)
+    {
+        var pieChartContainerID = "pieChartContainer";
+        var pieChartContainer = getDomOrCreateNew(pieChartContainerID,"canvas");
+        var LegendContainerID = "LegendContainer";
+        var LegendContainer = getDomOrCreateNew(LegendContainerID);
+        $(LegendContainer.Dom).addClass("LegendContainer");
+
+        
+
+
+        var ctx = pieChartContainer.Dom;
+        ctx = ctx.getContext("2d");
+        var myNewChart = new Chart(ctx);
+        
+        getDomObj.Dom.appendChild(pieChartContainer.Dom);
+        getDomObj.Dom.appendChild(LegendContainer.Dom);
+
+        $(pieChartContainer.Dom).addClass("PieChart");
+
+        var TotalNumberOfTask = parseInt(Dictionary_OfCalendarData[myEvent.CalendarID].TotalNumberOfEvents)
+        var DelededEvents=parseInt(Dictionary_OfCalendarData[myEvent.CalendarID].DeletedEvents);
+        var NumberOfCompleteTask =parseInt(Dictionary_OfCalendarData[myEvent.CalendarID].CompletedEvents);
+
+
+        var CompletedTask={
+            value: NumberOfCompleteTask,
+            color: "green"
+        };
+        var CompletedTaskLegend = makeMyLegend("CompletedTask");
+        CompletedTaskLegend[1].Dom.innerHTML = "Completed";
+        LegendContainer.Dom.appendChild(CompletedTaskLegend[2].Dom);
+        CompletedTaskLegend[2].Dom.style.top = "0";
+        CompletedTaskLegend[0].Dom.style.backgroundColor = "green";
+
+        var DisabledTask={
+            value: DelededEvents,
+            color: "red"
+        };
+        var DisabledTaskLegend = makeMyLegend("DisabledTask");
+        DisabledTaskLegend[1].Dom.innerHTML = "Disabled";
+        LegendContainer.Dom.appendChild(DisabledTaskLegend[2].Dom);
+        DisabledTaskLegend[2].Dom.style.top = "33%";
+        DisabledTaskLegend[0].Dom.style.backgroundColor = "red";
+
+        var NotCompleted =
+            {
+                value: TotalNumberOfTask - (DelededEvents + NumberOfCompleteTask),
+            color: "gray"
+            };
+        var NotCompletedLegend = makeMyLegend("NotCompleted");
+        NotCompletedLegend[1].Dom.innerHTML = "Not Completed";
+        LegendContainer.Dom.appendChild(NotCompletedLegend[2].Dom);
+        NotCompletedLegend[2].Dom.style.top = "66%";
+        NotCompletedLegend[0].Dom.style.backgroundColor = "gray";
+
+
+        var data = [CompletedTask, DisabledTask, NotCompleted];
+
+        var option= {
+        //Boolean - Whether we should show a stroke on each segment
+        segmentShowStroke : true,
+	
+        //String - The colour of each segment stroke
+        segmentStrokeColor : "rgba(50,50,50,.8)",
+	
+        //Number - The width of each segment stroke
+        segmentStrokeWidth : 1,
+	
+        //The percentage of the chart that we cut out of the middle.
+        percentageInnerCutout : 45,
+	
+        //Boolean - Whether we should animate the chart	
+        animation : true,
+	
+        //Number - Amount of animation steps
+        animationSteps : 100,
+	
+        //String - Animation easing effect
+        animationEasing : "easeOutBounce",
+	
+        //Boolean - Whether we animate the rotation of the Doughnut
+        animateRotate : true,
+
+        //Boolean - Whether we animate scaling the Doughnut from the centre
+        animateScale : false,
+	
+        //Function - Will fire on animation completion.
+        onAnimationComplete : null
+    }
+
+        myNewChart.Doughnut(data, option);
+        //pieChartContainer.Dom.style.height = "70px";
+        //pieChartContainer.Dom.style.width = "140px";
+    }
+
+    function makeMyLegend(ID)
+    {
+        var Color = getDomOrCreateNew(ID + "Color");
+        $(Color.Dom).addClass("LegendColor");
+        var Text = getDomOrCreateNew(ID + "Text");
+        $(Text.Dom).addClass("LegendText");
+        var EncasingDom = getDomOrCreateNew(ID + "LegendEncasing");
+        $(EncasingDom.Dom).addClass("LegendEncasingDom");
+        EncasingDom.Dom.appendChild(Color.Dom);
+        EncasingDom.Dom.appendChild(Text.Dom);
+
+        return [Color, Text, EncasingDom];
+    }
+    return CompletionMap.Dom;
+
+}
+
+
+
     generateColorCircle.ID = 0;
 
 

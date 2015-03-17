@@ -5,6 +5,9 @@ using System.Web;
 
 namespace TilerFront.Models
 {
+    /// <summary>
+    /// Represents an Event that has not being added to a users schedule. 
+    /// </summary>
     public class UnregisteredEvent:AuthorizedUser
     {
         public string BColor { get; set; }
@@ -40,5 +43,22 @@ namespace TilerFront.Models
         public string StartMonth { get; set; }
         public string StartYear { get; set; }
         public string RepeatFrequency { get; set; }
+        /// <summary>
+        /// is time restriction set on this event
+        /// </summary>
+        public string isRestricted { get; set; }
+        /// <summary>
+        /// Start time for restriction
+        /// </summary>
+        public string RestrictionStart {get;set;}
+        /// <summary>
+        /// End time for restriction
+        /// </summary>
+        public string RestrictionEnd {get;set;}
+        /// <summary>
+        /// is the restrcition to be for only work week.
+        /// </summary>
+        public string isWorkWeek {get;set;} 
+        
     }
 }

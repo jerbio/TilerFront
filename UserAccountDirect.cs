@@ -9,8 +9,14 @@ namespace TilerFront
 {
     public class UserAccountDirect:UserAccount
     {
-        Models.ApplicationUser sessionUser;
+        protected Models.ApplicationUser sessionUser;
         //LogControl UserLog;
+        protected UserAccountDirect()
+        {
+            
+        }
+
+
 
         public UserAccountDirect(Models.ApplicationUser user, bool Passive=false)
         {
@@ -53,9 +59,17 @@ namespace TilerFront
             return retValue;
         }
 
-        override protected DateTimeOffset getDayReferenceTime(string desiredDirectory = "")
+        async override protected Task<DateTimeOffset> getDayReferenceTime(string desiredDirectory = "")
         {
-            DateTimeOffset retValue = UserLog.getDayReferenceTime(desiredDirectory);
+            DateTimeOffset retValue = await UserLog.getDayReferenceTime(desiredDirectory);
+            return retValue;
+        }
+
+
+        async protected Task<DateTimeOffset> getDayReferenceTimeFromXml(string desiredDirectory = "")
+        {
+
+            DateTimeOffset retValue = await ((LogControlDirect)UserLog).getDayReferenceTimeFromXml(desiredDirectory);
             return retValue;
         }
 
@@ -98,7 +112,7 @@ namespace TilerFront
 
         override public void UpdateReferenceDayTime(DateTimeOffset referenceTime)
         {
-            UserLog.UpdateReferenceDay(referenceTime);
+            UserLog.UpdateReferenceDayInXMLLog(referenceTime);
         }
 
         #region properties
@@ -155,7 +169,7 @@ namespace TilerFront
             }
         }
 
-        virtual public LogControl ScheduleData
+        virtual public LogControl ScheduleLogControl
         {
             get
             {

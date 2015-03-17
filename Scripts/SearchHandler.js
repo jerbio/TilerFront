@@ -125,7 +125,7 @@ function CallBackFunctionForReturnedValues(data, DomContainer) {
 
         DoNowButtonOfSearchedEventContainer.Dom.appendChild(DoNowButtonOfSearchedEventImage.Dom)
 
-        $(DoNowButtonOfSearchedEventContainer.Dom).click(genFunctionCallForCalendarEventNow(MyCalendarEVent.ID))
+        setTimeout(function() {(DoNowButtonOfSearchedEventContainer.Dom).onclick=(genFunctionCallForCalendarEventNow(MyCalendarEVent.ID))}, 500)
 
 
         $(DoNowButtonOfSearchedEventContainer.Dom).addClass("DoNowButtonOfSearchedEventContainer");
@@ -158,10 +158,14 @@ function CallBackFunctionForReturnedValues(data, DomContainer) {
                 // DataType needs to stay, otherwise the response object
                 // will be treated as a single string
             }).done(function (data) {
+                RefreshSubEventsMainDivSubEVents(generateSearchBarContainer.closeSearch);
+
+                /*
                 if (InitializeHomePage!=null)
                 {
                     InitializeHomePage();
                 }
+                */
             });
         }
     }
@@ -222,6 +226,8 @@ function generateSearchBarContainer(ParentDom)
         SearchAutoSuggest.getAutoSuggestControlContainer().outerHTML = "";
 
     }
+
+    generateSearchBarContainer.closeSearch = outOfFocusInput;
 
     return;
 }

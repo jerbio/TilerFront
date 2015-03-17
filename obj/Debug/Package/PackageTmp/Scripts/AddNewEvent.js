@@ -63,13 +63,14 @@ function LaunchAddnewEvent(LoopBackCaller, CurrentUser)
 
     var CancelTab = createCalEventCancelTab();
     TabTitleContainer.Dom.appendChild(CancelTab.Button.Dom);
-    $(CancelTab.Button.Dom).click(function () {
+    var CloseAddNewEvent = function () {
         var myContainer = (CurrentTheme.getCurrentContainer());
         CurrentTheme.TransitionOldContainer();
         $(myContainer).empty();
         myContainer.outerHTML = "";
-    })
-
+    }
+    //$(CancelTab.Button.Dom).click(CloseAddNewEvent)
+    //(CancelTab.Button.Dom).onclick = (CloseAddNewEvent)
 
 
     AllTabs.push(RecurrenceTab);
@@ -77,9 +78,10 @@ function LaunchAddnewEvent(LoopBackCaller, CurrentUser)
     var DoneTab = createCalEventDoneTab();
     //$(RangeTab.Content.Dom).addClass(CurrentTheme.InActiveTabContent);
     //TabContentContainer.Dom.appendChild(RangeTab.Content.Dom);
-    TabTitleContainer.Dom.appendChild(DoneTab.Button.Dom);
+    //TabTitleContainer.Dom.appendChild(DoneTab.Button.Dom);
     var NewCalendarEvent;//
-    $(DoneTab.Button.Dom).click(function ()
+    //$(DoneTab.Button.Dom).click(function ()
+        (DoneTab.Button.Dom).onclick=(function ()
         {
 
 
@@ -113,10 +115,10 @@ function LaunchAddnewEvent(LoopBackCaller, CurrentUser)
             success: function (response) {
                 //alert(response);
                 //debugger;
-                var myContainer = (CurrentTheme.getCurrentContainer());
-                CurrentTheme.TransitionOldContainer();
-                $(myContainer).empty();
-                myContainer.outerHTML = "";                
+                //var myContainer = (CurrentTheme.getCurrentContainer());
+                //CurrentTheme.TransitionOldContainer();
+                //$(myContainer).empty();
+                //myContainer.outerHTML = "";                
             },
             error: function (err) {
                 //debugger;
@@ -129,12 +131,13 @@ function LaunchAddnewEvent(LoopBackCaller, CurrentUser)
             }
 
         }).done(function (data) {
-            //debugger;
-            var myContainer = (CurrentTheme.getCurrentContainer());
+            debugger;
+            /*var myContainer = (CurrentTheme.getCurrentContainer());
             CurrentTheme.TransitionOldContainer();
             $(myContainer).empty();
-            myContainer.outerHTML = "";
-            InitializeHomePage();//hack alert
+            myContainer.outerHTML = "";*/
+            //InitializeHomePage();//hack alert
+            RefreshSubEventsMainDivSubEVents(CloseAddNewEvent);
 
             var SubEventDate = new Date(data.Content.SubCalStartDate)
             var myDropDown = new DropDownNotification();
@@ -159,6 +162,8 @@ function LaunchAddnewEvent(LoopBackCaller, CurrentUser)
 
     AddNewEvent.Dom.appendChild(TabContentContainer.Dom);
     AddNewEvent.Dom.appendChild(TabTitleContainer.Dom);
+    (CancelTab.Button.Dom).onclick = (CloseAddNewEvent)
+    TabTitleContainer.Dom.appendChild(DoneTab.Button.Dom);
     $(NameTab.Content.Dom).removeClass(CurrentTheme.InActiveTabContent);
     $(NameTab.Content.Dom).addClass(CurrentTheme.ActiveTabContent);
     ActivateTab(AllTabs, NameTab);
@@ -1596,8 +1601,19 @@ function GenerateColorPickerContainer(OverLay)
 
 
 
-    var myPicker = generateColorPickerContainer();
-    $(pickColorButton.Dom).addClass(myPicker.Selector.getColor().cssClass);
+    var myPicker = generateColorPickerContainer(loopBack);
+    function loopBack(SelectedColorData)
+    {
+        if (loopBack.previousClass != null)
+        {
+            $(pickColorButton.Dom).removeClass(loopBack.previousClass);
+        }
+        $(pickColorButton.Dom).addClass(SelectedColorData.ColorClass);
+        loopBack.previousClass = SelectedColorData.ColorClass;
+    }
+    loopBack.previousClass = null;
+
+    
     
 
     function generateColorPicker()

@@ -97,7 +97,14 @@ namespace TilerFront.Controllers
             switch (result)
             {
                 case SignInStatus.Success:
-                    return RedirectToAction("Desktop", "Account");
+                    if (Request.Browser.IsMobileDevice)
+                    {
+                        return RedirectToAction("Mobile", "Account");
+                    }
+                    else
+                    {
+                        return RedirectToAction("Desktop", "Account");
+                    }
                 case SignInStatus.LockedOut:
                     return View("Lockout");
                 case SignInStatus.RequiresVerification:
@@ -773,7 +780,14 @@ namespace TilerFront.Controllers
             ViewBag.ReturnUrl = returnUrl;
             return View(model);
         }
-        
+
+
+        [AllowAnonymous]
+        public ActionResult LogOff(string returnUrl)
+        {
+            ViewBag.ReturnUrl = returnUrl;
+            return RedirectToAction("Index", "Home");
+        }
         
         //
         // POST: /Account/LogOff

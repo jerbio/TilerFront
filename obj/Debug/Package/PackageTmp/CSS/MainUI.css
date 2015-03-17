@@ -76,7 +76,7 @@ body {
     height:5px;
     background-color:rgb(127,127,127);
     box-shadow:rgba(0,0,0,.6) 0px 4px 4px;
-    z-index:100;
+    //z-index:100;
 }
 .DividerLight /*media*/
 {
@@ -86,7 +86,7 @@ body {
     height:5px;
     background-color:rgb(64,64,64);
     box-shadow:rgba(0,0,0,.6);
-    z-index:100;
+    //z-index:100;
 }
 
 
@@ -878,4 +878,10 @@ input
     position:absolute;
     //z-index:1;
     transition: left .7s;
+}
+
+
+.TimeInput 
+{
+    width:5em;
 }

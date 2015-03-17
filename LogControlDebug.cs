@@ -8,29 +8,21 @@ namespace TilerFront
     public class LogControlDebug:LogControlDirect
     {
         string UserID;
+        /*
         public LogControlDebug(string userid)
         {
             UserID = userid;
         }
-
-        public override async System.Threading.Tasks.Task Initialize()
+        */
+        public LogControlDebug(Models.ApplicationUser User, string logLocation="", bool Passive=false):base(User,logLocation,Passive)
         {
-            CurrentLog = "";
-            //if (VerifiedUser.Item1)
-            {
-#if ForceReadFromXml
-#else
-                myCassandraAccess = new CassandraUserLog.CassandraLog(ID);
-#endif
-                
-                    CurrentLog = UserID + ".xml";
-                    string LogDir = (WagTapLogLocation + CurrentLog);
-                    string myCurrDir = Directory.GetCurrentDirectory();
-                    Console.WriteLine("Log DIR is:" + LogDir);
-                    LogStatus = File.Exists(LogDir);
-            }
+            
+        }
 
 
+        public override async System.Threading.Tasks.Task<DateTimeOffset> getDayReferenceTime(string NameOfFile = "")
+        {
+            return await base.getDayReferenceTimeFromXml(NameOfFile);
         }
 
     }
