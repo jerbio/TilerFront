@@ -172,11 +172,17 @@ body {
     width: 100%;
 }
 
+
 .DayTimeContainer 
 {
+  /*
   position:absolute;
   top: 14%;
   height:86%;
+  width:100%;
+  */
+  position:absolute;
+  height:100%;
   width:100%;
 }
 
@@ -572,12 +578,14 @@ position: absolute;
 
 .ListElement 
 {
-    width:10%;
+    width:100%;
     height:20px;
-    position:absolute;
+    //position:absolute;
+    position:relative;
     font-size:12px;
     overflow: hidden;
     transition:all .1s;
+    left:100%;
 }
 
 
@@ -615,12 +623,13 @@ position: absolute;
 
 .ListElementDataContentContainer 
 {
-    position:absolute;
+    position: relative;
     cursor: pointer;
-    width:80%;
-    height:90%;
-    border-radius:10px;
-    left:20%;
+    width: calc(100% - 18px);
+    height: 90%;
+    border-radius: 10px;
+    left: 3px;
+    display: inline-block;
 }
 
 .EventLockImgContainer {
@@ -810,7 +819,7 @@ position: absolute;
 
 .FullColorAugmentation 
 {
-    border:white 1px solid;
+    //border:white 1px solid;
     height: 60px;
 }
 
@@ -1119,4 +1128,86 @@ width: auto;
 
 #NameInputBox {
     width:100% !important;
+}
+
+.SubEventListContainer
+{
+    position:absolute;
+    width:90%;
+    left:0;
+    padding-top:10px;
+}
+
+
+.DayContextContainer
+{
+    position:absolute;
+    top: 14%;
+    height:86%;
+    width:100%;
+}
+
+.EventLockContainer
+{
+    position: relative;
+    left: 0;
+    width: 14px;
+    height: 100%;
+    display: inline-block;
+}
+
+#TilerCloseButton
+{
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  z-index: 99;
+  top: 4px;
+  margin-left: -4px;
+  outline:none;
+}
+
+
+#TilerCloseButton:hover div
+{
+    border-color:black;
+}
+
+.RightCloseButton 
+{
+    left:100%;
+    transform:translateX(-100%);
+}
+
+
+.LeftCloseButton 
+{
+    left:0%;
+}
+
+#RightCloseBar
+{
+    width: 20px;
+  height: 15px;
+  border: none;
+  /* border-top: 2px solid black; */
+  border-right: 2px solid gray;
+  position: absolute;
+  /* display: block; */
+  transform: rotate(-135deg);
+  top: 3px;
+  left: 14px;
+}
+
+#LeftCloseBar
+{
+    width: 15px;
+  height: 15px;
+  border: none;
+  border-top: 2px solid gray;
+  /* border-right: 2px solid black; */
+  position: absolute;
+  transform: rotate(45deg);
+  top: 0px;
+  left: 5px;
 }

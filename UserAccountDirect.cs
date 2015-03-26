@@ -88,7 +88,7 @@ namespace TilerFront
         async public Task CommitEventToLog(IEnumerable<CalendarEvent> AllEvents, string LatestID, string LogFile = "")
         {
             await ((LogControlDirect)UserLog).WriteToLog(AllEvents, LatestID, LogFile);
-            sessionUser.LastChange = DateTime.Now;
+            sessionUser.LastChange = DateTimeOffset.Now.DateTime;
             Task SaveChangesToDB = new Controllers.UserController().SaveUser(sessionUser);
             await SaveChangesToDB;
         }

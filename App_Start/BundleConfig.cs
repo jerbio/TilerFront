@@ -179,7 +179,9 @@ namespace TilerFront
                     "~/Scripts/YuiCombo/3.18.1/dial/assets/skins/sam/dial.css",
                     "~/CSS/Notification.css"
                     ));
-            //"~/Scripts/YuiCombo/
+            bundles.Add(new StyleBundle("~/Content/TilerDesktopSettingsCss").Include(
+                    "~/CSS/SettingsDesktop.css"
+                ));
             
         }
     }

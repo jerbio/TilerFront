@@ -599,7 +599,7 @@ function populateSearchOptionDom(Dom)
                 Diamond.status %= 2;
             }
         }
-        if (myEvent.ID == "100724_7_0_100725") {
+        if (myEvent.ID == "110844_7_110848_110849") {
             //debugger;
             var a = 9;
         }
@@ -609,18 +609,20 @@ function populateSearchOptionDom(Dom)
 
         
 
-        
+        //debugger;
+        /*
         myEvent.SubCalStartDate = new Date(myEvent.SubCalStartDate + global_TimeZone_ms );
         myEvent.SubCalEndDate = new Date(myEvent.SubCalEndDate + global_TimeZone_ms );
         myEvent.SubCalCalEventStart = new Date(myEvent.SubCalCalEventStart + global_TimeZone_ms );
         myEvent.SubCalCalEventEnd = new Date(myEvent.SubCalCalEventEnd + global_TimeZone_ms );
+        //*/
         
-        /*
+        ///*
         myEvent.SubCalStartDate = new Date(myEvent.SubCalStartDate);// + global_TimeZone_ms);
         myEvent.SubCalEndDate = new Date(myEvent.SubCalEndDate);// + global_TimeZone_ms);
         myEvent.SubCalCalEventStart = new Date(myEvent.SubCalCalEventStart );//+ global_TimeZone_ms);
         myEvent.SubCalCalEventEnd = new Date(myEvent.SubCalCalEventEnd);// + global_TimeZone_ms);
-        */
+        //*/
         /*myEvent.SubCalStartDate = !myEvent.SubCalStartDate.dst() ? new Date(Number(myEvent.SubCalStartDate.getTime()) + OneHourInMs) : myEvent.SubCalStartDate;
         myEvent.SubCalEndDate =! myEvent.SubCalEndDate.dst() ? new Date(Number(myEvent.SubCalEndDate.getTime()) + OneHourInMs) : myEvent.SubCalEndDate;
         myEvent.SubCalCalEventStart = !myEvent.SubCalCalEventStart.dst() ? new Date(Number(myEvent.SubCalCalEventStart.getTime()) + OneHourInMs) : myEvent.SubCalCalEventStart;

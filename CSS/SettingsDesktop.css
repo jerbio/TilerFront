@@ -1,0 +1,48 @@
+﻿.SettingSectionContainer
+{
+    position:relative;
+    width:500px;
+    padding:50px;
+    left:50%;
+    margin-left:-300px;
+    //background:white;
+}
+
+.SettingSection
+{
+    position:relative;
+    max-width:100%;
+    height:100px;
+    //border:1px solid black;
+    margin-top:10px;
+    border-radius:2px;
+    box-shadow:rgba(10,10,10,.4) 0 2px 2px 1px;
+    background:white;
+    cursor:pointer;
+}
+
+.SettingSection:hover
+{
+    box-shadow:rgba(10,10,10,.4) 0px 0px 3px 3px;
+}
+
+body
+{
+    background:rgb(230,230,230);
+}
+
+.LabelSection
+{
+    color:white;
+    background:black;
+    height:35px;
+    width:100%;
+    line-height:35px;
+    padding-left:10px;
+    box-sizing:border-box;
+}
+
+.ContentDescription
+{
+    padding:10px;
+}

@@ -10,7 +10,7 @@ namespace TilerFront
         //public static class WebApiConfig
         
             public static DateTimeOffset JSStartTime = new DateTimeOffset(1970, 1, 1, 0, 0, 0, new TimeSpan());
-            public static TimeSpan StartOfTimeTimeSpan = JSStartTime - new DateTime(0);
+            public static TimeSpan StartOfTimeTimeSpan = JSStartTime - new DateTimeOffset(0, new TimeSpan());
             public static void Register(HttpConfiguration config)
             {
                 // Web API configuration and services
@@ -33,20 +33,25 @@ namespace TilerFront
                 );
             }
 
-            public static Models.SubCalEvent ToSubCalEvent(this TilerElements.SubCalendarEvent SubCalendarEventEntry, TilerElements.CalendarEvent CalendarEventEntry)
+            public static Models.SubCalEvent ToSubCalEvent(this TilerElements.SubCalendarEvent SubCalendarEventEntry, TilerElements.CalendarEvent CalendarEventEntry=null)
             {
                 Models.SubCalEvent retValue = new Models.SubCalEvent();
                 retValue.ID = SubCalendarEventEntry.ID;
                 retValue.CalendarID = SubCalendarEventEntry.SubEvent_ID.getRepeatCalendarEventID();
-                retValue.SubCalCalendarName = CalendarEventEntry.Name;
+                
                 retValue.SubCalStartDate = (long)(SubCalendarEventEntry.Start - JSStartTime).TotalMilliseconds;
                 retValue.SubCalEndDate = (long)(SubCalendarEventEntry.End - JSStartTime).TotalMilliseconds;
                 retValue.SubCalTotalDuration = SubCalendarEventEntry.ActiveDuration;
                 retValue.SubCalRigid = SubCalendarEventEntry.Rigid;
                 retValue.SubCalAddressDescription = SubCalendarEventEntry.myLocation.Description;
                 retValue.SubCalAddress = SubCalendarEventEntry.myLocation.Address;
-                retValue.SubCalCalEventStart = (long)(CalendarEventEntry.Start - JSStartTime).TotalMilliseconds;
-                retValue.SubCalCalEventEnd = (long)(CalendarEventEntry.End - JSStartTime).TotalMilliseconds;
+                if (CalendarEventEntry != null)
+                {
+                    retValue.SubCalCalendarName = CalendarEventEntry.Name;
+                    retValue.SubCalCalEventStart = (long)(CalendarEventEntry.Start - JSStartTime).TotalMilliseconds;
+                    retValue.SubCalCalEventEnd = (long)(CalendarEventEntry.End - JSStartTime).TotalMilliseconds;
+                }
+
                 retValue.SubCalEventLong = SubCalendarEventEntry.myLocation.YCoordinate;
                 retValue.SubCalEventLat = SubCalendarEventEntry.myLocation.XCoordinate;
                 retValue.RColor = SubCalendarEventEntry.UIParam.UIColor.R;

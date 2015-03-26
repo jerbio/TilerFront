@@ -257,6 +257,7 @@ function generateModal(x, y, height, width,WeekStart, RenderPlane,UseCurrentTime
 
     function removePanel()
     {
+        //debugger;
         CloseModal();
     }
 
@@ -273,13 +274,14 @@ function generateModal(x, y, height, width,WeekStart, RenderPlane,UseCurrentTime
             }
             return false;
         }
-        
+        ///*
         setTimeout(function () {
             if (!isDescendant(modalAddDom, document.activeElement)) {
                 //$(document).off("keydown", document, removePanel);
                 global_ExitManager.triggerLastExitAndPop();
             }
         }, 1);
+        //*/
 
         
 
@@ -289,17 +291,20 @@ function generateModal(x, y, height, width,WeekStart, RenderPlane,UseCurrentTime
     
     
     $(modalAddDom.Dom).attr('tabindex', 0).focus();
+    AddCloseButoon(modalAddDom,false);
 
 }
 generateModal.isOn = false;
 
 function CloseModal()
 {
-    //generateModal.isOn = false;
+    setTimeout(function () { generateModal.isOn = false; }, 200);
+    
     var myAddPanel = getDomOrCreateNew("AddModalDom");
     if (myAddPanel.Dom.parentElement != null)
     {
         myAddPanel.Dom.parentElement.removeChild(myAddPanel.Dom);
+        //generateModal.isOn = false;
     }
 
 }
@@ -380,6 +385,8 @@ function generateAddEventContainer(x,y,height,Container,refStartTime)
     $(SubmitButton.Selector.Button.Dom).click(function () {
         BindSubmitClick(NameDom.Selector.Input.Dom.value, LocationDom.Selector.Address.Dom.value, LocationDom.Selector.NickName.Dom.value, SplitCount.Selector.Input.Dom.value, StartDom, EndDom, DurationDom, null, true, ColorPicker.Selector.getColor(), global_ExitManager.triggerLastExitAndPop, recurrence)
     })
+
+    AddCloseButoon(NewEventcontainer, false);
     //var RepetitionDom = generateRepetitionContainer();
 }
 
@@ -1281,6 +1288,7 @@ function AddTiledEvent()
     //debugger;
     FirstElement.reveal();
     FirstElement.forceFocus();
+    AddCloseButoon(modalTileEvent, true);
     return ModalContentContainer;
 }
 

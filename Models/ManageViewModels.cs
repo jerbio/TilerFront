@@ -64,6 +64,8 @@ namespace TilerFront.Models
         [Display(Name = "Time Of Day")]
         [StringLength(7, ErrorMessage = "In valid time provided", MinimumLength = 6)]
         public string TimeOfDay { get; set; }
+        [Display(Name = "TimeZoneOffSet")]
+        public string TimeZoneOffSet { get; set; }
     }
 
     public class AddPhoneNumberViewModel

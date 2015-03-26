@@ -30,14 +30,15 @@ namespace TilerFront
             this.UiParams = CalendarEventData.UIParam;
             this.DataBlob = CalendarEventData.Notes;
             this.Enabled = CalendarEventData.isEnabled;
-            this.isRestricted = CalendarEventData.isEventRestricted;
+            //this.isRestricted = CalendarEventData.isEventRestricted;
             this.LocationData = CalendarEventData.myLocation;//hack you might need to make copy
-            this.ProfileOfProcrastination = CalendarEventData.ProcrastinationProfile;
+            this.ProfileOfProcrastination = CalendarEventData.ProcrastinationInfo;
             this.DeadlineElapsed = CalendarEventData.isDeadlineElapsed;
             this.UserDeleted = CalendarEventData.isUserDeleted;
             this.CompletedCount = CalendarEventData.CompletionCount;
             this.DeletedCount = CalendarEventData.DeletionCount;
             this.ProfileOfRestriction = restrictionData;
+            this.isRestricted = true;
             //this.SubEvents = ((DB_CalendarEventRestricted)CalendarEventData).getSubEvents();
             
             if (!RepetitionFlag)

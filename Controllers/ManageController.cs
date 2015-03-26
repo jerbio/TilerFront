@@ -247,7 +247,13 @@ namespace TilerFront.Controllers
         // GET: /Manage/ChangeStartOfDay
         public ActionResult ChangeStartOfDay()
         {
-            return View();
+            ApplicationUser myUser = UserManager.FindById(User.Identity.GetUserId());
+            long Milliseconds = (long)(new DateTimeOffset(myUser.LastChange) - WebApiConfig.JSStartTime).TotalMilliseconds;
+            var model = new ChangeStartOfDayModel
+            {
+                TimeOfDay = Milliseconds.ToString()
+            };
+            return View(model);
         }
 
         //
@@ -265,9 +271,10 @@ namespace TilerFront.Controllers
 
             DateTimeOffset TimeOfDay = new DateTimeOffset();
             if (DateTimeOffset.TryParse(TimeString,out TimeOfDay))
-            { 
-                
+            {  
                 ApplicationUser myUser = await UserManager.FindByIdAsync(User.Identity.GetUserId());
+                TimeSpan OffSetSpan= TimeSpan.FromMinutes(Convert.ToInt32( model.TimeZoneOffSet));
+                TimeOfDay = TimeOfDay.ToOffset(OffSetSpan);
                 myUser.LastChange=TimeOfDay.DateTime;
                 result= await UserManager.UpdateAsync(myUser);
             }

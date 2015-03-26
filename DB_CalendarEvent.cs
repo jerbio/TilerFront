@@ -31,7 +31,7 @@ namespace TilerFront
             this.Enabled = CalendarEventData.isEnabled;
             this.isRestricted = CalendarEventData.isEventRestricted;
             this.LocationData = CalendarEventData.myLocation;//hack you might need to make copy
-            this.ProfileOfProcrastination = CalendarEventData.ProcrastinationProfile;
+            this.ProfileOfProcrastination = CalendarEventData.ProcrastinationInfo;
             this.DeadlineElapsed = CalendarEventData.isDeadlineElapsed;
             this.UserDeleted = CalendarEventData.isUserDeleted;
             this.CompletedCount = CalendarEventData.CompletionCount;
@@ -47,6 +47,8 @@ namespace TilerFront
                     this.SubEvents.Add(eachSubCalendarEvent.SubEvent_ID, eachSubCalendarEvent);
                 }
             }
+
+            //this.SubEvents = CalendarEventData.SubEvents;
             this.otherPartyID = CalendarEventData.ThirdPartyID;// == CalendarEventData.null ? null : otherPartyID.ToString();
             this.UserIDs = CalendarEventData.getAllUserIDs();//.ToList();
             //return MyCalendarEventCopy;

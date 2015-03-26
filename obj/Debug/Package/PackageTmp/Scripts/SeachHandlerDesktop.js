@@ -58,6 +58,7 @@
         getRefreshedData.enableDataRefresh(true);
     }
     global_ExitManager.addNewExit(ActivateUserSearch.ClearSearch);
+    AddCloseButoon(SearchContainer, false);
 }
 
 

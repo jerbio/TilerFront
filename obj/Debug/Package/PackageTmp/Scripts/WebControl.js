@@ -265,6 +265,7 @@ function OutOfFocusManager()
             triggerLastExit();
             AllCallBackFunc.pop();
             --CurrIndex;
+            AddCloseButoon.HideClosButton();
         }
     }
 
@@ -2176,6 +2177,27 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
 
 }
 
+    function BindDatePicker(InputDom, format) {
+        if (format == null) {
+            format = 'm/d/yyyy';
+        }
+        ///*
+        $(InputDom).datepicker({
+            'format': format,
+            'autoclose': true
+        });
+        //*/
+
+        return $(InputDom).datepicker();
+    }
+
+    function BindTimePicker(InputDom) {
+        $(InputDom).timepicker({
+            'showDuration': true,
+            'timeFormat': 'g:ia'
+        });
+        return $(InputDom).timepicker();
+    }
 
 
     generateColorCircle.ID = 0;
@@ -2183,3 +2205,5 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
 
 
     generateMyButton.ID = 0;
+
+

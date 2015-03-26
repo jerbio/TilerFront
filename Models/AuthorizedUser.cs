@@ -27,7 +27,7 @@ namespace TilerFront.Models
            //get
            {
             DateTimeOffset refNow = DateTimeOffset.UtcNow;
-            refNow = refNow.Add(-this.getTImeSpan);
+            //refNow = refNow.Add(this.getTImeSpan);
             return refNow;
            }
         }

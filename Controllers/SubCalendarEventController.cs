@@ -147,7 +147,7 @@ namespace TilerFront.Controllers
             PostBackData retValue;
             if (retrievedUser.Status)
             {
-                My24HourTimerWPF.Schedule NewSchedule = new My24HourTimerWPF.Schedule(retrievedUser, new DateTime(myUser.getRefNow().Ticks));
+                My24HourTimerWPF.Schedule NewSchedule = new My24HourTimerWPF.Schedule(retrievedUser, myUser.getRefNow());
                 long StartLong = Convert.ToInt64(myUser.Start);
                 long EndLong = Convert.ToInt64(myUser.End);
                 long LongBegin = Convert.ToInt64(myUser.CalStart);
