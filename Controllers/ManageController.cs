@@ -248,7 +248,7 @@ namespace TilerFront.Controllers
         public ActionResult ChangeStartOfDay()
         {
             ApplicationUser myUser = UserManager.FindById(User.Identity.GetUserId());
-            long Milliseconds = (long)(new DateTimeOffset(myUser.LastChange) - WebApiConfig.JSStartTime).TotalMilliseconds;
+            long Milliseconds = (long)(new DateTimeOffset(myUser.LastChange.AddDays(10)) - WebApiConfig.JSStartTime).TotalMilliseconds;
             var model = new ChangeStartOfDayModel
             {
                 TimeOfDay = Milliseconds.ToString()
@@ -266,12 +266,19 @@ namespace TilerFront.Controllers
             {
                 return View(model);
             }
+            //bool isDST = Convert.ToBoolean(model.Dst);
             string TimeString = model.TimeOfDay + WebApiConfig.JSStartTime.Date.ToShortDateString();
             var result= IdentityResult.Failed(new string[]{"Invalid Time Start Of Time"});
 
             DateTimeOffset TimeOfDay = new DateTimeOffset();
             if (DateTimeOffset.TryParse(TimeString,out TimeOfDay))
             {  
+                /*
+                if(isDST)
+                {
+                    TimeOfDay=TimeOfDay.AddHours(-1);
+                }
+                */
                 ApplicationUser myUser = await UserManager.FindByIdAsync(User.Identity.GetUserId());
                 TimeSpan OffSetSpan= TimeSpan.FromMinutes(Convert.ToInt32( model.TimeZoneOffSet));
                 TimeOfDay = TimeOfDay.ToOffset(OffSetSpan);

@@ -1407,10 +1407,11 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
         //alert(rigidFlag);
         this.Count = eventCounts;
 
-    
-
-        //{ Days: Days, Hours: Hours, Mins: Mins };
-
+        this.getTotalDuration=function()
+        {
+            var TotalDurationInMs = (this.DurationDays * OneDayInMs) + (this.DurationHours * OneHourInMs) + (this.DurationMins * OneHourInMs);
+            return TotalDurationInMs;
+        }
     }
 
     function date_mm_dd__yyyy_ToDateObj(DateString,Delimiter)

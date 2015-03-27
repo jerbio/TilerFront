@@ -9,11 +9,11 @@ namespace TilerFront
 {
     public class PeekResult
     {
-        PeekDay[] RelevantDays;
+        PeekDay[] PeekDays;
         int ConflictingCount;
         public PeekResult(IEnumerable<IEnumerable<SubCalendarEvent>>AllInterferringEvents,DayTimeLine[] DayReferences, IEnumerable<SubCalendarEvent>ConflictingEvents)
         {
-            RelevantDays = AllInterferringEvents.Select((obj,i) =>{
+            PeekDays = AllInterferringEvents.Select((obj,i) =>{
                
                 double ActiveTimeDuration =(SubCalendarEvent.TotalActiveDuration(obj).TotalMilliseconds);
                 double durationRatio = ActiveTimeDuration/DayReferences[i].TimelineSpan.TotalMilliseconds;
@@ -31,5 +31,6 @@ namespace TilerFront
         public SubCalEvent[] AllSubEvents { get; set; }
         public double TotalDuration { get; set; }
         public double DurationRatio { get; set; }
+        public double SleepTime { get; set; }
     }
 }

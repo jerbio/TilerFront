@@ -309,6 +309,93 @@ function CloseModal()
 
 }
 
+function generatePeek(CalEvent,Container)
+{
+    var CalEvent = new CalEventData();
+    var CalEndTime =null;
+    var TotalDuration=null;
+    try
+    {
+        TotalDuration = CalEvent.getTotalDuration();
+        CalEndTime = new Date(CalEvent.EndYear, CalEvent.EndMonth, CalEvent.EndDay, CalEvent.EndHour, CalEvent.EndMins, 0, 0);
+    }
+    catch(e)
+    {
+        
+    }
+    
+    if ((TotalDuration != null) && (CalEndTime != null))
+    {
+        createPeekUI(CalEvent, Container)
+    }
+
+
+    function createPeekUI(CalEvent, Container)
+    {
+        var url = global_refTIlerUrl + "Schedule/Peek";
+        getRefreshedData.disableDataRefresh();
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: CalEvent,
+            // DO NOT SET CONTENT TYPE to json
+            // contentType: "application/json; charset=utf-8", 
+            // DataType needs to stay, otherwise the response object
+            // will be treated as a single string
+            //dataType: "json",
+            success: function (response) {
+                //alert(response);
+                //var myContainer = (CurrentTheme.getCurrentContainer());
+                //CurrentTheme.TransitionOldContainer();
+                //$(myContainer).empty();
+                //myContainer.outerHTML = "";
+                var b = 3;
+
+
+            },
+            error: function (err) {
+                //var myError = err;
+                //var step = "err";
+                //var NewMessage = "Oh No!!! Tiler is having issues modifying your schedule. Please try again Later :(";
+                //var ExitAfter = { ExitNow: true, Delay: 1000 };
+            }
+
+        }).done(function (response)
+        {
+            
+            getRefreshedData.enableDataRefresh(true);
+            affirmNewEvent(response);
+            HidePeekUI()
+        });
+    }
+
+    function HidePeekUI()
+    {
+
+    }
+
+    function RevealPeekUI()
+    {
+        var PeekDaysSampleData = [
+                            { TotalDuration: 100, DurationRatio: 0.3, SleepDuration: 4},
+                            { TotalDuration: 100, DurationRatio: 0.5, SleepDuration: 5},
+                            { TotalDuration: 100, DurationRatio: 0.2, SleepDuration: 5 },
+                            { TotalDuration: 100, DurationRatio: 0.7, SleepDuration: 6 },
+                            { TotalDuration: 100, DurationRatio: 0.65, SleepDuration: 7 },
+                            { TotalDuration: 100, DurationRatio: 0.48, SleepDuration: 4 },
+                            { TotalDuration: 100, DurationRatio: 0.72, SleepDuration: 8 }
+                       ]
+
+        var PeekData = { PeekDays: PeekDaysSampleData, ConflctCount: 4 }
+    }
+    
+
+    
+    
+}
+
+generatePeek.peekIsOn = false;
+
 function generateAddEventContainer(x,y,height,Container,refStartTime)
 {
     global_ExitManager.triggerLastExitAndPop();

@@ -27,8 +27,13 @@
                     var d = new Date();
                     var TotalMin =d.getTimezoneOffset();
                     TimeZoneDataDom.value = TotalMin;
-                    var OneMinInMS= 60000
-                    var Milliseconds = Number(TimeOfDay.value) - (OneMinInMS * TotalMin);
+                    var OneMinInMS = 60000
+                    var dstExtra = 0;
+                    if (new Date().dst())
+                    {
+                        dstExtra = 3600000
+                    }
+                    var Milliseconds =( Number(TimeOfDay.value) + dstExtra )- (OneMinInMS * 0);
                     TimeOfDay.value = new Date(Milliseconds).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                     BindTimePicker(TimeOfDay);
                 }, 200)

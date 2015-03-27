@@ -316,15 +316,43 @@ namespace TilerFront
 
             retValue = new Task<bool>(() => { return true; });
             retValue.Start();
+            string LogFileCopy = "";
             if (LogFile == "")
-            { LogFile = WagTapLogLocation + CurrentLog; }
+            { 
+                LogFile = WagTapLogLocation + CurrentLog;
+                LogFileCopy = WagTapLogLocation + "Copy_" + CurrentLog;
+            }
+
+            
+
             XmlDocument xmldoc = new XmlDocument();
+            XmlDocument xmldocCopy = new XmlDocument();
             xmldoc.Load(LogFile);
+            try
+            {
+                xmldocCopy.Load(LogFileCopy);
+            }
+            catch
+            {
+                try
+                {
+                    genereateNewLogFile("Copy_" + ID);
+                    xmldocCopy.Load(LogFileCopy);
+                }
+                catch(Exception e)
+                {
+                    Console.Write(e.Message);
+                }
+                
+            }
+
+
+            xmldocCopy.InnerXml = xmldoc.InnerXml;
             CachedLocation = await getLocationCache().ConfigureAwait(false); ;//populates with current location info
             Dictionary<string, Location_Elements> OldLocationCache = new Dictionary<string, Location_Elements>(CachedLocation);
             xmldoc.DocumentElement.SelectSingleNode("/ScheduleLog/LastIDCounter").InnerText = LatestID;
             XmlNodeList EventSchedulesNodes = xmldoc.DocumentElement.SelectNodes("/ScheduleLog/EventSchedules");
-
+            
             XmlNode EventSchedulesNodesNode = xmldoc.DocumentElement.SelectSingleNode("/ScheduleLog/EventSchedules");
             XmlNode EventSchedulesNodesNodeCpy = xmldoc.CreateElement("NodeCopy");// .DocumentElement.SelectSingleNode("/ScheduleLog/EventSchedules");
             EventSchedulesNodesNodeCpy.InnerXml = EventSchedulesNodesNode.InnerXml;
@@ -374,6 +402,7 @@ namespace TilerFront
                 try
                 {
                     xmldoc.Save(LogFile);
+                    xmldocCopy.Save(LogFileCopy);
                     break;
                 }
                 catch (Exception e)

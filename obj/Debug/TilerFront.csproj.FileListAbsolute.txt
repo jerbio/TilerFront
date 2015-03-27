@@ -1,8 +1,3 @@
-C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.csproj.App.config
-C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.csprojResolveAssemblyReference.cache
-C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.Migrations.init.resources
-C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.Migrations.Initial.resources
-C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.csproj.GenerateResource.Cache
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\ApplicationInsights.config
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Microsoft.ApplicationInsights.Extensions.Intercept_x86.dll
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Microsoft.ApplicationInsights.Extensions.Intercept_x64.dll
@@ -117,6 +112,11 @@ C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Microsoft.Owin.Secu
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Microsoft.Owin.Security.Twitter.xml
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Microsoft.Owin.Security.MicrosoftAccount.xml
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Google.Maps.pdb
+C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.csproj.App.config
+C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.csprojResolveAssemblyReference.cache
+C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.Migrations.init.resources
+C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.Migrations.Initial.resources
+C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.csproj.GenerateResource.Cache
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\ApplicationInsights.config
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.dll
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.pdb

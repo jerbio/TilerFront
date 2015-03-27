@@ -6,7 +6,4 @@
   <parameter name="TilerFront.Models.TilerContext-Web.config Connection String" description="TilerFront.Models.TilerContext Connection String used in web.config by the application to access the database." defaultValue="TilerFront.Models.TilerContext_ConnectionString" tags="SqlConnectionString">
     <parameterEntry kind="XmlFile" scope="C:\\Users\\OluJerome\\Documents\\WagTap\\WagTapWeb\\TilerFront\\obj\\Debug\\Package\\PackageTmp\\Web\.config$" match="/configuration/connectionStrings/add[@name='TilerFront.Models.TilerContext']/@connectionString" />
   </parameter>
-  <parameter name="DefaultConnection_DatabasePublish-Web.config Connection String" description="DefaultConnection_DatabasePublish Connection String used in web.config by the application to access the database." defaultValue="DefaultConnection_DatabasePublish.ConnetionString" tags="SqlConnectionString">
-    <parameterEntry kind="XmlFile" scope="C:\\Users\\OluJerome\\Documents\\WagTap\\WagTapWeb\\TilerFront\\obj\\Debug\\Package\\PackageTmp\\Web\.config$" match="/configuration/connectionStrings/add[@name='DefaultConnection_DatabasePublish']/@connectionString" />
-  </parameter>
 </parameters>
