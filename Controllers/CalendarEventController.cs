@@ -203,7 +203,9 @@ namespace TilerFront.Controllers
             {
                 My24HourTimerWPF.Schedule NewSchedule = new My24HourTimerWPF.Schedule(retrievedUser, myUser.getRefNow());
                 DateTimeOffset newStart = WebApiConfig.JSStartTime.AddMilliseconds( myUser.Start  );
+                newStart = newStart.Add(myUser.getTImeSpan);
                 DateTimeOffset newEnd = WebApiConfig.JSStartTime.AddMilliseconds( myUser.End  );
+                newEnd = newEnd.Add(myUser.getTImeSpan);
                 int SplitCount = (int)myUser.Split;
                 TimeSpan SpanPerSplit = TimeSpan.FromMilliseconds(myUser.Duration);
                 Tuple<CustomErrors, Dictionary<string, CalendarEvent>> ScheduleUpdateMessage = NewSchedule.BundleChangeUpdate(myUser.EventID, myUser.EventName, newStart, newEnd, SplitCount);//, SpanPerSplit);

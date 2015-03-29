@@ -153,9 +153,13 @@ namespace TilerFront.Controllers
                 long LongBegin = Convert.ToInt64(myUser.CalStart);
                 long LongDeadline = Convert.ToInt64(myUser.CalEnd);
                 DateTimeOffset newStart = WebApiConfig.JSStartTime.AddMilliseconds(StartLong);
+                newStart = newStart.Add(myUser.getTImeSpan);
                 DateTimeOffset newEnd = WebApiConfig.JSStartTime.AddMilliseconds(EndLong);
+                newEnd = newEnd.Add(myUser.getTImeSpan);
                 DateTimeOffset Begin = WebApiConfig.JSStartTime.AddMilliseconds(LongBegin);
+                Begin = Begin.Add(myUser.getTImeSpan);
                 DateTimeOffset Deadline = WebApiConfig.JSStartTime.AddMilliseconds(LongDeadline);
+                Deadline = Deadline.Add(myUser.getTImeSpan);
                 int SplitCount = (int)myUser.Split;
                 //TimeSpan SpanPerSplit = TimeSpan.FromMilliseconds(myUser.Duration);
                 Tuple<CustomErrors, Dictionary<string, CalendarEvent>> ScheduleUpdateMessage = NewSchedule.BundleChangeUpdate(myUser.EventID,myUser.EventName, newStart, newEnd,Begin,Deadline, SplitCount);//, SpanPerSplit);

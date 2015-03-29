@@ -1406,11 +1406,13 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
         this.Rigid = rigidFlag?true:false;
         //alert(rigidFlag);
         this.Count = eventCounts;
+    }
 
-    
 
-        //{ Days: Days, Hours: Hours, Mins: Mins };
-
+    function getTotalDurationFromCalEvent(CalEvent)
+    {
+        var TotalDurationInMs = (CalEvent.DurationDays * OneDayInMs) + (CalEvent.DurationHours * OneHourInMs) + (CalEvent.DurationMins * OneHourInMs);
+        return TotalDurationInMs;
     }
 
     function date_mm_dd__yyyy_ToDateObj(DateString,Delimiter)
