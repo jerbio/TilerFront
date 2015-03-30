@@ -505,7 +505,9 @@ function generateModalForTIleOrModal()
     }
 }
 
-    function AddNewEventOnClick()
+   
+
+    function AddNewEventOnClick(TileOrEvent)
     {
         generateModalForTIleOrModal();
     }

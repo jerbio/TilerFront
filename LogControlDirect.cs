@@ -847,8 +847,6 @@ namespace TilerFront
             return MyCalendarEventDictionary;
         }
          */
-        
-        
 
         Repetition getRepetitionObject(XmlNode RecurrenceXmlNode, TimeLine RangeOfLookUP)
         {
@@ -875,7 +873,7 @@ namespace TilerFront
                         repetitionNodes.Add(getRepetitionObject(eacXmlNode, RangeOfLookUP));
                     }
 
-                    RetValue = new Repetition(true, new TimeLine(DateTimeOffset.Parse(RepeatStart), DateTimeOffset.Parse(RepeatEnd)), RepeatFrequency, repetitionNodes.ToArray(), repetitionDay);
+                    RetValue = new DB_Repetition(true, new TimeLine(DateTimeOffset.Parse(RepeatStart), DateTimeOffset.Parse(RepeatEnd)), RepeatFrequency, repetitionNodes.ToArray(), repetitionDay);
                     return RetValue;
                 }
 
@@ -883,7 +881,7 @@ namespace TilerFront
 
 
 
-            RetValue = new Repetition(true, new TimeLine(DateTimeOffset.Parse(RepeatStart), DateTimeOffset.Parse(RepeatEnd)), RepeatFrequency, getAllRepeatCalendarEvents(XmlNodeWithList, RangeOfLookUP), repetitionDay);
+            RetValue = new DB_Repetition(true, new TimeLine(DateTimeOffset.Parse(RepeatStart), DateTimeOffset.Parse(RepeatEnd)), RepeatFrequency, getAllRepeatCalendarEvents(XmlNodeWithList, RangeOfLookUP), repetitionDay);
 
             return RetValue;
         }
