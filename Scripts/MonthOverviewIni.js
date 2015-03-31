@@ -16,11 +16,11 @@ var global_GoToDay;
 var global_eventIsPaused = false;
 var global_pauseManager;
 var global_CurrentWeekArrangedData = [];
-var global_UISetup = { Init: function () { }, RenderOnSubEventClick: null, RenderSubEvent: null, RenderTimeInformation: null, ConflictCalculation: null, ClearUIEffects: function () { },DisplayFullGrid:false,  ButtonID: "" }
+var global_UISetup = { Init: function () { }, RenderOnSubEventClick: null, RenderSubEvent: null, RenderTimeInformation: null, ConflictCalculation: null, ClearUIEffects: function () { }, DisplayFullGrid: false, ButtonID: "" }
 $(global_ControlPanelIconSet.getIconSetContainer()).addClass("ControlPanelIconSetContainer");
 
-var ClassicUIOptions = { Init: function () { }, RenderOnSubEventClick: renderClassicSubEventsClickEvents, RenderSubEvent: renderClassicSubEventLook, RenderTimeInformation: RenderTimeInformationClassic, ConflictCalculation: DoSideBarsConflictClassic, ClearUIEffects: ResetClassicUIEffects,DisplayFullGrid:true, ButtonID: "ClassicViewButton" }
-var ListUIOptions = { Init: InitializeListUIEffects, RenderOnSubEventClick: renderSubEventsClickEvents, RenderSubEvent: renderSideBarEvents, RenderTimeInformation: RenderListTimeInformation, ConflictCalculation: DoSideBarsInterSect, ClearUIEffects: ResetListUIEffects,DisplayFullGrid:false, ButtonID: "ListViewButton" }
+var ClassicUIOptions = { Init: function () { }, RenderOnSubEventClick: renderClassicSubEventsClickEvents, RenderSubEvent: renderClassicSubEventLook, RenderTimeInformation: RenderTimeInformationClassic, ConflictCalculation: DoSideBarsConflictClassic, ClearUIEffects: ResetClassicUIEffects, DisplayFullGrid: true, ButtonID: "ClassicViewButton" }
+var ListUIOptions = { Init: InitializeListUIEffects, RenderOnSubEventClick: renderSubEventsClickEvents, RenderSubEvent: renderSideBarEvents, RenderTimeInformation: RenderListTimeInformation, ConflictCalculation: DoSideBarsInterSect, ClearUIEffects: ResetListUIEffects, DisplayFullGrid: false, ButtonID: "ListViewButton" }
 
 var AllUIOptions = [ListUIOptions, ClassicUIOptions];
 $(document).ready(function () {
@@ -32,12 +32,10 @@ $(document).ready(function () {
     initializeWebSockets();
     InitializeMonthlyOverview();
     MenuManger();
-    
 });
 
 
-function LaumchUIOPtion(UIOptionIndex)
-{
+function LaumchUIOPtion(UIOptionIndex) {
     LaumchUIOPtion.CurrentIndex = UIOptionIndex % AllUIOptions.length;
     UpdateUISetup(AllUIOptions[LaumchUIOPtion.CurrentIndex]);
     var NextIndex = (LaumchUIOPtion.CurrentIndex + 1) % AllUIOptions.length;
@@ -46,10 +44,8 @@ function LaumchUIOPtion(UIOptionIndex)
     var ViewContainer = getDomOrCreateNew("ViewContainer");
     var CurrentActiveButton = ViewContainer.firstElementChild;
     CurrentActiveButton.parentNode.insertBefore(NextViewButton, CurrentActiveButton);
-    function generateNextCall()
-    {
-        return function()
-        {
+    function generateNextCall() {
+        return function () {
             LaumchUIOPtion(NextIndex);
         }
     }
@@ -59,8 +55,7 @@ function LaumchUIOPtion(UIOptionIndex)
 
 LaumchUIOPtion.CurrentIndex = 0;
 
-function UpdateUISetup(UIOptions)
-{
+function UpdateUISetup(UIOptions) {
     global_ExitManager.triggerLastExitAndPop();
     global_UISetup.ClearUIEffects();
     global_UISetup.Init = UIOptions.Init;
@@ -71,24 +66,20 @@ function UpdateUISetup(UIOptions)
     global_UISetup.RenderTimeInformation = UIOptions.RenderTimeInformation;
     global_UISetup.ClearUIEffects = UIOptions.ClearUIEffects;
     global_UISetup.DisplayFullGrid = UIOptions.DisplayFullGrid;
-    if (global_UISetup.DisplayFullGrid)
-    {
+    if (global_UISetup.DisplayFullGrid) {
         setTimeout(DisplayFullGrid, 100)///using timeout in case grid has not been generated yet, this occurs with the initializing call to LaumchUIOPtion, which is triggered before the rendering of the week schedule
     }
-    else
-    {
+    else {
         setTimeout(HideFullGrid, 100)///using timeout in case grid has not been generated yet
         //HideFullGrid();
     }
     setTimeout(function () { TriggerWeekUIupdate(global_CurrentWeekArrangedData); }, 1000);
 }
 
-function HideFullGrid()
-{
+function HideFullGrid() {
     var AllFullGridContainer = $(".FullGridContainer");
     if (AllFullGridContainer.length)
-        for (var ID = 0 ; ID < AllFullGridContainer.length; ID++)
-        {
+        for (var ID = 0 ; ID < AllFullGridContainer.length; ID++) {
             AllFullGridContainer[ID].isEnabled = false;
             $(AllFullGridContainer[ID]).addClass("setAsDisplayNone");
         }
@@ -107,15 +98,13 @@ function HideFullGrid()
     var LeftContainer = getDomOrCreateNew("leftDayOfTime");
     $(LeftContainer).removeClass("ZoomInto12Hours");
     $(LeftContainer).addClass("ZoomInto24Hours");
-    
+
 }
 
-function DisplayFullGrid()
-{
+function DisplayFullGrid() {
     var AllFullGridContainer = $(".FullGridContainer")
     if (AllFullGridContainer.length)
-        for (var ID = 0 ; ID < AllFullGridContainer.length; ID++)
-        {
+        for (var ID = 0 ; ID < AllFullGridContainer.length; ID++) {
             AllFullGridContainer[ID].isEnabled = true;
             $(AllFullGridContainer[ID]).removeClass("setAsDisplayNone");
         }
@@ -125,7 +114,7 @@ function DisplayFullGrid()
         for (var ID = 0 ; ID < DayOfTime.length; ID++) {
             $(DayOfTime[ID]).removeClass("setAsDisplayNone");
         }
-    
+
 
     var VerticalScrollContainer = getDomOrCreateNew("VerticalScrollContainer");
     $(VerticalScrollContainer).removeClass("ZoomInto24Hours");
@@ -138,17 +127,15 @@ function DisplayFullGrid()
     $(LeftContainer).addClass("ZoomInto12Hours");
 }
 
-function MenuManger()
-{
+function MenuManger() {
     var TilerManager = getDomOrCreateNew("TilerManager");
-    TilerManager.RevealCount=0;
+    TilerManager.RevealCount = 0;
     TilerManager.onmouseover = revealMenuContainer;
     TilerManager.onmouseout = unRevealMenuContainer;
     var MenuContainer = getDomOrCreateNew("MenuContainer");
 
 
-    function revealMenuContainer()
-    {
+    function revealMenuContainer() {
         //setTimeout(
         //function()
         {
@@ -160,10 +147,8 @@ function MenuManger()
         }//,200)
     }
 
-    function unRevealMenuContainer()
-    {
-        function getCurrentCount()
-        {
+    function unRevealMenuContainer() {
+        function getCurrentCount() {
             var RetValue = TilerManager.RevealCount
             return RetValue;
         }
@@ -171,32 +156,29 @@ function MenuManger()
         ResolveHideStatus(CurrentCount);
 
 
-        function ResolveHideStatus(CountSofar)
-        {
+        function ResolveHideStatus(CountSofar) {
             setTimeout(function () {
-                if (CountSofar==getCurrentCount())
-                {
+                if (CountSofar == getCurrentCount()) {
                     TriggerHide();
-                    TilerManager.RevealCount=0
+                    TilerManager.RevealCount = 0
                     return;
                 }
                 return;
-            },50)
+            }, 50)
         }
 
-        function TriggerHide()
-        {
+        function TriggerHide() {
             MenuContainer.style.display = "none";
             MenuContainer.style.width = 0;
             MenuContainer.style.left = "-50px"
         }
-        
+
 
     }
 
     var ManageMenuContainer = getDomOrCreateNew("ManageMenuContainer");
     ManageMenuContainer.onclick = function () {
-        var manageURL ="/Manage"
+        var manageURL = "/Manage"
         window.location.href = manageURL;
     }
 
@@ -218,9 +200,9 @@ function RenderTimeInformationClassic(DayOfWeek, ID) {
     //ListElementContainer.ondragstart = OnDragStartOfSubEvent;
     //ListElementContainer.ondragstart = OnDragStartOfSubEvent;
     $(ListElementContainer.Dom).addClass("TimeDataFormat");
-    
+
     RefSubEvent.gridDoms.push(ListElementContainer.Dom)//Adds the List element as list of candidates to be deleted
-    
+
     DayOfWeek.UISpecs[ID].refrenceListElement = ListElementContainer;
 
     var TimeDataPerListElement = getDomOrCreateNew("SubEventReferenceTime" + ID);
@@ -241,7 +223,7 @@ function RenderTimeInformationClassic(DayOfWeek, ID) {
     BottomPanelListElement.appendChild(CalendarTypeContainer);
     BottomPanelListElement.appendChild(TimeDataPerListElement);
 
-    
+
     //$(obj).addClass("ListElements");
     NameDataPerListElement.Dom.innerHTML = RefSubEvent.Name;
     TimeDataPerListElement.Dom.innerHTML = getTimeStringFromDate(RefSubEvent.SubCalStartDate) + " - " + getTimeStringFromDate(RefSubEvent.SubCalEndDate);
@@ -256,12 +238,11 @@ function RenderTimeInformationClassic(DayOfWeek, ID) {
     ListElementDataContentContainer.Dom.appendChild(NameDataPerListElement.Dom);
     ListElementDataContentContainer.Dom.appendChild(BottomPanelListElement.Dom);
 
-    
+
 
 
     var myBool = (RefSubEvent.SubCalRigid)
-    if (myBool)
-    {
+    if (myBool) {
         var EventLockContainer = getDomOrCreateNew("EventLockContainer" + ID);
         $(EventLockContainer.Dom).addClass("EventLockContainer");
         var EventLockImgContainer = getDomOrCreateNew("EventLockImgContainer" + ID);
@@ -270,9 +251,9 @@ function RenderTimeInformationClassic(DayOfWeek, ID) {
         ListElementContainer.Dom.appendChild(EventLockContainer.Dom);
         $(EventLockImgContainer.Dom).addClass("LockedIcon");
     }
-    
+
     ListElementContainer.Dom.appendChild(ListElementDataContentContainer.Dom);
-    
+
 
     //RefSubEvent.TimeSizeDom.appendChild(ListElementDataContentContainer);
     //DayOfWeek.UISpecs[ID].DataElement = ListElementDataContentContainer
@@ -282,7 +263,7 @@ function RenderTimeInformationClassic(DayOfWeek, ID) {
     HeightPx = HeightPx < 50 ? 50 : HeightPx;
     var EndPixelTop = TopPixels + HeightPx;
     ///BestBottom is data on tab a level which ends before myData. BestBottom.Count data member is the level, BestBOttom.End is the end pixel of this base tab
-    var RetValue = { Start: DayOfWeek.UISpecs[ID].Start, CalCCount: 0, Data: DayOfWeek.UISpecs[ID], ID: ID, BestBottom: { End: 10000, Count: 0 }, Count: 0, EarlierCount: 0, top: TopPixels, end: EndPixelTop, PrecedingOverlapers: 0, OverlappingCount: 0,OverlappingAfterMe:0 }
+    var RetValue = { Start: DayOfWeek.UISpecs[ID].Start, CalCCount: 0, Data: DayOfWeek.UISpecs[ID], ID: ID, BestBottom: { End: 10000, Count: 0 }, Count: 0, EarlierCount: 0, top: TopPixels, end: EndPixelTop, PrecedingOverlapers: 0, OverlappingCount: 0, OverlappingAfterMe: 0 }
     return RetValue;
 }
 
@@ -290,19 +271,16 @@ function RenderTimeInformationClassic(DayOfWeek, ID) {
 
 
 /*Function clears out the pertinent UI effects of the Classic UI*/
-function ResetClassicUIEffects()
-{
+function ResetClassicUIEffects() {
     //debugger;
     getRefreshedData.disableDataRefresh();
     TotalSubEventList.forEach(ResetSubEvent);
     for (var ID in global_DictionaryOfSubEvents) {
         global_DictionaryOfSubEvents[ID].Bind = null;
     }
-    function ResetSubEvent(SubEvent)
-    {
+    function ResetSubEvent(SubEvent) {
         var AllNodesWithListElementDataContentContainerClassic = $(SubEvent.TimeSizeDom).find(".ListElementDataContentContainerClassic");
-        if (AllNodesWithListElementDataContentContainerClassic.length)
-        {
+        if (AllNodesWithListElementDataContentContainerClassic.length) {
             //debugger;
             $(AllNodesWithListElementDataContentContainerClassic).removeClass("ListElementDataContentContainerClassic");
         }
@@ -327,8 +305,7 @@ function ResetClassicUIEffects()
     getRefreshedData.enableDataRefresh();
 }
 
-function RenderListTimeInformation(DayOfWeek, ID)
-{
+function RenderListTimeInformation(DayOfWeek, ID) {
     var RefSubEvent = global_DictionaryOfSubEvents[ID];
     /*
     if (DayOfWeek.Start.getTime() == new Date(2015, 4, 23, 0, 0, 0, 0).getTime()) {
@@ -345,9 +322,9 @@ function RenderListTimeInformation(DayOfWeek, ID)
     //ListElementContainer.ondragstart = OnDragStartOfSubEvent;
     $(ListElementContainer.Dom).addClass("TimeDataFormat");
     $(ListElementContainer.Dom).addClass("ListElement");
-    
+
     RefSubEvent.gridDoms.push(ListElementContainer.Dom)//Adds the List element as list of candidates to be deleted
-    
+
     DayOfWeek.UISpecs[ID].refrenceListElement = ListElementContainer;
     var TimeDataPerListElement = getDomOrCreateNew("SubEventReferenceTime" + ID);
     var BottomPanelListElement = getDomOrCreateNew("SubEventReferenceBottomPanel" + ID);
@@ -402,7 +379,7 @@ function RenderListTimeInformation(DayOfWeek, ID)
     ListElementContainer.Dom.appendChild(EventLockContainer.Dom);
     ListElementContainer.Dom.appendChild(ColorContainer.Dom);
 
-    
+
     DayOfWeek.renderPlane.Dom.appendChild(ListElementContainer);
     //DayOfWeek.renderPlane.Dom.appendChild(DayOfWeek.UISpecs[ID].refrenceListElement.Dom)
 
@@ -412,13 +389,12 @@ function RenderListTimeInformation(DayOfWeek, ID)
     var HeightPx = (DayOfWeek.UISpecs[ID].css.height / 100) * global_DayHeight;
     var EndPixelTop = TopPixels + HeightPx;
     ///BestBottom is data on tab a level which ends before myData. BestBottom.Count data member is the level, BestBOttom.End is the end pixel of this base tab
-    var RetValue= { Start: DayOfWeek.UISpecs[ID].Start, CalCCount: 0, Data: DayOfWeek.UISpecs[ID], ID: ID, BestBottom: { End: 10000, Count: 0 }, Count: 0, EarlierCount: 0, top: TopPixels, end: EndPixelTop, refSubEvent: ListElementContainer }
+    var RetValue = { Start: DayOfWeek.UISpecs[ID].Start, CalCCount: 0, Data: DayOfWeek.UISpecs[ID], ID: ID, BestBottom: { End: 10000, Count: 0 }, Count: 0, EarlierCount: 0, top: TopPixels, end: EndPixelTop, refSubEvent: ListElementContainer }
     return RetValue;
 
 }
 
-function InitializeListUIEffects()
-{
+function InitializeListUIEffects() {
     var AllSubEventListCOntainer = $(".SubEventListContainer");
     if (AllSubEventListCOntainer.length) {
         for (var i = 0 ; i < AllSubEventListCOntainer.length; i++) {
@@ -428,21 +404,17 @@ function InitializeListUIEffects()
     }
 }
 
-function ResetListUIEffects()
-{
+function ResetListUIEffects() {
     getRefreshedData.disableDataRefresh();
     TotalSubEventList.forEach(ResetSubEvent);
 
-    for (var ID in global_DictionaryOfSubEvents)
-    {
-        global_DictionaryOfSubEvents[ID].Bind=null;
+    for (var ID in global_DictionaryOfSubEvents) {
+        global_DictionaryOfSubEvents[ID].Bind = null;
     }
 
     var AllListElementColorContainer = $(".ListElementColorContainer");
-    if (AllListElementColorContainer.length)
-    {
-        for (var i = 0 ; i < AllListElementColorContainer.length; i++)
-        {
+    if (AllListElementColorContainer.length) {
+        for (var i = 0 ; i < AllListElementColorContainer.length; i++) {
             var DayOfWeekListCOntainer = AllListElementColorContainer[i];
             DayOfWeekListCOntainer.parentNode.removeChild(DayOfWeekListCOntainer);
             //$(DayOfWeekListCOntainer).removeClass("ListElementColorContainer");
@@ -450,10 +422,8 @@ function ResetListUIEffects()
     }
 
     var AllSubEventListCOntainer = $(".SubEventListContainer");
-    if (AllSubEventListCOntainer.length)
-    {
-        for (var i = 0 ; i < AllSubEventListCOntainer.length; i++)
-        {
+    if (AllSubEventListCOntainer.length) {
+        for (var i = 0 ; i < AllSubEventListCOntainer.length; i++) {
             var DayOfWeekListCOntainer = AllSubEventListCOntainer[i];
             $(DayOfWeekListCOntainer).addClass("setAsDisplayNone");
         }
@@ -471,8 +441,7 @@ function ResetListUIEffects()
 
     //$(SubEvent.TimeSizeDom).removeClass("SideBar");
 
-    function ResetSubEvent(SubEvent)
-    {
+    function ResetSubEvent(SubEvent) {
         var ListElementDataContentContainer = $(SubEvent.ListRefElement).find(".ListElementDataContentContainer");
         if (ListElementDataContentContainer.length) {
             //debugger;
@@ -489,8 +458,7 @@ function ResetListUIEffects()
 /*
 Add Close button to the given element. Container is Dom element to which you want to add a close button. if you want to the close button to be on the top left set LeftPosition to true
 */
-function AddCloseButoon(Container, LeftPosition)
-{
+function AddCloseButoon(Container, LeftPosition) {
     var TilerCloseButtonID = "TilerCloseButton"
     var TilerCloseButton = getDomOrCreateNew("TilerCloseButton");
     $(TilerCloseButton.Dom).attr('tabindex', 0)
@@ -498,15 +466,13 @@ function AddCloseButoon(Container, LeftPosition)
     $(TilerCloseButton).removeClass("RightCloseButton");
     $(TilerCloseButton).removeClass("setAsDisplayNone");
 
-    if(LeftPosition)
-    {
+    if (LeftPosition) {
         $(TilerCloseButton).addClass("LeftCloseButton");
     }
-    else
-    {
+    else {
         $(TilerCloseButton).addClass("RightCloseButton");
     }
-    
+
 
     var LeftCloseBar = getDomOrCreateNew("LeftCloseBar");
     var RightCloseBar = getDomOrCreateNew("RightCloseBar");
@@ -517,19 +483,17 @@ function AddCloseButoon(Container, LeftPosition)
     };
     TilerCloseButton.appendChild(LeftCloseBar);
     TilerCloseButton.appendChild(RightCloseBar);
-    
+
 
     Container.appendChild(TilerCloseButton);
 }
 
-AddCloseButoon.HideClosButton=function()
-{
+AddCloseButoon.HideClosButton = function () {
     var TilerCloseButton = getDomOrCreateNew("TilerCloseButton");
     $(TilerCloseButton).addClass("setAsDisplayNone");
 }
 
-function RevealControlPanelSection(SelectedEvents)
-{
+function RevealControlPanelSection(SelectedEvents) {
     //global_ExitManager.triggerLastExitAndPop();
     getRefreshedData.disableDataRefresh();
     var yeaButton = getDomOrCreateNew("YeaToConfirmDelete");
@@ -588,16 +552,14 @@ function RevealControlPanelSection(SelectedEvents)
     function closeProcrastinatePanel() {
         $(ProcrastinateEventModalContainer).slideUp(500);
     }
-    
-    
 
-    function closeControlPanel()
-    {
+
+
+    function closeControlPanel() {
         TriggerClose();
     }
 
-    function TriggerClose ()
-    {
+    function TriggerClose() {
         getRefreshedData.enableDataRefresh();
         resetButtons();
         closeModalDelete();
@@ -610,8 +572,7 @@ function RevealControlPanelSection(SelectedEvents)
         document.removeEventListener("keydown", containerKeyPress);
         $(ControlPanelProcrastinateButton).removeClass("setAsDisplayNone");
         $(RevealControlPanelSection.IconSet.getLocationButton()).removeClass("setAsDisplayNone");
-        if (IconSetContainer.parentNode!=null)
-        {
+        if (IconSetContainer.parentNode != null) {
             IconSetContainer.parentNode.removeChild(IconSetContainer);
         }
         $(ControlPanelContainer).removeClass("ControlPanelContainerLowerBar");
@@ -640,7 +601,7 @@ function RevealControlPanelSection(SelectedEvents)
             return;
             //closeControlPanel();
         }
-        
+
         if ((e.which == 8) || (e.which == 46))//bkspc/delete key pressed
         {
             deleteSubevent();
@@ -781,30 +742,28 @@ function RevealControlPanelSection(SelectedEvents)
     document.removeEventListener("keydown", containerKeyPress);//this is here just to avooid duplicate addition of the same keypress event
     document.addEventListener("keydown", containerKeyPress);
     //document.onkeydown = containerKeyPress
-   
-    MultiSelectPanel.innerHTML = Object.keys(SelectedEvents).length+" Events Selected"
+
+    MultiSelectPanel.innerHTML = Object.keys(SelectedEvents).length + " Events Selected"
     ControlPanelCloseButton.onclick = global_ExitManager.triggerLastExitAndPop
     deleteButton.onclick = deleteSubevent;
-    if (ModalDelete.isRevealed)
-    {
+    if (ModalDelete.isRevealed) {
         deleteSubevent();
     }
 }
 RevealControlPanelSection.IconSet = global_ControlPanelIconSet;
 RevealControlPanelSection.CallBack = RevealControlPanelSection;
 
-function IconSet()
-{
+function IconSet() {
     if (!IconSet.ID) {
         IconSet.ID = 0;
     }
     var myID = IconSet.ID++;
-    var IconSetContainerID = "IconSetContainer"+myID
+    var IconSetContainerID = "IconSetContainer" + myID
     var IconSetContainer = getDomOrCreateNew(IconSetContainerID);
     //$(IconSetContainer).addClass("ControlPanelIconSetContainer");
     var LocationIconID = "ControlPanelLocationButton" + myID;
     var LocationIcon = getDomOrCreateNew(LocationIconID);
-    LocationIcon.setAttribute("Title","Location");
+    LocationIcon.setAttribute("Title", "Location");
     $(LocationIcon).addClass("ControlPanelButton");
     $(LocationIcon).addClass("ControlPanelLocationButton");
     var ProcrastinateIconID = "ControlPanelProcrastinateButton" + myID;
@@ -835,8 +794,7 @@ function IconSet()
     var PauseResumeIcon = getDomOrCreateNew(PauseResumeIconID);
     $(PauseResumeIcon).addClass("ControlPanelButton");
 
-    this.getCloseButton = function ()
-    {
+    this.getCloseButton = function () {
         return CloseIcon;
     }
 
@@ -865,8 +823,7 @@ function IconSet()
         return IconSetContainer;
     }
 
-    this.HidePausePauseResumeButton = function () 
-    {
+    this.HidePausePauseResumeButton = function () {
         $(PauseResumeIcon).addClass("setAsDisplayNone");
     }
 
@@ -894,268 +851,244 @@ function IconSet()
     IconSetContainer.appendChild(CloseIcon)
 }
 
-IconSet.ID=0;
+IconSet.ID = 0;
 
 
-function multiSelect()
-{
-        var SelecedIDs = {};
-        var EnableChange = true;
-        var CallBackDict = {};
-        var CallBackFunctions = [];
-        var isMultiSelectActive = false;
+function multiSelect() {
+    var SelecedIDs = {};
+    var EnableChange = true;
+    var CallBackDict = {};
+    var CallBackFunctions = [];
+    var isMultiSelectActive = false;
 
-        var AddElement = function (EventID)
-        {
-            var IniID = BindClickOfSideBarToCLick.ActiveID;
+    var AddElement = function (EventID) {
+        var IniID = BindClickOfSideBarToCLick.ActiveID;
+        if (!isMultiSelectActive) {
+            global_ExitManager.triggerLastExitAndPop();
+        }
+        getRefreshedData.disableDataRefresh();
+        if (SelecedIDs[EventID] == null) {
+            if (IniID != null) {
+                AddElement(IniID);
+            }
+
+
+            var SubEvent = global_DictionaryOfSubEvents[EventID];
+            SelecedIDs[EventID] = SubEvent;
+            SelectElement(EventID);
             if (!isMultiSelectActive) {
-                global_ExitManager.triggerLastExitAndPop();
+                global_ExitManager.addNewExit(resetAllElement);
             }
-            getRefreshedData.disableDataRefresh();
-            if (SelecedIDs[EventID] == null)
-            {
-                if (IniID != null)
-                {
-                    AddElement(IniID);
-                }
-                
-                
-                var SubEvent = global_DictionaryOfSubEvents[EventID];
-                SelecedIDs[EventID] = SubEvent;
-                SelectElement(EventID);
-                if (!isMultiSelectActive)
-                {
-                    global_ExitManager.addNewExit(resetAllElement);
-                }
-                isMultiSelectActive = true;
-            }
-            else
-            {
-                RemoveELement(EventID)
-            }
-            
-            Change();
+            isMultiSelectActive = true;
+        }
+        else {
+            RemoveELement(EventID)
         }
 
-        var RemoveELement = function (EventID)
-        {
-            if (!isMultiSelectActive)
-            {
-                global_ExitManager.triggerLastExitAndPop();
-            }
-            var SubEvent = SelecedIDs[EventID];
-            
-            if (SubEvent == null)
-            {
-                alert("oops Jay there is some discrepancy with your multiselect");
-            }
-            DeselectEleemnt(EventID);
-            debugger;
-            delete SelecedIDs[EventID];
-            if (Object.keys(SelecedIDs).length < 1) {
-                isMultiSelectActive = false;
-            }
-            Change();
+        Change();
+    }
+
+    var RemoveELement = function (EventID) {
+        if (!isMultiSelectActive) {
+            global_ExitManager.triggerLastExitAndPop();
         }
+        var SubEvent = SelecedIDs[EventID];
 
-        var DisableChangeDetection = true;
-
-        var resetAllElement = function ()
-        {
-            EnableChange = false;
-            while (Object.keys(SelecedIDs).length > 0)
-            {
-                RemoveELement(Object.keys(SelecedIDs)[0])
-            }
-
-            /*
-            if (Object.keys(SelecedIDs).length < 1) {
-                isMultiSelectActive = false;
-                global_ExitManager.triggerLastExitAndPop();
-            }
-            */
-
+        if (SubEvent == null) {
+            alert("oops Jay there is some discrepancy with your multiselect");
+        }
+        DeselectEleemnt(EventID);
+        debugger;
+        delete SelecedIDs[EventID];
+        if (Object.keys(SelecedIDs).length < 1) {
             isMultiSelectActive = false;
-            EnableChange = true;
-            Change();
-            getRefreshedData.enableDataRefresh();
+        }
+        Change();
+    }
+
+    var DisableChangeDetection = true;
+
+    var resetAllElement = function () {
+        EnableChange = false;
+        while (Object.keys(SelecedIDs).length > 0) {
+            RemoveELement(Object.keys(SelecedIDs)[0])
         }
 
-        var SelectElement = function (EventID)
-        {
-            var SubEvent = SelecedIDs[EventID];
-            SubEvent.gridDoms.forEach(HighlightSubEvent);
+        /*
+        if (Object.keys(SelecedIDs).length < 1) {
+            isMultiSelectActive = false;
+            global_ExitManager.triggerLastExitAndPop();
         }
+        */
 
-        var DeselectEleemnt = function (EventID)
-        {
-            var SubEvent = SelecedIDs[EventID];
-            SubEvent.gridDoms.forEach(dehighlightSubEvent);
-        }
+        isMultiSelectActive = false;
+        EnableChange = true;
+        Change();
+        getRefreshedData.enableDataRefresh();
+    }
 
-        var Change = function ()
-        {
-            if ((EnableChange))
-            {
-                if (isMultiSelectActive) {
-                    CallBackFunctions.forEach(
-                    function (myFunc) {
-                        myFunc.CallBack(SelecedIDs);
-                    });
-                }
-                else
-                {
-                    CallBackFunctions.forEach(
-                    function (myFunc)
-                    {
-                        myFunc.Exit();
-                    });
-                }
-                
+    var SelectElement = function (EventID) {
+        var SubEvent = SelecedIDs[EventID];
+        SubEvent.gridDoms.forEach(HighlightSubEvent);
+    }
+
+    var DeselectEleemnt = function (EventID) {
+        var SubEvent = SelecedIDs[EventID];
+        SubEvent.gridDoms.forEach(dehighlightSubEvent);
+    }
+
+    var Change = function () {
+        if ((EnableChange)) {
+            if (isMultiSelectActive) {
+                CallBackFunctions.forEach(
+                function (myFunc) {
+                    myFunc.CallBack(SelecedIDs);
+                });
             }
-        }
-
-        var CallAllExits= function()
-        {
-            
-        }
-        this.AddElement = AddElement;
-        this.DeselectEleemnt = DeselectEleemnt;
-        this.SelectElement = SelectElement;
-        this.resetAllElement = resetAllElement;
-        this.RemoveELement = RemoveELement;
-        this.getAllSelectedElements = function () { SelecedIDs }
-        this.getIsMultiActive = function ()
-        {
-            return isMultiSelectActive;
-        }
-        this.addCallBack = function (CallBack)
-        {
-            if (CallBackDict[CallBack] == undefined)
-            {
-                CallBackFunctions.push(CallBack);
-                CallBackDict[CallBack] = CallBack;
+            else {
+                CallBackFunctions.forEach(
+                function (myFunc) {
+                    myFunc.Exit();
+                });
             }
-        }
 
-        function removeCallBack (CallBack)
-        {
-            delete CallBackDict[CallBack];
-            var funcIndex = CallBackFunctions.indexOf(CallBack);
-            if (funcIndex > -1)
-            {
-                CallBackFunctions.splice(funcIndex, 1);
-            }
         }
-        
-    
+    }
 
-        this.removeCallBack = removeCallBack;
-            
-    
+    var CallAllExits = function () {
+
+    }
+    this.AddElement = AddElement;
+    this.DeselectEleemnt = DeselectEleemnt;
+    this.SelectElement = SelectElement;
+    this.resetAllElement = resetAllElement;
+    this.RemoveELement = RemoveELement;
+    this.getAllSelectedElements = function () { SelecedIDs }
+    this.getIsMultiActive = function () {
+        return isMultiSelectActive;
+    }
+    this.addCallBack = function (CallBack) {
+        if (CallBackDict[CallBack] == undefined) {
+            CallBackFunctions.push(CallBack);
+            CallBackDict[CallBack] = CallBack;
+        }
+    }
+
+    function removeCallBack(CallBack) {
+        delete CallBackDict[CallBack];
+        var funcIndex = CallBackFunctions.indexOf(CallBack);
+        if (funcIndex > -1) {
+            CallBackFunctions.splice(funcIndex, 1);
+        }
+    }
+
+
+
+    this.removeCallBack = removeCallBack;
+
+
 }
 
 global_multiSelect = new multiSelect();
 global_multiSelect.addCallBack(RevealControlPanelSection);
 
-var FormatTime = function(date){
-  var d = date;
-  var TimeHours = d.getHours();
-  var TimeMinutes = d.getMinutes(); 
-  var TimeMonth = d.getMonth();
-  var TimeMM = TimeMinutes;
-  var TimeHH = TimeHours;
-  var AMPM = 'am';
-  var day = '';
-  var month = '';
-  var date_number = d.getDate();
-  var year = d.getFullYear();
+var FormatTime = function (date) {
+    var d = date;
+    var TimeHours = d.getHours();
+    var TimeMinutes = d.getMinutes();
+    var TimeMonth = d.getMonth();
+    var TimeMM = TimeMinutes;
+    var TimeHH = TimeHours;
+    var AMPM = 'am';
+    var day = '';
+    var month = '';
+    var date_number = d.getDate();
+    var year = d.getFullYear();
 
-  if (TimeMinutes <= 9){
-    TimeMM = '0' + TimeMinutes
-  }
-  if (TimeHours >= 12 && TimeMinutes >= 0){
-    if (TimeHours >= 13){
-      TimeHH = TimeHours - 12;
-    }  
-    AMPM = 'pm';
-  } else if(TimeHours === 12 && TimeMinutes === 0) {
-    TimeHH = 'Noon';
-    AMPM = '';
-    TimeMM = '';
-  } else if(TimeHours === 24 && TimeMinutes === 0) {
-    TimeHH = 'Midnight';
-    AMPM= '';
-    TimeMM = '';
-  }
-  switch (d.getMonth()){
-    case 0:
-      month = "Jan";
-      break;
-    case 1:
-      month = "Feb";
-      break;
-    case 2:
-      month = "Mar";
-      break;
-    case 3:
-      month = "Apr";
-      break;
-    case 4:
-      month = "May";
-      break;
-    case 5:
-      month = "Jun";
-      break;
-    case 6:
-      month = "Jul";
-      break;
-    case 7:
-      month = "Aug";
-      break;
-    case 8:
-      month = "Sep";
-      break;
-    case 9:
-      month = "Oct";
-      break;
-    case 10:
-      month = "Nov";
-      break;
-    case 11:
-      month = "Dec";
-      break;
-  }
-  switch (d.getDay()) {
-    case 0:
-      day = "Sunday";
-      break;
-    case 1:
-      day = "Monday";
-      break;
-    case 2:
-      day = "Tuesday";
-      break;
-    case 3:
-      day = "Wednesday";
-      break;
-    case 4:
-      day = "Thursday";
-      break;
-    case 5:
-      day = "Friday";
-      break;
-    case 6:
-      day = "Saturday";
-      break;
-  }
-  var a = { hour:TimeHH, minute:TimeMM, merid:AMPM, day:day, mon:month, date:date_number, year:year, month_num:TimeMonth }
-  return a;
-            };
+    if (TimeMinutes <= 9) {
+        TimeMM = '0' + TimeMinutes
+    }
+    if (TimeHours >= 12 && TimeMinutes >= 0) {
+        if (TimeHours >= 13) {
+            TimeHH = TimeHours - 12;
+        }
+        AMPM = 'pm';
+    } else if (TimeHours === 12 && TimeMinutes === 0) {
+        TimeHH = 'Noon';
+        AMPM = '';
+        TimeMM = '';
+    } else if (TimeHours === 24 && TimeMinutes === 0) {
+        TimeHH = 'Midnight';
+        AMPM = '';
+        TimeMM = '';
+    }
+    switch (d.getMonth()) {
+        case 0:
+            month = "Jan";
+            break;
+        case 1:
+            month = "Feb";
+            break;
+        case 2:
+            month = "Mar";
+            break;
+        case 3:
+            month = "Apr";
+            break;
+        case 4:
+            month = "May";
+            break;
+        case 5:
+            month = "Jun";
+            break;
+        case 6:
+            month = "Jul";
+            break;
+        case 7:
+            month = "Aug";
+            break;
+        case 8:
+            month = "Sep";
+            break;
+        case 9:
+            month = "Oct";
+            break;
+        case 10:
+            month = "Nov";
+            break;
+        case 11:
+            month = "Dec";
+            break;
+    }
+    switch (d.getDay()) {
+        case 0:
+            day = "Sunday";
+            break;
+        case 1:
+            day = "Monday";
+            break;
+        case 2:
+            day = "Tuesday";
+            break;
+        case 3:
+            day = "Wednesday";
+            break;
+        case 4:
+            day = "Thursday";
+            break;
+        case 5:
+            day = "Friday";
+            break;
+        case 6:
+            day = "Saturday";
+            break;
+    }
+    var a = { hour: TimeHH, minute: TimeMM, merid: AMPM, day: day, mon: month, date: date_number, year: year, month_num: TimeMonth }
+    return a;
+};
 
-function generateDayContainer()
-{
-    var myID =++generateDayContainer.id;
+function generateDayContainer() {
+    var myID = ++generateDayContainer.id;
     var DayContainer = getDomOrCreateNew("DayContainer" + myID);
     var DayContextContainer = getDomOrCreateNew("DayContextContainer" + myID);
     var SubEventListContainer = getDomOrCreateNew("SubEventListContainer" + myID);
@@ -1167,7 +1100,7 @@ function generateDayContainer()
     //DayContainer
     DayContainer.onmouseover = onMouseIn;
     DayContainer.onmouseout = onMouseOut;
-    
+
     $(DayContainer.Dom).addClass("DayContainer");
     var NameOfDayContainer = getDomOrCreateNew("NameOfDayContainer" + myID);
     NameOfDayContainer.onclick = function (e) { e.stopPropagation(); };
@@ -1192,26 +1125,26 @@ function generateDayContainer()
     var TotalTopElement = 0;
     var ConstTopIncrement = 2;
     var aPm = [" am", " pm"];
-    var TimeArray = [12,1,2,3,4,5,6,7,8,9,10,11]
+    var TimeArray = [12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
     for (; NumberOfShaders > 0; --NumberOfShaders) {
 
         var shadeContainer = getDomOrCreateNew("shadeContainer" + myID + "" + NumberOfShaders);
         var FullBarShadeContainer = getDomOrCreateNew("FullGridShadeContainer" + myID + "" + NumberOfShaders);
         $(FullBarShadeContainer).addClass("FullGridShadeContainer");//shade for full grid
-        var TimeOfDayTextContainer = getDomOrCreateNew("TimeOfDayTextContainer" + myID + "" + NumberOfShaders,"span");
+        var TimeOfDayTextContainer = getDomOrCreateNew("TimeOfDayTextContainer" + myID + "" + NumberOfShaders, "span");
         //debugger;
         var Military = 24 - NumberOfShaders;
-        var floorValue= Math.floor( Military / 12);
+        var floorValue = Math.floor(Military / 12);
         var DayTime = TimeArray[Military % 12];
         var ampmIndex = DayTime != 12 ? "" : aPm[floorValue];
-        
+
         var FullText = DayTime + ampmIndex;
         TimeOfDayTextContainer.innerHTML = FullText;
         $(TimeOfDayTextContainer).addClass("TimeOfDayText");
         shadeContainer.appendChild(TimeOfDayTextContainer);
         DayTimeContainer.Dom.appendChild(shadeContainer.Dom);
         FullGridContainer.appendChild(FullBarShadeContainer);
-        
+
         shadeContainer.Dom.style.top = TotalTopElement + "%";
         FullBarShadeContainer.Dom.style.top = TotalTopElement + "%";
         TotalTopElement += 4.1667;
@@ -1228,32 +1161,28 @@ function generateDayContainer()
         $(shadeContainer.Dom).addClass("shadeContainer");
     }
 
-    function revealMoreOptions()
-    {
+    function revealMoreOptions() {
         $(MoreInfoPanel).removeClass("setAsDisplayNone")
         $(MoreInfoPanel).addClass("RevealMoreInfoPanel")
         AddCloseButoon(MoreInfoPanel, false);
     }
 
     function unRevealMoreOptions() {
-        
+
         $(MoreInfoPanel).addClass("setAsDisplayNone");
         $(MoreInfoPanel).removeClass("RevealMoreInfoPanel")
         $(MoreInfoPanel).empty();
     }
 
 
-    MoreInfoPanel.onclick=function(e)
-    {
+    MoreInfoPanel.onclick = function (e) {
         e.stopPropagation();
     }
     unRevealMoreOptions();
 
-    function onMouseIn()
-    {
+    function onMouseIn() {
         //debugger;
-        setTimeout(function ()
-        {
+        setTimeout(function () {
             if (FullGridContainer.isEnabled) {
                 $(DayTimeContainer).addClass("setAsDisplayNone");
                 return;
@@ -1262,8 +1191,7 @@ function generateDayContainer()
         })
     }
 
-    function onMouseOut()
-    {
+    function onMouseOut() {
         setTimeout(function () {
             if (FullGridContainer.isEnabled) {
                 $(DayTimeContainer).addClass("setAsDisplayNone");
@@ -1271,22 +1199,22 @@ function generateDayContainer()
             }
             $(DayTimeContainer).addClass("setAsDisplayNone");
         })
-        
+
     }
 
     ///*
-    
+
     //*/
 
     var EventDayContainer = getDomOrCreateNew("EventDayContainer" + generateDayContainer.id);
     //DayContainer.onmou = function () { alert("Hey Jay") };
-    
-    $(EventDayContainer.Dom).addClass("EventDayContainer");
-    
-    DayTimeContainer.Dom.appendChild(EventDayContainer.Dom);
-    
 
-    return { renderPlane: SubEventListContainer, FullDayContext: DayContextContainer, Parent: DayContainer, EventDayContainer: EventDayContainer, NameOfDayContainer: NameOfDayContainer, DayID: myID,MoreInfoPanel:MoreInfoPanel, RevealMoreOptions: revealMoreOptions, UnRevealMoreOptions: unRevealMoreOptions }
+    $(EventDayContainer.Dom).addClass("EventDayContainer");
+
+    DayTimeContainer.Dom.appendChild(EventDayContainer.Dom);
+
+
+    return { renderPlane: SubEventListContainer, FullDayContext: DayContextContainer, Parent: DayContainer, EventDayContainer: EventDayContainer, NameOfDayContainer: NameOfDayContainer, DayID: myID, MoreInfoPanel: MoreInfoPanel, RevealMoreOptions: revealMoreOptions, UnRevealMoreOptions: unRevealMoreOptions }
 }
 
 
@@ -1296,32 +1224,77 @@ generateDayContainer.id = 0;
 //var RangeData;
 var miscCounter = 0;
 
-function BindAddButton()
-{
+function BindAddButton() {
     var AddButton = document.getElementById('AddEventButton');
     var newDate = new Date();
     newDate.setSeconds(0);
     newDate.setMinutes(0);
     $(AddButton).click(newAdd);
-    function newAdd()
-    {
+    function newAdd() {
         var HeaderContainer = getDomOrCreateNew("Header")
         var height = $(HeaderContainer).height();
         var width = $(HeaderContainer).width();
-        generateModal(width/2, 0, 1, width, new Date(), HeaderContainer,true)
+        generateModal(width / 2, 0, 1, width, new Date(), HeaderContainer, true)
         //addNewEvent(0, 0, 0, newDate);
     }
 }
 
+/*
+*Function binds the "somethinew" button to the back end for a simple rest call
+*/
+function SomethingNewButton() {
+    var FindSomethingNewButton = document.getElementById('SomethingNew');
 
-function InitializeMonthlyOverview()
-{
+    function reoptimizeSchedule() {
+        var TimeZone = new Date().getTimezoneOffset();
+        var ShuffleData = { UserName: UserCredentials.UserName, UserID: UserCredentials.ID, TimeZoneOffset: TimeZone, Longitude: global_PositionCoordinate.Longitude, Latitude: global_PositionCoordinate.Latitude, IsInitialized: global_PositionCoordinate.isInitialized };
+        var URL = global_refTIlerUrl + "Schedule/Shuffle";
+        var HandleNEwPage = new LoadingScreenControl("Tiler looking up the next good event  :)");
+        HandleNEwPage.Launch();
+
+        var exit = function (data) {
+            HandleNEwPage.Hide();
+            global_ExitManager.triggerLastExitAndPop();
+        }
+        $.ajax({
+            type: "POST",
+            url: URL,
+            data: ShuffleData,
+            // DO NOT SET CONTENT TYPE to json
+            // contentType: "application/json; charset=utf-8", 
+            // DataType needs to stay, otherwise the response object
+            // will be treated as a single string
+            dataType: "json",
+            success: function (response) {
+                triggerUndoPanel("Undo optimized shuffle");
+                var myContainer = (response);
+                if (myContainer.Error.code == 0) {
+                }
+                else {
+                    alert("error optimizing your schedule");
+                }
+
+            },
+            error: function () {
+                var NewMessage = "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
+                var ExitAfter = {
+                    ExitNow: true, Delay: 1000
+                };
+                HandleNEwPage.UpdateMessage(NewMessage, ExitAfter, exit);
+            }
+        }).done(function (data) {
+            HandleNEwPage.Hide();
+        });
+    }
+    FindSomethingNewButton.onclick = reoptimizeSchedule;
+}
+
+function InitializeMonthlyOverview() {
     BindAddButton();
     SomethingNewButton(document.getElementById('SomethingNew'))
     initializeUserLocation();
     var verifiedUser = GetCookieValue();
-    if (verifiedUser == "")
-    {
+    if (verifiedUser == "") {
         global_goToLoginPage();
         return;
     }
@@ -1332,41 +1305,38 @@ function InitializeMonthlyOverview()
     $('body').show();
 
     populateMonth();
-    
-    
-    
-    
+
+
+
+
 
     //genFunctionForSelectCalendarRange(GridRange, RefDate)();
     //getRefreshedData(GridRange);
-    
+
     //global_ClearRefreshDataInterval=setTimeout(getRefreshedData, 0, GridRange);
 }
 
-function GenerateDayTime(LeftOrRight)
-{
+function GenerateDayTime(LeftOrRight) {
     var i = 0;
     var TimeOfDayContainer = getDomOrCreateNew("TimeOfDayContainer" + GenerateDayTime.counter);
     var percentagePerTop = 100 / 24;
-   $(TimeOfDayContainer.Dom).addClass("TimeOfDayContainer");
+    $(TimeOfDayContainer.Dom).addClass("TimeOfDayContainer");
     var AmText = getDomOrCreateNew("AmText", "span");
     AmText.Dom.innerHTML = "AM";
     var PmText = getDomOrCreateNew("PmText", "span");
     PmText.Dom.innerHTML = "PM";
     var amPmArray = ["<span>  AM  </span>", "<span>  PM  </span>"];
-    for (; i < 24; i++)
-    {
-        var gridID = getDomOrCreateNew("DayTime" + GenerateDayTime.counter+"" + i);
-        
+    for (; i < 24; i++) {
+        var gridID = getDomOrCreateNew("DayTime" + GenerateDayTime.counter + "" + i);
+
         var stringee = "";
         if (LeftOrRight) {
-            stringee=(i % 12 == 0 ? amPmArray[i / 12] + 12 : i % 12)+"";
+            stringee = (i % 12 == 0 ? amPmArray[i / 12] + 12 : i % 12) + "";
             gridID.Dom.innerHTML = stringee;
         }
-        else
-        {
+        else {
             stringee = (i % 12 == 0 ? 12 + amPmArray[i / 12] : i % 12) + "";
-            gridID.Dom.innerHTML = i % 12 == 0 ? 12 +amPmArray[i / 12] : i % 12;
+            gridID.Dom.innerHTML = i % 12 == 0 ? 12 + amPmArray[i / 12] : i % 12;
         }
         //gridID.Dom.appendChild(TimeOfDayContainer.Dom);
         gridID.Dom.style.top = (percentagePerTop * i) + "%";
@@ -1375,15 +1345,13 @@ function GenerateDayTime(LeftOrRight)
     }
 
     return TimeOfDayContainer;
-    
+
 }
 
 GenerateDayTime.counter = 0;
 
-function populateMonth(refDate,CallBack)
-{
-    if (refDate == null)
-    {
+function populateMonth(refDate, CallBack) {
+    if (refDate == null) {
         refDate = Date.now();
     }
     refDate = new Date(refDate);
@@ -1410,10 +1378,8 @@ function populateMonth(refDate,CallBack)
     })*/
 
     LaunchMonthTicker(refDate);
-    function MyCallBack()
-    {
-        if(CallBack!=null)
-        {
+    function MyCallBack() {
+        if (CallBack != null) {
             CallBack();
         }
     }
@@ -1422,8 +1388,7 @@ function populateMonth(refDate,CallBack)
     return global_WeekGrid;
 }
 
-function scrollToDay(refDate)
-{
+function scrollToDay(refDate) {
     var sampleDay = getDomOrCreateNew("DayContainer1");
     var refDateInMS = new Date(refDate).getTime();
     var WidthInPixels = $(".DayContainer").width();
@@ -1433,10 +1398,9 @@ function scrollToDay(refDate)
 
     i = parseInt((refDateInMS - CurrDay) / OneDayInMs);
 
-    if (j)
-    {
+    if (j) {
         //debugger;
-        var bar = (i * parseInt(WidthInPixels)) - (WidthInPixels*3.5);
+        var bar = (i * parseInt(WidthInPixels)) - (WidthInPixels * 3.5);
         WidthInPixels = bar;
         $("#NameOfWeekContainerPlane").animate({ scrollLeft: WidthInPixels }, 1000);
         $("#VerticalScrollContainer").animate({ scrollLeft: WidthInPixels }, 1000);
@@ -1445,15 +1409,14 @@ function scrollToDay(refDate)
 
 }
 
-function InitiateGrid(refDate)
-{
+function InitiateGrid(refDate) {
     var encasingDOm = document.getElementById("FullWeekContainer");
     var LeftContainer = getDomOrCreateNew("leftDayOfTime");
     //$(LeftContainer.Dom).addClass("LefttimeOfDayContainer");
-    
-    var LeftDayOfTIme = GenerateDayTime(true); 
+
+    var LeftDayOfTIme = GenerateDayTime(true);
     LeftContainer.Dom.appendChild(LeftDayOfTIme.Dom);
-    
+
 
     var RightContainer = getDomOrCreateNew("rightDayOfTime");
     var RightDayOfTIme = GenerateDayTime(false);
@@ -1468,7 +1431,7 @@ function InitiateGrid(refDate)
     $(RightContainer.Dom).addClass("DayOfTime");
     TimeBarContainer.appendChild(RightContainer.Dom);
     TimeBarContainer.appendChild(LeftContainer.Dom);
-    
+
     return RangeData;
 }
 
@@ -1484,7 +1447,7 @@ function onSocketDataReceipt(data) {
             getRefreshedData();
         }
     }
-    
+
     ++onSocketDataReceipt.counter
 }
 onSocketDataReceipt.counter = 0;
@@ -1504,7 +1467,7 @@ function initializeWebSockets() {
 function getRefreshedData(CallBackAfterRefresh)//RangeData)
 {
     //setTimeout(refreshIframe,200);
-    
+
     if (--refreshCounter < 0)//debugging counter. THis allows us to set a max number of refreshes before stopping calls to backend
     {
         return;
@@ -1524,16 +1487,13 @@ function getRefreshedData(CallBackAfterRefresh)//RangeData)
 }
 getRefreshedData.isEnabled = true;
 
-getRefreshedData.disableDataRefresh = function ()
-{
+getRefreshedData.disableDataRefresh = function () {
     getRefreshedData.isEnabled = false;
 }
 
-getRefreshedData.enableDataRefresh = function (pullLatest)
-{
+getRefreshedData.enableDataRefresh = function (pullLatest) {
     getRefreshedData.isEnabled = true;
-    if (pullLatest)
-    {
+    if (pullLatest) {
         getRefreshedData();
     }
 
@@ -1573,771 +1533,705 @@ getRefreshedData.unEnroll = function (Id) {
     delete getRefreshedData.callBacks[Id]
 }
 
-    function getEventsInterferringInRange(StartDate, EndDate)
-    {
-        var myTImeLine = { Start: StartDate, End: EndDate };
-        var RetValue = getInterferringEventsWithTimeLine(myTImeLine, TotalSubEventList);
-        return RetValue;
-    }
-
-    function getInterferringEventsWithTimeLine(TimeLine, CollectionOFEvents)
-    {
-        var retValue = new Array();
-        CollectionOFEvents.forEach(
-            function (obj) {
-                if (isWithinTimeLine(TimeLine, obj)) {
-                    retValue.push(obj)
-                }
-            });
-
-        return retValue;
-
-    }
-
-    function isWithinTimeLine(TimeLine, Event)
-    {
-        var retvalue = false;
-
-        var TimeLineStart = new Date ( TimeLine.Start);
-        var TimeLineEnd = new Date ( TimeLine.End);
-        var EventStart = new Date(Event.SubCalStartDate);
-        var EventEnd = new Date(Event.SubCalEndDate);
-
-        retvalue = ((EventStart <= TimeLineEnd) && (EventStart >= TimeLineStart)) || ((EventEnd <= TimeLineEnd) && (EventEnd >= TimeLineStart))
-        return retvalue;
-    }
-
-    function refreshIframe(Start, End)
-    {
-        //var mapFrameDom = document.getElementsByName("MapContainerFrame");
-        return;
-        var AllEvents= getEventsInterferringInRange(Start, End);
-        if (AllEvents.length > 0)
-        {
-            AllEvents.sort(function (a, b) { return (a.SubCalStartDate) - (b.SubCalStartDate) });
-
-            var mapFrameDom = document.getElementById("MapFrame");
-            var origin = AllEvents[0].SubCalAddress;
-            var destination = AllEvents[AllEvents.length - 1].SubCalAddress;
-            var WayPoints = generateWayPointString(AllEvents);
-            var fullUrl = "https://www.google.com/maps/embed/v1/directions?key=AIzaSyAX5tvjWZixq3Qy_Rg9jATpjxUjf_Stftk&origin=" + origin + "&destination=" + destination + "&waypoints=" + WayPoints;
-            mapFrameDom.src = fullUrl;
-            mapFrameDom.src = mapFrameDom.src;
-        }
-    }
-
-    function generateWayPointString(AllEvents)
-    {
-        var AllAddresses = [];
-
-        AllEvents.forEach(function (obj) {
-            AllAddresses.push(obj.SubCalAddress)
-        })
-        var retValue = AllAddresses.join("|");
-        return retValue;
-    }
-
-    function deleteInActiveSubEvents()
-    {
-
-    }
-    
-    function PopulateTotalSubEvents(DataHolder, RangeData, CallBackAfterRefresh)
-    {
-        ///Gets the data from tiler back end. Also sucks out the subcalendar events
-
-
-        //var myurl = "RootWagTap/time.top?WagCommand=0";
-        var myurl = global_refTIlerUrl + "Schedule";
-        var TimeZone = new Date().getTimezoneOffset();
-        if (new Date().dst())
-        {
-            //TimeZone += 60;
-        }
-        getRefreshedData.disableDataRefresh();
-        var PostData = { UserName: UserCredentials.UserName, UserID: UserCredentials.ID, StartRange: RangeData.Start.getTime(), EndRange: RangeData.End.getTime(), TimeZoneOffset: TimeZone };
-
-        $.ajax({
-            type: "GET",
-            url: myurl,
-            data: PostData,
-            // DO NOT SET CONTENT TYPE to json
-            // contentType: "application/json; charset=utf-8", 
-            // DataType needs to stay, otherwise the response object
-            // will be treated as a single string
-            //dataType: "json",
-            success: prepFuncForPopulateSubEventData(DataHolder),
-            error: function (err) {
-                var myError = err;
-                var step = "err";
-            }
-        }).done(function (response)
-        {
-            //alert("done generating");
-            PopulateMonthGrid(DataHolder.Data, RangeData);
-            if (CallBackAfterRefresh != null)
-            {
-                CallBackAfterRefresh(response);
-            }
-            getRefreshedData.enableDataRefresh();
-        });
-
-        //    $.get(myurl, PopulateSubEventData);
-    }
-
-
-    function prepFuncForPopulateSubEventData(DataContainer)
-    {
-    //essentially returns a function that structuralizes the data for month grid
-        return function (NewData)
-        {
-            //NewData = JSON.parse(NewData);
-            var PerformanceStart = new Date();
-            NewData = NewData.Content;
-            ActiveSubEvents = new Array();
-            var StructuredData = StructuralizeNewData(NewData)
-            TotalSubEventList = StructuredData.TotalSubEventList;
-            ActiveSubEvents = StructuredData.ActiveSubEvents;
-            Dictionary_OfCalendarData = StructuredData.Dictionary_OfCalendarData;
-            Dictionary_OfSubEvents = StructuredData.Dictionary_OfSubEvents;
-            global_RemovedElemnts = global_DictionaryOfSubEvents;
-            global_DictionaryOfSubEvents = {};
-            DataContainer.Data = NewData;
-            var PerformanceEnd = new Date();
-            //console.log("Processing Data From Back End" + (PerformanceEnd - PerformanceStart));
-        }
-
-    }
-
-
-
-    function GetDeletedEvents(RangeData, CallBackAfterRefresh) {
-        ///Gets the data from tiler back end. Also sucks out the subcalendar events
-        var myurl = global_refTIlerUrl + "Schedule/DeletedSchedule";
-        var TimeZone = new Date().getTimezoneOffset();
-        if (new Date().dst()) {
-            //TimeZone += 60;
-        }
-        getRefreshedData.disableDataRefresh();
-        var PostData = { UserName: UserCredentials.UserName, UserID: UserCredentials.ID, StartRange: RangeData.Start.getTime(), EndRange: RangeData.End.getTime(), TimeZoneOffset: TimeZone };
-
-        $.ajax({
-            type: "GET",
-            url: myurl,
-            data: PostData,
-            // DO NOT SET CONTENT TYPE to json
-            // contentType: "application/json; charset=utf-8", 
-            // DataType needs to stay, otherwise the response object
-            // will be treated as a single string
-            //dataType: "json",
-            success: getSubEvents,
-            error: function (err) {
-                CallBackAfterRefresh();
-            }
-        }).done(function () {
-            getRefreshedData.enableDataRefresh();
-        });
-
-        function getSubEvents(NewData)
-        {
-            NewData=NewData.Content
-            var DeletedTotalSubEventList = StructuralizeNewData(NewData).TotalSubEventList;
-            CallBackAfterRefresh(DeletedTotalSubEventList);
-        }
-    }
-
-
-    
-
-
-    function PopulateMonthGrid(NewData, RangeData)
-    {
-        //populates the grid with the provided grid data
-        /*var encasingDOm = document.getElementById("FullWeekContainer");
-        var RangeData = PopulateUI(encasingDOm);*/
-        //genFunctionForSelectCalendarRange(RangeData, 1)();
-        /*PopulateMonthGrid
-        NewData.Schedule.RepeatCalendarEvent.forEach(function (RepeatCalendarEvent) {
-            RepeatCalendarEvent.RepeatCalendarEvents.forEach(
-                function (repeatCalEvent) {
-                    repeatCalEvent.AllSubCalEvents.forEach(
-                        function (subEvent) {
-                            getMyPositionFromRange(subEvent, RangeData);
-                        })
-                })
-        })
-        //*/
-        var PerformanceStart = new Date();
-        global_CurrentWeekArrangedData.forEach(
-            function (WeekRange) {
-                WeekRange.DaysOfWeek.forEach(
-                function (DayOfWeek)
-                {
-                    for (var i in DayOfWeek.UISpecs)
-                    {
-                        DayOfWeek.UISpecs[i].Enabled = false;
-                        DayOfWeek.UISpecs[i].Dom.Enabled = false;
-                    }
-            
-                });
-            });
-        var PerformanceEnd = new Date();
-
-
-        //console.log("Marking as false took " + (PerformanceEnd - PerformanceStart));
-
-        PerformanceStart = new Date();
-        TotalSubEventList.forEach(
-            function (subEvent)
-            {
-                delete
-                delete global_RemovedElemnts[subEvent.ID];
-                getMyPositionFromRange(subEvent, RangeData);
-            
-                global_DictionaryOfSubEvents[subEvent.ID] = subEvent;
-                global_DictionaryOfSubEvents[subEvent.ID].AllCallBacks = new Array();
-            });
-        PerformanceEnd = new Date();
-        //console.log("Processing TotalSubEventList " + (PerformanceEnd - PerformanceStart));
-
-
-        PerformanceStart = new Date();
-        for (var ID in global_RemovedElemnts)
-        {
-            if (global_RemovedElemnts[ID].gridDoms != null) {
-
-
-                global_RemovedElemnts[ID].gridDoms.forEach(function (eachDom) {
-                    //console.log(eachDom.innerHTML);
-                    if (eachDom.parentElement!=null)
-                    {
-                        eachDom.parentElement.removeChild(eachDom);
-                    }
-                    //outerHTML = "";
-                    
-                })
-            }
-            else
-            {
-                //alert("Jerome theres a problem");
-            }
-        }
-
-
-        PerformanceEnd = new Date();
-//        console.log("Removing elements from DOM " + (PerformanceEnd - PerformanceStart));
-
-        PerformanceStart = new Date();
-        RangeData.forEach(
-            function (WeekRange) {
-                for(var myKey in WeekRange.SubEventsCollection)
-                {
-                    var validSubEvents = WeekRange.SubEventsCollection[myKey];
-                    getMyPositionFromRange(validSubEvents, WeekRange.DaysOfWeek);
-                }
-
-                WeekRange.DaysOfWeek.forEach(
-                function (weekDay) {
-                    for (var myKey in weekDay.SubEventsCollection)
-                    {
-                        var subEvent = weekDay.SubEventsCollection[myKey];
-                        getMyDom(subEvent, weekDay);
-                        
-                    }
-                });
-            });
-        PerformanceEnd = new Date();
-        //console.log("Place SubEvents in expected weeks " + (PerformanceEnd - PerformanceStart));
-
-        global_CurrentWeekArrangedData = RangeData;
-
-
-
-        PerformanceStart = new Date();
-        TriggerWeekUIupdate(global_CurrentWeekArrangedData);
-        PerformanceEnd = new Date();
-        //console.log("TriggerUI motion " + (PerformanceEnd - PerformanceStart));
-        
-        /*
-        RangeData.forEach(
-            function (WeekRange) {
-                WeekRange.DaysOfWeek.forEach(renderUIChanges);
-
-            });*/
-        return;
-    }
-
-
-
-    function TriggerWeekUIupdate(RangeData)
-    {
-        RangeData.forEach(
-            function (WeekRange) {
-                WeekRange.DaysOfWeek.forEach(triggerSubEventRenderOnMonth);
-
-            });
-    }
-
-
-    function monthViewResetData()
-    {
-        
-        global_WeekGrid.forEach(//clears the current assigned subevents for each week
-           function (WeekRange) {
-               WeekRange.SubEventsCollection = {};
-               WeekRange.DaysOfWeek.forEach(
-                function (weekDay) {
-                    weekDay.SubEventsCollection = {};//clears the current assigned subevents for each day
-                });
-           });
-    }
-
-    function OnDragStartOfSubEvent(ev)
-    {
-        ev.dataTransfer.setData("text", ev.target.id);
-    }
-
-    function OnDraggingOfSubEvent(ev)
-    {
-        ev.preventDefault();
-    }
-
-    function OnDropOfSubEvent(ev)
-    {
-        ev.preventDefault();
-        var data = ev.dataTransfer.getData("text");
-        ev.target.appendChild(document.getElementById(data));
-    }
-
-    function triggerSubEventRenderOnMonth(DayOfWeek)
-    {
-        var verfyDate = new Date(2014, 5, 15, 0, 0, 0, 0);
-        var a = 0;
-    
-
-        var IntersectingArrayData = new Array();
-        var SortedUISpecs = new Array();
-        var Now = new Date();
-        for (var ID in DayOfWeek.UISpecs)
-        {
-            if (DayOfWeek.UISpecs[ID].Enabled)
-            {
-                var SortedUISpecs_Element = DayOfWeek.UISpecs[ID];
-                SortedUISpecs.push({SubEvent:SortedUISpecs_Element,ID: ID});
-                
-            }
-        }
-
-        
-        SortedUISpecs.sort(function (a, b)
-        {
-            //var Diff = (a.SubEvent.Start) - (b.SubEvent.Start)
-            return (a.SubEvent.Start) - (b.SubEvent.Start);
-        });
-
-        for (var i = 0; i < SortedUISpecs.length; i++)
-        {
-            var Element = SortedUISpecs[i];
-            var myData = global_UISetup.RenderTimeInformation(DayOfWeek, Element.ID);
-            IntersectingArrayData.push(myData);
-        }
-
-
-        //AllEvents.sort(function (a, b) { return (a.SubCalStartDate) - (b.SubCalStartDate) });
-        //debugger;
-        //IntersectingArrayData.sort(function (a, b) { return (a.Start) - (b.Start) });// no need for the line with SortedUISpecs.sort( does the job
-        var MinPercent = ((1/24)* 100);//40 derived from min pixel height.
-        
-        var myIndex = 0;
-        var MaxTabbingIndex = 1;
-        var CallPrepSyncLater = [];
-        for(var i=0;i<IntersectingArrayData.length;i++)
-        {
-            var ID = IntersectingArrayData[i].ID;
-            if (DayOfWeek.UISpecs[ID].Enabled)
-            {
-                var widthSubtraction = 0;
-                var LeftPercent = 0;
-                DayOfWeek.UISpecs[ID].Dom.Active = true;
-                //DayOfWeek.UISpecs[ID].Enabled = false;
-                //DayOfWeek.UISpecs[ID].Dom.Enabled = false;
-                
-                var HeightPx=(DayOfWeek.UISpecs[ID].css.height/100)*global_DayHeight;
-                if (DayOfWeek.UISpecs[ID].css.height < MinPercent)
-                {
-                    //HeightPx=40;
-                }
-                /*
-                if ((ID == "111414_7_0_111415") || (ID == "111426_7_0_111427"))
-                {
-                    //debugger;
-                }
-                */
-                //var TopPixels=IntersectingArrayData[i].top;
-                //var EndPixelTop = TopPixels + HeightPx;
-                var EndPixelTop =IntersectingArrayData[i].end;
-                //IntersectingArrayData[i].BestBottom.End = EndPixelTop
-
-                if (global_UISetup.ConflictCalculation(EndPixelTop, i, IntersectingArrayData))
-                {
-                    widthSubtraction += 10;
-                }
-                LeftPercent = IntersectingArrayData[i].Count*17;
-
-                if (IntersectingArrayData[i].Count >= MaxTabbingIndex)
-                {
-                    MaxTabbingIndex = IntersectingArrayData[i].Count+1;
-                }
-
-                widthSubtraction += IntersectingArrayData[i].Count * 10;
-                
-
-                if (LeftPercent > 90)
-                {
-                    //LeftPercent = 90;
-                }
-
-
-                if (DayOfWeek.UISpecs[ID].OldIDindex!=null)
-                {
-                    var OldDomID = ID + "_" + DayOfWeek.UISpecs[ID].OldIDindex;// gets the old ID for the dom event
-                    var toBeDeletedDom = getDomOrCreateNew(OldDomID);//gets the HTML element
-                    if (!toBeDeletedDom.Dom.Active)//checks if it is active
-                    {
-                        toBeDeletedDom.Dom.style.height = 0;
-                        $(toBeDeletedDom.Dom).hide();
-                    }
-                }
-
-
-                DayOfWeek.UISpecs[ID].OldIDindex = DayOfWeek.UISpecs[ID].IDindex;
-                //DayOfWeek.UISpecs[ID].css.width = (100 - widthSubtraction) * .1287;//12.87 derived from css file monthOverviewini.css. We chose a max width of 12.87%
-                DayOfWeek.UISpecs[ID].css.left = (LeftPercent);
-                
-                DayOfWeek.UISpecs[ID].refSubEvent = IntersectingArrayData[i].refSubEvent;
-                //$(DayOfWeek.UISpecs[ID].refrenceListElement.Dom).addClass("ListElement");
-                
-
-                //DayOfWeek.FullDayContext.Dom.appendChild(DayOfWeek.UISpecs[ID].Dom);
-                DayOfWeek.WeekRenderPlane.appendChild(DayOfWeek.UISpecs[ID].Dom);
-                
-                
-                $(DayOfWeek.UISpecs[ID].Dom).show();
-                var CallBackLaterData = { ID: ID, Index: i };
-                CallPrepSyncLater.push(CallBackLaterData);
-                //setTimeout(renderSideBarEvents(DayOfWeek, ID, IntersectingArrayData, i, MaxTabbingIndex), 200 * ++a);
-                DayOfWeek.maxIndex = global_ListOfDayCounter;
-
-            }
-            else
-            {
-                
-            
-            }
-        }
-
-        for (var i = 0 ; i < CallPrepSyncLater.length; i++)
-        {
-            var CallBackLaterData = CallPrepSyncLater[i]
-            setTimeout(global_UISetup.RenderSubEvent(DayOfWeek, CallBackLaterData.ID, IntersectingArrayData, CallBackLaterData.Index, MaxTabbingIndex), 200 * ++a);
-        }
-        return;
-    }
-
-
-    function PositionIconSet(DayContainer, SubEventDom)
-    {
-        //debugger;
-        DayContainer = DayContainer.Parent;
-        //var IconSetContainer = global_ControlPanelIconSet.getIconSetContainer();
-        var ControlPanelContainer = getDomOrCreateNew("ControlPanelContainer");
-        var documentWidth = $(document).width();
-        var documentHeight = $(document).height();;
-        var buffer = 20;
-        var widthOfIconSet = $(ControlPanelContainer).width()
-        var heightOfIconSet = $(ControlPanelContainer).height()
-        var widthOfDayContainer = $(DayContainer).width();
-        var widthOfListSubEvent = $(SubEventDom).width();
-        var leftOfDayContainer = $(SubEventDom).offset().left;
-        var RightBorder = leftOfDayContainer + widthOfListSubEvent + widthOfIconSet;
-        var topOfSubEvent = $(SubEventDom).offset().top;
-        var PossibleBottom = topOfSubEvent + heightOfIconSet + 36;//extra 36 is save button
-        var LeftOffset=0
-        if (RightBorder > documentWidth) {
-            LeftOffset = leftOfDayContainer - widthOfIconSet// - buffer
-        }
-        else
-        {
-            LeftOffset = leftOfDayContainer + widthOfListSubEvent + buffer;
-        }
-
-        if (PossibleBottom > documentHeight)
-        {
-            var Excess = PossibleBottom - documentHeight;
-            var SubEventHeight = $(SubEventDom).height();
-            topOfSubEvent -= (Excess + 45); //extra 40 is for save button. Save button is 36px
-        }
-
-        ControlPanelContainer.style.top = topOfSubEvent + "px";
-        ControlPanelContainer.style.left = LeftOffset + "px";
-        /*
-        setTimeout(
-            function ()
-            {
-                ControlPanelContainer.style.top = topOfSubEvent + "px";
-                ControlPanelContainer.style.left = LeftOffset + "px";
-            },
-            300)*/
-        AddCloseButoon(ControlPanelContainer, false);
-
-        /*
-        IconSetContainer.style.top = topOfSubEvent + "px";
-        IconSetContainer.style.left = LeftOffset + "px";
-        */
-
-    }
-
-    function BindClickOfSideBarToCLick(MyArray, FullContainer, Index, CLickedBar,EventID)
-    {
-        return function ()
-        {
-            if (!global_UISetup.RenderOnSubEventClick.isRefListSubEventClicked) {
-                global_ExitManager.triggerLastExitAndPop();
-            }
-            else
-            {
-                BindClickOfSideBarToCLick.reset();
-            }
-            //global_multiSelect.resetAllElement();
-            //global_multiSelect.removeCallBack(RevealControlPanelSection);
-            /*
-            if (BindClickOfSideBarToCLick.elementResetHeight != null)
-            {
-                BindClickOfSideBarToCLick.reset();
-            }*/
-            var ExpandElement = FullContainer.refrenceListElement.Dom
-            var JustDomsFromMyArray = new Array();
-            MyArray.forEach(function (element) { JustDomsFromMyArray.push( element.refSubEvent.Dom) })
-            var increment = 20;
-            var elementHeight = $(ExpandElement).height();
-            BindClickOfSideBarToCLick.elementResetHeight = elementHeight;
-            BindClickOfSideBarToCLick.clickedBar = CLickedBar;
-            //ExpandElement.style.top = (Index * 20) + "px";
-            BindClickOfSideBarToCLick.ExpandElement = ExpandElement;
-            BindClickOfSideBarToCLick.DataElement = FullContainer.DataElement.Dom;
-            //ExpandElement.style.height = (60) + "px";
-            $(ExpandElement).addClass("FullColorAugmentation");
-
-            //ExpandElement.style.backgroundColor = "yellow";
-            HighlightSubEvent(FullContainer.DataElement.Dom);
-            //$(FullContainer.DataElement.Dom).addClass("selectedElements");
-            var resetArray = new Array();
-            BindClickOfSideBarToCLick.previousIndex = Index;
-            
-            
-
-
-            var AllPreviousSelection = $(".selectedDayElements");
-            
-
-            for(var i=0;i<AllPreviousSelection.length;i++)
-            {
-                 var obj=AllPreviousSelection[i]
-                
-                    var currIndex=JustDomsFromMyArray.indexOf(obj)
-                    if (currIndex == -1)
-                    {
-                        $(obj).removeClass("selectedDayElements");
-                        //$(obj).addClass("ListElements");
-                        
-                    }
-            }
-                
-
-            for (var i = 0; i < MyArray.length; i++) {
-                $(MyArray[i].refSubEvent.Dom).addClass("selectedDayElements");
-            }
-
-            for (var i = Index+1; i < MyArray.length; i++)
-            {
-                var CurrentTop = $(MyArray[i].refSubEvent.Dom).position().top;
-                resetArray.push({ previousHeight: CurrentTop, DomElement: MyArray[i].refSubEvent.Dom,index:i })
-                CurrentTop = (increment * i)+40;
-                //MyArray[i].refSubEvent.Dom.style.top = CurrentTop + "px";
-            }
-            BindClickOfSideBarToCLick.resetArray = resetArray;
-            BindClickOfSideBarToCLick.ActiveID = EventID;
-            //global_ExitManager.addNewExit(BindClickOfSideBarToCLick.reset);
-            //renderSubEventsClickEvents.ignoreTriggerLastExitAndPop = true;
-
-            /*
-            var myFunc = BindClickOfSideBarToCLick.reset;
-            myFunc.isNotExitable = true;
-            global_ExitManager.addNewExit(myFunc);
-            setTimeout(function () {
-                myFunc.isNotExitable = false;
-            }, 100);
-            */
-        }
-    }
-
-    BindClickOfSideBarToCLick.reset = function ()
-    {
-        //BindClickOfSideBarToCLick.ExpandElement.style.height = BindClickOfSideBarToCLick.elementResetHeight + "px";
-        //BindClickOfSideBarToCLick.ExpandElement.style.backgroundColor = "transparent";
-        if (BindClickOfSideBarToCLick.ActiveID != null) {
-            //BindClickOfSideBarToCLick.ExpandElement.style.top = (BindClickOfSideBarToCLick.previousIndex * 20) + "px";
-            $(BindClickOfSideBarToCLick.clickedBar).removeClass("selectedElements")
-            $(BindClickOfSideBarToCLick.DataElement).removeClass("selectedElements")
-            $(BindClickOfSideBarToCLick.ExpandElement).removeClass("FullColorAugmentation");
-            BindClickOfSideBarToCLick.resetArray.forEach(function (obj) {
-                //obj.DomElement.style.top = (obj.index * 20) + "px";
-            })
-            BindClickOfSideBarToCLick.elementResetHeight = null;
-            BindClickOfSideBarToCLick.ActiveID = null;
-        }
-        
-    }
-    
-    var global_ListOfDayCounter = 0;
-
-    function DoSideBarsInterSect(MeEnd, Index, AllElements)
-    {
-        var retValue = false;
-        MeEnd = MeEnd.toFixed(2);
-        var Me = AllElements[Index];
-        for (var i = Index+1; i < AllElements.length; i++)
-        {
-            var PossibleInterferringElement = AllElements[i];
-            var PossibleInterferringTop = PossibleInterferringElement.top.toFixed(2);
-            if (PossibleInterferringTop < MeEnd)
-            {
-                //++Me.Count;
-                PossibleInterferringElement.CalCCount = Me.CalCCount + 1;
-                PossibleInterferringElement.Count = PossibleInterferringElement.CalCCount;
-                PossibleInterferringElement.EarlierCount = PossibleInterferringElement.Count
-
-
-                ///*// #### Note for revert to simplest tabbing enable on this comment block
-                ///BestBottom is data on tab level which ends before Me. BestBottom.Count data member is the of the level, BestBOttom.End is the end pixel
-                if (PossibleInterferringElement.BestBottom.End > MeEnd )
-                {
-                    PossibleInterferringElement.BestBottom.End = MeEnd
-                    PossibleInterferringElement.BestBottom.Count = Me.Count;
-                }
-                if (PossibleInterferringTop >= Me.BestBottom.End)//checks to see if the conflicting Event can go to same level as the BestBottom of Me
-                {
-                    PossibleInterferringElement.Count=Me.BestBottom.Count
-                    Me.BestBottom.End = PossibleInterferringElement.end;
-                    PossibleInterferringElement.CalCCount = Me.CalCCount;
-                }
-                ///*/
-                retValue = true;
-            }
-            else
-            {
-                break;
-            }
-
-
-            /*
-            if (AllElements[Index].BestBottom.End <= myTop) {
-                AllElements[i].Count = AllElements[Index].BestBottom.Count;
-                AllElements[Index].BestBottom.End = End
-            }*/
-        }
-
-        return retValue;
-    }
-
-
-
-
-    function DoSideBarsConflictClassic(MeEnd, Index, AllElements) {
-        var retValue = false;
-        MeEnd = MeEnd.toFixed(2);
-        var Me = AllElements[Index];
-        for (var i = Index + 1; i < AllElements.length; i++) {
-            var PossibleInterferringElement = AllElements[i];
-            var PossibleInterferringTop = PossibleInterferringElement.top.toFixed(2);
-            if (PossibleInterferringTop < MeEnd) {
-                ++Me.Count;
-                ++Me.OverlappingCount;
-                
-                PossibleInterferringElement.PrecedingOverlapers = Me.PrecedingOverlapers;
-                ++PossibleInterferringElement.PrecedingOverlapers;
-                ++PossibleInterferringElement.OverlappingCount;
-                ++Me.OverlappingAfterMe
-
-
-
-                PossibleInterferringElement.CalCCount = Me.CalCCount + 1;
-                PossibleInterferringElement.Count = PossibleInterferringElement.CalCCount;
-                PossibleInterferringElement.EarlierCount = PossibleInterferringElement.Count
-
-
-                ///*// #### Note for revert to simplest tabbing enable on this comment block
-                ///BestBottom is data on tab level which ends before Me. BestBottom.Count data member is the of the level, BestBOttom.End is the end pixel
-                if (PossibleInterferringElement.BestBottom.End > MeEnd) {
-                    PossibleInterferringElement.BestBottom.End = MeEnd
-                    PossibleInterferringElement.BestBottom.Count = Me.Count;
-                }
-                if (PossibleInterferringTop >= Me.BestBottom.End)//checks to see if the conflicting Event can go to same level as the BestBottom of Me
-                {
-                    PossibleInterferringElement.Count = Me.BestBottom.Count
-                    Me.BestBottom.End = PossibleInterferringElement.end;
-                    PossibleInterferringElement.CalCCount = Me.CalCCount;
-                }
-                ///*/
-                retValue = true;
-            }
-            else {
-                break;
-            }
-
-
-            /*
-            if (AllElements[Index].BestBottom.End <= myTop) {
-                AllElements[i].Count = AllElements[Index].BestBottom.Count;
-                AllElements[Index].BestBottom.End = End
-            }*/
-        }
-
-        return retValue;
-    }
-
-
-    function DoSubEventsIntersect(MeEnd, Index, AllElements)
-    {
-        var retValue = false;
-        MeEnd = MeEnd.toFixed(2);
-        var Me = AllElements[Index];
-        for (var i = Index+1; i < AllElements.length; i++)
-        {
-            var PossibleInterferringElement = AllElements[i];
-            var PossibleInterferringTop = PossibleInterferringElement.top.toFixed(2);
-            if (PossibleInterferringTop < MeEnd)
-            {
-                PossibleInterferringElement.CalCCount = Me.CalCCount + 1;
-                PossibleInterferringElement.Count = PossibleInterferringElement.CalCCount
-
-            }
-        }
-    }
-    
-
-    function HighlightSubEvent(Dom)
-    {
-        $(Dom).addClass("selectedElements");
-    }
-
-function dehighlightSubEvent(Dom)
+function getEventsInterferringInRange(StartDate, EndDate)
 {
+    var myTImeLine = { Start: StartDate, End: EndDate };
+    var RetValue = getInterferringEventsWithTimeLine(myTImeLine, TotalSubEventList);
+    return RetValue;
+}
+
+function getInterferringEventsWithTimeLine(TimeLine, CollectionOFEvents) {
+    var retValue = new Array();
+    CollectionOFEvents.forEach(
+        function (obj) {
+            if (isWithinTimeLine(TimeLine, obj)) {
+                retValue.push(obj)
+            }
+        });
+
+    return retValue;
+
+}
+
+function isWithinTimeLine(TimeLine, Event) {
+    var retvalue = false;
+
+    var TimeLineStart = new Date(TimeLine.Start);
+    var TimeLineEnd = new Date(TimeLine.End);
+    var EventStart = new Date(Event.SubCalStartDate);
+    var EventEnd = new Date(Event.SubCalEndDate);
+
+    retvalue = ((EventStart <= TimeLineEnd) && (EventStart >= TimeLineStart)) || ((EventEnd <= TimeLineEnd) && (EventEnd >= TimeLineStart))
+    return retvalue;
+}
+
+function refreshIframe(Start, End) {
+    //var mapFrameDom = document.getElementsByName("MapContainerFrame");
+    return;
+    var AllEvents = getEventsInterferringInRange(Start, End);
+    if (AllEvents.length > 0) {
+        AllEvents.sort(function (a, b) { return (a.SubCalStartDate) - (b.SubCalStartDate) });
+
+        var mapFrameDom = document.getElementById("MapFrame");
+        var origin = AllEvents[0].SubCalAddress;
+        var destination = AllEvents[AllEvents.length - 1].SubCalAddress;
+        var WayPoints = generateWayPointString(AllEvents);
+        var fullUrl = "https://www.google.com/maps/embed/v1/directions?key=AIzaSyAX5tvjWZixq3Qy_Rg9jATpjxUjf_Stftk&origin=" + origin + "&destination=" + destination + "&waypoints=" + WayPoints;
+        mapFrameDom.src = fullUrl;
+        mapFrameDom.src = mapFrameDom.src;
+    }
+}
+
+function generateWayPointString(AllEvents) {
+    var AllAddresses = [];
+
+    AllEvents.forEach(function (obj) {
+        AllAddresses.push(obj.SubCalAddress)
+    })
+    var retValue = AllAddresses.join("|");
+    return retValue;
+}
+
+function PopulateTotalSubEvents(DataHolder, RangeData, CallBackAfterRefresh) {
+    ///Gets the data from tiler back end. Also sucks out the subcalendar events
+
+
+    //var myurl = "RootWagTap/time.top?WagCommand=0";
+    var myurl = global_refTIlerUrl + "Schedule";
+    var TimeZone = new Date().getTimezoneOffset();
+    if (new Date().dst()) {
+        //TimeZone += 60;
+    }
+    getRefreshedData.disableDataRefresh();
+    var PostData = { UserName: UserCredentials.UserName, UserID: UserCredentials.ID, StartRange: RangeData.Start.getTime(), EndRange: RangeData.End.getTime(), TimeZoneOffset: TimeZone };
+
+    $.ajax({
+        type: "GET",
+        url: myurl,
+        data: PostData,
+        // DO NOT SET CONTENT TYPE to json
+        // contentType: "application/json; charset=utf-8", 
+        // DataType needs to stay, otherwise the response object
+        // will be treated as a single string
+        //dataType: "json",
+        success: prepFuncForPopulateSubEventData(DataHolder),
+        error: function (err) {
+            var myError = err;
+            var step = "err";
+        }
+    }).done(function () {
+        //alert("done generating");
+        PopulateMonthGrid(DataHolder.Data, RangeData);
+        if (CallBackAfterRefresh != null) {
+            CallBackAfterRefresh();
+        }
+        getRefreshedData.enableDataRefresh();
+    });
+
+    //    $.get(myurl, PopulateSubEventData);
+}
+
+
+function prepFuncForPopulateSubEventData(DataContainer) {
+    //essentially returns a function that structuralizes the data for month grid
+    return function (NewData) {
+        //NewData = JSON.parse(NewData);
+        var PerformanceStart = new Date();
+        NewData = NewData.Content;
+        ActiveSubEvents = new Array();
+        var StructuredData = StructuralizeNewData(NewData)
+        TotalSubEventList = StructuredData.TotalSubEventList;
+        ActiveSubEvents = StructuredData.ActiveSubEvents;
+        Dictionary_OfCalendarData = StructuredData.Dictionary_OfCalendarData;
+        Dictionary_OfSubEvents = StructuredData.Dictionary_OfSubEvents;
+        global_RemovedElemnts = global_DictionaryOfSubEvents;
+        global_DictionaryOfSubEvents = {};
+        DataContainer.Data = NewData;
+        var PerformanceEnd = new Date();
+        //console.log("Processing Data From Back End" + (PerformanceEnd - PerformanceStart));
+    }
+
+}
+
+
+
+function GetDeletedEvents(RangeData, CallBackAfterRefresh) {
+    ///Gets the data from tiler back end. Also sucks out the subcalendar events
+    var myurl = global_refTIlerUrl + "Schedule/DeletedSchedule";
+    var TimeZone = new Date().getTimezoneOffset();
+    if (new Date().dst()) {
+        //TimeZone += 60;
+    }
+    getRefreshedData.disableDataRefresh();
+    var PostData = { UserName: UserCredentials.UserName, UserID: UserCredentials.ID, StartRange: RangeData.Start.getTime(), EndRange: RangeData.End.getTime(), TimeZoneOffset: TimeZone };
+
+    $.ajax({
+        type: "GET",
+        url: myurl,
+        data: PostData,
+        // DO NOT SET CONTENT TYPE to json
+        // contentType: "application/json; charset=utf-8", 
+        // DataType needs to stay, otherwise the response object
+        // will be treated as a single string
+        //dataType: "json",
+        success: getSubEvents,
+        error: function (err) {
+            CallBackAfterRefresh();
+        }
+    }).done(function () {
+        getRefreshedData.enableDataRefresh();
+    });
+
+    function getSubEvents(NewData) {
+        NewData = NewData.Content
+        var DeletedTotalSubEventList = StructuralizeNewData(NewData).TotalSubEventList;
+        CallBackAfterRefresh(DeletedTotalSubEventList);
+    }
+}
+
+
+
+
+
+function PopulateMonthGrid(NewData, RangeData) {
+    //populates the grid with the provided grid data
+    /*var encasingDOm = document.getElementById("FullWeekContainer");
+    var RangeData = PopulateUI(encasingDOm);*/
+    //genFunctionForSelectCalendarRange(RangeData, 1)();
+    /*PopulateMonthGrid
+    NewData.Schedule.RepeatCalendarEvent.forEach(function (RepeatCalendarEvent) {
+        RepeatCalendarEvent.RepeatCalendarEvents.forEach(
+            function (repeatCalEvent) {
+                repeatCalEvent.AllSubCalEvents.forEach(
+                    function (subEvent) {
+                        getMyPositionFromRange(subEvent, RangeData);
+                    })
+            })
+    })
+    //*/
+    var PerformanceStart = new Date();
+    global_CurrentWeekArrangedData.forEach(
+        function (WeekRange) {
+            WeekRange.DaysOfWeek.forEach(
+            function (DayOfWeek) {
+                for (var i in DayOfWeek.UISpecs) {
+                    DayOfWeek.UISpecs[i].Enabled = false;
+                    DayOfWeek.UISpecs[i].Dom.Enabled = false;
+                }
+
+            });
+        });
+    var PerformanceEnd = new Date();
+
+
+    //console.log("Marking as false took " + (PerformanceEnd - PerformanceStart));
+
+    PerformanceStart = new Date();
+    TotalSubEventList.forEach(
+        function (subEvent) {
+            delete
+            delete global_RemovedElemnts[subEvent.ID];
+            getMyPositionFromRange(subEvent, RangeData);
+
+            global_DictionaryOfSubEvents[subEvent.ID] = subEvent;
+            global_DictionaryOfSubEvents[subEvent.ID].AllCallBacks = new Array();
+        });
+    PerformanceEnd = new Date();
+    //console.log("Processing TotalSubEventList " + (PerformanceEnd - PerformanceStart));
+
+
+    PerformanceStart = new Date();
+    for (var ID in global_RemovedElemnts) {
+        if (global_RemovedElemnts[ID].gridDoms != null) {
+
+
+            global_RemovedElemnts[ID].gridDoms.forEach(function (eachDom) {
+                //console.log(eachDom.innerHTML);
+                if (eachDom.parentElement != null) {
+                    eachDom.parentElement.removeChild(eachDom);
+                }
+                //outerHTML = "";
+
+            })
+        }
+        else {
+            //alert("Jerome theres a problem");
+        }
+    }
+
+
+    PerformanceEnd = new Date();
+    //        console.log("Removing elements from DOM " + (PerformanceEnd - PerformanceStart));
+
+    PerformanceStart = new Date();
+    RangeData.forEach(
+        function (WeekRange) {
+            for (var myKey in WeekRange.SubEventsCollection) {
+                var validSubEvents = WeekRange.SubEventsCollection[myKey];
+                getMyPositionFromRange(validSubEvents, WeekRange.DaysOfWeek);
+            }
+
+            WeekRange.DaysOfWeek.forEach(
+            function (weekDay) {
+                for (var myKey in weekDay.SubEventsCollection) {
+                    var subEvent = weekDay.SubEventsCollection[myKey];
+                    getMyDom(subEvent, weekDay);
+
+                }
+            });
+        });
+    PerformanceEnd = new Date();
+    //console.log("Place SubEvents in expected weeks " + (PerformanceEnd - PerformanceStart));
+
+    global_CurrentWeekArrangedData = RangeData;
+
+
+
+    PerformanceStart = new Date();
+    TriggerWeekUIupdate(global_CurrentWeekArrangedData);
+    PerformanceEnd = new Date();
+    //console.log("TriggerUI motion " + (PerformanceEnd - PerformanceStart));
+
+    /*
+    RangeData.forEach(
+        function (WeekRange) {
+            WeekRange.DaysOfWeek.forEach(renderUIChanges);
+
+        });*/
+    return;
+}
+
+
+
+function TriggerWeekUIupdate(RangeData) {
+    RangeData.forEach(
+        function (WeekRange) {
+            WeekRange.DaysOfWeek.forEach(triggerSubEventRenderOnMonth);
+
+        });
+}
+
+
+function monthViewResetData() {
+
+    global_WeekGrid.forEach(//clears the current assigned subevents for each week
+       function (WeekRange) {
+           WeekRange.SubEventsCollection = {};
+           WeekRange.DaysOfWeek.forEach(
+            function (weekDay) {
+                weekDay.SubEventsCollection = {};//clears the current assigned subevents for each day
+            });
+       });
+}
+
+function OnDragStartOfSubEvent(ev) {
+    ev.dataTransfer.setData("text", ev.target.id);
+}
+
+function OnDraggingOfSubEvent(ev) {
+    ev.preventDefault();
+}
+
+function OnDropOfSubEvent(ev) {
+    ev.preventDefault();
+    var data = ev.dataTransfer.getData("text");
+    ev.target.appendChild(document.getElementById(data));
+}
+
+function triggerSubEventRenderOnMonth(DayOfWeek) {
+    var verfyDate = new Date(2014, 5, 15, 0, 0, 0, 0);
+    var a = 0;
+
+
+    var IntersectingArrayData = new Array();
+    var SortedUISpecs = new Array();
+    var Now = new Date();
+    for (var ID in DayOfWeek.UISpecs) {
+        if (DayOfWeek.UISpecs[ID].Enabled) {
+            var SortedUISpecs_Element = DayOfWeek.UISpecs[ID];
+            SortedUISpecs.push({ SubEvent: SortedUISpecs_Element, ID: ID });
+
+        }
+    }
+
+
+    SortedUISpecs.sort(function (a, b) {
+        //var Diff = (a.SubEvent.Start) - (b.SubEvent.Start)
+        return (a.SubEvent.Start) - (b.SubEvent.Start);
+    });
+
+    for (var i = 0; i < SortedUISpecs.length; i++) {
+        var Element = SortedUISpecs[i];
+        var myData = global_UISetup.RenderTimeInformation(DayOfWeek, Element.ID);
+        IntersectingArrayData.push(myData);
+    }
+
+
+    //AllEvents.sort(function (a, b) { return (a.SubCalStartDate) - (b.SubCalStartDate) });
+    //debugger;
+    //IntersectingArrayData.sort(function (a, b) { return (a.Start) - (b.Start) });// no need for the line with SortedUISpecs.sort( does the job
+    var MinPercent = ((1 / 24) * 100);//40 derived from min pixel height.
+
+    var myIndex = 0;
+    var MaxTabbingIndex = 1;
+    var CallPrepSyncLater = [];
+    for (var i = 0; i < IntersectingArrayData.length; i++) {
+        var ID = IntersectingArrayData[i].ID;
+        if (DayOfWeek.UISpecs[ID].Enabled) {
+            var widthSubtraction = 0;
+            var LeftPercent = 0;
+            DayOfWeek.UISpecs[ID].Dom.Active = true;
+            //DayOfWeek.UISpecs[ID].Enabled = false;
+            //DayOfWeek.UISpecs[ID].Dom.Enabled = false;
+
+            var HeightPx = (DayOfWeek.UISpecs[ID].css.height / 100) * global_DayHeight;
+            if (DayOfWeek.UISpecs[ID].css.height < MinPercent) {
+                //HeightPx=40;
+            }
+            /*
+            if ((ID == "111414_7_0_111415") || (ID == "111426_7_0_111427"))
+            {
+                //debugger;
+            }
+            */
+            //var TopPixels=IntersectingArrayData[i].top;
+            //var EndPixelTop = TopPixels + HeightPx;
+            var EndPixelTop = IntersectingArrayData[i].end;
+            //IntersectingArrayData[i].BestBottom.End = EndPixelTop
+
+            if (global_UISetup.ConflictCalculation(EndPixelTop, i, IntersectingArrayData)) {
+                widthSubtraction += 10;
+            }
+            LeftPercent = IntersectingArrayData[i].Count * 17;
+
+            if (IntersectingArrayData[i].Count >= MaxTabbingIndex) {
+                MaxTabbingIndex = IntersectingArrayData[i].Count + 1;
+            }
+
+            widthSubtraction += IntersectingArrayData[i].Count * 10;
+
+
+            if (LeftPercent > 90) {
+                //LeftPercent = 90;
+            }
+
+
+            if (DayOfWeek.UISpecs[ID].OldIDindex != null) {
+                var OldDomID = ID + "_" + DayOfWeek.UISpecs[ID].OldIDindex;// gets the old ID for the dom event
+                var toBeDeletedDom = getDomOrCreateNew(OldDomID);//gets the HTML element
+                if (!toBeDeletedDom.Dom.Active)//checks if it is active
+                {
+                    toBeDeletedDom.Dom.style.height = 0;
+                    $(toBeDeletedDom.Dom).hide();
+                }
+            }
+
+
+            DayOfWeek.UISpecs[ID].OldIDindex = DayOfWeek.UISpecs[ID].IDindex;
+            //DayOfWeek.UISpecs[ID].css.width = (100 - widthSubtraction) * .1287;//12.87 derived from css file monthOverviewini.css. We chose a max width of 12.87%
+            DayOfWeek.UISpecs[ID].css.left = (LeftPercent);
+
+            DayOfWeek.UISpecs[ID].refSubEvent = IntersectingArrayData[i].refSubEvent;
+            //$(DayOfWeek.UISpecs[ID].refrenceListElement.Dom).addClass("ListElement");
+
+
+            //DayOfWeek.FullDayContext.Dom.appendChild(DayOfWeek.UISpecs[ID].Dom);
+            DayOfWeek.WeekRenderPlane.appendChild(DayOfWeek.UISpecs[ID].Dom);
+
+
+            $(DayOfWeek.UISpecs[ID].Dom).show();
+            var CallBackLaterData = { ID: ID, Index: i };
+            CallPrepSyncLater.push(CallBackLaterData);
+            //setTimeout(renderSideBarEvents(DayOfWeek, ID, IntersectingArrayData, i, MaxTabbingIndex), 200 * ++a);
+            DayOfWeek.maxIndex = global_ListOfDayCounter;
+
+        }
+        else {
+
+
+        }
+    }
+
+    for (var i = 0 ; i < CallPrepSyncLater.length; i++) {
+        var CallBackLaterData = CallPrepSyncLater[i]
+        setTimeout(global_UISetup.RenderSubEvent(DayOfWeek, CallBackLaterData.ID, IntersectingArrayData, CallBackLaterData.Index, MaxTabbingIndex), 200 * ++a);
+    }
+    return;
+}
+
+
+function PositionIconSet(DayContainer, SubEventDom) {
+    //debugger;
+    DayContainer = DayContainer.Parent;
+    //var IconSetContainer = global_ControlPanelIconSet.getIconSetContainer();
+    var ControlPanelContainer = getDomOrCreateNew("ControlPanelContainer");
+    var documentWidth = $(document).width();
+    var documentHeight = $(document).height();;
+    var buffer = 20;
+    var widthOfIconSet = $(ControlPanelContainer).width()
+    var heightOfIconSet = $(ControlPanelContainer).height()
+    var widthOfDayContainer = $(DayContainer).width();
+    var widthOfListSubEvent = $(SubEventDom).width();
+    var leftOfDayContainer = $(SubEventDom).offset().left;
+    var RightBorder = leftOfDayContainer + widthOfListSubEvent + widthOfIconSet;
+    var topOfSubEvent = $(SubEventDom).offset().top;
+    var PossibleBottom = topOfSubEvent + heightOfIconSet + 36;//extra 36 is save button
+    var LeftOffset = 0
+    if (RightBorder > documentWidth) {
+        LeftOffset = leftOfDayContainer - widthOfIconSet// - buffer
+    }
+    else {
+        LeftOffset = leftOfDayContainer + widthOfListSubEvent + buffer;
+    }
+
+    if (PossibleBottom > documentHeight) {
+        var Excess = PossibleBottom - documentHeight;
+        var SubEventHeight = $(SubEventDom).height();
+        topOfSubEvent -= (Excess + 45); //extra 40 is for save button. Save button is 36px
+    }
+
+    ControlPanelContainer.style.top = topOfSubEvent + "px";
+    ControlPanelContainer.style.left = LeftOffset + "px";
+    /*
+    setTimeout(
+        function ()
+        {
+            ControlPanelContainer.style.top = topOfSubEvent + "px";
+            ControlPanelContainer.style.left = LeftOffset + "px";
+        },
+        300)*/
+    AddCloseButoon(ControlPanelContainer, false);
+
+    /*
+    IconSetContainer.style.top = topOfSubEvent + "px";
+    IconSetContainer.style.left = LeftOffset + "px";
+    */
+
+}
+
+function BindClickOfSideBarToCLick(MyArray, FullContainer, Index, CLickedBar, EventID) {
+    return function () {
+        if (!global_UISetup.RenderOnSubEventClick.isRefListSubEventClicked) {
+            global_ExitManager.triggerLastExitAndPop();
+        }
+        else {
+            BindClickOfSideBarToCLick.reset();
+        }
+        //global_multiSelect.resetAllElement();
+        //global_multiSelect.removeCallBack(RevealControlPanelSection);
+        /*
+        if (BindClickOfSideBarToCLick.elementResetHeight != null)
+        {
+            BindClickOfSideBarToCLick.reset();
+        }*/
+        var ExpandElement = FullContainer.refrenceListElement.Dom
+        var JustDomsFromMyArray = new Array();
+        MyArray.forEach(function (element) { JustDomsFromMyArray.push(element.refSubEvent.Dom) })
+        var increment = 20;
+        var elementHeight = $(ExpandElement).height();
+        BindClickOfSideBarToCLick.elementResetHeight = elementHeight;
+        BindClickOfSideBarToCLick.clickedBar = CLickedBar;
+        //ExpandElement.style.top = (Index * 20) + "px";
+        BindClickOfSideBarToCLick.ExpandElement = ExpandElement;
+        BindClickOfSideBarToCLick.DataElement = FullContainer.DataElement.Dom;
+        //ExpandElement.style.height = (60) + "px";
+        $(ExpandElement).addClass("FullColorAugmentation");
+
+        //ExpandElement.style.backgroundColor = "yellow";
+        HighlightSubEvent(FullContainer.DataElement.Dom);
+        //$(FullContainer.DataElement.Dom).addClass("selectedElements");
+        var resetArray = new Array();
+        BindClickOfSideBarToCLick.previousIndex = Index;
+
+
+
+
+        var AllPreviousSelection = $(".selectedDayElements");
+
+
+        for (var i = 0; i < AllPreviousSelection.length; i++) {
+            var obj = AllPreviousSelection[i]
+
+            var currIndex = JustDomsFromMyArray.indexOf(obj)
+            if (currIndex == -1) {
+                $(obj).removeClass("selectedDayElements");
+                //$(obj).addClass("ListElements");
+
+            }
+        }
+
+
+        for (var i = 0; i < MyArray.length; i++) {
+            $(MyArray[i].refSubEvent.Dom).addClass("selectedDayElements");
+        }
+
+        for (var i = Index + 1; i < MyArray.length; i++) {
+            var CurrentTop = $(MyArray[i].refSubEvent.Dom).position().top;
+            resetArray.push({ previousHeight: CurrentTop, DomElement: MyArray[i].refSubEvent.Dom, index: i })
+            CurrentTop = (increment * i) + 40;
+            //MyArray[i].refSubEvent.Dom.style.top = CurrentTop + "px";
+        }
+        BindClickOfSideBarToCLick.resetArray = resetArray;
+        BindClickOfSideBarToCLick.ActiveID = EventID;
+        //global_ExitManager.addNewExit(BindClickOfSideBarToCLick.reset);
+        //renderSubEventsClickEvents.ignoreTriggerLastExitAndPop = true;
+
+        /*
+        var myFunc = BindClickOfSideBarToCLick.reset;
+        myFunc.isNotExitable = true;
+        global_ExitManager.addNewExit(myFunc);
+        setTimeout(function () {
+            myFunc.isNotExitable = false;
+        }, 100);
+        */
+    }
+}
+
+BindClickOfSideBarToCLick.reset = function () {
+    //BindClickOfSideBarToCLick.ExpandElement.style.height = BindClickOfSideBarToCLick.elementResetHeight + "px";
+    //BindClickOfSideBarToCLick.ExpandElement.style.backgroundColor = "transparent";
+    if (BindClickOfSideBarToCLick.ActiveID != null) {
+        //BindClickOfSideBarToCLick.ExpandElement.style.top = (BindClickOfSideBarToCLick.previousIndex * 20) + "px";
+        $(BindClickOfSideBarToCLick.clickedBar).removeClass("selectedElements")
+        $(BindClickOfSideBarToCLick.DataElement).removeClass("selectedElements")
+        $(BindClickOfSideBarToCLick.ExpandElement).removeClass("FullColorAugmentation");
+        BindClickOfSideBarToCLick.resetArray.forEach(function (obj) {
+            //obj.DomElement.style.top = (obj.index * 20) + "px";
+        })
+        BindClickOfSideBarToCLick.elementResetHeight = null;
+        BindClickOfSideBarToCLick.ActiveID = null;
+    }
+
+}
+
+var global_ListOfDayCounter = 0;
+
+function DoSideBarsInterSect(MeEnd, Index, AllElements) {
+    var retValue = false;
+    MeEnd = MeEnd.toFixed(2);
+    var Me = AllElements[Index];
+    for (var i = Index + 1; i < AllElements.length; i++) {
+        var PossibleInterferringElement = AllElements[i];
+        var PossibleInterferringTop = PossibleInterferringElement.top.toFixed(2);
+        if (PossibleInterferringTop < MeEnd) {
+            //++Me.Count;
+            PossibleInterferringElement.CalCCount = Me.CalCCount + 1;
+            PossibleInterferringElement.Count = PossibleInterferringElement.CalCCount;
+            PossibleInterferringElement.EarlierCount = PossibleInterferringElement.Count
+
+
+            ///*// #### Note for revert to simplest tabbing enable on this comment block
+            ///BestBottom is data on tab level which ends before Me. BestBottom.Count data member is the of the level, BestBOttom.End is the end pixel
+            if (PossibleInterferringElement.BestBottom.End > MeEnd) {
+                PossibleInterferringElement.BestBottom.End = MeEnd
+                PossibleInterferringElement.BestBottom.Count = Me.Count;
+            }
+            if (PossibleInterferringTop >= Me.BestBottom.End)//checks to see if the conflicting Event can go to same level as the BestBottom of Me
+            {
+                PossibleInterferringElement.Count = Me.BestBottom.Count
+                Me.BestBottom.End = PossibleInterferringElement.end;
+                PossibleInterferringElement.CalCCount = Me.CalCCount;
+            }
+            ///*/
+            retValue = true;
+        }
+        else {
+            break;
+        }
+
+
+        /*
+        if (AllElements[Index].BestBottom.End <= myTop) {
+            AllElements[i].Count = AllElements[Index].BestBottom.Count;
+            AllElements[Index].BestBottom.End = End
+        }*/
+    }
+
+    return retValue;
+}
+
+
+
+
+function DoSideBarsConflictClassic(MeEnd, Index, AllElements) {
+    var retValue = false;
+    MeEnd = MeEnd.toFixed(2);
+    var Me = AllElements[Index];
+    for (var i = Index + 1; i < AllElements.length; i++) {
+        var PossibleInterferringElement = AllElements[i];
+        var PossibleInterferringTop = PossibleInterferringElement.top.toFixed(2);
+        if (PossibleInterferringTop < MeEnd) {
+            ++Me.Count;
+            ++Me.OverlappingCount;
+
+            PossibleInterferringElement.PrecedingOverlapers = Me.PrecedingOverlapers;
+            ++PossibleInterferringElement.PrecedingOverlapers;
+            ++PossibleInterferringElement.OverlappingCount;
+            ++Me.OverlappingAfterMe
+
+
+
+            PossibleInterferringElement.CalCCount = Me.CalCCount + 1;
+            PossibleInterferringElement.Count = PossibleInterferringElement.CalCCount;
+            PossibleInterferringElement.EarlierCount = PossibleInterferringElement.Count
+
+
+            ///*// #### Note for revert to simplest tabbing enable on this comment block
+            ///BestBottom is data on tab level which ends before Me. BestBottom.Count data member is the of the level, BestBOttom.End is the end pixel
+            if (PossibleInterferringElement.BestBottom.End > MeEnd) {
+                PossibleInterferringElement.BestBottom.End = MeEnd
+                PossibleInterferringElement.BestBottom.Count = Me.Count;
+            }
+            if (PossibleInterferringTop >= Me.BestBottom.End)//checks to see if the conflicting Event can go to same level as the BestBottom of Me
+            {
+                PossibleInterferringElement.Count = Me.BestBottom.Count
+                Me.BestBottom.End = PossibleInterferringElement.end;
+                PossibleInterferringElement.CalCCount = Me.CalCCount;
+            }
+            ///*/
+            retValue = true;
+        }
+        else {
+            break;
+        }
+
+
+        /*
+        if (AllElements[Index].BestBottom.End <= myTop) {
+            AllElements[i].Count = AllElements[Index].BestBottom.Count;
+            AllElements[Index].BestBottom.End = End
+        }*/
+    }
+
+    return retValue;
+}
+
+
+function DoSubEventsIntersect(MeEnd, Index, AllElements) {
+    var retValue = false;
+    MeEnd = MeEnd.toFixed(2);
+    var Me = AllElements[Index];
+    for (var i = Index + 1; i < AllElements.length; i++) {
+        var PossibleInterferringElement = AllElements[i];
+        var PossibleInterferringTop = PossibleInterferringElement.top.toFixed(2);
+        if (PossibleInterferringTop < MeEnd) {
+            PossibleInterferringElement.CalCCount = Me.CalCCount + 1;
+            PossibleInterferringElement.Count = PossibleInterferringElement.CalCCount
+
+        }
+    }
+}
+
+
+function HighlightSubEvent(Dom) {
+    $(Dom).addClass("selectedElements");
+}
+
+function dehighlightSubEvent(Dom) {
     $(Dom).removeClass("selectedElements");
 }
 
-function renderClassicSubEventLook(DayOfWeek, ID, MyArray, Index, TabCount)
-{
+function renderClassicSubEventLook(DayOfWeek, ID, MyArray, Index, TabCount) {
     return function () {
         //debugger;
         var GridSubEventWidth = renderClassicSubEventLook.PercentWidthOfDay;// / TabCount;
@@ -2373,9 +2267,9 @@ function renderClassicSubEventLook(DayOfWeek, ID, MyArray, Index, TabCount)
 
         RefEvent.Dom.style.width = (DomWidth) + "%";
         RefEvent.Dom.style.top = RefEvent.css.top + "%";
-        
+
         var Range = global_DictionaryOfSubEvents[ID].Day;
-        global_DictionaryOfSubEvents[ID].Bind = function () {  };
+        global_DictionaryOfSubEvents[ID].Bind = function () { };
 
         function call_renderSubEventsClickEvents(e) {
             e.stopPropagation();
@@ -2388,39 +2282,38 @@ function renderClassicSubEventLook(DayOfWeek, ID, MyArray, Index, TabCount)
     }
 
 }
-renderClassicSubEventLook.PercentWidthOfDay = (100 / 7) -1.5;
+renderClassicSubEventLook.PercentWidthOfDay = (100 / 7) - 1.5;
 
 
-function renderSideBarEvents(DayOfWeek, ID, MyArray, Index, TabCount)
-{
+function renderSideBarEvents(DayOfWeek, ID, MyArray, Index, TabCount) {
     return function () {
         var RefEvent = DayOfWeek.UISpecs[ID];
 
         var GridSubEventWidth = renderSideBarEvents.SubEventGridWidthContainer / TabCount;
         $(RefEvent.Dom).addClass("SideBar");
-        RefEvent.Dom.style.left = (DayOfWeek.RightPercent - GridSubEventWidth )+ "%"
+        RefEvent.Dom.style.left = (DayOfWeek.RightPercent - GridSubEventWidth) + "%"
         RefEvent.Dom.style.height = RefEvent.css.height + "%";
         //RefEvent.Dom.style.minHeight = (global_DayHeight * (1 / 24)) + "px";//1/24 because we want the minimum to be the size of an hour
 
         //RefEvent.Dom.style.marginLeft = (-(RefEvent.css.left + 18) + "px");
         RefEvent.Dom.style.marginLeft = (-(GridSubEventWidth * MyArray[Index].Count) + "%");
-        RefEvent.Dom.style.width = GridSubEventWidth+"%";
+        RefEvent.Dom.style.width = GridSubEventWidth + "%";
         //RefEvent.Dom.style.width = RefEvent.css.width + "%";
         RefEvent.Dom.style.top = RefEvent.css.top + "%";
-        if (RefEvent.IDindex ==0) {
+        if (RefEvent.IDindex == 0) {
             //triggers change to List elements UI elements
-                //RefEvent.refrenceListElement.Dom.style.top = (Index * 20) + "px";
-                //RefEvent.refrenceListElement.Dom.style.marginTop = (20) + "px";
-                $(RefEvent.refrenceListElement.Dom).removeClass("FullColorAugmentation");
+            //RefEvent.refrenceListElement.Dom.style.top = (Index * 20) + "px";
+            //RefEvent.refrenceListElement.Dom.style.marginTop = (20) + "px";
+            $(RefEvent.refrenceListElement.Dom).removeClass("FullColorAugmentation");
             //RefEvent.refrenceListElement.Dom.style.left = DayOfWeek.LeftPercent + "%";
-                RefEvent.refrenceListElement.Dom.style.left = 0;
+            RefEvent.refrenceListElement.Dom.style.left = 0;
             if (global_DictionaryOfSubEvents[ID].ColorSelection > 0) {
                 //$(RefEvent.refrenceListElement.Dom).addClass(global_AllColorClasses[global_DictionaryOfSubEvents[ID].ColorSelection].cssClass);
                 $(RefEvent.DataElement.Dom).addClass(global_AllColorClasses[global_DictionaryOfSubEvents[ID].ColorSelection].cssClass);
-        }
+            }
 
-    }
-        var BindToThis = BindClickOfSideBarToCLick(MyArray, RefEvent, Index, RefEvent.Dom,ID);
+        }
+        var BindToThis = BindClickOfSideBarToCLick(MyArray, RefEvent, Index, RefEvent.Dom, ID);
         var Range = global_DictionaryOfSubEvents[ID].Day;
         RefEvent.refrenceListElement.Dom.onmouseover = function () {
             //debugger;
@@ -2436,14 +2329,12 @@ function renderSideBarEvents(DayOfWeek, ID, MyArray, Index, TabCount)
         //if statement ensures that only elements with IDIndex generate the function. This ensures that the selected element shows on the left side of the page.
         if ((global_DictionaryOfSubEvents[ID].Bind == null) && (RefEvent.IDindex == 0)) {
             global_DictionaryOfSubEvents[ID].Bind = BindToThis;
-    }
+        }
 
 
-        function call_renderSubEventsClickEvents(e)
-        {
+        function call_renderSubEventsClickEvents(e) {
             e.stopPropagation();
-            if (e.ctrlKey)
-            {
+            if (e.ctrlKey) {
                 global_multiSelect.AddElement(ID);
                 return;
             }
@@ -2458,14 +2349,13 @@ renderSideBarEvents.SubEventGridWidthContainer = (100 / 7) * (0.15);//0.15 be ca
 
 
 
-function renderSubEventsClickEvents(SubEventID)
-{
+function renderSubEventsClickEvents(SubEventID) {
     global_DictionaryOfSubEvents[SubEventID].Bind();
     global_DictionaryOfSubEvents[SubEventID].showBottomPanel();
-    
-    var DayContainer=global_DictionaryOfSubEvents[SubEventID].Day
+
+    var DayContainer = global_DictionaryOfSubEvents[SubEventID].Day
     var refSubEvent = global_DictionaryOfSubEvents[SubEventID].ListRefElement
-    setTimeout(function () { PositionIconSet(DayContainer, refSubEvent) },10);
+    setTimeout(function () { PositionIconSet(DayContainer, refSubEvent) }, 10);
 }
 renderSubEventsClickEvents.BottomPanelIsOpen = false;
 renderSubEventsClickEvents.isRefListSubEventClicked = false;
@@ -2484,7 +2374,7 @@ renderClassicSubEventsClickEvents.BottomPanelIsOpen = false;
 renderClassicSubEventsClickEvents.isRefListSubEventClicked = false;
 
 
-        function renderUIChanges(DayOfWeek) {
+function renderUIChanges(DayOfWeek) {
     for (var ID in DayOfWeek.UISpecs) {
         DayOfWeek.UISpecs[ID].Dom.Active = false;
 
@@ -2505,14 +2395,14 @@ renderClassicSubEventsClickEvents.isRefListSubEventClicked = false;
         }
     
         */
-        }
     }
+}
 
 
 
-        function genFunctionForSelectCalendarRange(ArrayOfCalendars, RefDate) {
-            /*AllRanges[Index].Start = RangeOfWeek.Start;
-            AllRanges[Index].End = RangeOfWeek.End;*/
+function genFunctionForSelectCalendarRange(ArrayOfCalendars, RefDate) {
+    /*AllRanges[Index].Start = RangeOfWeek.Start;
+    AllRanges[Index].End = RangeOfWeek.End;*/
 
     return function () {
         ArrayOfCalendars.forEach(function (eachRange) {
@@ -2521,13 +2411,13 @@ renderClassicSubEventsClickEvents.isRefListSubEventClicked = false;
             }
             else {
                 $(eachRange.Dom).hide();
-        }
+            }
 
             //$(eachRange.Dom).show();
         })
 
-        }
     }
+}
 
 function PopulateUI(ParentDom, refDate)// draws up the container and gathers all possible calendar within range.
 {
@@ -2535,16 +2425,18 @@ function PopulateUI(ParentDom, refDate)// draws up the container and gathers all
     var StartOfWeekDay = StartWeekDateInMS.getDay();
     $(ParentDom).empty();
 
-    StartOfWeekDay = 0 -StartOfWeekDay;
+    StartOfWeekDay = 0 - StartOfWeekDay;
     var StartOfRange = new Date((StartWeekDateInMS.getTime() + (StartOfWeekDay * OneDayInMs)));
     StartOfRange.setHours(0, 0, 0, 0);
     var EndOfRange = new Date(StartOfRange.getTime() + (OneWeekInMs * global_RangeMultiplier));//sets the range to be used for query
-    global_CurrentRange = { Start: StartOfRange, End: EndOfRange
-        };
+    global_CurrentRange = {
+        Start: StartOfRange, End: EndOfRange
+    };
 
-    var ScheduleRange = { Start: StartOfRange, End: EndOfRange
-        };
-            //getRangeofSchedule();
+    var ScheduleRange = {
+        Start: StartOfRange, End: EndOfRange
+    };
+    //getRangeofSchedule();
     var CurrentWeek = ScheduleRange.Start;
     var AllRanges = new Array();
     var HorizontalScrollPlane = getDomOrCreateNew("HorizontalScrollPlane");
@@ -2554,30 +2446,29 @@ function PopulateUI(ParentDom, refDate)// draws up the container and gathers all
     var VerticalScrollContainer = getDomOrCreateNew("VerticalScrollContainer");
     AllWeekData.appendChild(VerticalScrollContainer)
     var index = 0;
-    while (CurrentWeek < ScheduleRange.End)
-    {
+    while (CurrentWeek < ScheduleRange.End) {
         //debugger;
         //CurrentWeek = CurrentWeek.dst() ? new Date(Number(CurrentWeek.getTime()) +OneHourInMs) : CurrentWeek;
-        var MyRange = { Start: CurrentWeek, End: new Date(Number(CurrentWeek) + Number(OneWeekInMs))};
+        var MyRange = { Start: CurrentWeek, End: new Date(Number(CurrentWeek) + Number(OneWeekInMs)) };
 
 
         var WeekGird = genDivForEachWeek(MyRange, AllRanges);
         var CurrentWeekDOm = WeekGird.WeekTwentyFourHourGrid;
         var CurrentNameWeekDOM = WeekGird.NameOfWeek;
         if (!CurrentWeekDOm.status) {
-                NameOfWeekContainerPlane.appendChild(CurrentNameWeekDOM);
-                VerticalScrollContainer.Dom.appendChild(CurrentWeekDOm.Dom);
-                var translatePercent = 100 * index;
-                CurrentWeekDOm.Dom.style.transform = 'translateX(' + translatePercent + '%)';
-                $(CurrentWeekDOm.Dom).addClass("weekContainer");
-                CurrentNameWeekDOM.Dom.style.transform = 'translateX(' + translatePercent + '%)';
-                $(CurrentNameWeekDOM.Dom).addClass("weekContainer");
-                //CurrentWeekDOm.Dom.style.width = "100%";
-                //CurrentWeekDOm.Dom.style.width = "100%";
+            NameOfWeekContainerPlane.appendChild(CurrentNameWeekDOM);
+            VerticalScrollContainer.Dom.appendChild(CurrentWeekDOm.Dom);
+            var translatePercent = 100 * index;
+            CurrentWeekDOm.Dom.style.transform = 'translateX(' + translatePercent + '%)';
+            $(CurrentWeekDOm.Dom).addClass("weekContainer");
+            CurrentNameWeekDOM.Dom.style.transform = 'translateX(' + translatePercent + '%)';
+            $(CurrentNameWeekDOM.Dom).addClass("weekContainer");
+            //CurrentWeekDOm.Dom.style.width = "100%";
+            //CurrentWeekDOm.Dom.style.width = "100%";
 
-                //var ctx = CurrentWeekDOm.Dom.getContext("2d");
-                CurrentWeekDOm.index = index;
-                CurrentWeek = new Date(Number(CurrentWeek) + Number(OneWeekInMs));
+            //var ctx = CurrentWeekDOm.Dom.getContext("2d");
+            CurrentWeekDOm.index = index;
+            CurrentWeek = new Date(Number(CurrentWeek) + Number(OneWeekInMs));
         }
         ++index;
     }
@@ -2588,27 +2479,24 @@ function PopulateUI(ParentDom, refDate)// draws up the container and gathers all
     global_DayHeight = $(AllWeekData.Dom).height();
     global_WeekWidth = $(AllWeekData.Dom).width();
     global_DayTop = $(AllWeekData.Dom).offset().top;
-    AllRanges.Start =StartOfRange;
-    AllRanges.End =EndOfRange;
+    AllRanges.Start = StartOfRange;
+    AllRanges.End = EndOfRange;
     return AllRanges;
 }
 
-        function LaunchMonthTicker(CurrDate)
-    {
-        if (CurrDate == null)
-        {
-            CurrDate = Date.now();
-        }
-
-         
-        CurrDate = new Date(CurrDate.getFullYear(), CurrDate.getMonth(), 1);
-        var MonthTickerData = generateAMonthBar(CurrDate);
-        var MonthBarContainer = getDomOrCreateNew("MonthBar");
-        MonthBarContainer.Dom.appendChild(MonthTickerData.Month.Dom);
+function LaunchMonthTicker(CurrDate) {
+    if (CurrDate == null) {
+        CurrDate = Date.now();
     }
 
-function generateAMonthBar(MonthStart)
-{
+
+    CurrDate = new Date(CurrDate.getFullYear(), CurrDate.getMonth(), 1);
+    var MonthTickerData = generateAMonthBar(CurrDate);
+    var MonthBarContainer = getDomOrCreateNew("MonthBar");
+    MonthBarContainer.Dom.appendChild(MonthTickerData.Month.Dom);
+}
+
+function generateAMonthBar(MonthStart) {
     //debugger;
     MonthStart = new Date(MonthStart);
     MonthSelection();
@@ -2626,10 +2514,9 @@ function generateAMonthBar(MonthStart)
     //WholeMonthCOntainer.Dom.appendChild(AllDayContainer.Dom);
     var dayTicker = getDomOrCreateNew("DayTicker");
     $(dayTicker.Dom).addClass("Ticker");
-    
+
     var AllDayDivs = genDaysForMonthBar(MonthStart);
-    AllDayDivs.forEach(function (obj)
-    {
+    AllDayDivs.forEach(function (obj) {
         AllDayContainer.Dom.appendChild(obj.Dom)
         function CallBackFunc() {
             //debugger;
@@ -2638,18 +2525,15 @@ function generateAMonthBar(MonthStart)
         }
         //$(obj.Dom).click(CallBackFunc);
         obj.Dom.onclick = CallBackFunc;
-        if ((new Date() >= obj.StartDate) && (new Date() < obj.EndDate))
-        {
+        if ((new Date() >= obj.StartDate) && (new Date() < obj.EndDate)) {
             setTimeout(function () { CallBackFunc() }, 200);
         }
         AllDayContainer.Dom.appendChild(dayTicker.Dom);
     });
 
-    function goToDay(myDay)
-    {
-        var isDateWithin = (MonthStart.getTime() <= myDay.getTime()) && (myDay.getTime()<getNextMont(MonthStart).getTime());
-        if (isDateWithin)
-        {
+    function goToDay(myDay) {
+        var isDateWithin = (MonthStart.getTime() <= myDay.getTime()) && (myDay.getTime() < getNextMont(MonthStart).getTime());
+        if (isDateWithin) {
             $(AllDayDivs[myDay.getDate() - 1]).trigger("click");
             return true;
         }
@@ -2657,21 +2541,21 @@ function generateAMonthBar(MonthStart)
     }
     global_GoToDay = goToDay;
 
-    var retVAlue = { Days: AllDayDivs, Month: WholeMonthCOntainer, MonthButton: MonthSelectButton, DayContainer: AllDayContainer
-        }
+    var retVAlue = {
+        Days: AllDayDivs, Month: WholeMonthCOntainer, MonthButton: MonthSelectButton, DayContainer: AllDayContainer
+    }
     return retVAlue;
 }
 
-function MonthSelection()
-{
+function MonthSelection() {
     MonthSelection.toggle();
-    
+
     var AllMonthSelections = [];
     var MonthYearContainerID = "MonthYearContainer"
     var MonthYearContainer = getDomOrCreateNew(MonthYearContainerID);
     var AllMonthsContainerID = "AllMonthsContainer";
     var AllMonthsContainer = getDomOrCreateNew(AllMonthsContainerID);
-    
+
     var AllYearContainerID = "AllYearContainer";
     var AllYearContainer = getDomOrCreateNew(AllYearContainerID);
     var leftPerRatio = 100 / 12;
@@ -2689,24 +2573,20 @@ function MonthSelection()
     generateOrCreateMonthBars();
     populateYearContainer(true);
 
-    function generateOrCreateMonthBars()
-    {
-        if (AllMonthsContainer.status)
-        {
+    function generateOrCreateMonthBars() {
+        if (AllMonthsContainer.status) {
             return;
         }
         var MonthID;
         var MonthButton;
-        for (var i = 0; i < Months.length; i++)
-        {
+        for (var i = 0; i < Months.length; i++) {
             MonthID = Months[i] + "bar";
             MonthButton = getDomOrCreateNew(MonthID);
             AllMonthsContainer.appendChild(MonthButton);
             $(MonthButton).addClass("MonthBar");
             MonthButton.style.left = (i * leftPerRatio) + "%";
             MonthButton.onclick = prepOnclickOfMonth(i, MonthButton);
-            if (i == MonthSelection.CurrentSelection.Index)
-            {
+            if (i == MonthSelection.CurrentSelection.Index) {
                 updateMonthSelection(i, MonthButton);
                 //MonthButton.onclick();
             }
@@ -2714,49 +2594,44 @@ function MonthSelection()
         }
         //AllMonthsContainer.appendChild(MonthSelected);
 
-        
+
     }
 
-    function populateYearContainer(UserCurrentDate)
-    {
-        
+    function populateYearContainer(UserCurrentDate) {
+
         var CurrentYear = MonthSelection.CurrentSelection.Year;
         var YearContainer = getDomOrCreateNew("YearDomContainer");
         $(YearContainer).empty();
         var AllYearDoms = [];
         var myYearID = "";
         var myYearDom = null;
-        if (UserCurrentDate)
-        {
+        if (UserCurrentDate) {
             MonthSelection.Range.Start = CurrentYear - RangeOfYearDelta;
             MonthSelection.Range.End = CurrentYear + RangeOfYearDelta;
         }
-        
-        for (var i = MonthSelection.Range.Start; i <= MonthSelection.Range.End; i++)
-        {
+
+        for (var i = MonthSelection.Range.Start; i <= MonthSelection.Range.End; i++) {
             myYearID = "YearBarDom" + i;
             myYearDom = getDomOrCreateNew(myYearID);
             myYearDom.innerHTML = i;
             $(myYearDom).addClass("YearBarDom");
-            myYearDom.onclick = prepOnclickOfYear(myYearDom,i)
+            myYearDom.onclick = prepOnclickOfYear(myYearDom, i)
             AllYearDoms.push(myYearDom);
             YearContainer.appendChild(myYearDom);
-            
+
         }
         myYearID = "YearBarDom" + CurrentYear
         $(AllYearContainer).prepend(YearContainer);
         //YearContainer.appendChild(YearSelected);
         var currentYearDom = getDomOrCreateNew(myYearID);
-        if (currentYearDom.status)
-        {
+        if (currentYearDom.status) {
             currentYearDom.onclick()
         }
         generateOrCreateYearBars();
     }
 
 
-    function generateOrCreateYearBars()
-    {
+    function generateOrCreateYearBars() {
         if (AllYearContainer.status) {
             return;
         }
@@ -2778,26 +2653,22 @@ function MonthSelection()
         AllYearContainer.appendChild(RightYearButton);
         RightYearButton.onclick = RightScrollButtonClick;
 
-        function RightScrollButtonClick()
-        {
+        function RightScrollButtonClick() {
             ++MonthSelection.Range.Start;
             ++MonthSelection.Range.End;
             populateYearContainer()
         }
-        function LeftScrollButtonClick()
-        {
+        function LeftScrollButtonClick() {
             --MonthSelection.Range.Start;
             --MonthSelection.Range.End;
             populateYearContainer();
         }
     }
 
-    
 
-    function prepOnclickOfMonth(Index,MonthDom)
-    {
-        function onClickMonth()
-        {
+
+    function prepOnclickOfMonth(Index, MonthDom) {
+        function onClickMonth() {
             updateMonthSelection(Index, MonthDom);
             MonthSelection.HideAndCheckForChanges(true);
 
@@ -2807,11 +2678,9 @@ function MonthSelection()
 
 
 
-    function updateMonthSelection(Index, MonthDom)
-    {
+    function updateMonthSelection(Index, MonthDom) {
         //MonthSelected.style.left = (Index * leftPerRatio) + "%";
-        if (MonthSelection.CurrentSelection.MonthDom!=null)
-        {
+        if (MonthSelection.CurrentSelection.MonthDom != null) {
             $(MonthSelection.CurrentSelection.MonthDom).removeClass("MonthSelected");
         }
         $(MonthDom).addClass("MonthSelected")
@@ -2820,13 +2689,10 @@ function MonthSelection()
         MonthSelection.CurrentSelection.MonthDom = MonthDom;
     }
 
-    function prepOnclickOfYear(YearDom,Year)
-    {
-        function onClickYear()
-        {
+    function prepOnclickOfYear(YearDom, Year) {
+        function onClickYear() {
             //debugger;
-            if (MonthSelection.CurrentSelection.YearDom != null)
-            {
+            if (MonthSelection.CurrentSelection.YearDom != null) {
                 $(MonthSelection.CurrentSelection.YearDom).removeClass("YearSelected");
             }
             $(YearDom).addClass("YearSelected");
@@ -2839,26 +2705,21 @@ function MonthSelection()
         return onClickYear;
     }
 
-    function ShowMonthList()
-    {
-        
-    }
-    var MonthID=0
+    function ShowMonthList() {
 
-    function genCallBackForEachMonth(Month)
-    {
+    }
+    var MonthID = 0
+
+    function genCallBackForEachMonth(Month) {
         var myMonthID = MonthID++;
         var monthStringID = Month + myMonthID;
         var MonthSelectionDiv = getDomOrCreateNew(monthStringID);
         MonthSelectionDiv.innerHTML = Month;
     }
 
-    function PrepFunctionForClick(MonthDom, MonthIndex)
-    {
-        return function ()
-        {
-            if (MonthSelection.Index>-1)
-            {
+    function PrepFunctionForClick(MonthDom, MonthIndex) {
+        return function () {
+            if (MonthSelection.Index > -1) {
                 $(MonthSelection.CurrentMonth).removeClass("SelectedMonth");
             }
             MonthSelection.CurrentMonth = MonthDom;
@@ -2867,12 +2728,11 @@ function MonthSelection()
     }
 }
 
-MonthSelection.CurrentSelection = { Month: Months[new Date().getMonth()], Index: new Date().getMonth(), MonthDom: null,YearDom:null, Year: new Date().getFullYear(), SelectedYearID: -1, YearID: 0 };
+MonthSelection.CurrentSelection = { Month: Months[new Date().getMonth()], Index: new Date().getMonth(), MonthDom: null, YearDom: null, Year: new Date().getFullYear(), SelectedYearID: -1, YearID: 0 };
 MonthSelection.Range = { Start: new Date().getFullYear() - 3, End: new Date().getFullYear() + 3 };
 MonthSelection.isOpen = true;
 MonthSelection.initData = { Month: MonthSelection.CurrentSelection.Index, Year: MonthSelection.CurrentSelection.Year }
-MonthSelection.Reveal = function ()
-{
+MonthSelection.Reveal = function () {
     global_ExitManager.triggerLastExitAndPop();
     var MonthYearContainer = getDomOrCreateNew("MonthYearContainer");
     $(MonthYearContainer).slideDown(0);
@@ -2881,40 +2741,33 @@ MonthSelection.Reveal = function ()
     global_ExitManager.addNewExit(MonthSelection.Hide);
 }
 
-MonthSelection.Hide = function (CheckChange)
-{
+MonthSelection.Hide = function (CheckChange) {
     var MonthYearContainer = getDomOrCreateNew("MonthYearContainer");
     $(MonthYearContainer).slideUp(0);
     MonthSelection.isOpen = false;
 }
 
-MonthSelection.HideAndCheckForChanges = function (CheckChange)
-{
+MonthSelection.HideAndCheckForChanges = function (CheckChange) {
     global_ExitManager.triggerLastExitAndPop();
-    if (MonthSelection.isChanged() && CheckChange)
-    {
+    if (MonthSelection.isChanged() && CheckChange) {
         //debugger;
         var myDate = new Date(MonthSelection.CurrentSelection.Year, MonthSelection.CurrentSelection.Index, 1);
         populateMonth(myDate);
     }
 }
 
-MonthSelection.toggle = function ()
-{
+MonthSelection.toggle = function () {
     if (MonthSelection.isOpen) {
         MonthSelection.Hide();
     }
-    else
-    {
+    else {
         MonthSelection.Reveal();
     }
 }
 
 
-MonthSelection.isChanged = function ()
-{
-    if ((MonthSelection.initData.Month != MonthSelection.CurrentSelection.Index) || (MonthSelection.initData.Year != MonthSelection.CurrentSelection.Year))
-    {
+MonthSelection.isChanged = function () {
+    if ((MonthSelection.initData.Month != MonthSelection.CurrentSelection.Index) || (MonthSelection.initData.Year != MonthSelection.CurrentSelection.Year)) {
         //alert("Hey Jay Making a month Change");
         return true;
     }
@@ -2923,11 +2776,10 @@ MonthSelection.isChanged = function ()
 
 
 
-function genDaysForMonthBar(MonthStart)
-{
+function genDaysForMonthBar(MonthStart) {
     //function creates the day divs in the month bar 
-    var Month = MonthStart.getMonth() +1;
-    var IniMonth =Month;
+    var Month = MonthStart.getMonth() + 1;
+    var IniMonth = Month;
     var Day = MonthStart.getDate();
 
     var TodayStart = new Date(Date.now());
@@ -2938,14 +2790,13 @@ function genDaysForMonthBar(MonthStart)
     var TodayInMS = TodayStart.getTime();
     var AllDayDiivs = new Array();
     var i = 0;
-    while (IniMonth == Month)
-    {
+    while (IniMonth == Month) {
         var isToday = MonthStart.getTime() == TodayInMS;
         var MyDivContainer = getDomOrCreateNew("MonthBarDayWeekContainer" + genDaysForMonthBar.Day++);
         var MyDay = getDomOrCreateNew("MonthBarDay" + genDaysForMonthBar.Day++);
         var MyDivWeekDay = getDomOrCreateNew("MonthBarDayOfWeek" + genDaysForMonthBar.Day++);
         MyDay.Dom.innerHTML = Day;
-        MyDivWeekDay.Dom.innerHTML =WeekDays[MonthStart.getDay()][0];
+        MyDivWeekDay.Dom.innerHTML = WeekDays[MonthStart.getDay()][0];
 
         MyDivContainer.Dom.appendChild(MyDay.Dom);
         MyDivContainer.Dom.appendChild(MyDivWeekDay.Dom);
@@ -2960,7 +2811,7 @@ function genDaysForMonthBar(MonthStart)
 
         MyDivContainer.StartDate = MonthStart;
         MonthStart = new Date(MonthStart.getFullYear(), MonthStart.getMonth(), ++Day);
-        MyDivContainer.EndDate = new Date(MonthStart.getTime() -1);
+        MyDivContainer.EndDate = new Date(MonthStart.getTime() - 1);
         AllDayDiivs.push(MyDivContainer);
         if (isToday) {
             var PreviousDay = $(".CurrentDayMonthBar");
@@ -2969,7 +2820,7 @@ function genDaysForMonthBar(MonthStart)
             $(MyDivWeekDay.Dom).addClass("CurrentDayMonthBar")
         }
 
-        Month = MonthStart.getMonth() +1;
+        Month = MonthStart.getMonth() + 1;
     }
 
     return AllDayDiivs;
@@ -2992,26 +2843,22 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
     var SubEventEnd = new Date(Number(SubEvent.SubCalEndDate));
     var ValidRange = new Array();
 
-    for (i in AllRangeData)
-    {
+    for (i in AllRangeData) {
         var rangeElement = AllRangeData[i]
         var StartDate = new Date(Number(rangeElement.Start));
         var EndDate = new Date(Number(rangeElement.End));
 
-        if (((SubEvent.ID === "11792_7_11978_11979")))
-        {
-                var a = 9;
+        if (((SubEvent.ID === "11792_7_11978_11979"))) {
+            var a = 9;
         }
 
 
-        if ((SubEventStart >= StartDate) && (SubEventStart <= EndDate))
-        {
+        if ((SubEventStart >= StartDate) && (SubEventStart <= EndDate)) {
             ValidRange.push(rangeElement);
             rangeElement.SubEventsCollection[SubEvent.ID] = (SubEvent);
 
-            if (rangeElement.UISpecs[SubEvent.ID] == null)
-            {
-                rangeElement.UISpecs[SubEvent.ID] = { css: { }, IDindex: SubEvent.CurrentIndex, OldIDindex: null, Enabled: true, Dom: null}
+            if (rangeElement.UISpecs[SubEvent.ID] == null) {
+                rangeElement.UISpecs[SubEvent.ID] = { css: {}, IDindex: SubEvent.CurrentIndex, OldIDindex: null, Enabled: true, Dom: null }
             }
             rangeElement.UISpecs[SubEvent.ID].Start = SubEvent.SubCalStartDate.getTime();
             rangeElement.UISpecs[SubEvent.ID].IDindex = SubEvent.CurrentIndex;
@@ -3020,12 +2867,10 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
 
         }
         if ((SubEventEnd >= StartDate) && (SubEventEnd <= EndDate)) {
-            if (ValidRange.indexOf(rangeElement) < 0)
-            {
+            if (ValidRange.indexOf(rangeElement) < 0) {
                 ValidRange.push(rangeElement);
-                if (rangeElement.UISpecs[SubEvent.ID] == null)
-                {
-                    rangeElement.UISpecs[SubEvent.ID] = { css: { }, IDindex: SubEvent.CurrentIndex, OldIDindex: null, Enabled: true, Dom: null}
+                if (rangeElement.UISpecs[SubEvent.ID] == null) {
+                    rangeElement.UISpecs[SubEvent.ID] = { css: {}, IDindex: SubEvent.CurrentIndex, OldIDindex: null, Enabled: true, Dom: null }
                 }
 
                 rangeElement.SubEventsCollection[SubEvent.ID] = SubEvent;
@@ -3038,8 +2883,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
     }
 
 
-    if (ValidRange.length > 0) 
-    {
+    if (ValidRange.length > 0) {
         return ValidRange;
     }
 
@@ -3049,672 +2893,458 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
 
 
 
-        function getMyDom(SubEvent, Range) 
+function getMyDom(SubEvent, Range) {
+    var referenceStart = new Date(Range.Start);
+    //referenceStart.setHours(refStart.Hour, refStart.Minute);
+    var referenceEnd = new Date(Range.End);
+    //referenceEnd.setHours(refEnd.Hour, refEnd.Minute);
+    var SubCalCalEventStart = new Date(SubEvent.SubCalStartDate);
+    var SubCalCalEventEnd = new Date(SubEvent.SubCalEndDate);
+    if ((SubEvent.gridDoms == undefined) || (SubEvent.gridDoms == null)) {
+        SubEvent.gridDoms = new Array();
+    }
+
+    if (SubCalCalEventStart > referenceStart) {
+        referenceStart = SubCalCalEventStart;
+    }
+
+    if (referenceEnd > SubCalCalEventEnd) {
+        referenceEnd = SubCalCalEventEnd;
+    }
+
+    var totalDuration = referenceEnd - referenceStart;
+    var percentHeight = (totalDuration / OneDayInMs) * 100;
+
+    var percentTop = ((referenceStart - new Date(Range.Start)) / OneDayInMs) * 100;
+    function call_renderSubEventsClickEvents(e) {
+        e.stopPropagation();
+        //renderSubEventsClickEvents(SubEvent.ID)
+        global_UISetup.RenderOnSubEventClick(SubEvent.ID);
+    }
+    if (Range.UISpecs[SubEvent.ID].Enabled) {
+        Range.UISpecs[SubEvent.ID].css = { height: 0, top: 0 };
+        Range.UISpecs[SubEvent.ID].css.height = percentHeight;
+        Range.UISpecs[SubEvent.ID].css.top = percentTop;
+        Range.UISpecs[SubEvent.ID].Enabled = true;
+        var CurrentIndex = SubEvent.CurrentIndex++;
+        Range.UISpecs[SubEvent.ID].IDindex = CurrentIndex;
+
+
+        var EventDom = getDomOrCreateNew(SubEvent.ID + "_" + Range.UISpecs[SubEvent.ID].IDindex);
+
+        Range.UISpecs[SubEvent.ID].Dom = EventDom.Dom
+        Range.UISpecs[SubEvent.ID].Dom.Enabled = true;
+        SubEvent.gridDoms.push(EventDom.Dom);
+
+        $(EventDom.Dom).addClass("gridSubevent");
+
+
+        if (SubEvent.ID == "110972_7_110976_110977") {
+            //debugger;
+        }
+        $(EventDom.Dom).hover(function () {
+            //setTimeout(function () { debugger; },100)
+
+        });
+
+        EventDom.setAttribute("Title", SubEvent.SubCalStartDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + " - " + SubEvent.SubCalEndDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+        //debugger;
+        if (SubEvent.ColorSelection > 0) {
+            $(EventDom.Dom).addClass(global_AllColorClasses[SubEvent.ColorSelection].cssClass);
+        }
+        $(EventDom.Dom).addClass("SameSubEvent" + SubEvent.ID);
+
+        //$(EventDom.Dom).click(prepOnClickOfCalendarElement(SubEvent, EventDom.Dom));
+        global_DictionaryOfSubEvents[SubEvent.ID].showBottomPanel = prepOnClickOfCalendarElement(SubEvent, EventDom.Dom);
+        global_DictionaryOfSubEvents[SubEvent.ID].Day = Range;
+        global_DictionaryOfSubEvents[SubEvent.ID].TimeSizeDom = EventDom;
+
+        EventDom.Dom.onmouseover = function () {
+            //debugger;
+            Range.Parent.onmouseover();
+        }
+
+        EventDom.Dom.onmouseout = function () {
+            //debugger;
+            Range.Parent.onmouseout();
+        }
+
+        //global_DictionaryOfSubEvents[SubEvent.ID].
+
+
+        EventDom.Dom.onclick = call_renderSubEventsClickEvents;
+        //EventDom.Dom.innerHTML = SubEvent.Name
+    }
+    else {
+        if (!Range.UISpecs[SubEvent.ID].Enabled)//checks if it is active
         {
-            var referenceStart = new Date(Range.Start);
-                //referenceStart.setHours(refStart.Hour, refStart.Minute);
-            var referenceEnd = new Date(Range.End);
-                //referenceEnd.setHours(refEnd.Hour, refEnd.Minute);
-            var SubCalCalEventStart = new Date(SubEvent.SubCalStartDate);
-            var SubCalCalEventEnd = new Date(SubEvent.SubCalEndDate);
-            if ((SubEvent.gridDoms == undefined) || (SubEvent.gridDoms == null))
-            {
-                SubEvent.gridDoms = new Array();
-            }
-
-            if (SubCalCalEventStart > referenceStart) {
-                referenceStart = SubCalCalEventStart;
-            }
-
-            if (referenceEnd > SubCalCalEventEnd) {
-                referenceEnd = SubCalCalEventEnd;
-            }
-
-            var totalDuration = referenceEnd -referenceStart;
-            var percentHeight = (totalDuration / OneDayInMs) * 100;
-
-            var percentTop = ((referenceStart - new Date(Range.Start)) / OneDayInMs) * 100;
-            function call_renderSubEventsClickEvents(e)
-            {
-                e.stopPropagation();
-                //renderSubEventsClickEvents(SubEvent.ID)
-                global_UISetup.RenderOnSubEventClick(SubEvent.ID);
-            }
-            if (Range.UISpecs[SubEvent.ID].Enabled)
-            {
-                Range.UISpecs[SubEvent.ID].css = { height: 0, top: 0};
-                Range.UISpecs[SubEvent.ID].css.height = percentHeight;
-                Range.UISpecs[SubEvent.ID].css.top = percentTop;
-                Range.UISpecs[SubEvent.ID].Enabled = true;
-                var CurrentIndex = SubEvent.CurrentIndex++;
-                Range.UISpecs[SubEvent.ID].IDindex = CurrentIndex;
+            debugger;
+            Range.UISpecs[SubEvent.ID].Dom.outerHTML = "";
+            //Range.UISpecs[SubEvent.ID].Dom.style.height = 0;
+            var retValue = delete Range.UISpecs[SubEvent.ID];
+            //toBeDeletedDom.Dom.parentElement.removeChild(toBeDeletedDom.Dom);
+        }
+    }
+}
 
 
-                var EventDom = getDomOrCreateNew(SubEvent.ID + "_" + Range.UISpecs[SubEvent.ID].IDindex);
+function hideControlInfoContainer() {
+    var InfoContainer = getDomOrCreateNew("InfoContainer");
+    $(InfoContainer).addClass("setAsDisplayNone");
+}
 
-                Range.UISpecs[SubEvent.ID].Dom = EventDom.Dom
-                Range.UISpecs[SubEvent.ID].Dom.Enabled = true;
-                SubEvent.gridDoms.push(EventDom.Dom);
+function revealControlInfoContainer() {
+    var InfoContainer = getDomOrCreateNew("InfoContainer");
+    $(InfoContainer).removeClass("setAsDisplayNone");
+}
 
-                $(EventDom.Dom).addClass("gridSubevent");
-            
+function removeLowerBarIconSetCOntainer() {
+    $(global_ControlPanelIconSet.getIconSetContainer()).removeClass("ControlPanelIconSetContainerLowerBar");
+    $(getDomOrCreateNew("InfoBasePanel")).removeClass("setAsDisplayNone");
+}
 
-                if (SubEvent.ID == "110972_7_110976_110977")
-                {
-                    //debugger;
-                }
-                $(EventDom.Dom).hover(function () {
-                    //setTimeout(function () { debugger; },100)
-                
-                });
+function addLowerBarIconSetCOntainer() {
+    $(global_ControlPanelIconSet.getIconSetContainer()).addClass("ControlPanelIconSetContainerLowerBar")
+    $(getDomOrCreateNew("InfoBasePanel")).addClass("setAsDisplayNone");
+}
 
-                EventDom.setAttribute("Title", SubEvent.SubCalStartDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + " - " + SubEvent.SubCalEndDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
-                //debugger;
-                if (SubEvent.ColorSelection > 0)
-                {
-                    $(EventDom.Dom).addClass(global_AllColorClasses[SubEvent.ColorSelection].cssClass);
-                }
-                $(EventDom.Dom).addClass("SameSubEvent" + SubEvent.ID);
+var global_previousSelectedSubCalEvent = new Array();
 
-                //$(EventDom.Dom).click(prepOnClickOfCalendarElement(SubEvent, EventDom.Dom));
-                global_DictionaryOfSubEvents[SubEvent.ID].showBottomPanel = prepOnClickOfCalendarElement(SubEvent, EventDom.Dom);
-                global_DictionaryOfSubEvents[SubEvent.ID].Day = Range;
-                global_DictionaryOfSubEvents[SubEvent.ID].TimeSizeDom = EventDom;
-
-                EventDom.Dom.onmouseover = function () {
-                    //debugger;
-                    Range.Parent.onmouseover();
-                }
-
-                EventDom.Dom.onmouseout = function () {
-                    //debugger;
-                    Range.Parent.onmouseout();
-                }
-
-                //global_DictionaryOfSubEvents[SubEvent.ID].
+function DeselectAllSideBarElements() {
+    for (var i = 0; i < global_previousSelectedSubCalEvent.length; i++) {
+        var myDom = global_previousSelectedSubCalEvent[i];
+        $(myDom).removeClass("SelectedWeekGridSubcalEvent");
+        //global_previousSelectedSubCalEvent.pop();
+    }
+    global_previousSelectedSubCalEvent = new Array();
+}
+function prepOnClickOfCalendarElement(SubEvent, Dom) {
+    return function () {
+        //event.stopPropagation();
+        if (!global_UISetup.RenderOnSubEventClick.isRefListSubEventClicked) {
+            global_ExitManager.triggerLastExitAndPop();
+        }
+        DeselectAllSideBarElements();
 
 
-                EventDom.Dom.onclick = call_renderSubEventsClickEvents;
-                //EventDom.Dom.innerHTML = SubEvent.Name
-            }
-            else
-            {
-                if (!Range.UISpecs[SubEvent.ID].Enabled)//checks if it is active
-                {
-                    debugger;
-                    Range.UISpecs[SubEvent.ID].Dom.outerHTML ="";
-                    //Range.UISpecs[SubEvent.ID].Dom.style.height = 0;
-                    var retValue = delete Range.UISpecs[SubEvent.ID];
-                    //toBeDeletedDom.Dom.parentElement.removeChild(toBeDeletedDom.Dom);
-                }
-            }
+        var AllDomsOfTheSameSubevent = $(".SameSubEvent" + SubEvent.ID);
+        for (var i = 0; i < AllDomsOfTheSameSubevent.length; i++) {
+            var myDom = AllDomsOfTheSameSubevent[i]
+            $(myDom).addClass("SelectedWeekGridSubcalEvent");
+            global_previousSelectedSubCalEvent.push(myDom);
+            myDom.focus();
         }
 
+        var ControlPanelNameOfSubeventInfo = document.getElementById("ControlPanelNameOfSubeventInfo");
+        var ControlPanelDeadlineOfSubeventInfo = document.getElementById("ControlPanelDeadlineOfSubeventInfo");
+        var ControlPanelSubEventTimeInfo = document.getElementById("ControlPanelSubEventTimeInfo");
 
-        function hideControlInfoContainer()
-        {
-            var InfoContainer = getDomOrCreateNew("InfoContainer");
-            $(InfoContainer).addClass("setAsDisplayNone");
-        }
 
-        function revealControlInfoContainer() {
-            var InfoContainer = getDomOrCreateNew("InfoContainer");
-            $(InfoContainer).removeClass("setAsDisplayNone");
-        }
 
-        function removeLowerBarIconSetCOntainer()
-        {
-            $(global_ControlPanelIconSet.getIconSetContainer()).removeClass("ControlPanelIconSetContainerLowerBar");
-            $(getDomOrCreateNew("InfoBasePanel")).removeClass("setAsDisplayNone");
-        }
+        var FormatTime = function (date) {
+            var d = date;
+            var TimeHours = d.getHours();
+            var TimeMinutes = d.getMinutes();
+            var TimeMM = TimeMinutes;
+            var TimeHH = TimeHours;
+            var AMPM = 'am';
+            var day = '';
+            var month = '';
+            var date_number = d.getDate();
+            var year = d.getYear();
 
-        function addLowerBarIconSetCOntainer()
-        {
-            $(global_ControlPanelIconSet.getIconSetContainer()).addClass("ControlPanelIconSetContainerLowerBar")
-            $(getDomOrCreateNew("InfoBasePanel")).addClass("setAsDisplayNone");
-        }
-
-        var global_previousSelectedSubCalEvent = new Array();
-
-        function DeselectAllSideBarElements()
-        {
-            for (var i = 0; i < global_previousSelectedSubCalEvent.length; i++) {
-                var myDom = global_previousSelectedSubCalEvent[i];
-                $(myDom).removeClass("SelectedWeekGridSubcalEvent");
-                //global_previousSelectedSubCalEvent.pop();
+            if (TimeMinutes <= 9) {
+                TimeMM = '0' + TimeMinutes
             }
-            global_previousSelectedSubCalEvent = new Array();
-        }
-        function prepOnClickOfCalendarElement(SubEvent, Dom) {
-        return function () {
-            //event.stopPropagation();
-            if (!global_UISetup.RenderOnSubEventClick.isRefListSubEventClicked)
-            {
-                global_ExitManager.triggerLastExitAndPop();
-            }
-            DeselectAllSideBarElements();
-            
-            
-            var AllDomsOfTheSameSubevent = $(".SameSubEvent" + SubEvent.ID);
-            for (var i = 0; i < AllDomsOfTheSameSubevent.length; i++) {
-                var myDom = AllDomsOfTheSameSubevent[i]
-                $(myDom).addClass("SelectedWeekGridSubcalEvent");
-                global_previousSelectedSubCalEvent.push(myDom);
-                myDom.focus();
-        }
-
-              var ControlPanelNameOfSubeventInfo = document.getElementById("ControlPanelNameOfSubeventInfo");
-              var ControlPanelDeadlineOfSubeventInfo = document.getElementById("ControlPanelDeadlineOfSubeventInfo");
-              var ControlPanelSubEventTimeInfo = document.getElementById("ControlPanelSubEventTimeInfo");
-
-
-
-              var FormatTime = function (date) {
-              var d = date;
-              var TimeHours = d.getHours();
-              var TimeMinutes = d.getMinutes();
-              var TimeMM = TimeMinutes;
-              var TimeHH = TimeHours;
-              var AMPM = 'am';
-              var day = '';
-              var month = '';
-              var date_number = d.getDate();
-              var year = d.getYear();
-
-              if (TimeMinutes <= 9) {
-                TimeMM = '0' +TimeMinutes
-              }
-              if (TimeHours >= 12 && TimeMinutes >= 0) {
+            if (TimeHours >= 12 && TimeMinutes >= 0) {
                 if (TimeHours >= 13) {
-                  TimeHH = TimeHours -12;
-              }
+                    TimeHH = TimeHours - 12;
+                }
                 AMPM = 'pm';
-              } else if (TimeHours === 12 && TimeMinutes === 0) {
+            } else if (TimeHours === 12 && TimeMinutes === 0) {
                 TimeHH = 'Noon';
                 AMPM = '';
                 TimeMM = '';
-              } else if (TimeHours === 24 && TimeMinutes === 0) {
+            } else if (TimeHours === 24 && TimeMinutes === 0) {
                 TimeHH = 'Midnight';
                 AMPM = '';
                 TimeMM = '';
-              }
-              switch (d.getMonth()) {
+            }
+            switch (d.getMonth()) {
                 case 0:
-                  month = "Jan";
-                  break;
+                    month = "Jan";
+                    break;
                 case 1:
-                  month = "Feb";
-                  break;
+                    month = "Feb";
+                    break;
                 case 2:
-                  month = "Mar";
-                  break;
+                    month = "Mar";
+                    break;
                 case 3:
-                  month = "Apr";
-                  break;
+                    month = "Apr";
+                    break;
                 case 4:
-                  month = "May";
-                  break;
+                    month = "May";
+                    break;
                 case 5:
-                  month = "Jun";
-                  break;
+                    month = "Jun";
+                    break;
                 case 6:
-                  month = "Jul";
-                  break;
+                    month = "Jul";
+                    break;
                 case 7:
-                  month = "Aug";
-                  break;
+                    month = "Aug";
+                    break;
                 case 8:
-                  month = "Sep";
-                  break;
+                    month = "Sep";
+                    break;
                 case 9:
-                  month = "Oct";
-                  break;
+                    month = "Oct";
+                    break;
                 case 10:
-                  month = "Nov";
-                  break;
+                    month = "Nov";
+                    break;
                 case 11:
-                  month = "Dec";
-                  break;
-              }
-              switch (d.getDay()) {
+                    month = "Dec";
+                    break;
+            }
+            switch (d.getDay()) {
                 case 0:
-                  day = "Sunday";
-                  break;
+                    day = "Sunday";
+                    break;
                 case 1:
-                  day = "Monday";
-                  break;
+                    day = "Monday";
+                    break;
                 case 2:
-                  day = "Tuesday";
-                  break;
+                    day = "Tuesday";
+                    break;
                 case 3:
-                  day = "Wednesday";
-                  break;
+                    day = "Wednesday";
+                    break;
                 case 4:
-                  day = "Thursday";
-                  break;
+                    day = "Thursday";
+                    break;
                 case 5:
-                  day = "Friday";
-                  break;
+                    day = "Friday";
+                    break;
                 case 6:
-                  day = "Saturday";
-                  break;
-              }
-              var a = { hour: TimeHH, minute: TimeMM, merid: AMPM, day: day, mon: month, date: date_number, year: year
-              }
-              return a;
-              };
-              getRefreshedData.disableDataRefresh();
-            var StartDate = FormatTime(SubEvent.SubCalStartDate);
-            var EndDate = FormatTime(SubEvent.SubCalEndDate);
-            var Deadline = FormatTime(SubEvent.SubCalCalEventEnd);
-
-            var yeaButton = getDomOrCreateNew("YeaToConfirmDelete");
-            var nayButton = getDomOrCreateNew("NayToConfirmDelete");
-            var completeButton = global_ControlPanelIconSet.getCompleteButton();
-            var PauseResumeButton = global_ControlPanelIconSet.getPauseResumeButton()
-            var deleteButton = global_ControlPanelIconSet.getDeleteButton();
-            var DeleteMessage = getDomOrCreateNew("DeleteMessage")
-            var ProcatinationButton = getDomOrCreateNew("submitProcatination");
-            var ProcatinationCancelButton = getDomOrCreateNew("cancelProcatination");
-            var ControlPanelCloseButton = global_ControlPanelIconSet.getCloseButton();
-            var ProcrastinateEventModalContainer = getDomOrCreateNew("ProcrastinateEventModal");
-            var ControlPanelProcrastinateButton = global_ControlPanelIconSet.getProcrastinateButton();
-            var ControlPanelLocationButton = global_ControlPanelIconSet.getLocationButton();
-            var ModalDelete = getDomOrCreateNew("ConfirmDeleteModal")
-            var ControlPanelContainer = getDomOrCreateNew("ControlPanelContainer");
-            var MultiSelectPanel = getDomOrCreateNew("MultiSelectPanel");
-            $(ControlPanelContainer).addClass("ControlPanelContainerModal");
-            /*if (renderSubEventsClickEvents.BottomPanelIsOpen) {
-                closeControlPanel();
-            }*/
-
-            var InfoPanelOverLay = getDomOrCreateNew("InfoPanelOverLay")
-            removeLowerBarIconSetCOntainer();
-            revealControlInfoContainer()
-            var BasePanel = generateBasePanel();
-            
-
-            var IconSetContainer = global_ControlPanelIconSet.getIconSetContainer();
-            $(ControlPanelContainer).addClass("setAsVisibilityHidden");
-            setTimeout(function ()
-            {
-                $(ControlPanelContainer).removeClass("setAsVisibilityHidden");
-                $(ControlPanelContainer).slideDown(500);
-            }, 300)
-
-            
-            BasePanel.appendChild(InfoPanelOverLay);
-            BasePanel.appendChild(IconSetContainer);
-            
-
-            ControlPanelContainer.appendChild(BasePanel);
-            var EditContainerData = generateEditDoneCOntainer();
-            ControlPanelContainer.appendChild(EditContainerData.Container);
-
-            var LauchLocation = function () {
-                debugger;
-                var googleMapsURL = "https://www.google.com/maps/place/";
-                var fullURL = googleMapsURL + SubEvent.SubCalAddress
-                if (SubEvent.SubCalAddress) {
-                    var win = window.open(fullURL, '_blank');
-                    win.focus();
-                }
-                else {
-                    $(MultiSelectPanel).removeClass("hideMultiSelectPanel");
-                    MultiSelectPanel.innerHTML = "Oops tiler could not find an address :X &#x1f603;";
-                    setTimeout(function () { $(MultiSelectPanel).addClass("hideMultiSelectPanel"); }, 3000);
-
-
-                }
-
+                    day = "Saturday";
+                    break;
             }
-
-            ControlPanelLocationButton.onclick = LauchLocation;
-
-            ProcatinationButton.onclick = function () {
-                debugger;
-                procrastinateEvent();
-                closeProcrastinatePanel();
+            var a = {
+                hour: TimeHH, minute: TimeMM, merid: AMPM, day: day, mon: month, date: date_number, year: year
             }
+            return a;
+        };
+        getRefreshedData.disableDataRefresh();
+        var StartDate = FormatTime(SubEvent.SubCalStartDate);
+        var EndDate = FormatTime(SubEvent.SubCalEndDate);
+        var Deadline = FormatTime(SubEvent.SubCalCalEventEnd);
+
+        var yeaButton = getDomOrCreateNew("YeaToConfirmDelete");
+        var nayButton = getDomOrCreateNew("NayToConfirmDelete");
+        var completeButton = global_ControlPanelIconSet.getCompleteButton();
+        var PauseResumeButton = global_ControlPanelIconSet.getPauseResumeButton()
+        var deleteButton = global_ControlPanelIconSet.getDeleteButton();
+        var DeleteMessage = getDomOrCreateNew("DeleteMessage")
+        var ProcatinationButton = getDomOrCreateNew("submitProcatination");
+        var ProcatinationCancelButton = getDomOrCreateNew("cancelProcatination");
+        var ControlPanelCloseButton = global_ControlPanelIconSet.getCloseButton();
+        var ProcrastinateEventModalContainer = getDomOrCreateNew("ProcrastinateEventModal");
+        var ControlPanelProcrastinateButton = global_ControlPanelIconSet.getProcrastinateButton();
+        var ControlPanelLocationButton = global_ControlPanelIconSet.getLocationButton();
+        var ModalDelete = getDomOrCreateNew("ConfirmDeleteModal")
+        var ControlPanelContainer = getDomOrCreateNew("ControlPanelContainer");
+        var MultiSelectPanel = getDomOrCreateNew("MultiSelectPanel");
+        $(ControlPanelContainer).addClass("ControlPanelContainerModal");
+        /*if (renderSubEventsClickEvents.BottomPanelIsOpen) {
+            closeControlPanel();
+        }*/
+
+        var InfoPanelOverLay = getDomOrCreateNew("InfoPanelOverLay")
+        removeLowerBarIconSetCOntainer();
+        revealControlInfoContainer()
+        var BasePanel = generateBasePanel();
 
 
-            ProcatinationCancelButton.onclick = closeProcrastinatePanel;
+        var IconSetContainer = global_ControlPanelIconSet.getIconSetContainer();
+        $(ControlPanelContainer).addClass("setAsVisibilityHidden");
+        setTimeout(function () {
+            $(ControlPanelContainer).removeClass("setAsVisibilityHidden");
+            $(ControlPanelContainer).slideDown(500);
+        }, 300)
 
-            function resetButtons() {
-                yeaButton.onclick = null;
-                nayButton.onclick = null;
-                ControlPanelProcrastinateButton.onclick = null;
-                ControlPanelCloseButton.onclick = null;
-                ControlPanelLocationButton.onclick = null;
-        }
 
-            function generateBasePanel()
-            {
-                var BasePanelID = "InfoBasePanel";
-                var BasePanel = getDomOrCreateNew(BasePanelID);
-                return BasePanel;
+        BasePanel.appendChild(InfoPanelOverLay);
+        BasePanel.appendChild(IconSetContainer);
+
+
+        ControlPanelContainer.appendChild(BasePanel);
+        var EditContainerData = generateEditDoneCOntainer();
+        ControlPanelContainer.appendChild(EditContainerData.Container);
+
+        var LauchLocation = function () {
+            debugger;
+            var googleMapsURL = "https://www.google.com/maps/place/";
+            var fullURL = googleMapsURL + SubEvent.SubCalAddress
+            if (SubEvent.SubCalAddress) {
+                var win = window.open(fullURL, '_blank');
+                win.focus();
             }
-
-            function slideOpenProcrastinateEventModal() {
-                ProcrastinateEventModalContainer.focus();
-                $(ProcrastinateEventModalContainer).slideDown(500);
-                ProcrastinateEventModalContainer.onkeydown = ProcrastinateEventModalContainer;
-                function procrastinateContainerKeyPress(e) {
-                    e.stopPropagation();
-                    if (e.which == 27)//escape key press
-                    {
-                        closeProcrastinatePanel();
-                    }
-                }
-
-                
-
-            }
-
-            function generateEditDoneCOntainer()
-            {
-                var SaveButton = getDomOrCreateNew("SaveButton", "button");
-                SaveButton.innerHTML = "Save"
-                var EditContainer = getDomOrCreateNew("EditCalEventContainer");
-                $(EditContainer).addClass("setAsDisplayNone");
-                EditContainer.appendChild(SaveButton);
-                var EditContainerStatus = { isRevealed: false };
-                function RevealEditContainer()
-                {
-                    if (!EditContainerStatus.isRevealed)
-                    {
-                        $(EditContainer).removeClass("setAsDisplayNone");
-                        EditContainerStatus.isRevealed = true;
-                    }
-                }
-
-                    
-                function HideEditContainer()
-                {
-                    if (EditContainerStatus.isRevealed)
-                    {
-                        $(EditContainer).addClass("setAsDisplayNone");
-                        EditContainerStatus.isRevealed = false;
-                    }
-                }
+            else {
+                $(MultiSelectPanel).removeClass("hideMultiSelectPanel");
+                MultiSelectPanel.innerHTML = "Oops tiler could not find an address :X &#x1f603;";
+                setTimeout(function () { $(MultiSelectPanel).addClass("hideMultiSelectPanel"); }, 3000);
 
 
-                HideEditContainer();
-                SaveButton.onclick = null;
-
-                var retValue = { SaveButton: SaveButton, Container: EditContainer, RevealContainer: RevealEditContainer, HideEditContainer: HideEditContainer };
-                return retValue;
-            }
-
-            
-
-            ControlPanelProcrastinateButton.onclick = slideOpenProcrastinateEventModal;
-            
-
-            function closeControlPanel() {
-                global_ExitManager.triggerLastExitAndPop();
-            }
-
-
-            //function combines the close of selected reference list elements
-            function CombinedCLoser()
-            {
-                BindClickOfSideBarToCLick.reset();
-                TriggerClose();
-            }
-
-
-            function TriggerClose() {
-                getRefreshedData.enableDataRefresh();
-                resetButtons();
-                DeselectAllSideBarElements();
-                closeModalDelete();
-                closeProcrastinatePanel();
-                deleteButton.onclick = null;
-                completeButton.onclick = null;
-                PauseResumeButton.onclick = null;
-                $(ControlPanelContainer).slideUp(500);
-                document.removeEventListener("keydown", containerKeyPress);
-                global_UISetup.RenderOnSubEventClick.isRefListSubEventClicked = false;
-                global_UISetup.RenderOnSubEventClick.BottomPanelIsOpen = false;
-                
-                if (IconSetContainer.parentNode != null) {
-                    IconSetContainer.parentNode.removeChild(IconSetContainer);
-                }
-                $(ControlPanelContainer).removeClass("ControlPanelContainerLowerBar");
-                setTimeout(function(){ $(ControlPanelContainer).removeClass("ControlPanelContainerModal")},500);
-            }
-
-
-            //checks if bottompannel is open. If panel is open then just reset the subevent reflist element as opposed to 
-            if (!global_UISetup.RenderOnSubEventClick.isRefListSubEventClicked) {
-                global_ExitManager.addNewExit(CombinedCLoser);
-            }
-            
-            
-            
-            
-            
-
-            function closeProcrastinatePanel() {
-                $(ProcrastinateEventModalContainer).slideUp(500);
-            }
-
-            ControlPanelCloseButton.onclick = global_ExitManager.triggerLastExitAndPop;
-
-            function pauseEvent()
-            {
-                SendMessage();
-                function SendMessage() {
-                    var TimeZone = new Date().getTimezoneOffset();
-                    debugger;
-
-                    var PauseEvent = {
-                        UserName: UserCredentials.UserName,
-                        UserID: UserCredentials.ID,
-                        EventID: SubEvent.ID,
-                        TimeZoneOffset: TimeZone,
-                        ThirdPartyEventID: SubEvent.ThirdPartyEventID,
-                        ThirdPartyUserID: SubEvent.ThirdPartyUserID,
-                        ThirdPartyType: SubEvent.ThirdPartyType
-                    };
-                    
-                    var URL = global_refTIlerUrl + "Schedule/Event/Pause";
-                    var HandleNEwPage = new LoadingScreenControl("Tiler is Pausing your event :)");
-                    HandleNEwPage.Launch();
-
-                    var exit = function (data) {
-                        HandleNEwPage.Hide();
-                        //triggerUIUPdate();//hack alert
-                        global_ExitManager.triggerLastExitAndPop();
-                        //getRefreshedData();
-                    }
-
-                    $.ajax({
-                        type: "POST",
-                        url: URL,
-                        data: PauseEvent,
-                        success: function (response) {
-                            exit();
-                            //triggerUndoPanel("Undo Pause?");
-                            //alert("alert 0-b");
-                        },
-                        error: function () {
-                            var NewMessage = "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
-                            var ExitAfter = {
-                                ExitNow: true, Delay: 1000
-                            };
-                            HandleNEwPage.UpdateMessage(NewMessage, ExitAfter, exit);
-                        }
-                    }).done(function (data) {
-                        HandleNEwPage.Hide();
-                        triggerUIUPdate();//hack alert
-                        //getRefreshedData();
-                    });
-                }
-                function triggerUIUPdate() {
-                    //alert("we are deleting " + SubEvent.ID);
-                    //$('#ConfirmDeleteModal').slideToggle();
-                    //$('#ControlPanelContainer').slideUp(500);
-                    //resetButtons();
-                    global_ExitManager.triggerLastExitAndPop();
-                }
-
-            }
-
-            function continueEvent() {
-                SendMessage();
-                function SendMessage() {
-                    var TimeZone = new Date().getTimezoneOffset();
-                    debugger;
-
-                    var ContinueEvent = {
-                        UserName: UserCredentials.UserName,
-                        UserID: UserCredentials.ID,
-                        EventID: SubEvent.ID,
-                        TimeZoneOffset: TimeZone,
-                        ThirdPartyEventID: SubEvent.ThirdPartyEventID,
-                        ThirdPartyUserID: SubEvent.ThirdPartyUserID,
-                        ThirdPartyType: SubEvent.ThirdPartyType
-                    };
-
-                    var URL = global_refTIlerUrl + "Schedule/Event/Resume";
-                    var HandleNEwPage = new LoadingScreenControl("Tiler resuming your event :)");
-                    HandleNEwPage.Launch();
-
-                    var exit = function (data) {
-                        HandleNEwPage.Hide();
-                        //triggerUIUPdate();//hack alert
-                        global_ExitManager.triggerLastExitAndPop();
-                        //getRefreshedData();
-                    }
-
-                    $.ajax({
-                        type: "POST",
-                        url: URL,
-                        data: ContinueEvent,
-                        success: function (response) {
-                            exit();
-                            //triggerUndoPanel("Undo Pause?");
-                            //alert("alert 0-b");
-                        },
-                        error: function () {
-                            var NewMessage = "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
-                            var ExitAfter = {
-                                ExitNow: true, Delay: 1000
-                            };
-                            HandleNEwPage.UpdateMessage(NewMessage, ExitAfter, exit);
-                        }
-                    }).done(function (data) {
-                        HandleNEwPage.Hide();
-                        triggerUIUPdate();//hack alert
-                        //getRefreshedData();
-                    });
-                }
-                function triggerUIUPdate() {
-                    //alert("we are deleting " + SubEvent.ID);
-                    //$('#ConfirmDeleteModal').slideToggle();
-                    //$('#ControlPanelContainer').slideUp(500);
-                    //resetButtons();
-                    global_ExitManager.triggerLastExitAndPop();
-                }
-
-            }
-
-            function deleteSubevent()//triggers the yea / nay deletion of events
-            {
-                DeleteMessage.innerHTML = "Sure you want to delete \"" + SubEvent.Name + "\"?"
-
-                yeaButton.onclick = yeaDeleteSubEvent;
-                nayButton.onclick = nayDeleteSubEvent;
-                yeaButton.focus();
-                $('#ConfirmDeleteModal').slideDown(500);
-                ModalDelete.isRevealed = true;
-            }
-
-            if (ModalDelete.isRevealed) {
-                deleteSubevent();
-            }
-
-            function yeaDeleteSubEvent()//triggers the deletion of subevent
-            {
-                SendMessage();
-                function SendMessage() {
-                    var TimeZone = new Date().getTimezoneOffset();
-                    debugger;
-                    var DeletionEvent = {
-                        UserName: UserCredentials.UserName,
-                        UserID: UserCredentials.ID,
-                        EventID: SubEvent.ID,
-                        TimeZoneOffset: TimeZone,
-                        ThirdPartyEventID: SubEvent.ThirdPartyEventID,
-                        ThirdPartyUserID: SubEvent.ThirdPartyUserID,
-                        ThirdPartyType: SubEvent.ThirdPartyType
-                };
-                    //var URL = "RootWagTap/time.top?WagCommand=6"
-                    var URL = global_refTIlerUrl + "Schedule/Event";
-                    var HandleNEwPage = new LoadingScreenControl("Tiler is Deleting your event :)");
-                    HandleNEwPage.Launch();
-
-                    var exit = function (data) {
-                        HandleNEwPage.Hide();
-                        //triggerUIUPdate();//hack alert
-                        global_ExitManager.triggerLastExitAndPop();
-                        //getRefreshedData();
-                    }
-
-                    $.ajax({
-                            type: "DELETE",
-                            url: URL,
-                            data: DeletionEvent,
-                        // DO NOT SET CONTENT TYPE to json
-                        // contentType: "application/json; charset=utf-8", 
-                        // DataType needs to stay, otherwise the response object
-                        // will be treated as a single string
-                            success: function (response) {
-                                exit();
-                                triggerUndoPanel("Undo deletion?");
-                                //alert("alert 0-b");
-                    },
-                            error: function () {
-                            var NewMessage = "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
-                            var ExitAfter = { ExitNow: true, Delay: 1000
-                            };
-                            HandleNEwPage.UpdateMessage(NewMessage, ExitAfter, exit);
-                    }
-                    }).done(function (data) {
-                        HandleNEwPage.Hide();
-                        triggerUIUPdate();//hack alert
-                        //getRefreshedData();
-                    });
-            }
-                function triggerUIUPdate() {
-                    //alert("we are deleting " + SubEvent.ID);
-                    //$('#ConfirmDeleteModal').slideToggle();
-                    //$('#ControlPanelContainer').slideUp(500);
-                    //resetButtons();
-                    global_ExitManager.triggerLastExitAndPop();
             }
 
         }
 
+        ControlPanelLocationButton.onclick = LauchLocation;
 
-            function nayDeleteSubEvent()//ignores deletion of events
-            {
-                closeModalDelete();
-                //resetButtons();
+        ProcatinationButton.onclick = function () {
+            debugger;
+            procrastinateEvent();
+            closeProcrastinatePanel();
+        }
+
+
+        ProcatinationCancelButton.onclick = closeProcrastinatePanel;
+
+        function resetButtons() {
+            yeaButton.onclick = null;
+            nayButton.onclick = null;
+            ControlPanelProcrastinateButton.onclick = null;
+            ControlPanelCloseButton.onclick = null;
+            ControlPanelLocationButton.onclick = null;
+        }
+
+        function generateBasePanel() {
+            var BasePanelID = "InfoBasePanel";
+            var BasePanel = getDomOrCreateNew(BasePanelID);
+            return BasePanel;
+        }
+
+        function slideOpenProcrastinateEventModal() {
+            ProcrastinateEventModalContainer.focus();
+            $(ProcrastinateEventModalContainer).slideDown(500);
+            ProcrastinateEventModalContainer.onkeydown = ProcrastinateEventModalContainer;
+            function procrastinateContainerKeyPress(e) {
+                e.stopPropagation();
+                if (e.which == 27)//escape key press
+                {
+                    closeProcrastinatePanel();
+                }
             }
 
-            function procrastinateEvent() {
-                var HourInput = getDomOrCreateNew("procrastinateHours").value == "" ? 0 : getDomOrCreateNew("procrastinateHours").value;
-                var MinInput = getDomOrCreateNew("procrastinateMins").value == "" ? 0 : getDomOrCreateNew("procrastinateMins").value;
-                var DayInput = getDomOrCreateNew("procrastinateDays").value == "" ? 0 : getDomOrCreateNew("procrastinateDays").value;
-                debugger;
+
+
+        }
+
+        function generateEditDoneCOntainer() {
+            var SaveButton = getDomOrCreateNew("SaveButton", "button");
+            SaveButton.innerHTML = "Save"
+            var EditContainer = getDomOrCreateNew("EditCalEventContainer");
+            $(EditContainer).addClass("setAsDisplayNone");
+            EditContainer.appendChild(SaveButton);
+            var EditContainerStatus = { isRevealed: false };
+            function RevealEditContainer() {
+                if (!EditContainerStatus.isRevealed) {
+                    $(EditContainer).removeClass("setAsDisplayNone");
+                    EditContainerStatus.isRevealed = true;
+                }
+            }
+
+
+            function HideEditContainer() {
+                if (EditContainerStatus.isRevealed) {
+                    $(EditContainer).addClass("setAsDisplayNone");
+                    EditContainerStatus.isRevealed = false;
+                }
+            }
+
+
+            HideEditContainer();
+            SaveButton.onclick = null;
+
+            var retValue = { SaveButton: SaveButton, Container: EditContainer, RevealContainer: RevealEditContainer, HideEditContainer: HideEditContainer };
+            return retValue;
+        }
+
+
+
+        ControlPanelProcrastinateButton.onclick = slideOpenProcrastinateEventModal;
+
+
+        function closeControlPanel() {
+            global_ExitManager.triggerLastExitAndPop();
+        }
+
+
+        //function combines the close of selected reference list elements
+        function CombinedCLoser() {
+            BindClickOfSideBarToCLick.reset();
+            TriggerClose();
+        }
+
+
+        function TriggerClose() {
+            getRefreshedData.enableDataRefresh();
+            resetButtons();
+            DeselectAllSideBarElements();
+            closeModalDelete();
+            closeProcrastinatePanel();
+            deleteButton.onclick = null;
+            completeButton.onclick = null;
+            PauseResumeButton.onclick = null;
+            $(ControlPanelContainer).slideUp(500);
+            document.removeEventListener("keydown", containerKeyPress);
+            global_UISetup.RenderOnSubEventClick.isRefListSubEventClicked = false;
+            global_UISetup.RenderOnSubEventClick.BottomPanelIsOpen = false;
+
+            if (IconSetContainer.parentNode != null) {
+                IconSetContainer.parentNode.removeChild(IconSetContainer);
+            }
+            $(ControlPanelContainer).removeClass("ControlPanelContainerLowerBar");
+            setTimeout(function () { $(ControlPanelContainer).removeClass("ControlPanelContainerModal") }, 500);
+        }
+
+
+        //checks if bottompannel is open. If panel is open then just reset the subevent reflist element as opposed to 
+        if (!global_UISetup.RenderOnSubEventClick.isRefListSubEventClicked) {
+            global_ExitManager.addNewExit(CombinedCLoser);
+        }
+
+
+
+
+
+
+        function closeProcrastinatePanel() {
+            $(ProcrastinateEventModalContainer).slideUp(500);
+        }
+
+        ControlPanelCloseButton.onclick = global_ExitManager.triggerLastExitAndPop;
+
+        function pauseEvent() {
+            SendMessage();
+            function SendMessage() {
                 var TimeZone = new Date().getTimezoneOffset();
-                var NowData = { UserName: UserCredentials.UserName, UserID: UserCredentials.ID, EventID: SubEvent.ID, DurationDays: DayInput, DurationHours: HourInput, DurationMins: MinInput, TimeZoneOffset: TimeZone};
-                //var URL= "RootWagTap/time.top?WagCommand=2";
-                var URL = global_refTIlerUrl + "Schedule/Event/Procrastinate";
-                var HandleNEwPage = new LoadingScreenControl("Tiler is Postponing  :)");
+                debugger;
+
+                var PauseEvent = {
+                    UserName: UserCredentials.UserName,
+                    UserID: UserCredentials.ID,
+                    EventID: SubEvent.ID,
+                    TimeZoneOffset: TimeZone,
+                    ThirdPartyEventID: SubEvent.ThirdPartyEventID,
+                    ThirdPartyUserID: SubEvent.ThirdPartyUserID,
+                    ThirdPartyType: SubEvent.ThirdPartyType
+                };
+
+                var URL = global_refTIlerUrl + "Schedule/Event/Pause";
+                var HandleNEwPage = new LoadingScreenControl("Tiler is Pausing your event :)");
                 HandleNEwPage.Launch();
 
                 var exit = function (data) {
@@ -3723,120 +3353,475 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                     global_ExitManager.triggerLastExitAndPop();
                     //getRefreshedData();
                 }
-                $.ajax({
-                        type: "POST",
-                        url: URL,
-                        data: NowData,
-                    // DO NOT SET CONTENT TYPE to json
-                    // contentType: "application/json; charset=utf-8", 
-                    // DataType needs to stay, otherwise the response object
-                    // will be treated as a single string
-                        dataType: "json",
-                        success: function (response) {
-                            triggerUndoPanel("Undo Procrastination");
-                            var myContainer = (response);
-                            if (myContainer.Error.code == 0) {
-                                //exitSelectedEventScreen();
-                            }
-                            else {
-                                alert("error detected with marking as complete");
-                            }
 
-                        },
-                        error: function () {
+                $.ajax({
+                    type: "POST",
+                    url: URL,
+                    data: PauseEvent,
+                    success: function (response) {
+                        exit();
+                        //triggerUndoPanel("Undo Pause?");
+                        //alert("alert 0-b");
+                    },
+                    error: function () {
                         var NewMessage = "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
-                        var ExitAfter = { ExitNow: true, Delay: 1000
+                        var ExitAfter = {
+                            ExitNow: true, Delay: 1000
                         };
                         HandleNEwPage.UpdateMessage(NewMessage, ExitAfter, exit);
-                }
+                    }
                 }).done(function (data) {
                     HandleNEwPage.Hide();
                     triggerUIUPdate();//hack alert
                     //getRefreshedData();
-
                 });
+            }
+            function triggerUIUPdate() {
+                //alert("we are deleting " + SubEvent.ID);
+                //$('#ConfirmDeleteModal').slideToggle();
+                //$('#ControlPanelContainer').slideUp(500);
+                //resetButtons();
+                global_ExitManager.triggerLastExitAndPop();
+            }
 
-                function triggerUIUPdate() {
-                    //resetButtons();
-                    global_ExitManager.triggerLastExitAndPop();
-                }
         }
 
-            function markAsComplete() {
-                SendMessage();
-                function SendMessage() {
-                    var TimeZone = new Date().getTimezoneOffset();
-                    var Url;
-                    //Url="RootWagTap/time.top?WagCommand=7";
-                    Url = global_refTIlerUrl + "Schedule/Event/Complete";
-                    var HandleNEwPage = new LoadingScreenControl("Tiler is updating your schedule ...");
-                    HandleNEwPage.Launch();
+        function continueEvent() {
+            SendMessage();
+            function SendMessage() {
+                var TimeZone = new Date().getTimezoneOffset();
+                debugger;
 
-                    var MarkAsCompleteData = {
-                        UserName: UserCredentials.UserName,
-                        UserID: UserCredentials.ID,
-                        EventID: SubEvent.ID,
-                        TimeZoneOffset: TimeZone,
-                        ThirdPartyEventID: SubEvent.ThirdPartyEventID,
-                        ThirdPartyUserID: SubEvent.ThirdPartyUserID,
-                        ThirdPartyType: SubEvent.ThirdPartyType
-                    };
-                    var exit = function (data) {
-                        HandleNEwPage.Hide();
-                        //triggerUIUPdate();//hack alert
-                        global_ExitManager.triggerLastExitAndPop();
-                        //getRefreshedData();
+                var ContinueEvent = {
+                    UserName: UserCredentials.UserName,
+                    UserID: UserCredentials.ID,
+                    EventID: SubEvent.ID,
+                    TimeZoneOffset: TimeZone,
+                    ThirdPartyEventID: SubEvent.ThirdPartyEventID,
+                    ThirdPartyUserID: SubEvent.ThirdPartyUserID,
+                    ThirdPartyType: SubEvent.ThirdPartyType
+                };
+
+                var URL = global_refTIlerUrl + "Schedule/Event/Resume";
+                var HandleNEwPage = new LoadingScreenControl("Tiler resuming your event :)");
+                HandleNEwPage.Launch();
+
+                var exit = function (data) {
+                    HandleNEwPage.Hide();
+                    //triggerUIUPdate();//hack alert
+                    global_ExitManager.triggerLastExitAndPop();
+                    //getRefreshedData();
+                }
+
+                $.ajax({
+                    type: "POST",
+                    url: URL,
+                    data: ContinueEvent,
+                    success: function (response) {
+                        exit();
+                        //triggerUndoPanel("Undo Pause?");
+                        //alert("alert 0-b");
+                    },
+                    error: function () {
+                        var NewMessage = "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
+                        var ExitAfter = {
+                            ExitNow: true, Delay: 1000
+                        };
+                        HandleNEwPage.UpdateMessage(NewMessage, ExitAfter, exit);
                     }
-                    $.ajax({
-                            type: "POST",
-                            url: Url,
-                            data: MarkAsCompleteData,
-                        // DO NOT SET CONTENT TYPE to json
-                        // contentType: "application/json; charset=utf-8", 
-                        // DataType needs to stay, otherwise the response object
-                        // will be treated as a single string
-                        //dataType: "json",
-                            success: function (response) {
-                                triggerUndoPanel("Undo Completion");
-                            var myContainer = (response);
-                            if (myContainer.Error.code == 0) {
-                                //exitSelectedEventScreen();
-                            }
-                            else {
-                                alert("error detected with marking as complete");
-                            }
+                }).done(function (data) {
+                    HandleNEwPage.Hide();
+                    triggerUIUPdate();//hack alert
+                    //getRefreshedData();
+                });
+            }
+            function triggerUIUPdate() {
+                //alert("we are deleting " + SubEvent.ID);
+                //$('#ConfirmDeleteModal').slideToggle();
+                //$('#ControlPanelContainer').slideUp(500);
+                //resetButtons();
+                global_ExitManager.triggerLastExitAndPop();
+            }
+
+        }
+
+        function deleteSubevent()//triggers the yea / nay deletion of events
+        {
+            DeleteMessage.innerHTML = "Sure you want to delete \"" + SubEvent.Name + "\"?"
+
+            yeaButton.onclick = yeaDeleteSubEvent;
+            nayButton.onclick = nayDeleteSubEvent;
+            yeaButton.focus();
+            $('#ConfirmDeleteModal').slideDown(500);
+            ModalDelete.isRevealed = true;
+        }
+
+        if (ModalDelete.isRevealed) {
+            deleteSubevent();
+        }
+
+        function yeaDeleteSubEvent()//triggers the deletion of subevent
+        {
+            SendMessage();
+            function SendMessage() {
+                var TimeZone = new Date().getTimezoneOffset();
+                debugger;
+                var DeletionEvent = {
+                    UserName: UserCredentials.UserName,
+                    UserID: UserCredentials.ID,
+                    EventID: SubEvent.ID,
+                    TimeZoneOffset: TimeZone,
+                    ThirdPartyEventID: SubEvent.ThirdPartyEventID,
+                    ThirdPartyUserID: SubEvent.ThirdPartyUserID,
+                    ThirdPartyType: SubEvent.ThirdPartyType
+                };
+                //var URL = "RootWagTap/time.top?WagCommand=6"
+                var URL = global_refTIlerUrl + "Schedule/Event";
+                var HandleNEwPage = new LoadingScreenControl("Tiler is Deleting your event :)");
+                HandleNEwPage.Launch();
+
+                var exit = function (data) {
+                    HandleNEwPage.Hide();
+                    //triggerUIUPdate();//hack alert
+                    global_ExitManager.triggerLastExitAndPop();
+                    //getRefreshedData();
+                }
+
+                $.ajax({
+                    type: "DELETE",
+                    url: URL,
+                    data: DeletionEvent,
+                    // DO NOT SET CONTENT TYPE to json
+                    // contentType: "application/json; charset=utf-8", 
+                    // DataType needs to stay, otherwise the response object
+                    // will be treated as a single string
+                    success: function (response) {
+                        exit();
+                        triggerUndoPanel("Undo deletion?");
+                        //alert("alert 0-b");
+                    },
+                    error: function () {
+                        var NewMessage = "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
+                        var ExitAfter = {
+                            ExitNow: true, Delay: 1000
+                        };
+                        HandleNEwPage.UpdateMessage(NewMessage, ExitAfter, exit);
+                    }
+                }).done(function (data) {
+                    HandleNEwPage.Hide();
+                    triggerUIUPdate();//hack alert
+                    //getRefreshedData();
+                });
+            }
+            function triggerUIUPdate() {
+                //alert("we are deleting " + SubEvent.ID);
+                //$('#ConfirmDeleteModal').slideToggle();
+                //$('#ControlPanelContainer').slideUp(500);
+                //resetButtons();
+                global_ExitManager.triggerLastExitAndPop();
+            }
+
+        }
+
+
+        function nayDeleteSubEvent()//ignores deletion of events
+        {
+            closeModalDelete();
+            //resetButtons();
+        }
+
+        function procrastinateEvent() {
+            var HourInput = getDomOrCreateNew("procrastinateHours").value == "" ? 0 : getDomOrCreateNew("procrastinateHours").value;
+            var MinInput = getDomOrCreateNew("procrastinateMins").value == "" ? 0 : getDomOrCreateNew("procrastinateMins").value;
+            var DayInput = getDomOrCreateNew("procrastinateDays").value == "" ? 0 : getDomOrCreateNew("procrastinateDays").value;
+            debugger;
+            var TimeZone = new Date().getTimezoneOffset();
+            var NowData = { UserName: UserCredentials.UserName, UserID: UserCredentials.ID, EventID: SubEvent.ID, DurationDays: DayInput, DurationHours: HourInput, DurationMins: MinInput, TimeZoneOffset: TimeZone };
+            //var URL= "RootWagTap/time.top?WagCommand=2";
+            var URL = global_refTIlerUrl + "Schedule/Event/Procrastinate";
+            var HandleNEwPage = new LoadingScreenControl("Tiler is Postponing  :)");
+            HandleNEwPage.Launch();
+
+            var exit = function (data) {
+                HandleNEwPage.Hide();
+                //triggerUIUPdate();//hack alert
+                global_ExitManager.triggerLastExitAndPop();
+                //getRefreshedData();
+            }
+            $.ajax({
+                type: "POST",
+                url: URL,
+                data: NowData,
+                // DO NOT SET CONTENT TYPE to json
+                // contentType: "application/json; charset=utf-8", 
+                // DataType needs to stay, otherwise the response object
+                // will be treated as a single string
+                dataType: "json",
+                success: function (response) {
+                    triggerUndoPanel("Undo Procrastination");
+                    var myContainer = (response);
+                    if (myContainer.Error.code == 0) {
+                        //exitSelectedEventScreen();
+                    }
+                    else {
+                        alert("error detected with marking as complete");
+                    }
+
+                },
+                error: function () {
+                    var NewMessage = "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
+                    var ExitAfter = {
+                        ExitNow: true, Delay: 1000
+                    };
+                    HandleNEwPage.UpdateMessage(NewMessage, ExitAfter, exit);
+                }
+            }).done(function (data) {
+                HandleNEwPage.Hide();
+                triggerUIUPdate();//hack alert
+                //getRefreshedData();
+
+            });
+
+            function triggerUIUPdate() {
+                //resetButtons();
+                global_ExitManager.triggerLastExitAndPop();
+            }
+        }
+
+        function markAsComplete() {
+            SendMessage();
+            function SendMessage() {
+                var TimeZone = new Date().getTimezoneOffset();
+                var Url;
+                //Url="RootWagTap/time.top?WagCommand=7";
+                Url = global_refTIlerUrl + "Schedule/Event/Complete";
+                var HandleNEwPage = new LoadingScreenControl("Tiler is updating your schedule ...");
+                HandleNEwPage.Launch();
+
+                var MarkAsCompleteData = {
+                    UserName: UserCredentials.UserName,
+                    UserID: UserCredentials.ID,
+                    EventID: SubEvent.ID,
+                    TimeZoneOffset: TimeZone,
+                    ThirdPartyEventID: SubEvent.ThirdPartyEventID,
+                    ThirdPartyUserID: SubEvent.ThirdPartyUserID,
+                    ThirdPartyType: SubEvent.ThirdPartyType
+                };
+                var exit = function (data) {
+                    HandleNEwPage.Hide();
+                    //triggerUIUPdate();//hack alert
+                    global_ExitManager.triggerLastExitAndPop();
+                    //getRefreshedData();
+                }
+                $.ajax({
+                    type: "POST",
+                    url: Url,
+                    data: MarkAsCompleteData,
+                    // DO NOT SET CONTENT TYPE to json
+                    // contentType: "application/json; charset=utf-8", 
+                    // DataType needs to stay, otherwise the response object
+                    // will be treated as a single string
+                    //dataType: "json",
+                    success: function (response) {
+                        triggerUndoPanel("Undo Completion");
+                        var myContainer = (response);
+                        if (myContainer.Error.code == 0) {
+                            //exitSelectedEventScreen();
+                        }
+                        else {
+                            alert("error detected with marking as complete");
+                        }
 
                     },
-                            error: function (err) {
-                            var myError = err;
-                            var step = "err";
-                            var NewMessage = "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
-                            var ExitAfter = { ExitNow: true, Delay: 1000
-                            };
-                            HandleNEwPage.UpdateMessage(NewMessage, ExitAfter, exit);
-                                //InitializeHomePage();
+                    error: function (err) {
+                        var myError = err;
+                        var step = "err";
+                        var NewMessage = "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
+                        var ExitAfter = {
+                            ExitNow: true, Delay: 1000
+                        };
+                        HandleNEwPage.UpdateMessage(NewMessage, ExitAfter, exit);
+                        //InitializeHomePage();
 
 
                     }
 
-                    }).done(function (data) {
-                        debugger;
-                        HandleNEwPage.Hide();
-                        triggerUIUPdate();//hack alert
-                        //getRefreshedData();
-                    });
+                }).done(function (data) {
+                    debugger;
+                    HandleNEwPage.Hide();
+                    triggerUIUPdate();//hack alert
+                    //getRefreshedData();
+                });
             }
-                function triggerUIUPdate() {
-                    //resetButtons();
-                    global_ExitManager.triggerLastExitAndPop();
+            function triggerUIUPdate() {
+                //resetButtons();
+                global_ExitManager.triggerLastExitAndPop();
             }
 
         }
 
-            function closeModalDelete() {
-                DeleteMessage.innerHTML = "Sure you want to delete ?"
-                $('#ConfirmDeleteModal').slideUp(500);
-                ModalDelete.isRevealed = false;
+        function closeModalDelete() {
+            DeleteMessage.innerHTML = "Sure you want to delete ?"
+            $('#ConfirmDeleteModal').slideUp(500);
+            ModalDelete.isRevealed = false;
+        }
+        deleteButton.onclick = deleteSubevent;
+        completeButton.onclick = markAsComplete;
+        if (SubEvent.isPaused) {
+            global_ControlPanelIconSet.switchToResumeButton();
+            PauseResumeButton.onclick = continueEvent;
+            $(ControlPanelCloseButton).addClass("setAsDisplayNone");
+            global_ControlPanelIconSet.ShowPausePauseResumeButton();
+        }
+        else {
+            global_ControlPanelIconSet.switchToPauseButton();
+            PauseResumeButton.onclick = pauseEvent;
+            $(ControlPanelCloseButton).addClass("setAsDisplayNone");
+            if (!SubEvent.isPauseAble) {
+                global_ControlPanelIconSet.HidePausePauseResumeButton();
+            }
+            else {
+                global_ControlPanelIconSet.ShowPausePauseResumeButton();
+            }
+        }
+
+        //continueButton.onclick = continueEvent;
+
+        var ControlPanelContainer = getDomOrCreateNew("ControlPanelContainer");
+        ControlPanelContainer.focus();
+
+        function containerKeyPress(e) {
+            //e.stopPropagation();
+
+            if (e.which == 27)//escape key press
+            {
+
+                return;//closeControlPanel();
+            }
+
+            if ((e.which == 8) || (e.which == 46))//bkspc/delete key pressed
+            {
+                deleteSubevent();
+            }
+        }
+        //debugger;
+        document.removeEventListener("keydown", containerKeyPress);//this is here just to avooid duplicate addition of the same keypress event
+        document.addEventListener("keydown", containerKeyPress);
+
+        global_UISetup.RenderOnSubEventClick.isRefListSubEventClicked = true;
+        global_UISetup.RenderOnSubEventClick.BottomPanelIsOpen = true;
+
+        /*
+        ControlPanelNameOfSubeventInfo.innerHTML = SubEvent.Name;
+        ControlPanelDeadlineOfSubeventInfo.innerHTML = Deadline.hour + ' ' + Deadline.minute + ' ' + Deadline.merid + ' // ' + Deadline.day + ', ' + Deadline.mon + ' ' + Deadline.date;
+        ControlPanelSubEventTimeInfo.innerHTML = StartDate.hour + ' ' + StartDate.minute + ' ' + StartDate.merid + ' &mdash; ' + EndDate.hour + ' ' + EndDate.minute + ' ' + EndDate.merid;
+        */
+        function stopPropagationOfKeyDown(e) {
+            if (e.which == 27) {
+                return;
+            }
+            e.stopPropagation();
+        }
+        var NameContanierInput = getDomOrCreateNew("NameInputBox", "input");
+        $(NameContanierInput).off();
+        NameContanierInput.value = SubEvent.Name;
+        NameContanierInput.onkeydown = stopPropagationOfKeyDown;
+
+        $(NameContanierInput).on("input", EditContainerData.RevealContainer)
+
+        var SubEventStartTime = getDomOrCreateNew("StartTimeInput", "input");
+        $(SubEventStartTime).off();
+        var SubEventStartBinder = BindTimePicker(SubEventStartTime)
+        SubEventStartBinder.on('input', EditContainerData.RevealContainer);
+        SubEventStartBinder.on('changeTime', EditContainerData.RevealContainer);
+
+        SubEventStartTime.value = SubEvent.SubCalStartDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        var AmDash0 = getDomOrCreateNew("AmDash0", "span");
+        AmDash0.innerHTML = ' &mdash; '
+        var SubEventEndTime = getDomOrCreateNew("EndTimeInput", "input");
+        $(SubEventEndTime).off();
+        var SubEventEndBinder = BindTimePicker(SubEventEndTime)
+        SubEventEndBinder.on('input', EditContainerData.RevealContainer);
+        SubEventEndBinder.on('changeTime', EditContainerData.RevealContainer);
+
+        SubEventEndTime.value = SubEvent.SubCalEndDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+
+        SubEventStartTime.onkeydown = stopPropagationOfKeyDown;
+        SubEventEndTime.onkeydown = stopPropagationOfKeyDown;
+
+
+        var SubEventStartDate = getDomOrCreateNew("SubEventStartDateInput", "input");
+        $(SubEventStartDate).off("input");
+        $(SubEventStartDate).off("changeDate");
+        SubEventStartDate.value = SubEvent.SubCalStartDate.toLocaleDateString();//position of this insertion matters. It has to be before the call to "BindDatePicker" or else the input value will get reset at each entry
+        var SubEventStartDateBinder = BindDatePicker(SubEventStartDate, "D M d, yyyy");
+        SubEventStartDateBinder.datepicker("setDate", new Date(SubEventStartDate.value));
+        SubEventStartDateBinder.on('input', EditContainerData.RevealContainer);
+        SubEventStartDateBinder.on('changeDate', EditContainerData.RevealContainer);
+
+
+
+        var AmDash1 = getDomOrCreateNew("AmDash1", "span");
+        AmDash1.innerHTML = ' &mdash; '
+        var SubEventEndDate = getDomOrCreateNew("SubEventEndDateInput", "input");
+        $(SubEventEndDate).off("input");
+        $(SubEventEndDate).off("changeDate");
+        SubEventEndDate.value = SubEvent.SubCalEndDate.toLocaleDateString();//position of this insertion matters. It has to be before the call to "BindDatePicker"
+        var SubEventEndDateBinder = BindDatePicker(SubEventEndDate, "D M d, yyyy");
+        SubEventEndDateBinder.datepicker("setDate", new Date(SubEventEndDate.value));
+        SubEventEndDateBinder.on('input', EditContainerData.RevealContainer)
+        SubEventEndDateBinder.on('changeDate', EditContainerData.RevealContainer);
+
+
+
+
+
+
+        SubEventStartDate.onkeydown = stopPropagationOfKeyDown;
+        SubEventEndDate.onkeydown = stopPropagationOfKeyDown;
+
+        var SubCalStartInfo = getDomOrCreateNew("SubCalStartInfo");
+        var SubCalEndInfo = getDomOrCreateNew("SubCalEndInfo");
+        $(SubCalEndInfo).addClass("TimeDateContainer")
+        $(SubCalStartInfo).addClass("TimeDateContainer");
+
+
+
+        var CalEndTime = getDomOrCreateNew("CalEndTime", "input");
+        CalEndTime.onkeydown = stopPropagationOfKeyDown;
+        CalEndTime.onkeydown = stopPropagationOfKeyDown;
+
+        $(CalEndTime).off("input");
+        $(CalEndTime).off("changeTime");
+        CalEndTime.value = SubEvent.SubCalCalEventEnd.toLocaleTimeString();//position of this insertion matters. It has to be before the call to "BindTimePicker"
+        var CalEventEndTimeBinder = BindTimePicker(CalEndTime);
+        CalEventEndTimeBinder.on('input', EditContainerData.RevealContainer)
+        CalEventEndTimeBinder.on('changeTime', EditContainerData.RevealContainer);
+
+
+        //var CalStartDate = getDomOrCreateNew("CalStartDate", "input");
+        var CalEndDate = getDomOrCreateNew("CalEndDate", "input");
+        //CalStartDate.onkeydown = stopPropagationOfKeyDown;
+        CalEndDate.onkeydown = stopPropagationOfKeyDown;
+
+        $(CalEndDate).off("input");
+        $(CalEndDate).off("changeDate");
+        CalEndDate.value = SubEvent.SubCalCalEventEnd.toLocaleDateString();//position of this insertion matters. It has to be before the call to "BindDatePicker"
+        var CalEventEndDateBinder = BindDatePicker(CalEndDate, "D M d, yyyy");
+        CalEventEndDateBinder.datepicker("setDate", new Date(CalEndDate.value));
+        CalEventEndDateBinder.on('input', EditContainerData.RevealContainer)
+        CalEventEndDateBinder.on('changeDate', EditContainerData.RevealContainer);
+
+
+        var calendarEventData = getDomOrCreateNew("CalEndDate", "input");
+
+
+        //ControlPanelNameOfSubeventInfo.value = SubEvent.Name;
+        ControlPanelNameOfSubeventInfo.appendChild(NameContanierInput);
+
+
+        function removeInputBindings() {
+
         }
             deleteButton.onclick = deleteSubevent;
             completeButton.onclick = markAsComplete;
@@ -3861,339 +3846,195 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                 }
             }
 
-            //continueButton.onclick = continueEvent;
+        function extraOptionsData() {
+            var splitInputBox = getDomOrCreateNew("InputSplitCount", "input");
+            splitInputBox.readOnly = true;
+            splitInputBox.oninput = EditContainerData.RevealContainer;
+            splitInputBox.setAttribute("type", "Number");
+            splitInputBox.onkeydown = stopPropagationOfKeyDown;
+            splitInputBox.value = Dictionary_OfCalendarData[SubEvent.CalendarID].TotalNumberOfEvents;
+            var splitInputBoxLabel = getDomOrCreateNew("splitInputBoxLabel", "label");
+            splitInputBoxLabel.innerHTML = "Splits"
+            var splitInputBoxContainer = getDomOrCreateNew("InputSplitCountContainer");
+            splitInputBoxContainer.appendChild(splitInputBoxLabel);
+            splitInputBoxContainer.appendChild(splitInputBox);
+            $(splitInputBoxContainer).addClass("SubEventInformationContainer");
 
-            var ControlPanelContainer = getDomOrCreateNew("ControlPanelContainer");
-            ControlPanelContainer.focus();
+            var CompletionMap = getDomOrCreateNew("CompletionContainer");
+            var CompletionMapDom = generateCompletionMap(SubEvent)
+            CompletionMap.appendChild(CompletionMapDom);
+            var ContainerForExtraOptions = getDomOrCreateNew("ExtraOptionsContainer")
+            ContainerForExtraOptions.appendChild(splitInputBoxContainer)
+            ContainerForExtraOptions.appendChild(CompletionMap)
 
-            function containerKeyPress(e) {
-                //e.stopPropagation();
-                
-                if (e.which == 27)//escape key press
-                {
-
-                    return;//closeControlPanel();
-                }
-
-                if ((e.which == 8) || (e.which == 46))//bkspc/delete key pressed
-                {
-                    deleteSubevent();
-                }
+            return ContainerForExtraOptions;
         }
-            //debugger;
-            document.removeEventListener("keydown", containerKeyPress);//this is here just to avooid duplicate addition of the same keypress event
-            document.addEventListener("keydown", containerKeyPress);
 
-            global_UISetup.RenderOnSubEventClick.isRefListSubEventClicked = true;
-            global_UISetup.RenderOnSubEventClick.BottomPanelIsOpen = true;
 
-            /*
-            ControlPanelNameOfSubeventInfo.innerHTML = SubEvent.Name;
-            ControlPanelDeadlineOfSubeventInfo.innerHTML = Deadline.hour + ' ' + Deadline.minute + ' ' + Deadline.merid + ' // ' + Deadline.day + ', ' + Deadline.mon + ' ' + Deadline.date;
-            ControlPanelSubEventTimeInfo.innerHTML = StartDate.hour + ' ' + StartDate.minute + ' ' + StartDate.merid + ' &mdash; ' + EndDate.hour + ' ' + EndDate.minute + ' ' + EndDate.merid;
-            */
-            function stopPropagationOfKeyDown(e) {
-                if (e.which == 27)
-                {
-                    return;
-                }
-                e.stopPropagation();
+        SubCalStartInfo.appendChild(SubEventStartTime);
+        //SubCalTimeInfo.appendChild(AmDash0);
+        //SubCalTimeInfo.appendChild(SubEventEndTime);
+        SubCalStartInfo.appendChild(SubEventStartDate);
+
+        SubCalEndInfo.appendChild(SubEventEndTime);
+        //SubCalDateInfo.appendChild(AmDash1);
+        SubCalEndInfo.appendChild(SubEventEndDate);
+
+
+        ControlPanelSubEventTimeInfo.appendChild(SubCalStartInfo);
+        ControlPanelSubEventTimeInfo.appendChild(SubCalEndInfo);
+
+
+        var ControlPanelDeadlineOfSubevent = getDomOrCreateNew("ControlPanelDeadlineOfSubevent")
+        //ControlPanelDeadlineOfSubeventInfo.appendChild(CalStartDate);
+        ControlPanelDeadlineOfSubeventInfo.appendChild(CalEndTime)
+        ControlPanelDeadlineOfSubeventInfo.appendChild(CalEndDate);
+        var optionData = extraOptionsData();
+
+        var InfoCOntainer = getDomOrCreateNew("InfoContainer")
+
+        InfoCOntainer.appendChild(optionData);
+        if (Dictionary_OfCalendarData[SubEvent.CalendarID].Rigid) {
+            $(ControlPanelDeadlineOfSubevent).addClass("setAsDisplayNone");
+            $(optionData).addClass("setAsDisplayNone");
+
+        }
+        else {
+            $(ControlPanelDeadlineOfSubevent).removeClass("setAsDisplayNone");
+            $(optionData).removeClass("setAsDisplayNone");
+        }
+
+
+
+
+        function SaveButtonClick() {
+            debugger;
+            var TimeZone = new Date().getTimezoneOffset();
+            var Url;
+            //Url="RootWagTap/time.top?WagCommand=7";
+            SubEventStartTime.value = formatTimePortionOfStringToRightFormat(SubEventStartTime.value)
+            var SubCalStartDateTimeString = SubEventStartTime.value + " " + $(SubEventStartDate).datepicker("getDate").toLocaleDateString();
+            var SubCaStartDateInMS = Date.parse(SubCalStartDateTimeString) - (TimeZone * OneMinInMs)
+
+
+            SubEventEndTime.value = formatTimePortionOfStringToRightFormat(SubEventEndTime.value)
+            var SubCalEndDateTimeString = SubEventEndTime.value + " " + $(SubEventEndDate).datepicker("getDate").toLocaleDateString();
+            var SubCaEndDateInMS = Date.parse(SubCalEndDateTimeString) - (TimeZone * OneMinInMs);//.getFullTime();
+
+            CalEndTime.value = formatTimePortionOfStringToRightFormat(CalEndTime.value)
+
+            var CalDateEndTimeString = CalEndTime.value + " " + $(CalEndDate).datepicker("getDate").toLocaleDateString();
+            var CalEndDateInMS = Date.parse(CalDateEndTimeString) - (TimeZone * OneMinInMs);
+            var splitValue = getDomOrCreateNew("InputSplitCount", "input").value;
+            Url = global_refTIlerUrl + "SubCalendarEvent/Update";
+            var HandleNEwPage = new LoadingScreenControl("Tiler is updating your schedule ...");
+            HandleNEwPage.Launch();
+
+            var SaveData = {
+                UserName: UserCredentials.UserName,
+                UserID: UserCredentials.ID,
+                EventID: SubEvent.ID,
+                EventName: NameContanierInput.value, TimeZoneOffset: TimeZone,
+                Start: SubCaStartDateInMS,
+                End: SubCaEndDateInMS,
+                CalStart: 0,
+                CalEnd: CalEndDateInMS,
+                Split: splitValue,
+                ThirdPartyEventID: SubEvent.ThirdPartyEventID,
+                ThirdPartyUserID: SubEvent.ThirdPartyUserID,
+                ThirdPartyType: SubEvent.ThirdPartyType
+
+            };
+            var exit = function (data) {
+                HandleNEwPage.Hide();
+                //triggerUIUPdate();//hack alert
+                global_ExitManager.triggerLastExitAndPop();
+                //getRefreshedData();
             }
-            var NameContanierInput = getDomOrCreateNew("NameInputBox", "input");
-            $(NameContanierInput).off();
-            NameContanierInput.value = SubEvent.Name;
-            NameContanierInput.onkeydown = stopPropagationOfKeyDown;
-
-            $(NameContanierInput).on("input", EditContainerData.RevealContainer)
-
-            var SubEventStartTime = getDomOrCreateNew("StartTimeInput", "input");
-            $(SubEventStartTime).off();
-            var SubEventStartBinder = BindTimePicker(SubEventStartTime)
-            SubEventStartBinder.on('input', EditContainerData.RevealContainer);
-            SubEventStartBinder.on('changeTime', EditContainerData.RevealContainer);
-            
-            SubEventStartTime.value = SubEvent.SubCalStartDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-            var AmDash0 = getDomOrCreateNew("AmDash0", "span");
-            AmDash0.innerHTML = ' &mdash; '
-            var SubEventEndTime = getDomOrCreateNew("EndTimeInput", "input");
-            $(SubEventEndTime).off();
-            var SubEventEndBinder = BindTimePicker(SubEventEndTime)
-            SubEventEndBinder.on('input', EditContainerData.RevealContainer);
-            SubEventEndBinder.on('changeTime', EditContainerData.RevealContainer);
-            
-            SubEventEndTime.value= SubEvent.SubCalEndDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-
-            SubEventStartTime.onkeydown = stopPropagationOfKeyDown;
-            SubEventEndTime.onkeydown = stopPropagationOfKeyDown;
-
-
-            var SubEventStartDate = getDomOrCreateNew("SubEventStartDateInput", "input");
-            $(SubEventStartDate).off("input");
-            $(SubEventStartDate).off("changeDate");
-            SubEventStartDate.value = SubEvent.SubCalStartDate.toLocaleDateString();//position of this insertion matters. It has to be before the call to "BindDatePicker" or else the input value will get reset at each entry
-            var SubEventStartDateBinder = BindDatePicker(SubEventStartDate, "D M d, yyyy");
-            SubEventStartDateBinder.datepicker("setDate", new Date(SubEventStartDate.value));
-            SubEventStartDateBinder.on('input', EditContainerData.RevealContainer);
-            SubEventStartDateBinder.on('changeDate', EditContainerData.RevealContainer);
-            
-
-            
-            var AmDash1 = getDomOrCreateNew("AmDash1", "span");
-            AmDash1.innerHTML = ' &mdash; '
-            var SubEventEndDate = getDomOrCreateNew("SubEventEndDateInput", "input");
-            $(SubEventEndDate).off("input");
-            $(SubEventEndDate).off("changeDate");
-            SubEventEndDate.value = SubEvent.SubCalEndDate.toLocaleDateString();//position of this insertion matters. It has to be before the call to "BindDatePicker"
-            var SubEventEndDateBinder = BindDatePicker(SubEventEndDate, "D M d, yyyy");
-            SubEventEndDateBinder.datepicker("setDate", new Date(SubEventEndDate.value));
-            SubEventEndDateBinder.on('input', EditContainerData.RevealContainer)
-            SubEventEndDateBinder.on('changeDate', EditContainerData.RevealContainer);
-            
-            
-            
-
-
-
-            SubEventStartDate.onkeydown = stopPropagationOfKeyDown;
-            SubEventEndDate.onkeydown = stopPropagationOfKeyDown;
-
-            var SubCalStartInfo = getDomOrCreateNew("SubCalStartInfo");
-            var SubCalEndInfo = getDomOrCreateNew("SubCalEndInfo");
-            $(SubCalEndInfo).addClass( "TimeDateContainer")
-            $(SubCalStartInfo).addClass("TimeDateContainer");
-            
-
-
-            var CalEndTime = getDomOrCreateNew("CalEndTime", "input");
-            CalEndTime.onkeydown = stopPropagationOfKeyDown;
-            CalEndTime.onkeydown = stopPropagationOfKeyDown;
-
-            $(CalEndTime).off("input");
-            $(CalEndTime).off("changeTime");
-            CalEndTime.value = SubEvent.SubCalCalEventEnd.toLocaleTimeString();//position of this insertion matters. It has to be before the call to "BindTimePicker"
-            var CalEventEndTimeBinder = BindTimePicker(CalEndTime);
-            CalEventEndTimeBinder.on('input', EditContainerData.RevealContainer)
-            CalEventEndTimeBinder.on('changeTime', EditContainerData.RevealContainer);
-
-
-            //var CalStartDate = getDomOrCreateNew("CalStartDate", "input");
-            var CalEndDate = getDomOrCreateNew("CalEndDate", "input");
-            //CalStartDate.onkeydown = stopPropagationOfKeyDown;
-            CalEndDate.onkeydown = stopPropagationOfKeyDown;
-            
-            $(CalEndDate).off("input");
-            $(CalEndDate).off("changeDate");
-            CalEndDate.value = SubEvent.SubCalCalEventEnd.toLocaleDateString();//position of this insertion matters. It has to be before the call to "BindDatePicker"
-            var CalEventEndDateBinder = BindDatePicker(CalEndDate, "D M d, yyyy");
-            CalEventEndDateBinder.datepicker("setDate", new Date(CalEndDate.value));
-            CalEventEndDateBinder.on('input', EditContainerData.RevealContainer)
-            CalEventEndDateBinder.on('changeDate', EditContainerData.RevealContainer);
-
-
-            var calendarEventData = getDomOrCreateNew("CalEndDate", "input");
-
-
-            //ControlPanelNameOfSubeventInfo.value = SubEvent.Name;
-            ControlPanelNameOfSubeventInfo.appendChild(NameContanierInput);
-
-
-            function removeInputBindings()
-            {
-                
-            }
-            
-            function extraOptionsData()
-            {
-                var splitInputBox = getDomOrCreateNew("InputSplitCount", "input");
-                splitInputBox.readOnly = true;
-                splitInputBox.oninput= EditContainerData.RevealContainer;
-                splitInputBox.setAttribute("type", "Number");
-                splitInputBox.onkeydown = stopPropagationOfKeyDown;
-                splitInputBox.value = Dictionary_OfCalendarData[SubEvent.CalendarID].TotalNumberOfEvents;
-                var splitInputBoxLabel = getDomOrCreateNew("splitInputBoxLabel","label");
-                splitInputBoxLabel.innerHTML="Splits"
-                var splitInputBoxContainer = getDomOrCreateNew("InputSplitCountContainer");
-                splitInputBoxContainer.appendChild(splitInputBoxLabel);
-                splitInputBoxContainer.appendChild(splitInputBox);
-                $(splitInputBoxContainer).addClass("SubEventInformationContainer");
-
-                var CompletionMap = getDomOrCreateNew("CompletionContainer");
-                var CompletionMapDom= generateCompletionMap(SubEvent)
-                CompletionMap .appendChild(CompletionMapDom);
-                var ContainerForExtraOptions = getDomOrCreateNew("ExtraOptionsContainer")
-                ContainerForExtraOptions.appendChild(splitInputBoxContainer)
-                ContainerForExtraOptions.appendChild(CompletionMap)
-                
-                return ContainerForExtraOptions;
-            }
-
-            
-            SubCalStartInfo.appendChild(SubEventStartTime);
-            //SubCalTimeInfo.appendChild(AmDash0);
-            //SubCalTimeInfo.appendChild(SubEventEndTime);
-            SubCalStartInfo.appendChild(SubEventStartDate);
-
-            SubCalEndInfo.appendChild(SubEventEndTime);
-            //SubCalDateInfo.appendChild(AmDash1);
-            SubCalEndInfo.appendChild(SubEventEndDate);
-
-
-            ControlPanelSubEventTimeInfo.appendChild(SubCalStartInfo);
-            ControlPanelSubEventTimeInfo.appendChild(SubCalEndInfo);
-            
-
-            var ControlPanelDeadlineOfSubevent=getDomOrCreateNew("ControlPanelDeadlineOfSubevent")
-            //ControlPanelDeadlineOfSubeventInfo.appendChild(CalStartDate);
-            ControlPanelDeadlineOfSubeventInfo.appendChild(CalEndTime)
-            ControlPanelDeadlineOfSubeventInfo.appendChild(CalEndDate);
-            var optionData = extraOptionsData();
-
-            var InfoCOntainer = getDomOrCreateNew("InfoContainer")
-
-            InfoCOntainer.appendChild(optionData);
-            if (Dictionary_OfCalendarData[SubEvent.CalendarID].Rigid)
-            {
-                $(ControlPanelDeadlineOfSubevent).addClass("setAsDisplayNone");
-                $(optionData).addClass("setAsDisplayNone");
-                
-            }
-            else
-            {
-                $(ControlPanelDeadlineOfSubevent).removeClass("setAsDisplayNone");
-                $(optionData).removeClass("setAsDisplayNone");
-            }
-            
-
-
-
-            function SaveButtonClick()
-            {
-                debugger;
-                var TimeZone = new Date().getTimezoneOffset();
-                var Url;
-                //Url="RootWagTap/time.top?WagCommand=7";
-                SubEventStartTime.value =formatTimePortionOfStringToRightFormat(SubEventStartTime.value )
-                var SubCalStartDateTimeString = SubEventStartTime.value + " " + $(SubEventStartDate).datepicker("getDate").toLocaleDateString();
-                var SubCaStartDateInMS = Date.parse(SubCalStartDateTimeString) - (TimeZone * OneMinInMs)
-
-
-                SubEventEndTime.value = formatTimePortionOfStringToRightFormat(SubEventEndTime.value)
-                var SubCalEndDateTimeString = SubEventEndTime.value + " " + $(SubEventEndDate).datepicker("getDate").toLocaleDateString();
-                var SubCaEndDateInMS = Date.parse(SubCalEndDateTimeString) - (TimeZone*OneMinInMs);//.getFullTime();
-
-                CalEndTime.value = formatTimePortionOfStringToRightFormat(CalEndTime.value)
-
-                var CalDateEndTimeString = CalEndTime.value + " " + $(CalEndDate).datepicker("getDate").toLocaleDateString();
-                var CalEndDateInMS = Date.parse(CalDateEndTimeString) - (TimeZone * OneMinInMs);
-                var splitValue =  getDomOrCreateNew("InputSplitCount", "input").value;
-                Url = global_refTIlerUrl + "SubCalendarEvent/Update";
-                var HandleNEwPage = new LoadingScreenControl("Tiler is updating your schedule ...");
-                HandleNEwPage.Launch();
-
-                var SaveData = {
-                    UserName: UserCredentials.UserName,
-                    UserID: UserCredentials.ID,
-                    EventID: SubEvent.ID,
-                    EventName: NameContanierInput.value, TimeZoneOffset: TimeZone,
-                    Start: SubCaStartDateInMS,
-                    End: SubCaEndDateInMS,
-                    CalStart: 0,
-                    CalEnd: CalEndDateInMS,
-                    Split: splitValue,
-                    ThirdPartyEventID: SubEvent.ThirdPartyEventID,
-                    ThirdPartyUserID: SubEvent.ThirdPartyUserID,
-                    ThirdPartyType: SubEvent.ThirdPartyType
-
-                };
-                var exit= function (data) {
-                    HandleNEwPage.Hide();
-                    //triggerUIUPdate();//hack alert
-                    global_ExitManager.triggerLastExitAndPop();
-                    //getRefreshedData();
-                }
-                $.ajax({
-                    type: "POST",
-                    url: Url,
-                    data: SaveData,
-                    // DO NOT SET CONTENT TYPE to json
-                    // contentType: "application/json; charset=utf-8", 
-                    // DataType needs to stay, otherwise the response object
-                    // will be treated as a single string
-                    //dataType: "json",
-                    success: function (response) {
-                        triggerUndoPanel("Undo Change to event on Tiler");
-                        var myContainer = (response);
-                        if (myContainer.Error.code == 0) {
-                            //exitSelectedEventScreen();
-                        }
-                        else {
-                            alert("error detected with marking as complete");
-                        }
-
-                    },
-                    error: function (err) {
-                        var myError = err;
-                        var step = "err";
-                        var NewMessage = "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
-                        var ExitAfter = {
-                            ExitNow: true, Delay: 1000
-                        };
-                        HandleNEwPage.UpdateMessage(NewMessage, ExitAfter, exit);
+            $.ajax({
+                type: "POST",
+                url: Url,
+                data: SaveData,
+                // DO NOT SET CONTENT TYPE to json
+                // contentType: "application/json; charset=utf-8", 
+                // DataType needs to stay, otherwise the response object
+                // will be treated as a single string
+                //dataType: "json",
+                success: function (response) {
+                    triggerUndoPanel("Undo Change to event on Tiler");
+                    var myContainer = (response);
+                    if (myContainer.Error.code == 0) {
+                        //exitSelectedEventScreen();
+                    }
+                    else {
+                        alert("error detected with marking as complete");
                     }
 
-                }).done(exit);
+                },
+                error: function (err) {
+                    var myError = err;
+                    var step = "err";
+                    var NewMessage = "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
+                    var ExitAfter = {
+                        ExitNow: true, Delay: 1000
+                    };
+                    HandleNEwPage.UpdateMessage(NewMessage, ExitAfter, exit);
+                }
 
-            }
+            }).done(exit);
 
-            EditContainerData.SaveButton.onclick = SaveButtonClick;
+        }
 
-            
+        EditContainerData.SaveButton.onclick = SaveButtonClick;
 
-            //ControlPanelDeadlineOfSubeventInfo.value = Deadline.hour + ' ' + Deadline.minute + ' ' + Deadline.merid + ' // ' + Deadline.day + ', ' + Deadline.mon + ' ' + Deadline.date;
-            //ControlPanelSubEventTimeInfo.value = EndDate.hour + ' ' + StartDate.minute + ' ' + StartDate.merid + ' &mdash; ' + EndDate.hour + ' ' + EndDate.minute + ' ' + EndDate.merid;
-            var SubEventName = SubEvent.Name;
-            $(document).keyup(function (e) {
-              if (e == 46) {
+
+
+        //ControlPanelDeadlineOfSubeventInfo.value = Deadline.hour + ' ' + Deadline.minute + ' ' + Deadline.merid + ' // ' + Deadline.day + ', ' + Deadline.mon + ' ' + Deadline.date;
+        //ControlPanelSubEventTimeInfo.value = EndDate.hour + ' ' + StartDate.minute + ' ' + StartDate.merid + ' &mdash; ' + EndDate.hour + ' ' + EndDate.minute + ' ' + EndDate.merid;
+        var SubEventName = SubEvent.Name;
+        $(document).keyup(function (e) {
+            if (e == 46) {
                 deleteEvent();
             };
-            });
+        });
 
-        }
     }
+}
 
 
-        function StopPullingData() {
+function StopPullingData() {
     clearTimeout(global_ClearRefreshDataInterval);
-    }
+}
 
 
-        function PauseDataPolling(PauseByMs) {
-    if (PauseByMs ==undefined) {
+function PauseDataPolling(PauseByMs) {
+    if (PauseByMs == undefined) {
         PauseByMs = 300000;
-        }
+    }
 
     getRefreshedData.isEnabled = false;
-    }
+}
 
 
-        function PopulateYourself(RangeData) {
+function PopulateYourself(RangeData) {
     var StartDate = new Date(Number(this.SubCalStartDate));
     var EndDate = new Date(Number(this.SubCalEndDate));
     this.RangeCounter = new Array();
-    this.Dom = { DomA: getDomOrCreateNew("EventDOMA" + this.ID), DomB: getDomOrCreateNew("EventDOMB" + this.ID)
-        };
+    this.Dom = {
+        DomA: getDomOrCreateNew("EventDOMA" + this.ID), DomB: getDomOrCreateNew("EventDOMB" + this.ID)
+    };
 
 
-    var i =0;
-    for (; i <RangeData.length; i++) {
+    var i = 0;
+    for (; i < RangeData.length; i++) {
         if ((StartDate >= new Date(Number(RangeData[i].Start))) && (StartDate <= new Date(Number(RangeData[i].End)))) {
             this.RangeCounter.push(RangeData[i]);
-    }
+        }
 
         if ((EndDate >= new Date(Number(RangeData[i].Start))) && (EndDate <= new Date(Number(RangeData[i].End)))) {
             this.RangeCounter.push(RangeData[i]);
-    }
         }
+    }
 
 
 
@@ -4202,36 +4043,36 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
     }
     else {
 
-        }
-
     }
 
+}
 
-        function PopulateInputContainerOption(SubEvent) {
 
-    }
+function PopulateInputContainerOption(SubEvent) {
 
-        function UpdateDeadline() {
+}
+
+function UpdateDeadline() {
     var UpdateDeadlineID = "UpdateDeadline";
     var UpdateDeadline = getDomOrCreateNew(UpdateDeadlineID, "button");
-    }
+}
 
 
-        function DeleteCurrentRepetition() {
+function DeleteCurrentRepetition() {
 
-    }
+}
 
-        function DeleteCurrentRepetition() {
+function DeleteCurrentRepetition() {
 
-    }
+}
 
-        function getRangeofSchedule() {
+function getRangeofSchedule() {
     var CalStartRange = null;
     var CalEndRange = null;
     if (TotalSubEventList.length > 0) {
         CalStartRange = new Date(TotalSubEventList[0].SubCalStartDate);
-        CalEndRange = new Date(TotalSubEventList[TotalSubEventList.length -1].SubCalEndDate);
-        }
+        CalEndRange = new Date(TotalSubEventList[TotalSubEventList.length - 1].SubCalEndDate);
+    }
     var earliestDayIndex = CalStartRange.getDay();
     var earliestMonth = CalStartRange.getMonth();
     var earliestYear = CalStartRange.getFullYear();
@@ -4240,7 +4081,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
     var latestMonth = CalStartRange.getMonth();
     var latestYear = CalStartRange.getFullYear();
 
-    var TimeSpanInDayMS = earliestDayIndex *OneDayInMs;
+    var TimeSpanInDayMS = earliestDayIndex * OneDayInMs;
 
     var CalStartDay = Number(CalStartRange) - Number(TimeSpanInDayMS);
     CalStartDay = new Date(CalStartDay);
@@ -4249,20 +4090,21 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
 
     var EndTimeSpanInDayMS = ((7 - latestDayIndex) % 7) * OneDayInMs;
 
-    var CalEndDay =Number(CalEndRange) + Number(EndTimeSpanInDayMS);
+    var CalEndDay = Number(CalEndRange) + Number(EndTimeSpanInDayMS);
     CalEndDay = new Date(CalEndDay);
     CalEndDay.setHours(0, 0, 0, 0);
 
-    return { Start: CalStartDay, End: CalEndDay
-        }
-
+    return {
+        Start: CalStartDay, End: CalEndDay
     }
+
+}
 
 
 function genDivForEachWeek(RangeOfWeek, AllRanges)//generates each week container giving the range of the week
 {
     var DayIndex = 0;
-    var widthPercent = 100/7;
+    var widthPercent = 100 / 7;
     var refDate = new Date(RangeOfWeek.Start);
     var WeekID = Number(RangeOfWeek.Start) + "_" + Number(RangeOfWeek.End)
     var WeekRange = getDomOrCreateNew(WeekID);
@@ -4281,7 +4123,7 @@ function genDivForEachWeek(RangeOfWeek, AllRanges)//generates each week containe
     RenderPlane.appendChild(SubEventRenderPlane);
     var prev;
 
-    
+
 
     var StartOfDay = new Date(RangeOfWeek.Start);
     //StartOfDay = StartOfDay.dst() ? new Date(Number(StartOfDay.getTime())) : StartOfDay +OneHourInMs;
@@ -4290,10 +4132,10 @@ function genDivForEachWeek(RangeOfWeek, AllRanges)//generates each week containe
     TodayStart.setMinutes(0);
     TodayStart.setSeconds(0);
     TodayStart.setMilliseconds(0);
-    var TodayInMS= TodayStart.getTime();
+    var TodayInMS = TodayStart.getTime();
     if (!WeekRange.status) {
         var DaysOfWeekDoms = new Array();
-        
+
         //WeekRange.Dom.appendChild(RenderPlane.Dom);
         WeekDays.forEach(
             function (DayOfWeek) {
@@ -4304,21 +4146,20 @@ function genDivForEachWeek(RangeOfWeek, AllRanges)//generates each week containe
                 var TotalMilliseconds = myDay.Start.getTime();
                 TotalMilliseconds += OneDayInMs
                 StartOfDay = new Date(TotalMilliseconds);
-                if (StartOfDay.getHours() != 0)
-                {
+                if (StartOfDay.getHours() != 0) {
                     TotalMilliseconds += OneHourInMs;
                     StartOfDay = new Date(TotalMilliseconds);
                 }
-                myDay.End = new Date(TotalMilliseconds -1);
+                myDay.End = new Date(TotalMilliseconds - 1);
                 var isToday = myDay.Start.getTime() == TodayInMS;
                 var currDate = new Date(Number(refDate.getTime()) + Number(DayIndex * OneDayInMs))
                 if (new Date().dst()) {
-                    currDate = new Date(Number(currDate.getTime()) +OneHourInMs);
+                    currDate = new Date(Number(currDate.getTime()) + OneHourInMs);
                     // myDay.End = new Date(Number(myDay.End.getTime()) + OneHourInMs);
                 }
-                
+
                 prev = currDate;
-                var Month = currDate.getMonth() +1;
+                var Month = currDate.getMonth() + 1;
                 var Day = currDate.getDate();
                 myDay.NameOfDayContainer.Dom.innerHTML = "<p class='NameWeekDay'>" + DayOfWeek.substring(0, 2) + "</p>" + "<p class='dateOfDay'>" + myDay.Start.getDate() + "</p>";
                 var MoreOptions = getDomOrCreateNew("DayMoreOptions" + myDay.DayID)
@@ -4342,10 +4183,9 @@ function genDivForEachWeek(RangeOfWeek, AllRanges)//generates each week containe
                 NameOfWeekDayRenderPlane.appendChild(myDay.NameOfDayContainer);
 
 
-                MoreOptions.onclick =MoreOptionsClick;
+                MoreOptions.onclick = MoreOptionsClick;
 
-                function MoreOptionsClick()
-                {
+                function MoreOptionsClick() {
                     //return;
                     global_ExitManager.triggerLastExitAndPop();
                     myDay.RevealMoreOptions();
@@ -4353,20 +4193,18 @@ function genDivForEachWeek(RangeOfWeek, AllRanges)//generates each week containe
                     $(SubEventRenderPlane).addClass("HideSubEventRenderPlane");
                     global_ExitManager.addNewExit(MoreOptionsOutsideClick);
                     GetDeletedEvents(myDay, ProcessDeletedEvents);
-                    function ProcessDeletedEvents(DeletedData)
-                    {
+                    function ProcessDeletedEvents(DeletedData) {
                         //debugger;
-                        function generateListDom(SubEventData)
-                        {
+                        function generateListDom(SubEventData) {
                             var myID = generateListDom.Count++;
                             var InActiveElementContainer = getDomOrCreateNew("InActiveElementContainer" + myID);
                             $(InActiveElementContainer).addClass("InActiveElementContainer");
                             var InActiveElementNameContainer = getDomOrCreateNew("InActiveElementNameContainer" + myID);
                             $(InActiveElementNameContainer).addClass("InActiveElementNameContainer");
                             InActiveElementNameContainer.setAttribute("title", SubEventData.Name);
-                            var InActiveElementNameSpan = getDomOrCreateNew("InActiveElementNameSpan" + myID,"span");
+                            var InActiveElementNameSpan = getDomOrCreateNew("InActiveElementNameSpan" + myID, "span");
                             $(InActiveElementNameSpan).addClass("InActiveElementNameSpan");
-                            
+
 
                             InActiveElementNameSpan.innerHTML = SubEventData.Name;
                             InActiveElementNameContainer.appendChild(InActiveElementNameSpan)
@@ -4388,29 +4226,26 @@ function genDivForEachWeek(RangeOfWeek, AllRanges)//generates each week containe
                         }
                         generateListDom.Count = 0;
                         DeletedData.forEach(generateListDom);
-                        if(!DeletedData.length)
-                        {
+                        if (!DeletedData.length) {
 
                             var EmptySpan = getDomOrCreateNew("EmptySpan" + generateListDom.Count, "span");
-                            EmptySpan.innerHTML ="...Empty..."
+                            EmptySpan.innerHTML = "...Empty..."
                             //$(InActiveElementNameSpan).addClass("InActiveElementNameSpan");
                             myDay.MoreInfoPanel.appendChild(EmptySpan)
                             setTimeout(function () { EmptySpan.innerHTML = "" }, 3000)
                         }
-                        
+
                     }
                 }
 
-                function MoreOptionsOutsideClick()
-                {
+                function MoreOptionsOutsideClick() {
                     $(SubEventRenderPlane).removeClass("HideSubEventRenderPlane");
                     myDay.UnRevealMoreOptions();
                     MoreOptions.onclick = MoreOptionsClick;
                 }
 
 
-                if (isToday)
-                {
+                if (isToday) {
                     var PreviousDay = $(".CurrentDay");
                     PreviousDay.removeClass("CurrentDay");
                     $(myDay.NameOfDayContainer).addClass("CurrentDay");
@@ -4420,7 +4255,7 @@ function genDivForEachWeek(RangeOfWeek, AllRanges)//generates each week containe
 
 
                 myDay.SubEventsCollection = {
-            };
+                };
                 BindClickTOStartOfDay(myDay);
                 myDay.UISpecs = {
                 };
@@ -4439,37 +4274,37 @@ function genDivForEachWeek(RangeOfWeek, AllRanges)//generates each week containe
         SubEventRenderPlane.End = RangeOfWeek.End;
         BindAddNewEventToClick(SubEventRenderPlane);
         WeekRange.DaysOfWeek = DaysOfWeekDoms;
-        var Index =AllRanges.length//gets index, because it gets the index bewfore the push
+        var Index = AllRanges.length//gets index, because it gets the index bewfore the push
         AllRanges.push(WeekRange);
         AllRanges[Index].Start = RangeOfWeek.Start;
         AllRanges[Index].End = RangeOfWeek.End;
         AllRanges[Index].UISpecs = {
-    };
+        };
         AllRanges[Index].SubEventsCollection = {
-    };
-        }
+        };
+    }
     WeekRange.renderPlane = SubEventRenderPlane;
 
-            //binds click event to creation of new event
+    //binds click event to creation of new event
 
 
     WeekRange.Dom.appendChild(RenderPlane.Dom);
 
     var RetValue = { NameOfWeek: NameOfWeekDayRenderPlane, WeekTwentyFourHourGrid: RenderPlane }
     return RetValue;
-    }
+}
 
-        //function creates Bind a click event to the render plane to enable addition of new events
-        function BindAddNewEventToClick(Week) {
+//function creates Bind a click event to the render plane to enable addition of new events
+function BindAddNewEventToClick(Week) {
     var RenderPlaneDom = Week.Dom;
     $(RenderPlaneDom).click(function (e) {
         //debugger;
         var posX = $(this).offset().left
         var posY = $(this).offset().top;
-        var left = e.pageX -posX;
-        var top = e.pageY -posY;
+        var left = e.pageX - posX;
+        var top = e.pageY - posY;
         var height = $(RenderPlaneDom).height();
-        var width = $("body").width() - e.pageX ;
+        var width = $("body").width() - e.pageX;
         //debugger;
 
         //alert(width);
@@ -4477,14 +4312,14 @@ function genDivForEachWeek(RangeOfWeek, AllRanges)//generates each week containe
         generateModal(left, top, height, width, Week.Start, this);
         e.stopPropagation();
     });
-    }
-        function BindClickTOStartOfDay(myDay) {
-            function CallBackFunc() {
+}
+function BindClickTOStartOfDay(myDay) {
+    function CallBackFunc() {
         refreshIframe(myDay.Start, myDay.End);
-        }
+    }
 
     $(myDay.NameOfDayContainer.Dom).click(CallBackFunc);
-    }
+}
 
 
 function GlobaPauseResumeButtonManager(events) {
@@ -4766,5 +4601,6 @@ function GlobaPauseResumeButtonManager(events) {
     }
 
     getPausedEventOrNextPossibleEvent(_this.SubEvents);
+
 }
 

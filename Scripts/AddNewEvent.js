@@ -4,7 +4,7 @@ var EventAddressTagDom;
 var EventRigid;
 var EventStartDateTimeDom;
 var EventEndDateTimeDom;
-var EventSplits=1;
+var EventSplits = 1;
 var EventrepeatStatus;
 var EventNonRigidDurationHolder
 var EventRepeatStart;
@@ -18,19 +18,18 @@ var EventRestrictionIsWorkWeek;
 
 
 
-function LaunchAddnewEvent(LoopBackCaller, CurrentUser,isTIle)
-{
-    EventNameDom=null;
-    EventAddressDom=null;
+function LaunchAddnewEvent(LoopBackCaller, CurrentUser, isTIle) {
+    EventNameDom = null;
+    EventAddressDom = null;
     EventAddressTagDom = null;
-    EventRigid=null;
+    EventRigid = null;
     EventStartDom = null;
-    EventSplits=1;
-    EventEndDom=null;
-    EventrepeatStatus=null;
+    EventSplits = 1;
+    EventEndDom = null;
+    EventrepeatStatus = null;
     EventNonRigidDurationHolder = null;
     EventRepeatStart = null;
-    EventRepeatEnd=null;
+    EventRepeatEnd = null;
     EventRepetitionSelection = null;
 
 
@@ -55,7 +54,7 @@ function LaunchAddnewEvent(LoopBackCaller, CurrentUser,isTIle)
     AllTabs.push(NameTab);
 
 
-    
+
 
 
     var RecurrenceTab = createCalEventRecurrenceTab(isTIle);
@@ -85,14 +84,12 @@ function LaunchAddnewEvent(LoopBackCaller, CurrentUser,isTIle)
     //TabTitleContainer.Dom.appendChild(DoneTab.Button.Dom);
     var NewCalendarEvent;//
     //$(DoneTab.Button.Dom).click(function ()
-        (DoneTab.Button.Dom).onclick=(function ()
-        {
+    (DoneTab.Button.Dom).onclick = (function () {
 
 
         var NewEvent = prepCalDataForPost();
 
-        if (NewEvent == null)
-        {
+        if (NewEvent == null) {
             return;
         }
         NewEvent.UserName = CurrentUser.UserName
@@ -103,9 +100,9 @@ function LaunchAddnewEvent(LoopBackCaller, CurrentUser,isTIle)
         //var url = "RootWagTap/time.top?WagCommand=1"
         var url = global_refTIlerUrl + "Schedule/Event";
 
-        var HandleNEwPage = new LoadingScreenControl("Tiler is Adding \"" + NewEvent.Name+ " \" to your schedule ...");
+        var HandleNEwPage = new LoadingScreenControl("Tiler is Adding \"" + NewEvent.Name + " \" to your schedule ...");
         HandleNEwPage.Launch();
-        
+
 
         $.ajax({
             type: "POST",
@@ -160,9 +157,9 @@ function LaunchAddnewEvent(LoopBackCaller, CurrentUser,isTIle)
         var ret = repeteOpitonSelect.Type.Name;
 
         alert(ret);*/
-        }
-    );
-    
+    }
+);
+
 
     AddNewEvent.Dom.appendChild(TabContentContainer.Dom);
     AddNewEvent.Dom.appendChild(TabTitleContainer.Dom);
@@ -174,18 +171,15 @@ function LaunchAddnewEvent(LoopBackCaller, CurrentUser,isTIle)
     if (LoopBackCaller == null) {
         CurrentTheme.TransitionNewContainer(AddNewEvent.Dom);
     }
-    else
-    {
+    else {
         LoopBackCaller(AddNewEvent);
     }
 }
 
-function prepCalDataForPost()
-{    
+function prepCalDataForPost() {
     var EventLocation = new Location(EventAddressTagDom.Dom.value, EventAddressDom.Dom.value);
     var EventName = EventNameDom.Dom.value;
-    if (EventName == "")
-    {
+    if (EventName == "") {
         alert("Please provide an Event Name");
         return null;
     }
@@ -194,9 +188,9 @@ function prepCalDataForPost()
     var CalendarColor = EventColor.getColor();
     CalendarColor = { r: CalendarColor.r, g: CalendarColor.g, b: CalendarColor.b, s: CalendarColor.Selection, o: CalendarColor.a };
     var EventDuration = EventNonRigidDurationHolder.holder.ToTimeSpan();
-    var RigidFlag =  !(EventRigid.status )
+    var RigidFlag = !(EventRigid.status)
     var EventStart = EventStartDateTimeDom.getDateTimeData();
-    
+
     var EventEnd = EventEndDateTimeDom.getDateTimeData();
     var DurationInMS = (EventDuration.Days * OneDayInMs) + (EventDuration.Hours * OneHourInMs) + (EventDuration.Mins * OneMinInMs)
     if (DurationInMS == 0) {
@@ -205,25 +199,23 @@ function prepCalDataForPost()
     }
 
 
-    if (RigidFlag)
-    {   
-        var TempEndDate = new Date( getFullTimeFromEntrytoJSDateobj(EventStart).getTime() + DurationInMS);
+    if (RigidFlag) {
+        var TempEndDate = new Date(getFullTimeFromEntrytoJSDateobj(EventStart).getTime() + DurationInMS);
         EventEnd.Date = new Date(TempEndDate.getFullYear(), TempEndDate.getMonth(), TempEndDate.getDate());
         EventEnd.Time = { Hour: TempEndDate.getHours(), Minute: TempEndDate.getMinutes() };
     }
 
     var start = getFullTimeFromEntrytoJSDateobj(EventStart);
     var End = getFullTimeFromEntrytoJSDateobj(EventEnd);
-    if (End <= start)
-    {
+    if (End <= start) {
         alert("End Time is earlier Than Start Time");
         return null;
     }
 
     var RepeatStatus = true;
 
-    
-    
+
+
 
     var DayPlusOne = new Date(CurrentTheme.Now);
     var Day = DayPlusOne.getDate();
@@ -236,8 +228,7 @@ function prepCalDataForPost()
     var RepetitionEnd = EventRepeatEnd.Dom.value;
 
     var repeteOpitonSelect = "none"
-    if (EventrepeatStatus.status)
-    {
+    if (EventrepeatStatus.status) {
         EventRepetitionSelection.forEach(function (Selection) { Selection.Dom = null; if (Selection.status) { repeteOpitonSelect = Selection } });
     }
 
@@ -245,8 +236,7 @@ function prepCalDataForPost()
 
     var EndDateTime = new Date();
 
-    function generateRestrictionData()
-    {
+    function generateRestrictionData() {
         var RestrictionStatusButtonStatus = !EventRestrictionFalseFlag.checked;
         var RestrictionStart = EventRestrictionStart.value;
         var RestrictionEnd = EventRestrictionEnd.value;
@@ -257,7 +247,7 @@ function prepCalDataForPost()
 
 
     var RestrictionProfile = generateRestrictionData();
-    
+
     debugger;
     var NewEvent = new CalEventData(EventName, EventLocation, Splits, CalendarColor, EventDuration, EventStart, EventEnd, repeteOpitonSelect, RepetitionStart, RepetitionEnd, RigidFlag, RestrictionProfile);
     debugger;
@@ -267,14 +257,12 @@ function prepCalDataForPost()
 
 
 
-function ActivateTab(AllTabs, ActiveTab)
-{
+function ActivateTab(AllTabs, ActiveTab) {
     var i = 0;
 
     //var retValue = { Title: NameTabTitle, Content: NameTabContent, Completion: CalEventIdentifierSectionCompletion };
     var j = i + 1;
-    for (i; i < AllTabs.length; i++)
-    {
+    for (i; i < AllTabs.length; i++) {
         j = i + 1;
         $(AllTabs[i].Content.Dom).removeClass(CurrentTheme.ActiveTabContent);
         $(AllTabs[i].Title.Dom).removeClass(CurrentTheme.ActiveTabTitle);
@@ -285,15 +273,13 @@ function ActivateTab(AllTabs, ActiveTab)
         $(AllTabs[i].Title.Dom).addClass(CurrentTheme.InActiveTabTitle);
         $(AllTabs[i].Title.Dom).addClass(CurrentTheme.AlternateFontColor);
         AllTabs[i].DisableTab()
-        $(AllTabs[i].Title.Dom).click(function (AllTabs, i) { return (function () { ActivateTab(AllTabs, AllTabs[i]) }) }(AllTabs,i));
-        if (j < AllTabs.length)
-        {
+        $(AllTabs[i].Title.Dom).click(function (AllTabs, i) { return (function () { ActivateTab(AllTabs, AllTabs[i]) }) }(AllTabs, i));
+        if (j < AllTabs.length) {
             $(AllTabs[i].Completion.Dom).click(function (AllTabs, i) { return (function () { ActivateTab(AllTabs, AllTabs[i]) }) }(AllTabs, j));
             AllTabs[i].Completion.Dom.innerHTML = "<p>Go To " + AllTabs[j].Name + "...</p>";
             $(AllTabs[i].Completion.Dom).addClass(CurrentTheme.AlternateFontColor);
         }
-        else
-        {
+        else {
             $(AllTabs[i].Completion.Dom).click(function (AllTabs, i) { return (function () { ActivateTab(AllTabs, AllTabs[i]) }) }(AllTabs, 0));
             AllTabs[i].Completion.Dom.innerHTML = "<p>Go To " + AllTabs[0].Name + "...</p>";
             $(AllTabs[i].Completion.Dom).addClass(CurrentTheme.AlternateFontColor);
@@ -309,12 +295,11 @@ function ActivateTab(AllTabs, ActiveTab)
 
     $(ActiveTab.Title.Dom).removeClass(CurrentTheme.InActiveTabTitle);
     $(ActiveTab.Title.Dom).addClass(CurrentTheme.ActiveTabTitle);
-    
+
 }
 
 
-function createCalEventNameTab(isTIle)
-{
+function createCalEventNameTab(isTIle) {
     var NameTabContainerID = "NameTabContainer";
     var NameTabContainer = getDomOrCreateNew(NameTabContainerID);
     var NameTabTitleID = "NameTabTitle";
@@ -342,7 +327,7 @@ function createCalEventNameTab(isTIle)
     var CalEventAddressTagParam = { Name: "Address NickName", ID: "CalEventAddressTag", Default: "Nickname?" };
 
 
-    
+
 
 
     var CalEventNameInputDom = generateuserInput(CalEventNameParam, null);
@@ -352,8 +337,8 @@ function createCalEventNameTab(isTIle)
     CalEventNameInput.Dom.style.width = "70%";
     //CalEventNameInput.Dom.style.height = "8%";
     //CalEventNameInputDom.Input.Dom.style.height = "16px";
-    
-    
+
+
     CalEventNameInput.Dom.style.left = "15%";
     $(CalEventNameInput.Dom).addClass(CurrentTheme.FontColor);
     $(CalEventNameInput.Dom).addClass("InputTextFont");
@@ -367,19 +352,18 @@ function createCalEventNameTab(isTIle)
     EventNameDom.Dom.style.width = "100%";
     EventNameDom.Dom.style.fontFamily = "'Muli', sans-serif";
 
-    
+
     EventNameDom.Dom.style.left = 0;
-    LabelContainerNameDom.Dom.parentNode.removeChild(LabelContainerNameDom.Dom); 
+    LabelContainerNameDom.Dom.parentNode.removeChild(LabelContainerNameDom.Dom);
 
     var url = global_refTIlerUrl + "User/Location";
     var myAutoSuggestControl = new AutoSuggestControl(url, "GET", HandleLocationResult);
-    
 
-    function HandleLocationResult(data, DomContainer,InputContainer)
-    {
+
+    function HandleLocationResult(data, DomContainer, InputContainer) {
         var EventIndex = 0;
         var HeightOfDom = 70;
-        
+
 
         $(DomContainer.Dom).empty();
         (DomContainer.Dom).style.height = 0;
@@ -389,23 +373,21 @@ function createCalEventNameTab(isTIle)
 
         data.forEach(resolveEachRetrievedEvent);
 
-        function resolveEachRetrievedEvent(CalendarEvent)
-        {
+        function resolveEachRetrievedEvent(CalendarEvent) {
             var CalendarEventDom = generateDOM(CalendarEvent);
             CalendarEventDom.Dom.style.top = (EventIndex * HeightOfDom) + "px";
             CalendarEventDom.Dom.style.height = HeightOfDom + "px"
             DomContainer.Dom.appendChild(CalendarEventDom.Dom);
             DomContainer.Dom.style.height = (++EventIndex * HeightOfDom) + "px";
-            
+
         }
 
-        function generateDOM(LocationData)
-        {
+        function generateDOM(LocationData) {
             var CacheLocationContainerID = "CacheLocationContainer" + EventIndex;
-            var CacheLocationContainer=getDomOrCreateNew(CacheLocationContainerID)
+            var CacheLocationContainer = getDomOrCreateNew(CacheLocationContainerID)
             var CacheLocationContainerTagContainerID = "CacheLocationContainerTagContainer" + EventIndex;
             var CacheLocationContainerTagContainer = getDomOrCreateNew(CacheLocationContainerTagContainerID, "span");
-            CacheLocationContainerTagContainer.Dom.innerHTML = LocationData.Tag+" - "
+            CacheLocationContainerTagContainer.Dom.innerHTML = LocationData.Tag + " - "
             $(CacheLocationContainerTagContainer.Dom).addClass("LocationTag");
             var CacheLocationAddressTagAddressID = "CacheLocationAddressTagAddress" + EventIndex;
             var CacheLocationAddressTagAddress = getDomOrCreateNew(CacheLocationAddressTagAddressID, "span");
@@ -420,10 +402,8 @@ function createCalEventNameTab(isTIle)
             return CacheLocationContainer;
         }
 
-        function OnClickOfDiv(LocationData, AddressInputDom)
-        {
-            return function ()
-            {
+        function OnClickOfDiv(LocationData, AddressInputDom) {
+            return function () {
                 var TagInputDom = CalEventAddressTagInputDom.Input.Dom;
                 TagInputDom.value = LocationData.Tag;
                 AddressInputDom.value = LocationData.Address;
@@ -437,7 +417,7 @@ function createCalEventNameTab(isTIle)
     var CalEventAddressInput = CalEventAddressInputDom.FullContainer;
     //CalEventAddressInput.Dom.style.height = "8%";
     var LabelContainerAddressDom = CalEventAddressInputDom.Label;
-    
+
     LabelContainerAddressDom.Dom.parentNode.removeChild(LabelContainerAddressDom.Dom);
 
     var CalEventAddressTagInputDom = generateuserInput(CalEventAddressTagParam, null);
@@ -502,7 +482,7 @@ function createCalEventNameTab(isTIle)
     EventAddressTagDom = CalEventAddressTagInputDom.Input;//public access of Address Tag Dom
     var LabelContainerAddressTagDom = CalEventAddressTagInputDom.Label;
     EventAddressTagDom.Dom.style.width = "100%";
-    EventAddressTagDom.Dom.style.fontFamily= "'Muli', sans-serif";
+    EventAddressTagDom.Dom.style.fontFamily = "'Muli', sans-serif";
     EventAddressTagDom.Dom.style.left = 0;
     //EventAddressTagDom.Dom.style.height = "100%";
     LabelContainerAddressTagDom.Dom.parentNode.removeChild(LabelContainerAddressTagDom.Dom);
@@ -511,7 +491,7 @@ function createCalEventNameTab(isTIle)
     /* Auto Schedule Container start */
     var EnableAAutoScheduleContainerID = "EnableAAutoScheduleContainer";
     var EnableAAutoScheduleContainer = getDomOrCreateNew(EnableAAutoScheduleContainerID);
-    
+
     var EnableAAutoScheduleContainerLabelID = "EnableAAutoScheduleContainerLabel";
     var EnableAAutoScheduleContainerLabel = getDomOrCreateNew(EnableAAutoScheduleContainerLabelID);
     EnableAAutoScheduleContainerLabel.Dom.innerHTML = "Unlock Tiler?";
@@ -519,19 +499,19 @@ function createCalEventNameTab(isTIle)
     var EnableAutoSchedulerButtonID = "EnableAutoSchedulerButton"
     var EnableAutoSchedulerButton = generateMyButton(AutoScheduleContainerLoopBack, EnableAutoSchedulerButtonID);
     $(EnableAutoSchedulerButton).addClass("setAsDisplayNone");
-    
-    
+
+
     //EnableAutoSchedulerButton.status = 0;
 
-    
+
 
     EventRigid = EnableAutoSchedulerButton;
 
     EnableAAutoScheduleContainer.Dom.appendChild(EnableAAutoScheduleContainerLabel.Dom)
-    
+
 
     //Split Input box
-    
+
     /*
     var AutoScheduleCountContainerID = "AutoScheduleCountContainer";
     var AutoSchedulerDataInputData = { Name: "", ID: AutoScheduleCountContainerID, Default: "Splits?" };
@@ -552,12 +532,12 @@ function createCalEventNameTab(isTIle)
 
     EventSplits = AutoSchedulerDataInputDataCounterDom.Input;
     */
-    
 
 
 
 
-    
+
+
     var AutoScheduleTimeConstraintContainerID = "AutoScheduleTimeCOnstraintContainer";
     var AutoScheduleTimeConstraintContainer = getDomOrCreateNew(AutoScheduleTimeConstraintContainerID);
 
@@ -578,21 +558,20 @@ function createCalEventNameTab(isTIle)
 
 
     //var DurationDial = new Dial(0, 5, 12, 0, 0);
-    var DialHolder = function ()
-    {
+    var DialHolder = function () {
         this.holder = null;
     }
 
-    DialHolder.holder= new Dial(0, 5, 12, 0, 0);
+    DialHolder.holder = new Dial(0, 5, 12, 0, 0);
     EventNonRigidDurationHolder = DialHolder;
 
-    
+
     var AutoScheduleDurationContainerDialContainerID = "AutoScheduleDurationContainerDialContainer";
     var AutoScheduleDurationContainerDialContainer = getDomOrCreateNew(AutoScheduleDurationContainerDialContainerID);
 
     removeElement(AutoSchedulerDataInputDataDom.Input.Dom);
 
-    AutoSchedulerDataInputDataDom.Input = getDomOrCreateNew("AutoScheduleDurationContainer_Text","span");
+    AutoSchedulerDataInputDataDom.Input = getDomOrCreateNew("AutoScheduleDurationContainer_Text", "span");
     AutoSchedulerDataInputDataDom.Input.Dom.innerHTML = (isTIle ? "Tile" : "Event") + " Duration";
     AutoSchedulerDataInputDataDom.FullContainer.Dom.appendChild(AutoSchedulerDataInputDataDom.Input.Dom);
     //$(AutoSchedulerDataInputDataDom.Input.Dom).click(function () { dialAutoScheduleCallBack(AutoScheduleDurationContainerDialContainer.Dom, dialAutoScheduleCallBack) });
@@ -612,30 +591,30 @@ function createCalEventNameTab(isTIle)
     AutoSchedulerDataInputDataDom.Input.Dom.style.marginTop = 0;
     AutoSchedulerDataInputDataDom.Input.Dom.style.height = "30px";
     AutoSchedulerDataInputDataDom.Input.Dom.style.lineHeight = "30px";
-    
+
     AutoScheduleTimeConstraintContainer.Dom.appendChild(AutoSchedulerDataInputDataDom.FullContainer.Dom);
     EnableAutoSchedulerButton.SetAsOff();//this initializs the button. This initialization has to be placed after the creation of the reference objects specified in the loop back function. In this case after the creation of "AutoScheduleContainerDataContainerSlider" in AutoScheduleContainerLoopBack
 
-    
 
-    
-    
+
+
+
 
     var AutoScheduleCountContainerDialContainerID = "AutoScheduleCountContainerDialContainer";
     var AutoScheduleCountContainerDialContainer = getDomOrCreateNew(AutoScheduleCountContainerDialContainerID);
 
 
-    
-    
+
+
 
     var AutoScheduleRangeConstraintContainerID = "AutoScheduleRangeConstraintContainer";
     var AutoScheduleRangeConstraintContainer = getDomOrCreateNew(AutoScheduleRangeConstraintContainerID);
     //AutoScheduleContainerDataContainerSlider.Dom.appendChild(AutoScheduleRangeConstraintContainer.Dom);
-    
-    
+
+
 
     var AutoScheduleRangeConstraintContainerStartID = "AutoScheduleRangeConstraintContainerStart";
-    
+
     var AutoScheduleRangeConstraintContainerStart = getDomOrCreateNew(AutoScheduleRangeConstraintContainerStartID);
     $(AutoScheduleRangeConstraintContainerStart.Dom).addClass("AutoScheduleTimeRange");
     var AutoScheduleRangeConstraintContainerStartDatePickerID = "AutoScheduleRangeConstraintContainerStartDatePicker";
@@ -662,10 +641,10 @@ function createCalEventNameTab(isTIle)
         }
     );
     */
-    
+
     var AutoScheduleRangeConstraintContainerStartTimePickerID = "AutoScheduleRangeConstraintContainerStartTimePicker";
     var AutoScheduleRangeConstraintContainerStartTimePicker = getDomOrCreateNew(AutoScheduleRangeConstraintContainerStartTimePickerID, "input");
-    
+
 
     AutoScheduleRangeConstraintContainerStart.Dom.appendChild(AutoScheduleRangeConstraintContainerStartTimePicker.Dom)
     AutoScheduleRangeConstraintContainerStart.Dom.appendChild(AutoScheduleRangeConstraintContainerStartDatePicker.Dom)//placing after time picker because of tab input
@@ -674,7 +653,7 @@ function createCalEventNameTab(isTIle)
 
     AutoScheduleRangeConstraintContainerStartTimePicker.Dom.style.borderBottom = "6px solid";
     $(AutoScheduleRangeConstraintContainerStartTimePicker.Dom).addClass(CurrentTheme.BorderColor);
-    
+
 
     //$(AutoScheduleRangeConstraintContainerStartTimePicker.Dom).timepicker();
 
@@ -684,7 +663,7 @@ function createCalEventNameTab(isTIle)
     AutoScheduleRangeConstraintContainerStartDatePicker.Dom.value = "";
     AutoScheduleRangeConstraintContainerStartDatePicker.Dom.setAttribute("placeholder", "Start Date (Default:Today) mm/dd/yyyy");
     $(AutoScheduleRangeConstraintContainerStartDatePicker.Dom).addClass(CurrentTheme.FontColor);
-    
+
     //$(AutoScheduleRangeConstraintContainerStartDatePicker.Dom).datepicker();
 
 
@@ -722,10 +701,10 @@ function createCalEventNameTab(isTIle)
     );
 
 
-    
+
     var AutoScheduleRangeConstraintContainerEndTimePickerID = "AutoScheduleRangeConstraintContainerEndTimePicker";
     var AutoScheduleRangeConstraintContainerEndTimePicker = getDomOrCreateNew(AutoScheduleRangeConstraintContainerEndTimePickerID, "input");
-    
+
 
     AutoScheduleRangeConstraintContainerEnd.Dom.appendChild(AutoScheduleRangeConstraintContainerEndTimePicker.Dom);
     AutoScheduleRangeConstraintContainerEnd.Dom.appendChild(AutoScheduleRangeConstraintContainerEndDatePicker.Dom);//placing after time picker because of tab button press. I want site to go from Time picker to Date
@@ -741,15 +720,15 @@ function createCalEventNameTab(isTIle)
     $(AutoScheduleRangeConstraintContainerEndTimePicker.Dom).addClass(CurrentTheme.FontColor);
     AutoScheduleRangeConstraintContainerEndDatePicker.Dom.setAttribute("placeholder", "End Date (Default: Tomorrow) mm/dd/yyyy");
     $(AutoScheduleRangeConstraintContainerEndDatePicker.Dom).addClass(CurrentTheme.FontColor);
-    
+
     //$(AutoScheduleRangeConstraintContainerEndDatePicker.Dom).datepicker();
 
 
-    AutoScheduleRangeConstraintContainerStart.getDateTimeData=getFullTimeFromEntry(AutoScheduleRangeConstraintContainerStartTimePicker,AutoScheduleRangeConstraintContainerStartDatePicker,0)
-    EventStartDateTimeDom=AutoScheduleRangeConstraintContainerStart;
+    AutoScheduleRangeConstraintContainerStart.getDateTimeData = getFullTimeFromEntry(AutoScheduleRangeConstraintContainerStartTimePicker, AutoScheduleRangeConstraintContainerStartDatePicker, 0)
+    EventStartDateTimeDom = AutoScheduleRangeConstraintContainerStart;
 
     AutoScheduleRangeConstraintContainerEnd.getDateTimeData = getFullTimeFromEntry(AutoScheduleRangeConstraintContainerEndTimePicker, AutoScheduleRangeConstraintContainerEndDatePicker, OneDayInMs);
-    EventEndDateTimeDom=AutoScheduleRangeConstraintContainerEnd;
+    EventEndDateTimeDom = AutoScheduleRangeConstraintContainerEnd;
 
     var AutoScheduleRangeConstraintContainerEndLabelID = "AutoScheduleRangeConstraintContainerEndLabel";
     var AutoScheduleRangeConstraintContainerEndLabel = getDomOrCreateNew(AutoScheduleRangeConstraintContainerEndLabelID);
@@ -763,80 +742,73 @@ function createCalEventNameTab(isTIle)
     $(CalEventIdentifierSectionCompletion.Dom).addClass("SectionCompletionButton");
     $(CalEventIdentifierSectionCompletion.Dom).addClass(CurrentTheme.AlternateContentSection);
     $(CalEventIdentifierSectionCompletion.Dom).addClass(CurrentTheme.AlternateFontColor);
-    
 
 
 
 
 
-    
 
-    
+
+
+
     AutoScheduleRangeConstraintContainer.Dom.appendChild(AutoScheduleRangeConstraintContainerStart.Dom);
     AutoScheduleRangeConstraintContainer.Dom.appendChild(AutoScheduleTimeConstraintContainer.Dom);//readjust
     AutoScheduleContainerDataContainerSlider.Dom.appendChild(AutoScheduleRangeConstraintContainerEnd.Dom);//readjust again
     //AutoScheduleContainerDataContainerSlider.Dom.appendChild(AutoSchedulerDataInputDataCounterDom.FullContainer.Dom);//append number of split input box
-    
 
-    
+
+
 
 
     /* Auto Schedule Container End */
 
 
-    function getCurrentRangeOfAutoContainer()
-    {
+    function getCurrentRangeOfAutoContainer() {
 
-        if (!EnableAutoSchedulerButton.status)
-        {
+        if (!EnableAutoSchedulerButton.status) {
             return 0;
         }
-        var StartData = getFullTimeFromEntry(AutoScheduleRangeConstraintContainerStartTimePicker, AutoScheduleRangeConstraintContainerStartDatePicker,0)();
-        var EndData = getFullTimeFromEntry(AutoScheduleRangeConstraintContainerEndTimePicker, AutoScheduleRangeConstraintContainerEndDatePicker,OneDayInMs)();
+        var StartData = getFullTimeFromEntry(AutoScheduleRangeConstraintContainerStartTimePicker, AutoScheduleRangeConstraintContainerStartDatePicker, 0)();
+        var EndData = getFullTimeFromEntry(AutoScheduleRangeConstraintContainerEndTimePicker, AutoScheduleRangeConstraintContainerEndDatePicker, OneDayInMs)();
 
         var TwentyFourHourStartTime = StartData.Time //AP_To24Hour(AutoScheduleRangeConstraintContainerStartTimePicker.Dom.value);
         var TwentyFourHourEndTime = EndData.Time;//AP_To24Hour(AutoScheduleRangeConstraintContainerEndTimePicker.Dom.value);
-        var StartDate =StartData.Date// date_mm_dd__yyyy_ToDateObj(AutoScheduleRangeConstraintContainerStartDatePicker.Dom.value,"/")
+        var StartDate = StartData.Date// date_mm_dd__yyyy_ToDateObj(AutoScheduleRangeConstraintContainerStartDatePicker.Dom.value,"/")
         var EndDate = EndData.Date//date_mm_dd__yyyy_ToDateObj(AutoScheduleRangeConstraintContainerEndDatePicker.Dom.value, "/")
         StartDate.setHours(TwentyFourHourStartTime.Hour, TwentyFourHourStartTime.Minute);
         EndDate.setHours(TwentyFourHourEndTime.Hour, TwentyFourHourEndTime.Minute);
-        
+
 
         return EndDate - StartDate;
     }
 
-    
 
 
-    
 
-    function getFullTimeFromEntrytoJSDateobj(Obj)
-    {       
-        var Time=Tesobj.Time;
-        
-        var DateData=new Date(Tesobj.Date);
+
+
+    function getFullTimeFromEntrytoJSDateobj(Obj) {
+        var Time = Tesobj.Time;
+
+        var DateData = new Date(Tesobj.Date);
         DateData.setHours(Time.Hour, Time.Minute);
         return DateData;
     }
-    
 
-    function dialAutoScheduleCallBack(value)
-    {
+
+    function dialAutoScheduleCallBack(value) {
         DialOnEvent(null, UpdateInputBox, DialHolder.holder);
     }
 
 
-    function UpdateInputBox(myDial)
-    {
+    function UpdateInputBox(myDial) {
         DialHolder.holder = myDial;
         AutoSchedulerDataInputDataDom.Input.Dom.innerHTML = DialHolder.holder.getTimeString();
     }
 
-    function AutoScheduleContainerLoopBack()
-    {
-        if (!EnableAutoSchedulerButton.status)
-        {
-            
+    function AutoScheduleContainerLoopBack() {
+        if (!EnableAutoSchedulerButton.status) {
+
             $(EnableAAutoScheduleContainer.Dom).addClass("setAsDisplayNone");//sets as hidden
             setTimeout(function () {//later relases the slider
                 $(AutoScheduleContainerDataContainerSlider.Dom).removeClass("EnableSliderTop");
@@ -849,9 +821,8 @@ function createCalEventNameTab(isTIle)
                 //AutoScheduleRangeConstraintContainer.Dom.style.top = "0%";//hack Alert
             }
         }
-        else
-        {
-            
+        else {
+
             $(EnableAAutoScheduleContainer.Dom).removeClass("setAsDisplayNone");
             setTimeout(function () {
                 $(AutoScheduleContainerDataContainerSlider.Dom).removeClass("DisableSliderTop");
@@ -877,22 +848,20 @@ function createCalEventNameTab(isTIle)
 
     NameTabContent.Dom.appendChild(EnableAAutoScheduleContainer.Dom);
 
-    
-    
+
+
     NameTabContent.Dom.appendChild(CalEventIdentifierSectionCompletion.Dom);//disables recurrence tab selection
 
 
 
-    if (isTIle)
-    {
+    if (isTIle) {
         EnableAutoSchedulerButton.SetAsOn();
     }
     else {
         EnableAutoSchedulerButton.SetAsOff();
     }
 
-    function LaunchTab()
-    {
+    function LaunchTab() {
 
     }
 
@@ -910,12 +879,12 @@ function createCalEventNameTab(isTIle)
         overrideTimeFormat: 12,
         overrideTimeOutput: "%I:%M%p"
     });
-    
+
     AutoScheduleRangeConstraintContainerEndTimePicker.onclick = function () {
         var aElement1 = $(AutoScheduleRangeConstraintContainerEndTimePicker.parentElement).children("a");
         aElement1[0].click()
     };
-    
+
     $(AutoScheduleRangeConstraintContainerStartTimePicker.Dom).datebox({
         mode: "timeflipbox",
         minuteStep: 5,
@@ -931,8 +900,7 @@ function createCalEventNameTab(isTIle)
     return retValue;
 }
 
-function createCalEventRecurrenceTab(IsTile)
-{
+function createCalEventRecurrenceTab(IsTile) {
     var RecurrenceTabContainerID = "RecurrenceTabContainer";
     var RecurrenceTabContainer = getDomOrCreateNew(RecurrenceTabContainerID);
     var RecurrenceTabTitleID = "RecurrenceTabTitle";
@@ -957,7 +925,7 @@ function createCalEventRecurrenceTab(IsTile)
     var EnableRecurrenceContainer = getDomOrCreateNew(EnableRecurrenceContainerID);
 
     var EnableRecurrenceLabelID = "EnableRecurrenceLabel";
-    var EnableRecurrenceLabel = getDomOrCreateNew(EnableRecurrenceLabelID,"label");
+    var EnableRecurrenceLabel = getDomOrCreateNew(EnableRecurrenceLabelID, "label");
     EnableRecurrenceContainer.Dom.appendChild(EnableRecurrenceLabel.Dom);
     $(EnableRecurrenceContainer.Dom).addClass(CurrentTheme.FontColor);
     EnableRecurrenceLabel.Dom.innerHTML = "Do you want this event to recurr?"
@@ -966,26 +934,26 @@ function createCalEventRecurrenceTab(IsTile)
     var EnableRecurrenceButtonContainer = getDomOrCreateNew(EnableRecurrenceButtonContainerID);
     EnableRecurrenceContainer.Dom.appendChild(EnableRecurrenceButtonContainer.Dom);
     $(EnableRecurrenceButtonContainer.Dom).addClass("EnableButtonContainer");
-    
+
     var EnableRecurrenceButtonID = "EnableRecurrenceButton";
     var EnableRecurrenceButton = getDomOrCreateNew(EnableRecurrenceButtonID);
     $(EnableRecurrenceButton.Dom).addClass("EnableButton");
-    
+
     EnableRecurrenceButton.status = 0;
     EventrepeatStatus = EnableRecurrenceButton;
-    
+
 
     //Enabled Recurring Settings
     var EnabledRecurrenceContainerID = "EnabledRecurrenceContainer";
     var EnabledRecurrenceContainer = getDomOrCreateNew(EnabledRecurrenceContainerID);
-    
+
 
     var EnableRecurrenceYesTextID = "EnableRecurrenceYesText";
     var EnableRecurrenceYesText = getDomOrCreateNew(EnableRecurrenceYesTextID);
     EnableRecurrenceButtonContainer.Dom.appendChild(EnableRecurrenceYesText.Dom);
     $(EnableRecurrenceYesText.Dom).addClass("EnableButtonChoiceText");
     $(EnableRecurrenceYesText.Dom).addClass("EnableButtonChoiceYeaText");
-    
+
 
     var EnableRecurrenceNoTextID = "EnableRecurrenceNoText";
     var EnableRecurrenceNoText = getDomOrCreateNew(EnableRecurrenceNoTextID);
@@ -993,20 +961,17 @@ function createCalEventRecurrenceTab(IsTile)
     EnableRecurrenceButtonContainer.Dom.appendChild(EnableRecurrenceButton.Dom);//appending after because of z-index effect
     $(EnableRecurrenceNoText.Dom).addClass("EnableButtonChoiceText");
     $(EnableRecurrenceNoText.Dom).addClass("EnableButtonChoiceNayText");
-    
+
     RecurrenceTabContent.Dom.appendChild(EnableRecurrenceContainer.Dom);
     $(EnableRecurrenceContainer.Dom).click(genFunctionForButtonClick(EnableRecurrenceButton, EnabledRecurrenceContainer));
     genFunctionForButtonClick(EnableRecurrenceButton, EnabledRecurrenceContainer)();
     EventrepeatStatus = EnabledRecurrenceContainer;
 
-    
 
-    function genFunctionForButtonClick(Button, RecurrenceContainer)
-    {
-        return function()
-        {
-            switch(Button.status)
-            {
+
+    function genFunctionForButtonClick(Button, RecurrenceContainer) {
+        return function () {
+            switch (Button.status) {
                 case 0:
                     {
                         $(Button.Dom).removeClass("EnableButtonOn");
@@ -1017,7 +982,7 @@ function createCalEventRecurrenceTab(IsTile)
                     break;
                 case 1:
                     {
-                        
+
 
                         $(Button.Dom).removeClass("EnableButtonOff");
                         $(Button.Dom).addClass("EnableButtonOn");
@@ -1026,11 +991,11 @@ function createCalEventRecurrenceTab(IsTile)
                     }
                     break;
             }
-            Button.status+=1;
-            Button.status%=2;
+            Button.status += 1;
+            Button.status %= 2;
         }
     }
-    
+
 
 
 
@@ -1062,7 +1027,7 @@ function createCalEventRecurrenceTab(IsTile)
     var weeklyRecurrenceButtonText = getDomOrCreateNew(weeklyRecurrenceButtonTextID);
     $(weeklyRecurrenceButton.Dom).addClass("recurrenceButton");
     $(weeklyRecurrenceButtonText.Dom).addClass("CentreAlignedName");
-    weeklyRecurrenceButtonText.Dom.innerHTML="Weekly"
+    weeklyRecurrenceButtonText.Dom.innerHTML = "Weekly"
     $(weeklyRecurrenceButton.Dom).append(weeklyRecurrenceButtonText.Dom);
 
 
@@ -1115,19 +1080,16 @@ function createCalEventRecurrenceTab(IsTile)
     EventRepetitionSelection = AllDoms;//globals Access
 
 
-    function DisableAllDomData()
-    {
+    function DisableAllDomData() {
         AllDoms.forEach(function (eachDomCombo) { $(eachDomCombo.Dom).addClass("InActiveRecurrenceButton"); eachDomCombo.status = false });
     }
-    
 
-    
 
-    function createDomEnablingFunction(DomCombo, Index, RecurrenceTabContent, DayOfTheWeekContainer,RevealDayOfWeekCircles,EventRange)
-    {
+
+
+    function createDomEnablingFunction(DomCombo, Index, RecurrenceTabContent, DayOfTheWeekContainer, RevealDayOfWeekCircles, EventRange) {
         var var1 = DaysOfTheWeekContainer;
-        var CallBack = function  ()
-        {
+        var CallBack = function () {
             DisableAllDomData();
             $(DomCombo.Dom).removeClass("InActiveRecurrenceButton");
             $(DomCombo.Dom).addClass("ActiveRecurrenceButton");
@@ -1138,8 +1100,7 @@ function createCalEventRecurrenceTab(IsTile)
             {
                 $(var2.Dom).hide();
             }
-            else
-            {
+            else {
                 var2.Dom.style.visible = "visible";
                 $(var2.Dom).show();
                 RevealDayOfWeekCircles();
@@ -1156,9 +1117,9 @@ function createCalEventRecurrenceTab(IsTile)
     $(yearlyRecurrenceButton.Dom).click(createDomEnablingFunction(AllDoms[3], 3, RecurrenceTabContent, DaysOfTheWeekContainer, DaysOfTheWeek.RevealDayOfWeek));
 
 
-    
-    
-    
+
+
+
 
     /*RecurrenceButtonContainer.Dom.appendChild(dailyRecurrenceButton.Dom);
     RecurrenceButtonContainer.Dom.appendChild(weeklyRecurrenceButton.Dom);
@@ -1176,7 +1137,7 @@ function createCalEventRecurrenceTab(IsTile)
     var BussinessHourInputContainer = getDomOrCreateNew(BussinessHourContainerID);
     $(BussinessHourInputContainer.Dom).addClass(CurrentTheme.FontColor);
     $(BussinessHourInputContainer.Dom).addClass("DayPreferenceRadioButtonContainer")
-    
+
     var BussinessHourRadioID = "BussinessHourRadio";
     var BussinessHourRadio = getDomOrCreateNew(BussinessHourRadioID, "input");
     BussinessHourRadio.Dom.setAttribute("type", "radio");
@@ -1186,7 +1147,7 @@ function createCalEventRecurrenceTab(IsTile)
     var BussinessHourRadioLabel = getDomOrCreateNew(BussinessHourRadioLabelID, "label");
     BussinessHourRadioLabel.Dom.setAttribute("for", "BussinessHourRadio");
     BussinessHourRadioLabel.Dom.innerHTML = "Work Days";
-    
+
 
     BussinessHourInputContainer.Dom.appendChild(BussinessHourRadio.Dom)
     BussinessHourInputContainer.Dom.appendChild(BussinessHourRadioLabel.Dom)
@@ -1207,7 +1168,7 @@ function createCalEventRecurrenceTab(IsTile)
     AnytimeLabel.Dom.innerHTML = "AnyTime";
 
     Anytime.checked = true;
-    
+
 
 
     AnyHourTimeContainer.Dom.appendChild(Anytime.Dom)
@@ -1245,7 +1206,7 @@ function createCalEventRecurrenceTab(IsTile)
     TimeSelection.appendChild(StartTimeContainer);
     TimeSelection.appendChild(ToText);
     TimeSelection.appendChild(EndTimeContainer);
-    
+
 
     DayPreferenceContainer.Dom.appendChild(AnyHourTimeContainer.Dom)
     DayPreferenceContainer.Dom.appendChild(BussinessHourInputContainer.Dom)
@@ -1270,12 +1231,9 @@ function createCalEventRecurrenceTab(IsTile)
     EventRestrictionEnd = EndTime;
     EventRestrictionIsWorkWeek = BussinessHourRadio;
 
-    function BindChangesToRadioButton()
-    {
-        Anytime.onchange = function ()
-        {
-            if (Anytime.checked)
-            {
+    function BindChangesToRadioButton() {
+        Anytime.onchange = function () {
+            if (Anytime.checked) {
                 $(TimeSelection).addClass("setAsDisplayNone");
             }
         }
@@ -1296,8 +1254,7 @@ function createCalEventRecurrenceTab(IsTile)
         Customtime.onchange = function () {
             if (Customtime.checked) {
                 $(TimeSelection).removeClass("setAsDisplayNone");
-                if(StartTime.value =="")
-                {
+                if (StartTime.value == "") {
                     StartTime.value = "12:00 am";
                 }
 
@@ -1307,14 +1264,13 @@ function createCalEventRecurrenceTab(IsTile)
             }
         }
 
-        
+
         Anytime.onchange();
         BussinessHourRadio.onchange();
         Customtime.onchange();
 
         var aElement1 = $(StartTimeContainer).children("a");
-        StartTimeContainer.onclick = function ()
-        {
+        StartTimeContainer.onclick = function () {
             aElement1[0].click()
         };
 
@@ -1356,7 +1312,7 @@ function createCalEventRecurrenceTab(IsTile)
 
     var RepetitionRangeContainerEndInputID = "RepetitionRangeContainerEndInput";
     var RepetitionRangeContainerEndInput = getDomOrCreateNew(RepetitionRangeContainerEndInputID, "input");
-    
+
 
     $(RepetitionRangeContainerEndContainer.Dom).append(RepetitionRangeContainerEndContainerLabel.Dom);
     $(RepetitionRangeContainerEndContainer.Dom).append(RepetitionRangeContainerEndInput.Dom);
@@ -1368,7 +1324,7 @@ function createCalEventRecurrenceTab(IsTile)
     RepetitionRangeCOntainer.Dom.appendChild(RepetitionRangeContainerEndContainer.Dom);
 
     /*Repeat event container End*/
-    
+
     var RecurrenceSectionCompletionID = "RecurrenceSectionCompletion";
     var RecurrenceSectionCompletion = getDomOrCreateNew(RecurrenceSectionCompletionID);
     $(RecurrenceSectionCompletion.Dom).addClass("SectionCompletionButton");
@@ -1386,17 +1342,17 @@ function createCalEventRecurrenceTab(IsTile)
     AutoSchedulerDataInputDataCounterDom.Label.Dom.style.width = "auto";
     AutoSchedulerDataInputDataCounterDom.Label.Dom.style.position = "relative";
     AutoSchedulerDataInputDataCounterDom.Label.Dom.style.marginRight = "3px";
-    AutoSchedulerDataInputDataCounterDom.Label.Dom.style.display= "inline-block";
+    AutoSchedulerDataInputDataCounterDom.Label.Dom.style.display = "inline-block";
     $(AutoSchedulerDataInputDataCounterDom.Input.Dom).addClass(CurrentTheme.FontColor);
     AutoSchedulerDataInputDataCounterDom.Input.Dom.value = 1;
     AutoSchedulerDataInputDataCounterDom.Input.Dom.style.width = "2em";
     AutoSchedulerDataInputDataCounterDom.Input.Dom.style.height = "1em";
-    AutoSchedulerDataInputDataCounterDom.Input.Dom.style.left ="auto"
+    AutoSchedulerDataInputDataCounterDom.Input.Dom.style.left = "auto"
     AutoSchedulerDataInputDataCounterDom.Input.setAttribute("type", "Number");
     //AutoSchedulerDataInputDataCounterDom.Input.Dom.style.left = "10%";
     //AutoSchedulerDataInputDataCounterDom.Input.Dom.style.top = 0;
     //AutoSchedulerDataInputDataCounterDom.Input.Dom.style.marginTop = 0;
-    
+
 
 
     EventSplits = AutoSchedulerDataInputDataCounterDom.Input;
@@ -1404,21 +1360,20 @@ function createCalEventRecurrenceTab(IsTile)
     //$(AutoSchedulerDataInputDataCounterDom.FullContainer).removClass("setAsDisplayNone");
     //$(DayPreferenceContainer.Dom).addClass("setAsDisplayNone");
 
-    
+
 
     /*Recurrence Day Preference Container End*/
     EnabledRecurrenceContainer.Dom.appendChild(RecurrenceButtonContainer.Dom)
     EnabledRecurrenceContainer.Dom.appendChild(DaysOfTheWeekContainer.Dom);
     //EnabledRecurrenceContainer.Dom.appendChild(DayPreferenceContainer.Dom)
-    
-    if (!IsTile)
-    {
+
+    if (!IsTile) {
         $(AutoSchedulerDataInputDataCounterDom.FullContainer).addClass("setAsDisplayNone");
         $(DayPreferenceContainer.Dom).addClass("setAsDisplayNone");
     }
     EnabledRecurrenceContainer.Dom.appendChild(RepetitionRangeCOntainer.Dom);
-    
-    
+
+
     RecurrenceTabContent.Dom.appendChild(EnabledRecurrenceContainer.Dom)
     RecurrenceTabContent.Dom.appendChild(AutoSchedulerDataInputDataCounterDom.FullContainer.Dom);
     RecurrenceTabContent.Dom.appendChild(DayPreferenceContainer.Dom)
@@ -1430,19 +1385,16 @@ function createCalEventRecurrenceTab(IsTile)
 
 
 
-    
 
 
 
-    function LaunchTab(MiscData)
-    {
+
+    function LaunchTab(MiscData) {
         var CurrentRange = MiscData[0].Content.getCurrentRangeOfAutoContainer();
         var i = 0;
         var NumbeOfValids = new Array();
-        for (i; i < AllDoms.length; i++)
-        {
-            if (CurrentRange < AllDoms[i].Range)
-            {
+        for (i; i < AllDoms.length; i++) {
+            if (CurrentRange < AllDoms[i].Range) {
                 RecurrenceButtonContainer.Dom.appendChild(AllDoms[i].Dom)
                 NumbeOfValids.push(AllDoms[i]);
             }
@@ -1465,8 +1417,7 @@ function createCalEventRecurrenceTab(IsTile)
         $(RecurrenceTabTitle.Dom).addClass(CurrentTheme.ActiveTabTitle);*/
     }
 
-    function DisableTab(ExtraData)
-    {
+    function DisableTab(ExtraData) {
         /*$(RecurrenceTabContent.Dom).removeClass(CurrentTheme.ActiveTabContent);
         $(RecurrenceTabTitle.Dom).removeClass(CurrentTheme.ActiveTabTitle);
         $(RecurrenceTabTitle.Dom).removeClass(CurrentTheme.ContentSection);
@@ -1489,22 +1440,19 @@ function createCalEventRecurrenceTab(IsTile)
 /*
 function binds the date selector to the click event of the passed "LaunchDOm"
 */
-function BindImputToDatePicketMobile(LaunchDOm)
-{
+function BindImputToDatePicketMobile(LaunchDOm) {
 
-    LaunchDOm.onclick=function()
-    {
+    LaunchDOm.onclick = function () {
         var Container = getDomOrCreateNew("ContainerDateElement");
         LaunchDatePicker(false, Container.Dom, LaunchDOm);
         Container.Dom.style.display = "block";
         CurrentTheme.getCurrentContainer().appendChild((Container.Dom));
     }
 
-    
+
 }
 
-function createCalEventDoneTab()
-{
+function createCalEventDoneTab() {
     var RangeTabContainerID = "RangeTabContainer";
     var RangeTabContainer = getDomOrCreateNew(RangeTabContainerID);
     var RangeTabTitleID = "RangeTabTitle";
@@ -1537,7 +1485,7 @@ function createCalEventCancelTab() {
     var CancelTabTitleText = getDomOrCreateNew(CancelTabTitleTextID);
     //BackIcon
 
-    
+
     CancelTabTitleText.Dom.innerHTML = "Cancel";
     var CancelTabContentID = "CancelTabContent";
     var CancelTabContent = getDomOrCreateNew(CancelTabContentID);
@@ -1561,31 +1509,27 @@ function createCalEventCancelTab() {
 
 
 
-function generateDayOfWeekRepetitionDom()
-{
+function generateDayOfWeekRepetitionDom() {
     var i = 0;
     var AllDoms = new Array();
-    for (i = 0; i < WeekDays.length; i++)
-    {
+    for (i = 0; i < WeekDays.length; i++) {
         AllDoms.push(createDoms(WeekDays[i], i));
     }
 
-    var retValue = { AllDoms: AllDoms, RevealDayOfWeek: createRevealFunction(AllDoms)};
+    var retValue = { AllDoms: AllDoms, RevealDayOfWeek: createRevealFunction(AllDoms) };
 
-    function createDoms(DayOfWeek, index)
-    {
+    function createDoms(DayOfWeek, index) {
         var DayDomID = DayOfWeek + "Recurrence";
-        var DayDom = getDomOrCreateNew(DayDomID,"span");
+        var DayDom = getDomOrCreateNew(DayDomID, "span");
         DayDom.Dom.innerHTML = "<p class=\"DayOfWeekLetter\">" + DayOfWeek[0] + "</p>";
         DayDom.DayOfWeekIndex = index;
-        DayDom.Dom.style.left = ((index * 14.29) + (14.29/2)) + "%";
+        DayDom.Dom.style.left = ((index * 14.29) + (14.29 / 2)) + "%";
         //DayDom.Dom.style.marginLeft = "40px";
         $(DayDom.Dom).addClass("DayofWeekCircle");
         DayDom.status = 0;
         $(DayDom.Dom).click(generateFunctionForSelectedDayofWeek(DayDom));
         generateFunctionForSelectedDayofWeek(DayDom);
-        function generateFunctionForSelectedDayofWeek(DayDom)
-        {
+        function generateFunctionForSelectedDayofWeek(DayDom) {
             return function () {
                 DayDom.status += 1;
                 DayDom.status %= 2;
@@ -1610,13 +1554,10 @@ function generateDayOfWeekRepetitionDom()
     }
 
 
-    function createRevealFunction(AllDoms)
-    {//creates function that slowly displays the day of the week circles
-        return function ()
-        {
+    function createRevealFunction(AllDoms) {//creates function that slowly displays the day of the week circles
+        return function () {
             var i = 0;
-            AllDoms.forEach(function (myDom)
-            {
+            AllDoms.forEach(function (myDom) {
                 setTimeout(function () { myDom.Dom.style.opacity = 1; myDom.Dom.style.top = "0px"; }, i * 200);
             }
             )
@@ -1630,8 +1571,7 @@ function generateDayOfWeekRepetitionDom()
 
 
 
-function LaunchDatePicker(isRigid,Container,DivWithDateData)
-{
+function LaunchDatePicker(isRigid, Container, DivWithDateData) {
     var DatePickerOptionContainer = getDomOrCreateNew("DatePickerOptionContainer");
     var DatePickerTitleContainer = getDomOrCreateNew("DatePickerTitle", "span");
     DatePickerTitleContainer.Dom.innerHTML = "Select an Option";
@@ -1641,13 +1581,12 @@ function LaunchDatePicker(isRigid,Container,DivWithDateData)
     var SelectDateButtonContainer = getDomOrCreateNew("SelectDateContainer");
 
     var SelectDateButton = getDomOrCreateNew("SelectDate", "input");
-    SelectDateButton.Dom.value= DivWithDateData.value
+    SelectDateButton.Dom.value = DivWithDateData.value
     SelectDateButtonContainer.Dom.appendChild(SelectDateButton.Dom);
 
     $(DatePickerTitleContainer.Dom).addClass(CurrentTheme.AlternateFontColor);
 
-    if (!isRigid)
-    {
+    if (!isRigid) {
         var AllButtonsContainer = getDomOrCreateNew("AllButtonsContainer");
         var EndOfTodaybutton = getDomOrCreateNew("EndOfToday", "button");
         EndOfTodaybutton.Dom.innerHTML = "Today";
@@ -1670,8 +1609,8 @@ function LaunchDatePicker(isRigid,Container,DivWithDateData)
         $(EndOfWeekbutton.Dom).click(function () { var currentDateData = getEndOfTheWeekDateTime(); populateTextBox(currentDateData, DivWithDateData, Container) });
         $(EndOfMonthButton.Dom).click(function () { var currentDateData = getEndOfTheMontDateTime(); populateTextBox(currentDateData, DivWithDateData, Container) });
 
-        
-        
+
+
         AllButtonsContainer.Dom.appendChild(EndOfTodaybutton.Dom);
         AllButtonsContainer.Dom.appendChild(EndOfTomorrowButton.Dom);
         AllButtonsContainer.Dom.appendChild(EndOfWeekbutton.Dom);
@@ -1679,7 +1618,7 @@ function LaunchDatePicker(isRigid,Container,DivWithDateData)
         DatePickerButtonContainer.Dom.appendChild(AllButtonsContainer.Dom);
     }
 
-    
+
 
     DatePickerButtonContainer.Dom.appendChild(DatePickerTitleContainer.Dom);
     DatePickerButtonContainer.Dom.appendChild(SelectDateButtonContainer.Dom);
@@ -1687,18 +1626,16 @@ function LaunchDatePicker(isRigid,Container,DivWithDateData)
 
     DatePickerOptionContainer.Dom.appendChild(DatePickerButtonContainer.Dom);
 
-    
+
     $(DatePickerOptionContainer.Dom).click(function (event) { if (event.target == DatePickerOptionContainer.Dom) populateTextBox(null, DivWithDateData, Container) });
-    
+
     Container.appendChild(DatePickerOptionContainer.Dom);
     $(SelectDateButton.Dom).datebox({
         mode: "slidebox",
         //afterToday: true,
         overrideDateFormat: "%m/%d/%Y",
-        closeCallback: function ()
-        {
-            if (SelectDateButton.Dom.value == "")
-            {
+        closeCallback: function () {
+            if (SelectDateButton.Dom.value == "") {
                 return;
             }
             var selectedDate = SelectDateButton.Dom.value;
@@ -1708,13 +1645,12 @@ function LaunchDatePicker(isRigid,Container,DivWithDateData)
             if (!(selectedDate) || (selectedDate_split.length < 1)) {
                 retValue = null;
             }
-            else
-            {
+            else {
                 retValue = { Month: selectedDate_split[0], Day: selectedDate_split[1], Year: selectedDate_split[2] };
             }
             populateTextBox(retValue, DivWithDateData, Container);
-            
-            
+
+
 
         }
     });
@@ -1728,25 +1664,22 @@ function LaunchDatePicker(isRigid,Container,DivWithDateData)
     {
         event.stopPropagation();
     }
-    
-    
+
+
 
     //$(DatePickerButtonContainer.Dom).add(DatePickerOptionContainer).click(handler);
 
 }
 
-function populateTextBox(DateData, container, ContainerDateElement)
-{
-    if (DateData != null)
-    {
+function populateTextBox(DateData, container, ContainerDateElement) {
+    if (DateData != null) {
         container.value = DateData.Month + "/" + DateData.Day + "/" + DateData.Year;
     }
     ContainerDateElement.style.display = "none";
     $(ContainerDateElement).empty();
 }
 
-function getEndOfTodayDateTime()
-{
+function getEndOfTodayDateTime() {
     var RetValue = new Date(Date.now());
     RetValue.setHours(23, 59, 59);
 
@@ -1754,25 +1687,22 @@ function getEndOfTodayDateTime()
     return retValue;
 }
 
-function getEndOfTheWeekDateTime()
-{
+function getEndOfTheWeekDateTime() {
     var RetValue = new Date(Date.now());
     RetValue.setHours(0, 0, 0, 0);
     var currDay = RetValue.getDay();
     var Multiplier = 6 - currDay;
 
     RetValue = new Date(RetValue.getTime() + (Multiplier * OneDayInMs));
-    var retValue = { Month: RetValue.getMonth()+1, Day: RetValue.getDate(), Year: RetValue.getFullYear() };
+    var retValue = { Month: RetValue.getMonth() + 1, Day: RetValue.getDate(), Year: RetValue.getFullYear() };
     return retValue;
 }
 
-function getEndOfTheMontDateTime()
-{
+function getEndOfTheMontDateTime() {
     var RetValue = new Date(Date.now());
     var nextMonth = (RetValue.getMonth() + 1) % 12;
     var year = RetValue.getFullYear();
-    if (nextMonth == 0)
-    {
+    if (nextMonth == 0) {
         year + 1;
     }
     RetValue = new Date(new Date(year, nextMonth, 1, 23, 59, 59).getTime() - OneDayInMs);
@@ -1783,39 +1713,34 @@ function getEndOfTheMontDateTime()
 
 
 
-function getEndOfTomorrowDateTime()
-{
+function getEndOfTomorrowDateTime() {
     var RetValue = new Date(Date.now());
-    RetValue= new Date (RetValue.getTime() + OneDayInMs);
+    RetValue = new Date(RetValue.getTime() + OneDayInMs);
     RetValue.setHours(23, 59, 59);
     var retValue = { Month: RetValue.getMonth() + 1, Day: RetValue.getDate(), Year: RetValue.getFullYear() };
     return retValue;
 }
 
-function GenerateColorPickerContainer(OverLay)
-{
+function GenerateColorPickerContainer(OverLay) {
     var pickColorButton = getDomOrCreateNew("SelectColorButton");
     $(pickColorButton.Dom).click(generateColorPicker);
     var DarkOverLay = getDomOrCreateNew("DarkOverlay");
-    function loopBackFunction()
-    {
+    function loopBackFunction() {
         /*
         setTimeout(
         function () {*/
-            $(pickColorButton.Dom).addClass(myPicker.Selector.getColor().cssClass);
-            $(myPicker.Selector.Container).remove()
-            $(DarkOverLay.Dom).remove();
-            
+        $(pickColorButton.Dom).addClass(myPicker.Selector.getColor().cssClass);
+        $(myPicker.Selector.Container).remove()
+        $(DarkOverLay.Dom).remove();
+
         //}, 500);
     }
 
 
 
     var myPicker = generateColorPickerContainer(loopBack);
-    function loopBack(SelectedColorData)
-    {
-        if (loopBack.previousClass != null)
-        {
+    function loopBack(SelectedColorData) {
+        if (loopBack.previousClass != null) {
             $(pickColorButton.Dom).removeClass(loopBack.previousClass);
         }
         $(pickColorButton.Dom).addClass(SelectedColorData.ColorClass);
@@ -1823,18 +1748,17 @@ function GenerateColorPickerContainer(OverLay)
     }
     loopBack.previousClass = null;
 
-    
-    
 
-    function generateColorPicker()
-    {
+
+
+    function generateColorPicker() {
         //DarkOverLay = getDomOrCreateNew("DarkOverlay");
 
         $(myPicker.Selector.Container).click(function (event) {//stops clicking of add event from propagating
             event.stopPropagation();
         });
 
-        
+
         DarkOverLay.Dom.appendChild(myPicker.Selector.Container)
 
         CurrentTheme.getCurrentContainer().appendChild((DarkOverLay.Dom));
@@ -1842,13 +1766,13 @@ function GenerateColorPickerContainer(OverLay)
         //OverLay.appendChild(DarkOverLay.Dom);
         $(DarkOverLay.Dom).click(loopBackFunction);
     }
-    
+
     var retValue = { Button: pickColorButton.Dom, Picker: myPicker };
 
     return retValue;
-    
+
 }
 
-    
+
 
 
