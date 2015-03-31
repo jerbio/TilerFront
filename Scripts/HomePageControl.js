@@ -224,7 +224,8 @@ function populateHomePageFooter(Dom)
     $(TopSlider).empty();
 
     //$(AddButtonDom).click(AddNewEventOnClick)
-    AddButtonDom.addEventListener("click", AddNewEventOnClick);
+    //AddButtonDom.onclick("click", AddNewEventOnClick);
+    AddButtonDom.onclick = AddNewEventOnClick;
 
     //Adds Add button, Procrastinate button, and  TOp SLider to top banner
     
@@ -237,13 +238,15 @@ function populateHomePageFooter(Dom)
 
 
 
+
+
 function generateProcrastinateAllFunction(TimeData,CallBack)
 {
 
     var TimeZone = new Date().getTimezoneOffset();
     TimeData = TimeData.ToTimeSpan();
     var NowData = { DurationDays: TimeData.Days, DurationHours: TimeData.Hours, DurationMins: TimeData.Mins, UserName: UserCredentials.UserName, UserID: UserCredentials.ID, TimeZoneOffset: TimeZone };
-    var HandleNEwPage = new LoadingScreenControl("Tiler is Freeing up Sometime :)");
+    var HandleNEwPage = new LoadingScreenControl("Tiler is Freeing up Some time :)");
     TimeData.Hours
     HandleNEwPage.Launch();
     var URL = global_refTIlerUrl + "Schedule/ProcrastinateAll";
@@ -337,10 +340,55 @@ function populateSearchOptionDom(Dom)
 
 //function populateHomePageTopBanner(Dom) {
 
+function generateModalForTIleOrModal()
+{
+    var AddOption = getDomOrCreateNew("AddOption");
+    $(AddOption).addClass("AddOptionHidden");
+    $(AddOption).removeClass("AddOptionDisappear");
+    var ButtonContainer = getDomOrCreateNew("AddOptionButtonContainer");
+    
+
+    var AddTIleButton = getDomOrCreateNew("AddTIleButton");
+    AddTIleButton.innerHTML = "Add New Tile";
+    AddTIleButton.onclick = function () { callAddNewEvent(true) };
+    
+    var AddEventButton = getDomOrCreateNew("AddEventButton");
+    AddEventButton.onclick = function () { callAddNewEvent(false) };
+    AddEventButton.innerHTML = "Add New Event";
+    var CancelButton = getDomOrCreateNew("CancelButton");
+    CancelButton.innerHTML = "Cancel";
+
+    CancelButton.onclick = function () { $(AddOption).addClass("AddOptionHidden"); };
+
+    ButtonContainer.appendChild(AddTIleButton);
+    ButtonContainer.appendChild(AddEventButton);
+    ButtonContainer.appendChild(CancelButton);
+
+    $(AddEventButton).addClass("AddOptionButton")
+    $(AddTIleButton).addClass("AddOptionButton")
+    $(CancelButton).addClass("AddOptionButton")
+
+    AddOption.appendChild(ButtonContainer);
+
+    var ContentCOntainer = CurrentTheme.getCurrentContainer();
+    ContentCOntainer.appendChild(AddOption);
+
+    setTimeout(function () { $(AddOption).removeClass("AddOptionHidden"); });
+
+    function callAddNewEvent(isTile)
+    {
+        
+        LaunchAddnewEvent(null, UserCredentials, isTile);
+        //$(AddOption).addClass("AddOptionDisappear");
+        
+        setTimeout(function () { CancelButton.onclick(); }, 300);
+        
+    }
+}
 
     function AddNewEventOnClick()
     {
-        LaunchAddnewEvent(null, UserCredentials);
+        generateModalForTIleOrModal();
     }
 
     function populateHomePageTopBanner(Dom) {
@@ -556,8 +604,10 @@ function populateSearchOptionDom(Dom)
                     var addButton = document.getElementById("HomePageAddButton")
                     $(addButton).addClass("rotateToAdd");
                     $(addButton).removeClass("rotateToDelete");
-                    addButton.removeEventListener("click", deleteCallbackFunction);
-                    addButton.addEventListener("click", AddNewEventOnClick);
+
+                    //addButton.removeEventListener("click", deleteCallbackFunction);
+                    //addButton.addEventListener("click", AddNewEventOnClick);
+                    addButton.onclick = AddNewEventOnClick;
                     $(DisablePanel).hide();
                     DisablePanel.style.zIndex = 0;
                     EventDom.Dom.style.zIndex = 0;
@@ -579,8 +629,10 @@ function populateSearchOptionDom(Dom)
 
                     var addButton = document.getElementById("HomePageAddButton");
                 
-                    addButton.removeEventListener("click", AddNewEventOnClick);
-                    addButton.addEventListener("click", deleteCallbackFunction);
+                    //addButton.removeEventListener("click", AddNewEventOnClick);
+                    //addButton.addEventListener("click", deleteCallbackFunction);
+
+                    addButton.onclick = deleteCallbackFunction;
 
                     Complete_ProcrastinateAllIcon.removeEventListener("click", onProcrastinateAll);
                     Complete_ProcrastinateAllIcon.addEventListener("click", markAsCompleteCallBackFunction);

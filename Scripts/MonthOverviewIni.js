@@ -1242,7 +1242,7 @@ getRefreshedData.enableDataRefresh = function (pullLatest)
                 $(ListElementContainer.Dom).addClass("ListElement");
                 global_DictionaryOfSubEvents[ID].gridDoms.push(ListElementContainer.Dom)//Adds the List element as list of candidates to be deleted
                 DayOfWeek.UISpecs[ID].refrenceListElement =ListElementContainer;
-                var TimeDataPerListElement = getDomOrCreateNew("SubEventReferenceTime" + ID, "span");
+                var TimeDataPerListElement = getDomOrCreateNew("SubEventReferenceTime" + ID);
                 var NameDataPerListElement = getDomOrCreateNew("SubEventReferenceName" + ID);
                 
                 $(ListElementContainer.Dom).addClass("selectedDayElements");
@@ -1258,8 +1258,9 @@ getRefreshedData.enableDataRefresh = function (pullLatest)
 
                 var ListElementDataContentContainer = getDomOrCreateNew("ListElementDataContentContainer" + ID);
                 $(ListElementDataContentContainer.Dom).addClass("ListElementDataContentContainer");
-                ListElementDataContentContainer.Dom.appendChild(TimeDataPerListElement.Dom);
                 ListElementDataContentContainer.Dom.appendChild(NameDataPerListElement.Dom);
+                ListElementDataContentContainer.Dom.appendChild(TimeDataPerListElement.Dom);
+                
                 global_DictionaryOfSubEvents[ID].gridDoms.push(ListElementDataContentContainer.Dom)
                 
 

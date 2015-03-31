@@ -1,7 +1,7 @@
 ﻿"use strict"
 
 
-var Debug = false;
+var Debug = true;
 var DebugLocal = false;
 
 //var global_refTIlerUrl = "http://localhost:53201/api/";
@@ -401,9 +401,9 @@ function generateuserInput(InputParams, JqueryCss)
 
     var FullLabel = getDomOrCreateNew(InputParams.ID);
     //(FullLabel.Dom).style.width = "100%";
-    (FullLabel.Dom).style.height = "100px";
-    (FullLabel.Dom).style.position = "absolute";
-    (FullLabel.Dom).style.display = "table";
+    //(FullLabel.Dom).style.height = "100px";
+    (FullLabel.Dom).style.position = "relative";
+    //(FullLabel.Dom).style.display = "table";
     //(FullLabel.Dom).style.borderBottom = "3px solid rgb(127,127,127)";
     if (JqueryCss != null)
     {
@@ -411,7 +411,7 @@ function generateuserInput(InputParams, JqueryCss)
     }
 
     
-    var LabelContainer = getDomOrCreateNew(InputParams.ID + "Label");
+    var LabelContainer = getDomOrCreateNew(InputParams.ID + "Label","label");
     var InputContainer = getDomOrCreateNew(InputParams.ID + "Input", "input");
     LabelContainer.Dom.innerHTML = InputParams.Name;
     LabelContainer.Dom.style.width = "20%";
@@ -422,8 +422,8 @@ function generateuserInput(InputParams, JqueryCss)
     InputContainer.Dom.style.left = "20%";
     InputContainer.Dom.style.height = "40px";
     //InputContainer.Dom.style.maxHeight = "40%";
-    InputContainer.Dom.style.fontSize = "12px";
-    InputContainer.Dom.style.position = "absolute";
+    //InputContainer.Dom.style.fontSize = "12px";
+    InputContainer.Dom.style.position = "relative";
     
     InputContainer.Dom.setAttribute("placeholder", InputParams.Default);
 

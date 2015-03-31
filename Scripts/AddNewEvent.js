@@ -14,7 +14,7 @@ var EventColor;
 
 
 
-function LaunchAddnewEvent(LoopBackCaller, CurrentUser)
+function LaunchAddnewEvent(LoopBackCaller, CurrentUser,isTIle)
 {
     EventNameDom=null;
     EventAddressDom=null;
@@ -42,7 +42,7 @@ function LaunchAddnewEvent(LoopBackCaller, CurrentUser)
     var AllTabs = new Array();
 
 
-    var NameTab = createCalEventNameTab();
+    var NameTab = createCalEventNameTab(isTIle);
     $(NameTab.Content.Dom).addClass(CurrentTheme.InActiveTabContent);
     $(NameTab.Title.Dom).addClass(CurrentTheme.AlternateFontColor);
     TabContentContainer.Dom.appendChild(NameTab.Content.Dom);
@@ -54,7 +54,7 @@ function LaunchAddnewEvent(LoopBackCaller, CurrentUser)
     
 
 
-    var RecurrenceTab = createCalEventRecurrenceTab();
+    var RecurrenceTab = createCalEventRecurrenceTab(isTIle);
     $(RecurrenceTab.Content.Dom).addClass(CurrentTheme.InActiveTabContent);
     $(RecurrenceTab.Title.Dom).addClass(CurrentTheme.AlternateFontColor);
     TabContentContainer.Dom.appendChild(RecurrenceTab.Content.Dom);
@@ -295,7 +295,7 @@ function ActivateTab(AllTabs, ActiveTab)
 }
 
 
-function createCalEventNameTab()
+function createCalEventNameTab(isTIle)
 {
     var NameTabContainerID = "NameTabContainer";
     var NameTabContainer = getDomOrCreateNew(NameTabContainerID);
@@ -329,11 +329,11 @@ function createCalEventNameTab()
 
     var CalEventNameInputDom = generateuserInput(CalEventNameParam, null);
     var CalEventNameInput = CalEventNameInputDom.FullContainer;
-    CalEventNameInput.Dom.style.position = "absolute";
-    CalEventNameInput.Dom.style.top = "0%";
+    CalEventNameInput.Dom.style.position = "relative";
+    //CalEventNameInput.Dom.style.top = "0%";
     CalEventNameInput.Dom.style.width = "70%";
-    CalEventNameInput.Dom.style.height = "8%";
-    CalEventNameInputDom.Input.Dom.style.height = "16px";
+    //CalEventNameInput.Dom.style.height = "8%";
+    //CalEventNameInputDom.Input.Dom.style.height = "16px";
     
     
     CalEventNameInput.Dom.style.left = "15%";
@@ -424,10 +424,11 @@ function createCalEventNameTab()
 
     var CalEventAddressTagInputDom = generateuserInput(CalEventAddressTagParam, null);
     var CalEventAddressTagInput = CalEventAddressTagInputDom.FullContainer;
-    CalEventAddressTagInput.Dom.style.position = "absolute";
-    CalEventAddressTagInput.Dom.style.top = "16%";
-    CalEventAddressTagInput.Dom.style.marginTop = "6px";
-    CalEventAddressTagInput.Dom.style.height = "8%";
+    //CalEventAddressTagInput.Dom.style.position = "absolute";
+    CalEventAddressTagInput.Dom.style.position = "relative";
+    //CalEventAddressTagInput.Dom.style.top = "16%";
+    //CalEventAddressTagInput.Dom.style.marginTop = "6px";
+    //CalEventAddressTagInput.Dom.style.height = "8%";
 
     CalEventAddressTagInput.Dom.style.width = "70%";
     CalEventAddressTagInput.Dom.style.left = "15%";
@@ -461,8 +462,8 @@ function createCalEventNameTab()
 
 
 
-    CalEventAddressInput.Dom.style.position = "absolute";
-    CalEventAddressInput.Dom.style.top = "8%";//based on dimensions in generateuserInput
+    //CalEventAddressInput.Dom.style.position = "absolute";
+    //CalEventAddressInput.Dom.style.top = "8%";//based on dimensions in generateuserInput
     CalEventAddressInput.Dom.style.width = "70%";
     CalEventAddressInput.Dom.style.height = "8%";
     CalEventAddressInput.Dom.style.left = "15%";
@@ -485,7 +486,7 @@ function createCalEventNameTab()
     EventAddressTagDom.Dom.style.width = "100%";
     EventAddressTagDom.Dom.style.fontFamily= "'Muli', sans-serif";
     EventAddressTagDom.Dom.style.left = 0;
-    EventAddressTagDom.Dom.style.height = "100%";
+    //EventAddressTagDom.Dom.style.height = "100%";
     LabelContainerAddressTagDom.Dom.parentNode.removeChild(LabelContainerAddressTagDom.Dom);
 
 
@@ -499,9 +500,12 @@ function createCalEventNameTab()
     $(EnableAAutoScheduleContainerLabel.Dom).addClass(CurrentTheme.FontColor);
     var EnableAutoSchedulerButtonID = "EnableAutoSchedulerButton"
     var EnableAutoSchedulerButton = generateMyButton(AutoScheduleContainerLoopBack, EnableAutoSchedulerButtonID);
-    //EnableAutoSchedulerButton.SetAsOff();
+    $(EnableAutoSchedulerButton).addClass("setAsDisplayNone")
+    
     
     //EnableAutoSchedulerButton.status = 0;
+
+    
 
     EventRigid = EnableAutoSchedulerButton;
 
@@ -509,6 +513,8 @@ function createCalEventNameTab()
     
 
     //Split Input box
+    
+    /*
     var AutoScheduleCountContainerID = "AutoScheduleCountContainer";
     var AutoSchedulerDataInputData = { Name: "", ID: AutoScheduleCountContainerID, Default: "Splits?" };
     var AutoSchedulerDataInputDataCounterDom = generateuserInput(AutoSchedulerDataInputData, null);
@@ -527,6 +533,7 @@ function createCalEventNameTab()
 
 
     EventSplits = AutoSchedulerDataInputDataCounterDom.Input;
+    */
     
 
 
@@ -568,12 +575,13 @@ function createCalEventNameTab()
     removeElement(AutoSchedulerDataInputDataDom.Input.Dom);
 
     AutoSchedulerDataInputDataDom.Input = getDomOrCreateNew("AutoScheduleDurationContainer_Text","span");
-    AutoSchedulerDataInputDataDom.Input.Dom.innerHTML = "Duration";
+    AutoSchedulerDataInputDataDom.Input.Dom.innerHTML = (isTIle ? "Tile" : "Event") + " Duration";
     AutoSchedulerDataInputDataDom.FullContainer.Dom.appendChild(AutoSchedulerDataInputDataDom.Input.Dom);
-    $(AutoSchedulerDataInputDataDom.Input.Dom).click(function () { dialAutoScheduleCallBack(AutoScheduleDurationContainerDialContainer.Dom, dialAutoScheduleCallBack) });
+    //$(AutoSchedulerDataInputDataDom.Input.Dom).click(function () { dialAutoScheduleCallBack(AutoScheduleDurationContainerDialContainer.Dom, dialAutoScheduleCallBack) });
+    AutoSchedulerDataInputDataDom.FullContainer.onclick = (function () { dialAutoScheduleCallBack(AutoScheduleDurationContainerDialContainer.Dom, dialAutoScheduleCallBack) });
     $(AutoSchedulerDataInputDataDom.FullContainer.Dom).addClass(CurrentTheme.FontColor);
-    AutoSchedulerDataInputDataDom.FullContainer.Dom.style.borderBottom = "none";
-    $(AutoSchedulerDataInputDataDom.Input.Dom).addClass("InputBox");
+    //AutoSchedulerDataInputDataDom.FullContainer.Dom.style.borderBottom = "none";
+    //$(AutoSchedulerDataInputDataDom.Input.Dom).addClass("InputBox");
     //AutoSchedulerDataInputDataDom.Input.Dom.style.height = "30%";
     $(AutoSchedulerDataInputDataDom.Input.Dom).addClass(CurrentTheme.FontColor);
     //AutoSchedulerDataInputDataDom.Input.Dom.style.border = "yellow 2px solid";
@@ -623,7 +631,9 @@ function createCalEventNameTab()
         AutoScheduleRangeConstraintContainerStartDatePicker.Dom.removeAttribute('disabled');
     }, 100);
 
+    BindImputToDatePicketMobile(AutoScheduleRangeConstraintContainerStartDatePicker);
 
+    /*
     $(AutoScheduleRangeConstraintContainerStartDatePicker.Dom).click(
         function ()
         {
@@ -633,6 +643,7 @@ function createCalEventNameTab()
             CurrentTheme.getCurrentContainer().appendChild((Container.Dom));
         }
     );
+    */
     
     var AutoScheduleRangeConstraintContainerStartTimePickerID = "AutoScheduleRangeConstraintContainerStartTimePicker";
     var AutoScheduleRangeConstraintContainerStartTimePicker = getDomOrCreateNew(AutoScheduleRangeConstraintContainerStartTimePickerID, "input");
@@ -746,7 +757,7 @@ function createCalEventNameTab()
     AutoScheduleRangeConstraintContainer.Dom.appendChild(AutoScheduleRangeConstraintContainerStart.Dom);
     AutoScheduleRangeConstraintContainer.Dom.appendChild(AutoScheduleTimeConstraintContainer.Dom);//readjust
     AutoScheduleContainerDataContainerSlider.Dom.appendChild(AutoScheduleRangeConstraintContainerEnd.Dom);//readjust again
-    AutoScheduleContainerDataContainerSlider.Dom.appendChild(AutoSchedulerDataInputDataCounterDom.FullContainer.Dom);//append number of split input box
+    //AutoScheduleContainerDataContainerSlider.Dom.appendChild(AutoSchedulerDataInputDataCounterDom.FullContainer.Dom);//append number of split input box
     
 
     
@@ -807,8 +818,13 @@ function createCalEventNameTab()
     {
         if (!EnableAutoSchedulerButton.status)
         {
-            $(AutoScheduleContainerDataContainerSlider.Dom).removeClass("EnableSliderTop");
-            $(AutoScheduleContainerDataContainerSlider.Dom).addClass("DisableSliderTop");
+            
+            $(EnableAAutoScheduleContainer.Dom).addClass("setAsDisplayNone");//sets as hidden
+            setTimeout(function () {//later relases the slider
+                $(AutoScheduleContainerDataContainerSlider.Dom).removeClass("EnableSliderTop");
+                $(AutoScheduleContainerDataContainerSlider.Dom).addClass("DisableSliderTop");
+            }, 100);
+
             //$(AutoSchedulerDataInputDataCounterDom.FullContainer.Dom).hide();
 
             if (AutoScheduleRangeConstraintContainer != null) {
@@ -817,8 +833,13 @@ function createCalEventNameTab()
         }
         else
         {
-            $(AutoScheduleContainerDataContainerSlider.Dom).removeClass("DisableSliderTop");
-            $(AutoScheduleContainerDataContainerSlider.Dom).addClass("EnableSliderTop");
+            
+            $(EnableAAutoScheduleContainer.Dom).removeClass("setAsDisplayNone");
+            setTimeout(function () {
+                $(AutoScheduleContainerDataContainerSlider.Dom).removeClass("DisableSliderTop");
+                $(AutoScheduleContainerDataContainerSlider.Dom).addClass("EnableSliderTop");
+            }, 100);
+
             //$(AutoSchedulerDataInputDataCounterDom.FullContainer.Dom).show();
             if (AutoScheduleRangeConstraintContainer != null) {
                 //AutoScheduleRangeConstraintContainer.Dom.style.top = "50%";//hack Alert
@@ -841,6 +862,16 @@ function createCalEventNameTab()
     
     
     NameTabContent.Dom.appendChild(CalEventIdentifierSectionCompletion.Dom);//disables recurrence tab selection
+
+
+
+    if (isTIle)
+    {
+        EnableAutoSchedulerButton.SetAsOn();
+    }
+    else {
+        EnableAutoSchedulerButton.SetAsOff();
+    }
 
     function LaunchTab()
     {
@@ -874,7 +905,7 @@ function createCalEventNameTab()
     return retValue;
 }
 
-function createCalEventRecurrenceTab()
+function createCalEventRecurrenceTab(IsTile)
 {
     var RecurrenceTabContainerID = "RecurrenceTabContainer";
     var RecurrenceTabContainer = getDomOrCreateNew(RecurrenceTabContainerID);
@@ -900,10 +931,10 @@ function createCalEventRecurrenceTab()
     var EnableRecurrenceContainer = getDomOrCreateNew(EnableRecurrenceContainerID);
 
     var EnableRecurrenceLabelID = "EnableRecurrenceLabel";
-    var EnableRecurrenceLabel = getDomOrCreateNew(EnableRecurrenceLabelID);
+    var EnableRecurrenceLabel = getDomOrCreateNew(EnableRecurrenceLabelID,"label");
     EnableRecurrenceContainer.Dom.appendChild(EnableRecurrenceLabel.Dom);
     $(EnableRecurrenceContainer.Dom).addClass(CurrentTheme.FontColor);
-    EnableRecurrenceLabel.Dom.innerHTML = "<p>Do you want this event to recurr?</p>"
+    EnableRecurrenceLabel.Dom.innerHTML = "Do you want this event to recurr?"
 
     var EnableRecurrenceButtonContainerID = "EnableRecurrenceButtonContainer";
     var EnableRecurrenceButtonContainer = getDomOrCreateNew(EnableRecurrenceButtonContainerID);
@@ -1212,6 +1243,7 @@ function createCalEventRecurrenceTab()
     $(RepetitionRangeContainerEndContainer.Dom).append(RepetitionRangeContainerEndContainerLabel.Dom);
     $(RepetitionRangeContainerEndContainer.Dom).append(RepetitionRangeContainerEndInput.Dom);
     $(RepetitionRangeContainerEndInput.Dom).addClass("DateInputData");
+    BindImputToDatePicketMobile(RepetitionRangeContainerEndInput);
     //$(RepetitionRangeContainerEndInput.Dom).datepicker();
     EventRepeatEnd = RepetitionRangeContainerEndInput;
 
@@ -1224,12 +1256,47 @@ function createCalEventRecurrenceTab()
     $(RecurrenceSectionCompletion.Dom).addClass("SectionCompletionButton");
     $(RecurrenceSectionCompletion.Dom).addClass(CurrentTheme.AlternateContentSection);
 
+
+    /*Split count input box*/
+    var AutoScheduleCountContainerID = "AutoScheduleCountContainer";
+    var AutoSchedulerDataInputData = { Name: "Number Of Splits", ID: AutoScheduleCountContainerID, Default: "Splits?" };
+    var AutoSchedulerDataInputDataCounterDom = generateuserInput(AutoSchedulerDataInputData, null);
+    $(AutoSchedulerDataInputDataCounterDom.FullContainer.Dom).addClass(CurrentTheme.FontColor);
+    //AutoSchedulerDataInputDataCounterDom.FullContainer.Dom.style.borderBottom = "none";
+    //$(AutoSchedulerDataInputDataCounterDom.Input.Dom).addClass("InputBox");
+    //$(AutoSchedulerDataInputDataCounterDom.Label.Dom).addClass("InputLabel");
+    AutoSchedulerDataInputDataCounterDom.Label.Dom.style.width = "auto";
+    AutoSchedulerDataInputDataCounterDom.Label.Dom.style.position = "relative";
+    AutoSchedulerDataInputDataCounterDom.Label.Dom.style.marginRight = "3px";
+    AutoSchedulerDataInputDataCounterDom.Label.Dom.style.display= "inline-block";
+    $(AutoSchedulerDataInputDataCounterDom.Input.Dom).addClass(CurrentTheme.FontColor);
+    AutoSchedulerDataInputDataCounterDom.Input.Dom.value = 1;
+    AutoSchedulerDataInputDataCounterDom.Input.Dom.style.width = "2em";
+    AutoSchedulerDataInputDataCounterDom.Input.Dom.style.height = "1em";
+    AutoSchedulerDataInputDataCounterDom.Input.Dom.style.left ="auto"
+    AutoSchedulerDataInputDataCounterDom.Input.setAttribute("type", "Number");
+    //AutoSchedulerDataInputDataCounterDom.Input.Dom.style.left = "10%";
+    //AutoSchedulerDataInputDataCounterDom.Input.Dom.style.top = 0;
+    //AutoSchedulerDataInputDataCounterDom.Input.Dom.style.marginTop = 0;
+    
+
+
+    EventSplits = AutoSchedulerDataInputDataCounterDom.Input;
+
+
+
     
 
     /*Recurrence Day Preference Container End*/
     EnabledRecurrenceContainer.Dom.appendChild(RecurrenceButtonContainer.Dom)
     EnabledRecurrenceContainer.Dom.appendChild(DaysOfTheWeekContainer.Dom);
     EnabledRecurrenceContainer.Dom.appendChild(DayPreferenceContainer.Dom)
+    EnabledRecurrenceContainer.Dom.appendChild(AutoSchedulerDataInputDataCounterDom.FullContainer.Dom);
+    if (!IsTile)
+    {
+        $(AutoSchedulerDataInputDataCounterDom.FullContainer).addClass("setAsDisplayNone");
+        
+    }
     EnabledRecurrenceContainer.Dom.appendChild(RepetitionRangeCOntainer.Dom);
     
     RecurrenceTabContent.Dom.appendChild(EnabledRecurrenceContainer.Dom)
@@ -1238,7 +1305,6 @@ function createCalEventRecurrenceTab()
 
 
 
-    
 
 
 
@@ -1298,6 +1364,23 @@ function createCalEventRecurrenceTab()
     return retValue;
 }
 
+/*
+function binds the date selector to the click event of the passed "LaunchDOm"
+*/
+function BindImputToDatePicketMobile(LaunchDOm)
+{
+
+    LaunchDOm.onclick=function()
+    {
+        var Container = getDomOrCreateNew("ContainerDateElement");
+        LaunchDatePicker(false, Container.Dom, LaunchDOm);
+        Container.Dom.style.display = "block";
+        CurrentTheme.getCurrentContainer().appendChild((Container.Dom));
+    }
+
+    
+}
+
 function createCalEventDoneTab()
 {
     var RangeTabContainerID = "RangeTabContainer";
@@ -1316,7 +1399,7 @@ function createCalEventDoneTab()
     $(RangeTabContent.Dom).addClass("TabContent");
 
     RangeTabContainer.Dom.appendChild(RangeTabTitle.Dom);
-    RangeTabContainer.Dom.appendChild(RangeTabContent.Dom);
+    //RangeTabContainer.Dom.appendChild(RangeTabContent.Dom);
 
     var retValue = { Title: RangeTabTitle, Content: RangeTabContent, Button: RangeTabContainer };
     return retValue;

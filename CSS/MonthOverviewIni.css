@@ -578,34 +578,38 @@ position: absolute;
 
 .ListElement 
 {
-    width:100%;
-    height:20px;
-    //position:absolute;
-    position:relative;
-    font-size:12px;
+    width: 100%;
+    height: auto;
+    position: relative;
+    font-size: 12px;
     overflow: hidden;
-    transition:all .1s;
-    left:100%;
+    transition: all .1s;
+    left: 100%;
+    margin-top: 2px;
 }
 
 
 .SubEventReferenceName 
 {
-    position:absolute;
-    width:60%;
-    overflow:hidden;
-    margin-left:5px;
-    text-overflow:ellipsis;
+  position: relative;
+  width: calc(100% - 10px);
+  overflow: hidden;
+  margin-left: 5px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border-bottom: solid 1px rgb(225,225,225);
+  font-size: 12px;
 }
 
 .SubEventReferenceTime 
-{
-    position:absolute;
-    left:62%;
-    width:35%;
-    overflow:hidden;
-    text-overflow:ellipsis;
-    //z-index:15;
+ {
+  position: relative;
+  /* left: 62%; */
+  width: calc(100% - 10px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: right;
+  font-size: 9px;
 }
 
 .selectedElements 
@@ -627,9 +631,10 @@ position: absolute;
     cursor: pointer;
     width: calc(100% - 18px);
     height: 90%;
-    border-radius: 10px;
+    border-radius: 5px;
     left: 3px;
     display: inline-block;
+    box-shadow: rgba(10,10,10,0.2) 0px 2px 3px;
 }
 
 .EventLockImgContainer {
@@ -820,7 +825,7 @@ position: absolute;
 .FullColorAugmentation 
 {
     //border:white 1px solid;
-    height: 60px;
+    //height: 60px;
 }
 
 
@@ -985,10 +990,7 @@ width: auto;
     display:none;
 }
 
-.setAsDisplayNone 
-{
-    display:none !important;
-}
+
 
 #logoutForm 
 { position: fixed; 

@@ -6,6 +6,7 @@
     font-family: 'Muli', sans-serif;
     height:100%;
     transition:left .5s;
+    background-color:white;
 }
 
 .InActiveTabContentDark
@@ -64,11 +65,12 @@
 
 #TabTitleContainer 
 {
-    position:fixed;
-    height:15%;
-    width:100%;
-    top:0%;
-    overflow:hidden;
+    position: fixed;
+    height: 15%;
+    width: 100%;
+    top: 0%;
+    overflow: hidden;
+    background-color: rgb(250,250,250);
 }
 
 #TabContentContainer 
@@ -77,7 +79,7 @@
     height:85%;
     width:100%;
     top:15%;
-    min-height:500px;
+    //min-height:500px;
 }
 
 #RangeTabContainer {
@@ -108,6 +110,7 @@
     height:100%;
     overflow:hidden;
     text-align:center;
+    background:rgb(250,250,250);
 }
 
 .ActiveTabTitleDark
@@ -226,11 +229,11 @@
 
 #RecurrenceButtonContainer 
 {
-    position:absolute;
-    top:5%;
-    width:90%;
-    height:5%;
-    left:5%;
+    position: relative;
+    /* margin-top: 16px; */
+    width: 100%;
+    height: 30px;
+    /* left: 5%; */
 }
 
 #dailyRecurrenceButton
@@ -298,15 +301,16 @@ label {
     display: inline-block;  
     cursor: pointer;  
     position: relative;  
-    padding-left: 25px;  
-    margin-right: 30px;  
-    font-size: 30px;  
+    //padding-left: 25px;  
+    //margin-right: 30px;  
+    //font-size: 30px;  
 }  
 
 input[type=radio] {  
     display: none;  
 } 
 
+/*
 label:before
 {
     content: "";  
@@ -324,11 +328,13 @@ label:before
 
 }
 
+
 label:before {  
     border-radius: 15px; 
     top:6px; 
     display:table;
 }  
+*/
 
 input[type=radio]:checked + label:before {  
     content: "\2022";  
@@ -352,11 +358,11 @@ input[type=radio]:checked + label:before {
 
 #EnableRecurrenceContainer 
 {
-    position:absolute;
-    height:50px;
-    top:5%;
-    left:15%;
-    width:70%;
+    position: relative;
+    height: 50px;
+    margin-top: 8px;
+    left: 15%;
+    width: 70%;
 }
 
 #EnableRecurrenceLabel 
@@ -374,11 +380,11 @@ input[type=radio]:checked + label:before {
 
 #EnabledRecurrenceContainer 
 {
-    position:absolute;
-    top:10%;
-    left:10%;
-    width:80%;
-    height:90%;
+    position: relative;
+    margin-top: 8px;
+    left: 10%;
+    width: 80%;
+    height: 90%;
 }
 
 /*Day of week start*/
@@ -388,7 +394,7 @@ input[type=radio]:checked + label:before {
     height:28px;
     margin-left:-14px;
     border-radius:28px;
-    border: 3px solid rgb(127,127,127);
+    border: 1px solid rgb(127,127,127);
     font-family: 'Muli', sans-serif;
     font-size:1em;
     opacity:0;
@@ -411,7 +417,7 @@ input[type=radio]:checked + label:before {
 
 .SelectedDayOfWeek /*media*/
 {
-    box-shadow: rgb(120,120,120) 0px 0px 3px 3px;
+    box-shadow: yellow 0px 0px 3px 3px;
 }
 
 .deSelectedDayOfWeek 
@@ -421,18 +427,18 @@ input[type=radio]:checked + label:before {
 
 .DaysOfTheWeekContainer /*media*/
 {
-    position:absolute;
-    height:7.5%;
-    width:90%;
-    left:2.5%;
-    z-index:20;
-    visibility:visible;
-    
+    position: relative;
+    height: 7.5%;
+    width: 100%;
+    /* left: 2.5%; */
+    //z-index: 20;
+    visibility: visible;
+    margin-top: 8px;
 }
 
 #DaysOfTheWeekContainer 
 {
-    top:17.5%;
+    //top:17.5%;
     //visibility:hidden;
 }
 
@@ -440,35 +446,40 @@ input[type=radio]:checked + label:before {
 
 #RepetitionRangeContainer 
 {
-    position:absolute;
-    top:70%;
-    width:80%;
-    height:10%;
-    left:10%;
-    font-family: 'Muli', sans-serif;
+  position: relative;
+  /* top: 70%; */
+  width: 100%;
+  height: 10%;
+  /* left: 10%; */
+  font-family: 'Muli', sans-serif;
+  margin-top:10px;
     
 }
 
 .DateInputLabel 
 {
-    position:absolute;
-    left:0%;
-    width:20%;
-    line-height:6px;
-    font-size:8px;
-    height:100%;
-    top:50%;
+    position: relative;
+    left: 0%;
+    width: auto;
+    line-height: 6px;
+    font-size: 18px;
+    height: 100%;
+    top: 50%;
+    display: inline-block;
+    padding-right: 4px;
 }
 
 .DateInputData
 {
-    position:absolute;
-    left:30%;
-    width:60%;
-    height:100%;
-    background-color:rgba(200,200,200,.3);
-    border-bottom: solid 2px gray;
-    font-size:1em;
+    position: relative;
+    /* left: 30%; */
+    width: 5em;
+    height: 100%;
+    background-color: rgba(200,200,200,.3);
+    border: solid 2px gray;
+    font-size: 1em;
+    display: inline-block;
+    text-align: center;
 }
 
 #RepetitionRangeContainerStartContainer {
@@ -480,10 +491,10 @@ input[type=radio]:checked + label:before {
 }
 
 #RepetitionRangeContainerEndContainer {
-    position:absolute;
-    top:50%;
-    height:40%;
-    width:100%;
+  position: relative;
+  /* top: 50%; */
+  /* height: 40%; */
+  width: 100%;
 }
 
 
@@ -499,8 +510,8 @@ input[type=radio]:checked + label:before {
 
 #EnableAAutoScheduleContainer
 {
-    position:absolute;
-    top:60%;
+    position:relative;
+    //top:60%;
     width:70%;
     height:25%;
     left:15%;
@@ -523,32 +534,33 @@ input[type=radio]:checked + label:before {
     top:0%;
     height:100%;
     font-size:8px;
+    display:none;
 }
 
 #AutoScheduleContainerDataContainer 
 {
-    position:absolute;
-    
+    position:relative;
     top:1em;
     width:100%;
-    height:95%;
+    height:auto;
     
     overflow:hidden;
 }
 
 #AutoScheduleDurationContainer
 {
-    position:absolute;
-    width:40%;
-    //left:5%;
-    height:100%;
+    position:relative;
+    width:90%;
+    left:5%;
+    height:auto;
+    border: solid black 1px;
 }
 #AutoScheduleDurationContainer_Text
 {
-    position:absolute;
+    position:relative;
     width:100%;
     height:100%;
-    border-bottom:3px solid gray;
+    //border-bottom:3px solid gray;
     font-size:.85em;
     overflow:hidden;
     text-overflow:ellipsis;
@@ -556,12 +568,11 @@ input[type=radio]:checked + label:before {
 
 #AutoScheduleContainerDataContainerSlider 
 {
-    position:absolute;
-    
-    width:100%;
-    height:100%;
-    overflow:hidden;
-    transition: all .5s
+  position: relative;
+  width: 100%;
+  /* height: 100%; */
+  overflow: hidden;
+  /* transition: all .5s; */
 }
 
 .DisableSliderTop 
@@ -599,30 +610,33 @@ input[type=radio]:checked + label:before {
 
 #AutoScheduleCountContainer
 {
-    position:absolute;
-    left:100%;
-    transform:translateX(-100%);
-    width:3em;
-    top:10%;
-    height:40%;
+    position:relative;
+    width: 100%;
+    margin-top:10px;
 }
+
+input:focus {
+    background-color: yellow;
+    outline: none;
+} 
 
 #AutoScheduleTimeCOnstraintContainer
 {
-    position:absolute;
-    top:50%;
+    position:relative;
+    //top:50%;
     width:100%;
-    height:100%;
+    margin-top:3px;
     overflow:hidden;
 }
 
 #AutoScheduleRangeConstraintContainer 
 {
-    position:absolute;
+    //position:absolute;
+    position:relative;
     width:70%;
     left:15%;
-    height:32%;
-    top:30%;
+    //height:32%;
+    //top:30%;
     transition: all .5s;
     overflow:hidden;
 }
@@ -634,59 +648,63 @@ input[type=radio]:checked + label:before {
 
 #AutoScheduleRangeConstraintContainerStart 
 {
-    position:absolute;
-    height:45%;
+    position:relative;
+    height:auto;
 }
 
 #AutoScheduleRangeConstraintContainerEnd 
 {   
-    position:absolute;
-    height:50%;
-    width:50%;
-    top:10%;
+    position: relative;
+    height: auto;
 }
 
 #AutoScheduleRangeConstraintContainerEnd a {
-    position:absolute;
-    left:100%;
-    top:0;
-    transform:translateX(-100%);
+  position: absolute;
+  top: 0;
+  /* width: 100%; */
+  /* height: 100%; */
+  /* overflow: hidden; */
+  left: 100%;
+  transform: translateX(-220%);
 }
 
 #AutoScheduleRangeConstraintContainerStart a {
-    position:absolute;
-    left:100%;
-    top:0;
-    transform:translateX(-300%);
+  position: absolute;
+  top: 0;
+  /* width: 100%; */
+  /* height: 100%; */
+  /* overflow: hidden; */
+  left: 100%;
+  transform: translateX(-220%);
 }
-
+#AutoScheduleDurationContainerLabel
+{
+    display:none;
+}
 
 
 .TimePicker 
 {
-    width:100%;
-    font-size:10px;
-    text-align:left;
-    position:absolute;
-    height:50%;
-    //background-color: transparent;
-    border:none;
-    //border-bottom:solid white 3px;
+    width: 100%;
+    font-size: 10px;
+    text-align: left;
+    position: relative;
+    height: 40px;
+    border: none;
     font-family: 'Muli', sans-serif;
 }
 
 .DatePicker 
 {
-    width:100%;
-    font-size:10px;
-    position:absolute;
-    height:50%;
-    text-align:left;
+    width: 100%;
+    font-size: 10px;
+    position: relative;
+    height: 40px;
+    text-align: left;
     font-family: 'Muli', sans-serif;
-    top:50%;
-    margin-top:6px;/*Because of border from timepicker*/
-    border:none;
-    //background-color: transparent;
+    top: 50%;
+    margin-top: 6px;
+    border: none;
 }
 
 .RangeLabel 
@@ -764,23 +782,25 @@ input[type=radio]:checked + label:before {
 
 #DatePickerTitle
 {
-    position:absolute;
-    width:100%;
-    top:0.5em;
-    height:1em;
-    text-align:center;
+    position: absolute;
+    width: 100%;
+    top: 0.5em;
+    height: 1em;
+    text-align: center;
+    color: black;
 }
 
 #DatePickerButtonContainer 
 {
-    position:absolute;
-    left:15%;
-    top:20%;
-    width:70%;
-    min-height:200px;
-    height:40%;
-    border-radius:20px;
-    overflow:hidden;
+    position: absolute;
+    left: 10%;
+    top: 10%;
+    width: 80%;
+    min-height: 200px;
+    height: 80%;
+    border-radius: 20px;
+    overflow: hidden;
+    background: white;
 }
 
 #DatePickerOptionContainer 
@@ -793,69 +813,74 @@ input[type=radio]:checked + label:before {
 
 #AllButtonsContainer 
 {
-    position:absolute;
-    top:10%;
-    top:27%;
-    width:100%;
-    height:46%;
-    
+  position: absolute;
+  top: 10%;
+  top: 15%;
+  width: 100%;
+  height: 70%;
     //background-color:green;
 }
 
 .DateSelectionButton 
 {
-    position:absolute;
-    height:20%;
-    font-size: 10px;
-    min-height:40px;
-    min-width:80px;
-
-    width:20%;
-    left:50%;
+  position: relative;
+  height: 20%;
+  font-size: 10px;
+  min-height: 40px;
+  min-width: 80px;
+  width: 90%;
+  left: 5%;
+  margin-top: 5px;
+  background: white;
+  border: solid black 1px;
+  border-radius: 5px;
+  font-size: 18px;
 }
 
 #EndOfToday 
 {
-    top:0;
-    transform:translateX(-110%);
+    //top:0;
+    //transform:translateX(-110%);
 }
 
 #EndOfTomorrow 
 {
     
     
-    transform:translateX(10%)
+    //transform:translateX(10%)
 }
 
 #EndOfWeek 
 {
-    top:50%;
-    transform:translateX(-110%);
+    //top:50%;
+    //transform:translateX(-110%);
     
 }
 
 #EndOfMonth 
 {   
-    transform:translateX(10%);
-    top:50%;
+    //transform:translateX(10%);
+    //top:50%;
     
 }
 
 #SelectDate 
 {
-    position:absolute;
-    left:50%;
-    width:6em;
-    margin-left:-3em;
+    position: absolute;
+    left: 50%;
+    width: 6em;
+    margin-left: -3em;
+    color: black;
 }
 
 #SelectDateContainer 
 {
-    position:absolute;
-    top:80%;
-    width:100%;
-    height:100%;
-    padding-right:0;//padding because of jquery adds some padding to the parent element
+  position: absolute;
+  top: 80%;
+  width: 100%;
+  height: 100%;
+  padding-right: 0;
+  color: white;
 }
 
 
@@ -869,7 +894,7 @@ input[type=radio]:checked + label:before {
 }
 
 .InputBarAndContentContainer {
-    z-index:0;
+    z-index:1;
 
 }
 
@@ -884,6 +909,51 @@ input[type=radio]:checked + label:before {
     position:relative;
     display:inline-block;
 }
+
+#AddOption
+{
+    position:absolute;
+    width:100%;
+    height:100%;
+    background:white;
+    left:0;
+    transition:left .3s;
+}
+.AddOptionHidden
+{
+    left:100% !important;
+}
+
+.AddOptionDisappear
+{
+    display:none;
+}
+
+#AddOptionButtonContainer
+{
+    position:absolute;
+    
+    width:90%;
+    left:5%;
+    height:50%;
+    top:25%;
+
+}
+
+.AddOptionButton
+{
+    outline: 0;
+    border: solid 1px gray;
+    width: 100%;
+    height: 60px;
+    background: yellow;
+    margin-top: 10px;
+    position: relative;
+    text-align: center;
+    box-sizing: border-box;
+    line-height: 60px;
+}
+
 
 /*Media Queries For Desktop*/
 

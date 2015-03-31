@@ -885,3 +885,8 @@ input
 {
     width:5em;
 }
+
+.setAsDisplayNone 
+{
+    display:none !important;
+}
