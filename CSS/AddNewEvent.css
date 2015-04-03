@@ -260,41 +260,57 @@
 
 #DayPreferenceContainer 
 {
-    position:absolute;
-    top:30%;
-    border-top:2px solid rgb(120,120,120);
-    border-bottom:2px solid rgb(120,120,120);
-    width:90%;
-    left:5%;
-    height: 30%;
-    border-radius:3px;
-    display:none;
+    position: relative;
+    /* top: 30%; */
+    /* border-top: 2px solid rgb(120,120,120); */
+    /* border-bottom: 2px solid rgb(120,120,120); */
+    width: 90%;
+    /* left: 5%; */
+    /* height: 30%; */
+    border-radius: 3px;
+    padding-left: 12%;
 }
+
+
+#DayPreferenceContainer input
+{
+    display:inline-block;
+}
+#DayPreferenceContainer label
+{
+    display:inline-block;
+}
+
 
 .DayPreferenceRadioButtonContainer 
 {
-    position:absolute;
-    height:25%;
-    width:95%;
-    left:5%;
+    position:relative;
+    //height:25%;
+    //width:95%;
+    //left:5%;
     font-family: 'Metrophobic', sans-serif;
     font-size:30px;
 }
 
+#CustomTimeBar
+{
+    padding-top:5px;
+}
+
 #BussinessHourInputContainer 
 {
-    top:10%;
+    //top:10%;
 }
 
 
 #AnyHourTimeContainer 
 {
-    top:45%;
+    //top:45%;
 }
 
 #CustomHourTimeContainer 
 {
-    top:80%;
+    //top:80%;
 }
 
 label {  
@@ -334,7 +350,7 @@ label:before {
     top:6px; 
     display:table;
 }  
-*/
+
 
 input[type=radio]:checked + label:before {  
     content: "\2022";  
@@ -345,6 +361,7 @@ input[type=radio]:checked + label:before {
     text-align: center;  
     line-height: 15px;  
 }
+*/
 
 
 #EnableRecurrenceButtonContainer 
@@ -384,9 +401,33 @@ input[type=radio]:checked + label:before {
     margin-top: 8px;
     left: 10%;
     width: 80%;
-    height: 90%;
+    //height: 90%;
 }
 
+#CustomTimeBar div
+{
+    display:inline-block;
+    width:5em;
+    //border:solid 1px black;
+}
+
+
+#CustomTimeBar input
+{
+    display:inline-block;
+    width:5em;
+    border:solid 1px black;
+    text-align:center;
+}
+
+#CustomTimeBar div a
+{
+    position: absolute;
+    display: inline-block;
+    left: 100%;
+    transform: translate(-100%,-100%);
+    top: 18px;
+}
 /*Day of week start*/
 .DayofWeekCircle /*media*/
 {
@@ -431,9 +472,9 @@ input[type=radio]:checked + label:before {
     height: 7.5%;
     width: 100%;
     /* left: 2.5%; */
-    //z-index: 20;
     visibility: visible;
     margin-top: 8px;
+    height: 28px;/*height is from height of wach day of week circles*/
 }
 
 #DaysOfTheWeekContainer 

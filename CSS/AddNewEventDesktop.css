@@ -221,7 +221,7 @@ input:focus:-ms-input-placeholder { color:rgba(0,0,0, 0.2); }
 #AddModalDom {
     position:absolute;
     height: 130px;
-    width: 370px;
+    width: 380px;
     background-color: #fff;
     border: 1px solid #eee;
     z-index:999;
@@ -320,7 +320,7 @@ input:focus:-ms-input-placeholder { color:rgba(0,0,0, 0.2); }
       transform: translate(-50%,-50%);
       /* margin-left: -350px; */
       width: 600px;
-      min-height: 120px;
+      min-height: 300px;/*300px because of the preview panel*/
       height: auto;
       background-color: #fff;
       z-index: 1;
@@ -590,4 +590,37 @@ input:focus:-ms-input-placeholder { color:rgba(0,0,0, 0.2); }
 #SummaryContentAutoCompletion {
     text-align:center;
     text-decoration: underline;
+}
+
+
+#PreviewPanel
+{
+    position:absolute;
+    width:300px;
+    height:300px;
+    background-color:white;
+    transform: translate(0,0);
+    left:0;
+    transition:left .3s;
+    z-index:-1;
+    box-shadow:rgba(10,10,10,.8) 0 0 10px;
+    visibility:hidden;
+}
+
+.RevealPreviewPanel
+{
+    visibility:visible !important;
+    left:calc(100% + 100px) !important;/*Extra 100px left caused by width expansion intrpduced by padding of #ModalActiveTileContainer. */
+}
+
+.LocationCacheContainer
+{
+    width:100%;
+    height:40px;
+    position:relative;
+}
+
+.HoveLocationCacheContainer
+{
+    background-color:yellow !important;
 }

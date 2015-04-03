@@ -11,6 +11,10 @@ var EventRepeatStart;
 var EventRepeatEnd;
 var EventRepetitionSelection;
 var EventColor;
+var EventRestrictionFalseFlag;
+var EventRestrictionStart;
+var EventRestrictionEnd;
+var EventRestrictionIsWorkWeek;
 
 
 
@@ -240,9 +244,23 @@ function prepCalDataForPost()
 
 
     var EndDateTime = new Date();
-    
 
-    var NewEvent = new CalEventData(EventName, EventLocation, Splits, CalendarColor, EventDuration, EventStart, EventEnd, repeteOpitonSelect, RepetitionStart, RepetitionEnd, RigidFlag);
+    function generateRestrictionData()
+    {
+        var RestrictionStatusButtonStatus = !EventRestrictionFalseFlag.checked;
+        var RestrictionStart = EventRestrictionStart.value;
+        var RestrictionEnd = EventRestrictionEnd.value;
+        var RestrictionWorkWeek = EventRestrictionIsWorkWeek.checked;
+        var retValue = { isRestriction: RestrictionStatusButtonStatus, Start: RestrictionStart, End: RestrictionEnd, isWorkWeek: RestrictionWorkWeek }
+        return retValue;
+    }
+
+
+    var RestrictionProfile = generateRestrictionData();
+    
+    debugger;
+    var NewEvent = new CalEventData(EventName, EventLocation, Splits, CalendarColor, EventDuration, EventStart, EventEnd, repeteOpitonSelect, RepetitionStart, RepetitionEnd, RigidFlag, RestrictionProfile);
+    debugger;
     NewEvent.RepeatData = null;
     return NewEvent;
 }
@@ -500,7 +518,7 @@ function createCalEventNameTab(isTIle)
     $(EnableAAutoScheduleContainerLabel.Dom).addClass(CurrentTheme.FontColor);
     var EnableAutoSchedulerButtonID = "EnableAutoSchedulerButton"
     var EnableAutoSchedulerButton = generateMyButton(AutoScheduleContainerLoopBack, EnableAutoSchedulerButtonID);
-    $(EnableAutoSchedulerButton).addClass("setAsDisplayNone")
+    $(EnableAutoSchedulerButton).addClass("setAsDisplayNone");
     
     
     //EnableAutoSchedulerButton.status = 0;
@@ -892,16 +910,24 @@ function createCalEventNameTab(isTIle)
         overrideTimeFormat: 12,
         overrideTimeOutput: "%I:%M%p"
     });
-
     
-
-
+    AutoScheduleRangeConstraintContainerEndTimePicker.onclick = function () {
+        var aElement1 = $(AutoScheduleRangeConstraintContainerEndTimePicker.parentElement).children("a");
+        aElement1[0].click()
+    };
+    
     $(AutoScheduleRangeConstraintContainerStartTimePicker.Dom).datebox({
         mode: "timeflipbox",
         minuteStep: 5,
         overrideTimeFormat: 12,
         overrideTimeOutput: "%I:%M%p"
     });
+
+
+    AutoScheduleRangeConstraintContainerStartTimePicker.onclick = function () {
+        var aElement2 = $(AutoScheduleRangeConstraintContainerStartTimePicker.parentElement).children("a");
+        aElement2[0].click()
+    };
     return retValue;
 }
 
@@ -1159,7 +1185,7 @@ function createCalEventRecurrenceTab(IsTile)
     var BussinessHourRadioLabelID = "BussinessHourRadioLabel"
     var BussinessHourRadioLabel = getDomOrCreateNew(BussinessHourRadioLabelID, "label");
     BussinessHourRadioLabel.Dom.setAttribute("for", "BussinessHourRadio");
-    BussinessHourRadioLabel.Dom.innerHTML = "Business Hours";
+    BussinessHourRadioLabel.Dom.innerHTML = "Work Days";
     
 
     BussinessHourInputContainer.Dom.appendChild(BussinessHourRadio.Dom)
@@ -1179,6 +1205,10 @@ function createCalEventRecurrenceTab(IsTile)
     var AnytimeLabel = getDomOrCreateNew(AnytimeLabelID, "label");
     AnytimeLabel.Dom.setAttribute("for", "AnyHourTimeRadio");
     AnytimeLabel.Dom.innerHTML = "AnyTime";
+
+    Anytime.checked = true;
+    
+
 
     AnyHourTimeContainer.Dom.appendChild(Anytime.Dom)
     AnyHourTimeContainer.Dom.appendChild(AnytimeLabel.Dom)
@@ -1200,14 +1230,102 @@ function createCalEventRecurrenceTab(IsTile)
 
     CustomHourTimeContainer.Dom.appendChild(Customtime.Dom)
     CustomHourTimeContainer.Dom.appendChild(CustomtimeLabel.Dom)
+
+    var TimeSelection = getDomOrCreateNew("CustomTimeBar");
+    var StartTimeContainer = getDomOrCreateNew("StartTimeInputContainer");
+    var StartTime = getDomOrCreateNew("StartTimeInput", "input");
+    StartTimeContainer.appendChild(StartTime);
+    var ToText = getDomOrCreateNew("ToText", "span");
+    ToText.innerHTML = " to "
+    var EndTimeContainer = getDomOrCreateNew("EndTimeInputContainer");
+    var EndTime = getDomOrCreateNew("EndTimeInput", "input");
+    EndTimeContainer.appendChild(EndTime);
+
+
+    TimeSelection.appendChild(StartTimeContainer);
+    TimeSelection.appendChild(ToText);
+    TimeSelection.appendChild(EndTimeContainer);
     
 
-    DayPreferenceContainer.Dom.appendChild(BussinessHourInputContainer.Dom)
-    
     DayPreferenceContainer.Dom.appendChild(AnyHourTimeContainer.Dom)
-
+    DayPreferenceContainer.Dom.appendChild(BussinessHourInputContainer.Dom)
     DayPreferenceContainer.Dom.appendChild(CustomHourTimeContainer.Dom)
+    DayPreferenceContainer.Dom.appendChild(TimeSelection.Dom);
 
+    $(StartTime.Dom).datebox({
+        mode: "timeflipbox",
+        minuteStep: 5,
+        overrideTimeFormat: 12,
+        overrideTimeOutput: "%I:%M%p"
+    });
+
+    $(EndTime.Dom).datebox({
+        mode: "timeflipbox",
+        minuteStep: 5,
+        overrideTimeFormat: 12,
+        overrideTimeOutput: "%I:%M%p"
+    });
+    EventRestrictionFalseFlag = Anytime;
+    EventRestrictionStart = StartTime;
+    EventRestrictionEnd = EndTime;
+    EventRestrictionIsWorkWeek = BussinessHourRadio;
+
+    function BindChangesToRadioButton()
+    {
+        Anytime.onchange = function ()
+        {
+            if (Anytime.checked)
+            {
+                $(TimeSelection).addClass("setAsDisplayNone");
+            }
+        }
+
+        BussinessHourRadio.onchange = function () {
+            if (BussinessHourRadio.checked) {
+                $(TimeSelection).removeClass("setAsDisplayNone");
+                if (StartTime.value == "") {
+                    StartTime.value = "9:00 am";
+                }
+
+                if (EndTime.value == "") {
+                    EndTime.value = "6:00 pm";
+                }
+            }
+        }
+
+        Customtime.onchange = function () {
+            if (Customtime.checked) {
+                $(TimeSelection).removeClass("setAsDisplayNone");
+                if(StartTime.value =="")
+                {
+                    StartTime.value = "12:00 am";
+                }
+
+                if (EndTime.value == "") {
+                    EndTime.value = "11:59 pm";
+                }
+            }
+        }
+
+        
+        Anytime.onchange();
+        BussinessHourRadio.onchange();
+        Customtime.onchange();
+
+        var aElement1 = $(StartTimeContainer).children("a");
+        StartTimeContainer.onclick = function ()
+        {
+            aElement1[0].click()
+        };
+
+        var aElement2 = $(EndTimeContainer).children("a");
+        EndTimeContainer.onclick = function () {
+            aElement2[0].click()
+        };
+    }
+
+
+    BindChangesToRadioButton();
     /*Repeat event container Start*/
     var RepetitionRangeCOntainerID = "RepetitionRangeContainer";
     var RepetitionRangeCOntainer = getDomOrCreateNew(RepetitionRangeCOntainerID);
@@ -1283,23 +1401,25 @@ function createCalEventRecurrenceTab(IsTile)
 
     EventSplits = AutoSchedulerDataInputDataCounterDom.Input;
 
-
+    //$(AutoSchedulerDataInputDataCounterDom.FullContainer).removClass("setAsDisplayNone");
+    //$(DayPreferenceContainer.Dom).addClass("setAsDisplayNone");
 
     
 
     /*Recurrence Day Preference Container End*/
     EnabledRecurrenceContainer.Dom.appendChild(RecurrenceButtonContainer.Dom)
     EnabledRecurrenceContainer.Dom.appendChild(DaysOfTheWeekContainer.Dom);
-    EnabledRecurrenceContainer.Dom.appendChild(DayPreferenceContainer.Dom)
+    //EnabledRecurrenceContainer.Dom.appendChild(DayPreferenceContainer.Dom)
     EnabledRecurrenceContainer.Dom.appendChild(AutoSchedulerDataInputDataCounterDom.FullContainer.Dom);
     if (!IsTile)
     {
         $(AutoSchedulerDataInputDataCounterDom.FullContainer).addClass("setAsDisplayNone");
-        
+        $(DayPreferenceContainer.Dom).addClass("setAsDisplayNone");
     }
     EnabledRecurrenceContainer.Dom.appendChild(RepetitionRangeCOntainer.Dom);
     
     RecurrenceTabContent.Dom.appendChild(EnabledRecurrenceContainer.Dom)
+    RecurrenceTabContent.Dom.appendChild(DayPreferenceContainer.Dom)
     RecurrenceTabContent.Dom.appendChild(RecurrenceSectionCompletion.Dom);
     createDomEnablingFunction(AllDoms[3], 3, RecurrenceTabContent, DaysOfTheWeekContainer, DaysOfTheWeek.RevealDayOfWeek)();//defaults call to yearly
 
@@ -1596,6 +1716,11 @@ function LaunchDatePicker(isRigid,Container,DivWithDateData)
 
         }
     });
+
+    SelectDateButton.onclick = function () {
+        var aElement2 = $(SelectDateButton.parentElement).children("a");
+        aElement2[0].click()
+    };
 
     function handler(event)//prevents code from propagating to parent(DatePickerOptionContainer)
     {

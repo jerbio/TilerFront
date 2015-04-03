@@ -334,7 +334,7 @@ function RegisterUser(FullName, UserName, Password,PassWordConfirmation, Email)
     var __RequestVerificationToken = $('input[name=__RequestVerificationToken]').val();
     //var LoginCredentials = { Username: UserName, Password: Password, };
 
-    var RegistrationCredentials = { Username: UserName, Password: Password, ConfirmPassword: PassWordConfirmation, FullName: FullName, Email: Email, __RequestVerificationToken: __RequestVerificationToken};
+    var RegistrationCredentials = { Username: UserName, Password: Password, ConfirmPassword: PassWordConfirmation, FullName: FullName, Email: Email, __RequestVerificationToken: __RequestVerificationToken, TimeZoneOffSet: TimeZone };
     
     //var url="RootWagTap/time.top?WagCommand=3";
     //var url = global_refTIlerUrl + "User/New";

@@ -52,7 +52,6 @@ namespace TilerFront
                     "~/CSS/MainUI.css",
                     "~/CSS/Registration.css"
                 ));
-
             
             
 
@@ -62,6 +61,8 @@ namespace TilerFront
                     "~/Scripts/Chart.min.js",
                     "~/Scripts/moment.min.js",
                     "~/Scripts/fullcalendar.min.js",
+                    "~/Scripts/highcharts.js",
+                    "~/Scripts/exporting.js",
                     "~/Scripts/WebControl.js",
                     "~/Scripts/HomePageControl.js",
                     "~/Scripts/SelectedEvent.js",
@@ -160,6 +161,8 @@ namespace TilerFront
                     "~/Scripts/YuiCombo/3.18.1/node-core/node-core-min.js",
                     "~/Scripts/YuiCombo/3.18.1/event-focus/event-focus-min.js"
                       ));
+
+
             bundles.Add(new StyleBundle("~/Content/TilerMobileCss").Include(
                     "~/CSS/TilerMobile.css",
                     "~/CSS/TexGyreFont.css",

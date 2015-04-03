@@ -104,6 +104,10 @@ namespace TilerFront.Models
         [Required]
         [Display(Name = "Username")]
         public string Username { get; set; }
+
+        [Required]
+        [Display(Name = "TimeZoneSpan")]
+        public string TimeZoneOffSet { get; set; }
     }
 
     public class ResetPasswordViewModel

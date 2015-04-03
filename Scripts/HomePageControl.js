@@ -258,6 +258,28 @@ function generateProcrastinateAllFunction(TimeData,CallBack)
         // contentType: "application/json; charset=utf-8", 
         // DataType needs to stay, otherwise the response object
         // will be treated as a single string
+        success: function (response) {
+            //alert(response);
+            var myContainer = (response);
+            if (myContainer.Error.code == 0) {
+                //exitSelectedEventScreen();
+            }
+            else {
+                alert("error detected with marking as complete");
+            }
+
+        },
+
+        error: function (err) {
+            var myError = err;
+            var step = "err";
+            var NewMessage = "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
+            var ExitAfter = { ExitNow: true, Delay: 1000 };
+            HandleNEwPage.UpdateMessage(NewMessage, ExitAfter, CallBack);
+            //InitializeHomePage();
+
+
+        }
     }).done(function (data) {
         HandleNEwPage.Hide();
         RefreshSubEventsMainDivSubEVents(CallBack);

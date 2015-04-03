@@ -64,7 +64,9 @@ function MenuManger()
         document.forms["logoutForm"].submit();
     }
 }
-
+/*
+Add Close button to the given element. Container is Dom element to which you want to add a close button. if you want to the close button to be on the top left set LeftPosition to true
+*/
 function AddCloseButoon(Container, LeftPosition)
 {
     var TilerCloseButtonID = "TilerCloseButton"
@@ -720,10 +722,24 @@ function generateDayContainer()
     var NumberOfShaders = 24;
     var TotalTopElement = 0;
     var ConstTopIncrement = 2;
-
+    var aPm = [" am", " pm"];
+    var TimeArray = [12,1,2,3,4,5,6,7,8,9,10,11]
     for (; NumberOfShaders > 0; --NumberOfShaders) {
+
         var shadeContainer = getDomOrCreateNew("shadeContainer" + myID + "" + NumberOfShaders);
+        var TimeOfDayTextContainer = getDomOrCreateNew("TimeOfDayTextContainer" + myID + "" + NumberOfShaders,"span");
+        //debugger;
+        var Military = 24 - NumberOfShaders;
+        var floorValue= Math.floor( Military / 12);
+        var DayTime = TimeArray[Military % 12];
+        var ampmIndex = DayTime != 12 ? "" : aPm[floorValue];
+        
+        var FullText = DayTime + ampmIndex;
+        TimeOfDayTextContainer.innerHTML = FullText;
+        $(TimeOfDayTextContainer).addClass("TimeOfDayText");
+        shadeContainer.appendChild(TimeOfDayTextContainer);
         DayTimeContainer.Dom.appendChild(shadeContainer.Dom);
+        
         shadeContainer.Dom.style.top = TotalTopElement + "%";
         TotalTopElement += 4.1667;
         if (NumberOfShaders % 2) {
@@ -1380,6 +1396,7 @@ getRefreshedData.enableDataRefresh = function (pullLatest)
         //var IconSetContainer = global_ControlPanelIconSet.getIconSetContainer();
         var ControlPanelContainer = getDomOrCreateNew("ControlPanelContainer");
         var documentWidth = $(document).width();
+        var documentHeight = $(document).height();;
         var buffer = 20;
         var widthOfIconSet = $(ControlPanelContainer).width()
         var heightOfIconSet = $(ControlPanelContainer).height()
@@ -1388,6 +1405,7 @@ getRefreshedData.enableDataRefresh = function (pullLatest)
         var leftOfDayContainer = $(SubEventDom).offset().left;
         var RightBorder = leftOfDayContainer + widthOfListSubEvent + widthOfIconSet;
         var topOfSubEvent = $(SubEventDom).offset().top;
+        var PossibleBottom = topOfSubEvent + heightOfIconSet + 36;//extra 36 is save button
         var LeftOffset=0
         if (RightBorder > documentWidth) {
             LeftOffset = leftOfDayContainer - widthOfIconSet// - buffer
@@ -1396,6 +1414,14 @@ getRefreshedData.enableDataRefresh = function (pullLatest)
         {
             LeftOffset = leftOfDayContainer + widthOfListSubEvent + buffer;
         }
+
+        if (PossibleBottom > documentHeight)
+        {
+            var Excess = PossibleBottom - documentHeight;
+            var SubEventHeight = $(SubEventDom).height();
+            topOfSubEvent -= (Excess + 45); //extra 40 is for save button. Save button is 36px
+        }
+
         ControlPanelContainer.style.top = topOfSubEvent + "px";
         ControlPanelContainer.style.left = LeftOffset + "px";
         /*
@@ -1639,7 +1665,7 @@ function renderSubEventsClickEvents(SubEventID)
 
     var DayContainer=global_DictionaryOfSubEvents[SubEventID].Day
     var refSubEvent = global_DictionaryOfSubEvents[SubEventID].ListRefElement
-    setTimeout(function () { PositionIconSet(DayContainer, refSubEvent) },150);
+    setTimeout(function () { PositionIconSet(DayContainer, refSubEvent) },10);
 }
 renderSubEventsClickEvents.BottomPanelIsOpen = false;
 renderSubEventsClickEvents.isRefListSubEventClicked = false;
@@ -2075,10 +2101,18 @@ function genDaysForMonthBar(MonthStart)
     var Month = MonthStart.getMonth() +1;
     var IniMonth =Month;
     var Day = MonthStart.getDate();
+
+    var TodayStart = new Date(Date.now());
+    TodayStart.setHours(0);
+    TodayStart.setMinutes(0);
+    TodayStart.setSeconds(0);
+    TodayStart.setMilliseconds(0);
+    var TodayInMS = TodayStart.getTime();
     var AllDayDiivs = new Array();
     var i = 0;
     while (IniMonth == Month)
     {
+        var isToday = MonthStart.getTime() == TodayInMS;
         var MyDivContainer = getDomOrCreateNew("MonthBarDayWeekContainer" + genDaysForMonthBar.Day++);
         var MyDay = getDomOrCreateNew("MonthBarDay" + genDaysForMonthBar.Day++);
         var MyDivWeekDay = getDomOrCreateNew("MonthBarDayOfWeek" + genDaysForMonthBar.Day++);
@@ -2100,7 +2134,12 @@ function genDaysForMonthBar(MonthStart)
         MonthStart = new Date(MonthStart.getFullYear(), MonthStart.getMonth(), ++Day);
         MyDivContainer.EndDate = new Date(MonthStart.getTime() -1);
         AllDayDiivs.push(MyDivContainer);
-
+        if (isToday) {
+            var PreviousDay = $(".CurrentDayMonthBar");
+            PreviousDay.removeClass("CurrentDayMonthBar");
+            $(MyDivContainer).addClass("CurrentDayMonthBar");
+            $(MyDivWeekDay.Dom).addClass("CurrentDayMonthBar")
+        }
 
         Month = MonthStart.getMonth() +1;
     }
@@ -2460,12 +2499,12 @@ generateAMonthBar.counter = 0;
             
 
             var IconSetContainer = global_ControlPanelIconSet.getIconSetContainer();
-            $(ControlPanelContainer).addClass("setAsDisplayNone");
+            $(ControlPanelContainer).addClass("setAsVisibilityHidden");
             setTimeout(function ()
             {
-                $(ControlPanelContainer).removeClass("setAsDisplayNone");
+                $(ControlPanelContainer).removeClass("setAsVisibilityHidden");
                 $(ControlPanelContainer).slideDown(500);
-            }, 200)
+            }, 300)
 
             
             BasePanel.appendChild(InfoPanelOverLay);
@@ -3232,8 +3271,15 @@ function genDivForEachWeek(RangeOfWeek, AllRanges)//generates each week containe
 
     var StartOfDay = new Date(RangeOfWeek.Start);
     //StartOfDay = StartOfDay.dst() ? new Date(Number(StartOfDay.getTime())) : StartOfDay +OneHourInMs;
+    var TodayStart = new Date(Date.now());
+    TodayStart.setHours(0);
+    TodayStart.setMinutes(0);
+    TodayStart.setSeconds(0);
+    TodayStart.setMilliseconds(0);
+    var TodayInMS= TodayStart.getTime();
     if (!WeekRange.status) {
         var DaysOfWeekDoms = new Array();
+        
         //WeekRange.Dom.appendChild(RenderPlane.Dom);
         WeekDays.forEach(
             function (DayOfWeek) {
@@ -3244,21 +3290,29 @@ function genDivForEachWeek(RangeOfWeek, AllRanges)//generates each week containe
                 var TotalMilliseconds = myDay.Start.getTime();
                 TotalMilliseconds += OneDayInMs
                 StartOfDay = new Date(TotalMilliseconds);
-                if (StartOfDay.getHours() != 0) {
+                if (StartOfDay.getHours() != 0)
+                {
                     TotalMilliseconds += OneHourInMs;
                     StartOfDay = new Date(TotalMilliseconds);
-            }
+                }
                 myDay.End = new Date(TotalMilliseconds -1);
-
+                var isToday = myDay.Start.getTime() == TodayInMS;
                 var currDate = new Date(Number(refDate.getTime()) + Number(DayIndex * OneDayInMs))
                 if (new Date().dst()) {
                     currDate = new Date(Number(currDate.getTime()) +OneHourInMs);
                     // myDay.End = new Date(Number(myDay.End.getTime()) + OneHourInMs);
-            }
+                }
+                
                 prev = currDate;
                 var Month = currDate.getMonth() +1;
                 var Day = currDate.getDate();
-                myDay.NameOfDayContainer.Dom.innerHTML = "<p>" + DayOfWeek.substring(0, 2) + "<p class='dateOfDay'>" +myDay.Start.getDate()
+                myDay.NameOfDayContainer.Dom.innerHTML = "<p>" + DayOfWeek.substring(0, 2) + "<p class='dateOfDay'>" + myDay.Start.getDate();
+                if (isToday)
+                {
+                    var PreviousDay = $(".CurrentDay");
+                    PreviousDay.removeClass("CurrentDay");
+                    $(myDay.NameOfDayContainer).addClass("CurrentDay");
+                }
                 ;;
                 //   + "<br/><span>" + Month + "/" + Day + "</span></p>";;
 
@@ -3327,4 +3381,8 @@ function genDivForEachWeek(RangeOfWeek, AllRanges)//generates each week containe
     }
 
 
+
+        {
+
+        }
 

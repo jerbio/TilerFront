@@ -377,6 +377,8 @@
     <Content Include="img\Icons\locked2.svg" />
     <Content Include="LoggedInUser.html" />
     <Content Include="MonthOverView.html" />
+    <Content Include="Scripts\exporting.js" />
+    <Content Include="Scripts\highcharts.js" />
     <Content Include="Scripts\jqm-datebox-1.4.4.core.min.js" />
     <Content Include="Scripts\jqm-datebox-1.4.4.mode.flipbox.min.js" />
     <Content Include="Scripts\jqm-datebox-1.4.4.mode.slidebox.min.js" />

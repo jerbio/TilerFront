@@ -401,9 +401,9 @@ function generateuserInput(InputParams, JqueryCss)
 
     var FullLabel = getDomOrCreateNew(InputParams.ID);
     //(FullLabel.Dom).style.width = "100%";
-    (FullLabel.Dom).style.height = "100px";
-    (FullLabel.Dom).style.position = "absolute";
-    (FullLabel.Dom).style.display = "table";
+    //(FullLabel.Dom).style.height = "100px";
+    (FullLabel.Dom).style.position = "relative";
+    //(FullLabel.Dom).style.display = "table";
     //(FullLabel.Dom).style.borderBottom = "3px solid rgb(127,127,127)";
     if (JqueryCss != null)
     {
@@ -411,7 +411,7 @@ function generateuserInput(InputParams, JqueryCss)
     }
 
     
-    var LabelContainer = getDomOrCreateNew(InputParams.ID + "Label");
+    var LabelContainer = getDomOrCreateNew(InputParams.ID + "Label","label");
     var InputContainer = getDomOrCreateNew(InputParams.ID + "Input", "input");
     LabelContainer.Dom.innerHTML = InputParams.Name;
     LabelContainer.Dom.style.width = "20%";
@@ -422,8 +422,8 @@ function generateuserInput(InputParams, JqueryCss)
     InputContainer.Dom.style.left = "20%";
     InputContainer.Dom.style.height = "40px";
     //InputContainer.Dom.style.maxHeight = "40%";
-    InputContainer.Dom.style.fontSize = "12px";
-    InputContainer.Dom.style.position = "absolute";
+    //InputContainer.Dom.style.fontSize = "12px";
+    InputContainer.Dom.style.position = "relative";
     
     InputContainer.Dom.setAttribute("placeholder", InputParams.Default);
 
@@ -1331,7 +1331,7 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
         this.BColor = eventColor.b;
         this.ColorSelection = null == eventColor.s ? 0 : eventColor.s;
         this.Opacity = null == eventColor.o ? 1 : eventColor.o;
-        this.DurationDays = eventDuration.Days;
+        this.DurationDays = 0;// eventDuration.Days;
         this.DurationHours = eventDuration.Hours;
         this.DurationMins = eventDuration.Mins;
         this.StartHour = eventStart.Time.Hour;
@@ -1347,12 +1347,14 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
         this.StartYear = eventStart.Date.getFullYear();
         this.EndYear = eventEnd.Date.getFullYear();
 
+        this.Rigid = rigidFlag ? true : false;
+
         var isRestricted = false;
         var RestrictionStart = "12:00am"
         var RestrictionEnd = "12:00am"
         var isWorkWeek = false;
 
-        if (RestrictionData != null)
+        if ((RestrictionData != null)&&(!rigidFlag))
         {
             if (RestrictionData.isRestriction)
             {
@@ -1403,7 +1405,7 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
         this.RepeatEndDay = repeatEndDate.getDate();
         this.RepeatEndMonth = repeatEndDate.getMonth() + 1;
         this.RepeatEndYear = repeatEndDate.getFullYear();
-        this.Rigid = rigidFlag?true:false;
+        
         //alert(rigidFlag);
         this.Count = eventCounts;
     }
@@ -1413,6 +1415,36 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
     {
         var TotalDurationInMs = (CalEvent.DurationDays * OneDayInMs) + (CalEvent.DurationHours * OneHourInMs) + (CalEvent.DurationMins * OneHourInMs);
         return TotalDurationInMs;
+    }
+
+    function getCalEventEnd(CalEvent)
+    {
+        //CalEvent = new CalEventData();
+        var RetValue = new Date(CalEvent.EndYear,CalEvent.EndMonth-1,CalEvent.EndDay,0,0,0,0)
+        return RetValue;
+    }
+
+    /*Function tries to check if the passed object (d) is a valid date object*/
+    function isDateValid(d)
+    {
+        var RetValue = true;
+        if (Object.prototype.toString.call(d) === "[object Date]")
+        {
+            if (isNaN(d.getTime())) {  // d.valueOf() could also work
+                // date is not valid
+                RetValue = false;
+            }
+            else {
+                // date is valid
+                RetValue = true;
+            }
+        }
+        else {
+            // not a date
+            RetValue = false;
+        }
+
+        return RetValue;
     }
 
     function date_mm_dd__yyyy_ToDateObj(DateString,Delimiter)
@@ -1578,7 +1610,7 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
         var InputBarContainer = getDomOrCreateNew(InputBarContainerID);
         var myRequest = null;
         var DomAndContainer = generateFullInputBar(UserInputBox);
-
+        var IsContentOn = false;
 
         var InputBarAndContentContainerID = "InputBarAndContentContainer" + myID;
         var InputBarAndContentContainer = getDomOrCreateNew(InputBarAndContentContainerID);
@@ -1621,15 +1653,37 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
         {
             return myID;
         }
-        this.clear = function ()
-        {
-            if (InputBarContainer.Dom.parentNode != null)
-            {
+
+        var clear = function () {
+            if (InputBarContainer.Dom.parentNode != null) {
                 $(InputBarContainer.Dom).empty();
                 InputBarContainer.Dom.parentNode.removeChild(InputBarContainer.Dom);
-            }   
+            }
+            IsContentOn = false;
         }
-    
+        this.clear = clear
+
+
+        function HideContainer()
+        {
+            $(InputBarContainer.Dom).addClass("setAsDisplayNone");
+            IsContentOn = false;
+        }
+
+        function ShowContainer()
+        {
+            $(InputBarContainer.Dom).removeClass("setAsDisplayNone");
+            IsContentOn = true;
+        }
+        this.HideContainer = HideContainer;
+        this.ShowContainer = ShowContainer;
+
+        var IsTilerAutoContentOn = function ()
+        {
+            return IsContentOn;
+        }
+        this.isContentOn = IsTilerAutoContentOn;
+
         function generateFullInputBar(UserInputBox)
         {
             var InputBarID = "InputBar" + AutoSuggestControl.Counter;
@@ -1643,8 +1697,8 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
             var returnedValueContainer = getDomOrCreateNew(returnedValueContainerID);
             $(returnedValueContainer.Dom).addClass("returnedValueContainer");
             //$(returnedValueContainer.Dom).addClass(CurrentTheme.ContentSection);
-            (InputBar.Dom).onkeyup = prepCall(InputBar.Dom, Url, Method, returnedValueContainer);
-        
+            (InputBar.Dom).oninput = prepCall(InputBar.Dom, Url, Method, returnedValueContainer);
+            //InputBar.onchange= clear;
 
             var retValue = { InputBar: InputBar, returnedValue: returnedValueContainer };
             return retValue;
@@ -1670,6 +1724,11 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
         {
             return function(e)
             {
+                if (e.which == 27)
+                {
+                    clear();
+                    return;
+                }
                 if (TimerResetID == ini_TimerResetID)
                 {
                     ;
@@ -1726,6 +1785,7 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
                     var AllDom = GenerateEachDomCallBack(data, SuggestedValuesContainer, InputDom);
                     TimerResetID = ini_TimerResetID;
                     myRequest = null;
+                    IsContentOn = true;
                 });;
 
                 //var returnedValue = getReturnedValueContainer(FullLetter);

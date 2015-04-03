@@ -9,15 +9,20 @@ namespace TilerFront
 {
     public class PeekResult
     {
-        PeekDay[] PeekDays;
-        int ConflictingCount;
+        public PeekDay[] PeekDays;
+        public int ConflictingCount;
         public PeekResult(IEnumerable<IEnumerable<SubCalendarEvent>>AllInterferringEvents,DayTimeLine[] DayReferences, IEnumerable<SubCalendarEvent>ConflictingEvents)
         {
             PeekDays = AllInterferringEvents.Select((obj,i) =>{
                
-                double ActiveTimeDuration =(SubCalendarEvent.TotalActiveDuration(obj).TotalMilliseconds);
+                TimeLine myDay = DayReferences[i];
+                TimeLine myTimeLine = new TimeLine(myDay.Start, myDay.End);
+                myTimeLine.AddBusySlots(obj.Select(obj1 => obj1.ActiveSlot));
+                TimeSpan SleepSpan = myTimeLine.getAllFreeSlots().Max(obj1 => obj1.TimelineSpan);
+                TimeSpan TotalActiveSpan = SubCalendarEvent.TotalActiveDuration(obj);
+                double ActiveTimeDuration =TotalActiveSpan.TotalMilliseconds;
                 double durationRatio = ActiveTimeDuration/DayReferences[i].TimelineSpan.TotalMilliseconds;
-                PeekDay MyPeekDay = new PeekDay { AllSubEvents = obj.Select(obj1 => obj1.ToSubCalEvent()).ToArray(), TotalDuration = ActiveTimeDuration, DurationRatio = durationRatio };
+                PeekDay MyPeekDay = new PeekDay { DayIndex = (int)myDay.Start.DayOfWeek, AllSubEvents = obj.Select(obj1 => obj1.ToSubCalEvent()).ToArray(), TotalDuration = TotalActiveSpan.TotalHours, DurationRatio = durationRatio, SleepTime = SleepSpan.TotalHours };
                 return MyPeekDay;
             }).ToArray();
             ConflictingCount = ConflictingEvents.Count();
@@ -26,11 +31,12 @@ namespace TilerFront
         
     }
 
-    class PeekDay
+    public class PeekDay
     {
         public SubCalEvent[] AllSubEvents { get; set; }
         public double TotalDuration { get; set; }
         public double DurationRatio { get; set; }
         public double SleepTime { get; set; }
+        public int DayIndex { get; set; }
     }
 }

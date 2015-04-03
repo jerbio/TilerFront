@@ -21,7 +21,7 @@ namespace TilerFront
 
 
             //this.CalendarEventRange = CalendarEventRange.CreateCopy();
-            this.Complete = Complete;
+            this.Complete = mySubCalEvent.isComplete;
             this.ConflictingEvents = mySubCalEvent.Conflicts;
             this.DataBlob = mySubCalEvent.Notes;
             this.DeadlineElapsed = mySubCalEvent.isDeadlineElapsed;

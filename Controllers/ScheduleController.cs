@@ -298,13 +298,14 @@ namespace TilerFront.Controllers
             bool RepetitionFlag = false;
             TilerColor userColor = new TilerColor(Convert.ToInt32(RColor), Convert.ToInt32(GColor), Convert.ToInt32(BColor), Convert.ToInt32(Opacity), Convert.ToInt32(ColorSelection));
 
-            if (RigidScheduleFlag)
+            if (RigidScheduleFlag)//this needs to be called after the initialization of restrictionFlag
             {
                 DateTimeOffset FullStartTime = new DateTimeOffset(StartDateEntry.Year, StartDateEntry.Month, StartDateEntry.Day, Convert.ToInt32(StartTime.Split(':')[0]), Convert.ToInt32(StartTime.Split(':')[1]), 0, new TimeSpan());// DateTimeOffset.Parse(StartDateEntry + " " + StartTime);
                 DateTimeOffset FullEndTime = new DateTimeOffset(EndDateEntry.Year, EndDateEntry.Month, EndDateEntry.Day, Convert.ToInt32(EndTime.Split(':')[0]), Convert.ToInt32(EndTime.Split(':')[1]), 0, new TimeSpan());// DateTimeOffset.Parse(EndDateEntry + " " + EndTime);
                 FullStartTime = FullStartTime.Add(newEvent.getTImeSpan);
                 FullEndTime = FullEndTime.Add(newEvent.getTImeSpan);
                 EventDuration = (FullEndTime - FullStartTime).ToString();
+                restrictionFlag = false;
             }
 
             if (!string.IsNullOrEmpty(RepeatType))

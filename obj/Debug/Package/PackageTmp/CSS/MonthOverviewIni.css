@@ -162,6 +162,7 @@ body {
 }
 
 
+
 .dateOfDay 
 {
     font-size: 16px !important;
@@ -202,15 +203,19 @@ body {
 
 .DarkerShade 
 {
-  position:absolute;
-  border-bottom: 1px solid rgb(202, 241, 255); 
-  cursor: pointer;
+    position:absolute;
+    border-bottom: 1px solid rgb(202, 241, 255); 
+    width: calc(100% - 1.6em);
+
+    cursor: pointer;
+    //overflow:visible;
 }
 
 .LighterShade 
 {
   position:absolute;
   border-bottom: 1px solid #eee;
+  width: calc(100% - 1.6em);
   cursor: pointer;
 }
 
@@ -559,6 +564,7 @@ position: absolute;
   border-left:2px solid black;
   //box-shadow: -2px 0px 2px rgb(136, 136, 136);
   transform:translateX(-100%);
+  display:none;
   
 }
 .TimeOfDay 
@@ -578,34 +584,38 @@ position: absolute;
 
 .ListElement 
 {
-    width:100%;
-    height:20px;
-    //position:absolute;
-    position:relative;
-    font-size:12px;
+    width: 100%;
+    height: auto;
+    position: relative;
+    font-size: 12px;
     overflow: hidden;
-    transition:all .1s;
-    left:100%;
+    transition: all .1s;
+    left: 100%;
+    margin-top: 2px;
 }
 
 
 .SubEventReferenceName 
 {
-    position:absolute;
-    width:60%;
-    overflow:hidden;
-    margin-left:5px;
-    text-overflow:ellipsis;
+  position: relative;
+  width: calc(100% - 10px);
+  overflow: hidden;
+  margin-left: 5px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border-bottom: solid 1px rgb(225,225,225);
+  font-size: 12px;
 }
 
 .SubEventReferenceTime 
-{
-    position:absolute;
-    left:62%;
-    width:35%;
-    overflow:hidden;
-    text-overflow:ellipsis;
-    //z-index:15;
+ {
+  position: relative;
+  /* left: 62%; */
+  width: calc(100% - 10px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: right;
+  font-size: 9px;
 }
 
 .selectedElements 
@@ -625,11 +635,12 @@ position: absolute;
 {
     position: relative;
     cursor: pointer;
-    width: calc(100% - 18px);
+    width: calc(100% - 3em);
     height: 90%;
-    border-radius: 10px;
+    border-radius: 5px;
     left: 3px;
     display: inline-block;
+    box-shadow: rgba(10,10,10,0.2) 0px 2px 3px;
 }
 
 .EventLockImgContainer {
@@ -671,6 +682,21 @@ position: absolute;
     color:#cccccc;
     display:inline-block;
     left:0;
+}
+
+
+.CurrentDay
+{
+    color: orange;
+    text-shadow: rgba(10,10,10,.3) 0 0 10px;
+}
+
+
+.CurrentDayMonthBar
+{
+    color: orange;
+    //text-shadow: rgba(10,10,10,.3) 0 0 10px;
+    font-weight: bolder;
 }
 
 #AllDayContainer {
@@ -820,7 +846,7 @@ position: absolute;
 .FullColorAugmentation 
 {
     //border:white 1px solid;
-    height: 60px;
+    //height: 60px;
 }
 
 
@@ -985,10 +1011,7 @@ width: auto;
     display:none;
 }
 
-.setAsDisplayNone 
-{
-    display:none !important;
-}
+
 
 #logoutForm 
 { position: fixed; 
@@ -1081,7 +1104,7 @@ width: auto;
       width: 0;
       overflow: hidden;
       box-sizing: border-box;
-      transition: all .5s ease-in
+      //transition: all .5s ease-in
 }
 .TilerLogo {
   display: inline-block;
@@ -1097,7 +1120,19 @@ width: auto;
   background-position-y: 11px;
   box-shadow: rgba(10,10,10,0.3) 0px 0px 6px 1px;
   background-color: white;
+  background-position: 0px 9px;
   z-index: 1;
+}
+
+.TimeOfDayText
+{
+    position:absolute;
+    left:100%;
+    //margin-left:-3em;
+    font-family: 'texreg', Helvetica, sans-serif;
+    font-variant: small-caps;
+    font-size: .6em;
+    white-space:nowrap;
 }
 
 
@@ -1152,8 +1187,9 @@ width: auto;
     position: relative;
     left: 0;
     width: 14px;
-    height: 100%;
+    height: 18px;
     display: inline-block;
+    //z-index: 20;
 }
 
 #TilerCloseButton

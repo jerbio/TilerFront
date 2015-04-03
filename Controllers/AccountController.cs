@@ -310,7 +310,10 @@ namespace TilerFront.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.Username, Email = model.Email, FullName = model.FullName, LastChange = DateTime.Now};
+                int Min=Convert.ToInt32(model.TimeZoneOffSet);
+                TimeSpan OffSet = TimeSpan.FromMinutes(Min);
+                DateTimeOffset EndOfDay = new DateTimeOffset(2014, 1, 1, 22, 0, 0, OffSet);
+                var user = new ApplicationUser { UserName = model.Username, Email = model.Email, FullName = model.FullName, LastChange = EndOfDay.UtcDateTime};
                 var logGenerationresult = await generateLog(user);
                 //var result = logGenerationresult.Item1;
                 //if (result.Succeeded)
@@ -379,7 +382,10 @@ namespace TilerFront.Controllers
             JsonResult RetValue = new JsonResult();
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.Username, Email = model.Email, FullName = model.FullName, LastChange = DateTime.Now };
+                int Min = Convert.ToInt32(model.TimeZoneOffSet);
+                TimeSpan OffSet = TimeSpan.FromMinutes(Min);
+                DateTimeOffset EndOfDay = new DateTimeOffset(2014, 1, 1, 22, 0, 0, OffSet);
+                var user = new ApplicationUser { UserName = model.Username, Email = model.Email, FullName = model.FullName, LastChange = EndOfDay.UtcDateTime };
                 var logGenerationresult = await generateLog(user);
                 var result = logGenerationresult.Item1;
                 if (result.Succeeded)
