@@ -874,7 +874,7 @@ function GenerateDayTime(LeftOrRight)
 
 GenerateDayTime.counter = 0;
 
-function populateMonth(refDate)
+function populateMonth(refDate,CallBack)
 {
     if (refDate == null)
     {
@@ -904,7 +904,15 @@ function populateMonth(refDate)
     })*/
 
     LaunchMonthTicker(refDate);
-    getRefreshedData();
+    function MyCallBack()
+    {
+        if(CallBack!=null)
+        {
+            CallBack();
+        }
+    }
+
+    getRefreshedData(MyCallBack);
     return global_WeekGrid;
 }
 
@@ -960,7 +968,7 @@ function InitiateGrid(refDate)
 
 
 
-function getRefreshedData()//RangeData)
+function getRefreshedData(CallBackAfterRefresh)//RangeData)
 {
     //setTimeout(refreshIframe,200);
     if (--refreshCounter < 0)//debugging counter. THis allows us to set a max number of refreshes before stopping calls to backend
@@ -973,7 +981,7 @@ function getRefreshedData()//RangeData)
     if (getRefreshedData.isEnabled)
     {
         
-        PopulateTotalSubEvents(DataHolder, global_WeekGrid);
+        PopulateTotalSubEvents(DataHolder, global_WeekGrid,CallBackAfterRefresh);
         
     }
         global_ClearRefreshDataInterval = setTimeout(getRefreshedData, global_refreshDataInterval);
@@ -1065,7 +1073,7 @@ getRefreshedData.enableDataRefresh = function (pullLatest)
 
     }
     
-    function PopulateTotalSubEvents(DataHolder, RangeData)
+    function PopulateTotalSubEvents(DataHolder, RangeData, CallBackAfterRefresh)
     {
         ///Gets the data from tiler back end. Also sucks out the subcalendar events
 
@@ -1098,6 +1106,10 @@ getRefreshedData.enableDataRefresh = function (pullLatest)
         {
             //alert("done generating");
             PopulateMonthGrid(DataHolder.Data, RangeData);
+            if (CallBackAfterRefresh != null)
+            {
+                CallBackAfterRefresh();
+            }
             getRefreshedData.enableDataRefresh();
         });
 
@@ -1212,7 +1224,7 @@ getRefreshedData.enableDataRefresh = function (pullLatest)
         RangeData.forEach(
             function (WeekRange)
             {
-                WeekRange.DaysOfWeek.forEach(triggerUIUPdate);
+                WeekRange.DaysOfWeek.forEach(triggerSubEventRenderOnMonth);
                 
             });
 
@@ -1240,7 +1252,7 @@ getRefreshedData.enableDataRefresh = function (pullLatest)
            });
     }
 
-    function triggerUIUPdate(DayOfWeek)
+    function triggerSubEventRenderOnMonth(DayOfWeek)
     {
         var verfyDate = new Date(2014, 5, 15, 0, 0, 0, 0);
         var a = 0;
@@ -1298,8 +1310,11 @@ getRefreshedData.enableDataRefresh = function (pullLatest)
                 DayOfWeek.UISpecs[ID].DataElement=ListElementDataContentContainer
                 global_DictionaryOfSubEvents[ID].ListRefElement = ListElementContainer;
 
-
-                IntersectingArrayData.push({ Start: DayOfWeek.UISpecs[ID].Start, Data: DayOfWeek.UISpecs[ID], ID: ID, Count: 0, top: TopPixels,refSubEvent:ListElementContainer })
+                var HeightPx = (DayOfWeek.UISpecs[ID].css.height / 100) * global_DayHeight;
+                var EndPixelTop = TopPixels + HeightPx;
+                ///BestBottom is data on tab a level which ends before myData. BestBottom.Count data member is the level, BestBOttom.End is the end pixel of this base tab
+                var myData = { Start: DayOfWeek.UISpecs[ID].Start, CalCCount: 0, Data: DayOfWeek.UISpecs[ID], ID: ID, BestBottom: { End: 10000, Count: 0 }, Count: 0, top: TopPixels, end: EndPixelTop, refSubEvent: ListElementContainer }
+                IntersectingArrayData.push(myData);
             }
         }
 
@@ -1308,8 +1323,9 @@ getRefreshedData.enableDataRefresh = function (pullLatest)
         IntersectingArrayData.sort(function (a, b) { return (a.Start) - (b.Start) });
         var MinPercent = ((1/24)* 100);//40 derived from min pixel height.
         
-        var myIndex=0;
-        
+        var myIndex = 0;
+        var MaxTabbingIndex = 1;
+        var CallPrepSyncLater = [];
         for(var i=0;i<IntersectingArrayData.length;i++)
         {
             var ID = IntersectingArrayData[i].ID;
@@ -1326,8 +1342,15 @@ getRefreshedData.enableDataRefresh = function (pullLatest)
                 {
                     //HeightPx=40;
                 }
-                var TopPixels=IntersectingArrayData[i].top;
-                var EndPixelTop = TopPixels + HeightPx;
+
+                if ((ID == "111414_7_0_111415") || (ID == "111426_7_0_111427"))
+                {
+                    //debugger;
+                }
+                //var TopPixels=IntersectingArrayData[i].top;
+                //var EndPixelTop = TopPixels + HeightPx;
+                var EndPixelTop =IntersectingArrayData[i].end;
+                //IntersectingArrayData[i].BestBottom.End = EndPixelTop
 
                 if (DoIInterSect(EndPixelTop, i, IntersectingArrayData))
                 {
@@ -1335,15 +1358,17 @@ getRefreshedData.enableDataRefresh = function (pullLatest)
                 }
                 LeftPercent = IntersectingArrayData[i].Count*17;
 
-                widthSubtraction += IntersectingArrayData[i].Count * 10;
-                if (widthSubtraction >= 90)
+                if (IntersectingArrayData[i].Count >= MaxTabbingIndex)
                 {
-                    widthSubtraction = 90;
+                    MaxTabbingIndex = IntersectingArrayData[i].Count+1;
                 }
+
+                widthSubtraction += IntersectingArrayData[i].Count * 10;
+                
 
                 if (LeftPercent > 90)
                 {
-                    LeftPercent = 90;
+                    //LeftPercent = 90;
                 }
 
 
@@ -1375,7 +1400,9 @@ getRefreshedData.enableDataRefresh = function (pullLatest)
                 }
                 DayOfWeek.renderPlane.Dom.appendChild(DayOfWeek.UISpecs[ID].refrenceListElement.Dom)
                 $(DayOfWeek.UISpecs[ID].Dom).show();
-                setTimeout(prepUiSlideFunc(DayOfWeek, ID, IntersectingArrayData, i), 200 * ++a);
+                var CallBackLaterData = { ID: ID, Index: i };
+                CallPrepSyncLater.push(CallBackLaterData);
+                //setTimeout(prepUiSlideFunc(DayOfWeek, ID, IntersectingArrayData, i, MaxTabbingIndex), 200 * ++a);
                 DayOfWeek.maxIndex = global_ListOfDayCounter;
 
             }
@@ -1384,6 +1411,12 @@ getRefreshedData.enableDataRefresh = function (pullLatest)
                 
             
             }
+        }
+
+        for (var i = 0 ; i < CallPrepSyncLater.length; i++)
+        {
+            var CallBackLaterData = CallPrepSyncLater[i]
+            setTimeout(prepUiSlideFunc(DayOfWeek, CallBackLaterData.ID, IntersectingArrayData, CallBackLaterData.Index, MaxTabbingIndex), 200 * ++a);
         }
         return;
     }
@@ -1545,16 +1578,43 @@ getRefreshedData.enableDataRefresh = function (pullLatest)
     
     var global_ListOfDayCounter = 0;
 
-    function DoIInterSect(End,Index,AllElements)
+    function DoIInterSect(MeEnd, Index, AllElements)
     {
         var retValue = false;
+        MeEnd = MeEnd.toFixed(2);
+        var Me = AllElements[Index];
         for (var i = Index+1; i < AllElements.length; i++)
         {
-            if (AllElements[i].top.toFixed(2) < End.toFixed(2))
+            var PossibleInterferringElement = AllElements[i];
+            var PossibleInterferringTop = PossibleInterferringElement.top.toFixed(2);
+            if (PossibleInterferringTop < MeEnd)
             {
-                ++AllElements[i].Count;
+                PossibleInterferringElement.CalCCount = Me.CalCCount + 1;
+                PossibleInterferringElement.Count = PossibleInterferringElement.CalCCount
+
+                ///*// #### Note for revert to simplest tabbing enable on this comment block
+                ///BestBottom is data on tab level which ends before Me. BestBottom.Count data member is the of the level, BestBOttom.End is the end pixel
+                if (PossibleInterferringElement.BestBottom.End > MeEnd )
+                {
+                    PossibleInterferringElement.BestBottom.End = MeEnd
+                    PossibleInterferringElement.BestBottom.Count = Me.Count;
+                }
+                if (PossibleInterferringTop >= Me.BestBottom.End)//checks to see if the conflicting Event can go to same level as the BestBottom of Me
+                {
+                    PossibleInterferringElement.Count=Me.BestBottom.Count
+                    Me.BestBottom.End = PossibleInterferringElement.end;
+                    PossibleInterferringElement.CalCCount = Me.CalCCount;
+                }
+                ///*/
                 retValue = true;
             }
+
+
+            /*
+            if (AllElements[Index].BestBottom.End <= myTop) {
+                AllElements[i].Count = AllElements[Index].BestBottom.Count;
+                AllElements[Index].BestBottom.End = End
+            }*/
         }
 
         return retValue;
@@ -1570,7 +1630,7 @@ function dehighlightSubEvent(Dom)
 {
     $(Dom).removeClass("selectedElements");
 }
-function prepUiSlideFunc(DayOfWeek, ID, MyArray, Index)
+function prepUiSlideFunc(DayOfWeek, ID, MyArray, Index, TabCount)
 {
     return function () {
         //DayOfWeek.UISpecs[ID].Dom.style.left = DayOfWeek.LeftPercent + DayOfWeek.widtPct + "%";
@@ -1578,13 +1638,15 @@ function prepUiSlideFunc(DayOfWeek, ID, MyArray, Index)
         * DayOfWeek.UISpecs[ID].Dom is the left bar element
         * DayOfWeek.UISpecs[ID].refrenceListElement is the list element
         */
-
+        var GridSubEventWidth = prepUiSlideFunc.SubEventGridWidthContainer / TabCount;
         //DayOfWeek.UISpecs[ID].Dom.style.left = "100%";
-        DayOfWeek.UISpecs[ID].Dom.style.left = DayOfWeek.RightPercent+"%"
+        DayOfWeek.UISpecs[ID].Dom.style.left = (DayOfWeek.RightPercent - GridSubEventWidth )+ "%"
         DayOfWeek.UISpecs[ID].Dom.style.height = DayOfWeek.UISpecs[ID].css.height + "%";
         //DayOfWeek.UISpecs[ID].Dom.style.minHeight = (global_DayHeight * (1 / 24)) + "px";//1/24 because we want the minimum to be the size of an hour
 
-        DayOfWeek.UISpecs[ID].Dom.style.marginLeft = (- (DayOfWeek.UISpecs[ID].css.left + 18) + "px");
+        //DayOfWeek.UISpecs[ID].Dom.style.marginLeft = (-(DayOfWeek.UISpecs[ID].css.left + 18) + "px");
+        DayOfWeek.UISpecs[ID].Dom.style.marginLeft = (-(GridSubEventWidth * MyArray[Index].Count) + "%");
+        DayOfWeek.UISpecs[ID].Dom.style.width = GridSubEventWidth+"%";
         //DayOfWeek.UISpecs[ID].Dom.style.width = DayOfWeek.UISpecs[ID].css.width + "%";
         DayOfWeek.UISpecs[ID].Dom.style.top = DayOfWeek.UISpecs[ID].css.top + "%";
         if (DayOfWeek.UISpecs[ID].IDindex ==0) {
@@ -1653,8 +1715,8 @@ function prepUiSlideFunc(DayOfWeek, ID, MyArray, Index)
     }
 
 }
-
-
+prepUiSlideFunc.PercentWidthOfDay = 100 / 7;
+prepUiSlideFunc.SubEventGridWidthContainer = (100 / 7) * (0.15);//0.15 be cause the SubEventListContainer uses a width of 85%
 
 
 
@@ -1803,17 +1865,20 @@ function generateAMonthBar(MonthStart)
     $(dayTicker.Dom).addClass("Ticker");
     
     var AllDayDivs = genDaysForMonthBar(MonthStart);
-    AllDayDivs.forEach(function (obj) {
+    AllDayDivs.forEach(function (obj)
+    {
         AllDayContainer.Dom.appendChild(obj.Dom)
-        var CallBackFunc = function () {
+        function CallBackFunc() {
             //debugger;
             scrollToDay(obj.StartDate);
             dayTicker.Dom.style.left = obj.left + "%";
-    }
-        $(obj.Dom).click(CallBackFunc);
-        if ((new Date() >= obj.StartDate) && (new Date() < obj.EndDate)) {
+        }
+        //$(obj.Dom).click(CallBackFunc);
+        obj.Dom.onclick = CallBackFunc;
+        if ((new Date() >= obj.StartDate) && (new Date() < obj.EndDate))
+        {
             setTimeout(function () { CallBackFunc() }, 200);
-    }
+        }
         AllDayContainer.Dom.appendChild(dayTicker.Dom);
     });
 

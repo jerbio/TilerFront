@@ -10,7 +10,7 @@ function addNewEvent(x, y, height, refStart)
 
 function generatePostBackDataForTimeRestriction(RestrictionSlider)
 {
-    debugger;
+    //debugger;
     var RestrictionStatusButtonStatus = RestrictionSlider.getStatus();
     var RestrictionStart = RestrictionSlider.getStart();
     var RestrictionEnd = RestrictionSlider.getEnd();
@@ -496,7 +496,7 @@ function generatePeek(CalEvent,Container)
             
         }
         else {
-            debugger;
+            //debugger;
             generatePeek.ChartData.highcharts().series[0].setData(WorkData,true);
             generatePeek.ChartData.highcharts().series[1].setData(SleepData,true);
         }
@@ -1340,7 +1340,7 @@ function AddTiledEvent()
             $(FullContainer).css({ left: Left + "px", top: Top + "px", position: "absolute", width: "calc(100% - 100px)" });
 
             MyDataContainer.AllData.splice(0, MyDataContainer.AllData.length);
-            debugger;
+            //debugger;
             resolveEachRetrievedEvent.ID = 0;
             $(DomContainer).empty();
             if (data.length == 0 || data.length == null || data.length == undefined || (document.activeElement != InputBox))
@@ -1408,7 +1408,7 @@ function AddTiledEvent()
                     InputCOntainer.value = LocationData.Address;
                     LocationAutoSuggestControl.HideContainer();
                     NickNameSlider.turnOnSlide();
-                    debugger
+                    //debugger
                     var NickElements = NickNameSlider.getAllElements()
                     NickElements[0].TileInput.getInputDom().value = LocationData.Tag;
                     setTimeout(function () { InputBox.focus(), 200 });
@@ -1984,7 +1984,7 @@ function TileInputBox(TabElement, ModalContainer, SendTile, Exit, HideInput, get
         //
         if (TabElement.SubTileInputBox != undefined)
         {
-            debugger;
+            //debugger;
             TabElement.SubTileInputBox.forEach(revealEachElement);
         }
 
@@ -2474,7 +2474,8 @@ function BindSubmitClick(Name, Address, AddressNick, Splits, Start, End, EventNo
 function SendScheduleInformation(NewEvent, CallBack)
 {
     //var url = "RootWagTap/time.top?WagCommand=1"
-    debugger;
+    //debugger;
+    //NewEvent = null;
     var ErrorCheck = isCalEvenValidForSend(NewEvent)
     if (ErrorCheck.isError)
     {
@@ -2519,8 +2520,11 @@ function SendScheduleInformation(NewEvent, CallBack)
 
     }).done(function (response) {
         HandleNEwPage.Hide();
-        getRefreshedData.enableDataRefresh(true);
-        affirmNewEvent(response);
+        getRefreshedData.enableDataRefresh();
+        debugger;
+        var AffirmCallBack = affirmNewEvent(response);
+        
+        getRefreshedData(AffirmCallBack);
         CallBack();
     });
 }
@@ -2604,25 +2608,45 @@ function isCalEvenValidForSend(CalEvent)
 
 function affirmNewEvent(response)
 {
-    var StartOfEvent;
-    var EventID;
-    function retValue() {
-        global_GoToDay(StartOfEvent);
-        renderSubEventsClickEvents(EventID);
+    var StartOfEvent=null;
+    var EventID = null;
+    function retValue(CallBack)
+    {
+        if (StartOfEvent != null)
+        {
+            if (global_GoToDay(StartOfEvent))
+            {
+                setTimeout(function () { renderSubEventsClickEvents(EventID); }, 1500);
+                
+            }
+            else
+            {
+                populateMonth(StartOfEvent, retValue);
+            }
+        }
+        if(CallBack!=null)
+        {
+            CallBack();
+        }
     }
-    if (response.Error.code == 0) {
-        StartOfEvent = new Date(response.Content.SubCalCalEventStart + global_TimeZone_ms);
+    if (response.Error.code == 0)
+    {
+        StartOfEvent = new Date(response.Content.SubCalCalEventStart);
         EventID = response.Content.ID;
 
-        if (global_GoToDay(StartOfEvent)) {
+        /*
+        if (global_GoToDay(StartOfEvent))
+        {
             setTimeout(function () { renderSubEventsClickEvents(EventID); }, 5000);
             return;
         }
         else {
             populateMonth(StartOfEvent);
-            setTimeout(retValue, 12000);
-        }
+            //setTimeout(retValue, 12000);
+        }*/
     }
+
+    return retValue;
 }
 
 function createCalEventRecurrence()

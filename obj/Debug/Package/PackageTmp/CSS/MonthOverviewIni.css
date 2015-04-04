@@ -230,7 +230,7 @@ body {
 .gridSubevent {
   position:absolute;
   cursor: pointer;
-  width:12.87%;
+  //width:12.87%;
   transition:all 1s;
   background-color:rgba(1,1,1,.1);
   
@@ -242,7 +242,7 @@ body {
   box-sizing:border-box;
   border:white 1px solid;
   border-radius:7px;
-  width:17px;
+  max-width:17px;
 
 }
 
@@ -635,7 +635,7 @@ position: absolute;
 {
     position: relative;
     cursor: pointer;
-    width: calc(100% - 3em);
+    width: calc(100% - 17px);
     height: 90%;
     border-radius: 5px;
     left: 3px;
@@ -1133,6 +1133,7 @@ width: auto;
     font-variant: small-caps;
     font-size: .6em;
     white-space:nowrap;
+    color:gray;
 }
 
 
@@ -1168,7 +1169,7 @@ width: auto;
 .SubEventListContainer
 {
     position:absolute;
-    width:90%;
+    width:85%;
     left:0;
     padding-top:10px;
 }

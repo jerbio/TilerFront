@@ -1410,7 +1410,7 @@ function createCalEventRecurrenceTab(IsTile)
     EnabledRecurrenceContainer.Dom.appendChild(RecurrenceButtonContainer.Dom)
     EnabledRecurrenceContainer.Dom.appendChild(DaysOfTheWeekContainer.Dom);
     //EnabledRecurrenceContainer.Dom.appendChild(DayPreferenceContainer.Dom)
-    EnabledRecurrenceContainer.Dom.appendChild(AutoSchedulerDataInputDataCounterDom.FullContainer.Dom);
+    
     if (!IsTile)
     {
         $(AutoSchedulerDataInputDataCounterDom.FullContainer).addClass("setAsDisplayNone");
@@ -1418,7 +1418,9 @@ function createCalEventRecurrenceTab(IsTile)
     }
     EnabledRecurrenceContainer.Dom.appendChild(RepetitionRangeCOntainer.Dom);
     
+    
     RecurrenceTabContent.Dom.appendChild(EnabledRecurrenceContainer.Dom)
+    RecurrenceTabContent.Dom.appendChild(AutoSchedulerDataInputDataCounterDom.FullContainer.Dom);
     RecurrenceTabContent.Dom.appendChild(DayPreferenceContainer.Dom)
     RecurrenceTabContent.Dom.appendChild(RecurrenceSectionCompletion.Dom);
     createDomEnablingFunction(AllDoms[3], 3, RecurrenceTabContent, DaysOfTheWeekContainer, DaysOfTheWeek.RevealDayOfWeek)();//defaults call to yearly

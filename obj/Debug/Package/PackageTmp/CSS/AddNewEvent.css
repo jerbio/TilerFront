@@ -264,11 +264,11 @@
     /* top: 30%; */
     /* border-top: 2px solid rgb(120,120,120); */
     /* border-bottom: 2px solid rgb(120,120,120); */
-    width: 90%;
-    /* left: 5%; */
+    width: 70%;
+    left: 15%;
     /* height: 30%; */
     border-radius: 3px;
-    padding-left: 12%;
+    /* padding-left: 12%; */
 }
 
 
@@ -284,17 +284,15 @@
 
 .DayPreferenceRadioButtonContainer 
 {
-    position:relative;
-    //height:25%;
-    //width:95%;
-    //left:5%;
-    font-family: 'Metrophobic', sans-serif;
-    font-size:30px;
+  position: relative;
+  font-family: 'Metrophobic', sans-serif;
+  font-size: 30px;
+  height: 35px;
 }
 
-#CustomTimeBar
+#CustomTimeBar 
 {
-    padding-top:5px;
+  padding-top: 10px;
 }
 
 #BussinessHourInputContainer 
@@ -399,27 +397,26 @@ input[type=radio]:checked + label:before {
 {
     position: relative;
     margin-top: 8px;
-    left: 10%;
-    width: 80%;
-    //height: 90%;
+    left: 15%;
+    width: 70%;
 }
 
-#CustomTimeBar div
+#CustomTimeBar div 
 {
-    display:inline-block;
-    width:5em;
-    //border:solid 1px black;
+  display: inline-block;
+  width: 6em;
+  padding-right: 0;
+  position: relative;
 }
 
-
-#CustomTimeBar input
+#CustomTimeBar input 
 {
-    display:inline-block;
-    width:5em;
-    border:solid 1px black;
-    text-align:center;
+  display: inline-block;
+  width: 4.8em;
+  border: solid 1px black;
+  text-align: center;
+  font-size: .8em;
 }
-
 #CustomTimeBar div a
 {
     position: absolute;
@@ -649,11 +646,11 @@ input[type=radio]:checked + label:before {
     font-size:40px;
 }
 
-#AutoScheduleCountContainer
-{
-    position:relative;
-    width: 100%;
-    margin-top:10px;
+#AutoScheduleCountContainer {
+    position: relative;
+    width: 70%;
+    margin-top: 10px;
+    left: 15%;
 }
 
 input:focus {
