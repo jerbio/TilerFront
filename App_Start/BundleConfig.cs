@@ -180,7 +180,8 @@ namespace TilerFront
                     "~/CSS/jqm-datebox-1.4.4.min.css",
                     "~/Scripts/YuiCombo/3.18.1/widget-base/assets/skins/sam/widget-base.css",
                     "~/Scripts/YuiCombo/3.18.1/dial/assets/skins/sam/dial.css",
-                    "~/CSS/Notification.css"
+                    "~/CSS/Notification.css",
+                    "~/CSS/SearchMobile.css"
                     ));
             bundles.Add(new StyleBundle("~/Content/TilerDesktopSettingsCss").Include(
                     "~/CSS/SettingsDesktop.css"

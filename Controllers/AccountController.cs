@@ -358,7 +358,7 @@ namespace TilerFront.Controllers
                     }
                     else
                     {
-                        LogControlDirect LogToBedeleted = new LogControlDirect(user);
+                        LogControlDirect LogToBedeleted = new LogControlDirect(user, "", true);
                         await LogToBedeleted.DeleteLog();
                     }
                 //}
@@ -440,7 +440,7 @@ namespace TilerFront.Controllers
                     }
                     else
                     {
-                        LogControlDirect LogToBedeleted = new LogControlDirect(user);
+                        LogControlDirect LogToBedeleted = new LogControlDirect(user,"",true);
                         await LogToBedeleted.DeleteLog();
                     }
                 }
@@ -701,7 +701,15 @@ namespace TilerFront.Controllers
                     // If the user does not have an account, then prompt the user to create an account
                     ViewBag.ReturnUrl = returnUrl;
                     ViewBag.LoginProvider = loginInfo.Login.LoginProvider;
-                    return await ExternalLoginConfirmation(new ExternalLoginConfirmationViewModel { Email = loginInfo.Email }, returnUrl);
+                    if (string.IsNullOrEmpty( loginInfo.Email))
+                    {
+                        return View("ExternalLoginConfirmation", new ExternalLoginConfirmationViewModel { Email = loginInfo.Email });
+                    }
+                    else
+                    {
+                        return await ExternalLoginConfirmation(new ExternalLoginConfirmationViewModel { Email = loginInfo.Email }, returnUrl);
+                    }
+                    
                     //return View("ExternalLoginConfirmation", new ExternalLoginConfirmationViewModel { Email = loginInfo.Email });
             }
         }
@@ -784,7 +792,8 @@ namespace TilerFront.Controllers
             }
 
             ViewBag.ReturnUrl = returnUrl;
-            return View(model);
+            //return View("ExternalLoginFailure");
+            return View("ExternalLoginConfirmation", model);
         }
 
 
