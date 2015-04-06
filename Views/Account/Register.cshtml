@@ -52,12 +52,13 @@
         @Html.ValidationMessageFor(m => m.TimeZoneOffSet, "", new { @class = "text-danger" })
     </div>
     <script>
-                setTimeout(function () {
-                    var TimeZoneDataDom = document.getElementById("TimeZoneData");
-                    var d = new Date();
-                    var TotalMin =d.getTimezoneOffset();
-                    TimeZoneDataDom.value = TotalMin;
-                }, 100)
+
+        setTimeout(function () {
+            var TimeZoneDataDom = document.getElementById("TimeZoneData");
+            var d = new Date();
+            var TotalMin =d.getTimezoneOffset();
+            TimeZoneDataDom.value = TotalMin;
+        }, 100)
 
     </script>
 

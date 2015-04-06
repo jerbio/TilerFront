@@ -656,12 +656,16 @@ position: absolute;
 {
     width: 3em;
     left: 20px;
-    height: 100%;
+    height: auto;
     top: 50%;
     /* margin: 0 auto; */
     margin-top: -1.5em;
     position: absolute;
-    cursor:pointer;
+    cursor: pointer;
+    /* border: solid black 1px; */
+    text-align: center;
+    border-radius: 5px;
+    box-shadow: rgba(30,30,30,.8) 0 0 6px;
 }
 
 .MonthBarDay 
@@ -712,11 +716,11 @@ position: absolute;
 }
 
 #MonthArrayContainer {
-    position:absolute;
-    left:4em;
-    width:90%;
-    height:100%;
-    text-align:center;
+    position: relative;
+    left: 5em;
+    width: 90%;
+    height: 100%;
+    text-align: center;
 }
 .MultipleBarSelectionContainer
 {

@@ -95,6 +95,13 @@
                     }
                 </div>
                 <button id="gotToRegisterScreenButton">Register</button>
+                <script>
+                    if (DisableRegistration)
+                    {
+                        var RegistrationButton = document.getElementById("gotToRegisterScreenButton");
+                        RegistrationButton.style.display = "none";
+                    }
+                </script>
             </div>
         </div>
     </div>

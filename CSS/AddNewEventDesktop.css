@@ -358,7 +358,7 @@ input:focus:-ms-input-placeholder { color:rgba(0,0,0, 0.2); }
   border-top:none;
   border-left:none;
   border-right:none;
-
+  min-width:2em;
 }
 
 

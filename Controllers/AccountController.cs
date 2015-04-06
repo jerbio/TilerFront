@@ -810,7 +810,12 @@ namespace TilerFront.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult LogOff()
         {
-            AuthenticationManager.SignOut();
+            //AuthenticationManager.SignOut();
+
+            AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie); 
+
+            Session.Abandon();
+
             return RedirectToAction("Index", "Home");
         }
 

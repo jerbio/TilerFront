@@ -234,6 +234,7 @@ namespace TilerFront
                 SessionUser = await forceLogin().ConfigureAwait(false);
             }
             DateTimeOffset retValue = new DateTimeOffset(SessionUser.LastChange);
+            retValue = new DateTimeOffset(2015, 4, 5, 12, 0, 0, new TimeSpan());
             return retValue;
         }
 
