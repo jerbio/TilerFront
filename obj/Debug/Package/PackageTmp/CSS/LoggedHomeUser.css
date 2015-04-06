@@ -114,8 +114,9 @@
     left:100%;
     margin-left:-40px;
 }
-
-#LogOutButton  /*media*/
+/*media*/
+/*
+#LogOutButton  
 {
     position:absolute;
     left:2.5%;
@@ -134,7 +135,7 @@
     top:26px;
     //z-index:1;
 }
-
+*/
 
 /*Top**End***/
 
@@ -188,7 +189,7 @@
     position:absolute;
     top:100%;
     width:100%;
-    box-shadow:rgba(20,20,20,.4) 0 -10px 15px;
+    box-shadow:rgba(20,20,20,.4) 0 -2px 15px;
     height:60px;
     margin-top:-60px;
     //z-index:10;
@@ -228,4 +229,78 @@
     position: absolute;
     width:700px;
     height:155px;
+}
+
+.MenuIconBar
+{
+    position:relative;
+    height:3px;
+    margin-top: 16.5%;
+    margin-bottom: 16.5%;
+    width:70%;
+    left:15%;
+    box-sizing:border-box;
+    background-color:white;
+}
+
+#MenuButton
+{
+    position:absolute;
+    left:2.5%;
+    background:none;
+    height:35px;
+    padding:0 0 0 0;
+    max-height:40px;
+    text-align:center;
+    //top:50%;
+    margin-top:-20px;
+    width:35px;
+    font-size:0.5em;
+    box-shadow:none;
+    border-width:2px;
+    border-radius:8px;
+    top:26px;
+    border:solid 1px rgb(20,20,20);
+
+}
+
+#MenuIconBarContainer
+{
+    height:80%;
+    top:10%;
+    position:absolute;
+    width:80%;
+    left:10%;
+}
+
+#MenuContainer
+{
+    //top:50px;
+    left:-100%;
+    height:100%;
+    width:100%;
+    position:absolute;
+    z-index:10;
+    transition:left .5s;
+    background-color:transparent;
+}
+
+#MenuContent {
+  top: 50px;
+  position: absolute;
+  height: calc(100% - 50px);
+  width: 70%;
+  background-color: rgb(200,200,200);
+  box-shadow: rgba(10,10,10,.6) 0 6px 10px;
+  border-top: solid 1px gray;
+}
+
+.MenuItemButton
+{
+    position:relative;
+    text-align:center;
+    width:100%;
+    height:40px;
+    line-height:40px;
+    border-bottom:solid gray 1px;
 }

@@ -105,7 +105,7 @@ function SubmitTile(Name, Address,AddressNick, Splits, Hour, Minutes, Deadline, 
             }
             */
 
-            End = new Date(Start.getTime() + repeteOpitonSelect.Range);
+            //End = new Date(Start.getTime() + repeteOpitonSelect.Range);
         }
         else
         {
@@ -113,6 +113,10 @@ function SubmitTile(Name, Address,AddressNick, Splits, Hour, Minutes, Deadline, 
             return;
         }
         
+    }
+    else
+    {
+        Split = 1;
     }
     var EventEnd = {}
     EventEnd.Date = new Date(End.getFullYear(), End.getMonth(), End.getDate());
@@ -982,7 +986,7 @@ function generateAddressNickName()
     var PerElementData = {
         LabelAfter: "Nick Name", Message:
             {
-                Index: 7,
+                Index: 2,
                 LoopBack: function (value) {
                     var message = "";
                     var invalidMessage = false;
@@ -1061,7 +1065,9 @@ function GenerateTileRepetition()
             }
         }
     };
-    var PerElementData = { LabelBefore: "times per",Message:
+    
+    var PerElementData = {
+        LabelBefore: "times per", CustomType:{Type:"select",InnerHtml: "<option></option><option>Day</option><option>Week</option><option>Month</option><option>Year</option>"}, Message:
         {
             Index: 6,
             LoopBack: function (value) {
@@ -1076,7 +1082,7 @@ function GenerateTileRepetition()
 
                 return message;
             }
-        }, DefaultText: "Day/Week/Month/Year", };
+        }, DefaultText: "Day/Week/Month/Year" };
     //DropDown: { url: [{ repetition: "Day" }, { repetition: "Week" }, { repetition: "Month" }, { repetition: "Year" }, { repetition: "Decade" }], LookOut: "repetition" } 
     var ButtonElements = [];
     ButtonElements.push(CountElementData);
@@ -1814,7 +1820,17 @@ function TileInputBox(TabElement, ModalContainer, SendTile, Exit, HideInput, get
     var InputBoxID = "InputBox" + myTIleInputID;
     this.NextElement = NextElement.Data;
     NextElement.Previous = this;
-    var InputBox = getDomOrCreateNew(InputBoxID, "input");
+    var InputBox ;//= getDomOrCreateNew(InputBoxID, "input");
+    if (!TabElement.CustomType)
+    {
+        InputBox = getDomOrCreateNew(InputBoxID, "input");
+    }
+    else
+    {
+        debugger;
+        InputBox = getDomOrCreateNew(InputBoxID,TabElement.CustomType.Type);
+        InputBox.innerHTML = TabElement.CustomType.InnerHtml;
+    }
     var InputDataDomain = InputBox;
     InputDataDomain.CleanUp = function ()
     {

@@ -186,6 +186,23 @@ namespace TilerFront
             bundles.Add(new StyleBundle("~/Content/TilerDesktopSettingsCss").Include(
                     "~/CSS/SettingsDesktop.css"
                 ));
+
+            bundles.Add(new ScriptBundle("~/Content/HomePageJS").Include(
+                    "~/Scripts/cbpAnimatedHeader.js",
+                    "~/Scripts/classie.js",
+                    "~/Scripts/contact_me.js",
+                    "~/Scripts/freelancer.js",
+                    "~/Scripts/cbpAnimatedHeader.js",
+                    "~/Scripts/jqBootstrapValidation.js"
+                      ));
+            bundles.Add(new ScriptBundle("~/Content/HomePageCSS").Include(
+                    "~/Scripts/cbpAnimatedHeader.js",
+                    "~/Scripts/classie.js",
+                    "~/Scripts/contact_me.js",
+                    "~/Scripts/freelancer.js",
+                    "~/Scripts/cbpAnimatedHeader.js",
+                    "~/Scripts/jqBootstrapValidation.js"
+                      ));
             
         }
     }

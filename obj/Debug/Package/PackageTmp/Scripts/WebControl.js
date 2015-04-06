@@ -1,6 +1,5 @@
 ﻿"use strict"
-
-
+var DisableRegistration = true;
 var Debug = false;
 var DebugLocal = false;
 

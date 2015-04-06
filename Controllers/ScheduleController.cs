@@ -325,7 +325,7 @@ namespace TilerFront.Controllers
                     selectedDaysOftheweek = RepeatWeeklyData.Split(',').Where(obj => !String.IsNullOrEmpty(obj)).Select(obj => Convert.ToInt32(obj)).ToArray();
                 }
 
-                RepeatEnd = new DateTimeOffset(Convert.ToInt32(RepeatEndYear), Convert.ToInt32(RepeatEndMonth), Convert.ToInt32(RepeatEndDay), 0, 0, 0, new TimeSpan());
+                RepeatEnd = new DateTimeOffset(Convert.ToInt32(RepeatEndYear), Convert.ToInt32(RepeatEndMonth), Convert.ToInt32(RepeatEndDay),23, 59, 0, new TimeSpan());
                 RepeatEnd = RepeatEnd.Add(newEvent.getTImeSpan);
                 //RepeatEnd = (DateTimeOffset.Now).AddDays(7);
                 RepetitionFlag = true;

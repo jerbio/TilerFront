@@ -8,6 +8,8 @@
     $(DomInformation.Dom).addClass("ScreenContainer");
     var DomTopSection = generateSelectedEventLabelDom(SelectedEvent);
     var CompletionMapDom = generateCompletionMap(SelectedEvent);
+    //$(CompletionMapDom).addClass("SubEventLabelSection TextColorLight")
+    $(CompletionMapDom).addClass("SubEventNonLabelSection ContentSectionLight")
     var NextEventDom = generateNextEventSelection(SelectedEvent);
     var WeatherSelectionDom = generateWeatherSelection(SelectedEvent);
     var RangeUpdateDom=generateRangeUpdate(SelectedEvent)
@@ -112,7 +114,7 @@ function generateNextEventSelection(SelectedEvent)
     var LabelNextEventID = "LabelNextEvent"
     var LabelNextEvent = getDomOrCreateNew(LabelNextEventID);
     $(LabelNextEvent.Dom).addClass("SubEventLabelSection");
-    LabelNextEvent.Dom.innerHTML = "<p>Time \nTill...</p>"
+    LabelNextEvent.Dom.innerHTML = "<p>Begins in ...</p>"
     $(LabelNextEvent.Dom).addClass(CurrentTheme.AlternateFontColor);
     //Populates splitter of Next event section
     /*var SectionSplitterID = "LabelSectionSplitterNextEvent"
@@ -127,7 +129,8 @@ function generateNextEventSelection(SelectedEvent)
     
     
     var nextDate = new Date(SelectedEvent.SubCalStartDate);
-    UpdateTimer(nextDate, ContentNextEvent.Dom);
+    var EndDate = new Date(SelectedEvent.SubCalEndDate);
+    UpdateTimer(ContentNextEvent.Dom, LabelNextEvent, nextDate, EndDate);
     /*var DayID="DayNext"
     var DayDom = getDomOrCreateNew(DayID);
     var DayNameID = "Days";
@@ -314,7 +317,7 @@ function generateRangeUpdate(SelectedEvent) {
     //var LabelWeatherSubEventID = "LabelWeatherSubEvent"
     //var LabelWeatherSubEvent = getDomOrCreateNew(LabelWeatherSubEventID);
     //$(LabelWeatherSubEvent.Dom).addClass("SubEventLabelSection");
-    LabelRangeModify.Dom.innerHTML = "<p>Concentrate Date</p>"
+    LabelRangeModify.Dom.innerHTML = "<p>Change Deadline</p>"
     $(LabelRangeModify.Dom).addClass(CurrentTheme.AlternateFontColor);
 
     //Populates splitter of Next event section
@@ -554,7 +557,7 @@ function prepFunctionForSilentClick(EventID)
     }
 }
 
-function UpdateTimer(CountDownDate, EncasingDom)
+function UpdateTimer(EncasingDom,LabelSection, CountDownDate, EndDate)
 {
     var DomObject = EncasingDom;//RetrieveDom("Event_Content_Text_Container1_Element1");
     DomObject.innerHTML = "";
@@ -600,18 +603,33 @@ function UpdateTimer(CountDownDate, EncasingDom)
     TimerHookDomObject.style.border = "24px solid rgba(255, 128, 0,0)";
     TimerHookDomObject.style.zIndex = "-1";
     TimerHookDomObject.style.borderLeft = "24px solid rgba(79, 0, 54,1)";
-    CountDownTimer(DomObject3.Dom, CountDownDate);
+    //debugger;
+    CountDownTimer(DomObject3.Dom,LabelSection, CountDownDate,EndDate);
     //CountDownTimer("Event_Content_Text_Container1_Element_Timer1", CountDownDate) 
 }
 
 //function takes two variables 1-DomObject(DomID or Object) to which the counter will be implemented; 2-FinalDate to which you are executing the time difference.
-function CountDownTimer(DomObjectEntry, FinalDate)
+function CountDownTimer(DomObjectEntry, LabelSection, StartDate, EndDate)
 {
     var DomObject = DomObjectEntry;//RetrieveDom(DomObjectEntry);
     var today = new Date();
     var dd = today.getDate();
     //today.setMonth((today.getMonth()) + 1); //January is 0!
-    var milliTimeSpan = FinalDate - today//gets Time Difference in milliseconds
+
+    var RefDate = StartDate
+    var milliTimeSpan = RefDate - today//gets Time Difference in milliseconds
+    if (milliTimeSpan < 0)
+    {
+        RefDate = EndDate;
+        milliTimeSpan = RefDate - today;
+        if(milliTimeSpan<0)
+        {
+            LabelSection.innerHTML = "<p>YOU ARE &mdash;<p>"
+            DomObject.innerHTML = "<div style='postion:absolute;height:100%; line-height:400%;width:100%; text-align:center;'>Done!!!</div>";
+            return;
+        }
+        LabelSection.innerHTML = "<p>Ends in ...<p>"
+    }
     var SecondsTimeSpan = parseInt(milliTimeSpan / 1000); //converts to milliseconds
     //alert(SecondsTimeSpan)
     var Days = parseInt(SecondsTimeSpan / (60 * 60 * 24));//gets day Value
@@ -620,7 +638,7 @@ function CountDownTimer(DomObjectEntry, FinalDate)
     var Seconds = parseInt((((SecondsTimeSpan % (60 * 60 * 24)) % (60 * 60)) % (60)));
     UpdateTimerDiv([Days, Hours, Minutes, Seconds], DomObject)
     
-    setTimeout(function(){CountDownTimer(DomObjectEntry, FinalDate);},1000)
+    setTimeout(function () { CountDownTimer(DomObjectEntry,LabelSection, StartDate, EndDate); }, 1000)
 
     function UpdateTimerDiv(TimeData,DomObjectEntry)
     {

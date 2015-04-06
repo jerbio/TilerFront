@@ -122,6 +122,38 @@ function generateHomePage(UserSchedule) {
     
 }
 
+function generateMenuContainer()
+{
+    var MenuContainer = getDomOrCreateNew("MenuContainer");
+    var MenuContent = generateMenuContent();
+    MenuContainer.appendChild(MenuContent);
+    MenuContainer.onclick = MenuToggle;
+    var RetValue = MenuContainer;
+    MenuContent.onclick = function (e) { e.stopPropagation() };
+    $(MenuContent).on("swipe", MenuToggle)
+    return RetValue;
+}
+
+function generateMenuContent()
+{
+    var MenuContainer = getDomOrCreateNew("MenuContent");
+
+    var ManageButton = getDomOrCreateNew("ManageButton","button");
+    var LogOutButton = getDomOrCreateNew("LogOutButton", "button");
+    LogOutButton.innerHTML = "LogOut"
+    ManageButton.innerHTML = "Manage"
+    $(ManageButton).addClass("MenuItemButton")
+    $(LogOutButton).addClass("MenuItemButton")
+    MenuContainer.appendChild(ManageButton);
+    MenuContainer.appendChild(LogOutButton);
+    ManageButton.onclick = function () { window.location.href = ("../Manage") }
+    LogOutButton.onclick = function () { document.getElementById('logoutForm').submit() }
+
+    
+    var RetValue = MenuContainer;
+    return RetValue;
+}
+
 function generateHomePageDoms(Dom) {
     var TopBannerDom = document.getElementById("HomePageTopBanner");
     if (TopBannerDom == null) {
@@ -140,8 +172,11 @@ function generateHomePageDoms(Dom) {
         BodyDOM.setAttribute("id", "HomeMiddleContent");
     }
     
-
+    var MenuContainer = generateMenuContainer();
     $(Dom).append(BodyDOM);
+    Dom.appendChild(MenuContainer);
+    MenuContainer.onblur = MenuToggle;
+
     $(Dom).append(TopBannerDom);
     $(BodyDOM).empty();
     $(BodyDOM).addClass(CurrentTheme.ContentSection);
@@ -413,6 +448,48 @@ function generateModalForTIleOrModal()
         generateModalForTIleOrModal();
     }
 
+    function generateMenuButton()
+    {
+        var ButtonID = "MenuButton"
+        var MenuButton = getDomOrCreateNew(ButtonID);
+        var ButtonIconBarAID = "IconBarA"
+        var ButtonIconBarA = getDomOrCreateNew(ButtonIconBarAID);
+        var ButtonIconBarBID = "IconBarB"
+        var ButtonIconBarB = getDomOrCreateNew(ButtonIconBarBID);
+        var ButtonIconBarCID = "IconBarC"
+        var ButtonIconBarC = getDomOrCreateNew(ButtonIconBarCID);
+
+        var IconBarContainer = getDomOrCreateNew("MenuIconBarContainer");
+        IconBarContainer.appendChild(ButtonIconBarA);
+        IconBarContainer.appendChild(ButtonIconBarB);
+        IconBarContainer.appendChild(ButtonIconBarC);
+
+        
+        $(ButtonIconBarA).addClass("MenuIconBar")
+        $(ButtonIconBarB).addClass("MenuIconBar")
+        $(ButtonIconBarC).addClass("MenuIconBar")
+        MenuButton.appendChild(IconBarContainer);
+        MenuButton.onclick = MenuToggle;
+        return MenuButton;
+    }
+
+
+    function MenuToggle()
+    {
+        var menuContainer = getDomOrCreateNew("MenuContainer");
+        if (MenuToggle.isOn)
+        {
+            MenuToggle.isOn = false;
+            menuContainer.style.left = "-100%";
+        }
+        else
+        {
+            MenuToggle.isOn = true;
+            menuContainer.style.left = 0;
+        }
+    }
+    MenuToggle.isOn = false;
+
     function populateHomePageTopBanner(Dom) {
 
         var FullInfoPanelID = "FullInfoPanel"
@@ -435,10 +512,13 @@ function generateModalForTIleOrModal()
             //LogOut();
             //LogOutButton.submit();
         });
+        /*
         var LogOutContainer = getDomOrCreateNew("logoutForm");
         LogOutContainer.appendChild(LogOutButton.Dom)
         Dom.appendChild(LogOutContainer.Dom)
-
+        */
+        var MenuButton = generateMenuButton();
+        Dom.appendChild(MenuButton);
 
         var LoggedLogoContainerID = "LoggedLogoContainer";
         var LoggedLogoContainer = getDomOrCreateNew(LoggedLogoContainerID);
