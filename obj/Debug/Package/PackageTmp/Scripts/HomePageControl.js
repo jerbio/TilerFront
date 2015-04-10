@@ -50,6 +50,7 @@ function getGetParameter(name) {
 function retrieveUserSchedule(myurl, UserEntry,SuccessCallBack)
 {
     //$.get(myurl, generateCalendarEvents);
+    //debugger;
     var TimeZone = new Date().getTimezoneOffset();
     UserCredentials.UserName= UserEntry.UserName;//, : ,TimeZoneOffset: TimeZone };
     UserCredentials.ID = UserEntry.UserID;
@@ -98,7 +99,7 @@ function generateLoggedInUserAccountUI(UserSchedule) {
 function generateHomePage(UserSchedule) {
     var CalendarBodyDom = CurrentTheme.AppUIContainer;
     var HomePageContainer = getHomePageDomContainer();
-    UserCredentials.Name = UserSchedule.Name;
+    //UserCredentials.Name = UserSchedule.Name;
     $(HomePageContainer.Dom).addClass("ScreenContainer");
     CurrentTheme.TransitionNewContainer(HomePageContainer.Dom);
     $(HomePageContainer.Dom).css({ "left": "0%" });
@@ -138,8 +139,8 @@ function generateMenuContent()
 {
     var MenuContainer = getDomOrCreateNew("MenuContent");
 
-    var ManageButton = getDomOrCreateNew("ManageButton");
-    var LogOutButton = getDomOrCreateNew("LogOutButton");
+    var ManageButton = getDomOrCreateNew("ManageButton","button");
+    var LogOutButton = getDomOrCreateNew("LogOutButton", "button");
     LogOutButton.innerHTML = "LogOut"
     ManageButton.innerHTML = "Manage"
     $(ManageButton).addClass("MenuItemButton")
@@ -543,7 +544,7 @@ function generateModalForTIleOrModal()
         var NameProfileInfoContainer = getDomOrCreateNew(NameProfileInfoContainerID);
         var NameProfileInfoContainerContentID = "NameProfileInfoContainerContent";
         var NameProfileInfoContainerContent = getDomOrCreateNew(NameProfileInfoContainerContentID,"span");
-        NameProfileInfoContainerContent.Dom.innerHTML = UserCredentials.Name ==null? "Hello":"Hello" + UserCredentials.Name + "-";
+        NameProfileInfoContainerContent.Dom.innerHTML = UserCredentials.Name ==null? "Hello":"Hello " + UserCredentials.Name + "!";
         NameProfileInfoContainer.Dom.appendChild(NameProfileInfoContainerContent.Dom);
 
 
@@ -851,7 +852,10 @@ function generateModalForTIleOrModal()
         $(EventBottomLeftDescription.Dom).addClass("EventBottomLeftDescription");
 
         //$(EventBottomLeftDescriptionText.Dom).addClass("EventBottomGenericDescriptionText");
-        EventBottomLeftDescriptionText.Dom.innerHTML ="@ " +myEvent.SubCalAddressDescription;
+        if(myEvent.SubCalAddressDescription)
+        {
+            EventBottomLeftDescriptionText.Dom.innerHTML = "@ " + myEvent.SubCalAddressDescription;
+        }
 
 
         //Bottom Description. Container for Traffic Light and What is left

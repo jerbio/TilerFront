@@ -78,6 +78,8 @@ namespace TilerFront.Models
         public bool RememberMe { get; set; }
     }
 
+
+
     public class RegisterViewModel
     {
         [Required]
@@ -137,5 +139,10 @@ namespace TilerFront.Models
         [EmailAddress]
         [Display(Name = "Email")]
         public string Email { get; set; }
+    }
+
+    public class  LoggedInUser:DTOs.VerifiedUser
+    {
+        public string FullName { get; set; }
     }
 }

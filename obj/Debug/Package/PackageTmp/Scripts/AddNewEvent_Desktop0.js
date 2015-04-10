@@ -116,7 +116,10 @@ function SubmitTile(Name, Address,AddressNick, Splits, Hour, Minutes, Deadline, 
     }
     else
     {
-        Split = 1;
+        if (!RepetitionFlag)
+        {
+            Splits = 1;
+        }
     }
     var EventEnd = {}
     EventEnd.Date = new Date(End.getFullYear(), End.getMonth(), End.getDate());
@@ -455,15 +458,17 @@ function generatePeek(CalEvent,Container)
                     stacking: 'normal'
                 }
             },
-            series: [{
-                name: 'Work',
-                //data: [5, 3, 4, 7, 2]
-                data: []
-            }, {
-                name: 'Sleep',
-                //data: [2, 2, 3, 2, 1]
-                data: []
-            }
+            series: [
+                 {
+                     name: 'Sleep',
+                     //data: [2, 2, 3, 2, 1]
+                     data: []
+                 },
+                {
+                    name: 'Work',
+                    //data: [5, 3, 4, 7, 2]
+                    data: []
+                }
             /*,
             {
                 name: 'Joe',
@@ -479,14 +484,15 @@ function generatePeek(CalEvent,Container)
         var labelData = [];
         var SleepData = [];
         var WorkData = [];
+        var InitialDayOfWeek =PeekData.PeekDays[0].DayIndex;
         for (var i = 0; i < PeekData.PeekDays.length; i++)
         {
-            labelData.push(WeekDays[PeekData.PeekDays[i].DayIndex]);
+            labelData.push(WeekDays[(InitialDayOfWeek + i)%7]);
             SleepData.push(PeekData.PeekDays[i].SleepTime);
             WorkData.push(PeekData.PeekDays[i].TotalDuration);
         }
-        HighChartsData.series[0].data = WorkData;
-        HighChartsData.series[1].data = SleepData;
+        HighChartsData.series[1].data = WorkData;
+        HighChartsData.series[0].data = SleepData;
         HighChartsData.xAxis.categories = labelData;
 
         
@@ -501,8 +507,8 @@ function generatePeek(CalEvent,Container)
         }
         else {
             //debugger;
-            generatePeek.ChartData.highcharts().series[0].setData(WorkData,true);
-            generatePeek.ChartData.highcharts().series[1].setData(SleepData,true);
+            generatePeek.ChartData.highcharts().series[1].setData(WorkData,true);
+            generatePeek.ChartData.highcharts().series[0].setData(SleepData,true);
         }
 
         
@@ -1695,7 +1701,8 @@ function AddTiledEvent()
         var RepetionChoice = RepetionSlider.getAllElements()[1].TileInput;
         var myColor = ColorPicker.Selector.getColor();
         var restrictionData = generatePostBackDataForTimeRestriction(TimeRestrictionSlider);
-        var peekEvent = SubmitTile(Element1.TileInput.getInputDom().value, "","", Splits.getInputDom().value, Hour.getInputDom().value, Min.getInputDom().value, Element4.TileInput.getInputDom().value, RepetionChoice.getInputDom().value, myColor, RepetionSlider.getStatus().value, restrictionData);
+        
+        var peekEvent = SubmitTile(Element1.TileInput.getInputDom().value, "","", Splits.getInputDom().value, Hour.getInputDom().value, Min.getInputDom().value, Element4.TileInput.getInputDom().value, RepetionChoice.getInputDom().value, myColor, RepetionSlider.getStatus(), restrictionData);
         setTimeout(function () { generatePeek(peekEvent, PreviewPanel) }, 300);
     }
 

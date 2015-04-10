@@ -24,21 +24,21 @@
     font-size:0.8em;
     top:4%;
     height:90%;
-    background-color: rgba(89,89,89,.6);
-    color:rgb(240,240,240);
+    //background-color: rgba(89,89,89,.6);
+    //color:rgb(240,240,240);
 }
 
 .LabelDescriptionTop /*media*/
 {
-    position:absolute;
-    left:5%;
-    width:90%;
-    height:50%;
-    overflow:hidden;
-    text-overflow:ellipsis;
-    //font-family: 'Poiret One', cursive;
-    //font-size:20px;
-    font-weight:600;
+  position: relative;
+  left: 5%;
+  width: 90%;
+  height: auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 600;
+  text-align: center;
+  /* line-height: 200%; */
 }
 
 .LabelDescriptionTopDesktop /*media*/
@@ -54,38 +54,39 @@
 
 .LabelDescriptionBottom  /*media*/
 {
-    position:absolute;
-    display:table;
-    top:50%;
-    left:5%;
-    width:90%;
-    height:50%;
-    display: table-cell; 
-    vertical-align: middle; 
-    
-    font-weight:600;
+  position: relative;
+  display: table;
+  /* top: 50%; */
+  /* left: 5%; */
+  width: 100%;
+  /* height: 50%; */
+  /* display: table-cell; */
+  vertical-align: middle;
+  font-weight: 600;
 }
 
 .LabelDescriptionBottomLocation 
 {
-    position:absolute;
-    width:45%;
-    height:100%;
-    display: table-cell; 
-    vertical-align: middle; 
-    overflow:hidden;
-    text-overflow:ellipsis;
+    position: relative;
+    width: 100%;
+    /* height: 100%; */
+    /* display: table-cell; */
+    vertical-align: middle;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: center;
     
 }
 
 .LabelDescriptionBottomTime 
 {
-    position:absolute;
-    left:55%;
-    width:45%;
-    height:100%;
-    text-overflow:ellipsis;
-    font-size:0.7em;
+    position: relative;
+    /* left: 55%; */
+    width: 100%;
+    height: 100%;
+    text-overflow: ellipsis;
+    font-size: 0.7em;
+    text-align: center;
 }
 
 #BackIconSelectedEvent  /*media*/
@@ -201,9 +202,10 @@
 
 .SelectedEventOption 
 {
-    position:absolute;
-    width:25%;
+    position: relative;
+    width: 25%;
     height: 100%;
+    display: inline-block;
 }
 
 .SelectedEventOptionImageContainer
@@ -214,6 +216,14 @@
     top:10%;
     height: 70%;
 }
+
+#OptionContainer
+{
+      left: 12.5%;
+  /* transform: translateX(-50%); */
+  position: relative;
+}
+
 
 
 .SelectedEventOptionImage /*media*/
@@ -238,26 +248,27 @@
 
 
 #ProcrastinateOption {
-    position:absolute;
-    left:0%;
+    //position:absolute;
+    //left:0%;
 }
 
 
 #SilentOption {
-    position:absolute;
-    left:25%;
+    //position:absolute;
+    //left:25%;
+    display:none;
 }
 
 
 #DirectionsOption {
-    position:absolute;
-    left:50%;
+    //position:absolute;
+    //left:50%;
 }
 
 
 #MoreOption {
-    position:absolute;
-    left:75%;
+    //position:absolute;
+    //left:75%;
 }
 
 .ColonString 
@@ -354,19 +365,31 @@
 
 #SelectedSubEventEndDateContainer /*media*/
 {
-    position:absolute;
-    top:25%;
-    height:45%;
-    width:90%;
-    left:12.5%;
-    font-size:.85em;
+  position: absolute;
+  top: 50%;
+  height: auto;
+  width: auto;
+  left: 12.5%;
+  font-size: .85em;
+  transform: translateY(-50%);
 }
 
 #SelectedSubEventEndDateContainerName /*media*/
 {
-    position:absolute;
+    position:relative;
     font-size:.70em;
     font-weight:700;
+    margin-top:10%;
+}
+
+
+#SelectedDeadline
+{
+  color: white;
+  border: none;
+  border-bottom: solid white 1px;
+  width: 9em;
+  position: relative;
 }
 
 #SelectedSubEventEndDateContainerContent 

@@ -79,7 +79,7 @@ function generateSelectedEventLabelDom(SelectedEvent)
     $(LabelDescriptionBottom.Dom).addClass("LabelDescriptionBottom");
     LabelDescription.Dom.appendChild(LabelDescriptionBottom.Dom);
     var VerticalLine = InsertVerticalLine("95%", "50%", "0%");
-    LabelDescriptionBottom.Dom.appendChild(VerticalLine);
+    //LabelDescriptionBottom.Dom.appendChild(VerticalLine);
 
     var LabelDescriptionBottomLocation = document.createElement("div");
     $(LabelDescriptionBottomLocation).addClass("LabelDescriptionBottomLocation");
@@ -348,8 +348,10 @@ function generateRangeUpdate(SelectedEvent) {
     SubEventEndDate.Dom.appendChild(SubEventEndDateName.Dom);
     var SubEventEndDateNameContent = getDomOrCreateNew("SelectedSubEventEndDateContainerContent");
     SubEventEndDate.Dom.appendChild(SubEventEndDateNameContent.Dom);
-
-
+    var SubEventEnd = getDomOrCreateNew("SelectedDeadline","input");
+    SubEventEnd.value = new Date(SelectedEvent.SubCalCalEventEnd).toDateString();
+    SubEventEndDate.Dom.appendChild(SubEventEnd);
+    BindImputToDatePicketMobile(SubEventEnd);
     function UpdateDateDisplay() {
         /*var myDate = $(SliderContainer.Dom).slider("value");
         SubEventEndDateNameContent.Dom.innerHTML = DateTimeToDayMDYTimeString(new Date(myDate));*/
@@ -504,13 +506,14 @@ function generateEventOptions(SelectedEvent) {
     MoreOption.Dom.appendChild(MoreOptionTxt.Dom);
 
 
+    var OptionContainer = getDomOrCreateNew("OptionContainer");
 
+    EventOptionsSubEvent.appendChild(OptionContainer);
 
-
-    EventOptionsSubEvent.Dom.appendChild(ProcrastinateOption.Dom);
-    EventOptionsSubEvent.Dom.appendChild(DirectionsOption.Dom);
-    EventOptionsSubEvent.Dom.appendChild(SilentOption.Dom);
-    EventOptionsSubEvent.Dom.appendChild(MoreOption.Dom);
+    OptionContainer.Dom.appendChild(ProcrastinateOption.Dom);
+    OptionContainer.Dom.appendChild(DirectionsOption.Dom);
+    OptionContainer.Dom.appendChild(SilentOption.Dom);
+    OptionContainer.Dom.appendChild(MoreOption.Dom);
 
 
     return EventOptionsSubEvent.Dom;

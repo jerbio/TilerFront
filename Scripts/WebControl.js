@@ -1,5 +1,5 @@
 ﻿"use strict"
-var DisableRegistration = true;
+var DisableRegistration = false;
 var Debug = false;
 var DebugLocal = false;
 
@@ -18,7 +18,18 @@ if (Debug)
 
 var UserTheme = { Light: new Theme("Light"), Dark: new Theme("Dark") };
 var CurrentTheme = UserTheme.Light;
-var UserCredentials = {UserName:"",ID:"", Name:""};
+var UserCredentials;
+try
+{
+    //debugger;
+    UserCredentials=  RetrieveUserCredentials();
+}
+catch(e)
+{
+    //debugger;
+    UserCredentials= { UserName: "", ID: "", Name: "" };
+}
+
 var OneDayInMs = 86400000;
 var OneWeekInMs = OneDayInMs * 7;
 var FourWeeksInMs = OneWeekInMs * 4;
@@ -109,7 +120,7 @@ function GetCookieValue()//verifies that user has cookies
         if (Debug)
             {
         ///*
-            CookieValue = { UserName: "jerbio", UserID: "d350ba4d-fe0b-445c-bed6-b6411c2156b3" }
+            CookieValue = { UserName: "jerbio", UserID: "d350ba4d-fe0b-445c-bed6-b6411c2156b3",FullName:"Jerome" }
         //*/
         /*
         CookieValue = {};
@@ -964,8 +975,8 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
         $(ActiveEventProcratination).addClass("ActiveEventProcrastination");
         var CurrentDial, SelectedDialOptionDomButton;
 
-        var DayTextBox = getDomOrCreateNew("DialDayInput" + DialOnEvent.id);
-        DayTextBox.Dom.innerHTML = "<p>Day(s)</p>";
+        var DayTextBox = getDomOrCreateNew("DialDayInput" + DialOnEvent.id,"button");
+        DayTextBox.Dom.innerHTML = "Day(s)";
         DayTextBox.Dom.setAttribute("class", "DialInput DialDayInput");
         $(DayTextBox.Dom).click(function () {
             var CurrentDayValue = new Dial(0, 1, 1, 0);
@@ -978,9 +989,9 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
         })
 
 
-        var HourTextBox = getDomOrCreateNew("DialHourInput" + DialOnEvent.id);
+        var HourTextBox = getDomOrCreateNew("DialHourInput" + DialOnEvent.id, "button");
         HourTextBox.Dom.setAttribute("class", "DialInput DialHourInput");
-        HourTextBox.Dom.innerHTML = "<p>Hour(s)</p>";
+        HourTextBox.Dom.innerHTML = "Hour(s)";
         $(HourTextBox.Dom).click(function () {
             var CurrentHourValue = new Dial(0, 5, 0, 60 * 2);
             CurrentDial = CurrentHourValue;
@@ -990,9 +1001,9 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
             InitializeDialDial(CurrentHourValue, EventDialContainer.Dom);
         })
 
-        var MinTextBox = getDomOrCreateNew("DialMinInput" + DialOnEvent.id);;
+        var MinTextBox = getDomOrCreateNew("DialMinInput" + DialOnEvent.id, "button");
         MinTextBox.Dom.setAttribute("class", "DialInput DialMinInput");
-        MinTextBox.Dom.innerHTML = "<p>Min(s)</p>";
+        MinTextBox.Dom.innerHTML = "Min(s)";
 
 
 

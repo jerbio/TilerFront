@@ -545,7 +545,9 @@ namespace TilerFront.Controllers
         public ActionResult Mobile()
         {
             ViewBag.Message = "Welcome To Tiler";
-            return View();
+            ApplicationUser myUser = UserManager.FindById(User.Identity.GetUserId());
+
+            return View(myUser);
         }
 
 

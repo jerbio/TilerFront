@@ -514,7 +514,7 @@ position: absolute;
   //box-shadow:rgba(10,10,10,.9) 0px 0px 8px;
   z-index:4;
   //border:solid 2px rgb(80,80,80);
-  background-color:yellow;
+  background-color:yellow !important;
   transition:all .1s;
 }
 
@@ -620,7 +620,7 @@ position: absolute;
 
 .selectedElements 
 {
-    background-color:yellow;
+    background-color:yellow !important;
 }
 .LockSymbolContainer 
 {
@@ -791,7 +791,7 @@ position: absolute;
     position:absolute;
     width:5%;
     height:100%;
-    background:gray;
+    background-color:transparent;
 }
 
 #RightYearScrollButoon {
@@ -800,7 +800,7 @@ position: absolute;
 }
 
 .innerArrow {
-    border:white solid 3px;
+    border:gray solid 3px;
     background:transparent;
     border-top:none;
     border-left:none;
@@ -1108,7 +1108,8 @@ width: auto;
       width: 0;
       overflow: hidden;
       box-sizing: border-box;
-      //transition: all .5s ease-in
+      height:auto;
+      z-index:0;
 }
 .TilerLogo {
   display: inline-block;
