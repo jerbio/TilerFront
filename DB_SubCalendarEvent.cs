@@ -6,41 +6,33 @@ using TilerElements;
 
 namespace TilerFront
 {
-    public class DB_SubCalendarEvent:SubCalendarEvent
+    public class DB_SubCalendarEvent : SubCalendarEvent
     {
-        internal DB_SubCalendarEvent(SubCalendarEvent mySubCalEvent, NowProfile NowProfileData, Procrastination ProcrastinationData)
+        public DB_SubCalendarEvent(string MySubEventID, BusyTimeLine MyBusylot, DateTimeOffset EventStart, DateTimeOffset EventDeadline, TimeSpan EventPrepTime, DateTimeOffset OriginalStartData, string myParentID, bool Rigid, bool Enabled, EventDisplay UiParam, MiscData Notes, bool completeFlag, Location_Elements EventLocation = null, TimeLine RangeOfSubCalEvent = null, ConflictProfile conflicts = null)
         {
-            this.BusyFrame = mySubCalEvent.ActiveSlot;
-            this.CalendarEventRange = mySubCalEvent.getCalendarEventRange;
-            this.FromRepeatEvent = mySubCalEvent.FromRepeat;
-            this.EventName = mySubCalEvent.Name;
-            this.EventDuration = mySubCalEvent.ActiveDuration;
-            this.Complete = mySubCalEvent.isComplete;
-            this.ConflictingEvents = mySubCalEvent.Conflicts;
-            this.DataBlob = mySubCalEvent.Notes;
-            this.DeadlineElapsed = mySubCalEvent.isDeadlineElapsed;
-            this.Enabled = mySubCalEvent.isEnabled;
-            this.EndDateTime = mySubCalEvent.End;
-            this.EventPreDeadline = mySubCalEvent.PreDeadline;
-            this.EventScore = mySubCalEvent.Score;
-            this.isRestricted = mySubCalEvent.isEventRestricted;
-            this.LocationData = mySubCalEvent.myLocation;
-            this.OldPreferredIndex = mySubCalEvent.OldUniversalIndex;
-            this.otherPartyID = mySubCalEvent.ThirdPartyID;
-            this.preferredDayIndex = mySubCalEvent.UniversalDayIndex;
-            this.PrepTime = mySubCalEvent.Preparation;
-            this.Priority = mySubCalEvent.EventPriority;
-            this.ProfileOfNow = NowProfileData;
-            this.ProfileOfProcrastination = ProcrastinationData;
-            this.RepetitionFlag = mySubCalEvent.FromRepeat;
-            this.RigidSchedule = mySubCalEvent.Rigid;
-            this.StartDateTime = mySubCalEvent.Start;
-            this.UiParams = mySubCalEvent.UIParam;
-            this.UniqueID = mySubCalEvent.SubEvent_ID;
-            this.UserDeleted = mySubCalEvent.isUserDeleted;
-            this.UserIDs = mySubCalEvent.getAllUserIDs();
-            this.Vestige = mySubCalEvent.isVestige;
-            this.OriginalStart = mySubCalEvent.OrginalStartInfo;
+            if (conflicts == null)
+            {
+                conflicts = new ConflictProfile();
+            }
+            ConflictingEvents = conflicts;
+            OriginalStart = OriginalStartData;
+            CalendarEventRange = RangeOfSubCalEvent;
+            //string eventName, TimeSpan EventDuration, DateTimeOffset EventStart, DateTimeOffset EventDeadline, TimeSpan EventPrepTime, TimeSpan PreDeadline, bool EventRigidFlag, bool EventRepetition, int EventSplit
+            StartDateTime = EventStart;
+            EndDateTime = EventDeadline;
+            EventDuration = MyBusylot.End - MyBusylot.Start;
+            BusyFrame = MyBusylot;
+            PrepTime = EventPrepTime;
+            UniqueID = new EventID(MySubEventID);
+            this.LocationInfo = EventLocation;
+            RepetitionSequence = 0;
+            UiParams=UiParam;
+            DataBlob= Notes;
+            Complete = completeFlag;
+
+            this.Enabled = Enabled;
+            //EventSequence = new EventTimeLine(UniqueID.ToString(), StartDateTime, EndDateTime);
+            RigidSchedule = Rigid;
         }
     }
 }

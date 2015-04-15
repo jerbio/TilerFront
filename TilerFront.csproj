@@ -428,7 +428,8 @@
     <Content Include="Content\bootstrap.css.map" />
     <Compile Include="DBControlDirect.cs" />
     <Compile Include="DBControl.cs" />
-    <Compile Include="DB_CalendarEvent.cs" />
+    <Compile Include="DB_CalendarEventFly.cs" />
+    <Compile Include="DB_CalendarEventExtra.cs" />
     <Compile Include="DB_CalendarEventRestricted.cs" />
     <Compile Include="DB_NowProfile.cs" />
     <Compile Include="DB_Procrastination.cs" />
@@ -436,6 +437,8 @@
     <Compile Include="DB_RestrictionProfile.cs" />
     <Compile Include="DB_RestrictionTimeLine.cs" />
     <Compile Include="DB_SubCalendarEvent.cs" />
+    <Compile Include="DB_SubCalendarEventFly.cs" />
+    <Compile Include="DB_SubCalendarEventExtra.cs" />
     <Compile Include="DB_SubCalendarEventRestricted.cs" />
     <Compile Include="DTOs\PostBackStruct.cs" />
     <Compile Include="DTOs\PostError.cs" />

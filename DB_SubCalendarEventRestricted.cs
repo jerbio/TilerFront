@@ -37,12 +37,12 @@ namespace TilerFront
             //this.InterferringEvents = mySubCalEvent.inter
             this.isRestricted = true;
             this.Vestige = mySubCalEvent.isVestige;
-            this.LocationData = mySubCalEvent.myLocation;
+            this.LocationInfo = mySubCalEvent.myLocation;
             this.MiscIntData = mySubCalEvent.IntData;
             //this.NonHumaneTimeLine = mySubCalEvent.NonHumaneTimeLine.CreateCopy();
             this.PrepTime = mySubCalEvent.Preparation;
             this.Priority = mySubCalEvent.EventPriority;
-            this.RepetitionFlag = mySubCalEvent.FromRepeat;
+            //this.RepetitionFlag = mySubCalEvent.FromRepeat;
             this.RigidSchedule = mySubCalEvent.Rigid;
 
             this.UiParams = mySubCalEvent.UIParam;

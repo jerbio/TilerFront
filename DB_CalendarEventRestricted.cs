@@ -18,7 +18,7 @@ namespace TilerFront
             this.EventPreDeadline = CalendarEventData.PreDeadline;
             this.PrepTime = CalendarEventData.Preparation;
             this.Priority = CalendarEventData.EventPriority;
-            this.RepetitionFlag = CalendarEventData.RepetitionStatus;
+            //this.RepetitionFlag = CalendarEventData.RepetitionStatus;
             this.EventRepetition = (CalendarEventData).Repeat;// EventRepetition != CalendarEventData.null ? EventRepetition.CreateCopy() : EventRepetition;
             this.Complete = CalendarEventData.isComplete;
             this.RigidSchedule = CalendarEventData.Rigid;//hack
@@ -31,7 +31,7 @@ namespace TilerFront
             this.DataBlob = CalendarEventData.Notes;
             this.Enabled = CalendarEventData.isEnabled;
             //this.isRestricted = CalendarEventData.isEventRestricted;
-            this.LocationData = CalendarEventData.myLocation;//hack you might need to make copy
+            this.LocationInfo = CalendarEventData.myLocation;//hack you might need to make copy
             this.ProfileOfProcrastination = CalendarEventData.ProcrastinationInfo;
             this.DeadlineElapsed = CalendarEventData.isDeadlineElapsed;
             this.UserDeleted = CalendarEventData.isUserDeleted;
@@ -42,7 +42,7 @@ namespace TilerFront
             this.OriginalStart = CalendarEventData.OrginalStartInfo;
             //this.SubEvents = ((DB_CalendarEventRestricted)CalendarEventData).getSubEvents();
             
-            if (!RepetitionFlag)
+            if (!this.EventRepetition.Enable)
             {
                 foreach (SubCalendarEventRestricted eachSubCalendarEvent in CalendarEventData.AllSubEvents)
                 {
