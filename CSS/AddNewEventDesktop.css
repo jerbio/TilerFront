@@ -354,7 +354,7 @@ input:focus:-ms-input-placeholder { color:rgba(0,0,0, 0.2); }
   padding-left: 5px;
   //margin-right: 15px;
   width: auto;
-  max-width: 100%;
+  max-width: 40%;
   border-top:none;
   border-left:none;
   border-right:none;
@@ -615,9 +615,24 @@ input:focus:-ms-input-placeholder { color:rgba(0,0,0, 0.2); }
 
 .LocationCacheContainer
 {
-    width:100%;
-    height:40px;
-    position:relative;
+    width: 100%;
+    min-height: 40px;
+    position: relative;
+    box-sizing: border-box;
+    padding: 5px;
+}
+.LocationCacheContainer:hover
+{
+    background-color: rgb(200,200,200);
+}
+
+.LocationTag
+{
+   
+}
+.LocationAddress
+{
+
 }
 
 .HoveLocationCacheContainer

@@ -1,6 +1,6 @@
 ﻿"use strict"
 var DisableRegistration = false;
-var Debug = false;
+var Debug =  true;
 var DebugLocal = false;
 
 //var global_refTIlerUrl = "http://localhost:53201/api/";
@@ -79,6 +79,7 @@ Date.prototype.dst = function () {
     return this.getTimezoneOffset() < this.stdTimezoneOffset();
 }
 
+var googleAPiKey = "AIzaSyAOnexWFxnoQ6nQI7p64lyR8YgXwB4qRvU";//Debug ? "AIzaSyAeFh3yjsRCmTEL1ujbaA_CBk_r_LUNPY8" : "AIzaSyAd2zKjpB7lw4FS41oLzC2SPwtCP6HXHoc";
 
 
 
@@ -1613,14 +1614,15 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
     LoadingScreenControl.Counter = 0;
 
 
-    function AutoSuggestControl(Url,Method, GenerateEachDomCallBack, UserInputBox)
+    function AutoSuggestControl(Url,Method, GenerateEachDomCallBack, UserInputBox,IsNotTilerEndPoint,DataStructure)
     {
         var myID = AutoSuggestControl.Counter++;
         var InputBarContainerID = "InputBarContainer" + myID++;
         var InputBarContainer = getDomOrCreateNew(InputBarContainerID);
         var myRequest = null;
-        var DomAndContainer = generateFullInputBar(UserInputBox);
+        var DomAndContainer = generateFullInputBar(UserInputBox, IsNotTilerEndPoint,DataStructure);
         var IsContentOn = false;
+        var SendRequest = true;
 
         var InputBarAndContentContainerID = "InputBarAndContentContainer" + myID;
         var InputBarAndContentContainer = getDomOrCreateNew(InputBarAndContentContainerID);
@@ -1665,6 +1667,7 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
         }
 
         var clear = function () {
+            //debugger;
             if (InputBarContainer.Dom.parentNode != null) {
                 $(InputBarContainer.Dom).empty();
                 InputBarContainer.Dom.parentNode.removeChild(InputBarContainer.Dom);
@@ -1676,6 +1679,7 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
 
         function HideContainer()
         {
+            //debugger;
             $(InputBarContainer.Dom).addClass("setAsDisplayNone");
             IsContentOn = false;
         }
@@ -1694,7 +1698,7 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
         }
         this.isContentOn = IsTilerAutoContentOn;
 
-        function generateFullInputBar(UserInputBox)
+        function generateFullInputBar(UserInputBox, IsNotTilerEndPoint, DataStructure)
         {
             var InputBarID = "InputBar" + AutoSuggestControl.Counter;
             var InputBar = getDomOrCreateNew(InputBarID, "input");
@@ -1707,11 +1711,28 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
             var returnedValueContainer = getDomOrCreateNew(returnedValueContainerID);
             $(returnedValueContainer.Dom).addClass("returnedValueContainer");
             //$(returnedValueContainer.Dom).addClass(CurrentTheme.ContentSection);
-            (InputBar.Dom).oninput = prepCall(InputBar.Dom, Url, Method, returnedValueContainer);
+            //(InputBar.Dom).oninput = prepCall(InputBar.Dom, Url, Method, returnedValueContainer, IsNotTilerEndPoint);
+            $(InputBar.Dom).on("input", prepCall(InputBar.Dom, Url, Method, returnedValueContainer, IsNotTilerEndPoint, DataStructure));
             //InputBar.onchange= clear;
 
             var retValue = { InputBar: InputBar, returnedValue: returnedValueContainer };
             return retValue;
+        }
+
+        function disableSendRequest()
+        {
+            SendRequest = false;
+        }
+
+        function enableSendRequest() {
+            SendRequest = true;
+        }
+
+        this.enableSendRequest = enableSendRequest;
+        this.disableSendRequest = disableSendRequest;
+        function getSendRequestStatus()
+        {
+            return SendRequest;
         }
 
         var ini_TimerResetID = -67767;
@@ -1730,13 +1751,17 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
 
 
 
-        function prepCall(InputDom, url, Method, SuggestedValuesContainer)//[reps timer
+        function prepCall(InputDom, url, Method, SuggestedValuesContainer, IsNotTilerEndPoint, DataStructure)//[reps timer
         {
             return function(e)
             {
                 if (e.which == 27)
                 {
                     clear();
+                    return;
+                }
+                if (!getSendRequestStatus())
+                {
                     return;
                 }
                 if (TimerResetID == ini_TimerResetID)
@@ -1747,32 +1772,43 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
                 {
                     clearTimeout(TimerResetID);
                 }
-                TimerResetID = setTimeout(prepCalToBackEnd(InputDom, url, Method, SuggestedValuesContainer,e), 50);
+                TimerResetID = setTimeout(prepCalToBackEnd(InputDom, url, Method, SuggestedValuesContainer, e, IsNotTilerEndPoint, DataStructure), 50);
             }
         }
-
-
-        function prepCalToBackEnd(InputDom, url, Method, SuggestedValuesContainer,e) {
+        function prepCalToBackEnd(InputDom, url, Method, SuggestedValuesContainer, e, IsNotTilerEndPoint,DataStructure) {
             return function ()
             {
                 //debugger;
-                if (typeof (url) != "string")//checks if data set is already provided. If it is provided then it should just call the call back.
+                
+                cancelRequest();//cancels any preceeding requests
+                var FullLetter = InputDom.value;
+                FullLetter = FullLetter.trim();
+                myRequest = null;
+                if (!(url))//checks if data set is already provided. If it is provided then it should just call the call back.
                 {
+                    //debugger;
                     var Data = url;
                     var AllDom = GenerateEachDomCallBack(Data, SuggestedValuesContainer, InputDom);
                     TimerResetID = ini_TimerResetID;
                     return;
                 }
-                cancelRequest();//cancels any preceeding requests
-                var FullLetter = InputDom.value;
-                FullLetter = FullLetter.trim();
-                myRequest=null;
+
                 if (FullLetter == "")
                 {
                     var AllDom = GenerateEachDomCallBack([], SuggestedValuesContainer, InputDom);
                     return;
                 }
-                var postData = { Data: FullLetter, UserName: UserCredentials.UserName, UserID: UserCredentials.ID };
+                var postData ={}
+                if (IsNotTilerEndPoint)
+                {
+                    debugger;
+                    postData = DataStructure;
+                    postData["query"] = FullLetter;
+                }
+                else
+                {
+                    postData={ Data: FullLetter, UserName: UserCredentials.UserName, UserID: UserCredentials.ID };
+                }
                 if (Method == null)
                 {
                     Method="POST"
@@ -1781,9 +1817,12 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
                 myRequest = $.ajax({
                     type: Method,
                     url: url,
+                    //jsonp: "callback",
+                    //dataType: 'jsonp',
                     data: postData/*,
                 success: function (response)
                 {
+                    debugger;
                     response = JSON.parse(response);
                     var data = response.Content;
                     var AllDom = GenerateEachDomCallBack(data, SuggestedValuesContainer);
@@ -1791,7 +1830,8 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
                 }).done(function (response)
                 {
                     //response = JSON.parse(response);
-                    var data = response.Content;
+                    
+                    var data = IsNotTilerEndPoint ? response : response.Content;
                     var AllDom = GenerateEachDomCallBack(data, SuggestedValuesContainer, InputDom);
                     TimerResetID = ini_TimerResetID;
                     myRequest = null;

@@ -51,6 +51,12 @@ body {
     background-repeat:no-repeat;
 }
 
+.GoogleSearchIcon
+{
+    background-image:url(../img/Icons/googleSearchIcon.png);
+    background-size: 100% 100%;
+    background-repeat:no-repeat;
+}
 
 #CalBodyContainer 
 {
@@ -898,4 +904,29 @@ input
 .setAsVisibilityHidden
 {
     visibility:hidden;
+}
+
+.GoogleSearchSymbolContainer
+{
+    width: 20px;
+    height: 95%;
+    left: 100%;
+    position: absolute;
+    margin-left: -20px !important;
+    z-index: 1;
+    top: 2.5%;
+    background-color:transparent !important;
+}
+
+
+.GoogleSearchSymbol
+{
+width: 20px;
+  height: 20px;
+  top: 100%;
+  margin-top: -25px !important;
+  position: absolute;
+  left: 100%;
+  margin-left: -25px !important;
+  background-color:transparent !important;
 }

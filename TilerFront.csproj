@@ -397,6 +397,7 @@
     <Content Include="CSS\TilerMobile.css" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Icon.png" />
+    <Content Include="img\Icons\googleSearchIcon.png" />
     <Content Include="img\Icons\locked2.svg" />
     <Content Include="LoggedInUser.html" />
     <Content Include="MonthOverView.html" />

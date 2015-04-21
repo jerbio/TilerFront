@@ -311,14 +311,48 @@ namespace TilerFront.Controllers
                 restrictionFlag = false;
             }
 
+            
+
             if (!string.IsNullOrEmpty(RepeatType))
             {
+                
 
                 DateTimeOffset FullStartTime = new DateTimeOffset(StartDateEntry.Year, StartDateEntry.Month, StartDateEntry.Day, Convert.ToInt32(StartTime.Split(':')[0]), Convert.ToInt32(StartTime.Split(':')[1]), 0, new TimeSpan());// DateTimeOffset.Parse(StartDateEntry + " " + StartTime);
                 DateTimeOffset FullEndTime = new DateTimeOffset(EndDateEntry.Year, EndDateEntry.Month, EndDateEntry.Day, Convert.ToInt32(EndTime.Split(':')[0]), Convert.ToInt32(EndTime.Split(':')[1]), 0, new TimeSpan());// DateTimeOffset.Parse(EndDateEntry + " " + EndTime);
 
                 FullStartTime = FullStartTime.Add(newEvent.getTImeSpan);
                 FullEndTime = FullEndTime.Add(newEvent.getTImeSpan);
+
+                RepeatEnd = new DateTimeOffset(Convert.ToInt32(RepeatEndYear), Convert.ToInt32(RepeatEndMonth), Convert.ToInt32(RepeatEndDay), 23, 59, 0, new TimeSpan());
+                RepeatEnd = RepeatEnd.Add(newEvent.getTImeSpan);
+                if (!RigidScheduleFlag)
+                {
+                    DateTimeOffset newEndTime = FullEndTime;
+
+                    string Frequency = RepeatFrequency.Trim().ToUpper();
+                    switch(Frequency)
+                    {
+                        case "DAILY":
+                            FullEndTime = FullStartTime.AddDays(1);
+                            break;
+                        case "WEEKLY":
+                            FullEndTime = FullStartTime.AddDays(7);
+                            break;
+                        case "MONTHLY":
+                            FullEndTime = FullStartTime.AddMonths(1);
+                            break;
+                        case "YEARLY":
+                            FullEndTime = FullStartTime.AddYears(1);
+                            break;
+                        default:
+                            break;
+                    }
+
+                    RepeatEnd = newEndTime;
+                }
+
+
+                
 
                 RepeatStart = StartDateEntry;
                 int[] selectedDaysOftheweek={};
@@ -328,13 +362,14 @@ namespace TilerFront.Controllers
                     selectedDaysOftheweek = RepeatWeeklyData.Split(',').Where(obj => !String.IsNullOrEmpty(obj)).Select(obj => Convert.ToInt32(obj)).ToArray();
                 }
 
-                RepeatEnd = new DateTimeOffset(Convert.ToInt32(RepeatEndYear), Convert.ToInt32(RepeatEndMonth), Convert.ToInt32(RepeatEndDay),23, 59, 0, new TimeSpan());
-                RepeatEnd = RepeatEnd.Add(newEvent.getTImeSpan);
+                
                 //RepeatEnd = (DateTimeOffset.Now).AddDays(7);
                 RepetitionFlag = true;
                 MyRepetition = new Repetition(RepetitionFlag, new TimeLine(RepeatStart, RepeatEnd), RepeatFrequency, new TimeLine(FullStartTime, FullEndTime), selectedDaysOftheweek);
                 EndDateEntry = RepeatEnd;
             }
+
+            
 
             UserAccountDirect myUser = await newEvent.getUserAccountDirect();
             PostBackData retValue;
@@ -486,6 +521,37 @@ namespace TilerFront.Controllers
                 FullStartTime = FullStartTime.Add(newEvent.getTImeSpan);
                 FullEndTime = FullEndTime.Add(newEvent.getTImeSpan);
 
+                RepeatEnd = new DateTimeOffset(Convert.ToInt32(RepeatEndYear), Convert.ToInt32(RepeatEndMonth), Convert.ToInt32(RepeatEndDay), 23, 59, 0, new TimeSpan());
+                RepeatEnd = RepeatEnd.Add(newEvent.getTImeSpan);
+                if (!RigidScheduleFlag)
+                {
+                    DateTimeOffset newEndTime = FullEndTime;
+
+                    string Frequency = RepeatFrequency.Trim().ToUpper();
+                    switch (Frequency)
+                    {
+                        case "DAILY":
+                            FullEndTime = FullStartTime.AddDays(1);
+                            break;
+                        case "WEEKLY":
+                            FullEndTime = FullStartTime.AddDays(7);
+                            break;
+                        case "MONTHLY":
+                            FullEndTime = FullStartTime.AddMonths(1);
+                            break;
+                        case "YEARLY":
+                            FullEndTime = FullStartTime.AddYears(1);
+                            break;
+                        default:
+                            break;
+                    }
+
+                    RepeatEnd = newEndTime;
+                }
+
+
+
+
                 RepeatStart = StartDateEntry;
                 int[] selectedDaysOftheweek = { };
                 RepeatWeeklyData = string.IsNullOrEmpty(RepeatWeeklyData) ? "" : RepeatWeeklyData.Trim();
@@ -494,8 +560,7 @@ namespace TilerFront.Controllers
                     selectedDaysOftheweek = RepeatWeeklyData.Split(',').Where(obj => !String.IsNullOrEmpty(obj)).Select(obj => Convert.ToInt32(obj)).ToArray();
                 }
 
-                RepeatEnd = new DateTimeOffset(Convert.ToInt32(RepeatEndYear), Convert.ToInt32(RepeatEndMonth), Convert.ToInt32(RepeatEndDay), 0, 0, 0, new TimeSpan());
-                RepeatEnd = RepeatEnd.Add(newEvent.getTImeSpan);
+
                 //RepeatEnd = (DateTimeOffset.Now).AddDays(7);
                 RepetitionFlag = true;
                 MyRepetition = new Repetition(RepetitionFlag, new TimeLine(RepeatStart, RepeatEnd), RepeatFrequency, new TimeLine(FullStartTime, FullEndTime), selectedDaysOftheweek);
