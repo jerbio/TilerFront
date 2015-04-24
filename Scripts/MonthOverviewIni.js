@@ -1252,6 +1252,23 @@ getRefreshedData.enableDataRefresh = function (pullLatest)
            });
     }
 
+    function OnDragStartOfSubEvent(ev)
+    {
+        ev.dataTransfer.setData("text", ev.target.id);
+    }
+
+    function OnDraggingOfSubEvent(ev)
+    {
+        ev.preventDefault();
+    }
+
+    function OnDropOfSubEvent(ev)
+    {
+        ev.preventDefault();
+        var data = ev.dataTransfer.getData("text");
+        ev.target.appendChild(document.getElementById(data));
+    }
+
     function triggerSubEventRenderOnMonth(DayOfWeek)
     {
         var verfyDate = new Date(2014, 5, 15, 0, 0, 0, 0);
@@ -1266,7 +1283,14 @@ getRefreshedData.enableDataRefresh = function (pullLatest)
             if (DayOfWeek.UISpecs[ID].Enabled)
             {
                 
+                
+
                 var ListElementContainer = getDomOrCreateNew("SubEventReference" + ID);
+                ListElementContainer.setAttribute("draggable", true);
+                ListElementContainer.ondragstart = OnDragStartOfSubEvent;
+                //ListElementContainer.ondrop = OnDropOfSubEvent;
+                //ListElementContainer.ondragstart = OnDragStartOfSubEvent;
+                //ListElementContainer.ondragstart = OnDragStartOfSubEvent;
                 $(ListElementContainer.Dom).addClass("ListElement");
                 global_DictionaryOfSubEvents[ID].gridDoms.push(ListElementContainer.Dom)//Adds the List element as list of candidates to be deleted
                 DayOfWeek.UISpecs[ID].refrenceListElement =ListElementContainer;
