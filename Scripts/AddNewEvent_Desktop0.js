@@ -2008,9 +2008,6 @@ function AddTiledEvent()
         combinedCallBack.rePopulate = function () {
 
         }
-
-
-
         combinedCallBack.clear = function ()
         {
             debugger;

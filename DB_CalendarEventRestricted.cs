@@ -11,7 +11,7 @@ namespace TilerFront
         internal DB_CalendarEventRestricted(CalendarEvent CalendarEventData, RestrictionProfile restrictionData)
         {
             //CalendarEventRestricted MyCalendarEventCopy = CalendarEventData.new CalendarEventRestricted();
-            this.EventDuration = CalendarEventData.ActiveDuration;
+            this.EventDuration = CalendarEventData.Duration;
             this.EventName = CalendarEventData.Name;
             this.StartDateTime = CalendarEventData.Start;
             this.EndDateTime = CalendarEventData.End;
