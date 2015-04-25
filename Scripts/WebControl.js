@@ -68,7 +68,7 @@ var SkeleClass = { cssClass: "skeleOrb", r: 125, g: 33, b: 255, a: 1, Selection:
 var mariClass = { cssClass: "mariOrb", r: 255, g: 160, b: 237, a: 1, Selection: 6 };
 var purpleClass = { cssClass: "purpleOrb", r: 255, g: 0, b: 255, a: 1, Selection: 7 };
 var ldonBoysClass = { cssClass: "ldonBoysOrb", r: 255, g: 103, b: 61, a: 1, Selection: 8 };
-
+var global_PositionCoordinate = { Latitude: 40.0274, Longitude: -105.2519, isInitialized: false, Message:"Uninitialized" };;
 var global_AllColorClasses = [defaultColorClass, oriClass, storyClass, redClass, greenClass, purpleClass, SkeleClass, mariClass, ldonBoysClass]
 var global_ExitManager = new OutOfFocusManager();
 Date.prototype.stdTimezoneOffset = function () {
@@ -78,6 +78,8 @@ Date.prototype.stdTimezoneOffset = function () {
 }
 
 var myClickManager = new OutClickManager();
+
+
 
 Date.prototype.dst = function () {
     return this.getTimezoneOffset() < this.stdTimezoneOffset();
@@ -89,6 +91,42 @@ var googleAPiKey = "AIzaSyAOnexWFxnoQ6nQI7p64lyR8YgXwB4qRvU";//Debug ? "AIzaSyAe
 
 
 var global_TimeZone_ms = new Date().getTimezoneOffset()*60000;
+
+
+
+function getLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(populatePosition, showError);
+    } else {
+        //global_PositionCoordinate = null;
+    }
+
+    function populatePosition(position)
+    {
+        global_PositionCoordinate.isInitialized = true;
+        global_PositionCoordinate.Latitude = position.coords.latitude;
+        global_PositionCoordinate.Longitude = position.coords.longitude;
+    }
+
+    function showError(error) {
+        switch (error.code) {
+            case error.PERMISSION_DENIED:
+                global_PositionCoordinate.Message = "User denied the request for Geolocation."
+                break;
+            case error.POSITION_UNAVAILABLE:
+                global_PositionCoordinate.Message = "Location information is unavailable."
+                break;
+            case error.TIMEOUT:
+                global_PositionCoordinate.Message = "The request to get user location timed out."
+                break;
+            case error.UNKNOWN_ERROR:
+                global_PositionCoordinate.Message = "An unknown error occurred."
+                break;
+        }
+    }
+
+}
+
 
 function SetCookie(CookieValue)
 {

@@ -713,7 +713,7 @@ namespace TilerFront
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("RigidFlag"));
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.Rigid.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Duration"));
-            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.ActiveDuration.ToString();
+            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.Duration.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Split"));
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.NumberOfSplit.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Deadline"));
@@ -772,7 +772,7 @@ namespace TilerFront
             {
                 MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Recurrence"));
                 MyEventScheduleNode.ChildNodes[0].InnerXml = CreateRepetitionNode(MyEvent.Repeat).InnerXml;
-                return MyEventScheduleNode;
+                //return MyEventScheduleNode;
             }
             else
             {
@@ -781,6 +781,7 @@ namespace TilerFront
             }
             XmlNode SubScheduleNodes = MyEventScheduleNode.SelectSingleNode("Modifieds");
 
+            /*
             if (newImplementation!=1)
             {
                 foreach (SubCalendarEvent MySubEvent in MyEvent.AllSubEvents)
@@ -789,7 +790,7 @@ namespace TilerFront
                     SubScheduleNodes.ChildNodes[0].InnerXml = CreateSubScheduleNode(MySubEvent).InnerXml;
                 }
             }
-            else
+            else*/
             {
                 foreach (SubCalendarEvent MySubEvent in MyEvent.getAllDeviatingSubEVents())
                 {
@@ -1467,8 +1468,8 @@ namespace TilerFront
                 {
                     CalendarEvent RetrievedEvent;
 
-                    //RetrievedEvent = getCalendarEventObjFromNode(EventScheduleNode, RangeOfLookUP);
-                    ///*
+                    RetrievedEvent = getCalendarEventObjFromNode(EventScheduleNode, RangeOfLookUP);
+                    /*
                     try
                     {
                         RetrievedEvent = getCalendarEventObjFromNode(EventScheduleNode, RangeOfLookUP);
@@ -1823,7 +1824,12 @@ namespace TilerFront
                 TimeLine rangeTImeLine = new TimeLine(DateTimeOffset.Parse(RepeatStartData),DateTimeOffset.Parse(RepeatEndData));
                 TimeLine SubeventTImeLine = new TimeLine(DateTimeOffset.Parse(RepeatSubEventStart),DateTimeOffset.Parse(RepeatSubEventEnd));
 
-                int [] WeekDays = RepeatWeekDays.Split(',').Select(obj=>Convert.ToInt32(obj)).ToArray();
+                int[] WeekDays = new int[0];
+                if (!string.IsNullOrEmpty( RepeatWeekDays))
+                {
+                    WeekDays = RepeatWeekDays.Split(',').Select(obj => Convert.ToInt32(obj)).ToArray();
+                }
+                
                 RetValue = new Repetition(true, rangeTImeLine, Frequency, SubeventTImeLine, WeekDays);
                 
                 return RetValue;

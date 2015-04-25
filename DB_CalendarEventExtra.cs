@@ -10,7 +10,7 @@ namespace TilerFront
     {
         public DB_CalendarEventExtra(CalendarEvent CalendarEventData, Procrastination procrastinationData, NowProfile NowProfileData)
         {
-            this.EventDuration = CalendarEventData.ActiveDuration;
+            this.EventDuration = CalendarEventData.Duration;
             this.EventName = CalendarEventData.Name;
             this.StartDateTime = CalendarEventData.Start;
             this.EndDateTime = CalendarEventData.End;
