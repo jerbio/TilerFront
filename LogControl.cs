@@ -756,6 +756,8 @@ namespace TilerFront
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.EventPriority.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("TimePerSplit"));
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.EachSplitTimeSpan.ToString();
+            MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Sequence"));
+            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.RepetitionIndex.ToString();
             
 
 
@@ -1009,6 +1011,8 @@ namespace TilerFront
             MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.isComplete.ToString();
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("OriginalStart"));
             MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.OrginalStartInfo.ToString();
+            MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("Sequence"));
+            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.RepetitionIndex.ToString();
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("Location"));
             MyEventSubScheduleNode.ChildNodes[0].InnerXml = CreateLocationNode(MySubEvent.myLocation, "EventSubScheduleLocation").InnerXml;
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("UIParams"));
@@ -1706,8 +1710,10 @@ namespace TilerFront
                 MiscData noteData = getMiscData(MyXmlNode.ChildNodes[i]);
                 EventDisplay UiData = getDisplayUINode(MyXmlNode.ChildNodes[i]);
                 ConflictProfile conflictProfile = getConflctProfile(MyXmlNode.ChildNodes[i]);
+                DateTimeOffset OriginalStart = DateTimeOffset.Parse(MyXmlNode.ChildNodes[i].SelectSingleNode("OriginalStart").InnerText).UtcDateTime;
 
-                SubCalendarEvent retrievedSubEvent = new DB_SubCalendarEvent(ID, BusySlot, Start, End, PrepTime, MyParent.OrginalStartInfo, MyParent.ID, rigidFlag, Enabled, UiData, noteData, CompleteFlag, var1, MyParent.RangeTimeLine, conflictProfile);
+
+                SubCalendarEvent retrievedSubEvent = new DB_SubCalendarEvent(ID, BusySlot, Start, End, PrepTime, OriginalStart, MyParent.ID, rigidFlag, Enabled, UiData, noteData, CompleteFlag, var1, MyParent.RangeTimeLine, conflictProfile);
                 retrievedSubEvent.ThirdPartyID = MyXmlNode.ChildNodes[i].SelectSingleNode("ThirdPartyID").InnerText;//this is a hack to just update the Third partyID
                 XmlNode restrictedNode = MyXmlNode.ChildNodes[i].SelectSingleNode("Restricted");
 
@@ -1830,7 +1836,7 @@ namespace TilerFront
                     WeekDays = RepeatWeekDays.Split(',').Select(obj => Convert.ToInt32(obj)).ToArray();
                 }
                 
-                RetValue = new Repetition(true, rangeTImeLine, Frequency, SubeventTImeLine, WeekDays);
+                RetValue = new DB_Repetition(true, rangeTImeLine, Frequency, SubeventTImeLine, WeekDays);
                 
                 return RetValue;
             }
