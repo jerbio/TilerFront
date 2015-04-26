@@ -8,6 +8,8 @@ namespace TilerFront
 {
     public class DB_SubCalendarEventFly:SubCalendarEvent
     {
+        DB_SubCalendarEventFly()
+        { }
         internal DB_SubCalendarEventFly(EventID EventIDData, string Name, DateTimeOffset StartData, DateTimeOffset EndData, int PriorityData, Location_Elements LocationData, DateTimeOffset OriginalStartData, TimeSpan EventPrepTimeData, TimeSpan Event_PreDeadlineData, bool EventRigidFlagData, EventDisplay UiData, MiscData NoteData, bool CompletionFlagData, Procrastination ProcrastinationData, NowProfile NowProfileData, TimeLine CalendarEventRangeData, bool FromRepeatFlagData, bool ElapsedFlagData, bool EnabledFlagData, List<string> UserIDData,long Sequence)
         {
             this.BusyFrame = new BusyTimeLine(EventIDData.ToString(), StartData, EndData);
@@ -40,6 +42,30 @@ namespace TilerFront
 
             this.UserIDs = UserIDData;
             this.OriginalStart = OriginalStartData;
+        }
+
+        internal void InitializeDisabled(SubCalendarEvent SubCalendarEventData)
+        {
+            if (!SubCalendarEventData.isEnabled)
+            {
+                TimeSpan SPanShift = SubCalendarEventData.Start - this.Start;
+                this.shiftEvent(SPanShift, true);
+                this.Enabled = SubCalendarEventData.isEnabled;
+                return;
+            }
+            throw new Exception("Trying to set undelete event as deleted, check DB_SubCalendarEventFly");
+        }
+
+        internal void InitializeCompleted(SubCalendarEvent SubCalendarEventData)
+        {
+            if (SubCalendarEventData.isComplete)
+            {
+                TimeSpan SPanShift = SubCalendarEventData.Start - this.Start;
+                this.shiftEvent(SPanShift, true);
+                this.Complete = SubCalendarEventData.isComplete;
+                return;
+            }
+            throw new Exception("Trying to set uncomplete event as completed, check DB_SubCalendarEventFly");
         }
     }
 }
