@@ -8,7 +8,7 @@ namespace TilerFront
 {
     public class DB_Repetition:Repetition
     {
-        internal DB_Repetition(bool ReadFromFileEnableFlag, TimeLine ReadFromFileRepetitionRange_Entry, string ReadFromFileFrequency, CalendarEvent[] ReadFromFileRecurringListOfCalendarEvents, int DayOfWeek = 7)
+        internal DB_Repetition(bool ReadFromFileEnableFlag, TimeLine ReadFromFileRepetitionRange_Entry, string ReadFromFileFrequency, CalendarEvent[] ReadFromFileRecurringListOfCalendarEvents, int DayOfWeek = 7, TimeLine initializingRangeData = null)
         {
             EnableRepeat = ReadFromFileEnableFlag;
             DictionaryOfIDAndCalendarEvents = new System.Collections.Generic.Dictionary<string, CalendarEvent>();
@@ -18,10 +18,18 @@ namespace TilerFront
             foreach (CalendarEvent MyRepeatCalendarEvent in ReadFromFileRecurringListOfCalendarEvents)
             {
                 MyRepeatCalendarEvent.updateRepetitionIndex(repetitionIndex);
-                DictionaryOfIDAndCalendarEvents.Add(MyRepeatCalendarEvent.Calendar_EventID.getIDUpToRepeatCalendarEvent(), MyRepeatCalendarEvent);
+                DictionaryOfIDAndCalendarEvents.Add(MyRepeatCalendarEvent.Calendar_EventID.getRepeatCalendarEventID(), MyRepeatCalendarEvent);
                 repetitionIndex++;
             }
 
+            if (initializingRangeData!=null)
+            {
+                initializingRange = initializingRangeData;
+            }
+            else
+            {
+                initializingRange = ReadFromFileRecurringListOfCalendarEvents.Last().ActiveSubEvents.Last().ActiveSlot;
+            }
             RepeatingEvents = DictionaryOfIDAndCalendarEvents.Values.ToArray();
             RepetitionFrequency = ReadFromFileFrequency;
             RepetitionRange = ReadFromFileRepetitionRange_Entry;
@@ -43,7 +51,7 @@ namespace TilerFront
 
         }
 
-        internal DB_Repetition(bool ReadFromFileEnableFlag, TimeLine ReadFromFileRepetitionRange_Entry, string ReadFromFileFrequency, Repetition[] repetition_Weekday, int DayOfWeek = 7)
+        internal DB_Repetition(bool ReadFromFileEnableFlag, TimeLine ReadFromFileRepetitionRange_Entry, string ReadFromFileFrequency, Repetition[] repetition_Weekday, int DayOfWeek = 7, TimeLine initializingRangeData=null)
         {
             EnableRepeat = ReadFromFileEnableFlag;
             DictionaryOfIDAndCalendarEvents = new System.Collections.Generic.Dictionary<string, CalendarEvent>();
@@ -52,7 +60,7 @@ namespace TilerFront
             {
                 DictionaryOfWeekDayToRepetition.Add(eachRepetition.weekDay, eachRepetition);
             }
-            
+
 
             RepeatingEvents = DictionaryOfIDAndCalendarEvents.Values.ToArray();
             RepetitionFrequency = ReadFromFileFrequency;
@@ -60,6 +68,15 @@ namespace TilerFront
             if (repetition_Weekday.Length > 0)
             {
                 RepeatLocation = repetition_Weekday[0].myLocation;
+            }
+
+            if (initializingRangeData != null)
+            {
+                initializingRange = initializingRangeData;
+            }
+            else
+            {
+                initializingRange = DictionaryOfWeekDayToRepetition.First().Value.RecurringCalendarEvents().Last().ActiveSubEvents.Last().ActiveSlot;
             }
         }
 

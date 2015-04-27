@@ -848,7 +848,7 @@ namespace TilerFront
         }
          */
 
-        Repetition getRepetitionObject(XmlNode RecurrenceXmlNode, TimeLine RangeOfLookUP)
+        Repetition getRepetitionObject(XmlNode RecurrenceXmlNode, TimeLine RangeOfLookUP,int implementation)
         {
             Repetition RetValue = new Repetition();
             string RepeatStart = RecurrenceXmlNode.SelectSingleNode("RepeatStartDate").InnerText;
@@ -870,7 +870,7 @@ namespace TilerFront
                     List<Repetition> repetitionNodes = new List<Repetition>();
                     foreach (XmlNode eacXmlNode in AllRepeatingDays)
                     {
-                        repetitionNodes.Add(getRepetitionObject(eacXmlNode, RangeOfLookUP));
+                        repetitionNodes.Add(getRepetitionObject(eacXmlNode, RangeOfLookUP, implementation));
                     }
 
                     RetValue = new DB_Repetition(true, new TimeLine(DateTimeOffset.Parse(RepeatStart), DateTimeOffset.Parse(RepeatEnd)), RepeatFrequency, repetitionNodes.ToArray(), repetitionDay);
@@ -881,18 +881,18 @@ namespace TilerFront
 
 
 
-            RetValue = new DB_Repetition(true, new TimeLine(DateTimeOffset.Parse(RepeatStart), DateTimeOffset.Parse(RepeatEnd)), RepeatFrequency, getAllRepeatCalendarEvents(XmlNodeWithList, RangeOfLookUP), repetitionDay);
+            RetValue = new DB_Repetition(true, new TimeLine(DateTimeOffset.Parse(RepeatStart), DateTimeOffset.Parse(RepeatEnd)), RepeatFrequency, getAllRepeatCalendarEvents(XmlNodeWithList, RangeOfLookUP, implementation), repetitionDay);
 
             return RetValue;
         }
-        CalendarEvent[] getAllRepeatCalendarEvents(XmlNode RepeatEventSchedulesNode, TimeLine RangeOfLookUP)
+        CalendarEvent[] getAllRepeatCalendarEvents(XmlNode RepeatEventSchedulesNode, TimeLine RangeOfLookUP,int implementation)
         {
             XmlNodeList ListOfRepeatEventScheduleNode = RepeatEventSchedulesNode.ChildNodes;
             List<CalendarEvent> ListOfRepeatCalendarNodes = new List<CalendarEvent>();
 
             foreach (XmlNode MyNode in ListOfRepeatEventScheduleNode)
             {
-                CalendarEvent myCalendarEvent = getCalendarEventObjFromNode(MyNode, RangeOfLookUP);
+                CalendarEvent myCalendarEvent = getCalendarEventObjFromNode(MyNode, RangeOfLookUP, implementation);
                 if (myCalendarEvent != null)
                 {
                     ListOfRepeatCalendarNodes.Add(myCalendarEvent);

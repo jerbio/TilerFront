@@ -44,6 +44,7 @@ namespace TilerFront
             this.Priority = mySubCalEvent.EventPriority;
             //this.RepetitionFlag = mySubCalEvent.FromRepeat;
             this.RigidSchedule = mySubCalEvent.Rigid;
+            this.OriginalStart = mySubCalEvent.OrginalStartInfo;
 
             this.UiParams = mySubCalEvent.UIParam;
             this.UniqueID = mySubCalEvent.SubEvent_ID;

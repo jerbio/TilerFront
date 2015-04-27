@@ -56,6 +56,18 @@ namespace TilerFront
             throw new Exception("Trying to set undelete event as deleted, check DB_SubCalendarEventFly");
         }
 
+        internal void InitializeNowProfile(SubCalendarEvent SubCalendarEventData)
+        {
+            if (SubCalendarEventData.NowInfo.isInitialized)
+            {
+                TimeSpan SPanShift = SubCalendarEventData.Start - this.Start;
+                this.shiftEvent(SPanShift, true);
+                this.Enabled = SubCalendarEventData.isEnabled;
+                return;
+            }
+            throw new Exception("Trying to Now event thats not set to Now");
+        }
+
         internal void InitializeCompleted(SubCalendarEvent SubCalendarEventData)
         {
             if (SubCalendarEventData.isComplete)
