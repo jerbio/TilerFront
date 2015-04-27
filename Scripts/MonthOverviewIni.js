@@ -1464,7 +1464,6 @@ function onSocketDataReceipt(data) {
         }
     }
 
-<<<<<<< HEAD
     if (!!data.pauseData) {
         if (data.pauseData.pausedEvent) {
             refreshCounter = 1;
@@ -1475,8 +1474,6 @@ function onSocketDataReceipt(data) {
         }
     }
     
-=======
->>>>>>> Made list bigger and added distinction in mobile view.
     ++onSocketDataReceipt.counter
 }
 onSocketDataReceipt.counter = 0;
@@ -1570,7 +1567,6 @@ getRefreshedData.unEnroll = function (Id) {
     delete getRefreshedData.callBacks[Id]
 }
 
-<<<<<<< HEAD
 getRefreshedData.pauseEnroll = function (callback) {
     var Id = null;
     if (isFunction(callback)) {
@@ -1592,45 +1588,15 @@ getRefreshedData.pauseUnEnroll = function (Id) {
 
 
 
-    function getEventsInterferringInRange(StartDate, EndDate)
-    {
-        var myTImeLine = { Start: StartDate, End: EndDate };
-        var RetValue = getInterferringEventsWithTimeLine(myTImeLine, TotalSubEventList);
-        return RetValue;
-    }
-
-    function getInterferringEventsWithTimeLine(TimeLine, CollectionOFEvents)
-    {
-        var retValue = new Array();
-        CollectionOFEvents.forEach(
-            function (obj) {
-                if (isWithinTimeLine(TimeLine, obj)) {
-                    retValue.push(obj)
-                }
-            });
-
-        return retValue;
-
-    }
-
-    function isWithinTimeLine(TimeLine, Event)
-    {
-        var retvalue = false;
-
-        var TimeLineStart = new Date ( TimeLine.Start);
-        var TimeLineEnd = new Date ( TimeLine.End);
-        var EventStart = new Date(Event.SubCalStartDate);
-        var EventEnd = new Date(Event.SubCalEndDate);
-=======
 function getEventsInterferringInRange(StartDate, EndDate)
 {
     var myTImeLine = { Start: StartDate, End: EndDate };
     var RetValue = getInterferringEventsWithTimeLine(myTImeLine, TotalSubEventList);
     return RetValue;
 }
->>>>>>> Made list bigger and added distinction in mobile view.
 
-function getInterferringEventsWithTimeLine(TimeLine, CollectionOFEvents) {
+function getInterferringEventsWithTimeLine(TimeLine, CollectionOFEvents)
+{
     var retValue = new Array();
     CollectionOFEvents.forEach(
         function (obj) {
@@ -1642,6 +1608,7 @@ function getInterferringEventsWithTimeLine(TimeLine, CollectionOFEvents) {
     return retValue;
 
 }
+
 
 function isWithinTimeLine(TimeLine, Event) {
     var retvalue = false;

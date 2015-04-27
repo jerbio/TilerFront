@@ -166,10 +166,17 @@ namespace TilerFront
                         
                         DB_SubCalendarEventFly myDB_SubCalendarEventFly = (DB_SubCalendarEventFly)RefCalEvent.ActiveSubEvents.Last();
                         myDB_SubCalendarEventFly.InitializeCompleted(eachSubCalendarEvent);
-                        RefCalEvent.updateDeviationList(myDB_SubCalendarEventFly);
-                        ++RefCalEvent.CompletedSofar;
-                        RefCalEvent.CompletedCount =RefCalEvent.CompletedSofar;
-                        continue;
+                        try
+                        {
+                            RefCalEvent.updateDeviationList(1, myDB_SubCalendarEventFly);
+                            ++RefCalEvent.CompletedSofar;
+                            RefCalEvent.CompletedCount = RefCalEvent.CompletedSofar;
+                            continue;
+                        }
+                        catch(Exception e)
+                        {
+
+                        }
                     } 
                 }
 
@@ -179,10 +186,36 @@ namespace TilerFront
                     {
                         DB_SubCalendarEventFly myDB_SubCalendarEventFly = (DB_SubCalendarEventFly)RefCalEvent.ActiveSubEvents.Last();
                         myDB_SubCalendarEventFly.InitializeDisabled(eachSubCalendarEvent);
-                        RefCalEvent.updateDeviationList(myDB_SubCalendarEventFly);
-                        ++RefCalEvent.DeletedSofar;
-                        RefCalEvent.DeletedCount = RefCalEvent.DeletedSofar;
-                        continue;
+                        try
+                        {
+                            RefCalEvent.updateDeviationList(0, myDB_SubCalendarEventFly);
+                            ++RefCalEvent.DeletedSofar;
+                            RefCalEvent.DeletedCount = RefCalEvent.DeletedSofar;
+                            continue;
+                        }
+                        catch (Exception e)
+                        {
+
+                        }                        
+                    }
+                }
+
+                if(eachSubCalendarEvent.NowInfo.isInitialized)
+                {
+                    SubCalendarEvent[] AllActives = RefCalEvent.ActiveSubEvents;
+                    if(AllActives.Length>0)
+                    {
+                        try
+                        {
+                            DB_SubCalendarEventFly myDB_SubCalendarEventFly = (DB_SubCalendarEventFly)AllActives.Last();
+                            myDB_SubCalendarEventFly.InitializeNowProfile(eachSubCalendarEvent);
+                            RefCalEvent.updateDeviationList(2,myDB_SubCalendarEventFly);
+                            continue;
+                        }
+                        catch(Exception e)
+                        {
+
+                        }
                     }
                 }
             }
