@@ -9,8 +9,7 @@ namespace TilerFront
     {
         //public static class WebApiConfig
         
-            public static DateTimeOffset JSStartTime = new DateTimeOffset(1970, 1, 1, 0, 0, 0, new TimeSpan());
-            public static TimeSpan StartOfTimeTimeSpan = JSStartTime - new DateTimeOffset(0, new TimeSpan());
+            
             public static void Register(HttpConfiguration config)
             {
                 // Web API configuration and services
@@ -33,6 +32,7 @@ namespace TilerFront
                 );
             }
 
+        /*
             public static Models.SubCalEvent ToSubCalEvent(this TilerElements.SubCalendarEvent SubCalendarEventEntry, TilerElements.CalendarEvent CalendarEventEntry=null)
             {
                 Models.SubCalEvent retValue = new Models.SubCalEvent();
@@ -118,6 +118,7 @@ namespace TilerFront
                 retValue.isNull = LocationEntry.isNull;
                 return retValue;
             }
+        */
         
     }
 }

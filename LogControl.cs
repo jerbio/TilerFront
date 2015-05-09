@@ -7,6 +7,7 @@ using System.Text;
 using System.Xml;
 using System.IO;
 using System.Threading;
+using DBTilerElement;
 using TilerElements;
 using System.Threading.Tasks;
 #if ForceReadFromXml
@@ -931,7 +932,7 @@ namespace TilerFront
                 dirString = WagTapLogLocation + CurrentLog;
             }
 
-            File.WriteAllText(dirString, "<?xml version=\"1.0\" encoding=\"utf-8\"?><ScheduleLog><LastIDCounter>0</LastIDCounter><referenceDay>8:00 AM</referenceDay><EventSchedules></EventSchedules></ScheduleLog>");
+            File.WriteAllText(dirString, "<?xml version=\"1.0\" encoding=\"utf-8\"?><ScheduleLog><LastIDCounter>1024</LastIDCounter><referenceDay>8:00 AM</referenceDay><EventSchedules></EventSchedules></ScheduleLog>");
         }
 
         public void deleteAllCalendarEvets(string dirString = "")

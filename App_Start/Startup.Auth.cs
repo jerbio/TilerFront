@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
 using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.Google;
+using Microsoft.Owin.Security.Facebook;
 using Owin;
 using TilerFront.Models;
 
@@ -53,6 +55,47 @@ namespace TilerFront
             //app.UseTwitterAuthentication(
             //   consumerKey: "",
             //   consumerSecret: "");
+
+
+            var facebookOptions = new Microsoft.Owin.Security.Facebook.FacebookAuthenticationOptions()
+            {
+                Provider = new FacebookAuthenticationProvider()
+                {
+                    OnAuthenticated = (context) =>
+                        {
+                            // All data from facebook in this object. 
+                            var rawUserObjectFromFacebookAsJson = context.User;
+                            var myToken= context.AccessToken;
+                            // Only some of the basic details from facebook 
+                            // like id, username, email etc are added as claims.
+                            // But you can retrieve any other details from this
+                            // raw Json object from facebook and add it as claims here.
+                            // Subsequently adding a claim here will also send this claim
+                            // as part of the cookie set on the browser so you can retrieve
+                            // on every successive request. 
+                            return Task.FromResult(0);
+                        }
+                }
+            };
+
+            facebookOptions.Scope.Add("email");
+
+            var googleOptions = new Microsoft.Owin.Security.Google.GoogleAuthenticationOptions()
+            {
+                Provider = new GoogleAuthenticationProvider()
+                {
+                    OnAuthenticated = (context) =>
+                        {
+                            // All data from facebook in this object. 
+                            IOwinRequest myReq = context.Request;
+                            return Task.FromResult(0);
+                        }
+                }
+            };
+
+            
+
+            
 
             app.UseFacebookAuthentication(
                appId: "1530915617167749",

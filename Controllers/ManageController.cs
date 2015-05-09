@@ -7,6 +7,29 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using TilerFront.Models;
+using DBTilerElement;
+using System.Threading;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.Entity;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Net;
+using System.Web;
+using System.Web.Mvc;
+using System.Text;
+using Newtonsoft.Json;
+
+using Google.Apis.Auth.OAuth2.Mvc;
+using Google.Apis.Oauth2.v2;
+using Google.Apis.Calendar.v3;
+using Google.Apis.Calendar.v3.Data;
+using Google.Apis.Services;
+using Google.Apis.Plus.v1;
+using Google.Apis.Plus.v1.Data;
+using Google.Apis.Auth.OAuth2.Flows;
+using Google.Apis.Auth.OAuth2;
+using Google.Apis.Util.Store;
 
 namespace TilerFront.Controllers
 {
@@ -15,7 +38,7 @@ namespace TilerFront.Controllers
     {
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
-
+        private ApplicationDbContext db = new ApplicationDbContext();
         public ManageController()
         {
         }
@@ -242,20 +265,19 @@ namespace TilerFront.Controllers
             AddErrors(result);
             return View(model);
         }
-
+#region End of day
         //
         // GET: /Manage/ChangeStartOfDay
         public ActionResult ChangeStartOfDay()
         {
             ApplicationUser myUser = UserManager.FindById(User.Identity.GetUserId());
-            long Milliseconds = (long)(new DateTimeOffset(myUser.LastChange.AddDays(10)) - WebApiConfig.JSStartTime).TotalMilliseconds;
+            long Milliseconds = (long)(new DateTimeOffset(myUser.LastChange.AddDays(10)) - TilerElementExtension.JSStartTime).TotalMilliseconds;
             var model = new ChangeStartOfDayModel
             {
                 TimeOfDay = Milliseconds.ToString()
             };
             return View(model);
         }
-
         //
         // POST: /Manage/ChangeStartOfDay
         [HttpPost]
@@ -267,7 +289,7 @@ namespace TilerFront.Controllers
                 return View(model);
             }
             //bool isDST = Convert.ToBoolean(model.Dst);
-            string TimeString = model.TimeOfDay + WebApiConfig.JSStartTime.Date.ToShortDateString();
+            string TimeString = model.TimeOfDay + TilerElementExtension.JSStartTime.Date.ToShortDateString();
             var result= IdentityResult.Failed(new string[]{"Invalid Time Start Of Time"});
 
             DateTimeOffset TimeOfDay = new DateTimeOffset();
@@ -293,6 +315,319 @@ namespace TilerFront.Controllers
             AddErrors(result);
             return View(model);
         }
+
+
+#endregion
+
+#region ThirdParty Authentincation
+        // Get: /Manage/ImportCalendar
+        public async Task<ActionResult> ImportCalendar()
+        {
+            string userID = User.Identity.GetUserId();
+            return View((await db.ThirdPartyAuthentication.Where(obj => userID == obj.TilerID).ToListAsync()).Select(obj => obj.getThirdPartyOut()));
+        }
+
+        async public Task<List<ThirdPartyCalendarAuthenticationModel>> getAllThirdPartyAuthentication()
+        {
+            string userID = User.Identity.GetUserId();
+            List<ThirdPartyCalendarAuthenticationModel> RetValue = (await db.ThirdPartyAuthentication.Where(obj => userID == obj.TilerID).ToListAsync().ConfigureAwait(false));
+            return RetValue;
+        }
+
+        async Task<ThirdPartyCalendarAuthenticationModel> getGoogleAuthenticationData(string TilerUSerID,string EmailID )
+        {
+            Object[] Param = { TilerUSerID, EmailID, (int)TilerElements.ThirdPartyControl.CalendarTool.Google};
+            ThirdPartyCalendarAuthenticationModel checkingThirdPartyCalendarAuthentication = await db.ThirdPartyAuthentication.FindAsync(Param);
+            return checkingThirdPartyCalendarAuthentication;
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> deleteGoogleAccount(ThirdPartyOut modelData)
+        {
+            ThirdPartyCalendarAuthenticationModel ThirdPartyAuth = db.ThirdPartyAuthentication.Where(obj => obj.ID == modelData.ID).Single();
+
+            if (ThirdPartyAuth != null)
+            {
+                await ThirdPartyAuth.getGoogleOauthCredentials().RevokeTokenAsync(CancellationToken.None).ConfigureAwait(false);
+                db.ThirdPartyAuthentication.Remove(ThirdPartyAuth);
+                await db.SaveChangesAsync().ConfigureAwait(false);
+            }
+
+            return RedirectToAction("ImportCalendar");
+        }
+
+
+        public async Task<ActionResult> CreateGoogle([Bind(Include = "ID,isLongLived,Email,Token,RefreshToken,ProviderID,Deadline")] ThirdPartyCalendarAuthenticationModel thirdPartyCalendarAuthentication,bool deletGoogleCalendarFromLog=false)
+        {
+            if (ModelState.IsValid)
+            {
+                bool makeAdditionCall = false;
+                if (!deletGoogleCalendarFromLog)
+                {
+                    try
+                    {
+                        Object[] Param = { thirdPartyCalendarAuthentication.TilerID, thirdPartyCalendarAuthentication.Email, thirdPartyCalendarAuthentication.ProviderID };
+                        ThirdPartyCalendarAuthenticationModel checkingThirdPartyCalendarAuthentication = await db.ThirdPartyAuthentication.FindAsync(Param);
+                        if (checkingThirdPartyCalendarAuthentication != null)
+                        {
+                            checkingThirdPartyCalendarAuthentication.ID = thirdPartyCalendarAuthentication.ID;
+                            checkingThirdPartyCalendarAuthentication.Token = thirdPartyCalendarAuthentication.Token;
+                            checkingThirdPartyCalendarAuthentication.RefreshToken = thirdPartyCalendarAuthentication.RefreshToken;
+                            checkingThirdPartyCalendarAuthentication.Deadline = thirdPartyCalendarAuthentication.Deadline;
+                            db.Entry(checkingThirdPartyCalendarAuthentication).State = EntityState.Modified;
+                            await db.SaveChangesAsync().ConfigureAwait(false);
+                        }
+                        else
+                        {
+                            db.ThirdPartyAuthentication.Add(thirdPartyCalendarAuthentication);
+                            await db.SaveChangesAsync();
+                            //RedirectToAction()
+
+                            //Object ParamS = new {TilerID= thirdPartyCalendarAuthentication.TilerID,Email= thirdPartyCalendarAuthentication.Email,Provider = thirdPartyCalendarAuthentication.ProviderID };
+
+                            //return RedirectToAction("Authenticate", "ThirdPartyCalendarAuthenticationModels", ParamS);
+
+                            if(!(await SendRequestForGoogleNotification(thirdPartyCalendarAuthentication).ConfigureAwait(false)))
+                            {
+                                await deleteGoogleAccount(thirdPartyCalendarAuthentication.getThirdPartyOut()).ConfigureAwait(false);
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        ;
+                    }
+                }
+                else 
+                {
+                    Object[] Param = { thirdPartyCalendarAuthentication.TilerID, thirdPartyCalendarAuthentication.Email, thirdPartyCalendarAuthentication.ProviderID };
+                    ThirdPartyCalendarAuthenticationModel checkingThirdPartyCalendarAuthentication = await db.ThirdPartyAuthentication.FindAsync(Param);
+                    if (checkingThirdPartyCalendarAuthentication != null)
+                    {
+                        await deleteGoogleAccount(thirdPartyCalendarAuthentication.getThirdPartyOut()).ConfigureAwait(false);
+                    }
+                }
+                return RedirectToAction("ImportCalendar");
+            }
+
+            return View("ImportCalendar");
+        }
+
+        ///*
+        public async Task<bool> SendRequestForGoogleNotification(ThirdPartyCalendarAuthenticationModel AuthenticationData)
+        {
+            bool RetValue = false;
+            HttpContext Ctx = System.Web.HttpContext.Current;
+            try
+            {
+
+                var url = string.Format
+                (
+                    "https://www.googleapis.com/calendar/v3/calendars/{0}/events/watch",
+                    AuthenticationData.Email 
+                );
+                //url = "https://mytilerkid.azurewebsites.net/api/GoogleNotification/Trigger";
+                var httpWebRequest = HttpWebRequest.Create(url) as HttpWebRequest;
+                httpWebRequest.Headers["Authorization"] =
+                    string.Format("Bearer {0}", AuthenticationData.Token);
+                httpWebRequest.Method = "POST";
+                // added the character set to the content-type as per David's suggestion
+                httpWebRequest.ContentType = "application/json; charset=UTF-8";
+                httpWebRequest.CookieContainer = new CookieContainer();
+
+                // replaced Environment.Newline by CRLF as per David's suggestion
+                GoogleNotificationRequestModel NotificationRequest = AuthenticationData.getGoogleNotificationCredentials(Ctx.Request.Url.Authority);
+
+                var requestText = JsonConvert.SerializeObject(NotificationRequest);
+
+                /*
+                GoogleNotificationWatchResponseModel testGoogleResponse = new GoogleNotificationWatchResponseModel();
+                testGoogleResponse.expiration = "98989";
+                testGoogleResponse.id = "jkhj2hkjhkjh";
+                testGoogleResponse.kind = "99898989";
+                testGoogleResponse.resourceUri= "hjhj98878";
+                requestText = JsonConvert.SerializeObject(testGoogleResponse);*/
+
+                using (var stream = httpWebRequest.GetRequestStream())
+                // replaced Encoding.UTF8 by new UTF8Encoding(false) to avoid the byte order mark
+                using (var streamWriter = new System.IO.StreamWriter(stream, new UTF8Encoding(false)))
+                {
+                    streamWriter.Write(requestText);
+                    streamWriter.Flush();
+                    streamWriter.Close();
+                }
+
+                var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+                using (var streamReader = new System.IO.StreamReader(httpResponse.GetResponseStream()))
+                {
+                    string result = streamReader.ReadToEnd();
+                    GoogleNotificationWatchResponseModel NotificationResponse = JsonConvert.DeserializeObject<GoogleNotificationWatchResponseModel>(result);
+                    db.GoogleNotificationCredentials.Add(NotificationResponse);
+                    await db.SaveChangesAsync().ConfigureAwait(false);
+                }
+                RetValue = true;
+
+
+
+
+                /*
+                string url = "https://www.googleapis.com/calendar/v3/calendars/" + AuthenticationData.Email + "/events/watch";
+                //url = "https://mytilerkid.azurewebsites.net/api/GoogleNotification/Trigger";
+                var httpWebRequest = WebRequest.Create(url);
+                httpWebRequest.ContentType = "application/json";
+                string AuthorizationString = "Bearer " + AuthenticationData.Token;
+                httpWebRequest.Headers.Add("Authorization", AuthorizationString);
+                httpWebRequest.Method = "POST";
+
+                GoogleNotificationRequestModel NotificationRequest = AuthenticationData.getGoogleNotificationCredentials(Ctx.Request.Url.Authority);
+
+                
+                //GoogleNotificationWatchResponseModel testGoogleResponse = new GoogleNotificationWatchResponseModel();
+                //testGoogleResponse.expiration = "98989";
+                //testGoogleResponse.id = "jkhj2hkjhkjh";
+                //testGoogleResponse.kind = "99898989";
+                //testGoogleResponse.resourceUri= "hjhj98878";
+                //string JsonString = JsonConvert.SerializeObject(testGoogleResponse);
+                
+                
+                
+                string JsonString = JsonConvert.SerializeObject(NotificationRequest);
+                
+                using (var streamWriter = new System.IO.StreamWriter(httpWebRequest.GetRequestStream()))
+                {
+                    string json = JsonString;
+                    streamWriter.Write(json);
+                    streamWriter.Flush();
+                    streamWriter.Close();
+                }
+
+                var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+                using (var streamReader = new System.IO.StreamReader(httpResponse.GetResponseStream()))
+                {
+                    var result = streamReader.ReadToEnd();
+                }
+                RetValue = true;
+                */
+            }
+            catch (Exception E)
+            {
+                Console.WriteLine(E.Message);
+            }
+
+            return RetValue;
+        }
+        //*/
+        async public Task<ActionResult> ImportGoogle(CancellationToken cancellationToken)
+        {
+            string UserID = User.Identity.GetUserId();
+            //var result = await new AuthorizationCodeMvcApp(this, new AppFlowMetadata(UserID)).
+            var result = await new AuthorizationCodeMvcApp(this, new AppFlowMetadata()).AuthorizeAsync(cancellationToken);
+            Google.Apis.Auth.OAuth2.UserCredential myCredential = result.Credential;
+
+
+
+            if (myCredential != null)
+            {
+                var service = new Oauth2Service(new BaseClientService.Initializer
+                    {
+                        HttpClientInitializer = myCredential,
+                        ApplicationName = "ASP.NET MVC Sample"
+                    });
+
+                    bool ResetThirdparty = false;
+
+                    ThirdPartyCalendarAuthenticationModel thirdpartydata = new ThirdPartyCalendarAuthenticationModel();
+                    Google.Apis.Oauth2.v2.Data.Userinfoplus userInfo ;
+                    try
+                    {
+                        userInfo = service.Userinfo.Get().Execute();
+                    }
+                    catch (Google.Apis.Auth.OAuth2.Responses.TokenResponseException e)
+                    {
+                        ResetThirdparty = true;
+                        return RedirectToAction("ImportGoogle");
+                    }
+
+
+                
+                    string Email = userInfo.Email;
+
+                    if (myCredential.Token.RefreshToken!=null)//if user hasn't authenticated tiler before
+                    {
+                    
+
+                        thirdpartydata.Email = Email;
+                        thirdpartydata.TilerID = UserID;
+                        thirdpartydata.ID = myCredential.UserId;
+                        thirdpartydata.isLongLived = false;
+                        double totalSeconds = myCredential.Token.ExpiresInSeconds == null ? 0 : (double)myCredential.Token.ExpiresInSeconds;
+                        DateTime myDate = myCredential.Token.Issued.AddSeconds(totalSeconds);
+                        thirdpartydata.Deadline = new DateTimeOffset(myDate);
+                        thirdpartydata.ProviderID = (int)TilerElements.ThirdPartyControl.CalendarTool.Google;
+                        thirdpartydata.Token = myCredential.Token.AccessToken;
+                        thirdpartydata.RefreshToken = myCredential.Token.RefreshToken;
+
+                        return await CreateGoogle(thirdpartydata).ConfigureAwait(false);
+                    }
+                    else //if user hasn authenticated tiler before, then update current credentials
+                    {
+                        ThirdPartyCalendarAuthenticationModel retrievedAuthentication = await getGoogleAuthenticationData(UserID, Email).ConfigureAwait(false);
+                        await retrievedAuthentication.refreshAndCommitToken().ConfigureAwait(false);
+                        return RedirectToAction("ImportCalendar");
+                    }
+            }
+            else
+            {
+                //return View();
+                return new RedirectResult(result.RedirectUri);
+            }
+        }
+
+        /*
+
+        private async Task<BaseClientService.Initializer> GetCredentials()
+        {
+            ClientSecrets secrets = new ClientSecrets
+            {
+                ClientId = "518133740160-i5ie6s4h802048gujtmui1do8h2lqlfj.apps.googleusercontent.com",
+                ClientSecret = "NKRal5rA8NM5qHnmiigU6kWh"
+            };
+
+            String[] SCOPES = new[] { CalendarService.Scope.Calendar, CalendarService.Scope.CalendarReadonly };
+
+            IDataStore credentialPersistanceStore = getPersistentCredentialStore();
+
+            UserCredential credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(secrets,
+                    SCOPES, getUserId(), CancellationToken.None, credentialPersistanceStore);
+
+            BaseClientService.Initializer initializer = new BaseClientService.Initializer
+            {
+                HttpClientInitializer = credential,
+                ApplicationName = "TilerWebZy"
+            };
+
+            return initializer;
+        }
+
+        private String getUserId()
+        {
+            // TODO: Generate a unique user ID within your system for this user. The credential
+            // data store will use this as a key to look up saved credentials.
+            return User.Identity.GetUserId();
+        }
+
+        /// <summary> Returns a persistent data store for user's credentials. </summary>
+        private  IDataStore getPersistentCredentialStore()
+        {
+            // TODO: This uses a local file store to cache credentials. You should replace this with
+            // the appropriate IDataStore for your application.
+            return new FileDataStore("Drive.Sample.Credentals");
+        }
+        */
+
+#endregion
 
         //
         // GET: /Manage/SetPassword
@@ -371,6 +706,7 @@ namespace TilerFront.Controllers
             var result = await UserManager.AddLoginAsync(User.Identity.GetUserId(), loginInfo.Login);
             return result.Succeeded ? RedirectToAction("ManageLogins") : RedirectToAction("ManageLogins", new { Message = ManageMessageId.Error });
         }
+
 
         protected override void Dispose(bool disposing)
         {

@@ -1283,7 +1283,7 @@ getRefreshedData.enableDataRefresh = function (pullLatest)
             if (DayOfWeek.UISpecs[ID].Enabled)
             {
                 
-                
+                var RefSubEvent = global_DictionaryOfSubEvents[ID];
 
                 var ListElementContainer = getDomOrCreateNew("SubEventReference" + ID);
                 ListElementContainer.setAttribute("draggable", true);
@@ -1292,16 +1292,31 @@ getRefreshedData.enableDataRefresh = function (pullLatest)
                 //ListElementContainer.ondragstart = OnDragStartOfSubEvent;
                 //ListElementContainer.ondragstart = OnDragStartOfSubEvent;
                 $(ListElementContainer.Dom).addClass("ListElement");
-                global_DictionaryOfSubEvents[ID].gridDoms.push(ListElementContainer.Dom)//Adds the List element as list of candidates to be deleted
+                RefSubEvent.gridDoms.push(ListElementContainer.Dom)//Adds the List element as list of candidates to be deleted
                 DayOfWeek.UISpecs[ID].refrenceListElement =ListElementContainer;
                 var TimeDataPerListElement = getDomOrCreateNew("SubEventReferenceTime" + ID);
+                var BottomPanelListElement = getDomOrCreateNew("SubEventReferenceBottomPanel" + ID);
+                $(BottomPanelListElement.Dom).addClass("SubEventReferenceBottomPanel");
+
+                var CalendarTypeContainer = getDomOrCreateNew("SubEventReferenceCalType" + ID);
+                var CalendarTypeCalImage = getDomOrCreateNew("SubEventReferenceCalImg" + ID);
+
+                $(CalendarTypeCalImage.Dom).addClass("SubEventReferenceCalImg");
+                $(CalendarTypeCalImage.Dom).addClass(RefSubEvent.ThirdPartyType+"Icon");
+                $(CalendarTypeContainer.Dom).addClass("SubEventReferenceCalType");
+
+                CalendarTypeContainer.appendChild(CalendarTypeCalImage);
+
                 var NameDataPerListElement = getDomOrCreateNew("SubEventReferenceName" + ID);
+
+                BottomPanelListElement.appendChild(CalendarTypeContainer);
+                BottomPanelListElement.appendChild(TimeDataPerListElement);
                 
                 $(ListElementContainer.Dom).addClass("selectedDayElements");
                // $(ListElementContainer.Dom).removeClass("ListElements");
                 //$(obj).addClass("ListElements");
-                NameDataPerListElement.Dom.innerHTML = global_DictionaryOfSubEvents[ID].Name;
-                TimeDataPerListElement.Dom.innerHTML = getTimeStringFromDate(global_DictionaryOfSubEvents[ID].SubCalStartDate) + " - " + getTimeStringFromDate(global_DictionaryOfSubEvents[ID].SubCalEndDate);
+                NameDataPerListElement.Dom.innerHTML = RefSubEvent.Name;
+                TimeDataPerListElement.Dom.innerHTML = getTimeStringFromDate(RefSubEvent.SubCalStartDate) + " - " + getTimeStringFromDate(RefSubEvent.SubCalEndDate);
                 $(NameDataPerListElement.Dom).addClass("SubEventReferenceName");
                 $(TimeDataPerListElement.Dom).addClass("SubEventReferenceTime");
                 
@@ -1311,14 +1326,14 @@ getRefreshedData.enableDataRefresh = function (pullLatest)
                 var ListElementDataContentContainer = getDomOrCreateNew("ListElementDataContentContainer" + ID);
                 $(ListElementDataContentContainer.Dom).addClass("ListElementDataContentContainer");
                 ListElementDataContentContainer.Dom.appendChild(NameDataPerListElement.Dom);
-                ListElementDataContentContainer.Dom.appendChild(TimeDataPerListElement.Dom);
+                ListElementDataContentContainer.Dom.appendChild(BottomPanelListElement.Dom);
                 
-                global_DictionaryOfSubEvents[ID].gridDoms.push(ListElementDataContentContainer.Dom)
+                RefSubEvent.gridDoms.push(ListElementDataContentContainer.Dom)
                 
 
                 var EventLockContainer = getDomOrCreateNew("EventLockContainer" + ID);
                 $(EventLockContainer.Dom).addClass("EventLockContainer");
-                var myBool = (global_DictionaryOfSubEvents[ID].SubCalRigid)
+                var myBool = (RefSubEvent.SubCalRigid)
                 var EventLockImgContainer = getDomOrCreateNew("EventLockImgContainer" + ID);
                 $(EventLockImgContainer.Dom).addClass("EventLockImgContainer");
                 if (myBool) {
@@ -1332,7 +1347,7 @@ getRefreshedData.enableDataRefresh = function (pullLatest)
                 ListElementContainer.Dom.appendChild(ListElementDataContentContainer.Dom);
                 
                 DayOfWeek.UISpecs[ID].DataElement=ListElementDataContentContainer
-                global_DictionaryOfSubEvents[ID].ListRefElement = ListElementContainer;
+                RefSubEvent.ListRefElement = ListElementContainer;
 
                 var HeightPx = (DayOfWeek.UISpecs[ID].css.height / 100) * global_DayHeight;
                 var EndPixelTop = TopPixels + HeightPx;
@@ -2776,7 +2791,15 @@ generateAMonthBar.counter = 0;
                 SendMessage();
                 function SendMessage() {
                     var TimeZone = new Date().getTimezoneOffset();
-                    var DeletionEvent = { UserName: UserCredentials.UserName, UserID: UserCredentials.ID, EventID: SubEvent.ID, TimeZoneOffset: TimeZone
+                    debugger;
+                    var DeletionEvent = {
+                        UserName: UserCredentials.UserName,
+                        UserID: UserCredentials.ID,
+                        EventID: SubEvent.ID,
+                        TimeZoneOffset: TimeZone,
+                        ThirdPartyEventID: SubEvent.ThirdPartyEventID,
+                        ThirdPartyUserID: SubEvent.ThirdPartyUserID,
+                        ThirdPartyType: SubEvent.ThirdPartyType
                 };
                     //var URL = "RootWagTap/time.top?WagCommand=6"
                     var URL = global_refTIlerUrl + "Schedule/Event";
@@ -2899,7 +2922,14 @@ generateAMonthBar.counter = 0;
                     var HandleNEwPage = new LoadingScreenControl("Tiler is updating your schedule ...");
                     HandleNEwPage.Launch();
 
-                    var MarkAsCompleteData = { UserName: UserCredentials.UserName, UserID: UserCredentials.ID, EventID: SubEvent.ID, TimeZoneOffset: TimeZone
+                    var MarkAsCompleteData = {
+                        UserName: UserCredentials.UserName,
+                        UserID: UserCredentials.ID,
+                        EventID: SubEvent.ID,
+                        TimeZoneOffset: TimeZone,
+                        ThirdPartyEventID: SubEvent.ThirdPartyEventID,
+                        ThirdPartyUserID: SubEvent.ThirdPartyUserID,
+                        ThirdPartyType: SubEvent.ThirdPartyType
                     };
                     var exit = function (data) {
                         HandleNEwPage.Hide();
@@ -2917,7 +2947,7 @@ generateAMonthBar.counter = 0;
                         // will be treated as a single string
                         //dataType: "json",
                             success: function (response) {
-                                //alert(response);
+                                debugger;
                             var myContainer = (response);
                             if (myContainer.Error.code == 0) {
                                 //exitSelectedEventScreen();
@@ -2940,6 +2970,7 @@ generateAMonthBar.counter = 0;
                     }
 
                     }).done(function (data) {
+                        debugger;
                         HandleNEwPage.Hide();
                         triggerUIUPdate();//hack alert
                         getRefreshedData();
@@ -3188,7 +3219,19 @@ generateAMonthBar.counter = 0;
                 HandleNEwPage.Launch();
 
                 var SaveData = {
-                    UserName: UserCredentials.UserName, UserID: UserCredentials.ID, EventID: SubEvent.ID, EventName: NameContanierInput.value, TimeZoneOffset: TimeZone, Start: SubCaStartDateInMS, End: SubCaEndDateInMS, CalStart: 0, CalEnd: CalEndDateInMS, Split: splitValue
+                    UserName: UserCredentials.UserName,
+                    UserID: UserCredentials.ID,
+                    EventID: SubEvent.ID,
+                    EventName: NameContanierInput.value, TimeZoneOffset: TimeZone,
+                    Start: SubCaStartDateInMS,
+                    End: SubCaEndDateInMS,
+                    CalStart: 0,
+                    CalEnd: CalEndDateInMS,
+                    Split: splitValue,
+                    ThirdPartyEventID: SubEvent.ThirdPartyEventID,
+                    ThirdPartyUserID: SubEvent.ThirdPartyUserID,
+                    ThirdPartyType: SubEvent.ThirdPartyType
+
                 };
                 var exit= function (data) {
                     HandleNEwPage.Hide();

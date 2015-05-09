@@ -6,6 +6,7 @@ using System.Web;
 
 namespace TilerFront.Models
 {
+    /*
     public class TilerContext : DbContext
     {
         // You can add custom code to this file. Changes will not be overwritten.
@@ -21,9 +22,9 @@ namespace TilerFront.Models
 
         public System.Data.Entity.DbSet<TilerFront.Models.ApplicationUser> Users { get; set; }
 
-        public System.Data.Entity.DbSet<TilerFront.Models.SubCalEvent> SubCalEvents { get; set; }
+        public System.Data.Entity.DbSet<DBTilerElement.SubCalEvent> SubCalEvents { get; set; }
 
-        public System.Data.Entity.DbSet<TilerFront.Models.CalEvent> CalEvents { get; set; }
+        public System.Data.Entity.DbSet<DBTilerElement.CalEvent> CalEvents { get; set; }
     
-    }
+    }*/
 }

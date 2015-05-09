@@ -1249,7 +1249,7 @@
             False.</summary>
         </member>
         <member name="P:Google.Apis.Calendar.v3.CalendarListResource.ListRequest.MinAccessRole">
-            <summary>The minimum access role for the user in the returned entires. Optional. The default is no
+            <summary>The minimum access role for the user in the returned entries. Optional. The default is no
             restriction.</summary>
         </member>
         <member name="P:Google.Apis.Calendar.v3.CalendarListResource.ListRequest.MaxResults">
@@ -1273,7 +1273,7 @@
             <summary>Gets the REST path.</summary>
         </member>
         <member name="T:Google.Apis.Calendar.v3.CalendarListResource.ListRequest.MinAccessRoleEnum">
-            <summary>The minimum access role for the user in the returned entires. Optional. The default is no
+            <summary>The minimum access role for the user in the returned entries. Optional. The default is no
             restriction.</summary>
         </member>
         <member name="F:Google.Apis.Calendar.v3.CalendarListResource.ListRequest.MinAccessRoleEnum.FreeBusyReader">
@@ -1380,7 +1380,7 @@
             False.</summary>
         </member>
         <member name="P:Google.Apis.Calendar.v3.CalendarListResource.WatchRequest.MinAccessRole">
-            <summary>The minimum access role for the user in the returned entires. Optional. The default is no
+            <summary>The minimum access role for the user in the returned entries. Optional. The default is no
             restriction.</summary>
         </member>
         <member name="P:Google.Apis.Calendar.v3.CalendarListResource.WatchRequest.MaxResults">
@@ -1407,7 +1407,7 @@
             <summary>Gets the REST path.</summary>
         </member>
         <member name="T:Google.Apis.Calendar.v3.CalendarListResource.WatchRequest.MinAccessRoleEnum">
-            <summary>The minimum access role for the user in the returned entires. Optional. The default is no
+            <summary>The minimum access role for the user in the returned entries. Optional. The default is no
             restriction.</summary>
         </member>
         <member name="F:Google.Apis.Calendar.v3.CalendarListResource.WatchRequest.MinAccessRoleEnum.FreeBusyReader">

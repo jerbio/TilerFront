@@ -14,6 +14,17 @@ namespace TilerFront.Models
         public bool BrowserRemembered { get; set; }
     }
 
+    public class ThirdPartyOut
+    {
+        [Display(Name = "Calendar Provider")]
+        public string ProviderName { get; set; }
+        [Display(Name = "Associated Email")]
+        public string Email { get; set; }
+
+        [Display(Name = "CalendarID")]
+        public string ID { get; set; }
+    }
+
     public class ManageLoginsViewModel
     {
         public IList<UserLoginInfo> CurrentLogins { get; set; }

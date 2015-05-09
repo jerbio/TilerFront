@@ -1,6 +1,6 @@
 ﻿"use strict"
 var DisableRegistration = false;
-var Debug =  true;
+var Debug =  false;
 var DebugLocal = false;
 
 //var global_refTIlerUrl = "http://localhost:53201/api/";

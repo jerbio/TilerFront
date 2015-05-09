@@ -14,6 +14,7 @@ using System.Web.Http;
 using System.Web.Configuration;
 using System.Web.Http.Description;
 using TilerFront.Models;
+using DBTilerElement;
 //using System.Web.Http.Cors;
 
 namespace TilerFront.Controllers

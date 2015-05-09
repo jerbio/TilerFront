@@ -7,6 +7,7 @@ using System.Text;
 using System.Xml;
 using System.IO;
 using System.Threading;
+using DBTilerElement;
 using TilerElements;
 using System.Web;
 using System.Threading.Tasks;
@@ -57,7 +58,7 @@ namespace TilerFront
                 LogStatus = true;
                 ID = SessionUser.Id;
                 UserName = SessionUser.UserName;
-                LogDBDataAccess = new DBControlDirect(User);
+                LogDBDataAccess = new DBControlDirect(User.Id,User.UserName);
 
             }
 

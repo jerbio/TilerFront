@@ -10,14 +10,41 @@ namespace TilerFront.Models
     /// </summary>
     public class UnregisteredEvent:AuthorizedUser
     {
+        /// <summary>
+        /// Blue Value for RGBO color format  for calendar event
+        /// </summary>
         public string BColor { get; set; }
+        /// <summary>
+        /// Red Value for RGBO color format  for calendar event
+        /// </summary>
         public string RColor { get; set; }
+        /// <summary>
+        /// Green Value for RGBO color format for calendar event
+        /// </summary>
         public string GColor { get; set; }
+        /// <summary>
+        /// Sets the opacity RGBO color format for calendar event
+        /// </summary>
         public string Opacity { get; set; }
+        /// <summary>
+        /// One of the preset color selections for tiler. The preset options are from [0-8].
+        /// </summary>
         public string ColorSelection { get; set; }
+        /// <summary>
+        /// The number of splits for a specific calendar event. Default is 1.
+        /// </summary>
         public string Count { get; set; }
+        /// <summary>
+        /// Sets the number of days for duration component of the given calendar event. Default is 0
+        /// </summary>
         public string DurationDays { get; set; }
+        /// <summary>
+        /// Sets the number of hours component for the duration of event. for the given calendar event. Default is 0
+        /// </summary>
         public string DurationHours { get; set; }
+        /// <summary>
+        /// Sets the number of Minutes component for the duration of event. for the given calendar event. Default is 0
+        /// </summary>
         public string DurationMins { get; set; }
         public string EndDay { get; set; }
         public string EndHour { get; set; }

@@ -10,7 +10,10 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Description;
 using TilerElements;
+using DBTilerElement;
 using TilerFront.Models;
+//using TilerGoogleCalendarLib;
+
 
 namespace TilerFront.Controllers
 {
@@ -144,31 +147,57 @@ namespace TilerFront.Controllers
         {
             UserAccountDirect retrievedUser = await myUser.getUserAccountDirect(); //new UserAccountDirect(myUser.UserName, myUser.UserID);
             await retrievedUser.Login();
-            PostBackData retValue;
+            PostBackData retValue = new PostBackData("", 1);
             if (retrievedUser.Status)
             {
-                My24HourTimerWPF.Schedule NewSchedule = new My24HourTimerWPF.Schedule(retrievedUser, myUser.getRefNow());
-                long StartLong = Convert.ToInt64(myUser.Start);
-                long EndLong = Convert.ToInt64(myUser.End);
-                long LongBegin = Convert.ToInt64(myUser.CalStart);
-                long LongDeadline = Convert.ToInt64(myUser.CalEnd);
-                DateTimeOffset newStart = WebApiConfig.JSStartTime.AddMilliseconds(StartLong);
-                newStart = newStart.Add(myUser.getTImeSpan);
-                DateTimeOffset newEnd = WebApiConfig.JSStartTime.AddMilliseconds(EndLong);
-                newEnd = newEnd.Add(myUser.getTImeSpan);
-                DateTimeOffset Begin = WebApiConfig.JSStartTime.AddMilliseconds(LongBegin);
-                Begin = Begin.Add(myUser.getTImeSpan);
-                DateTimeOffset Deadline = WebApiConfig.JSStartTime.AddMilliseconds(LongDeadline);
-                Deadline = Deadline.Add(myUser.getTImeSpan);
-                int SplitCount = (int)myUser.Split;
-                //TimeSpan SpanPerSplit = TimeSpan.FromMilliseconds(myUser.Duration);
-                Tuple<CustomErrors, Dictionary<string, CalendarEvent>> ScheduleUpdateMessage = NewSchedule.BundleChangeUpdate(myUser.EventID,myUser.EventName, newStart, newEnd,Begin,Deadline, SplitCount);//, SpanPerSplit);
-                await NewSchedule.UpdateWithProcrastinateSchedule(ScheduleUpdateMessage.Item2).ConfigureAwait(false);
-                retValue = new PostBackData(ScheduleUpdateMessage.Item1);
-            }
-            else
-            {
-                retValue = new PostBackData("", 1);
+                string CalendarType = myUser.ThirdPartyType.ToLower();
+
+                switch (CalendarType)
+                {
+                    case "google":
+                        {
+                            
+                            
+                            My24HourTimerWPF.Schedule NewSchedule = new My24HourTimerWPF.Schedule(retrievedUser, myUser.getRefNow());
+
+                            Models.ThirdPartyCalendarAuthenticationModel AllIndexedThirdParty = await ScheduleController.getThirdPartyAuthentication(retrievedUser.UserID, myUser.ThirdPartyUserID, 2);
+                            GoogleTilerEventControl googleControl = new GoogleTilerEventControl(AllIndexedThirdParty);
+                            await googleControl.updateSubEvent(myUser).ConfigureAwait(false);
+                            Dictionary<string, CalendarEvent> AllCalendarEvents = (await googleControl.getCalendarEvents().ConfigureAwait(false)).ToDictionary(obj => obj.ID, obj => obj);
+                            GoogleThirdPartyControl googleEvents = new GoogleThirdPartyControl(AllCalendarEvents);
+                            await NewSchedule.updateDataSetWithThirdPartyDataAndTriggerNewAddition(googleEvents).ConfigureAwait(false);
+
+                            retValue = new PostBackData("\"Success\"", 0);
+                        }
+                        break;
+                    case "tiler":
+                        {
+                            My24HourTimerWPF.Schedule NewSchedule = new My24HourTimerWPF.Schedule(retrievedUser, myUser.getRefNow());
+
+                            await ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(NewSchedule, retrievedUser.UserID).ConfigureAwait(false);
+
+                            long StartLong = Convert.ToInt64(myUser.Start);
+                            long EndLong = Convert.ToInt64(myUser.End);
+                            long LongBegin = Convert.ToInt64(myUser.CalStart);
+                            long LongDeadline = Convert.ToInt64(myUser.CalEnd);
+                            DateTimeOffset newStart = TilerElementExtension.JSStartTime.AddMilliseconds(StartLong);
+                            newStart = newStart.Add(myUser.getTImeSpan);
+                            DateTimeOffset newEnd = TilerElementExtension.JSStartTime.AddMilliseconds(EndLong);
+                            newEnd = newEnd.Add(myUser.getTImeSpan);
+                            DateTimeOffset Begin = TilerElementExtension.JSStartTime.AddMilliseconds(LongBegin);
+                            Begin = Begin.Add(myUser.getTImeSpan);
+                            DateTimeOffset Deadline = TilerElementExtension.JSStartTime.AddMilliseconds(LongDeadline);
+                            Deadline = Deadline.Add(myUser.getTImeSpan);
+                            int SplitCount = (int)myUser.Split;
+                            //TimeSpan SpanPerSplit = TimeSpan.FromMilliseconds(myUser.Duration);
+                            Tuple<CustomErrors, Dictionary<string, CalendarEvent>> ScheduleUpdateMessage = NewSchedule.BundleChangeUpdate(myUser.EventID, myUser.EventName, newStart, newEnd, Begin, Deadline, SplitCount);//, SpanPerSplit);
+                            await NewSchedule.UpdateWithProcrastinateSchedule(ScheduleUpdateMessage.Item2).ConfigureAwait(false);
+                            retValue = new PostBackData(ScheduleUpdateMessage.Item1);
+                        }
+                        break;
+                    default:
+                        break;
+                }
             }
 
             return Ok(retValue.getPostBack);

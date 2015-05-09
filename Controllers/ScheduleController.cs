@@ -9,7 +9,9 @@ using System.Web.Http.Description;
 using System.Web;
 using TilerFront.Models;
 using TilerElements;
-
+using DBTilerElement;
+//using TilerGoogleCalendarLib;
+using System.Collections.Concurrent;
 //using System.Web.Http.Cors;
 
 namespace TilerFront.Controllers
@@ -28,6 +30,7 @@ namespace TilerFront.Controllers
         /// </summary>
         /// <param name="myAuthorizedUser"></param>
         /// <returns></returns>
+        [HttpGet]
         [ResponseType(typeof(PostBackStruct))]
         public async Task<IHttpActionResult> GetSchedule([FromUri] getScheduleModel myAuthorizedUser)
         {
@@ -43,9 +46,38 @@ namespace TilerFront.Controllers
                 
 
                 LogControl LogAccess = myUserAccount.ScheduleLogControl;
+                List<IndexedThirdPartyAuthentication> AllIndexedThirdParty = await getAllThirdPartyAuthentication(myUserAccount.UserID).ConfigureAwait(false);
+
+                List<GoogleTilerEventControl> AllGoogleTilerEvents = AllIndexedThirdParty.Select(obj => new GoogleTilerEventControl(obj)).ToList();
+                //AllIndexedThirdParty.Select(obj => new GoogleTilerEventControl(obj)).ToList();
+                foreach (IndexedThirdPartyAuthentication obj in AllIndexedThirdParty)
+                {
+                    var GoogleTilerEventControlobj = new GoogleTilerEventControl(obj);
+                }
+                
+                
+                
+
+
+
+                //List<Task<List<CalendarEvent>>> getAllCalTasks = AllGoogleTilerEvents.Select(obj => obj.getCalendarEvents()).ToList();
+
+                List<CalendarEvent> ScheduleData = new List<CalendarEvent>();
+
+                Task<ConcurrentBag<CalendarEvent>> GoogleCalEventsTask =  GoogleTilerEventControl.getAllCalEvents(AllGoogleTilerEvents);
+
                 Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, Location_Elements>> ProfileData =await LogAccess.getProfileInfo(TimelineForData);
-                IEnumerable<CalendarEvent> ScheduleData = ProfileData.Item1.Values.Where(obj=>obj.isActive);
+
+                IEnumerable<CalendarEvent> GoogleCalEvents = await GoogleCalEventsTask.ConfigureAwait(false);
+
+                ScheduleData = ScheduleData.Concat(ProfileData.Item1.Values.Where(obj => obj.isActive)).ToList();
+
+                ScheduleData = ScheduleData.Concat(GoogleCalEvents).ToList();
                 IEnumerable<CalendarEvent> NonRepeatingEvents = ScheduleData.Where(obj => !obj.RepetitionStatus);
+
+                
+
+
                 //IEnumerable<CalendarEvent> RepeatingEvents = ScheduleData.Where(obj => obj.RepetitionStatus).SelectMany(obj => obj.Repeat.RecurringCalendarEvents);
                 IList<UserSchedule.repeatedEventData> RepeatingEvents = ScheduleData.AsParallel().Where(obj => obj.RepetitionStatus).
                     Select(obj => new UserSchedule.repeatedEventData 
@@ -75,12 +107,91 @@ namespace TilerFront.Controllers
             
             return Ok(returnPostBack.getPostBack);
         }
+        
+        /// <summary>
+        /// Retrieves the third party authentication credentials needed to retrieve third party calendar. Attaches an index for multiple calendar retrieval. Based on a specific userID
+        /// </summary>
+        /// <param name="ID"></param>
+        /// <returns></returns>
+        static async Task<List<IndexedThirdPartyAuthentication>> getAllThirdPartyAuthentication(string ID)
+        {
+            ApplicationDbContext db = new ApplicationDbContext();
+            List<ThirdPartyCalendarAuthenticationModel> AllAuthentications = ( db.ThirdPartyAuthentication.Where(obj => ID == obj.TilerID).ToList());
+            List<IndexedThirdPartyAuthentication> RetValue = AllAuthentications.Select((obj, i) => new IndexedThirdPartyAuthentication(obj,(uint) i)).ToList();
+            return RetValue;
+        }
+
+
+        /// <summary>
+        /// Retrieves the third party authentication credentials needed to retrieve third party calendar. Gets a specific calendar authentication. You need full credentials to get specific oauth credentials
+        /// </summary>
+        /// <param name="TilerUserID"></param>
+        /// <param name="ThirdpaartyUserID"></param>
+        /// <param name="ThirdPartyType"></param>
+        /// <returns></returns>
+        async static public Task<ThirdPartyCalendarAuthenticationModel> getThirdPartyAuthentication(string TilerUserID, string ThirdpaartyUserID, int ThirdPartyType)
+        {
+            Object[] Param = { TilerUserID, ThirdpaartyUserID, ThirdPartyType };
+            ApplicationDbContext db = new ApplicationDbContext();
+            ThirdPartyCalendarAuthenticationModel RetValue = await db.ThirdPartyAuthentication.FindAsync(Param);
+            return RetValue;
+        }
+
+        static async public Task googleNotificationTrigger(string GoogleNotificationID)
+        {
+            ApplicationDbContext db = new ApplicationDbContext();
+            ThirdPartyCalendarAuthenticationModel ThirdPartAuthData= db.ThirdPartyAuthentication.Where(obj => obj.ID == GoogleNotificationID).Single();
+            object[] LookUpParams = {ThirdPartAuthData.TilerID};
+            ApplicationUser myUser = db.Users.Find(LookUpParams);
+            await notificationTrigger(myUser).ConfigureAwait(false);
+        }
+
+
+        static async Task notificationTrigger(ApplicationUser TilerUser)
+        {
+            UserAccountDirect RetrievedUSer = new UserAccountDirect(TilerUser, true);
+            ApplicationDbContext db = new ApplicationDbContext();
+            //DateTimeOffset CurrentTime = DateTimeOffset.Parse("5/8/2015 5:35:00 AM +00:00");//.AddDays(-1);// DateTimeOffset.UtcNow.AddDays(-1);
+            DateTimeOffset CurrentTime = DateTimeOffset.UtcNow;//.AddDays(-1);
+            My24HourTimerWPF.Schedule TilerSchedule = new My24HourTimerWPF.Schedule(RetrievedUSer, CurrentTime);
+            await updatemyScheduleWithGoogleThirdpartyCalendar(TilerSchedule, RetrievedUSer.UserID).ConfigureAwait(false);
+            await TilerSchedule.UpdateScheduleDueToExternalChanges().ConfigureAwait(false);
+        }
+
 
         // GET api/schedule/5
         [NonAction]
         public async Task<IHttpActionResult> GetScheduleById([FromBody]AuthorizedUser myAuthorizedUser)
         {
             return Ok("return");
+        }
+
+
+        /// <summary>
+        /// Function retrives the third party credential. Credential are used to retrieve calendar event. The retrieved events are used to populate mySchedule
+        /// </summary>
+        /// <param name="mySchedule"></param>
+        /// <param name="TilerUserID"></param>
+        /// <returns></returns>
+        static internal async Task updatemyScheduleWithGoogleThirdpartyCalendar(My24HourTimerWPF.Schedule mySchedule, string TilerUserID)
+        {
+            List<IndexedThirdPartyAuthentication> AllIndexedThirdParty = await getAllThirdPartyAuthentication(TilerUserID).ConfigureAwait(false);
+            List<GoogleTilerEventControl> AllGoogleTilerEvents = AllIndexedThirdParty.Select(obj => new GoogleTilerEventControl (obj)).ToList();
+
+            foreach(GoogleTilerEventControl eachGoogleTilerEventControl in AllGoogleTilerEvents)
+            {
+                GoogleThirdPartyControl AllCalEvents = await eachGoogleTilerEventControl.getThirdPartyControlForIndex().ConfigureAwait(false);
+                mySchedule.updateDataSetWithThirdPartyData(AllCalEvents);
+                if (AllCalEvents==null)
+                {
+                    ApplicationDbContext db = new ApplicationDbContext();
+                    Object[] Param = { TilerUserID, eachGoogleTilerEventControl.CalendarUserID, (int)ThirdPartyControl.CalendarTool.Google };
+                    ThirdPartyCalendarAuthenticationModel RetValue = await db.ThirdPartyAuthentication.FindAsync(Param);
+                    db.ThirdPartyAuthentication.Remove(RetValue);    
+                    await db.SaveChangesAsync().ConfigureAwait(false);
+                }
+                
+            }
         }
 
 
@@ -101,13 +212,23 @@ namespace TilerFront.Controllers
             TimeSpan fullTimeSpan = myAuthorizedUser.getTImeSpan;
             UserAccountDirect myUserAccount = await UserData.getUserAccountDirect();
             My24HourTimerWPF.Schedule MySchedule = new My24HourTimerWPF.Schedule(myUserAccount, myAuthorizedUser.getRefNow());
+
+            await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, UserData.UserID).ConfigureAwait(false);
+
+
+
+
             Tuple<CustomErrors, Dictionary<string, CalendarEvent>> ScheduleUpdateMessage = MySchedule.ProcrastinateAll(ProcrastinateDuration.TotalTimeSpan);
             await MySchedule.UpdateWithProcrastinateSchedule(ScheduleUpdateMessage.Item2);
             PostBackData myPostData = new PostBackData("\"Success\"", 0);
             return Ok(myPostData.getPostBack);
         }
 
-
+        /// <summary>
+        /// Procrastinate a given event. 
+        /// </summary>
+        /// <param name="UserData"></param>
+        /// <returns></returns>
         [HttpPost]
         [ResponseType(typeof(PostBackStruct))]
         [Route("api/Schedule/Event/Procrastinate")]
@@ -118,7 +239,13 @@ namespace TilerFront.Controllers
             TimeSpan fullTimeSpan = myAuthorizedUser.getTImeSpan;
             UserAccountDirect myUser = await UserData.getUserAccountDirect();
             await myUser.Login();
-            My24HourTimerWPF.Schedule MySchedule = new My24HourTimerWPF.Schedule(myUser, myAuthorizedUser.getRefNow());
+
+            DateTimeOffset myNow = DateTimeOffset.Parse("5/5/2015 2:45:00 PM");
+            myNow = myAuthorizedUser.getRefNow();
+            My24HourTimerWPF.Schedule MySchedule = new My24HourTimerWPF.Schedule(myUser,myNow);
+
+            await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, UserData.UserID).ConfigureAwait(false);
+
             Tuple<CustomErrors, Dictionary<string, CalendarEvent>> ScheduleUpdateMessage = MySchedule.ProcrastinateJustAnEvent(UserData.EventID, ProcrastinateDuration.TotalTimeSpan);
             await MySchedule.UpdateWithProcrastinateSchedule(ScheduleUpdateMessage.Item2);
             PostBackData myPostData = new PostBackData("\"Success\"", 0);
@@ -130,12 +257,37 @@ namespace TilerFront.Controllers
         [Route("api/Schedule/Event/Complete")]
         public async Task<IHttpActionResult> CompleteSubCalendarEvent([FromBody]getEventModel UserData)
         {
-            UserAccountDirect myUser = await UserData.getUserAccountDirect();
-            await myUser.Login();
-            My24HourTimerWPF.Schedule MySchedule = new My24HourTimerWPF.Schedule(myUser, UserData.getRefNow());
-            MySchedule.markSubEventAsCompleteCalendarEventAndReadjust(UserData.EventID);
-            PostBackData myPostData = new PostBackData("\"Success\"", 0);
-            return Ok(myPostData.getPostBack);
+            UserAccountDirect retrievedUser = await UserData.getUserAccountDirect();
+            await retrievedUser.Login();
+            PostBackData retValue = new PostBackData("", 1);
+            if (retrievedUser.Status)
+            {
+                string CalendarType = UserData.ThirdPartyType.ToLower();
+
+                switch (CalendarType)
+                {
+                    case "google":
+                        {
+                            Models.ThirdPartyCalendarAuthenticationModel AllIndexedThirdParty = await getThirdPartyAuthentication(retrievedUser.UserID, UserData.ThirdPartyUserID, 2);
+                            GoogleTilerEventControl googleControl = new GoogleTilerEventControl(AllIndexedThirdParty);
+                            await googleControl.deleteSubEvent(UserData).ConfigureAwait(false);
+                            retValue = new PostBackData("\"Success\"", 0);
+                        }
+                        break;
+                    case "tiler":
+                        {
+                            My24HourTimerWPF.Schedule MySchedule = new My24HourTimerWPF.Schedule(retrievedUser, UserData.getRefNow());
+                            await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, UserData.UserID).ConfigureAwait(false);
+
+                            MySchedule.markSubEventAsCompleteCalendarEventAndReadjust(UserData.EventID);
+                            retValue = new PostBackData("\"Success\"", 0);
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+            return Ok(retValue.getPostBack);
         }
 
 
@@ -147,6 +299,8 @@ namespace TilerFront.Controllers
             UserAccountDirect myUser = await UserData.getUserAccountDirect();
             await myUser.Login();
             My24HourTimerWPF.Schedule MySchedule = new My24HourTimerWPF.Schedule(myUser, UserData.getRefNow());
+            await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, UserData.UserID).ConfigureAwait(false);
+
             IEnumerable<string> AllEVentIDs = UserData.EventID.Split(',');
             MySchedule.markSubEventsAsComplete(AllEVentIDs);
             PostBackData myPostData = new PostBackData("\"Success\"", 0);
@@ -166,6 +320,9 @@ namespace TilerFront.Controllers
             if (retrievedUser.Status)
             {
                 My24HourTimerWPF.Schedule MySchedule = new My24HourTimerWPF.Schedule(retrievedUser, myUser.getRefNow());
+
+                await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, myUser.UserID).ConfigureAwait(false);
+
                 Tuple<CustomErrors, Dictionary<string, CalendarEvent>> retValue0 = MySchedule.SetEventAsNow(myUser.EventID, true);
                 await MySchedule.UpdateWithProcrastinateSchedule(retValue0.Item2);
                 retValue = new PostBackData("\"Success\"", 0);
@@ -178,6 +335,8 @@ namespace TilerFront.Controllers
         }
 
 
+        
+
 
         [HttpDelete]
         [ResponseType(typeof(PostBackStruct))]
@@ -186,17 +345,39 @@ namespace TilerFront.Controllers
         {
             UserAccountDirect retrievedUser = await myUser.getUserAccountDirect();
             await retrievedUser.Login();
-            PostBackData retValue;
+            PostBackData retValue= new PostBackData("", 1);
             if (retrievedUser.Status)
             {
-                My24HourTimerWPF.Schedule MySchedule = new My24HourTimerWPF.Schedule(retrievedUser, myUser.getRefNow());
-                MySchedule.deleteSubCalendarEvent(myUser.EventID);
-                retValue = new PostBackData("\"Success\"", 0);   
+                string CalendarType = myUser.ThirdPartyType.ToLower();
+
+                switch(CalendarType )
+                {
+                    case "google":
+                        {
+                            Models.ThirdPartyCalendarAuthenticationModel AllIndexedThirdParty = await getThirdPartyAuthentication(retrievedUser.UserID, myUser.ThirdPartyUserID, 2);
+                            GoogleTilerEventControl googleControl = new GoogleTilerEventControl(AllIndexedThirdParty);
+                            await googleControl.deleteSubEvent(myUser).ConfigureAwait(false);
+                            retValue = new PostBackData("\"Success\"", 0);   
+                        }
+                        break;
+                    case "tiler":
+                        {
+                            My24HourTimerWPF.Schedule MySchedule = new My24HourTimerWPF.Schedule(retrievedUser, myUser.getRefNow());
+                            
+                            await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, myUser.UserID).ConfigureAwait(false);
+
+                            MySchedule.deleteSubCalendarEvent(myUser.EventID);
+                            retValue = new PostBackData("\"Success\"", 0);   
+                        }
+                        break;
+                    default:
+                        break;
+                }
+
+
+                
             }
-            else
-            {
-                retValue = new PostBackData("", 1);
-            }
+            
             return Ok(retValue.getPostBack);
         }
         [HttpOptions]
@@ -219,6 +400,9 @@ namespace TilerFront.Controllers
             if (retrievedUser.Status)
             {
                 My24HourTimerWPF.Schedule MySchedule = new My24HourTimerWPF.Schedule(retrievedUser, myUser.getRefNow());
+
+                
+
                 IEnumerable<string> AllEVentIDs = myUser.EventID.Split(',');
                 MySchedule.deleteSubCalendarEvents(AllEVentIDs);
                 retValue = new PostBackData("\"Success\"", 0);
@@ -237,6 +421,12 @@ namespace TilerFront.Controllers
             return Ok();
         }
 
+
+        /// <summary>
+        /// Adds an Event to Tiler. Returns data formatted as tiler endpoint together. Returns the earliest sub calendarevent generated. 
+        /// </summary>
+        /// <param name="newEvent"></param>
+        /// <returns></returns>
         [HttpPost]
         [ResponseType(typeof(PostBackStruct))]
         [Route("api/Schedule/Event")]
@@ -380,6 +570,9 @@ namespace TilerFront.Controllers
             if (myUser.Status)
             {
                 My24HourTimerWPF.Schedule MySchedule = new My24HourTimerWPF.Schedule(myUser, newEvent.getRefNow());
+
+                await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, myUser.UserID).ConfigureAwait(false);
+
                 CalendarEvent newCalendarEvent;
                 if(restrictionFlag )
                 {
@@ -438,6 +631,28 @@ namespace TilerFront.Controllers
             return Ok(retValue.getPostBack);
         }
 
+
+        [HttpPost]
+        [ResponseType(typeof(PostBackStruct))]
+        [Route("api/Schedule/Notification")]
+        public async Task<IHttpActionResult> Notification([FromBody]AuthorizedUser newEvent)
+        {
+            PostBackData retValue = new PostBackData("", 1);
+            try
+            { 
+                UserAccount RetrievedUser = await newEvent.getUserAccountDirect().ConfigureAwait(false);
+                My24HourTimerWPF.Schedule MySchedule = new My24HourTimerWPF.Schedule(RetrievedUser, newEvent.getRefNow());
+                await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, RetrievedUser.UserID).ConfigureAwait(false);
+                await MySchedule.UpdateScheduleDueToExternalChanges().ConfigureAwait(false);
+                retValue = new PostBackData("\"Success\"", 0);
+            }
+            catch 
+            {
+                ;
+            }
+            return Ok(retValue.getPostBack);
+            
+        }
 
         [HttpPost]
         [ResponseType(typeof(PostBackStruct))]
@@ -576,6 +791,8 @@ namespace TilerFront.Controllers
             if (myUser.Status)
             {
                 My24HourTimerWPF.Schedule MySchedule = new My24HourTimerWPF.Schedule(myUser, newEvent.getRefNow());
+                await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, myUser.UserID).ConfigureAwait(false);
+
                 CalendarEvent newCalendarEvent;
                 if (restrictionFlag)
                 {
