@@ -178,20 +178,10 @@ namespace TilerFront.Controllers
             List<IndexedThirdPartyAuthentication> AllIndexedThirdParty = await getAllThirdPartyAuthentication(TilerUserID).ConfigureAwait(false);
             List<GoogleTilerEventControl> AllGoogleTilerEvents = AllIndexedThirdParty.Select(obj => new GoogleTilerEventControl (obj)).ToList();
 
-            foreach(GoogleTilerEventControl eachGoogleTilerEventControl in AllGoogleTilerEvents)
-            {
-                GoogleThirdPartyControl AllCalEvents = await eachGoogleTilerEventControl.getThirdPartyControlForIndex().ConfigureAwait(false);
-                mySchedule.updateDataSetWithThirdPartyData(AllCalEvents);
-                if (AllCalEvents==null)
-                {
-                    ApplicationDbContext db = new ApplicationDbContext();
-                    Object[] Param = { TilerUserID, eachGoogleTilerEventControl.CalendarUserID, (int)ThirdPartyControl.CalendarTool.Google };
-                    ThirdPartyCalendarAuthenticationModel RetValue = await db.ThirdPartyAuthentication.FindAsync(Param);
-                    db.ThirdPartyAuthentication.Remove(RetValue);    
-                    await db.SaveChangesAsync().ConfigureAwait(false);
-                }
-                
-            }
+            Tuple<List<GoogleTilerEventControl>, GoogleThirdPartyControl> GoogleEvents = await GoogleTilerEventControl.getThirdPartyControlForIndex(AllGoogleTilerEvents).ConfigureAwait(false);
+            Task DeleteInvalidAuthentication = ManageController.delelteGoogleAuthentication(GoogleEvents.Item1.Select(obj => obj.getDBAuthenticationData()));
+            mySchedule.updateDataSetWithThirdPartyData(GoogleEvents.Item2);
+            await DeleteInvalidAuthentication.ConfigureAwait(false);
         }
 
 

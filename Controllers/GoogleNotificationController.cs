@@ -23,8 +23,8 @@ namespace TilerFront.Controllers
             //return retValue;
             System.Web.HttpContext myContext = System.Web.HttpContext.Current;
 
-            
-            bool continueIntoTrigger=true;
+
+            bool continueIntoTrigger = myContext.Request.Headers["X-Goog-Resource-State"].ToLower() == "exists";
             if (continueIntoTrigger)
             {
                 string ChannelID = myContext.Request.Headers["X-Goog-Channel-ID"];

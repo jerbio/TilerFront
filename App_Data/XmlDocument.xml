@@ -757,6 +757,12 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:TilerFront.GoogleTilerEventControl.getThirdPartyControlForIndex(System.Collections.Generic.IEnumerable{TilerFront.GoogleTilerEventControl})">
+            <summary>
+            Function generates google calendar control. Its populated with events retrieved within +/- 90 days of google calendar update. It returns null if access to google api is lost.
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:TilerFront.LogControl.getRestrictionTimeLine(System.Xml.XmlNode)">
             <summary>
             Funciton returns aall the possible active restriction timelines for the restriciton profile
@@ -780,6 +786,12 @@
             <summary>
             Represents a request for procrastination of an event. EventID is required.
             </summary>
+        </member>
+        <member name="M:TilerFront.Models.ThirdPartyCalendarAuthenticationModel.getThirdPartyOut">
+            <summary>
+            Converts "this" object to "ThirdPartyAuthenticationForView" object. This is to be used to generate the more secure information on the user for the management of third party accounts on the front end
+            </summary>
+            <returns></returns>
         </member>
         <member name="M:TilerFront.Models.ThirdPartyCalendarAuthenticationModel.getGoogleOauthCredentials">
             <summary>

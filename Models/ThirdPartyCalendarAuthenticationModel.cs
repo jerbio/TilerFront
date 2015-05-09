@@ -31,9 +31,13 @@ namespace TilerFront.Models
         public int ProviderID { get; set; }
         public DateTimeOffset Deadline { get; set; }
 
-        public ThirdPartyOut getThirdPartyOut()
+        /// <summary>
+        /// Converts "this" object to "ThirdPartyAuthenticationForView" object. This is to be used to generate the more secure information on the user for the management of third party accounts on the front end
+        /// </summary>
+        /// <returns></returns>
+        public ThirdPartyAuthenticationForView getThirdPartyOut()
         {
-            ThirdPartyOut RetValue = new ThirdPartyOut() { Email = this.Email, ProviderName =TilerElementExtension. ProviderNames[this.ProviderID],ID=this.ID };
+            ThirdPartyAuthenticationForView RetValue = new ThirdPartyAuthenticationForView() { Email = this.Email, ProviderName =TilerElementExtension. ProviderNames[this.ProviderID],ID=this.ID };
             return RetValue;
         }
 
@@ -60,7 +64,7 @@ namespace TilerFront.Models
         /// Function refreshes the token and update "this" object. Note it does not try to persist the authentication to permanent storage on azure. If you want it to persist call function refreshAndCommitToken;
         /// </summary>
         /// <returns></returns>
-        async public Task<bool> refreshAuthenticationToken()
+        async Task<bool> refreshAuthenticationToken()
         {
             Google.Apis.Auth.OAuth2.UserCredential OldCredentials = getGoogleOauthCredentials();
             System.Threading.CancellationToken CancelToken = new System.Threading.CancellationToken();
@@ -78,6 +82,8 @@ namespace TilerFront.Models
             return refreshSuccess;
         }
 
+
+        //refreshes the token credentials and updates tiler DB with the data
         async public Task<bool> refreshAndCommitToken()
         {
             bool RetValue =await refreshAuthenticationToken().ConfigureAwait(false);
@@ -106,20 +112,34 @@ namespace TilerFront.Models
 
 
         /// <summary>
-        /// This deletes this authentication tokens from persistent storage. Note this uses the data members from "this" object. Be caustious of refreshAuthenticationToken.
+        /// This deletes this authentication tokens from persistent storage. Note this uses the data members from "this" object. It revokes the credentials then commits them.
         /// </summary>
         /// <returns></returns>
         async public Task<bool> unCommitAuthentication()
         {
-            bool RetValue = false;            
-            Object[] Param = { this.TilerID, this.Email, this.ProviderID };
-            ApplicationDbContext db = new ApplicationDbContext();
-            ThirdPartyCalendarAuthenticationModel checkingThirdPartyCalendarAuthentication = await db.ThirdPartyAuthentication.FindAsync(Param);
-            if (checkingThirdPartyCalendarAuthentication != null)
-            {
-                db.ThirdPartyAuthentication.Remove(checkingThirdPartyCalendarAuthentication);
-                await db.SaveChangesAsync().ConfigureAwait(false);
+            bool RetValue = false;    
+
+            UserCredential googleCredential = getGoogleOauthCredentials();
+            try
+            { 
+                await googleCredential.RefreshTokenAsync(System.Threading.CancellationToken.None).ConfigureAwait(false);
+                await googleCredential.RevokeTokenAsync(System.Threading.CancellationToken.None).ConfigureAwait(false);
+                Object[] Param = { this.TilerID, this.Email, this.ProviderID };
+                ApplicationDbContext db = new ApplicationDbContext();
+                ThirdPartyCalendarAuthenticationModel checkingThirdPartyCalendarAuthentication = await db.ThirdPartyAuthentication.FindAsync(Param);
+                if (checkingThirdPartyCalendarAuthentication != null)
+                {
+                    db.ThirdPartyAuthentication.Remove(checkingThirdPartyCalendarAuthentication);
+                    await db.SaveChangesAsync().ConfigureAwait(false);
+                }
+                RetValue = true;
             }
+            catch(Exception e)
+            {
+                ;
+            }
+                    
+            
             return RetValue;
         }
 

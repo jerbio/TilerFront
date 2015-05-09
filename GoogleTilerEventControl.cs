@@ -33,7 +33,6 @@ namespace TilerFront
             AuthenticationInfo = AuthenticationCredential;
 
             EmailID = AuthenticationCredential.Email;
-            
         }
 
 
@@ -53,6 +52,48 @@ namespace TilerFront
 
             List<CalendarEvent> RetValueList = (await GoogleCalExtension.getAllCalEvents(list.Items, CalendarServiceInfo, EmailID, googleAuthenticationID).ConfigureAwait(false)).ToList();
             RetValue = new GoogleThirdPartyControl(RetValueList);
+            return RetValue;
+        }
+
+
+        /// <summary>
+        /// Function generates google calendar control. Its populated with events retrieved within +/- 90 days of google calendar update. It returns null if access to google api is lost.
+        /// </summary>
+        /// <returns></returns>
+        async static public Task<Tuple<List<GoogleTilerEventControl>, GoogleThirdPartyControl>> getThirdPartyControlForIndex(IEnumerable<GoogleTilerEventControl> AllGoogleControls)
+        {
+            List<GoogleTilerEventControl> AllControls = AllGoogleControls.ToList();
+            GoogleThirdPartyControl RetrievedGoogleControls= null;
+            List<Task<List<CalendarEvent>>> AllConcurrentTasks= new List<Task<List<CalendarEvent>>>();
+            List<CalendarEvent> AllCalEvents = new List<CalendarEvent>();
+            List<GoogleTilerEventControl> AllInvalids = new List<GoogleTilerEventControl>();
+
+            for (int j = 0; j < AllControls.Count; j++)
+            {
+                GoogleTilerEventControl eachGoogleTilerEventControl = AllControls[j];
+                AllConcurrentTasks.Add(eachGoogleTilerEventControl.getCalendarEvents());
+            }
+
+            int i = 0;
+
+            foreach( Task<List<CalendarEvent>> eachTask in AllConcurrentTasks)
+            {
+                List<CalendarEvent> DownloadedCals = await eachTask.ConfigureAwait(false);
+                if (DownloadedCals==null)
+                {
+                    AllInvalids.Add(AllControls[i]);
+                }
+                else 
+                {
+                    AllCalEvents.AddRange(DownloadedCals);
+                }
+                
+                i++;
+            }
+
+            RetrievedGoogleControls = new GoogleThirdPartyControl(AllCalEvents);
+
+            Tuple<List<GoogleTilerEventControl>, GoogleThirdPartyControl> RetValue = new Tuple<List<GoogleTilerEventControl>, GoogleThirdPartyControl>(AllInvalids, RetrievedGoogleControls);
             return RetValue;
         }
 
@@ -175,6 +216,11 @@ namespace TilerFront
                 ;
             }
             
+        }
+
+        public TilerFront.Models.ThirdPartyCalendarAuthenticationModel getDBAuthenticationData()
+        {
+            return AuthenticationInfo;
         }
 
         static async public Task<ConcurrentBag<CalendarEvent>> getAllCalEvents(IEnumerable<GoogleTilerEventControl>AllGoogleCalControl)

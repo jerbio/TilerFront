@@ -182,6 +182,9 @@ namespace TilerFront.Controllers
             if (retrievedUser.Status)
             {
                 My24HourTimerWPF.Schedule NewSchedule = new My24HourTimerWPF.Schedule(retrievedUser, myUser.getRefNow());
+
+                await ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(NewSchedule, myUser.UserID).ConfigureAwait(false);
+
                 Tuple<CustomErrors, Dictionary<string, CalendarEvent>> ScheduleUpdateMessage = NewSchedule.SetCalendarEventAsNow(myUser.ID);
                 await NewSchedule.UpdateWithProcrastinateSchedule(ScheduleUpdateMessage.Item2).ConfigureAwait(false);
                 retValue = new PostBackData(ScheduleUpdateMessage.Item1);

@@ -344,18 +344,47 @@ namespace TilerFront.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> deleteGoogleAccount(ThirdPartyOut modelData)
+        public async Task<ActionResult> deleteGoogleAccount(ThirdPartyAuthenticationForView modelData)
         {
             ThirdPartyCalendarAuthenticationModel ThirdPartyAuth = db.ThirdPartyAuthentication.Where(obj => obj.ID == modelData.ID).Single();
 
             if (ThirdPartyAuth != null)
             {
-                await ThirdPartyAuth.getGoogleOauthCredentials().RevokeTokenAsync(CancellationToken.None).ConfigureAwait(false);
-                db.ThirdPartyAuthentication.Remove(ThirdPartyAuth);
+                UserCredential googleCredential = ThirdPartyAuth.getGoogleOauthCredentials();
+                try 
+                {
+                    await googleCredential.RefreshTokenAsync(CancellationToken.None).ConfigureAwait(false);
+                    await googleCredential.RevokeTokenAsync(CancellationToken.None).ConfigureAwait(false);
+                    db.ThirdPartyAuthentication.Remove(ThirdPartyAuth);
+                }
+                catch(Exception e)
+                {
+
+                }
+                //await ThirdPartyAuth.getGoogleOauthCredentials().RevokeTokenAsync(CancellationToken.None).ConfigureAwait(false);
+                
                 await db.SaveChangesAsync().ConfigureAwait(false);
             }
 
             return RedirectToAction("ImportCalendar");
+        }
+
+        internal static async Task delelteGoogleAuthentication(IEnumerable<ThirdPartyCalendarAuthenticationModel> AllAuthenticaitonData)
+        {
+
+            List<Task<bool>> AllConcurrentTasks = new List<System.Threading.Tasks.Task<bool>>();
+            
+
+            foreach (ThirdPartyCalendarAuthenticationModel eachThirdPartyCalendarAuthenticationModel in AllAuthenticaitonData)
+            {
+                AllConcurrentTasks.Add(eachThirdPartyCalendarAuthenticationModel.unCommitAuthentication());
+            }
+
+
+            foreach (Task<bool> eachTask in AllConcurrentTasks)
+            {
+                bool UncommitStatus = await eachTask.ConfigureAwait(false);
+            }
         }
 
 

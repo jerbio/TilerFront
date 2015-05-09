@@ -14,7 +14,7 @@ namespace TilerFront.Models
         public bool BrowserRemembered { get; set; }
     }
 
-    public class ThirdPartyOut
+    public class ThirdPartyAuthenticationForView
     {
         [Display(Name = "Calendar Provider")]
         public string ProviderName { get; set; }
