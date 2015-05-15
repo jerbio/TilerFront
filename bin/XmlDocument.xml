@@ -807,7 +807,7 @@
         </member>
         <member name="M:TilerFront.Models.ThirdPartyCalendarAuthenticationModel.unCommitAuthentication">
             <summary>
-            This deletes this authentication tokens from persistent storage. Note this uses the data members from "this" object. Be caustious of refreshAuthenticationToken.
+            This deletes this authentication tokens from persistent storage. Note this uses the data members from "this" object. It revokes the credentials then commits them.
             </summary>
             <returns></returns>
         </member>

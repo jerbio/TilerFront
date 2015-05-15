@@ -232,8 +232,6 @@ body {
   cursor: pointer;
   //width:12.87%;
   transition:all 1s;
-  background-color:rgba(1,1,1,.1);
-  
   overflow:hidden;
   text-align:left;
   text-overflow:ellipsis;
@@ -241,9 +239,18 @@ body {
   white-space:nowrap;
   box-sizing:border-box;
   border:white 1px solid;
-  border-radius:7px;
-  max-width:17px;
-
+}
+.ClassicGridEvents
+{
+    background-color: rgba(244,242,230,1);
+    box-shadow:rgba(20,20,20,.3) 0 0 1px 1px;
+    min-height:50px;
+}
+.SideBar
+{
+    max-width:17px;
+    border-radius:7px;
+    background-color: rgba(1,1,1,.1);
 }
 
 .gridSubeventContainer {
@@ -582,7 +589,7 @@ position: absolute;
     width:100%;
 }
 
-.ListElement 
+.TimeDataFormat 
 {
     width: 100%;
     height: auto;
@@ -590,10 +597,13 @@ position: absolute;
     font-size: 12px;
     overflow: hidden;
     transition: all .1s;
-    left: 100%;
     margin-top: 2px;
 }
 
+.ListElement
+{
+    left: 100%;
+}
 
 .SubEventReferenceName 
 {
@@ -670,6 +680,18 @@ position: absolute;
     left: 3px;
     display: inline-block;
     box-shadow: rgba(10,10,10,0.2) 0px 2px 3px;
+}
+
+.TimeDataContentContainerClassic
+{
+    position: relative;
+    cursor: pointer;
+    width: calc(100% - 17px);
+    //height: 90%;
+    border-radius: 5px;
+    left: 3px;
+    display: inline-block;
+    //box-shadow: rgba(10,10,10,0.2) 0px 2px 3px;
 }
 
 .EventLockImgContainer {
@@ -1206,6 +1228,7 @@ width: auto;
     width:85%;
     left:0;
     padding-top:10px;
+    //display:none;
 }
 
 
@@ -1222,7 +1245,7 @@ width: auto;
     position: relative;
     left: 0;
     width: 14px;
-    height: 18px;
+    height: 46px;/*Derived from height of TimeDataContentContainerClassic*/
     display: inline-block;
     //z-index: 20;
 }

@@ -2809,11 +2809,7 @@ function SendScheduleInformation(NewEvent, CallBack)
         // will be treated as a single string
         //dataType: "json",
         success: function (response) {
-            //alert(response);
-            //var myContainer = (CurrentTheme.getCurrentContainer());
-            //CurrentTheme.TransitionOldContainer();
-            //$(myContainer).empty();
-            //myContainer.outerHTML = "";
+            triggerUndoPanel("Undo addition of \"" + NewEvent.Name+"\"");
             var b = 3;
 
 

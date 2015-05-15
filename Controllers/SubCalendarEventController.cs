@@ -156,9 +156,10 @@ namespace TilerFront.Controllers
                 {
                     case "google":
                         {
+                            DateTimeOffset myNow = myUser.getRefNow();
+                            myNow = DateTimeOffset.UtcNow;
                             
-                            
-                            My24HourTimerWPF.Schedule NewSchedule = new My24HourTimerWPF.Schedule(retrievedUser, myUser.getRefNow());
+                            My24HourTimerWPF.Schedule NewSchedule = new My24HourTimerWPF.Schedule(retrievedUser, myNow);
 
                             Models.ThirdPartyCalendarAuthenticationModel AllIndexedThirdParty = await ScheduleController.getThirdPartyAuthentication(retrievedUser.UserID, myUser.ThirdPartyUserID, 2);
                             GoogleTilerEventControl googleControl = new GoogleTilerEventControl(AllIndexedThirdParty);
@@ -172,7 +173,9 @@ namespace TilerFront.Controllers
                         break;
                     case "tiler":
                         {
-                            My24HourTimerWPF.Schedule NewSchedule = new My24HourTimerWPF.Schedule(retrievedUser, myUser.getRefNow());
+                            DateTimeOffset myNow = myUser.getRefNow();
+                            myNow = DateTimeOffset.UtcNow;
+                            My24HourTimerWPF.Schedule NewSchedule = new My24HourTimerWPF.Schedule(retrievedUser, myNow);
 
                             await ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(NewSchedule, retrievedUser.UserID).ConfigureAwait(false);
 

@@ -179,6 +179,73 @@ namespace TilerFront
 
         #region Write Data
 
+        public void Undo(string LogFile = "")
+        {
+            Task<bool> retValue;
+
+#if ForceReadFromXml
+#else
+            if (useCassandra)
+            {
+                retValue =  myCassandraAccess.Commit(AllEvents);
+                LogDBDataAccess.WriteLatestData(DateTime.Now,Convert.ToInt64( LatestID), ID);
+                bool boolRetValue = await retValue;
+                return boolRetValue;
+            }
+#endif
+
+
+
+            retValue = new Task<bool>(() => { return true; });
+            retValue.Start();
+            string LogFileCopy = "";
+            if (LogFile == "")
+            {
+                LogFile = WagTapLogLocation + CurrentLog;
+                LogFileCopy = WagTapLogLocation + "Copy_" + CurrentLog;
+            }
+
+
+
+            XmlDocument xmldoc = new XmlDocument();
+            XmlDocument xmldocCopy = new XmlDocument();
+            xmldoc.Load(LogFile);
+            try
+            {
+                xmldocCopy.Load(LogFileCopy);
+            }
+            catch
+            {
+                try
+                {
+                    genereateNewLogFile("Copy_" + ID);
+                    xmldocCopy.Load(LogFileCopy);
+                }
+                catch (Exception e)
+                {
+                    Console.Write(e.Message);
+                }
+
+            }
+
+            xmldoc.InnerXml = xmldocCopy.InnerXml;
+
+            while (true)
+            {
+                try
+                {
+                    xmldoc.Save(LogFile);
+                    xmldocCopy.Save(LogFileCopy);
+                    break;
+                }
+                catch (Exception e)
+                {
+                    Thread.Sleep(160);
+                }
+            }
+
+        }
+
         public CustomErrors genereateNewLogFile(string UserID)//creates a new xml log file. Uses the passed UserID
         {
             

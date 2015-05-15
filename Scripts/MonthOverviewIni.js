@@ -11,10 +11,11 @@ var global_CurrentRange;
 var global_ClearRefreshDataInterval = 0;
 var global_ColorAugmentation = 0;
 var refreshCounter = 1000000;
-var global_refreshDataInterval = 60000;
+var global_refreshDataInterval = 600000;
 var global_multiSelect;
 var global_ControlPanelIconSet = new IconSet();
 var global_GoToDay;
+var global_UISetup = {RenderOnSubEventClick:null,RenderSubEvent:null,RenderTimeInformation:null, ConflictCalculation:null}
 $(global_ControlPanelIconSet.getIconSetContainer()).addClass("ControlPanelIconSetContainer");
 
 $(document).ready(function () {
@@ -22,8 +23,22 @@ $(document).ready(function () {
     $('body').hide();
     InitializeMonthlyOverview();
     MenuManger();
+
+
+    var UIOptions = { RenderOnSubEventClick: renderClassicSubEventsClickEvents, RenderSubEvent: renderClassicSubEventLook, RenderTimeInformation: RenderTimeInformationClassic, ConflictCalculation: DoSideBarsConflictClassic }
+    //var UIOptions = { RenderOnSubEventClick: renderSubEventsClickEvents, RenderSubEvent: renderSideBarEvents,RenderTimeInformation: RenderListTimeInformation, ConflictCalculation: DoSideBarsInterSect }
+    UpdateUISetup(UIOptions)
 });
 
+
+function UpdateUISetup(UIOptions)
+{
+    global_UISetup.RenderSubEvent = UIOptions.RenderSubEvent;
+    global_UISetup.RenderOnSubEventClick = UIOptions.RenderOnSubEventClick;
+    global_UISetup.ConflictCalculation = UIOptions.ConflictCalculation;
+    global_UISetup.RenderTimeInformation = UIOptions.RenderTimeInformation;
+
+}
 
 function MenuManger()
 {
@@ -63,6 +78,160 @@ function MenuManger()
         //var logoutForm = getDomOrCreateNew("logoutForm");
         document.forms["logoutForm"].submit();
     }
+}
+
+function RenderTimeInformationClassic(DayOfWeek, ID) {
+    var RefSubEvent = global_DictionaryOfSubEvents[ID];
+    var TopPixels = ((DayOfWeek.UISpecs[ID].css.top / 100) * global_DayHeight) + global_DayTop;
+
+    var ListElementContainer = getDomOrCreateNew("SubEventReference" + ID);
+    ListElementContainer.setAttribute("draggable", true);
+    ListElementContainer.ondragstart = OnDragStartOfSubEvent;
+    //ListElementContainer.ondrop = OnDropOfSubEvent;
+    //ListElementContainer.ondragstart = OnDragStartOfSubEvent;
+    //ListElementContainer.ondragstart = OnDragStartOfSubEvent;
+    $(ListElementContainer.Dom).addClass("TimeDataFormat");
+    RefSubEvent.gridDoms.push(ListElementContainer.Dom)//Adds the List element as list of candidates to be deleted
+    DayOfWeek.UISpecs[ID].refrenceListElement = ListElementContainer;
+
+    var TimeDataPerListElement = getDomOrCreateNew("SubEventReferenceTime" + ID);
+    var BottomPanelListElement = getDomOrCreateNew("SubEventReferenceBottomPanel" + ID);
+    $(BottomPanelListElement.Dom).addClass("SubEventReferenceBottomPanel");
+
+    var CalendarTypeContainer = getDomOrCreateNew("SubEventReferenceCalType" + ID);
+    var CalendarTypeCalImage = getDomOrCreateNew("SubEventReferenceCalImg" + ID);
+
+    $(CalendarTypeCalImage.Dom).addClass("SubEventReferenceCalImg");
+    $(CalendarTypeCalImage.Dom).addClass(RefSubEvent.ThirdPartyType + "Icon");
+    $(CalendarTypeContainer.Dom).addClass("SubEventReferenceCalType");
+
+    CalendarTypeContainer.appendChild(CalendarTypeCalImage);
+
+    var NameDataPerListElement = getDomOrCreateNew("SubEventReferenceName" + ID);
+
+    BottomPanelListElement.appendChild(CalendarTypeContainer);
+    BottomPanelListElement.appendChild(TimeDataPerListElement);
+
+    
+    //$(obj).addClass("ListElements");
+    NameDataPerListElement.Dom.innerHTML = RefSubEvent.Name;
+    TimeDataPerListElement.Dom.innerHTML = getTimeStringFromDate(RefSubEvent.SubCalStartDate) + " - " + getTimeStringFromDate(RefSubEvent.SubCalEndDate);
+    $(NameDataPerListElement.Dom).addClass("SubEventReferenceName");
+    $(TimeDataPerListElement.Dom).addClass("SubEventReferenceTime");
+
+
+
+
+    var ListElementDataContentContainer = getDomOrCreateNew("ListElementDataContentContainer" + ID);
+    $(ListElementDataContentContainer.Dom).addClass("TimeDataContentContainerClassic");
+    ListElementDataContentContainer.Dom.appendChild(NameDataPerListElement.Dom);
+    ListElementDataContentContainer.Dom.appendChild(BottomPanelListElement.Dom);
+
+    
+
+
+    var myBool = (RefSubEvent.SubCalRigid)
+    if (myBool)
+    {
+        var EventLockContainer = getDomOrCreateNew("EventLockContainer" + ID);
+        $(EventLockContainer.Dom).addClass("EventLockContainer");
+        var EventLockImgContainer = getDomOrCreateNew("EventLockImgContainer" + ID);
+        $(EventLockImgContainer.Dom).addClass("EventLockImgContainer");
+        EventLockContainer.Dom.appendChild(EventLockImgContainer.Dom);
+        ListElementContainer.Dom.appendChild(EventLockContainer.Dom);
+        $(EventLockImgContainer.Dom).addClass("LockedIcon");
+    }
+    
+    ListElementContainer.Dom.appendChild(ListElementDataContentContainer.Dom);
+
+    //RefSubEvent.TimeSizeDom.appendChild(ListElementDataContentContainer);
+    //DayOfWeek.UISpecs[ID].DataElement = ListElementDataContentContainer
+    RefSubEvent.TimeSizeDom.appendChild(ListElementContainer);
+
+    var HeightPx = (DayOfWeek.UISpecs[ID].css.height / 100) * global_DayHeight;
+    HeightPx = HeightPx < 50 ? 50 : HeightPx;
+    var EndPixelTop = TopPixels + HeightPx;
+    ///BestBottom is data on tab a level which ends before myData. BestBottom.Count data member is the level, BestBOttom.End is the end pixel of this base tab
+    var RetValue = { Start: DayOfWeek.UISpecs[ID].Start, CalCCount: 0, Data: DayOfWeek.UISpecs[ID], ID: ID, BestBottom: { End: 10000, Count: 0 }, Count: 0, EarlierCount: 0, top: TopPixels, end: EndPixelTop}
+    return RetValue;
+
+}
+
+function RenderListTimeInformation(DayOfWeek, ID)
+{
+    var RefSubEvent = global_DictionaryOfSubEvents[ID];
+    var TopPixels = ((DayOfWeek.UISpecs[ID].css.top / 100) * global_DayHeight) + global_DayTop;
+    var ListElementContainer = getDomOrCreateNew("SubEventReference" + ID);
+    ListElementContainer.setAttribute("draggable", true);
+    ListElementContainer.ondragstart = OnDragStartOfSubEvent;
+    //ListElementContainer.ondrop = OnDropOfSubEvent;
+    //ListElementContainer.ondragstart = OnDragStartOfSubEvent;
+    //ListElementContainer.ondragstart = OnDragStartOfSubEvent;
+    $(ListElementContainer.Dom).addClass("TimeDataFormat");
+    $(ListElementContainer.Dom).addClass("ListElement");
+    RefSubEvent.gridDoms.push(ListElementContainer.Dom)//Adds the List element as list of candidates to be deleted
+    DayOfWeek.UISpecs[ID].refrenceListElement = ListElementContainer;
+    var TimeDataPerListElement = getDomOrCreateNew("SubEventReferenceTime" + ID);
+    var BottomPanelListElement = getDomOrCreateNew("SubEventReferenceBottomPanel" + ID);
+    $(BottomPanelListElement.Dom).addClass("SubEventReferenceBottomPanel");
+
+    var CalendarTypeContainer = getDomOrCreateNew("SubEventReferenceCalType" + ID);
+    var CalendarTypeCalImage = getDomOrCreateNew("SubEventReferenceCalImg" + ID);
+
+    $(CalendarTypeCalImage.Dom).addClass("SubEventReferenceCalImg");
+    $(CalendarTypeCalImage.Dom).addClass(RefSubEvent.ThirdPartyType + "Icon");
+    $(CalendarTypeContainer.Dom).addClass("SubEventReferenceCalType");
+
+    CalendarTypeContainer.appendChild(CalendarTypeCalImage);
+
+    var NameDataPerListElement = getDomOrCreateNew("SubEventReferenceName" + ID);
+
+    BottomPanelListElement.appendChild(CalendarTypeContainer);
+    BottomPanelListElement.appendChild(TimeDataPerListElement);
+
+    $(ListElementContainer.Dom).addClass("selectedDayElements");
+    // $(ListElementContainer.Dom).removeClass("ListElements");
+    //$(obj).addClass("ListElements");
+    NameDataPerListElement.Dom.innerHTML = RefSubEvent.Name;
+    TimeDataPerListElement.Dom.innerHTML = getTimeStringFromDate(RefSubEvent.SubCalStartDate) + " - " + getTimeStringFromDate(RefSubEvent.SubCalEndDate);
+    $(NameDataPerListElement.Dom).addClass("SubEventReferenceName");
+    $(TimeDataPerListElement.Dom).addClass("SubEventReferenceTime");
+
+
+
+
+    var ListElementDataContentContainer = getDomOrCreateNew("ListElementDataContentContainer" + ID);
+    $(ListElementDataContentContainer.Dom).addClass("ListElementDataContentContainer");
+    ListElementDataContentContainer.Dom.appendChild(NameDataPerListElement.Dom);
+    ListElementDataContentContainer.Dom.appendChild(BottomPanelListElement.Dom);
+
+    RefSubEvent.gridDoms.push(ListElementDataContentContainer.Dom)
+
+
+    var EventLockContainer = getDomOrCreateNew("EventLockContainer" + ID);
+    $(EventLockContainer.Dom).addClass("EventLockContainer");
+    var myBool = (RefSubEvent.SubCalRigid)
+    var EventLockImgContainer = getDomOrCreateNew("EventLockImgContainer" + ID);
+    $(EventLockImgContainer.Dom).addClass("EventLockImgContainer");
+    if (myBool) {
+        $(EventLockImgContainer.Dom).addClass("LockedIcon");
+    }
+
+    EventLockContainer.Dom.appendChild(EventLockImgContainer.Dom)
+
+
+    ListElementContainer.Dom.appendChild(EventLockContainer.Dom);
+    ListElementContainer.Dom.appendChild(ListElementDataContentContainer.Dom);
+
+    DayOfWeek.UISpecs[ID].DataElement = ListElementDataContentContainer
+    RefSubEvent.ListRefElement = ListElementContainer;
+
+    var HeightPx = (DayOfWeek.UISpecs[ID].css.height / 100) * global_DayHeight;
+    var EndPixelTop = TopPixels + HeightPx;
+    ///BestBottom is data on tab a level which ends before myData. BestBottom.Count data member is the level, BestBOttom.End is the end pixel of this base tab
+    var RetValue= { Start: DayOfWeek.UISpecs[ID].Start, CalCCount: 0, Data: DayOfWeek.UISpecs[ID], ID: ID, BestBottom: { End: 10000, Count: 0 }, Count: 0, EarlierCount: 0, top: TopPixels, end: EndPixelTop, refSubEvent: ListElementContainer }
+    return RetValue;
+
 }
 /*
 Add Close button to the given element. Container is Dom element to which you want to add a close button. if you want to the close button to be on the top left set LeftPosition to true
@@ -142,7 +311,7 @@ function RevealControlPanelSection(SelectedEvents)
 
     hideControlInfoContainer();
     $(MultiSelectPanel).removeClass("hideMultiSelectPanel");
-    renderSubEventsClickEvents.BottomPanelIsOpen = true;
+    global_UISetup.RenderOnSubEventClick.BottomPanelIsOpen = true;
     ControlPanelContainer.appendChild(IconSetContainer);
 
     $(global_ControlPanelIconSet.getIconSetContainer())
@@ -182,7 +351,7 @@ function RevealControlPanelSection(SelectedEvents)
         completeButton.onclick = null;
         $('#ControlPanelContainer').slideUp(500);
         $(MultiSelectPanel).addClass("hideMultiSelectPanel");
-        renderSubEventsClickEvents.BottomPanelIsOpen = false;
+        global_UISetup.RenderOnSubEventClick.BottomPanelIsOpen = false;
         document.removeEventListener("keydown", containerKeyPress);
         $(ControlPanelProcrastinateButton).removeClass("setAsDisplayNone");
         $(RevealControlPanelSection.IconSet.getLocationButton()).removeClass("setAsDisplayNone");
@@ -255,6 +424,7 @@ function RevealControlPanelSection(SelectedEvents)
                 // will be treated as a single string
                 success: function (response) {
                     exitSendMessage()
+                    triggerUndoPanel("Undo deletion?");
                 },
                 error: function () {
                     var NewMessage = "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
@@ -324,7 +494,7 @@ function RevealControlPanelSection(SelectedEvents)
                     else {
                         alert("error detected with marking as complete");
                     }
-
+                    triggerUndoPanel("Undo");
                 },
                 error: function (err) {
                     var myError = err;
@@ -1279,80 +1449,11 @@ getRefreshedData.enableDataRefresh = function (pullLatest)
         var Now = new Date();
         for (var ID in DayOfWeek.UISpecs)
         {
-            var TopPixels = ((DayOfWeek.UISpecs[ID].css.top / 100) * global_DayHeight) + global_DayTop;
+            
             if (DayOfWeek.UISpecs[ID].Enabled)
             {
                 
-                var RefSubEvent = global_DictionaryOfSubEvents[ID];
-
-                var ListElementContainer = getDomOrCreateNew("SubEventReference" + ID);
-                ListElementContainer.setAttribute("draggable", true);
-                ListElementContainer.ondragstart = OnDragStartOfSubEvent;
-                //ListElementContainer.ondrop = OnDropOfSubEvent;
-                //ListElementContainer.ondragstart = OnDragStartOfSubEvent;
-                //ListElementContainer.ondragstart = OnDragStartOfSubEvent;
-                $(ListElementContainer.Dom).addClass("ListElement");
-                RefSubEvent.gridDoms.push(ListElementContainer.Dom)//Adds the List element as list of candidates to be deleted
-                DayOfWeek.UISpecs[ID].refrenceListElement =ListElementContainer;
-                var TimeDataPerListElement = getDomOrCreateNew("SubEventReferenceTime" + ID);
-                var BottomPanelListElement = getDomOrCreateNew("SubEventReferenceBottomPanel" + ID);
-                $(BottomPanelListElement.Dom).addClass("SubEventReferenceBottomPanel");
-
-                var CalendarTypeContainer = getDomOrCreateNew("SubEventReferenceCalType" + ID);
-                var CalendarTypeCalImage = getDomOrCreateNew("SubEventReferenceCalImg" + ID);
-
-                $(CalendarTypeCalImage.Dom).addClass("SubEventReferenceCalImg");
-                $(CalendarTypeCalImage.Dom).addClass(RefSubEvent.ThirdPartyType+"Icon");
-                $(CalendarTypeContainer.Dom).addClass("SubEventReferenceCalType");
-
-                CalendarTypeContainer.appendChild(CalendarTypeCalImage);
-
-                var NameDataPerListElement = getDomOrCreateNew("SubEventReferenceName" + ID);
-
-                BottomPanelListElement.appendChild(CalendarTypeContainer);
-                BottomPanelListElement.appendChild(TimeDataPerListElement);
-                
-                $(ListElementContainer.Dom).addClass("selectedDayElements");
-               // $(ListElementContainer.Dom).removeClass("ListElements");
-                //$(obj).addClass("ListElements");
-                NameDataPerListElement.Dom.innerHTML = RefSubEvent.Name;
-                TimeDataPerListElement.Dom.innerHTML = getTimeStringFromDate(RefSubEvent.SubCalStartDate) + " - " + getTimeStringFromDate(RefSubEvent.SubCalEndDate);
-                $(NameDataPerListElement.Dom).addClass("SubEventReferenceName");
-                $(TimeDataPerListElement.Dom).addClass("SubEventReferenceTime");
-                
-
-                
-
-                var ListElementDataContentContainer = getDomOrCreateNew("ListElementDataContentContainer" + ID);
-                $(ListElementDataContentContainer.Dom).addClass("ListElementDataContentContainer");
-                ListElementDataContentContainer.Dom.appendChild(NameDataPerListElement.Dom);
-                ListElementDataContentContainer.Dom.appendChild(BottomPanelListElement.Dom);
-                
-                RefSubEvent.gridDoms.push(ListElementDataContentContainer.Dom)
-                
-
-                var EventLockContainer = getDomOrCreateNew("EventLockContainer" + ID);
-                $(EventLockContainer.Dom).addClass("EventLockContainer");
-                var myBool = (RefSubEvent.SubCalRigid)
-                var EventLockImgContainer = getDomOrCreateNew("EventLockImgContainer" + ID);
-                $(EventLockImgContainer.Dom).addClass("EventLockImgContainer");
-                if (myBool) {
-                    $(EventLockImgContainer.Dom).addClass("LockedIcon");
-                }
-
-                EventLockContainer.Dom.appendChild(EventLockImgContainer.Dom)
-                
-
-                ListElementContainer.Dom.appendChild(EventLockContainer.Dom);
-                ListElementContainer.Dom.appendChild(ListElementDataContentContainer.Dom);
-                
-                DayOfWeek.UISpecs[ID].DataElement=ListElementDataContentContainer
-                RefSubEvent.ListRefElement = ListElementContainer;
-
-                var HeightPx = (DayOfWeek.UISpecs[ID].css.height / 100) * global_DayHeight;
-                var EndPixelTop = TopPixels + HeightPx;
-                ///BestBottom is data on tab a level which ends before myData. BestBottom.Count data member is the level, BestBOttom.End is the end pixel of this base tab
-                var myData = { Start: DayOfWeek.UISpecs[ID].Start, CalCCount: 0, Data: DayOfWeek.UISpecs[ID], ID: ID, BestBottom: { End: 10000, Count: 0 }, Count: 0, top: TopPixels, end: EndPixelTop, refSubEvent: ListElementContainer }
+                var myData=global_UISetup. RenderTimeInformation(DayOfWeek,ID);
                 IntersectingArrayData.push(myData);
             }
         }
@@ -1391,7 +1492,7 @@ getRefreshedData.enableDataRefresh = function (pullLatest)
                 var EndPixelTop =IntersectingArrayData[i].end;
                 //IntersectingArrayData[i].BestBottom.End = EndPixelTop
 
-                if (DoIInterSect(EndPixelTop, i, IntersectingArrayData))
+                if (global_UISetup.ConflictCalculation(EndPixelTop, i, IntersectingArrayData))
                 {
                     widthSubtraction += 10;
                 }
@@ -1433,15 +1534,12 @@ getRefreshedData.enableDataRefresh = function (pullLatest)
 
                 //DayOfWeek.FullDayContext.Dom.appendChild(DayOfWeek.UISpecs[ID].Dom);
                 DayOfWeek.WeekRenderPlane.appendChild(DayOfWeek.UISpecs[ID].Dom);
-                if ((Now >= DayOfWeek.Start) && (Now < DayOfWeek.End))
-                {
-                    $(DayOfWeek.UISpecs[ID].refrenceListElement.Dom).addClass("selectedDayElements");
-                }
-                DayOfWeek.renderPlane.Dom.appendChild(DayOfWeek.UISpecs[ID].refrenceListElement.Dom)
+                
+                
                 $(DayOfWeek.UISpecs[ID].Dom).show();
                 var CallBackLaterData = { ID: ID, Index: i };
                 CallPrepSyncLater.push(CallBackLaterData);
-                //setTimeout(prepUiSlideFunc(DayOfWeek, ID, IntersectingArrayData, i, MaxTabbingIndex), 200 * ++a);
+                //setTimeout(renderSideBarEvents(DayOfWeek, ID, IntersectingArrayData, i, MaxTabbingIndex), 200 * ++a);
                 DayOfWeek.maxIndex = global_ListOfDayCounter;
 
             }
@@ -1455,7 +1553,7 @@ getRefreshedData.enableDataRefresh = function (pullLatest)
         for (var i = 0 ; i < CallPrepSyncLater.length; i++)
         {
             var CallBackLaterData = CallPrepSyncLater[i]
-            setTimeout(prepUiSlideFunc(DayOfWeek, CallBackLaterData.ID, IntersectingArrayData, CallBackLaterData.Index, MaxTabbingIndex), 200 * ++a);
+            setTimeout(global_UISetup.RenderSubEvent(DayOfWeek, CallBackLaterData.ID, IntersectingArrayData, CallBackLaterData.Index, MaxTabbingIndex), 200 * ++a);
         }
         return;
     }
@@ -1517,7 +1615,7 @@ getRefreshedData.enableDataRefresh = function (pullLatest)
     {
         return function ()
         {
-            if (!renderSubEventsClickEvents.isRefListSubEventClicked) {
+            if (!global_UISetup.RenderOnSubEventClick.isRefListSubEventClicked) {
                 global_ExitManager.triggerLastExitAndPop();
             }
             else
@@ -1617,7 +1715,7 @@ getRefreshedData.enableDataRefresh = function (pullLatest)
     
     var global_ListOfDayCounter = 0;
 
-    function DoIInterSect(MeEnd, Index, AllElements)
+    function DoSideBarsInterSect(MeEnd, Index, AllElements)
     {
         var retValue = false;
         MeEnd = MeEnd.toFixed(2);
@@ -1628,8 +1726,11 @@ getRefreshedData.enableDataRefresh = function (pullLatest)
             var PossibleInterferringTop = PossibleInterferringElement.top.toFixed(2);
             if (PossibleInterferringTop < MeEnd)
             {
+                //++Me.Count;
                 PossibleInterferringElement.CalCCount = Me.CalCCount + 1;
-                PossibleInterferringElement.Count = PossibleInterferringElement.CalCCount
+                PossibleInterferringElement.Count = PossibleInterferringElement.CalCCount;
+                PossibleInterferringElement.EarlierCount = PossibleInterferringElement.Count
+
 
                 ///*// #### Note for revert to simplest tabbing enable on this comment block
                 ///BestBottom is data on tab level which ends before Me. BestBottom.Count data member is the of the level, BestBOttom.End is the end pixel
@@ -1647,6 +1748,10 @@ getRefreshedData.enableDataRefresh = function (pullLatest)
                 ///*/
                 retValue = true;
             }
+            else
+            {
+                break;
+            }
 
 
             /*
@@ -1660,6 +1765,72 @@ getRefreshedData.enableDataRefresh = function (pullLatest)
     }
 
 
+
+
+    function DoSideBarsConflictClassic(MeEnd, Index, AllElements) {
+        var retValue = false;
+        MeEnd = MeEnd.toFixed(2);
+        var Me = AllElements[Index];
+        for (var i = Index + 1; i < AllElements.length; i++) {
+            var PossibleInterferringElement = AllElements[i];
+            var PossibleInterferringTop = PossibleInterferringElement.top.toFixed(2);
+            if (PossibleInterferringTop < MeEnd) {
+                ++Me.Count;
+                PossibleInterferringElement.CalCCount = Me.CalCCount + 1;
+                PossibleInterferringElement.Count = PossibleInterferringElement.CalCCount;
+                PossibleInterferringElement.EarlierCount = PossibleInterferringElement.Count
+
+
+                ///*// #### Note for revert to simplest tabbing enable on this comment block
+                ///BestBottom is data on tab level which ends before Me. BestBottom.Count data member is the of the level, BestBOttom.End is the end pixel
+                if (PossibleInterferringElement.BestBottom.End > MeEnd) {
+                    PossibleInterferringElement.BestBottom.End = MeEnd
+                    PossibleInterferringElement.BestBottom.Count = Me.Count;
+                }
+                if (PossibleInterferringTop >= Me.BestBottom.End)//checks to see if the conflicting Event can go to same level as the BestBottom of Me
+                {
+                    PossibleInterferringElement.Count = Me.BestBottom.Count
+                    Me.BestBottom.End = PossibleInterferringElement.end;
+                    PossibleInterferringElement.CalCCount = Me.CalCCount;
+                }
+                ///*/
+                retValue = true;
+            }
+            else {
+                break;
+            }
+
+
+            /*
+            if (AllElements[Index].BestBottom.End <= myTop) {
+                AllElements[i].Count = AllElements[Index].BestBottom.Count;
+                AllElements[Index].BestBottom.End = End
+            }*/
+        }
+
+        return retValue;
+    }
+
+
+    function DoSubEventsIntersect(MeEnd, Index, AllElements)
+    {
+        var retValue = false;
+        MeEnd = MeEnd.toFixed(2);
+        var Me = AllElements[Index];
+        for (var i = Index+1; i < AllElements.length; i++)
+        {
+            var PossibleInterferringElement = AllElements[i];
+            var PossibleInterferringTop = PossibleInterferringElement.top.toFixed(2);
+            if (PossibleInterferringTop < MeEnd)
+            {
+                PossibleInterferringElement.CalCCount = Me.CalCCount + 1;
+                PossibleInterferringElement.Count = PossibleInterferringElement.CalCCount
+
+            }
+        }
+    }
+    
+
     function HighlightSubEvent(Dom)
     {
         $(Dom).addClass("selectedElements");
@@ -1669,76 +1840,102 @@ function dehighlightSubEvent(Dom)
 {
     $(Dom).removeClass("selectedElements");
 }
-function prepUiSlideFunc(DayOfWeek, ID, MyArray, Index, TabCount)
+
+function renderClassicSubEventLook(DayOfWeek, ID, MyArray, Index, TabCount)
 {
     return function () {
-        //DayOfWeek.UISpecs[ID].Dom.style.left = DayOfWeek.LeftPercent + DayOfWeek.widtPct + "%";
-        /*
-        * DayOfWeek.UISpecs[ID].Dom is the left bar element
-        * DayOfWeek.UISpecs[ID].refrenceListElement is the list element
-        */
-        var GridSubEventWidth = prepUiSlideFunc.SubEventGridWidthContainer / TabCount;
+        //debugger;
+        var GridSubEventWidth = renderClassicSubEventLook.PercentWidthOfDay;// / TabCount;
         //DayOfWeek.UISpecs[ID].Dom.style.left = "100%";
-        DayOfWeek.UISpecs[ID].Dom.style.left = (DayOfWeek.RightPercent - GridSubEventWidth )+ "%"
-        DayOfWeek.UISpecs[ID].Dom.style.height = DayOfWeek.UISpecs[ID].css.height + "%";
-        //DayOfWeek.UISpecs[ID].Dom.style.minHeight = (global_DayHeight * (1 / 24)) + "px";//1/24 because we want the minimum to be the size of an hour
+        var RefEvent = DayOfWeek.UISpecs[ID]
 
-        //DayOfWeek.UISpecs[ID].Dom.style.marginLeft = (-(DayOfWeek.UISpecs[ID].css.left + 18) + "px");
-        DayOfWeek.UISpecs[ID].Dom.style.marginLeft = (-(GridSubEventWidth * MyArray[Index].Count) + "%");
-        DayOfWeek.UISpecs[ID].Dom.style.width = GridSubEventWidth+"%";
+        var ArrayElement = MyArray[Index];
+        var LeftPercent = DayOfWeek.LeftPercent;
+        var LeftShift = ArrayElement.EarlierCount * 2;
+        LeftShift = LeftShift > 12 ? 8 : LeftShift;
+        LeftPercent = LeftPercent + LeftShift;
+        var myCount = ArrayElement.Count 
+        //var DomWidth = (GridSubEventWidth - (2 + LeftShift))
+        var DomWidth = (GridSubEventWidth - 2 )
+        //DayOfWeek.UISpecs[ID].Dom.style.left = (LeftPercent + 1) + "%"
+        DomWidth -= (myCount * 2);
+        $(RefEvent.Dom).addClass("ClassicGridEvents");
+        RefEvent.Dom.style.left = (LeftPercent + 1) + "%"
+        RefEvent.Dom.style.height = RefEvent.css.height + "%";
+
+        RefEvent.Dom.style.width = (DomWidth) + "%";
         //DayOfWeek.UISpecs[ID].Dom.style.width = DayOfWeek.UISpecs[ID].css.width + "%";
-        DayOfWeek.UISpecs[ID].Dom.style.top = DayOfWeek.UISpecs[ID].css.top + "%";
-        if (DayOfWeek.UISpecs[ID].IDindex ==0) {
+        RefEvent.Dom.style.top = RefEvent.css.top + "%";
+        //var BindToThis = function () { };
+        var Range = global_DictionaryOfSubEvents[ID].Day;
+        global_DictionaryOfSubEvents[ID].Bind = function () { };
+
+        //if statement ensures that only elements with IDIndex generate the function. This ensures that the selected element shows on the left side of the page.
+        /*if ((global_DictionaryOfSubEvents[ID].Bind == null) && (RefEvent.IDindex == 0)) {
+            
+        }*/
+        function call_renderSubEventsClickEvents(e) {
+            e.stopPropagation();
+            if (e.ctrlKey) {
+                global_multiSelect.AddElement(ID);
+                return;
+            }
+            renderClassicSubEventsClickEvents(ID)
+        }
+    }
+
+}
+renderClassicSubEventLook.PercentWidthOfDay = (100 / 7) -1.5;
+
+
+function renderSideBarEvents(DayOfWeek, ID, MyArray, Index, TabCount)
+{
+    return function () {
+        var RefEvent = DayOfWeek.UISpecs[ID];
+
+        var GridSubEventWidth = renderSideBarEvents.SubEventGridWidthContainer / TabCount;
+        DayOfWeek.renderPlane.Dom.appendChild(DayOfWeek.UISpecs[ID].refrenceListElement.Dom)
+        $(RefEvent.Dom).addClass("SideBar");
+        RefEvent.Dom.style.left = (DayOfWeek.RightPercent - GridSubEventWidth )+ "%"
+        RefEvent.Dom.style.height = RefEvent.css.height + "%";
+        //RefEvent.Dom.style.minHeight = (global_DayHeight * (1 / 24)) + "px";//1/24 because we want the minimum to be the size of an hour
+
+        //RefEvent.Dom.style.marginLeft = (-(RefEvent.css.left + 18) + "px");
+        RefEvent.Dom.style.marginLeft = (-(GridSubEventWidth * MyArray[Index].Count) + "%");
+        RefEvent.Dom.style.width = GridSubEventWidth+"%";
+        //RefEvent.Dom.style.width = RefEvent.css.width + "%";
+        RefEvent.Dom.style.top = RefEvent.css.top + "%";
+        if (RefEvent.IDindex ==0) {
             //triggers change to List elements UI elements
-                //DayOfWeek.UISpecs[ID].refrenceListElement.Dom.style.top = (Index * 20) + "px";
-                //DayOfWeek.UISpecs[ID].refrenceListElement.Dom.style.marginTop = (20) + "px";
-                $(DayOfWeek.UISpecs[ID].refrenceListElement.Dom).removeClass("FullColorAugmentation");
-            //DayOfWeek.UISpecs[ID].refrenceListElement.Dom.style.left = DayOfWeek.LeftPercent + "%";
-                DayOfWeek.UISpecs[ID].refrenceListElement.Dom.style.left = 0;
+                //RefEvent.refrenceListElement.Dom.style.top = (Index * 20) + "px";
+                //RefEvent.refrenceListElement.Dom.style.marginTop = (20) + "px";
+                $(RefEvent.refrenceListElement.Dom).removeClass("FullColorAugmentation");
+            //RefEvent.refrenceListElement.Dom.style.left = DayOfWeek.LeftPercent + "%";
+                RefEvent.refrenceListElement.Dom.style.left = 0;
             if (global_DictionaryOfSubEvents[ID].ColorSelection > 0) {
-                //$(DayOfWeek.UISpecs[ID].refrenceListElement.Dom).addClass(global_AllColorClasses[global_DictionaryOfSubEvents[ID].ColorSelection].cssClass);
-                $(DayOfWeek.UISpecs[ID].DataElement.Dom).addClass(global_AllColorClasses[global_DictionaryOfSubEvents[ID].ColorSelection].cssClass);
+                //$(RefEvent.refrenceListElement.Dom).addClass(global_AllColorClasses[global_DictionaryOfSubEvents[ID].ColorSelection].cssClass);
+                $(RefEvent.DataElement.Dom).addClass(global_AllColorClasses[global_DictionaryOfSubEvents[ID].ColorSelection].cssClass);
         }
 
     }
-        var BindToThis = BindClickOfSideBarToCLick(MyArray, DayOfWeek.UISpecs[ID], Index, DayOfWeek.UISpecs[ID].Dom,ID);
+        var BindToThis = BindClickOfSideBarToCLick(MyArray, RefEvent, Index, RefEvent.Dom,ID);
         var Range = global_DictionaryOfSubEvents[ID].Day;
-        DayOfWeek.UISpecs[ID].refrenceListElement.Dom.onmouseover = function () {
+        RefEvent.refrenceListElement.Dom.onmouseover = function () {
             //debugger;
             Range.Parent.onmouseover();
         }
 
-        DayOfWeek.UISpecs[ID].refrenceListElement.Dom.onmouseout = function () {
+        RefEvent.refrenceListElement.Dom.onmouseout = function () {
             //debugger;
             Range.Parent.onmouseout();
         }
 
 
         //if statement ensures that only elements with IDIndex generate the function. This ensures that the selected element shows on the left side of the page.
-        if ((global_DictionaryOfSubEvents[ID].Bind == null) && (DayOfWeek.UISpecs[ID].IDindex == 0)) {
+        if ((global_DictionaryOfSubEvents[ID].Bind == null) && (RefEvent.IDindex == 0)) {
             global_DictionaryOfSubEvents[ID].Bind = BindToThis;
     }
-        /*
-        function triggerClick(e) {
-            if(e!=null)
-            {
-                e.stopPropagation();
-            }
-            global_DictionaryOfSubEvents[ID].Bind()
-        };
-        //$(DayOfWeek.UISpecs[ID].Dom).click(triggerClick);
-        (DayOfWeek.UISpecs[ID].Dom).onclick=(triggerClick);
 
-        $(DayOfWeek.UISpecs[ID].refrenceListElement.Dom).click
-        (
-            function (e) 
-            { 
-                e.stopPropagation();
-                triggerClick();
-                //$(DayOfWeek.UISpecs[ID].Dom).trigger("click");
-            }
-        )//clicking of the named element triggers a click on the
-        */
 
         function call_renderSubEventsClickEvents(e)
         {
@@ -1748,14 +1945,14 @@ function prepUiSlideFunc(DayOfWeek, ID, MyArray, Index, TabCount)
                 global_multiSelect.AddElement(ID);
                 return;
             }
-            renderSubEventsClickEvents(ID)
+            global_UISetup.RenderOnSubEventClick(ID)
         }
-        DayOfWeek.UISpecs[ID].refrenceListElement.Dom.onclick = call_renderSubEventsClickEvents;
+        RefEvent.refrenceListElement.Dom.onclick = call_renderSubEventsClickEvents;
     }
 
 }
-prepUiSlideFunc.PercentWidthOfDay = 100 / 7;
-prepUiSlideFunc.SubEventGridWidthContainer = (100 / 7) * (0.15);//0.15 be cause the SubEventListContainer uses a width of 85%
+renderSideBarEvents.PercentWidthOfDay = 100 / 7;
+renderSideBarEvents.SubEventGridWidthContainer = (100 / 7) * (0.15);//0.15 be cause the SubEventListContainer uses a width of 85%
 
 
 
@@ -1763,7 +1960,7 @@ function renderSubEventsClickEvents(SubEventID)
 {
     global_DictionaryOfSubEvents[SubEventID].Bind();
     global_DictionaryOfSubEvents[SubEventID].showBottomPanel();
-
+    
     var DayContainer=global_DictionaryOfSubEvents[SubEventID].Day
     var refSubEvent = global_DictionaryOfSubEvents[SubEventID].ListRefElement
     setTimeout(function () { PositionIconSet(DayContainer, refSubEvent) },10);
@@ -1771,6 +1968,18 @@ function renderSubEventsClickEvents(SubEventID)
 renderSubEventsClickEvents.BottomPanelIsOpen = false;
 renderSubEventsClickEvents.isRefListSubEventClicked = false;
 
+
+
+function renderClassicSubEventsClickEvents(SubEventID) {
+    global_DictionaryOfSubEvents[SubEventID].Bind();
+    global_DictionaryOfSubEvents[SubEventID].showBottomPanel();
+
+    var DayContainer = global_DictionaryOfSubEvents[SubEventID].Day
+    var refSubEvent = global_DictionaryOfSubEvents[SubEventID].TimeSizeDom
+    setTimeout(function () { PositionIconSet(DayContainer, refSubEvent) }, 10);
+}
+renderClassicSubEventsClickEvents.BottomPanelIsOpen = false;
+renderClassicSubEventsClickEvents.isRefListSubEventClicked = false;
 
 
         function renderUIChanges(DayOfWeek) {
@@ -2351,7 +2560,8 @@ generateAMonthBar.counter = 0;
         var percentTop = ((referenceStart - new Date(Range.Start)) / OneDayInMs) * 100;
             function call_renderSubEventsClickEvents(e) {
             e.stopPropagation();
-            renderSubEventsClickEvents(SubEvent.ID)
+            //renderSubEventsClickEvents(SubEvent.ID)
+            global_UISetup.RenderOnSubEventClick(SubEvent.ID);
         }
         if (Range.UISpecs[SubEvent.ID].Enabled) {
             Range.UISpecs[SubEvent.ID].css = { height: 0, top: 0
@@ -2392,6 +2602,7 @@ generateAMonthBar.counter = 0;
             //$(EventDom.Dom).click(prepOnClickOfCalendarElement(SubEvent, EventDom.Dom));
             global_DictionaryOfSubEvents[SubEvent.ID].showBottomPanel = prepOnClickOfCalendarElement(SubEvent, EventDom.Dom);
             global_DictionaryOfSubEvents[SubEvent.ID].Day = Range;
+            global_DictionaryOfSubEvents[SubEvent.ID].TimeSizeDom = EventDom;
 
             EventDom.Dom.onmouseover = function () {
                 //debugger;
@@ -2458,7 +2669,7 @@ generateAMonthBar.counter = 0;
         function prepOnClickOfCalendarElement(SubEvent, Dom) {
         return function () {
             //event.stopPropagation();
-            if (!renderSubEventsClickEvents.isRefListSubEventClicked)
+            if (!global_UISetup.RenderOnSubEventClick.isRefListSubEventClicked)
             {
                 global_ExitManager.triggerLastExitAndPop();
             }
@@ -2742,8 +2953,8 @@ generateAMonthBar.counter = 0;
                 completeButton.onclick = null;
                 $(ControlPanelContainer).slideUp(500);
                 document.removeEventListener("keydown", containerKeyPress);
-                renderSubEventsClickEvents.isRefListSubEventClicked = false;
-                renderSubEventsClickEvents.BottomPanelIsOpen = false;
+                global_UISetup.RenderOnSubEventClick.isRefListSubEventClicked = false;
+                global_UISetup.RenderOnSubEventClick.BottomPanelIsOpen = false;
                 
                 if (IconSetContainer.parentNode != null) {
                     IconSetContainer.parentNode.removeChild(IconSetContainer);
@@ -2754,7 +2965,7 @@ generateAMonthBar.counter = 0;
 
 
             //checks if bottompannel is open. If panel is open then just reset the subevent reflist element as opposed to 
-            if (!renderSubEventsClickEvents.isRefListSubEventClicked) {
+            if (!global_UISetup.RenderOnSubEventClick.isRefListSubEventClicked) {
                 global_ExitManager.addNewExit(CombinedCLoser);
             }
             
@@ -2823,6 +3034,7 @@ generateAMonthBar.counter = 0;
                         // will be treated as a single string
                             success: function (response) {
                                 exit();
+                                triggerUndoPanel("Undo deletion?");
                                 //alert("alert 0-b");
                     },
                             error: function () {
@@ -2883,7 +3095,7 @@ generateAMonthBar.counter = 0;
                     // will be treated as a single string
                         dataType: "json",
                         success: function (response) {
-                            //alert(response);
+                            triggerUndoPanel("Undo Procrastination");
                             var myContainer = (response);
                             if (myContainer.Error.code == 0) {
                                 //exitSelectedEventScreen();
@@ -2947,7 +3159,7 @@ generateAMonthBar.counter = 0;
                         // will be treated as a single string
                         //dataType: "json",
                             success: function (response) {
-                                debugger;
+                                triggerUndoPanel("Undo Completion");
                             var myContainer = (response);
                             if (myContainer.Error.code == 0) {
                                 //exitSelectedEventScreen();
@@ -3012,8 +3224,8 @@ generateAMonthBar.counter = 0;
             document.removeEventListener("keydown", containerKeyPress);//this is here just to avooid duplicate addition of the same keypress event
             document.addEventListener("keydown", containerKeyPress);
 
-            renderSubEventsClickEvents.isRefListSubEventClicked = true;
-            renderSubEventsClickEvents.BottomPanelIsOpen = true;
+            global_UISetup.RenderOnSubEventClick.isRefListSubEventClicked = true;
+            global_UISetup.RenderOnSubEventClick.BottomPanelIsOpen = true;
 
             /*
             ControlPanelNameOfSubeventInfo.innerHTML = SubEvent.Name;
@@ -3249,7 +3461,7 @@ generateAMonthBar.counter = 0;
                     // will be treated as a single string
                     //dataType: "json",
                     success: function (response) {
-                        //alert(response);
+                        triggerUndoPanel("Undo Change to event on Tiler");
                         var myContainer = (response);
                         if (myContainer.Error.code == 0) {
                             //exitSelectedEventScreen();

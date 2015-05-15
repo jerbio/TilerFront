@@ -1,6 +1,6 @@
 ﻿"use strict"
 var DisableRegistration = false;
-var Debug =  false;
+var Debug =  true;
 var DebugLocal = false;
 
 //var global_refTIlerUrl = "http://localhost:53201/api/";
@@ -147,6 +147,133 @@ function removeElement(id)
 
 }
 
+
+function triggerUndoPanel(UndoMessage)
+{
+
+    var UndoPanelContainerID = "UndoPanelContainer"
+    var UndoPanelContainer = getDomOrCreateNew(UndoPanelContainerID);
+
+    var UndoTextContainerID = "UndoTextContainer"
+    var UndoTextContainer = getDomOrCreateNew(UndoTextContainerID, "span");
+    UndoTextContainer.innerHTML = UndoMessage == null ? "Undo Last Act in ..." : UndoMessage;
+
+
+    var UndoCountDownTextContainerID = "UndoCountDownTextContainer"
+    var UndoCountDownTextContainer = getDomOrCreateNew(UndoCountDownTextContainerID, "span");
+    
+    
+
+    UndoPanelContainer.appendChild(UndoTextContainer);
+    UndoPanelContainer.appendChild(UndoCountDownTextContainer);
+    UndoPanelContainer.onclick = clickUnDoPanel;
+
+    var NumberOfSeconds = 10;
+    showUndoPanel();
+
+    function showUndoPanel()
+    {
+        var weekContainer = getDomOrCreateNew("FullWeekContainer");
+        weekContainer.appendChild(UndoPanelContainer);
+        triggerTimer(NumberOfSeconds)
+        $(UndoPanelContainer).removeClass("setAsDisplayNone");
+        
+        function triggerTimer(CountDownInSecs)
+        {
+            updateCountDown(CountDownInSecs);
+            function updateCountDown(CurrentSec)
+            {
+                UndoCountDownTextContainer.innerHTML = "... "+CurrentSec + "s"
+                if(CurrentSec>0)
+                {
+                    --CurrentSec;
+                    setTimeout(function () { updateCountDown(CurrentSec) }, 1000);
+                }
+                else
+                {
+                    hideUndoPanel();
+                }
+            }
+
+
+        }
+
+    }
+
+    
+
+    function hideUndoPanel()
+    {
+        console.log("Hiding undo pannel")
+        $(UndoPanelContainer).addClass("setAsDisplayNone");
+        if (UndoPanelContainer.parentNode != null)
+        {
+            UndoPanelContainer.parentNode.removeChild(UndoPanelContainer);
+        }
+    }
+
+    function clickUnDoPanel()
+    {
+        function undoCallBack() {
+            hideUndoPanel();
+            getRefreshedData.enableDataRefresh();
+            getRefreshedData();
+        }
+        sendUndoRequest(undoCallBack);
+        
+    }
+}
+
+
+
+function sendUndoRequest(CallBack)
+{
+    var TimeZone = new Date().getTimezoneOffset();
+    var UndoData = {
+        UserName: UserCredentials.UserName, UserID: UserCredentials.ID, TimeZoneOffset: TimeZone
+    };
+
+    var HandleNEwPage = new LoadingScreenControl("Tiler is undoing your last request :)");
+    HandleNEwPage.Launch();
+
+    var exitSendMessage = function (data) {
+        HandleNEwPage.Hide();
+    }
+    
+    //var URL= "RootWagTap/time.top?WagCommand=2";
+    var URL = global_refTIlerUrl + "Schedule/Undo";
+    var HandleNEwPage = new LoadingScreenControl("Tiler is Undoing :)");
+    HandleNEwPage.Launch();
+    var ProcrastinateRequest = $.ajax({
+        type: "POST",
+        url: URL,
+        data: UndoData,
+        // DO NOT SET CONTENT TYPE to json
+        // contentType: "application/json; charset=utf-8", 
+        // DataType needs to stay, otherwise the response object
+        // will be treated as a single string
+        dataType: "json",
+        success: CallBackSuccess,
+        error: CallBackFailure,
+    })
+
+    function CallBackSuccess()
+    {
+        HandleNEwPage.Hide();
+        CallBack();
+        return;
+    }
+
+    function CallBackFailure()
+    {
+        var NewMessage = "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
+        var ExitAfter = {
+            ExitNow: true, Delay: 1000
+        };
+        HandleNEwPage.UpdateMessage(NewMessage, ExitAfter, exitSendMessage);
+        return;
+    }
+}
 
 function delete_cookie()
 {

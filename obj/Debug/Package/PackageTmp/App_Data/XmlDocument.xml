@@ -787,6 +787,12 @@
             Represents a request for procrastination of an event. EventID is required.
             </summary>
         </member>
+        <member name="M:TilerFront.Models.ThirdPartyCalendarAuthenticationModel.getThirdPartyOut">
+            <summary>
+            Converts "this" object to "ThirdPartyAuthenticationForView" object. This is to be used to generate the more secure information on the user for the management of third party accounts on the front end
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:TilerFront.Models.ThirdPartyCalendarAuthenticationModel.getGoogleOauthCredentials">
             <summary>
             function generates the google oauth credentials
@@ -801,7 +807,7 @@
         </member>
         <member name="M:TilerFront.Models.ThirdPartyCalendarAuthenticationModel.unCommitAuthentication">
             <summary>
-            This deletes this authentication tokens from persistent storage. Note this uses the data members from "this" object. Be caustious of refreshAuthenticationToken.
+            This deletes this authentication tokens from persistent storage. Note this uses the data members from "this" object. It revokes the credentials then commits them.
             </summary>
             <returns></returns>
         </member>

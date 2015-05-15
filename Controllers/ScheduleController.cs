@@ -201,7 +201,7 @@ namespace TilerFront.Controllers
             TimeDuration ProcrastinateDuration = UserData.ProcrastinateDuration;
             TimeSpan fullTimeSpan = myAuthorizedUser.getTImeSpan;
             UserAccountDirect myUserAccount = await UserData.getUserAccountDirect();
-            My24HourTimerWPF.Schedule MySchedule = new My24HourTimerWPF.Schedule(myUserAccount, myAuthorizedUser.getRefNow());
+            My24HourTimerWPF.Schedule MySchedule = new My24HourTimerWPF.Schedule(myUserAccount, DateTimeOffset.UtcNow);
 
             await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, UserData.UserID).ConfigureAwait(false);
 
@@ -231,7 +231,7 @@ namespace TilerFront.Controllers
             await myUser.Login();
 
             DateTimeOffset myNow = DateTimeOffset.Parse("5/5/2015 2:45:00 PM");
-            myNow = myAuthorizedUser.getRefNow();
+            myNow = DateTimeOffset.UtcNow;// myAuthorizedUser.getRefNow();
             My24HourTimerWPF.Schedule MySchedule = new My24HourTimerWPF.Schedule(myUser,myNow);
 
             await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, UserData.UserID).ConfigureAwait(false);
@@ -266,7 +266,9 @@ namespace TilerFront.Controllers
                         break;
                     case "tiler":
                         {
-                            My24HourTimerWPF.Schedule MySchedule = new My24HourTimerWPF.Schedule(retrievedUser, UserData.getRefNow());
+                            DateTimeOffset myNow = DateTimeOffset.UtcNow;
+                            //myNOw = UserData.getRefNow();
+                            My24HourTimerWPF.Schedule MySchedule = new My24HourTimerWPF.Schedule(retrievedUser, myNow );
                             await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, UserData.UserID).ConfigureAwait(false);
 
                             MySchedule.markSubEventAsCompleteCalendarEventAndReadjust(UserData.EventID);
@@ -288,7 +290,9 @@ namespace TilerFront.Controllers
         {
             UserAccountDirect myUser = await UserData.getUserAccountDirect();
             await myUser.Login();
-            My24HourTimerWPF.Schedule MySchedule = new My24HourTimerWPF.Schedule(myUser, UserData.getRefNow());
+            DateTimeOffset myNow = DateTimeOffset.UtcNow;
+            //myNow = UserData.getRefNow();
+            My24HourTimerWPF.Schedule MySchedule = new My24HourTimerWPF.Schedule(myUser, myNow);
             await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, UserData.UserID).ConfigureAwait(false);
 
             IEnumerable<string> AllEVentIDs = UserData.EventID.Split(',');
@@ -309,7 +313,10 @@ namespace TilerFront.Controllers
             PostBackData retValue;
             if (retrievedUser.Status)
             {
-                My24HourTimerWPF.Schedule MySchedule = new My24HourTimerWPF.Schedule(retrievedUser, myUser.getRefNow());
+                DateTimeOffset myNow = DateTimeOffset.UtcNow;
+                //myNow = UserData.getRefNow();
+
+                My24HourTimerWPF.Schedule MySchedule = new My24HourTimerWPF.Schedule(retrievedUser, myNow);
 
                 await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, myUser.UserID).ConfigureAwait(false);
 
@@ -324,6 +331,26 @@ namespace TilerFront.Controllers
             return Ok(retValue.getPostBack);
         }
 
+
+        [HttpPost]
+        [ResponseType(typeof(PostBackStruct))]
+        [Route("api/Schedule/Undo")]
+        public async Task<IHttpActionResult> Undo([FromBody]AuthorizedUser myUser)
+        {
+            UserAccountDirect retrievedUser = await myUser.getUserAccountDirect();// new UserAccountDirect(myUser.UserName, myUser.UserID);
+            await retrievedUser.Login();
+            PostBackData retValue;
+            if (retrievedUser.Status)
+            {
+                retrievedUser.ScheduleLogControl.Undo();
+                retValue = new PostBackData("\"Success\"", 0);
+            }
+            else
+            {
+                retValue = new PostBackData("", 1);
+            }
+            return Ok(retValue.getPostBack);
+        }
 
         
 
@@ -559,7 +586,9 @@ namespace TilerFront.Controllers
             Task CommitChangesToSchedule;
             if (myUser.Status)
             {
-                My24HourTimerWPF.Schedule MySchedule = new My24HourTimerWPF.Schedule(myUser, newEvent.getRefNow());
+                DateTimeOffset myNow = newEvent.getRefNow();
+                myNow = DateTimeOffset.UtcNow;
+                My24HourTimerWPF.Schedule MySchedule = new My24HourTimerWPF.Schedule(myUser, myNow);
 
                 await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, myUser.UserID).ConfigureAwait(false);
 
@@ -629,9 +658,11 @@ namespace TilerFront.Controllers
         {
             PostBackData retValue = new PostBackData("", 1);
             try
-            { 
+            {
+                DateTimeOffset myNow = newEvent.getRefNow();
+                myNow = DateTimeOffset.UtcNow;
                 UserAccount RetrievedUser = await newEvent.getUserAccountDirect().ConfigureAwait(false);
-                My24HourTimerWPF.Schedule MySchedule = new My24HourTimerWPF.Schedule(RetrievedUser, newEvent.getRefNow());
+                My24HourTimerWPF.Schedule MySchedule = new My24HourTimerWPF.Schedule(RetrievedUser, myNow);
                 await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, RetrievedUser.UserID).ConfigureAwait(false);
                 await MySchedule.UpdateScheduleDueToExternalChanges().ConfigureAwait(false);
                 retValue = new PostBackData("\"Success\"", 0);
@@ -780,7 +811,9 @@ namespace TilerFront.Controllers
             Task CommitChangesToSchedule;
             if (myUser.Status)
             {
-                My24HourTimerWPF.Schedule MySchedule = new My24HourTimerWPF.Schedule(myUser, newEvent.getRefNow());
+                DateTimeOffset myNow = newEvent.getRefNow();
+                myNow = DateTimeOffset.UtcNow;
+                My24HourTimerWPF.Schedule MySchedule = new My24HourTimerWPF.Schedule(myUser, myNow);
                 await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, myUser.UserID).ConfigureAwait(false);
 
                 CalendarEvent newCalendarEvent;

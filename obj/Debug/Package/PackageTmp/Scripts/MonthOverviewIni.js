@@ -255,6 +255,7 @@ function RevealControlPanelSection(SelectedEvents)
                 // will be treated as a single string
                 success: function (response) {
                     exitSendMessage()
+                    triggerUndoPanel("Undo deletion?");
                 },
                 error: function () {
                     var NewMessage = "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
@@ -324,7 +325,7 @@ function RevealControlPanelSection(SelectedEvents)
                     else {
                         alert("error detected with marking as complete");
                     }
-
+                    triggerUndoPanel("Undo");
                 },
                 error: function (err) {
                     var myError = err;
@@ -2823,6 +2824,7 @@ generateAMonthBar.counter = 0;
                         // will be treated as a single string
                             success: function (response) {
                                 exit();
+                                triggerUndoPanel("Undo deletion?");
                                 //alert("alert 0-b");
                     },
                             error: function () {
@@ -2883,7 +2885,7 @@ generateAMonthBar.counter = 0;
                     // will be treated as a single string
                         dataType: "json",
                         success: function (response) {
-                            //alert(response);
+                            triggerUndoPanel("Undo Procrastination");
                             var myContainer = (response);
                             if (myContainer.Error.code == 0) {
                                 //exitSelectedEventScreen();
@@ -2947,7 +2949,7 @@ generateAMonthBar.counter = 0;
                         // will be treated as a single string
                         //dataType: "json",
                             success: function (response) {
-                                debugger;
+                                triggerUndoPanel("Undo Completion");
                             var myContainer = (response);
                             if (myContainer.Error.code == 0) {
                                 //exitSelectedEventScreen();
@@ -3249,7 +3251,7 @@ generateAMonthBar.counter = 0;
                     // will be treated as a single string
                     //dataType: "json",
                     success: function (response) {
-                        //alert(response);
+                        triggerUndoPanel("Undo Change to event on Tiler");
                         var myContainer = (response);
                         if (myContainer.Error.code == 0) {
                             //exitSelectedEventScreen();
