@@ -434,6 +434,7 @@
     <Content Include="Icon.png" />
     <Content Include="img\Icons\googleSearchIcon.png" />
     <Content Include="img\Icons\locked2.svg" />
+    <Content Include="img\Icons\ViewButtonSprites.png" />
     <Content Include="LoggedInUser.html" />
     <Content Include="MonthOverView.html" />
     <Content Include="Scripts\bootstrap.js" />

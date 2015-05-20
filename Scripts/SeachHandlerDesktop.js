@@ -49,15 +49,19 @@
     ActivateUserSearch.isActive = true;
     getRefreshedData.disableDataRefresh();
     //ActivateUserSearch.setSearchAsOff();
+    var SearchBar = getDomOrCreateNew("SearchBar")
+    $(SearchBar).addClass("ActiveSearchBar")
     ActivateUserSearch.ClearSearch = function () {
         $(SearchContainer.Dom).removeClass("FullScreenSearchContainer");
-        SearchInput.Dom.value = "";
+        SearchInput.value = "";
         ActivateUserSearch.AutoSuggest.clear();
         SearchInput.Dom.blur();
         ActivateUserSearch.isActive = false;
+        $(SearchBar).removeClass("ActiveSearchBar")
         getRefreshedData.enableDataRefresh(true);
     }
     global_ExitManager.addNewExit(ActivateUserSearch.ClearSearch);
+    
     AddCloseButoon(SearchContainer, false);
 }
 
@@ -128,6 +132,8 @@ function CallBackFunctionForReturnedValuesDesktop(data, DomContainer) {
     $(DomContainer.Dom).empty();
     (DomContainer.Dom).style.height = 0;
     if (data.length == 0 || data.length == null || data.length == undefined) {
+        DomContainer.innerHTML = "No Results";
+        setTimeout(function () { $(DomContainer.Dom).empty(); }, 6000);
         return;
     }
 

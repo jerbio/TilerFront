@@ -1,7 +1,5 @@
 ﻿"use strict"
 
-var global_DictionaryOfSubEvents = {};
-var global_RemovedElemnts = {};
 var global_WeekGrid;
 var global_DayHeight;
 var global_WeekWidth;
@@ -11,19 +9,130 @@ var global_CurrentRange;
 var global_ClearRefreshDataInterval = 0;
 var global_ColorAugmentation = 0;
 var refreshCounter = 1000000;
-var global_refreshDataInterval = 60000;
+var global_refreshDataInterval = 30000;
 var global_multiSelect;
 var global_ControlPanelIconSet = new IconSet();
 var global_GoToDay;
+var global_CurrentWeekArrangedData = [];
+var global_UISetup = { Init: function () { }, RenderOnSubEventClick: null, RenderSubEvent: null, RenderTimeInformation: null, ConflictCalculation: null, ClearUIEffects: function () { },DisplayFullGrid:false,  ButtonID: "" }
 $(global_ControlPanelIconSet.getIconSetContainer()).addClass("ControlPanelIconSetContainer");
 
+var ClassicUIOptions = { Init: function () { }, RenderOnSubEventClick: renderClassicSubEventsClickEvents, RenderSubEvent: renderClassicSubEventLook, RenderTimeInformation: RenderTimeInformationClassic, ConflictCalculation: DoSideBarsConflictClassic, ClearUIEffects: ResetClassicUIEffects,DisplayFullGrid:true, ButtonID: "ClassicViewButton" }
+var ListUIOptions = { Init: InitializeListUIEffects, RenderOnSubEventClick: renderSubEventsClickEvents, RenderSubEvent: renderSideBarEvents, RenderTimeInformation: RenderListTimeInformation, ConflictCalculation: DoSideBarsInterSect, ClearUIEffects: ResetListUIEffects,DisplayFullGrid:false, ButtonID: "ListViewButton" }
+
+var AllUIOptions = [ListUIOptions, ClassicUIOptions];
 $(document).ready(function () {
+    LaumchUIOPtion(1);
     $(document).tooltip({ track: true });
     $('body').hide();
     InitializeMonthlyOverview();
     MenuManger();
+    
+    
 });
 
+
+function LaumchUIOPtion(UIOptionIndex)
+{
+    LaumchUIOPtion.CurrentIndex = UIOptionIndex % AllUIOptions.length;
+    UpdateUISetup(AllUIOptions[LaumchUIOPtion.CurrentIndex]);
+    var NextIndex = (LaumchUIOPtion.CurrentIndex + 1) % AllUIOptions.length;
+    var NextViewButtonID = AllUIOptions[NextIndex].ButtonID;
+    var NextViewButton = getDomOrCreateNew(NextViewButtonID);
+    var ViewContainer = getDomOrCreateNew("ViewContainer");
+    var CurrentActiveButton = ViewContainer.firstElementChild;
+    CurrentActiveButton.parentNode.insertBefore(NextViewButton, CurrentActiveButton);
+    function generateNextCall()
+    {
+        return function()
+        {
+            LaumchUIOPtion(NextIndex);
+        }
+    }
+
+    NextViewButton.onclick = generateNextCall();
+}
+
+LaumchUIOPtion.CurrentIndex = 0;
+
+function UpdateUISetup(UIOptions)
+{
+    global_ExitManager.triggerLastExitAndPop();
+    global_UISetup.ClearUIEffects();
+    global_UISetup.Init = UIOptions.Init;
+    global_UISetup.Init();
+    global_UISetup.RenderSubEvent = UIOptions.RenderSubEvent;
+    global_UISetup.RenderOnSubEventClick = UIOptions.RenderOnSubEventClick;
+    global_UISetup.ConflictCalculation = UIOptions.ConflictCalculation;
+    global_UISetup.RenderTimeInformation = UIOptions.RenderTimeInformation;
+    global_UISetup.ClearUIEffects = UIOptions.ClearUIEffects;
+    global_UISetup.DisplayFullGrid = UIOptions.DisplayFullGrid;
+    if (global_UISetup.DisplayFullGrid)
+    {
+        setTimeout(DisplayFullGrid, 100)///using timeout in case grid has not been generated yet, this occurs with the initializing call to LaumchUIOPtion, which is triggered before the rendering of the week schedule
+    }
+    else
+    {
+        setTimeout(HideFullGrid, 100)///using timeout in case grid has not been generated yet
+        //HideFullGrid();
+    }
+    setTimeout(function () { TriggerWeekUIupdate(global_CurrentWeekArrangedData); }, 1000);
+}
+
+function HideFullGrid()
+{
+    var AllFullGridContainer = $(".FullGridContainer");
+    if (AllFullGridContainer.length)
+        for (var ID = 0 ; ID < AllFullGridContainer.length; ID++)
+        {
+            AllFullGridContainer[ID].isEnabled = false;
+            $(AllFullGridContainer[ID]).addClass("setAsDisplayNone");
+        }
+
+    var DayOfTime = $(".DayOfTime");
+    if (DayOfTime.length)
+        for (var ID = 0 ; ID < DayOfTime.length; ID++) {
+            $(DayOfTime[ID]).addClass("setAsDisplayNone");
+        }
+    var VerticalScrollContainer = getDomOrCreateNew("VerticalScrollContainer");
+    $(VerticalScrollContainer).removeClass("ZoomInto12Hours");
+    $(VerticalScrollContainer).addClass("ZoomInto24Hours");
+    $(VerticalScrollContainer).removeClass("FullGridEnhancements");
+    var NameOfWeekContainerPlane = getDomOrCreateNew("NameOfWeekContainerPlane");
+    $(NameOfWeekContainerPlane).removeClass("FullGridEnhancements");
+    var LeftContainer = getDomOrCreateNew("leftDayOfTime");
+    $(LeftContainer).removeClass("ZoomInto12Hours");
+    $(LeftContainer).addClass("ZoomInto24Hours");
+    
+}
+
+function DisplayFullGrid()
+{
+    var AllFullGridContainer = $(".FullGridContainer")
+    if (AllFullGridContainer.length)
+        for (var ID = 0 ; ID < AllFullGridContainer.length; ID++)
+        {
+            AllFullGridContainer[ID].isEnabled = true;
+            $(AllFullGridContainer[ID]).removeClass("setAsDisplayNone");
+        }
+
+    var DayOfTime = $(".DayOfTime");
+    if (DayOfTime.length)
+        for (var ID = 0 ; ID < DayOfTime.length; ID++) {
+            $(DayOfTime[ID]).removeClass("setAsDisplayNone");
+        }
+    
+
+    var VerticalScrollContainer = getDomOrCreateNew("VerticalScrollContainer");
+    $(VerticalScrollContainer).removeClass("ZoomInto24Hours");
+    $(VerticalScrollContainer).addClass("ZoomInto12Hours");
+    $(VerticalScrollContainer).addClass("FullGridEnhancements");
+    var NameOfWeekContainerPlane = getDomOrCreateNew("NameOfWeekContainerPlane");
+    $(NameOfWeekContainerPlane).addClass("FullGridEnhancements");
+    var LeftContainer = getDomOrCreateNew("leftDayOfTime");
+    $(LeftContainer).removeClass("ZoomInto24Hours");
+    $(LeftContainer).addClass("ZoomInto12Hours");
+}
 
 function MenuManger()
 {
@@ -63,6 +172,272 @@ function MenuManger()
         //var logoutForm = getDomOrCreateNew("logoutForm");
         document.forms["logoutForm"].submit();
     }
+}
+
+function RenderTimeInformationClassic(DayOfWeek, ID) {
+    var RefSubEvent = global_DictionaryOfSubEvents[ID];
+    var TopPixels = ((DayOfWeek.UISpecs[ID].css.top / 100) * global_DayHeight) + global_DayTop;
+
+    var ListElementContainer = getDomOrCreateNew("SubEventReference" + ID);
+    ListElementContainer.setAttribute("draggable", true);
+    ListElementContainer.ondragstart = OnDragStartOfSubEvent;
+    //ListElementContainer.ondrop = OnDropOfSubEvent;
+    //ListElementContainer.ondragstart = OnDragStartOfSubEvent;
+    //ListElementContainer.ondragstart = OnDragStartOfSubEvent;
+    $(ListElementContainer.Dom).addClass("TimeDataFormat");
+    
+    RefSubEvent.gridDoms.push(ListElementContainer.Dom)//Adds the List element as list of candidates to be deleted
+    
+    DayOfWeek.UISpecs[ID].refrenceListElement = ListElementContainer;
+
+    var TimeDataPerListElement = getDomOrCreateNew("SubEventReferenceTime" + ID);
+    var BottomPanelListElement = getDomOrCreateNew("SubEventReferenceBottomPanel" + ID);
+    $(BottomPanelListElement.Dom).addClass("SubEventReferenceBottomPanel");
+
+    var CalendarTypeContainer = getDomOrCreateNew("SubEventReferenceCalType" + ID);
+    var CalendarTypeCalImage = getDomOrCreateNew("SubEventReferenceCalImg" + ID);
+
+    $(CalendarTypeCalImage.Dom).addClass("SubEventReferenceCalImg");
+    $(CalendarTypeCalImage.Dom).addClass(RefSubEvent.ThirdPartyType + "Icon");
+    $(CalendarTypeContainer.Dom).addClass("SubEventReferenceCalType");
+
+    CalendarTypeContainer.appendChild(CalendarTypeCalImage);
+
+    var NameDataPerListElement = getDomOrCreateNew("SubEventReferenceName" + ID);
+
+    BottomPanelListElement.appendChild(CalendarTypeContainer);
+    BottomPanelListElement.appendChild(TimeDataPerListElement);
+
+    
+    //$(obj).addClass("ListElements");
+    NameDataPerListElement.Dom.innerHTML = RefSubEvent.Name;
+    TimeDataPerListElement.Dom.innerHTML = getTimeStringFromDate(RefSubEvent.SubCalStartDate) + " - " + getTimeStringFromDate(RefSubEvent.SubCalEndDate);
+    $(NameDataPerListElement.Dom).addClass("SubEventReferenceName");
+    $(TimeDataPerListElement.Dom).addClass("SubEventReferenceTime");
+
+
+
+
+    var ListElementDataContentContainer = getDomOrCreateNew("ListElementDataContentContainer" + ID);
+    $(ListElementDataContentContainer.Dom).addClass("ListElementDataContentContainerClassic");
+    ListElementDataContentContainer.Dom.appendChild(NameDataPerListElement.Dom);
+    ListElementDataContentContainer.Dom.appendChild(BottomPanelListElement.Dom);
+
+    
+
+
+    var myBool = (RefSubEvent.SubCalRigid)
+    if (myBool)
+    {
+        var EventLockContainer = getDomOrCreateNew("EventLockContainer" + ID);
+        $(EventLockContainer.Dom).addClass("EventLockContainer");
+        var EventLockImgContainer = getDomOrCreateNew("EventLockImgContainer" + ID);
+        $(EventLockImgContainer.Dom).addClass("EventLockImgContainer");
+        EventLockContainer.Dom.appendChild(EventLockImgContainer.Dom);
+        ListElementContainer.Dom.appendChild(EventLockContainer.Dom);
+        $(EventLockImgContainer.Dom).addClass("LockedIcon");
+    }
+    
+    ListElementContainer.Dom.appendChild(ListElementDataContentContainer.Dom);
+    
+
+    //RefSubEvent.TimeSizeDom.appendChild(ListElementDataContentContainer);
+    //DayOfWeek.UISpecs[ID].DataElement = ListElementDataContentContainer
+    RefSubEvent.TimeSizeDom.appendChild(ListElementContainer);
+
+    var HeightPx = (DayOfWeek.UISpecs[ID].css.height / 100) * global_DayHeight;
+    HeightPx = HeightPx < 50 ? 50 : HeightPx;
+    var EndPixelTop = TopPixels + HeightPx;
+    ///BestBottom is data on tab a level which ends before myData. BestBottom.Count data member is the level, BestBOttom.End is the end pixel of this base tab
+    var RetValue = { Start: DayOfWeek.UISpecs[ID].Start, CalCCount: 0, Data: DayOfWeek.UISpecs[ID], ID: ID, BestBottom: { End: 10000, Count: 0 }, Count: 0, EarlierCount: 0, top: TopPixels, end: EndPixelTop, PrecedingOverlapers: 0, OverlappingCount: 0,OverlappingAfterMe:0 }
+    return RetValue;
+}
+
+
+
+
+
+function ResetClassicUIEffects()
+{
+    //debugger;
+    getRefreshedData.disableDataRefresh();
+    TotalSubEventList.forEach(ResetSubEvent);
+    for (var ID in global_DictionaryOfSubEvents) {
+        global_DictionaryOfSubEvents[ID].Bind = null;
+    }
+    function ResetSubEvent(SubEvent)
+    {
+        var AllNodesWithListElementDataContentContainerClassic = $(SubEvent.TimeSizeDom).find(".ListElementDataContentContainerClassic");
+        if (AllNodesWithListElementDataContentContainerClassic.length)
+        {
+            //debugger;
+            $(AllNodesWithListElementDataContentContainerClassic).removeClass("ListElementDataContentContainerClassic");
+        }
+
+        var AllNodesWithTimeDataFormat = $(SubEvent.TimeSizeDom).find(".TimeDataFormat");
+        if (AllNodesWithTimeDataFormat.length) {
+            $(AllNodesWithTimeDataFormat).removeClass("TimeDataFormat");
+        }
+
+
+        $(SubEvent.TimeSizeDom).removeClass("ClassicGridEvents");
+
+    }
+    getRefreshedData.enableDataRefresh();
+}
+
+function RenderListTimeInformation(DayOfWeek, ID)
+{
+    var RefSubEvent = global_DictionaryOfSubEvents[ID];
+    var TopPixels = ((DayOfWeek.UISpecs[ID].css.top / 100) * global_DayHeight) + global_DayTop;
+    var ListElementContainer = getDomOrCreateNew("SubEventReference" + ID);
+    ListElementContainer.setAttribute("draggable", true);
+    ListElementContainer.ondragstart = OnDragStartOfSubEvent;
+    //ListElementContainer.ondrop = OnDropOfSubEvent;
+    //ListElementContainer.ondragstart = OnDragStartOfSubEvent;
+    //ListElementContainer.ondragstart = OnDragStartOfSubEvent;
+    $(ListElementContainer.Dom).addClass("TimeDataFormat");
+    $(ListElementContainer.Dom).addClass("ListElement");
+    
+    RefSubEvent.gridDoms.push(ListElementContainer.Dom)//Adds the List element as list of candidates to be deleted
+    
+    DayOfWeek.UISpecs[ID].refrenceListElement = ListElementContainer;
+    var TimeDataPerListElement = getDomOrCreateNew("SubEventReferenceTime" + ID);
+    var BottomPanelListElement = getDomOrCreateNew("SubEventReferenceBottomPanel" + ID);
+    $(BottomPanelListElement.Dom).addClass("SubEventReferenceBottomPanel");
+
+    var CalendarTypeContainer = getDomOrCreateNew("SubEventReferenceCalType" + ID);
+    var CalendarTypeCalImage = getDomOrCreateNew("SubEventReferenceCalImg" + ID);
+
+    $(CalendarTypeCalImage.Dom).addClass("SubEventReferenceCalImg");
+    $(CalendarTypeCalImage.Dom).addClass(RefSubEvent.ThirdPartyType + "Icon");
+    $(CalendarTypeContainer.Dom).addClass("SubEventReferenceCalType");
+
+    CalendarTypeContainer.appendChild(CalendarTypeCalImage);
+
+    var NameDataPerListElement = getDomOrCreateNew("SubEventReferenceName" + ID);
+
+    BottomPanelListElement.appendChild(CalendarTypeContainer);
+    BottomPanelListElement.appendChild(TimeDataPerListElement);
+
+    $(ListElementContainer.Dom).addClass("selectedDayElements");
+    // $(ListElementContainer.Dom).removeClass("ListElements");
+    //$(obj).addClass("ListElements");
+    NameDataPerListElement.Dom.innerHTML = RefSubEvent.Name;
+    TimeDataPerListElement.Dom.innerHTML = getTimeStringFromDate(RefSubEvent.SubCalStartDate) + " - " + getTimeStringFromDate(RefSubEvent.SubCalEndDate);
+    $(NameDataPerListElement.Dom).addClass("SubEventReferenceName");
+    $(TimeDataPerListElement.Dom).addClass("SubEventReferenceTime");
+
+
+    var ColorContainer = getDomOrCreateNew("ListElementDataContentContainerColorContainer" + ID);
+    $(ColorContainer).addClass("ListElementColorContainer");
+
+    var ListElementDataContentContainer = getDomOrCreateNew("ListElementDataContentContainer" + ID);
+    $(ListElementDataContentContainer.Dom).addClass("ListElementDataContentContainer");
+    ListElementDataContentContainer.Dom.appendChild(NameDataPerListElement.Dom);
+    ListElementDataContentContainer.Dom.appendChild(BottomPanelListElement.Dom);
+
+    RefSubEvent.gridDoms.push(ListElementDataContentContainer.Dom)
+    ColorContainer.appendChild(ListElementDataContentContainer)
+
+    var EventLockContainer = getDomOrCreateNew("EventLockContainer" + ID);
+    $(EventLockContainer.Dom).addClass("EventLockContainer");
+    var myBool = (RefSubEvent.SubCalRigid)
+    var EventLockImgContainer = getDomOrCreateNew("EventLockImgContainer" + ID);
+    $(EventLockImgContainer.Dom).addClass("EventLockImgContainer");
+    if (myBool) {
+        $(EventLockImgContainer.Dom).addClass("LockedIcon");
+    }
+
+    EventLockContainer.Dom.appendChild(EventLockImgContainer.Dom)
+
+
+    ListElementContainer.Dom.appendChild(EventLockContainer.Dom);
+    ListElementContainer.Dom.appendChild(ColorContainer.Dom);
+
+    
+    DayOfWeek.renderPlane.Dom.appendChild(ListElementContainer);
+    //DayOfWeek.renderPlane.Dom.appendChild(DayOfWeek.UISpecs[ID].refrenceListElement.Dom)
+
+    DayOfWeek.UISpecs[ID].DataElement = ColorContainer
+    RefSubEvent.ListRefElement = ListElementContainer;
+
+    var HeightPx = (DayOfWeek.UISpecs[ID].css.height / 100) * global_DayHeight;
+    var EndPixelTop = TopPixels + HeightPx;
+    ///BestBottom is data on tab a level which ends before myData. BestBottom.Count data member is the level, BestBOttom.End is the end pixel of this base tab
+    var RetValue= { Start: DayOfWeek.UISpecs[ID].Start, CalCCount: 0, Data: DayOfWeek.UISpecs[ID], ID: ID, BestBottom: { End: 10000, Count: 0 }, Count: 0, EarlierCount: 0, top: TopPixels, end: EndPixelTop, refSubEvent: ListElementContainer }
+    return RetValue;
+
+}
+
+function InitializeListUIEffects()
+{
+    var AllSubEventListCOntainer = $(".SubEventListContainer");
+    if (AllSubEventListCOntainer.length) {
+        for (var i = 0 ; i < AllSubEventListCOntainer.length; i++) {
+            var DayOfWeekListCOntainer = AllSubEventListCOntainer[i];
+            $(DayOfWeekListCOntainer).removeClass("setAsDisplayNone");
+        }
+    }
+}
+
+function ResetListUIEffects()
+{
+    getRefreshedData.disableDataRefresh();
+    TotalSubEventList.forEach(ResetSubEvent);
+
+    for (var ID in global_DictionaryOfSubEvents)
+    {
+        global_DictionaryOfSubEvents[ID].Bind=null;
+    }
+
+    var AllListElementColorContainer = $(".ListElementColorContainer");
+    if (AllListElementColorContainer.length)
+    {
+        for (var i = 0 ; i < AllListElementColorContainer.length; i++)
+        {
+            var DayOfWeekListCOntainer = AllListElementColorContainer[i];
+            DayOfWeekListCOntainer.parentNode.removeChild(DayOfWeekListCOntainer);
+            //$(DayOfWeekListCOntainer).removeClass("ListElementColorContainer");
+        }
+    }
+
+    var AllSubEventListCOntainer = $(".SubEventListContainer");
+    if (AllSubEventListCOntainer.length)
+    {
+        for (var i = 0 ; i < AllSubEventListCOntainer.length; i++)
+        {
+            var DayOfWeekListCOntainer = AllSubEventListCOntainer[i];
+            $(DayOfWeekListCOntainer).addClass("setAsDisplayNone");
+        }
+    }
+
+    var SideBarElements = $(".SideBar");
+    if (SideBarElements.length) {
+        for (var i = 0 ; i < SideBarElements.length; i++) {
+            var SideBar = SideBarElements[i];
+            $(SideBar).removeClass("SideBar");
+        }
+    }
+
+
+
+    //$(SubEvent.TimeSizeDom).removeClass("SideBar");
+
+    function ResetSubEvent(SubEvent)
+    {
+        var ListElementDataContentContainer = $(SubEvent.ListRefElement).find(".ListElementDataContentContainer");
+        if (ListElementDataContentContainer.length) {
+            //debugger;
+            $(ListElementDataContentContainer).removeClass("ListElementDataContentContainer");
+        }
+
+        var AllNodesWithListElement = $(SubEvent.TimeSizeDom).find(".ListElement");
+        if (AllNodesWithListElement.length) {
+            $(AllNodesWithListElement).removeClass("ListElement");
+        }
+    }
+    getRefreshedData.enableDataRefresh();
 }
 /*
 Add Close button to the given element. Container is Dom element to which you want to add a close button. if you want to the close button to be on the top left set LeftPosition to true
@@ -142,7 +517,7 @@ function RevealControlPanelSection(SelectedEvents)
 
     hideControlInfoContainer();
     $(MultiSelectPanel).removeClass("hideMultiSelectPanel");
-    renderSubEventsClickEvents.BottomPanelIsOpen = true;
+    global_UISetup.RenderOnSubEventClick.BottomPanelIsOpen = true;
     ControlPanelContainer.appendChild(IconSetContainer);
 
     $(global_ControlPanelIconSet.getIconSetContainer())
@@ -182,7 +557,7 @@ function RevealControlPanelSection(SelectedEvents)
         completeButton.onclick = null;
         $('#ControlPanelContainer').slideUp(500);
         $(MultiSelectPanel).addClass("hideMultiSelectPanel");
-        renderSubEventsClickEvents.BottomPanelIsOpen = false;
+        global_UISetup.RenderOnSubEventClick.BottomPanelIsOpen = false;
         document.removeEventListener("keydown", containerKeyPress);
         $(ControlPanelProcrastinateButton).removeClass("setAsDisplayNone");
         $(RevealControlPanelSection.IconSet.getLocationButton()).removeClass("setAsDisplayNone");
@@ -493,6 +868,7 @@ function multiSelect()
                 alert("oops Jay there is some discrepancy with your multiselect");
             }
             DeselectEleemnt(EventID);
+            debugger;
             delete SelecedIDs[EventID];
             if (Object.keys(SelecedIDs).length < 1) {
                 isMultiSelectActive = false;
@@ -711,11 +1087,18 @@ function generateDayContainer()
     $(DayContainer.Dom).addClass("DayContainer");
     var NameOfDayContainer = getDomOrCreateNew("NameOfDayContainer" + myID);
     NameOfDayContainer.onclick = function (e) { e.stopPropagation(); };
-    var DayTimeContainer = getDomOrCreateNew("DayTimeContainer" + myID);
+    var DayTimeContainer = getDomOrCreateNew("DayTimeContainer" + myID);//Single day grid displayed only on mouse over
+
+
+    var FullGridContainer = getDomOrCreateNew("FullGridContainer" + myID);//Bar grid for classic view
+    $(FullGridContainer.Dom).addClass("FullGridContainer");
+    FullGridContainer.isEnabled = false;
+    $(FullGridContainer).addClass("setAsDisplayNone");
+
     $(DayTimeContainer).addClass("setAsDisplayNone");
     $(NameOfDayContainer.Dom).addClass("NameOfDayContainer");
     DayContainer.Dom.appendChild(NameOfDayContainer.Dom);
-
+    DayContextContainer.Dom.appendChild(FullGridContainer.Dom);//Full grid
     DayContextContainer.Dom.appendChild(DayTimeContainer.Dom);
     DayContextContainer.Dom.appendChild(SubEventListContainer.Dom);
     //DayContainer.Dom.appendChild(DayTimeContainer.Dom);
@@ -728,6 +1111,8 @@ function generateDayContainer()
     for (; NumberOfShaders > 0; --NumberOfShaders) {
 
         var shadeContainer = getDomOrCreateNew("shadeContainer" + myID + "" + NumberOfShaders);
+        var FullBarShadeContainer = getDomOrCreateNew("FullGridShadeContainer" + myID + "" + NumberOfShaders);
+        $(FullBarShadeContainer).addClass("FullGridShadeContainer");//shade for full grid
         var TimeOfDayTextContainer = getDomOrCreateNew("TimeOfDayTextContainer" + myID + "" + NumberOfShaders,"span");
         //debugger;
         var Military = 24 - NumberOfShaders;
@@ -740,14 +1125,19 @@ function generateDayContainer()
         $(TimeOfDayTextContainer).addClass("TimeOfDayText");
         shadeContainer.appendChild(TimeOfDayTextContainer);
         DayTimeContainer.Dom.appendChild(shadeContainer.Dom);
+        FullGridContainer.appendChild(FullBarShadeContainer);
         
         shadeContainer.Dom.style.top = TotalTopElement + "%";
+        FullBarShadeContainer.Dom.style.top = TotalTopElement + "%";
         TotalTopElement += 4.1667;
+        $(shadeContainer.Dom).addClass("SingleDayShadeWidth");
         if (NumberOfShaders % 2) {
             $(shadeContainer.Dom).addClass("DarkerShade");
+            $(FullBarShadeContainer.Dom).addClass("DarkerShade");
         }
         else {
             $(shadeContainer.Dom).addClass("LighterShade");
+            $(FullBarShadeContainer.Dom).addClass("LighterShade");
         }
 
         $(shadeContainer.Dom).addClass("shadeContainer");
@@ -757,6 +1147,10 @@ function generateDayContainer()
         //debugger;
         setTimeout(function ()
         {
+            if (FullGridContainer.isEnabled) {
+                $(DayTimeContainer).addClass("setAsDisplayNone");
+                return;
+            }
             $(DayTimeContainer).removeClass("setAsDisplayNone");
         })
     }
@@ -764,8 +1158,10 @@ function generateDayContainer()
     function onMouseOut()
     {
         setTimeout(function () {
-            //debugger;
-            //return;
+            if (FullGridContainer.isEnabled) {
+                $(DayTimeContainer).addClass("setAsDisplayNone");
+                return;
+            }
             $(DayTimeContainer).addClass("setAsDisplayNone");
         })
         
@@ -781,6 +1177,8 @@ function generateDayContainer()
     $(EventDayContainer.Dom).addClass("EventDayContainer");
     
     DayTimeContainer.Dom.appendChild(EventDayContainer.Dom);
+    
+
     return { renderPlane: SubEventListContainer, FullDayContext: DayContextContainer, Parent: DayContainer, EventDayContainer: EventDayContainer, NameOfDayContainer: NameOfDayContainer }
 }
 
@@ -930,9 +1328,11 @@ function scrollToDay(refDate)
 
     if (j)
     {
+        //debugger;
         var bar = (i * parseInt(WidthInPixels)) - (WidthInPixels*3.5);
         WidthInPixels = bar;
-        $("#CurrentWeekContainer").animate({ scrollLeft: WidthInPixels }, 1000);
+        $("#NameOfWeekContainerPlane").animate({ scrollLeft: WidthInPixels }, 1000);
+        $("#VerticalScrollContainer").animate({ scrollLeft: WidthInPixels }, 1000);
     }
 
 
@@ -951,7 +1351,7 @@ function InitiateGrid(refDate)
     var RightContainer = getDomOrCreateNew("rightDayOfTime");
     var RightDayOfTIme = GenerateDayTime(false);
     RightContainer.Dom.appendChild(RightDayOfTIme.Dom);
-    //$(RightContainer.Dom).addClass("RightTimeOfDayContainer");
+    //(RightContainer.Dom).addClass("RightTimeOfDayContainer");
 
 
 
@@ -959,8 +1359,8 @@ function InitiateGrid(refDate)
     var TimeBarContainer = document.getElementById("CurrentWeekContainer");
     $(LeftContainer.Dom).addClass("DayOfTime");
     $(RightContainer.Dom).addClass("DayOfTime");
-    encasingDOm.appendChild(RightContainer.Dom);
-    encasingDOm.appendChild(LeftContainer.Dom);
+    TimeBarContainer.appendChild(RightContainer.Dom);
+    TimeBarContainer.appendChild(LeftContainer.Dom);
     
     return RangeData;
 }
@@ -1124,9 +1524,12 @@ getRefreshedData.enableDataRefresh = function (pullLatest)
         return function (NewData)
         {
             //NewData = JSON.parse(NewData);
+            var PerformanceStart = new Date();
             NewData = NewData.Content;
             StructuralizeNewData(NewData)
             DataContainer.Data = NewData;
+            var PerformanceEnd = new Date();
+            console.log("Processing Data From Back End" + (PerformanceEnd - PerformanceStart));
         }
 
     }
@@ -1134,21 +1537,7 @@ getRefreshedData.enableDataRefresh = function (pullLatest)
 
 
 
-    function StructuralizeNewData(NewData)
-    {
-        if (NewData != "") {
-            TotalSubEventList = new Array();
-            generateNonRepeatEvents(NewData.Schedule.NonRepeatCalendarEvent);
-            generateRepeatEvents(NewData.Schedule.RepeatCalendarEvent);
-            global_RemovedElemnts = global_DictionaryOfSubEvents;
-            global_DictionaryOfSubEvents = {};
-        }
-        else
-        {
-            console.log("Empty Data");
-        }
-        
-    }
+    
 
 
     function PopulateMonthGrid(NewData, RangeData)
@@ -1157,7 +1546,7 @@ getRefreshedData.enableDataRefresh = function (pullLatest)
         /*var encasingDOm = document.getElementById("FullWeekContainer");
         var RangeData = PopulateUI(encasingDOm);*/
         //genFunctionForSelectCalendarRange(RangeData, 1)();
-        /*
+        /*PopulateMonthGrid
         NewData.Schedule.RepeatCalendarEvent.forEach(function (RepeatCalendarEvent) {
             RepeatCalendarEvent.RepeatCalendarEvents.forEach(
                 function (repeatCalEvent) {
@@ -1168,18 +1557,41 @@ getRefreshedData.enableDataRefresh = function (pullLatest)
                 })
         })
         //*/
+        var PerformanceStart = new Date();
+        global_CurrentWeekArrangedData.forEach(
+            function (WeekRange) {
+                WeekRange.DaysOfWeek.forEach(
+                function (DayOfWeek)
+                {
+                    for (var i in DayOfWeek.UISpecs)
+                    {
+                        DayOfWeek.UISpecs[i].Enabled = false;
+                        DayOfWeek.UISpecs[i].Dom.Enabled = false;
+                    }
+            
+                });
+            });
+        var PerformanceEnd = new Date();
 
-        
+
+        console.log("Marking as false took " + (PerformanceEnd - PerformanceStart));
+
+        PerformanceStart = new Date();
         TotalSubEventList.forEach(
             function (subEvent)
             {
+                delete
                 delete global_RemovedElemnts[subEvent.ID];
                 getMyPositionFromRange(subEvent, RangeData);
             
                 global_DictionaryOfSubEvents[subEvent.ID] = subEvent;
                 global_DictionaryOfSubEvents[subEvent.ID].AllCallBacks = new Array();
             });
+        PerformanceEnd = new Date();
+        console.log("Processing TotalSubEventList " + (PerformanceEnd - PerformanceStart));
 
+
+        PerformanceStart = new Date();
         for (var ID in global_RemovedElemnts)
         {
             if (global_RemovedElemnts[ID].gridDoms != null) {
@@ -1199,9 +1611,13 @@ getRefreshedData.enableDataRefresh = function (pullLatest)
             {
                 //alert("Jerome theres a problem");
             }
-        
         }
 
+
+        PerformanceEnd = new Date();
+        console.log("Removing elements from DOM " + (PerformanceEnd - PerformanceStart));
+
+        PerformanceStart = new Date();
         RangeData.forEach(
             function (WeekRange) {
                 for(var myKey in WeekRange.SubEventsCollection)
@@ -1220,24 +1636,37 @@ getRefreshedData.enableDataRefresh = function (pullLatest)
                     }
                 });
             });
+        PerformanceEnd = new Date();
+        console.log("Place SubEvents in expected weeks " + (PerformanceEnd - PerformanceStart));
+
+        global_CurrentWeekArrangedData = RangeData;
 
 
-        RangeData.forEach(
-            function (WeekRange)
-            {
-                WeekRange.DaysOfWeek.forEach(triggerSubEventRenderOnMonth);
-                
-            });
 
+        PerformanceStart = new Date();
+        TriggerWeekUIupdate(global_CurrentWeekArrangedData);
+        PerformanceEnd = new Date();
+        console.log("TriggerUI motion " + (PerformanceEnd - PerformanceStart));
+        
+        /*
         RangeData.forEach(
             function (WeekRange) {
                 WeekRange.DaysOfWeek.forEach(renderUIChanges);
 
-            });
+            });*/
         return;
     }
 
 
+
+    function TriggerWeekUIupdate(RangeData)
+    {
+        RangeData.forEach(
+            function (WeekRange) {
+                WeekRange.DaysOfWeek.forEach(triggerSubEventRenderOnMonth);
+
+            });
+    }
 
 
     function monthViewResetData()
@@ -1280,80 +1709,11 @@ getRefreshedData.enableDataRefresh = function (pullLatest)
         var Now = new Date();
         for (var ID in DayOfWeek.UISpecs)
         {
-            var TopPixels = ((DayOfWeek.UISpecs[ID].css.top / 100) * global_DayHeight) + global_DayTop;
+            
             if (DayOfWeek.UISpecs[ID].Enabled)
             {
                 
-                var RefSubEvent = global_DictionaryOfSubEvents[ID];
-
-                var ListElementContainer = getDomOrCreateNew("SubEventReference" + ID);
-                ListElementContainer.setAttribute("draggable", true);
-                ListElementContainer.ondragstart = OnDragStartOfSubEvent;
-                //ListElementContainer.ondrop = OnDropOfSubEvent;
-                //ListElementContainer.ondragstart = OnDragStartOfSubEvent;
-                //ListElementContainer.ondragstart = OnDragStartOfSubEvent;
-                $(ListElementContainer.Dom).addClass("ListElement");
-                RefSubEvent.gridDoms.push(ListElementContainer.Dom)//Adds the List element as list of candidates to be deleted
-                DayOfWeek.UISpecs[ID].refrenceListElement =ListElementContainer;
-                var TimeDataPerListElement = getDomOrCreateNew("SubEventReferenceTime" + ID);
-                var BottomPanelListElement = getDomOrCreateNew("SubEventReferenceBottomPanel" + ID);
-                $(BottomPanelListElement.Dom).addClass("SubEventReferenceBottomPanel");
-
-                var CalendarTypeContainer = getDomOrCreateNew("SubEventReferenceCalType" + ID);
-                var CalendarTypeCalImage = getDomOrCreateNew("SubEventReferenceCalImg" + ID);
-
-                $(CalendarTypeCalImage.Dom).addClass("SubEventReferenceCalImg");
-                $(CalendarTypeCalImage.Dom).addClass(RefSubEvent.ThirdPartyType+"Icon");
-                $(CalendarTypeContainer.Dom).addClass("SubEventReferenceCalType");
-
-                CalendarTypeContainer.appendChild(CalendarTypeCalImage);
-
-                var NameDataPerListElement = getDomOrCreateNew("SubEventReferenceName" + ID);
-
-                BottomPanelListElement.appendChild(CalendarTypeContainer);
-                BottomPanelListElement.appendChild(TimeDataPerListElement);
-                
-                $(ListElementContainer.Dom).addClass("selectedDayElements");
-               // $(ListElementContainer.Dom).removeClass("ListElements");
-                //$(obj).addClass("ListElements");
-                NameDataPerListElement.Dom.innerHTML = RefSubEvent.Name;
-                TimeDataPerListElement.Dom.innerHTML = getTimeStringFromDate(RefSubEvent.SubCalStartDate) + " - " + getTimeStringFromDate(RefSubEvent.SubCalEndDate);
-                $(NameDataPerListElement.Dom).addClass("SubEventReferenceName");
-                $(TimeDataPerListElement.Dom).addClass("SubEventReferenceTime");
-                
-
-                
-
-                var ListElementDataContentContainer = getDomOrCreateNew("ListElementDataContentContainer" + ID);
-                $(ListElementDataContentContainer.Dom).addClass("ListElementDataContentContainer");
-                ListElementDataContentContainer.Dom.appendChild(NameDataPerListElement.Dom);
-                ListElementDataContentContainer.Dom.appendChild(BottomPanelListElement.Dom);
-                
-                RefSubEvent.gridDoms.push(ListElementDataContentContainer.Dom)
-                
-
-                var EventLockContainer = getDomOrCreateNew("EventLockContainer" + ID);
-                $(EventLockContainer.Dom).addClass("EventLockContainer");
-                var myBool = (RefSubEvent.SubCalRigid)
-                var EventLockImgContainer = getDomOrCreateNew("EventLockImgContainer" + ID);
-                $(EventLockImgContainer.Dom).addClass("EventLockImgContainer");
-                if (myBool) {
-                    $(EventLockImgContainer.Dom).addClass("LockedIcon");
-                }
-
-                EventLockContainer.Dom.appendChild(EventLockImgContainer.Dom)
-                
-
-                ListElementContainer.Dom.appendChild(EventLockContainer.Dom);
-                ListElementContainer.Dom.appendChild(ListElementDataContentContainer.Dom);
-                
-                DayOfWeek.UISpecs[ID].DataElement=ListElementDataContentContainer
-                RefSubEvent.ListRefElement = ListElementContainer;
-
-                var HeightPx = (DayOfWeek.UISpecs[ID].css.height / 100) * global_DayHeight;
-                var EndPixelTop = TopPixels + HeightPx;
-                ///BestBottom is data on tab a level which ends before myData. BestBottom.Count data member is the level, BestBOttom.End is the end pixel of this base tab
-                var myData = { Start: DayOfWeek.UISpecs[ID].Start, CalCCount: 0, Data: DayOfWeek.UISpecs[ID], ID: ID, BestBottom: { End: 10000, Count: 0 }, Count: 0, top: TopPixels, end: EndPixelTop, refSubEvent: ListElementContainer }
+                var myData=global_UISetup. RenderTimeInformation(DayOfWeek,ID);
                 IntersectingArrayData.push(myData);
             }
         }
@@ -1374,8 +1734,8 @@ getRefreshedData.enableDataRefresh = function (pullLatest)
                 var widthSubtraction = 0;
                 var LeftPercent = 0;
                 DayOfWeek.UISpecs[ID].Dom.Active = true;
-                DayOfWeek.UISpecs[ID].Enabled = false;
-                DayOfWeek.UISpecs[ID].Dom.Enabled = false;
+                //DayOfWeek.UISpecs[ID].Enabled = false;
+                //DayOfWeek.UISpecs[ID].Dom.Enabled = false;
                 
                 var HeightPx=(DayOfWeek.UISpecs[ID].css.height/100)*global_DayHeight;
                 if (DayOfWeek.UISpecs[ID].css.height < MinPercent)
@@ -1392,7 +1752,7 @@ getRefreshedData.enableDataRefresh = function (pullLatest)
                 var EndPixelTop =IntersectingArrayData[i].end;
                 //IntersectingArrayData[i].BestBottom.End = EndPixelTop
 
-                if (DoIInterSect(EndPixelTop, i, IntersectingArrayData))
+                if (global_UISetup.ConflictCalculation(EndPixelTop, i, IntersectingArrayData))
                 {
                     widthSubtraction += 10;
                 }
@@ -1434,15 +1794,12 @@ getRefreshedData.enableDataRefresh = function (pullLatest)
 
                 //DayOfWeek.FullDayContext.Dom.appendChild(DayOfWeek.UISpecs[ID].Dom);
                 DayOfWeek.WeekRenderPlane.appendChild(DayOfWeek.UISpecs[ID].Dom);
-                if ((Now >= DayOfWeek.Start) && (Now < DayOfWeek.End))
-                {
-                    $(DayOfWeek.UISpecs[ID].refrenceListElement.Dom).addClass("selectedDayElements");
-                }
-                DayOfWeek.renderPlane.Dom.appendChild(DayOfWeek.UISpecs[ID].refrenceListElement.Dom)
+                
+                
                 $(DayOfWeek.UISpecs[ID].Dom).show();
                 var CallBackLaterData = { ID: ID, Index: i };
                 CallPrepSyncLater.push(CallBackLaterData);
-                //setTimeout(prepUiSlideFunc(DayOfWeek, ID, IntersectingArrayData, i, MaxTabbingIndex), 200 * ++a);
+                //setTimeout(renderSideBarEvents(DayOfWeek, ID, IntersectingArrayData, i, MaxTabbingIndex), 200 * ++a);
                 DayOfWeek.maxIndex = global_ListOfDayCounter;
 
             }
@@ -1456,7 +1813,7 @@ getRefreshedData.enableDataRefresh = function (pullLatest)
         for (var i = 0 ; i < CallPrepSyncLater.length; i++)
         {
             var CallBackLaterData = CallPrepSyncLater[i]
-            setTimeout(prepUiSlideFunc(DayOfWeek, CallBackLaterData.ID, IntersectingArrayData, CallBackLaterData.Index, MaxTabbingIndex), 200 * ++a);
+            setTimeout(global_UISetup.RenderSubEvent(DayOfWeek, CallBackLaterData.ID, IntersectingArrayData, CallBackLaterData.Index, MaxTabbingIndex), 200 * ++a);
         }
         return;
     }
@@ -1518,7 +1875,7 @@ getRefreshedData.enableDataRefresh = function (pullLatest)
     {
         return function ()
         {
-            if (!renderSubEventsClickEvents.isRefListSubEventClicked) {
+            if (!global_UISetup.RenderOnSubEventClick.isRefListSubEventClicked) {
                 global_ExitManager.triggerLastExitAndPop();
             }
             else
@@ -1618,7 +1975,7 @@ getRefreshedData.enableDataRefresh = function (pullLatest)
     
     var global_ListOfDayCounter = 0;
 
-    function DoIInterSect(MeEnd, Index, AllElements)
+    function DoSideBarsInterSect(MeEnd, Index, AllElements)
     {
         var retValue = false;
         MeEnd = MeEnd.toFixed(2);
@@ -1629,8 +1986,11 @@ getRefreshedData.enableDataRefresh = function (pullLatest)
             var PossibleInterferringTop = PossibleInterferringElement.top.toFixed(2);
             if (PossibleInterferringTop < MeEnd)
             {
+                //++Me.Count;
                 PossibleInterferringElement.CalCCount = Me.CalCCount + 1;
-                PossibleInterferringElement.Count = PossibleInterferringElement.CalCCount
+                PossibleInterferringElement.Count = PossibleInterferringElement.CalCCount;
+                PossibleInterferringElement.EarlierCount = PossibleInterferringElement.Count
+
 
                 ///*// #### Note for revert to simplest tabbing enable on this comment block
                 ///BestBottom is data on tab level which ends before Me. BestBottom.Count data member is the of the level, BestBOttom.End is the end pixel
@@ -1648,6 +2008,10 @@ getRefreshedData.enableDataRefresh = function (pullLatest)
                 ///*/
                 retValue = true;
             }
+            else
+            {
+                break;
+            }
 
 
             /*
@@ -1661,6 +2025,81 @@ getRefreshedData.enableDataRefresh = function (pullLatest)
     }
 
 
+
+
+    function DoSideBarsConflictClassic(MeEnd, Index, AllElements) {
+        var retValue = false;
+        MeEnd = MeEnd.toFixed(2);
+        var Me = AllElements[Index];
+        for (var i = Index + 1; i < AllElements.length; i++) {
+            var PossibleInterferringElement = AllElements[i];
+            var PossibleInterferringTop = PossibleInterferringElement.top.toFixed(2);
+            if (PossibleInterferringTop < MeEnd) {
+                ++Me.Count;
+                ++Me.OverlappingCount;
+                
+                PossibleInterferringElement.PrecedingOverlapers = Me.PrecedingOverlapers;
+                ++PossibleInterferringElement.PrecedingOverlapers;
+                ++PossibleInterferringElement.OverlappingCount;
+                ++Me.OverlappingAfterMe
+
+
+
+                PossibleInterferringElement.CalCCount = Me.CalCCount + 1;
+                PossibleInterferringElement.Count = PossibleInterferringElement.CalCCount;
+                PossibleInterferringElement.EarlierCount = PossibleInterferringElement.Count
+
+
+                ///*// #### Note for revert to simplest tabbing enable on this comment block
+                ///BestBottom is data on tab level which ends before Me. BestBottom.Count data member is the of the level, BestBOttom.End is the end pixel
+                if (PossibleInterferringElement.BestBottom.End > MeEnd) {
+                    PossibleInterferringElement.BestBottom.End = MeEnd
+                    PossibleInterferringElement.BestBottom.Count = Me.Count;
+                }
+                if (PossibleInterferringTop >= Me.BestBottom.End)//checks to see if the conflicting Event can go to same level as the BestBottom of Me
+                {
+                    PossibleInterferringElement.Count = Me.BestBottom.Count
+                    Me.BestBottom.End = PossibleInterferringElement.end;
+                    PossibleInterferringElement.CalCCount = Me.CalCCount;
+                }
+                ///*/
+                retValue = true;
+            }
+            else {
+                break;
+            }
+
+
+            /*
+            if (AllElements[Index].BestBottom.End <= myTop) {
+                AllElements[i].Count = AllElements[Index].BestBottom.Count;
+                AllElements[Index].BestBottom.End = End
+            }*/
+        }
+
+        return retValue;
+    }
+
+
+    function DoSubEventsIntersect(MeEnd, Index, AllElements)
+    {
+        var retValue = false;
+        MeEnd = MeEnd.toFixed(2);
+        var Me = AllElements[Index];
+        for (var i = Index+1; i < AllElements.length; i++)
+        {
+            var PossibleInterferringElement = AllElements[i];
+            var PossibleInterferringTop = PossibleInterferringElement.top.toFixed(2);
+            if (PossibleInterferringTop < MeEnd)
+            {
+                PossibleInterferringElement.CalCCount = Me.CalCCount + 1;
+                PossibleInterferringElement.Count = PossibleInterferringElement.CalCCount
+
+            }
+        }
+    }
+    
+
     function HighlightSubEvent(Dom)
     {
         $(Dom).addClass("selectedElements");
@@ -1670,76 +2109,114 @@ function dehighlightSubEvent(Dom)
 {
     $(Dom).removeClass("selectedElements");
 }
-function prepUiSlideFunc(DayOfWeek, ID, MyArray, Index, TabCount)
+
+function renderClassicSubEventLook(DayOfWeek, ID, MyArray, Index, TabCount)
 {
     return function () {
-        //DayOfWeek.UISpecs[ID].Dom.style.left = DayOfWeek.LeftPercent + DayOfWeek.widtPct + "%";
-        /*
-        * DayOfWeek.UISpecs[ID].Dom is the left bar element
-        * DayOfWeek.UISpecs[ID].refrenceListElement is the list element
-        */
-        var GridSubEventWidth = prepUiSlideFunc.SubEventGridWidthContainer / TabCount;
+        //debugger;
+        var GridSubEventWidth = renderClassicSubEventLook.PercentWidthOfDay;// / TabCount;
         //DayOfWeek.UISpecs[ID].Dom.style.left = "100%";
-        DayOfWeek.UISpecs[ID].Dom.style.left = (DayOfWeek.RightPercent - GridSubEventWidth )+ "%"
-        DayOfWeek.UISpecs[ID].Dom.style.height = DayOfWeek.UISpecs[ID].css.height + "%";
-        //DayOfWeek.UISpecs[ID].Dom.style.minHeight = (global_DayHeight * (1 / 24)) + "px";//1/24 because we want the minimum to be the size of an hour
+        var RefEvent = DayOfWeek.UISpecs[ID]
 
-        //DayOfWeek.UISpecs[ID].Dom.style.marginLeft = (-(DayOfWeek.UISpecs[ID].css.left + 18) + "px");
-        DayOfWeek.UISpecs[ID].Dom.style.marginLeft = (-(GridSubEventWidth * MyArray[Index].Count) + "%");
-        DayOfWeek.UISpecs[ID].Dom.style.width = GridSubEventWidth+"%";
-        //DayOfWeek.UISpecs[ID].Dom.style.width = DayOfWeek.UISpecs[ID].css.width + "%";
-        DayOfWeek.UISpecs[ID].Dom.style.top = DayOfWeek.UISpecs[ID].css.top + "%";
-        if (DayOfWeek.UISpecs[ID].IDindex ==0) {
+        var ArrayElement = MyArray[Index];
+        var LeftPercent = DayOfWeek.LeftPercent;//DayOfWeek.RightPercent
+
+        var NumberOfLeftShifts = ArrayElement.PrecedingOverlapers;
+        var LeftShift = NumberOfLeftShifts;
+        
+        if (ID == "112000_7_112054_112055")
+        {
+            //debugger;
+        }
+
+        var DomWidth = (GridSubEventWidth - NumberOfLeftShifts)
+        DomWidth -= ArrayElement.OverlappingAfterMe;
+        /*
+        DomWidth /= (ArrayElement.OverlappingCount + 1);
+
+        var MaxCounts =(( GridSubEventWidth / DomWidth)-1);
+
+        LeftShift = (MaxCounts - LeftShift);
+        if (LeftShift < 0)
+        {
+            LeftShift = Math.abs(LeftShift) / 2;
+        }
+        */
+
+        //LeftShift *= DomWidth;
+
+        LeftPercent = LeftPercent + LeftShift;
+        $(RefEvent.Dom).addClass("ClassicGridEvents");
+        RefEvent.Dom.style.left = (LeftPercent + 1) + "%"
+        RefEvent.Dom.style.height = RefEvent.css.height + "%";
+
+        RefEvent.Dom.style.width = (DomWidth) + "%";
+        RefEvent.Dom.style.top = RefEvent.css.top + "%";
+        
+        var Range = global_DictionaryOfSubEvents[ID].Day;
+        global_DictionaryOfSubEvents[ID].Bind = function () {  };
+
+        function call_renderSubEventsClickEvents(e) {
+            e.stopPropagation();
+            if (e.ctrlKey) {
+                global_multiSelect.AddElement(ID);
+                return;
+            }
+            renderClassicSubEventsClickEvents(ID)
+        }
+    }
+
+}
+renderClassicSubEventLook.PercentWidthOfDay = (100 / 7) -1.5;
+
+
+function renderSideBarEvents(DayOfWeek, ID, MyArray, Index, TabCount)
+{
+    return function () {
+        var RefEvent = DayOfWeek.UISpecs[ID];
+
+        var GridSubEventWidth = renderSideBarEvents.SubEventGridWidthContainer / TabCount;
+        $(RefEvent.Dom).addClass("SideBar");
+        RefEvent.Dom.style.left = (DayOfWeek.RightPercent - GridSubEventWidth )+ "%"
+        RefEvent.Dom.style.height = RefEvent.css.height + "%";
+        //RefEvent.Dom.style.minHeight = (global_DayHeight * (1 / 24)) + "px";//1/24 because we want the minimum to be the size of an hour
+
+        //RefEvent.Dom.style.marginLeft = (-(RefEvent.css.left + 18) + "px");
+        RefEvent.Dom.style.marginLeft = (-(GridSubEventWidth * MyArray[Index].Count) + "%");
+        RefEvent.Dom.style.width = GridSubEventWidth+"%";
+        //RefEvent.Dom.style.width = RefEvent.css.width + "%";
+        RefEvent.Dom.style.top = RefEvent.css.top + "%";
+        if (RefEvent.IDindex ==0) {
             //triggers change to List elements UI elements
-                //DayOfWeek.UISpecs[ID].refrenceListElement.Dom.style.top = (Index * 20) + "px";
-                //DayOfWeek.UISpecs[ID].refrenceListElement.Dom.style.marginTop = (20) + "px";
-                $(DayOfWeek.UISpecs[ID].refrenceListElement.Dom).removeClass("FullColorAugmentation");
-            //DayOfWeek.UISpecs[ID].refrenceListElement.Dom.style.left = DayOfWeek.LeftPercent + "%";
-                DayOfWeek.UISpecs[ID].refrenceListElement.Dom.style.left = 0;
+                //RefEvent.refrenceListElement.Dom.style.top = (Index * 20) + "px";
+                //RefEvent.refrenceListElement.Dom.style.marginTop = (20) + "px";
+                $(RefEvent.refrenceListElement.Dom).removeClass("FullColorAugmentation");
+            //RefEvent.refrenceListElement.Dom.style.left = DayOfWeek.LeftPercent + "%";
+                RefEvent.refrenceListElement.Dom.style.left = 0;
             if (global_DictionaryOfSubEvents[ID].ColorSelection > 0) {
-                //$(DayOfWeek.UISpecs[ID].refrenceListElement.Dom).addClass(global_AllColorClasses[global_DictionaryOfSubEvents[ID].ColorSelection].cssClass);
-                $(DayOfWeek.UISpecs[ID].DataElement.Dom).addClass(global_AllColorClasses[global_DictionaryOfSubEvents[ID].ColorSelection].cssClass);
+                //$(RefEvent.refrenceListElement.Dom).addClass(global_AllColorClasses[global_DictionaryOfSubEvents[ID].ColorSelection].cssClass);
+                $(RefEvent.DataElement.Dom).addClass(global_AllColorClasses[global_DictionaryOfSubEvents[ID].ColorSelection].cssClass);
         }
 
     }
-        var BindToThis = BindClickOfSideBarToCLick(MyArray, DayOfWeek.UISpecs[ID], Index, DayOfWeek.UISpecs[ID].Dom,ID);
+        var BindToThis = BindClickOfSideBarToCLick(MyArray, RefEvent, Index, RefEvent.Dom,ID);
         var Range = global_DictionaryOfSubEvents[ID].Day;
-        DayOfWeek.UISpecs[ID].refrenceListElement.Dom.onmouseover = function () {
+        RefEvent.refrenceListElement.Dom.onmouseover = function () {
             //debugger;
             Range.Parent.onmouseover();
         }
 
-        DayOfWeek.UISpecs[ID].refrenceListElement.Dom.onmouseout = function () {
+        RefEvent.refrenceListElement.Dom.onmouseout = function () {
             //debugger;
             Range.Parent.onmouseout();
         }
 
 
         //if statement ensures that only elements with IDIndex generate the function. This ensures that the selected element shows on the left side of the page.
-        if ((global_DictionaryOfSubEvents[ID].Bind == null) && (DayOfWeek.UISpecs[ID].IDindex == 0)) {
+        if ((global_DictionaryOfSubEvents[ID].Bind == null) && (RefEvent.IDindex == 0)) {
             global_DictionaryOfSubEvents[ID].Bind = BindToThis;
     }
-        /*
-        function triggerClick(e) {
-            if(e!=null)
-            {
-                e.stopPropagation();
-            }
-            global_DictionaryOfSubEvents[ID].Bind()
-        };
-        //$(DayOfWeek.UISpecs[ID].Dom).click(triggerClick);
-        (DayOfWeek.UISpecs[ID].Dom).onclick=(triggerClick);
 
-        $(DayOfWeek.UISpecs[ID].refrenceListElement.Dom).click
-        (
-            function (e) 
-            { 
-                e.stopPropagation();
-                triggerClick();
-                //$(DayOfWeek.UISpecs[ID].Dom).trigger("click");
-            }
-        )//clicking of the named element triggers a click on the
-        */
 
         function call_renderSubEventsClickEvents(e)
         {
@@ -1749,14 +2226,14 @@ function prepUiSlideFunc(DayOfWeek, ID, MyArray, Index, TabCount)
                 global_multiSelect.AddElement(ID);
                 return;
             }
-            renderSubEventsClickEvents(ID)
+            global_UISetup.RenderOnSubEventClick(ID)
         }
-        DayOfWeek.UISpecs[ID].refrenceListElement.Dom.onclick = call_renderSubEventsClickEvents;
+        RefEvent.refrenceListElement.Dom.onclick = call_renderSubEventsClickEvents;
     }
 
 }
-prepUiSlideFunc.PercentWidthOfDay = 100 / 7;
-prepUiSlideFunc.SubEventGridWidthContainer = (100 / 7) * (0.15);//0.15 be cause the SubEventListContainer uses a width of 85%
+renderSideBarEvents.PercentWidthOfDay = 100 / 7;
+renderSideBarEvents.SubEventGridWidthContainer = (100 / 7) * (0.15);//0.15 be cause the SubEventListContainer uses a width of 85%
 
 
 
@@ -1764,7 +2241,7 @@ function renderSubEventsClickEvents(SubEventID)
 {
     global_DictionaryOfSubEvents[SubEventID].Bind();
     global_DictionaryOfSubEvents[SubEventID].showBottomPanel();
-
+    
     var DayContainer=global_DictionaryOfSubEvents[SubEventID].Day
     var refSubEvent = global_DictionaryOfSubEvents[SubEventID].ListRefElement
     setTimeout(function () { PositionIconSet(DayContainer, refSubEvent) },10);
@@ -1772,6 +2249,18 @@ function renderSubEventsClickEvents(SubEventID)
 renderSubEventsClickEvents.BottomPanelIsOpen = false;
 renderSubEventsClickEvents.isRefListSubEventClicked = false;
 
+
+
+function renderClassicSubEventsClickEvents(SubEventID) {
+    global_DictionaryOfSubEvents[SubEventID].Bind();
+    global_DictionaryOfSubEvents[SubEventID].showBottomPanel();
+
+    var DayContainer = global_DictionaryOfSubEvents[SubEventID].Day
+    var refSubEvent = global_DictionaryOfSubEvents[SubEventID].TimeSizeDom
+    setTimeout(function () { PositionIconSet(DayContainer, refSubEvent) }, 10);
+}
+renderClassicSubEventsClickEvents.BottomPanelIsOpen = false;
+renderClassicSubEventsClickEvents.isRefListSubEventClicked = false;
 
 
         function renderUIChanges(DayOfWeek) {
@@ -1837,7 +2326,12 @@ function PopulateUI(ParentDom, refDate)// draws up the container and gathers all
             //getRangeofSchedule();
     var CurrentWeek = ScheduleRange.Start;
     var AllRanges = new Array();
+    var HorizontalScrollPlane = getDomOrCreateNew("HorizontalScrollPlane");
+    //AllWeekData.style.width=(global_RangeMultiplier * 100) + "%"
+    var NameOfWeekContainerPlane = getDomOrCreateNew("NameOfWeekContainerPlane");
     var AllWeekData = getDomOrCreateNew("CurrentWeekContainer");
+    var VerticalScrollContainer = getDomOrCreateNew("VerticalScrollContainer");
+    AllWeekData.appendChild(VerticalScrollContainer)
     var index = 0;
     while (CurrentWeek < ScheduleRange.End)
     {
@@ -1845,12 +2339,18 @@ function PopulateUI(ParentDom, refDate)// draws up the container and gathers all
         //CurrentWeek = CurrentWeek.dst() ? new Date(Number(CurrentWeek.getTime()) +OneHourInMs) : CurrentWeek;
         var MyRange = { Start: CurrentWeek, End: new Date(Number(CurrentWeek) + Number(OneWeekInMs))};
 
-        var CurrentWeekDOm = genDivForEachWeek(MyRange, AllRanges);
+
+        var WeekGird = genDivForEachWeek(MyRange, AllRanges);
+        var CurrentWeekDOm = WeekGird.WeekTwentyFourHourGrid;
+        var CurrentNameWeekDOM = WeekGird.NameOfWeek;
         if (!CurrentWeekDOm.status) {
-                AllWeekData.Dom.appendChild(CurrentWeekDOm.Dom);
+                NameOfWeekContainerPlane.appendChild(CurrentNameWeekDOM);
+                VerticalScrollContainer.Dom.appendChild(CurrentWeekDOm.Dom);
                 var translatePercent = 100 * index;
                 CurrentWeekDOm.Dom.style.transform = 'translateX(' + translatePercent + '%)';
                 $(CurrentWeekDOm.Dom).addClass("weekContainer");
+                CurrentNameWeekDOM.Dom.style.transform = 'translateX(' + translatePercent + '%)';
+                $(CurrentNameWeekDOM.Dom).addClass("weekContainer");
                 //CurrentWeekDOm.Dom.style.width = "100%";
                 //CurrentWeekDOm.Dom.style.width = "100%";
 
@@ -1861,7 +2361,9 @@ function PopulateUI(ParentDom, refDate)// draws up the container and gathers all
         ++index;
     }
 
-    ParentDom.appendChild(AllWeekData.Dom);
+    HorizontalScrollPlane.appendChild(NameOfWeekContainerPlane.Dom);
+    HorizontalScrollPlane.appendChild(AllWeekData.Dom);
+    ParentDom.appendChild(HorizontalScrollPlane)
     global_DayHeight = $(AllWeekData.Dom).height();
     global_WeekWidth = $(AllWeekData.Dom).width();
     global_DayTop = $(AllWeekData.Dom).offset().top;
@@ -2256,9 +2758,9 @@ genDaysForMonthBar.Day = 0;
 
 generateAMonthBar.counter = 0;
 
-        function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range to assign a subEvent. THe range could be a week, month ,or day. It returns an array for the corresponding range it might fall within
-        {
-            //var AllRangeData = new Array();
+function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range to assign a subEvent. THe range could be a week, month ,or day. It returns an array for the corresponding range it might fall within
+{
+    //var AllRangeData = new Array();
     var i = 0;
 
     var verfyDate = new Date(2014, 5, 18, 0, 0, 0, 0);
@@ -2269,156 +2771,162 @@ generateAMonthBar.counter = 0;
     var SubEventEnd = new Date(Number(SubEvent.SubCalEndDate));
     var ValidRange = new Array();
 
-    for (i in AllRangeData) {
+    for (i in AllRangeData)
+    {
         var rangeElement = AllRangeData[i]
         var StartDate = new Date(Number(rangeElement.Start));
         var EndDate = new Date(Number(rangeElement.End));
 
-        if (((SubEvent.ID === "11792_7_11978_11979"))) {
-            var a = 9;
-    }
+        if (((SubEvent.ID === "11792_7_11978_11979")))
+        {
+                var a = 9;
+        }
 
 
-        if ((SubEventStart >= StartDate) && (SubEventStart <= EndDate)) {
+        if ((SubEventStart >= StartDate) && (SubEventStart <= EndDate))
+        {
             ValidRange.push(rangeElement);
             rangeElement.SubEventsCollection[SubEvent.ID] = (SubEvent);
 
-            if (rangeElement.UISpecs[SubEvent.ID] == null) {
-                rangeElement.UISpecs[SubEvent.ID] = { css: { }, IDindex: SubEvent.CurrentIndex, OldIDindex: null, Enabled: true, Dom: null
+            if (rangeElement.UISpecs[SubEvent.ID] == null)
+            {
+                rangeElement.UISpecs[SubEvent.ID] = { css: { }, IDindex: SubEvent.CurrentIndex, OldIDindex: null, Enabled: true, Dom: null}
             }
-        }
             rangeElement.UISpecs[SubEvent.ID].Start = SubEvent.SubCalStartDate.getTime();
             rangeElement.UISpecs[SubEvent.ID].IDindex = SubEvent.CurrentIndex;
             rangeElement.UISpecs[SubEvent.ID].Enabled = true;
             rangeElement.UISpecs[SubEvent.ID].Dom = null;
 
-    }
+        }
         if ((SubEventEnd >= StartDate) && (SubEventEnd <= EndDate)) {
-            if (ValidRange.indexOf(rangeElement) < 0) {
+            if (ValidRange.indexOf(rangeElement) < 0)
+            {
                 ValidRange.push(rangeElement);
-
-                if (rangeElement.UISpecs[SubEvent.ID] == null) {
-                    rangeElement.UISpecs[SubEvent.ID] = { css: { }, IDindex: SubEvent.CurrentIndex, OldIDindex: null, Enabled: true, Dom: null
+                if (rangeElement.UISpecs[SubEvent.ID] == null)
+                {
+                    rangeElement.UISpecs[SubEvent.ID] = { css: { }, IDindex: SubEvent.CurrentIndex, OldIDindex: null, Enabled: true, Dom: null}
                 }
-            }
 
                 rangeElement.SubEventsCollection[SubEvent.ID] = SubEvent;
                 rangeElement.UISpecs[SubEvent.ID].IDindex = SubEvent.CurrentIndex;
                 rangeElement.UISpecs[SubEvent.ID].Enabled = true;
                 rangeElement.UISpecs[SubEvent.ID].Dom = null;
                 rangeElement.UISpecs[SubEvent.ID].Start = SubEvent.SubCalStartDate.getTime();
+            }
         }
     }
-        }
 
 
-    if (ValidRange.length > 0) {
+    if (ValidRange.length > 0) 
+    {
         return ValidRange;
-        }
+    }
 
     return ValidRange;
-    }
+}
 
 
 
 
-        function getMyDom(SubEvent, Range) {
-        var referenceStart = new Date(Range.Start);
-            //referenceStart.setHours(refStart.Hour, refStart.Minute);
-        var referenceEnd = new Date(Range.End);
-            //referenceEnd.setHours(refEnd.Hour, refEnd.Minute);
-        var SubCalCalEventStart = new Date(SubEvent.SubCalStartDate);
-        var SubCalCalEventEnd = new Date(SubEvent.SubCalEndDate);
-        if ((SubEvent.gridDoms == undefined) || (SubEvent.gridDoms == null)) {
-            SubEvent.gridDoms = new Array();
-        }
+        function getMyDom(SubEvent, Range) 
+        {
+            var referenceStart = new Date(Range.Start);
+                //referenceStart.setHours(refStart.Hour, refStart.Minute);
+            var referenceEnd = new Date(Range.End);
+                //referenceEnd.setHours(refEnd.Hour, refEnd.Minute);
+            var SubCalCalEventStart = new Date(SubEvent.SubCalStartDate);
+            var SubCalCalEventEnd = new Date(SubEvent.SubCalEndDate);
+            if ((SubEvent.gridDoms == undefined) || (SubEvent.gridDoms == null))
+            {
+                SubEvent.gridDoms = new Array();
+            }
 
-        if (SubCalCalEventStart > referenceStart) {
-            referenceStart = SubCalCalEventStart;
-        }
+            if (SubCalCalEventStart > referenceStart) {
+                referenceStart = SubCalCalEventStart;
+            }
 
-        if (referenceEnd > SubCalCalEventEnd) {
-            referenceEnd = SubCalCalEventEnd;
-        }
+            if (referenceEnd > SubCalCalEventEnd) {
+                referenceEnd = SubCalCalEventEnd;
+            }
 
-        if (SubEvent.ID == "110844_7_110850_110851") {
-            //debugger;
-            var z = 981;
-        }
+            var totalDuration = referenceEnd -referenceStart;
+            var percentHeight = (totalDuration / OneDayInMs) * 100;
 
-        var totalDuration = referenceEnd -referenceStart;
-        var percentHeight = (totalDuration / OneDayInMs) * 100;
-
-        var percentTop = ((referenceStart - new Date(Range.Start)) / OneDayInMs) * 100;
-            function call_renderSubEventsClickEvents(e) {
-            e.stopPropagation();
-            renderSubEventsClickEvents(SubEvent.ID)
-        }
-        if (Range.UISpecs[SubEvent.ID].Enabled) {
-            Range.UISpecs[SubEvent.ID].css = { height: 0, top: 0
-        };
-            Range.UISpecs[SubEvent.ID].css.height = percentHeight;
-            Range.UISpecs[SubEvent.ID].css.top = percentTop;
-            Range.UISpecs[SubEvent.ID].Enabled = true;
-            var CurrentIndex = SubEvent.CurrentIndex++;
-            Range.UISpecs[SubEvent.ID].IDindex = CurrentIndex;
+            var percentTop = ((referenceStart - new Date(Range.Start)) / OneDayInMs) * 100;
+            function call_renderSubEventsClickEvents(e)
+            {
+                e.stopPropagation();
+                //renderSubEventsClickEvents(SubEvent.ID)
+                global_UISetup.RenderOnSubEventClick(SubEvent.ID);
+            }
+            if (Range.UISpecs[SubEvent.ID].Enabled)
+            {
+                Range.UISpecs[SubEvent.ID].css = { height: 0, top: 0};
+                Range.UISpecs[SubEvent.ID].css.height = percentHeight;
+                Range.UISpecs[SubEvent.ID].css.top = percentTop;
+                Range.UISpecs[SubEvent.ID].Enabled = true;
+                var CurrentIndex = SubEvent.CurrentIndex++;
+                Range.UISpecs[SubEvent.ID].IDindex = CurrentIndex;
 
 
-            var EventDom = getDomOrCreateNew(SubEvent.ID + "_" + Range.UISpecs[SubEvent.ID].IDindex);
+                var EventDom = getDomOrCreateNew(SubEvent.ID + "_" + Range.UISpecs[SubEvent.ID].IDindex);
 
-            Range.UISpecs[SubEvent.ID].Dom = EventDom.Dom
-            Range.UISpecs[SubEvent.ID].Dom.Enabled = true;
-            SubEvent.gridDoms.push(EventDom.Dom);
+                Range.UISpecs[SubEvent.ID].Dom = EventDom.Dom
+                Range.UISpecs[SubEvent.ID].Dom.Enabled = true;
+                SubEvent.gridDoms.push(EventDom.Dom);
 
-            $(EventDom.Dom).addClass("gridSubevent");
+                $(EventDom.Dom).addClass("gridSubevent");
             
 
-            if (SubEvent.ID == "110972_7_110976_110977")
-            {
-                //debugger;
-            }
-            $(EventDom.Dom).hover(function () {
-               //setTimeout(function () { debugger; },100)
+                if (SubEvent.ID == "110972_7_110976_110977")
+                {
+                    //debugger;
+                }
+                $(EventDom.Dom).hover(function () {
+                    //setTimeout(function () { debugger; },100)
                 
-            });
+                });
 
-            EventDom.setAttribute("Title", SubEvent.SubCalStartDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + " - " + SubEvent.SubCalEndDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
-            //debugger;
-            if (SubEvent.ColorSelection > 0) {
+                EventDom.setAttribute("Title", SubEvent.SubCalStartDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + " - " + SubEvent.SubCalEndDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
                 //debugger;
-                $(EventDom.Dom).addClass(global_AllColorClasses[SubEvent.ColorSelection].cssClass);
-        }
-            $(EventDom.Dom).addClass("SameSubEvent" + SubEvent.ID);
+                if (SubEvent.ColorSelection > 0)
+                {
+                    $(EventDom.Dom).addClass(global_AllColorClasses[SubEvent.ColorSelection].cssClass);
+                }
+                $(EventDom.Dom).addClass("SameSubEvent" + SubEvent.ID);
 
-            //$(EventDom.Dom).click(prepOnClickOfCalendarElement(SubEvent, EventDom.Dom));
-            global_DictionaryOfSubEvents[SubEvent.ID].showBottomPanel = prepOnClickOfCalendarElement(SubEvent, EventDom.Dom);
-            global_DictionaryOfSubEvents[SubEvent.ID].Day = Range;
+                //$(EventDom.Dom).click(prepOnClickOfCalendarElement(SubEvent, EventDom.Dom));
+                global_DictionaryOfSubEvents[SubEvent.ID].showBottomPanel = prepOnClickOfCalendarElement(SubEvent, EventDom.Dom);
+                global_DictionaryOfSubEvents[SubEvent.ID].Day = Range;
+                global_DictionaryOfSubEvents[SubEvent.ID].TimeSizeDom = EventDom;
 
-            EventDom.Dom.onmouseover = function () {
-                //debugger;
-                Range.Parent.onmouseover();
+                EventDom.Dom.onmouseover = function () {
+                    //debugger;
+                    Range.Parent.onmouseover();
+                }
+
+                EventDom.Dom.onmouseout = function () {
+                    //debugger;
+                    Range.Parent.onmouseout();
+                }
+
+                //global_DictionaryOfSubEvents[SubEvent.ID].
+
+
+                EventDom.Dom.onclick = call_renderSubEventsClickEvents;
+                //EventDom.Dom.innerHTML = SubEvent.Name
             }
-
-            EventDom.Dom.onmouseout = function () {
-                //debugger;
-                Range.Parent.onmouseout();
-            }
-
-            //global_DictionaryOfSubEvents[SubEvent.ID].
-
-
-            EventDom.Dom.onclick = call_renderSubEventsClickEvents;
-            //EventDom.Dom.innerHTML = SubEvent.Name
-        }
-        else {
-            if (!Range.UISpecs[SubEvent.ID].Enabled)//checks if it is active
+            else
             {
-                Range.UISpecs[SubEvent.ID].Dom.outerHTML ="";
-                //Range.UISpecs[SubEvent.ID].Dom.style.height = 0;
-                var retValue = delete Range.UISpecs[SubEvent.ID];
-                //toBeDeletedDom.Dom.parentElement.removeChild(toBeDeletedDom.Dom);
-        }
-        }
+                if (!Range.UISpecs[SubEvent.ID].Enabled)//checks if it is active
+                {
+                    debugger;
+                    Range.UISpecs[SubEvent.ID].Dom.outerHTML ="";
+                    //Range.UISpecs[SubEvent.ID].Dom.style.height = 0;
+                    var retValue = delete Range.UISpecs[SubEvent.ID];
+                    //toBeDeletedDom.Dom.parentElement.removeChild(toBeDeletedDom.Dom);
+                }
+            }
         }
 
 
@@ -2459,7 +2967,7 @@ generateAMonthBar.counter = 0;
         function prepOnClickOfCalendarElement(SubEvent, Dom) {
         return function () {
             //event.stopPropagation();
-            if (!renderSubEventsClickEvents.isRefListSubEventClicked)
+            if (!global_UISetup.RenderOnSubEventClick.isRefListSubEventClicked)
             {
                 global_ExitManager.triggerLastExitAndPop();
             }
@@ -2743,8 +3251,8 @@ generateAMonthBar.counter = 0;
                 completeButton.onclick = null;
                 $(ControlPanelContainer).slideUp(500);
                 document.removeEventListener("keydown", containerKeyPress);
-                renderSubEventsClickEvents.isRefListSubEventClicked = false;
-                renderSubEventsClickEvents.BottomPanelIsOpen = false;
+                global_UISetup.RenderOnSubEventClick.isRefListSubEventClicked = false;
+                global_UISetup.RenderOnSubEventClick.BottomPanelIsOpen = false;
                 
                 if (IconSetContainer.parentNode != null) {
                     IconSetContainer.parentNode.removeChild(IconSetContainer);
@@ -2755,7 +3263,7 @@ generateAMonthBar.counter = 0;
 
 
             //checks if bottompannel is open. If panel is open then just reset the subevent reflist element as opposed to 
-            if (!renderSubEventsClickEvents.isRefListSubEventClicked) {
+            if (!global_UISetup.RenderOnSubEventClick.isRefListSubEventClicked) {
                 global_ExitManager.addNewExit(CombinedCLoser);
             }
             
@@ -3014,8 +3522,8 @@ generateAMonthBar.counter = 0;
             document.removeEventListener("keydown", containerKeyPress);//this is here just to avooid duplicate addition of the same keypress event
             document.addEventListener("keydown", containerKeyPress);
 
-            renderSubEventsClickEvents.isRefListSubEventClicked = true;
-            renderSubEventsClickEvents.BottomPanelIsOpen = true;
+            global_UISetup.RenderOnSubEventClick.isRefListSubEventClicked = true;
+            global_UISetup.RenderOnSubEventClick.BottomPanelIsOpen = true;
 
             /*
             ControlPanelNameOfSubeventInfo.innerHTML = SubEvent.Name;
@@ -3396,12 +3904,22 @@ function genDivForEachWeek(RangeOfWeek, AllRanges)//generates each week containe
     var refDate = new Date(RangeOfWeek.Start);
     var WeekID = Number(RangeOfWeek.Start) + "_" + Number(RangeOfWeek.End)
     var WeekRange = getDomOrCreateNew(WeekID);
-    var WeekRenderPlaneID = WeekID +"RenderPlane"
-    var RenderPlane = getDomOrCreateNew(WeekRenderPlaneID);
-    $(RenderPlane.Dom).addClass("renderPlane");
+    var WeekGridRenderPlaneID = WeekID + "WeekGridRenderPlane"
+    var RenderPlane = getDomOrCreateNew(WeekGridRenderPlaneID);
+    $(RenderPlane.Dom).addClass("WeekGridRenderPlane");
+
+    var SubEventRenderPlaneID = WeekID + "SubEventRenderPlane"
+    var SubEventRenderPlane = getDomOrCreateNew(SubEventRenderPlaneID);
+    var NameOfWeekDayRenderPlaneID = WeekID + "NameOfWeekDayRenderPlane"
+    var NameOfWeekDayRenderPlane = getDomOrCreateNew(NameOfWeekDayRenderPlaneID);
+    $(NameOfWeekDayRenderPlane.Dom).addClass("NameOfWeekDayRenderPlane");
+
+    $(SubEventRenderPlane.Dom).addClass("SubEventRenderPlane");
+    RenderPlane.appendChild(NameOfWeekDayRenderPlane);
+    RenderPlane.appendChild(SubEventRenderPlane);
     var prev;
 
-    BindAddNewEventToClick(WeekRange);
+    
 
     var StartOfDay = new Date(RangeOfWeek.Start);
     //StartOfDay = StartOfDay.dst() ? new Date(Number(StartOfDay.getTime())) : StartOfDay +OneHourInMs;
@@ -3441,6 +3959,7 @@ function genDivForEachWeek(RangeOfWeek, AllRanges)//generates each week containe
                 var Month = currDate.getMonth() +1;
                 var Day = currDate.getDate();
                 myDay.NameOfDayContainer.Dom.innerHTML = "<p>" + DayOfWeek.substring(0, 2) + "<p class='dateOfDay'>" + myDay.Start.getDate();
+                NameOfWeekDayRenderPlane.appendChild(myDay.NameOfDayContainer);
                 if (isToday)
                 {
                     var PreviousDay = $(".CurrentDay");
@@ -3457,17 +3976,19 @@ function genDivForEachWeek(RangeOfWeek, AllRanges)//generates each week containe
                 myDay.UISpecs = {
                 };
 
-                myDay.WeekRenderPlane = RenderPlane;
+                myDay.WeekRenderPlane = SubEventRenderPlane;
                 $(myDay.Parent.Dom).addClass(DayOfWeek + "DayContainer");
-                RenderPlane.appendChild(myDay.Parent.Dom);
+                SubEventRenderPlane.appendChild(myDay.Parent.Dom);
                 //WeekRange.Dom.appendChild(myDay.Parent.Dom);
                 myDay.LeftPercent = (DayIndex * widthPercent);
                 myDay.RightPercent = myDay.LeftPercent + widthPercent;
 
                 DayIndex += 1;
                 DaysOfWeekDoms.push(myDay);
-        });
-
+            });
+        SubEventRenderPlane.Start = RangeOfWeek.Start;
+        SubEventRenderPlane.End = RangeOfWeek.End;
+        BindAddNewEventToClick(SubEventRenderPlane);
         WeekRange.DaysOfWeek = DaysOfWeekDoms;
         var Index =AllRanges.length//gets index, because it gets the index bewfore the push
         AllRanges.push(WeekRange);
@@ -3478,26 +3999,28 @@ function genDivForEachWeek(RangeOfWeek, AllRanges)//generates each week containe
         AllRanges[Index].SubEventsCollection = {
     };
         }
-    WeekRange.renderPlane = RenderPlane;
+    WeekRange.renderPlane = SubEventRenderPlane;
 
             //binds click event to creation of new event
 
 
     WeekRange.Dom.appendChild(RenderPlane.Dom);
 
-    return WeekRange;
+    var RetValue = { NameOfWeek: NameOfWeekDayRenderPlane, WeekTwentyFourHourGrid: RenderPlane }
+    return RetValue;
     }
 
         //function creates Bind a click event to the render plane to enable addition of new events
         function BindAddNewEventToClick(Week) {
     var RenderPlaneDom = Week.Dom;
     $(RenderPlaneDom).click(function (e) {
+        //debugger;
         var posX = $(this).offset().left
         var posY = $(this).offset().top;
         var left = e.pageX -posX;
         var top = e.pageY -posY;
         var height = $(RenderPlaneDom).height();
-        var width = $(RenderPlaneDom).width();
+        var width = $("body").width() - e.pageX ;
         //debugger;
 
         //alert(width);

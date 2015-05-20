@@ -14,23 +14,23 @@ body {
 }
 
 #MonthBar {
-  height: 7%;
+  height: 50px;
   border-top: 1px solid black;
   border-bottom: 1px solid black;
   width: 100%;
-  position: absolute;
-  top: 12.5%;
+  position: relative;
+  /* top: 12.5%; */
 }
 
 #FullWeekContainer 
 {
-  position:absolute;
-  top: 20%;
-  left: 0;
-  background-color:white;
-  border-radius:20px;
-  width:100%;
-  height:75%;
+    position: absolute;
+    left: 0;
+    background-color: white;
+    border-radius: 20px;
+    width: 100%;
+    height: 78%;
+    margin-top:5px;
 }
 
 #LeftPane 
@@ -47,14 +47,34 @@ body {
 
 #CurrentWeekContainer 
 {
-  width:100%;
-  left: 0;
-  height:100%;
-  position:absolute;
-  overflow:auto;
-  overflow-y:hidden;
+    width: 100%;
+    left: 0;
+    height: calc(100% - 50px);
+    position: relative;
+    box-sizing: border-box;
+    overflow-y: auto;
+    overflow-x: hidden;
+    border-bottom: solid 1px;
 }
 
+
+#VerticalScrollContainer
+{
+  height: 200%;
+  position: absolute;
+  width: calc(100% - 3em);
+  overflow-y: hidden;
+  overflow-x: hidden;
+  //margin-left: 3em;
+  //box-shadow: inset rgba(20,20,20,0.3) 5px -1px 4px;
+}
+
+#HorizontalScrollPlane
+{
+    height:100%;
+    overflow-x:auto;
+    overflow-y:hidden;
+}
 
 .disabledWeekRange 
 {
@@ -84,9 +104,9 @@ body {
   position:absolute;
   width:calc(100% / 7);
   overflow:hidden;
-  height: 116.279069767% !important;
+  //height: 116.279069767% !important;
   overflow: hidden;
-  top: -16.6666666667%;
+  //top: -16.6666666667%;
   box-sizing:border-box;
 }
 
@@ -141,19 +161,21 @@ body {
 
 .NameOfDayContainer 
 {
-  position:absolute;
-  height:14%;
-  width:100%;
+  position:relative;
+  height:100%;
+  width:calc(100%/7);
   text-align:center;
   white-space: nowrap;
   border-bottom:solid black 1px;
+  box-sizing:border-box;
+  display:inline-block;
 }
 
 .NameOfDayContainer p {
-  font-family: 'texbold';
-  font-size: 34px;
-  line-height: 59px;
-  margin-top: 0;
+    font-family: 'texbold';
+    font-size: 25px;
+    line-height: 20px;
+    margin-top: 0;
 }
 
 .NameOfDayContainer span {
@@ -165,11 +187,11 @@ body {
 
 .dateOfDay 
 {
-    font-size: 16px !important;
+    font-size: 11px !important;
     font-family: 'texreg', Helvetica, sans-serif !important;
     position: absolute;
-    top: 36%;
-    height: 50%;
+    /* top: 36%; */
+    /* height: 50%; */
     width: 100%;
 }
 
@@ -201,12 +223,15 @@ body {
   width:100%;
 }
 
+.SingleDayShadeWidth
+{
+    width: calc(100% - 1.6em);
+}
+
 .DarkerShade 
 {
     position:absolute;
     border-bottom: 1px solid rgb(202, 241, 255); 
-    width: calc(100% - 1.6em);
-
     cursor: pointer;
     //overflow:visible;
 }
@@ -216,9 +241,22 @@ body {
   position:absolute;
   border-bottom: 1px solid #eee;
   width: calc(100% - 1.6em);
+  box-sizing:border-box;
   cursor: pointer;
 }
 
+.FullGridContainer
+{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-right: solid 1px rgba(10,10,10,.3);
+    box-sizing: border-box;
+}
+.FullGridShadeContainer
+{
+    width:100%;
+}
 .EventDayContainer 
 {
   position:absolute;
@@ -232,8 +270,6 @@ body {
   cursor: pointer;
   //width:12.87%;
   transition:all 1s;
-  background-color:rgba(1,1,1,.1);
-  
   overflow:hidden;
   text-align:left;
   text-overflow:ellipsis;
@@ -241,9 +277,21 @@ body {
   white-space:nowrap;
   box-sizing:border-box;
   border:white 1px solid;
-  border-radius:7px;
-  max-width:17px;
+}
+.ClassicGridEvents
+{
+    background-color: rgba(244,242,230,1);
+    //box-shadow: rgba(250,250,250,.3) 0 0 1px 1px;
+    min-height: calc(100%/48);
+    border-radius: 2px;
+    box-shadow:rgba(20,20,20,.4) 0 0 4px;
+}
 
+.SideBar
+{
+    max-width:17px;
+    border-radius:7px;
+    background-color: rgba(1,1,1,.1);
 }
 
 .gridSubeventContainer {
@@ -256,36 +304,68 @@ body {
 
 }
 
-.renderPlane {
-position: absolute;
-    left: 0;
-    top: 14%;
-    width: 100%;
-    height: 86%;
-    padding: 2px;
-    box-sizing: border-box;
+.ZoomInto12Hours
+{
+    height:200% !important;
+}
 
-/*
-<<<<<<< HEAD
+.ZoomInto24Hours
+{
+    height:100% !important;
+}
+
+.FullGridEnhancements
+{
+  margin-left: 3em;
+  box-shadow: inset rgba(20,20,20,0.3) 3px -4px 6px;
+}
+
+#NameOfWeekContainerPlane
+{
+  height: 50px;
+  position: relative;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  //margin-left: 3em;
+  //box-shadow: inset rgba(20,20,20,0.3) 5px -1px 4px;
+}
+.WeekGridRenderPlane 
+{
+  position: absolute;
+  left: 0;
+  /* top: 14%; */
+  width: 100%;
+  height: 100%;
+  padding: 2px;
+  box-sizing: border-box;
+}
+
+
+
+.SubEventRenderPlane 
+{
+  position: absolute;
+  /* top: 50px; */
+  border-radius: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  padding: 2px;
+  box-sizing: border-box;
+  //background-color: rgba(255,0,0,.5);
+}
+
+.NameOfWeekDayRenderPlane
+{
     position: absolute;
+    top:0px;
+    border-radius:0;
     left: 0;
-    top: 14%;
-    width: 100%;
-    height: 86%;
+    width: calc(100% - 17px) !important;/*17px derived from width of scroll bar*/
+    height: 50px;
     padding: 2px;
     box-sizing: border-box;
-=======
-    
-  position:absolute;
-  left:0;
-  cursor: pointer;
-  top:14.5%;
-  width:100%;
-  height:83%;
-  border-bottom: 1px solid black;
-  padding-bottom: 2px;
-  //background-color:rgba(20,255,20,.3);
-/*>>>>>>> e5cb8506ad4d32507c63315d56156ba841ffb2a1*/
+    /*background-color:rgba(0,0,255,.5);*/
 }
 
 /*Conrol panel Container*/
@@ -455,10 +535,10 @@ position: absolute;
 .ControlPanelButton:first-child { margin-left: 0; }
 
 #Header {
-  width: 100%;
-  position: relative;
-  top: 0;
-  height: 12.5%;
+    width: 100%;
+    position: relative;
+    top: 0;
+    height: 12.5%;
 }
 
 #Header .ControlPanelButton {
@@ -470,8 +550,8 @@ position: absolute;
 #Header #AddEventButton 
 { 
     background-position: -135px 0;
-    left: 100%;
-    position: absolute; 
+    position: relative; 
+    margin-left:0;
 }
 #Header #AddEventButton:hover { background-position: -135px -45px; }
 
@@ -518,6 +598,74 @@ position: absolute;
   transition:all .1s;
 }
 
+#ViewContainer 
+{
+  width: 48px;
+  height: 56px;
+  /* border: solid 1px; */
+  position: relative;
+  /* top: 120%; */
+  /* left: 100%; */
+  /* transform: translateX(-100%); */
+  /* margin-left: -5%; */
+  display: inline-block;
+  overflow: hidden;
+}
+
+
+
+.ViewButton
+{
+  width: 100%;
+  height: 100%;
+  position: relative;
+  top: 5%;
+  left: 3%;
+  margin-right: 3%;
+  box-sizing: border-box;
+  /* border: solid 1px; */
+  display: inline-block;
+}
+
+#ListViewButtonImg
+{
+    background-position: -5px 0;
+	width: 39px;
+	height: 52px;
+}
+
+
+#ListViewButtonImg:hover
+{
+	background-position: -105px 0;
+	width: 39px;
+	height: 52px;
+}
+
+
+#ClassicViewButtonImg
+{
+    background-position: 0 -102px ;
+	width: 39px;
+	height: 52px;
+}
+
+#ClassicViewButtonImg:hover
+{
+    background-position: -203px -100px ;
+	width: 39px;
+	height: 52px;
+}
+.ViewButtonImg
+{
+    background-image: url('../img/Icons/ViewButtonSprites.png');
+    background-repeat:no-repeat;
+    height:100%;
+    width:100%;
+    position:relative;
+    margin-left: 6px;
+}
+
 #DirectionPanel 
 {
   position:absolute;
@@ -534,26 +682,30 @@ position: absolute;
   width:100%;
 }
 
+.TimeOfDayContainer:hover
+{
+    color: rgba(10,10,10,.5);
+}
+
+
 
 .DayOfTime 
 {
-    position:absolute;
-    top:14%;
-    width: 8%;
-    max-width:49px;
-    height:calc(86% - 16px);
-    font-family: 'texreg', Helvetica, sans-serif;
-    font-variant: small-caps;
-    font-size: .6em;
+  position: absolute;
+  top: 0;
+  width: 4em;
+  max-width: 49px;
+  height: 100%;
+  font-family: 'texreg', Helvetica, sans-serif;
+  font-variant: small-caps;
+  font-size: .6em;
 }
 
 #leftDayOfTime {
-  display:none;
-  text-align:right;
+  text-align: right;
   overflow-x: visible;
-  overflow-y:hidden;
-  box-shadow: 2px 0px 2px rgb(136, 136, 136);
-  
+  overflow-y: hidden;
+  /* box-shadow: 2px 0px 2px rgb(136, 136, 136); */
 }
 
 #rightDayOfTime {
@@ -582,7 +734,7 @@ position: absolute;
     width:100%;
 }
 
-.ListElement 
+.TimeDataFormat 
 {
     width: 100%;
     height: auto;
@@ -590,10 +742,13 @@ position: absolute;
     font-size: 12px;
     overflow: hidden;
     transition: all .1s;
-    left: 100%;
     margin-top: 2px;
 }
 
+.ListElement
+{
+    left: 100%;
+}
 
 .SubEventReferenceName 
 {
@@ -660,7 +815,7 @@ position: absolute;
     display:block; 
 }
 
-.ListElementDataContentContainer 
+.ListElementColorContainer
 {
     position: relative;
     cursor: pointer;
@@ -670,6 +825,30 @@ position: absolute;
     left: 3px;
     display: inline-block;
     box-shadow: rgba(10,10,10,0.2) 0px 2px 3px;
+}
+
+.ListElementDataContentContainer 
+{
+    position: relative;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+    //border-radius: 5px;
+    //left: 3px;
+    //display: inline-block;
+    //box-shadow: rgba(10,10,10,0.2) 0px 2px 3px;
+}
+
+.ListElementDataContentContainerClassic
+{
+    position: relative;
+    cursor: pointer;
+    width: calc(100% - 17px);
+    //height: 90%;
+    border-radius: 5px;
+    left: 3px;
+    display: inline-block;
+    //box-shadow: rgba(10,10,10,0.2) 0px 2px 3px;
 }
 
 .EventLockImgContainer {
@@ -683,18 +862,19 @@ position: absolute;
 
 .MonthButton 
 {
-    width: 3em;
+    width: 44px;
     left: 20px;
-    height: auto;
+    height: 44px;
     top: 50%;
     /* margin: 0 auto; */
-    margin-top: -1.5em;
+    margin-top: -22px;
     position: absolute;
     cursor: pointer;
     /* border: solid black 1px; */
     text-align: center;
     border-radius: 5px;
     box-shadow: rgba(30,30,30,.8) 0 0 6px;
+    font-size: 15px;
 }
 
 .MonthBarDay 
@@ -1176,9 +1356,9 @@ width: auto;
   position: relative;
   top: 10px;
   left: 30px;
-  height: 100px;
+  height: 85px;
   width: auto;
-  max-width:200px;
+  max-width: 200px;
 }
 
 .MenuElementContainer {
@@ -1202,19 +1382,23 @@ width: auto;
 
 .SubEventListContainer
 {
-    position:absolute;
-    width:85%;
-    left:0;
-    padding-top:10px;
+    position: absolute;
+    width: 85%;
+    left: 0;
+    padding-top: 10px;
+    max-height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 
 .DayContextContainer
 {
     position:absolute;
-    top: 14%;
-    height:86%;
+    //top: 50px;
+    //height:86%;
     width:100%;
+    height: 100%  !important;/*50px derived from NameOfDayContainer*/
 }
 
 .EventLockContainer
@@ -1222,7 +1406,7 @@ width: auto;
     position: relative;
     left: 0;
     width: 14px;
-    height: 18px;
+    height: 46px;/*Derived from height of ListElementDataContentContainerClassic*/
     display: inline-block;
     //z-index: 20;
 }

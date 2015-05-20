@@ -1,6 +1,6 @@
 ﻿"use strict"
 var DisableRegistration = false;
-var Debug =  true;
+var Debug =  false;
 var DebugLocal = false;
 
 //var global_refTIlerUrl = "http://localhost:53201/api/";
@@ -29,6 +29,9 @@ catch(e)
     //debugger;
     UserCredentials= { UserName: "", ID: "", Name: "" };
 }
+
+var global_DictionaryOfSubEvents = {};
+var global_RemovedElemnts = {};
 
 var OneDayInMs = 86400000;
 var OneWeekInMs = OneDayInMs * 7;
@@ -223,6 +226,173 @@ function triggerUndoPanel(UndoMessage)
         
     }
 }
+
+
+function StructuralizeNewData(NewData)
+{
+    if (NewData != "") {
+        TotalSubEventList = new Array();
+        ActiveSubEvents = new Array();
+        generateNonRepeatEvents(NewData.Schedule.NonRepeatCalendarEvent);
+        generateRepeatEvents(NewData.Schedule.RepeatCalendarEvent);
+        CleanupData();
+        global_RemovedElemnts = global_DictionaryOfSubEvents;
+        global_DictionaryOfSubEvents = {};
+    }
+    else {
+        console.log("Empty Data");
+    }
+
+    function generateRepeatEvents(AllRepeatSchedules) {
+        AllRepeatSchedules.forEach(function (EachRepeatEvent) { EachRepeatEvent.RepeatCalendarEvents.forEach(CalendarCreateDomElement) });
+    }
+
+    function generateNonRepeatEvents(AllNonRepeatingEvents) {
+        AllNonRepeatingEvents.forEach(CalendarCreateDomElement);
+        //return AllNonRepeatingEvents;
+    }
+
+
+    function CalendarCreateDomElement(CalendarEvent) {
+        //function is responsible for populating Dictionary_OfSubEvents. It also tries to populate the respective sub event dom
+        var UIColor = {};
+        UIColor.R = CalendarEvent.RColor;
+        UIColor.G = CalendarEvent.GColor;
+        UIColor.B = CalendarEvent.BColor;
+        UIColor.O = CalendarEvent.OColor;
+        UIColor.S = CalendarEvent.ColorSelection;
+        var CalendarData = { CompletedEvents: CalendarEvent.NumberOfCompletedTasks, DeletedEvents: CalendarEvent.NumberOfDeletedEvents, TotalNumberOfEvents: CalendarEvent.NumberOfSubEvents, UI: UIColor, Rigid: CalendarEvent.Rigid };
+        Dictionary_OfCalendarData[CalendarEvent.ID] = CalendarData;
+        var i = 0;
+        for (; i < CalendarEvent.AllSubCalEvents.length; i++) {
+            CalendarEvent.AllSubCalEvents[i].Name = CalendarEvent.CalendarName;
+            TotalSubEventList.push(PopulateDomForScheduleEvent(CalendarEvent.AllSubCalEvents[i], CalendarEvent.Tiers));
+        }
+    }
+
+
+    function CleanupData()
+    {
+        TotalSubEventList.sort(function (a, b) { return (a.SubCalStartDate) - (b.SubCalStartDate) });
+
+        
+        var NowDate = new Date(CurrentTheme.Now);
+        TotalSubEventList.forEach(function (eachSubEvent) {
+            if (Dictionary_OfSubEvents[eachSubEvent.ID] == null) {
+                Dictionary_OfSubEvents[eachSubEvent.ID] = eachSubEvent;
+            }
+            else {
+                ToBeReorganized.push(eachSubEvent);
+                //if (Dictionary_OfSubEvents[eachSubEvent.ID].SubCalStartDate != eachSubEvent.SubCalStartDate)
+                {
+                    //global_DeltaSubevents.push(eachSubEvent);
+                }
+
+            }
+            //debugger;
+            var RangeStart = new Date(NowDate.getTime() - (OneHourInMs * 12));
+            var RangeEned = new Date(CurrentTheme.Now + TwelveHourMilliseconds);
+
+            
+        }
+        )
+
+    }
+
+
+
+
+    function PopulateDomForScheduleEvent(myEvent, Tiers) {
+        
+
+        //debugger;
+        /*
+        myEvent.SubCalStartDate = new Date(myEvent.SubCalStartDate + global_TimeZone_ms );
+        myEvent.SubCalEndDate = new Date(myEvent.SubCalEndDate + global_TimeZone_ms );
+        myEvent.SubCalCalEventStart = new Date(myEvent.SubCalCalEventStart + global_TimeZone_ms );
+        myEvent.SubCalCalEventEnd = new Date(myEvent.SubCalCalEventEnd + global_TimeZone_ms );
+        //*/
+
+        ///*
+        myEvent.SubCalStartDate = new Date(myEvent.SubCalStartDate);// + global_TimeZone_ms);
+        myEvent.SubCalEndDate = new Date(myEvent.SubCalEndDate);// + global_TimeZone_ms);
+        myEvent.SubCalCalEventStart = new Date(myEvent.SubCalCalEventStart);//+ global_TimeZone_ms);
+        myEvent.SubCalCalEventEnd = new Date(myEvent.SubCalCalEventEnd);// + global_TimeZone_ms);
+        myEvent.Tiers = Tiers;
+        //*/
+        /*myEvent.SubCalStartDate = !myEvent.SubCalStartDate.dst() ? new Date(Number(myEvent.SubCalStartDate.getTime()) + OneHourInMs) : myEvent.SubCalStartDate;
+        myEvent.SubCalEndDate =! myEvent.SubCalEndDate.dst() ? new Date(Number(myEvent.SubCalEndDate.getTime()) + OneHourInMs) : myEvent.SubCalEndDate;
+        myEvent.SubCalCalEventStart = !myEvent.SubCalCalEventStart.dst() ? new Date(Number(myEvent.SubCalCalEventStart.getTime()) + OneHourInMs) : myEvent.SubCalCalEventStart;
+        myEvent.SubCalCalEventEnd = !myEvent.SubCalCalEventEnd.dst() ? new Date(Number(myEvent.SubCalCalEventEnd.getTime()) + OneHourInMs) : myEvent.SubCalCalEventEnd;*/
+
+
+
+        //var MobileDom = genereateMobileDoms(myEvent);
+        //myEvent.Dom = MobileDom;
+        return myEvent
+    }
+
+}
+
+function getEventsWithinRange(RangeStart, RangeEned) {
+    var RetValue = new Array();
+    for (var i = 0 ; i < TotalSubEventList.length; i++) {
+        var eachSubEvent = TotalSubEventList[i];
+        if ((eachSubEvent.SubCalEndDate > RangeStart)  ) {
+            if ((eachSubEvent.SubCalStartDate <= RangeEned))
+            {
+                RetValue.push(eachSubEvent);
+            }
+            else
+            {
+                break;
+            }
+        }
+        
+    }
+
+    return RetValue;
+
+    /*
+    if ((eachSubEvent.SubCalEndDate > RangeStart) && (eachSubEvent.SubCalStartDate < RangeEned) && (RetValue.indexOf(eachSubEvent) < 0))
+    {
+        var Difference = eachSubEvent.SubCalEndDate.getTime() - NowDate.getTime();
+        if (Difference < 0) {
+            Difference *= -1;
+        }
+
+        if (Difference < lowestMsToNow) {
+            ClosestSubEventToNow = eachSubEvent;
+        }
+        RetValue.push(eachSubEvent);
+    }
+    */
+}
+
+function getClosestToNow(AllEvents, ReferenceTime) {
+    var RetValue;
+
+    if (AllEvents.length) {
+        RetValue = AllEvents[0];
+        var lowestMsToNow = AllEvents[0].SubCalEndDate.getTime() - ReferenceTime.getTime();
+        if (lowestMsToNow < 0) {
+            lowestMsToNow *= -1;
+        }
+        for (var i = 0 ; i < AllEvents.length; i++) {
+            var eachSubEvent = AllEvents[i];
+            var Difference = eachSubEvent.SubCalEndDate.getTime() - ReferenceTime.getTime();
+            if (Difference < 0) {
+                Difference *= -1;
+            }
+
+            if (Difference < lowestMsToNow) {
+                RetValue = eachSubEvent;
+            }
+        }
+    }
+    return RetValue;
+}
+
 
 
 

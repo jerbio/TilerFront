@@ -185,11 +185,11 @@ function SubmitTile(Name, Address,AddressNick, Splits, Hour, Minutes, Deadline, 
 
 }
 
-
+/*generates modal "Add New Event & Add New Tile" for creating new item. Note: width is distance in pixels between left click and End of window */
 function generateModal(x, y, height, width,WeekStart, RenderPlane,UseCurrentTime)
 {
     //return;
-    
+    //debugger;
 
     if (generateModal.isOn)
     {
@@ -197,6 +197,8 @@ function generateModal(x, y, height, width,WeekStart, RenderPlane,UseCurrentTime
         generateModal.isOn = false;
         return;
     }
+
+    //debugger;
     global_ExitManager.triggerLastExitAndPop();
     generateModal.isOn = true;
     var modalAddDom = getDomOrCreateNew("AddModalDom");
@@ -239,7 +241,7 @@ function generateModal(x, y, height, width,WeekStart, RenderPlane,UseCurrentTime
         var NewDay = 0;
         if(!UseCurrentTime)
         {
-            floatalTime = (y - ($(".NameOfDayContainer:first").height())) / (height - ($(".NameOfDayContainer:first").height()));// Hack alert the sutractions are hacks to make it work within the UIrenderplace.
+            floatalTime = (y ) / (height );// Hack alert the sutractions are hacks to make it work within the UIrenderplace.
             Hour = Math.floor((floatalTime) * 24);
             Min = 0;
             WeekDayIndex = Math.floor(x / weekDayWidth);

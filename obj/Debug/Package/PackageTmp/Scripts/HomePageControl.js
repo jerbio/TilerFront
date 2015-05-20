@@ -9,6 +9,9 @@ var lowestMsToNow=999999999999999;
 var ClosestSubEventToNow;
 var global_RenderedList = new Array();
 
+
+
+
 function InitializeHomePage(DomContainer)
 {
     var verifiedUser = GetCookieValue();
@@ -42,6 +45,17 @@ function InitializeHomePage(DomContainer)
     retrieveUserSchedule(myurl, preppePostdData,generateCalendarEvents);
 }
 
+function ActiveRange()
+{
+
+}
+ActiveRange.Start = new Date(new Date().getTime() - (OneHourInMs * 12));
+ActiveRange.End = new Date(CurrentTheme.Now + TwelveHourMilliseconds);
+ActiveRange.Refresh = function()
+{
+    ActiveRange.Start = new Date(new Date().getTime() - (OneHourInMs * 12));
+    ActiveRange.End = new Date(CurrentTheme.Now + TwelveHourMilliseconds);
+}
 
 function getGetParameter(name) {
     if (name = (new RegExp('[?&]' + encodeURIComponent(name) + '=([^&]*)')).exec(location.search))
@@ -108,8 +122,24 @@ function generateHomePage(UserSchedule) {
     CurrentTheme.TransitionNewContainer(HomePageContainer.Dom);
     var HomePageDoms = generateHomePageDoms(HomePageContainer.Dom);
     var MiddleContentDom = HomePageDoms[1].childNodes[1];//second index selection selects content section
-    var AllNonrepeatingNonEvents = generateNonRepeatEvents(UserSchedule.Schedule.NonRepeatCalendarEvent);
-    var AllRepeatEventDoms = generateRepeatEvents(UserSchedule.Schedule.RepeatCalendarEvent);
+
+    StructuralizeNewData(UserSchedule);
+    ActiveSubEvents = getEventsWithinRange(ActiveRange.Start, ActiveRange.End);
+    if (ActiveSubEvents.length)
+    {
+        ClosestSubEventToNow = getClosestToNow(ActiveSubEvents, new Date());
+    }
+    else
+    {
+        ClosestSubEventToNow = getClosestToNow(TotalSubEventList, new Date());
+    }
+
+    ActiveSubEvents.forEach(function (myEvent) {
+        var MobileDom = genereateMobileDoms(myEvent);
+        myEvent.Dom = MobileDom;
+    });
+    /*var AllNonrepeatingNonEvents = generateNonRepeatEvents(UserSchedule.Schedule.NonRepeatCalendarEvent);
+    var AllRepeatEventDoms = generateRepeatEvents(UserSchedule.Schedule.RepeatCalendarEvent);*/
     InitializeMiddleDomUI(MiddleContentDom);
     
     if (ClosestSubEventToNow != null)
@@ -641,8 +671,11 @@ function generateModalForTIleOrModal()
         EventDom.Dom.style.left = "15%";
     }
 
-    function PopulateDomForScheduleEvent(myEvent,Tiers)
-    {
+    
+
+
+    function genereateMobileDoms(myEvent) {
+        Tiers = myEvent.Tiers;
         var EventDom = getDomOrCreateNew("EventID" + myEvent.ID);
         var HorizontalLine = InsertHorizontalLine("70%", "15%", "100%")//creates underlying gray Line
         HorizontalLine.style.zIndex = 3;
@@ -650,21 +683,21 @@ function generateModalForTIleOrModal()
         //HorizontalLine.style.marginTop = "-6px";
         $(HorizontalLine).addClass("UnderLyingGrayLine");
         EventDom.Dom.appendChild(HorizontalLine);
-    
+
         var EventDom_ContainerA = getDomOrCreateNew("EventID_ContainerA" + myEvent.ID);
         var EventDom_ContainerB = getDomOrCreateNew("EventID_ContainerB" + myEvent.ID);
         var EventDom_ContainerC = getDomOrCreateNew("SliderBand" + myEvent.ID);
 
         $(EventDom_ContainerA.Dom).addClass("EventDomContainerA");
         EventDom.Dom.appendChild(EventDom_ContainerA.Dom);
-    
 
-    
+
+
         EventDom.Dom.appendChild(EventDom_ContainerB.Dom);
         $(EventDom_ContainerB.Dom).addClass("EventDomContainerB");
         //$(EventDom_ContainerB.Dom).addClass(CurrentTheme.AlternateFontColor);
 
-        
+
         $(EventDom_ContainerC.Dom).addClass("SliderBand");
         //$(EventDom_ContainerC.Dom).addClass(CurrentTheme.ContentSection);
         $(EventDom_ContainerC.Dom).addClass(CurrentTheme.BorderColor);
@@ -679,26 +712,22 @@ function generateModalForTIleOrModal()
         //"EventDomContainer"
         "EventDomContainerA"
         "EventDomContainerB"
-        EventDom_ContainerC.Dom.onclick =generateFunctionForSliderClick()
+        EventDom_ContainerC.Dom.onclick = generateFunctionForSliderClick()
         //$(EventDom_ContainerC.Dom).click(generateFunctionForSliderClick());
-        var deleteCallbackFunction = genFunctionCallForDeletion(myEvent.ID, EventDom_ContainerB.Dom,triggerClickOfEventDom_ContainerCWhenDisablePanelIsClicked);
+        var deleteCallbackFunction = genFunctionCallForDeletion(myEvent.ID, EventDom_ContainerB.Dom, triggerClickOfEventDom_ContainerCWhenDisablePanelIsClicked);
         var markAsCompleteCallBackFunction = prepFunctionForCompletionOfEvent(myEvent.ID, triggerClickOfEventDom_ContainerCWhenDisablePanelIsClicked);
 
-        function triggerClickOfEventDom_ContainerCWhenDisablePanelIsClicked()
-        {
+        function triggerClickOfEventDom_ContainerCWhenDisablePanelIsClicked() {
             $(EventDom_ContainerC.Dom).trigger("click");
             var DisablePanel = document.getElementById("DisablePanel");
             DisablePanel.removeEventListener("click", triggerClickOfEventDom_ContainerCWhenDisablePanelIsClicked);
         }
 
-        function generateFunctionForSliderClick()
-        {
-            return function()
-            {
+        function generateFunctionForSliderClick() {
+            return function () {
                 var DisablePanel = document.getElementById("DisablePanel");
                 var Complete_ProcrastinateAllIcon = document.getElementById("HomePageProcrastinate");
-                if (Diamond.status)
-                {
+                if (Diamond.status) {
                     $(Diamond.Dom).removeClass("RightArrow");
                     $(Diamond.Dom).addClass("LeftArrow");
                     $(EventDom_ContainerA.Dom).show();
@@ -714,24 +743,23 @@ function generateModalForTIleOrModal()
                     $(DisablePanel).hide();
                     DisablePanel.style.zIndex = 0;
                     EventDom.Dom.style.zIndex = 0;
-                    Complete_ProcrastinateAllIcon.removeEventListener("click",markAsCompleteCallBackFunction);
+                    Complete_ProcrastinateAllIcon.removeEventListener("click", markAsCompleteCallBackFunction);
                     Complete_ProcrastinateAllIcon.addEventListener("click", onProcrastinateAll);
 
                     $(Complete_ProcrastinateAllIcon).addClass(CurrentTheme.ProcrastinateAllIcon);
                     $(Complete_ProcrastinateAllIcon).removeClass(CurrentTheme.CompleteIcon);
                     DisablePanel.removeEventListener("click", triggerClickOfEventDom_ContainerCWhenDisablePanelIsClicked);
                 }
-                else
-                {
+                else {
                     $(Diamond.Dom).addClass("RightArrow");
                     $(Diamond.Dom).removeClass("LeftArrow");
                     //EventDom_ContainerC.Dom.style.marginLeft = 0;
                     EventDom_ContainerC.Dom.style.left = "40px";
-                    $(EventDom_ContainerA.Dom).hide(); 
+                    $(EventDom_ContainerA.Dom).hide();
                     EventDom_ContainerB.Dom.style.left = "15%";
 
                     var addButton = document.getElementById("HomePageAddButton");
-                
+
                     //addButton.removeEventListener("click", AddNewEventOnClick);
                     //addButton.addEventListener("click", deleteCallbackFunction);
 
@@ -749,39 +777,11 @@ function generateModalForTIleOrModal()
                     $(DisablePanel).show();
                     DisablePanel.addEventListener("click", triggerClickOfEventDom_ContainerCWhenDisablePanelIsClicked);
                 }
-            
+
                 Diamond.status += 1;
                 Diamond.status %= 2;
             }
         }
-        if (myEvent.ID == "110844_7_110848_110849") {
-            //debugger;
-            var a = 9;
-        }
-
-
-        
-
-        
-
-        //debugger;
-        /*
-        myEvent.SubCalStartDate = new Date(myEvent.SubCalStartDate + global_TimeZone_ms );
-        myEvent.SubCalEndDate = new Date(myEvent.SubCalEndDate + global_TimeZone_ms );
-        myEvent.SubCalCalEventStart = new Date(myEvent.SubCalCalEventStart + global_TimeZone_ms );
-        myEvent.SubCalCalEventEnd = new Date(myEvent.SubCalCalEventEnd + global_TimeZone_ms );
-        //*/
-        
-        ///*
-        myEvent.SubCalStartDate = new Date(myEvent.SubCalStartDate);// + global_TimeZone_ms);
-        myEvent.SubCalEndDate = new Date(myEvent.SubCalEndDate);// + global_TimeZone_ms);
-        myEvent.SubCalCalEventStart = new Date(myEvent.SubCalCalEventStart );//+ global_TimeZone_ms);
-        myEvent.SubCalCalEventEnd = new Date(myEvent.SubCalCalEventEnd);// + global_TimeZone_ms);
-        //*/
-        /*myEvent.SubCalStartDate = !myEvent.SubCalStartDate.dst() ? new Date(Number(myEvent.SubCalStartDate.getTime()) + OneHourInMs) : myEvent.SubCalStartDate;
-        myEvent.SubCalEndDate =! myEvent.SubCalEndDate.dst() ? new Date(Number(myEvent.SubCalEndDate.getTime()) + OneHourInMs) : myEvent.SubCalEndDate;
-        myEvent.SubCalCalEventStart = !myEvent.SubCalCalEventStart.dst() ? new Date(Number(myEvent.SubCalCalEventStart.getTime()) + OneHourInMs) : myEvent.SubCalCalEventStart;
-        myEvent.SubCalCalEventEnd = !myEvent.SubCalCalEventEnd.dst() ? new Date(Number(myEvent.SubCalCalEventEnd.getTime()) + OneHourInMs) : myEvent.SubCalCalEventEnd;*/
 
         //var refStart = getHourMin(myEvent.SubCalStartDate);
         //var refEnd = getHourMin(myEvent.SubCalEndDate);
@@ -801,11 +801,10 @@ function generateModalForTIleOrModal()
         var EventDescription = getDomOrCreateNew("EventDescription" + myEvent.ID);
         $(EventDom_ContainerA.Dom).append(EventDescription.Dom);
         $(EventDescription.Dom).addClass("EventDescriptionContainer");
-        if (myEvent.ColorSelection > 0)
-        {
+        if (myEvent.ColorSelection > 0) {
             $(EventDescription.Dom).addClass(global_AllColorClasses[myEvent.ColorSelection].cssClass);
         }
-        
+
 
 
         //Top Description. Shows Name of Event
@@ -814,7 +813,7 @@ function generateModalForTIleOrModal()
         $(EventDescription.Dom).append(EventTopDescription.Dom);
         $(EventTopDescription.Dom).addClass("EventTopDescription");
         //EventTopDescription.Dom.innerHTML = "<p>" + myEvent.Name + "</P>";
-    
+
         EventTopDescriptionText.Dom.innerHTML = myEvent.Name;
         $(EventTopDescriptionText.Dom).addClass("EventTopDescriptionText");
         EventTopDescription.Dom.appendChild(EventTopDescriptionText.Dom);
@@ -822,8 +821,8 @@ function generateModalForTIleOrModal()
         //HorizontalLine.style.zIndex = "10";
         //EventDescription.Dom.appendChild(HorizontalLine);
 
-    
-    
+
+
 
         //Bottom Description. Shows time and Location
         var EventBottomDescription = getDomOrCreateNew("EventBottomDescription" + myEvent.ID);
@@ -852,8 +851,7 @@ function generateModalForTIleOrModal()
         $(EventBottomLeftDescription.Dom).addClass("EventBottomLeftDescription");
 
         //$(EventBottomLeftDescriptionText.Dom).addClass("EventBottomGenericDescriptionText");
-        if(myEvent.SubCalAddressDescription)
-        {
+        if (myEvent.SubCalAddressDescription) {
             EventBottomLeftDescriptionText.Dom.innerHTML = "@ " + myEvent.SubCalAddressDescription;
         }
 
@@ -870,21 +868,20 @@ function generateModalForTIleOrModal()
         $(EventBottomRightDescriptionTextContainer.Dom).append(EventBottomRightDescriptionText.Dom);
 
 
-        if (myEvent.ID == "151_209_210")
-        {
-            var qq=45;
+        if (myEvent.ID == "151_209_210") {
+            var qq = 45;
         }
 
         var alertLevel = getSubEventAlertLevel(myEvent.SubCalStartDate, Tiers);
         var TrafficLightData = generateTrafficLightContainer(myEvent.ID, alertLevel);
-        EventBottomRightTrafficContainer.Dom.appendChild( TrafficLightData.Container.Dom)
-    
+        EventBottomRightTrafficContainer.Dom.appendChild(TrafficLightData.Container.Dom)
+
         $(EventBottomDescription.Dom).append(EventBottomRightDescription.Dom);
         $(EventBottomRightDescription.Dom).append(EventBottomRightDescriptionTextContainer.Dom);
         $(EventBottomRightDescription.Dom).addClass("EventBottomRightDescription");
 
 
-    
+
 
         //EventBottomRightDescriptionText.Dom.innerHTML = "@ " + myEvent.SubCalAddressDescription;
 
@@ -905,13 +902,13 @@ function generateModalForTIleOrModal()
         $(EventTopDescription.Dom).append(EventTopRightDescription.Dom);
         $(EventTopRightDescription.Dom).append(EventTopRightDescriptionTextContainer.Dom);
         $(EventTopRightDescription.Dom).addClass("EventTopRightDescription");
-        
+
 
         //$(EventTopRightDescriptionText.Dom).addClass("EventBottomGenericDescriptionText");
         EventTopRightDescriptionText.Dom.innerHTML = getTimeStringFromDate(myEvent.SubCalStartDate);// + "-" + getTimeStringFromDate(myEvent.SubCalEndDate);
 
 
-    
+
         //Procrastinate Button
         var EventProcrastinateContainer = getDomOrCreateNew("EventProcrastinateContainer" + myEvent.ID);
         var EventProcrastinateButton = getDomOrCreateNew("EventProcrastinateButton" + myEvent.ID);
@@ -919,7 +916,7 @@ function generateModalForTIleOrModal()
         var EventProcrastinateTextContainer = getDomOrCreateNew("EventProcrastinateTextContainer" + myEvent.ID);
 
         //$(EventProcrastinateContainer.Dom).click(function () {
-        (EventProcrastinateContainer.Dom).onclick=(function () {
+        (EventProcrastinateContainer.Dom).onclick = (function () {
             var myEventID = myEvent.ID;
             ProcrastinateOnEvent(myEventID, EventDom_ContainerA.Dom, function () {
                 triggerClickOfEventDom_ContainerCWhenDisablePanelIsClicked();
@@ -945,11 +942,11 @@ function generateModalForTIleOrModal()
         $(EventDom_ContainerB_ElementContainer.Dom).append(EventProcrastinateContainer.Dom);
         $(EventProcrastinateContainer.Dom).append(EventProcrastinateButton.Dom);
 
-    
+
 
         $(EventProcrastinateContainer.Dom).addClass("EventProcrastinateContainer");
         $(EventProcrastinateContainer.Dom).addClass("ContainerB_Element");
-        var VerticalLine = InsertVerticalLine("65%", "0%", "17.5%", "3px",true);
+        var VerticalLine = InsertVerticalLine("65%", "0%", "17.5%", "3px", true);
         //EventProcrastinateContainer.Dom.appendChild(VerticalLine);
         $(EventProcrastinateButton.Dom).addClass("EventProcrastinateButton");
         $(EventProcrastinateImageContainer.Dom).addClass("ProcrastinateIcon");
@@ -969,7 +966,7 @@ function generateModalForTIleOrModal()
         //Directions Button
         var EventDirectionsContainer = getDomOrCreateNew("EventDirectionsContainer" + myEvent.ID);
         $(EventDirectionsContainer.Dom).addClass("ContainerB_Element");
-        VerticalLine = InsertVerticalLine("65%", "0%", "17.5%", "3px",true);
+        VerticalLine = InsertVerticalLine("65%", "0%", "17.5%", "3px", true);
         //EventDirectionsContainer.Dom.appendChild(VerticalLine);
 
         var EventDirectionsButton = getDomOrCreateNew("EventDirectionsButton" + myEvent.ID);
@@ -993,7 +990,7 @@ function generateModalForTIleOrModal()
         $(EventDirectionsButton.Dom).addClass("EventDirectionsButton");
         //$(EventDirectionsButton.Dom).addClass("DirectionsIcon");
         //$(EventDirectionsContainer.Dom).click(getDirectionsCallBack(myEvent.ID, CurrentTheme));
-        (EventDirectionsContainer.Dom).onclick=(getDirectionsCallBack(myEvent.ID, CurrentTheme));
+        (EventDirectionsContainer.Dom).onclick = (getDirectionsCallBack(myEvent.ID, CurrentTheme));
 
 
 
@@ -1027,7 +1024,7 @@ function generateModalForTIleOrModal()
         $(EventNowButton.Dom).addClass("EventNowButton");
         //$(EventNowButton.Dom).addClass("NowIcon");
         //$(EventNowContainer.Dom).click(genFunctionCallForNow(myEvent.ID, EventDom_ContainerB.Dom, triggerClickOfEventDom_ContainerCWhenDisablePanelIsClicked));
-        (EventNowContainer.Dom).onclick=(genFunctionCallForNow(myEvent.ID, EventDom_ContainerB.Dom, triggerClickOfEventDom_ContainerCWhenDisablePanelIsClicked));
+        (EventNowContainer.Dom).onclick = (genFunctionCallForNow(myEvent.ID, EventDom_ContainerB.Dom, triggerClickOfEventDom_ContainerCWhenDisablePanelIsClicked));
 
 
         //Delete Button
@@ -1039,7 +1036,7 @@ function generateModalForTIleOrModal()
         //$(EventDom_ContainerB.Dom).append(EventDeleteContainer.Dom);
         $(EventDeleteContainer.Dom).append(EventDeleteButton.Dom);
         //$(EventDeleteContainer.Dom).click(genFunctionCallForDeletion(myEvent.ID, EventDom_ContainerB.Dom));
-        (EventDeleteContainer.Dom).onclick=(genFunctionCallForDeletion(myEvent.ID, EventDom_ContainerB.Dom));
+        (EventDeleteContainer.Dom).onclick = (genFunctionCallForDeletion(myEvent.ID, EventDom_ContainerB.Dom));
 
 
 
@@ -1057,9 +1054,8 @@ function generateModalForTIleOrModal()
         EventLockImgContainer.Dom.style.width = "70px";
         EventLockImgContainer.Dom.style.left = "50%"
         EventLockImgContainer.Dom.style.marginLeft = "-35px"*/
-    
-        if (myBool)
-        {
+
+        if (myBool) {
             $(EventLockImgContainer.Dom).addClass("LockedIcon");
         }
 
@@ -1076,13 +1072,7 @@ function generateModalForTIleOrModal()
         $(EventDeleteButton.Dom).addClass("EventDeleteButton");
         $(EventDeleteButton.Dom).addClass("DeleteIcon");
 
-    
-
-    
-
-        myEvent.Dom = EventDom;
-
-        return myEvent;
+        return EventDom;
     }
 
     function getSubEventAlertLevel(StartTime, AllTiers)
@@ -1607,18 +1597,7 @@ function generateModalForTIleOrModal()
     }
 
 
-    function generateRepeatEvents(AllRepeatSchedules) {
-        AllRepeatSchedules.forEach(function (EachRepeatEvent) { EachRepeatEvent.RepeatCalendarEvents.forEach(CalendarCreateDomElement) });
-    }
-
-    function generateNonRepeatEvents(AllNonRepeatingEvents) {
-        AllNonRepeatingEvents.forEach(CalendarCreateDomElement);
     
-    
-    
-
-        return AllNonRepeatingEvents;
-    }
 
 
     function InitializeMiddleDomUI(Dom)
@@ -1687,8 +1666,21 @@ function generateModalForTIleOrModal()
     function sortOutData(PostData)
     {
         var UserSchedule = PostData.Content;
+        StructuralizeNewData(UserSchedule)
+        ActiveSubEvents = getEventsWithinRange(ActiveRange.Start, ActiveRange.End);
+        if (ActiveSubEvents.length) {
+            ClosestSubEventToNow = getClosestToNow(ActiveSubEvents, new Date());
+        }
+        else {
+            ClosestSubEventToNow = getClosestToNow(TotalSubEventList, new Date());
+        }
+        ActiveSubEvents.forEach(function (myEvent) {
+            var MobileDom = genereateMobileDoms(myEvent);
+            myEvent.Dom = MobileDom;
+        });
+        /*
         var AllNonrepeatingNonEvents = generateNonRepeatEvents(UserSchedule.Schedule.NonRepeatCalendarEvent);
-        var AllRepeatEventDoms = generateRepeatEvents(UserSchedule.Schedule.RepeatCalendarEvent);
+        var AllRepeatEventDoms = generateRepeatEvents(UserSchedule.Schedule.RepeatCalendarEvent);*/
         
         //adds all transition to all subcal elements
         for (var i = 0; i < sortOutData.OldActiveEvents.length; i++)
@@ -1880,77 +1872,7 @@ function generateModalForTIleOrModal()
 
     var weyy = 0;
 
-    function CalendarCreateDomElement(CalendarEvent)
-    {
-        //function is responsible for populating Dictionary_OfSubEvents. It also tries to populate the respective sub event dom
-        var UIColor = {};
-        UIColor.R = CalendarEvent.RColor;
-        UIColor.G = CalendarEvent.GColor;
-        UIColor.B = CalendarEvent.BColor;
-        UIColor.O = CalendarEvent.OColor;
-        UIColor.S = CalendarEvent.ColorSelection;
-        var CalendarData = { CompletedEvents: CalendarEvent.NumberOfCompletedTasks, DeletedEvents: CalendarEvent.NumberOfDeletedEvents, TotalNumberOfEvents: CalendarEvent.NumberOfSubEvents, UI: UIColor, Rigid: CalendarEvent.Rigid };
-        Dictionary_OfCalendarData[CalendarEvent.ID] = CalendarData;
-        var i = 0;
-        for (; i < CalendarEvent.AllSubCalEvents.length; i++)
-        {
-            CalendarEvent.AllSubCalEvents[i].Name = CalendarEvent.CalendarName;
-            TotalSubEventList.push(PopulateDomForScheduleEvent(CalendarEvent.AllSubCalEvents[i], CalendarEvent.Tiers));
-        }
-        TotalSubEventList.sort(function (a, b) { return (a.SubCalStartDate) - (b.SubCalStartDate) });
     
-        var LaunchWindowEnd= new Date(CurrentTheme.Now+TwelveHourMilliseconds);
-        var NowDate = new Date(CurrentTheme.Now);
-        TotalSubEventList.forEach(function (eachSubEvent)
-        {
-            /*eachSubEvent.EngulfingDom = "stop";
-            eachSubEvent.PopulateYourself=function PopulateYourself(RangeData) {
-                //alert(this.Name);
-                this.EngulfingDom = "namamama" + (weyy++);
-            }
-            eachSubEvent.PopulateYourself("hahaha")*/
-            if(eachSubEvent.ID=="87653_1_87661_87662")
-            {
-                //debugger;
-            }
-            if (Dictionary_OfSubEvents[eachSubEvent.ID] == null) {
-                Dictionary_OfSubEvents[eachSubEvent.ID] = eachSubEvent;
-            }
-            else
-            {
-                ToBeReorganized.push(eachSubEvent);
-                if (Dictionary_OfSubEvents[eachSubEvent.ID].SubCalStartDate != eachSubEvent.SubCalStartDate)
-                {
-                    //global_DeltaSubevents.push(eachSubEvent);
-                }
-
-            }
-
-            var RangeStart = new Date(NowDate.getTime() - (OneHourInMs * 12));
-        
-        
-            if ((eachSubEvent.SubCalEndDate > RangeStart) && (eachSubEvent.SubCalStartDate < LaunchWindowEnd) && (ActiveSubEvents.indexOf(eachSubEvent) < 0))
-            {
-                var Difference = eachSubEvent.SubCalEndDate.getTime() - NowDate.getTime();
-                if (Difference < 0)
-                {
-                    Difference *= -1;
-                }
-
-                if (Difference < lowestMsToNow)
-                {
-                    ClosestSubEventToNow = eachSubEvent;
-                }
-                ActiveSubEvents.push(eachSubEvent);
-            }
-        }
-        )
-    
-        
-    }
-
-
-
 
     function LaunchSubEventSelection(EventID, SelectedEvent) {
         loadSelectedSubEvent(EventID, SelectedEvent);
