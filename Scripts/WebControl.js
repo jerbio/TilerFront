@@ -176,7 +176,7 @@ function triggerUndoPanel(UndoMessage)
 
     function showUndoPanel()
     {
-        var weekContainer = getDomOrCreateNew("FullWeekContainer");
+        var weekContainer = getDomOrCreateNew("MonthBar");
         weekContainer.appendChild(UndoPanelContainer);
         triggerTimer(NumberOfSeconds)
         $(UndoPanelContainer).removeClass("setAsDisplayNone");
