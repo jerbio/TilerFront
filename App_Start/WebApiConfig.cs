@@ -19,7 +19,6 @@ namespace TilerFront
                 //config.EnableCors();
                 //config.EnableCors(new EnableCorsAttribute(origins: "*", headers: "accept, authorization, origin", methods: "DELETE,PUT,POST,GET"));
                 config.MapHttpAttributeRoutes();
-
                 config.Routes.MapHttpRoute(
                     name: "DefaultApi",
                     routeTemplate: "api/{controller}/{id}",

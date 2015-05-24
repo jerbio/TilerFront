@@ -137,6 +137,11 @@ namespace TilerFront.Controllers
             return RetValue;
         }
 
+        /// <summary>
+        /// Handles the trigger when new google notification comes through.
+        /// </summary>
+        /// <param name="GoogleNotificationID"></param>
+        /// <returns></returns>
         static async public Task googleNotificationTrigger(string GoogleNotificationID)
         {
             ApplicationDbContext db = new ApplicationDbContext();
@@ -242,6 +247,12 @@ namespace TilerFront.Controllers
             return Ok(myPostData.getPostBack);
         }
 
+
+        /// <summary>
+        /// Marks an Event as complete.  Note this also triggers a readjust to the schedule
+        /// </summary>
+        /// <param name="UserData"></param>
+        /// <returns></returns>
         [HttpPost]
         [ResponseType(typeof(PostBackStruct))]
         [Route("api/Schedule/Event/Complete")]
@@ -282,7 +293,11 @@ namespace TilerFront.Controllers
             return Ok(retValue.getPostBack);
         }
 
-
+        /// <summary>
+        /// Marks a series of Event as complete. It takes a collection of IDs and then marks them as complete
+        /// </summary>
+        /// <param name="UserData"></param>
+        /// <returns></returns>
         [HttpPost]
         [ResponseType(typeof(PostBackStruct))]
         [Route("api/Schedule/Events/Complete")]
@@ -302,7 +317,11 @@ namespace TilerFront.Controllers
         }
 
 
-
+        /// <summary>
+        /// Sets the provided event as now. The ID has to be a Sub event ID
+        /// </summary>
+        /// <param name="myUser"></param>
+        /// <returns></returns>
         [HttpPost]
         [ResponseType(typeof(PostBackStruct))]
         [Route("api/Schedule/Event/Now")]
@@ -331,7 +350,11 @@ namespace TilerFront.Controllers
             return Ok(retValue.getPostBack);
         }
 
-
+        /// <summary>
+        /// Undoes the last schedule changing effect triggered on tiler.
+        /// </summary>
+        /// <param name="myUser"></param>
+        /// <returns></returns>
         [HttpPost]
         [ResponseType(typeof(PostBackStruct))]
         [Route("api/Schedule/Undo")]
@@ -354,7 +377,11 @@ namespace TilerFront.Controllers
 
         
 
-
+        /// <summary>
+        /// Deletes a Sub event from Tiler. The deletion does not trigger a schedule readjustment.
+        /// </summary>
+        /// <param name="myUser"></param>
+        /// <returns></returns>
         [HttpDelete]
         [ResponseType(typeof(PostBackStruct))]
         [Route("api/Schedule/Event")]
@@ -397,6 +424,14 @@ namespace TilerFront.Controllers
             
             return Ok(retValue.getPostBack);
         }
+
+
+        /// <summary>
+        /// Option needed to satisfy a delete request for deletion of a subevent.
+        /// </summary>
+        /// <param name="myUser"></param>
+        /// <returns></returns>
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpOptions]
         [ResponseType(typeof(PostBackStruct))]
         [Route("api/Schedule/Event")]
@@ -405,7 +440,11 @@ namespace TilerFront.Controllers
             return Ok();
         }
 
-
+        /// <summary>
+        /// Deletes multiple subevents.
+        /// </summary>
+        /// <param name="myUser"></param>
+        /// <returns></returns>
         [HttpDelete]
         [ResponseType(typeof(PostBackStruct))]
         [Route("api/Schedule/Events")]
@@ -417,9 +456,7 @@ namespace TilerFront.Controllers
             if (retrievedUser.Status)
             {
                 My24HourTimerWPF.Schedule MySchedule = new My24HourTimerWPF.Schedule(retrievedUser, myUser.getRefNow());
-
-                
-
+                await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, myUser.UserID).ConfigureAwait(false);
                 IEnumerable<string> AllEVentIDs = myUser.EventID.Split(',');
                 MySchedule.deleteSubCalendarEvents(AllEVentIDs);
                 retValue = new PostBackData("\"Success\"", 0);
@@ -430,6 +467,14 @@ namespace TilerFront.Controllers
             }
             return Ok(retValue.getPostBack);
         }
+
+
+        /// <summary>
+        /// Option needed to satisfy a delete request for multiple subevents.
+        /// </summary>
+        /// <param name="myUser"></param>
+        /// <returns></returns>
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpOptions]
         [ResponseType(typeof(PostBackStruct))]
         [Route("api/Schedule/Events")]
@@ -651,6 +696,12 @@ namespace TilerFront.Controllers
         }
 
 
+
+        /// <summary>
+        /// Triggers a schedule update when a notification is received pertaining third party event modification
+        /// </summary>
+        /// <param name="newEvent"></param>
+        /// <returns></returns>
         [HttpPost]
         [ResponseType(typeof(PostBackStruct))]
         [Route("api/Schedule/Notification")]
@@ -675,6 +726,12 @@ namespace TilerFront.Controllers
             
         }
 
+
+        /// <summary>
+        /// Peeks into user schedule. Generates an update to a schedule for any changes.
+        /// </summary>
+        /// <param name="newEvent"></param>
+        /// <returns></returns>
         [HttpPost]
         [ResponseType(typeof(PostBackStruct))]
         [Route("api/Schedule/Peek")]
@@ -874,6 +931,17 @@ namespace TilerFront.Controllers
 
             return Ok(retValue.getPostBack);
         }
+
+        /// <summary>
+        /// Creates a restriction profile to be used when generating a new event.
+        /// </summary>
+        /// <param name="Start"></param>
+        /// <param name="End"></param>
+        /// <param name="workWeek"></param>
+        /// <param name="TimeZoneOffSet"></param>
+        /// <param name="DaySelection"></param>
+        /// <returns></returns>
+        [ApiExplorerSettings(IgnoreApi = true)]
         RestrictionProfile CreateRestrictionProfile(string Start, string End,string workWeek,TimeSpan TimeZoneOffSet ,string DaySelection="")
         { 
             DateTimeOffset RestrictStart = DateTimeOffset.Parse(Start).UtcDateTime;
@@ -915,20 +983,6 @@ namespace TilerFront.Controllers
             return retValue;
         }
         
-
-        // PUT api/schedule/5
-        //[NonAction]
-        public async Task<IHttpActionResult> Put(int id, [FromBody]string value)
-        {
-            return Ok("return");
-        }
-
-        // DELETE api/schedule/5
-        [NonAction]
-        public void Delete(int id)
-        {
-            return;
-        }
 
         protected override void Dispose(bool disposing)
         {

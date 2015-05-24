@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using System.Security.Claims;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
@@ -8,6 +9,15 @@ using Microsoft.Owin.Security.Google;
 using Microsoft.Owin.Security.Facebook;
 using Owin;
 using TilerFront.Models;
+using Google.Apis.Auth.OAuth2;
+using Google.Apis.Auth.OAuth2.Flows;
+using Google.Apis.Auth.OAuth2.Mvc;
+
+
+using Google.Apis.Calendar.v3;
+using Google.Apis.Plus.v1;
+using Google.Apis.Calendar.v3.Data;
+using Google.Apis.Util.Store;
 
 namespace TilerFront
 {
@@ -66,6 +76,7 @@ namespace TilerFront
                             // All data from facebook in this object. 
                             var rawUserObjectFromFacebookAsJson = context.User;
                             var myToken= context.AccessToken;
+                            context.Identity.AddClaim(new Claim("ThirdPartyType", ((int)TilerElements.ThirdPartyControl.CalendarTool.Facebook).ToString()));
                             // Only some of the basic details from facebook 
                             // like id, username, email etc are added as claims.
                             // But you can retrieve any other details from this
@@ -80,32 +91,47 @@ namespace TilerFront
 
             facebookOptions.Scope.Add("email");
 
-            var googleOptions = new Microsoft.Owin.Security.Google.GoogleAuthenticationOptions()
+            var googleOptions = new GoogleOAuth2AuthenticationOptions()
             {
-                Provider = new GoogleAuthenticationProvider()
+                ClientId = "518133740160-i5ie6s4h802048gujtmui1do8h2lqlfj.apps.googleusercontent.com",
+                ClientSecret = "NKRal5rA8NM5qHnmiigU6kWh",
+                Provider = new GoogleOAuth2AuthenticationProvider
                 {
-                    OnAuthenticated = (context) =>
+                    OnAuthenticated = async context =>
+                    {
+
+                        context.Identity.AddClaim(new Claim(ClaimTypes.Name, context.Identity.FindFirstValue(ClaimTypes.Name)));
+                        context.Identity.AddClaim(new Claim(ClaimTypes.Email, context.Identity.FindFirstValue(ClaimTypes.Email)));
+                        context.Identity.AddClaim(new Claim("AccessToken", context.AccessToken));
+                        context.Identity.AddClaim(new Claim("ThirdPartyType", ((int)TilerElements.ThirdPartyControl.CalendarTool.Google).ToString()));
+                        context.Identity.AddClaim(new Claim("ExpiryDuration", context.ExpiresIn.ToString()));
+                        if (context.RefreshToken != null)
                         {
-                            // All data from facebook in this object. 
-                            IOwinRequest myReq = context.Request;
-                            return Task.FromResult(0);
+                            context.Identity.AddClaim(new Claim("RefreshToken", context.RefreshToken));
                         }
-                }
+                        else
+                        {
+                            context.Identity.AddClaim(new Claim("RefreshToken", ""));
+                        }
+
+
+                    }
+                },
+                AccessType = "offline"
             };
 
+            googleOptions.Scope.Add("https://www.googleapis.com/auth/plus.login");
+            googleOptions.Scope.Add(PlusService.Scope.UserinfoEmail);
+            googleOptions.Scope.Add(CalendarService.Scope.Calendar);
+            googleOptions.Scope.Add(CalendarService.Scope.CalendarReadonly);
             
-
             
 
             app.UseFacebookAuthentication(
                appId: "1530915617167749",
                appSecret: "c68800eb9d3bf8eb9fd20ac1891cda5b");
 
-            app.UseGoogleAuthentication(new GoogleOAuth2AuthenticationOptions()
-            {
-                ClientId = "518133740160-i5ie6s4h802048gujtmui1do8h2lqlfj.apps.googleusercontent.com",
-                ClientSecret = "NKRal5rA8NM5qHnmiigU6kWh"
-            });
+            app.UseGoogleAuthentication(googleOptions);
             
         }
     }

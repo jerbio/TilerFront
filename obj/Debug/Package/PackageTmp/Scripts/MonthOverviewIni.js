@@ -9,7 +9,7 @@ var global_CurrentRange;
 var global_ClearRefreshDataInterval = 0;
 var global_ColorAugmentation = 0;
 var refreshCounter = 1000000;
-var global_refreshDataInterval = 30000;
+var global_refreshDataInterval = 45000;
 var global_multiSelect;
 var global_ControlPanelIconSet = new IconSet();
 var global_GoToDay;
@@ -22,7 +22,7 @@ var ListUIOptions = { Init: InitializeListUIEffects, RenderOnSubEventClick: rend
 
 var AllUIOptions = [ListUIOptions, ClassicUIOptions];
 $(document).ready(function () {
-    LaumchUIOPtion(1);
+    LaumchUIOPtion(0);
     $(document).tooltip({ track: true });
     $('body').hide();
     InitializeMonthlyOverview();
@@ -137,6 +137,7 @@ function DisplayFullGrid()
 function MenuManger()
 {
     var TilerManager = getDomOrCreateNew("TilerManager");
+    TilerManager.RevealCount=0;
     TilerManager.onmouseover = revealMenuContainer;
     TilerManager.onmouseout = unRevealMenuContainer;
     var MenuContainer = getDomOrCreateNew("MenuContainer");
@@ -151,14 +152,42 @@ function MenuManger()
             $(MenuContainer).removeClass("setAsDisplayNone");
             MenuContainer.style.width = "auto";
             MenuContainer.style.left = "-20px"
+            ++TilerManager.RevealCount;
         }//,200)
     }
 
     function unRevealMenuContainer()
     {
-        MenuContainer.style.display = "none";
-        MenuContainer.style.width = 0;
-        MenuContainer.style.left = "-60px"
+        function getCurrentCount()
+        {
+            var RetValue = TilerManager.RevealCount
+            return RetValue;
+        }
+        var CurrentCount = getCurrentCount();
+        ResolveHideStatus(CurrentCount);
+
+
+        function ResolveHideStatus(CountSofar)
+        {
+            setTimeout(function () {
+                if (CountSofar==getCurrentCount())
+                {
+                    TriggerHide();
+                    TilerManager.RevealCount=0
+                    return;
+                }
+                return;
+            },50)
+        }
+
+        function TriggerHide()
+        {
+            MenuContainer.style.display = "none";
+            MenuContainer.style.width = 0;
+            MenuContainer.style.left = "-50px"
+        }
+        
+
     }
 
     var ManageMenuContainer = getDomOrCreateNew("ManageMenuContainer");
@@ -256,7 +285,7 @@ function RenderTimeInformationClassic(DayOfWeek, ID) {
 
 
 
-
+/*Function clears out the pertinent UI effects of the Classic UI*/
 function ResetClassicUIEffects()
 {
     //debugger;
@@ -281,14 +310,28 @@ function ResetClassicUIEffects()
 
 
         $(SubEvent.TimeSizeDom).removeClass("ClassicGridEvents");
-
     }
+
+    var AllClassicGridEvents = $(".ClassicGridEvents");
+    if (AllClassicGridEvents.length) {
+        for (var i = 0 ; i < AllClassicGridEvents.length; i++) {
+            var ClassicGridEvents = AllClassicGridEvents[i];
+            $(ClassicGridEvents).removeClass("ClassicGridEvents");
+        }
+    }
+
     getRefreshedData.enableDataRefresh();
 }
 
 function RenderListTimeInformation(DayOfWeek, ID)
 {
     var RefSubEvent = global_DictionaryOfSubEvents[ID];
+    /*
+    if (DayOfWeek.Start.getTime() == new Date(2015, 4, 23, 0, 0, 0, 0).getTime()) {
+        debugger;
+    }
+    */
+
     var TopPixels = ((DayOfWeek.UISpecs[ID].css.top / 100) * global_DayHeight) + global_DayTop;
     var ListElementContainer = getDomOrCreateNew("SubEventReference" + ID);
     ListElementContainer.setAttribute("draggable", true);
@@ -1706,21 +1749,36 @@ getRefreshedData.enableDataRefresh = function (pullLatest)
     
 
         var IntersectingArrayData = new Array();
+        var SortedUISpecs = new Array();
         var Now = new Date();
         for (var ID in DayOfWeek.UISpecs)
         {
-            
             if (DayOfWeek.UISpecs[ID].Enabled)
             {
+                var SortedUISpecs_Element = DayOfWeek.UISpecs[ID];
+                SortedUISpecs.push({SubEvent:SortedUISpecs_Element,ID: ID});
                 
-                var myData=global_UISetup. RenderTimeInformation(DayOfWeek,ID);
-                IntersectingArrayData.push(myData);
             }
         }
 
+        
+        SortedUISpecs.sort(function (a, b)
+        {
+            //var Diff = (a.SubEvent.Start) - (b.SubEvent.Start)
+            return (a.SubEvent.Start) - (b.SubEvent.Start);
+        });
+
+        for (var i = 0; i < SortedUISpecs.length; i++)
+        {
+            var Element = SortedUISpecs[i];
+            var myData = global_UISetup.RenderTimeInformation(DayOfWeek, Element.ID);
+            IntersectingArrayData.push(myData);
+        }
+
+
         //AllEvents.sort(function (a, b) { return (a.SubCalStartDate) - (b.SubCalStartDate) });
         //debugger;
-        IntersectingArrayData.sort(function (a, b) { return (a.Start) - (b.Start) });
+        //IntersectingArrayData.sort(function (a, b) { return (a.Start) - (b.Start) });// no need for the line with SortedUISpecs.sort( does the job
         var MinPercent = ((1/24)* 100);//40 derived from min pixel height.
         
         var myIndex = 0;
@@ -1742,11 +1800,12 @@ getRefreshedData.enableDataRefresh = function (pullLatest)
                 {
                     //HeightPx=40;
                 }
-
+                /*
                 if ((ID == "111414_7_0_111415") || (ID == "111426_7_0_111427"))
                 {
                     //debugger;
                 }
+                */
                 //var TopPixels=IntersectingArrayData[i].top;
                 //var EndPixelTop = TopPixels + HeightPx;
                 var EndPixelTop =IntersectingArrayData[i].end;

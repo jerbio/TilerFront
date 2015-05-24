@@ -1,3 +1,8 @@
+C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.csproj.App.config
+C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.csprojResolveAssemblyReference.cache
+C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.Migrations.GoogleNotificationAuthentication.resources
+C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.Migrations.GoogleNotificationAuthentication1.resources
+C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.csproj.GenerateResource.Cache
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\ApplicationInsights.config
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Microsoft.ApplicationInsights.Extensions.Intercept_x86.dll
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Microsoft.ApplicationInsights.Extensions.Intercept_x64.dll
@@ -124,11 +129,6 @@ C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\System.Web.Optimiza
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\TilerElements.pdb
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Zlib.Portable.xml
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Google.Maps.pdb
-C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.csproj.App.config
-C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.csprojResolveAssemblyReference.cache
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\ApplicationInsights.config
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.dll
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.pdb
-C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.Migrations.GoogleNotificationAuthentication.resources
-C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.csproj.GenerateResource.Cache
-C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.Migrations.GoogleNotificationAuthentication1.resources

@@ -64,7 +64,7 @@ namespace TilerFront.Models
         /// Function refreshes the token and update "this" object. Note it does not try to persist the authentication to permanent storage on azure. If you want it to persist call function refreshAndCommitToken;
         /// </summary>
         /// <returns></returns>
-        async Task<bool> refreshAuthenticationToken()
+        public async Task<bool> refreshAuthenticationToken()
         {
             Google.Apis.Auth.OAuth2.UserCredential OldCredentials = getGoogleOauthCredentials();
             System.Threading.CancellationToken CancelToken = new System.Threading.CancellationToken();
@@ -120,26 +120,28 @@ namespace TilerFront.Models
             bool RetValue = false;    
 
             UserCredential googleCredential = getGoogleOauthCredentials();
+            Object[] Param = { this.TilerID, this.Email, this.ProviderID };
             try
             { 
                 await googleCredential.RefreshTokenAsync(System.Threading.CancellationToken.None).ConfigureAwait(false);
                 await googleCredential.RevokeTokenAsync(System.Threading.CancellationToken.None).ConfigureAwait(false);
-                Object[] Param = { this.TilerID, this.Email, this.ProviderID };
-                ApplicationDbContext db = new ApplicationDbContext();
-                ThirdPartyCalendarAuthenticationModel checkingThirdPartyCalendarAuthentication = await db.ThirdPartyAuthentication.FindAsync(Param);
-                if (checkingThirdPartyCalendarAuthentication != null)
-                {
-                    db.ThirdPartyAuthentication.Remove(checkingThirdPartyCalendarAuthentication);
-                    await db.SaveChangesAsync().ConfigureAwait(false);
-                }
+                
                 RetValue = true;
             }
             catch(Exception e)
             {
                 ;
             }
-                    
-            
+            finally
+            {
+                ApplicationDbContext db = new ApplicationDbContext();
+                ThirdPartyCalendarAuthenticationModel checkingThirdPartyCalendarAuthentication = db.ThirdPartyAuthentication.Find(Param);
+                if (checkingThirdPartyCalendarAuthentication != null)
+                {
+                    db.ThirdPartyAuthentication.Remove(checkingThirdPartyCalendarAuthentication);
+                    db.SaveChanges();
+                }
+            }
             return RetValue;
         }
 

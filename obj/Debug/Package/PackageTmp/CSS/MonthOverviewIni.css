@@ -62,7 +62,7 @@ body {
 {
   height: 200%;
   position: absolute;
-  width: calc(100% - 3em);
+  width: 100%;
   overflow-y: hidden;
   overflow-x: hidden;
   //margin-left: 3em;
@@ -163,7 +163,7 @@ body {
 {
   position:relative;
   height:100%;
-  width:calc(100%/7);
+  width:calc((100%/7) - 1px);
   text-align:center;
   white-space: nowrap;
   border-bottom:solid black 1px;
@@ -292,6 +292,7 @@ body {
     max-width:17px;
     border-radius:7px;
     background-color: rgba(1,1,1,.1);
+    border:white 1px solid;
 }
 
 .gridSubeventContainer {
@@ -318,6 +319,7 @@ body {
 {
   margin-left: 3em;
   box-shadow: inset rgba(20,20,20,0.3) 3px -4px 6px;
+  width: calc(100% - 3em) !important;
 }
 
 #NameOfWeekContainerPlane
@@ -691,21 +693,21 @@ body {
 
 .DayOfTime 
 {
-  position: absolute;
-  top: 0;
-  width: 4em;
-  max-width: 49px;
-  height: 100%;
-  font-family: 'texreg', Helvetica, sans-serif;
-  font-variant: small-caps;
-  font-size: .6em;
+    position: absolute;
+    top: 0;
+    width: 5em;
+    max-width: 49px;
+    height: 100%;
+    font-family: 'texreg', Helvetica, sans-serif;
+    font-variant: small-caps;
+    font-size: .6em;
 }
 
 #leftDayOfTime {
-  text-align: right;
-  overflow-x: visible;
-  overflow-y: hidden;
-  /* box-shadow: 2px 0px 2px rgb(136, 136, 136); */
+    text-align: right;
+    overflow-x: visible;
+    overflow-y: hidden;
+    box-shadow: 2px 0px 8px rgba(136, 136, 136,.7);
 }
 
 #rightDayOfTime {
@@ -765,7 +767,7 @@ body {
 .SubEventReferenceTime 
  {
   position: relative;
-  left: 5px;
+  left: 30px;
   overflow: hidden;
   text-overflow: ellipsis;
   text-align: right;
@@ -788,8 +790,8 @@ body {
 .SubEventReferenceCalType
 {
     position:relative;
-    width:20px;
-    height:20px;
+    max-width:20px;
+    max-height:20px;
     display:inline-block;
     left:5px;
     top:2px;
@@ -1313,7 +1315,7 @@ width: auto;
       cursor: pointer;
       box-shadow: rgba(10,10,10,0.3) 0px 0px 6px 1px;
       padding: 0 20px 0 25px;
-      left: -60px;
+      left: -50px;
       width: 0;
       overflow: hidden;
       box-sizing: border-box;
@@ -1353,12 +1355,11 @@ width: auto;
 
 #TilerManager
 {
-  position: relative;
-  top: 10px;
-  left: 30px;
-  height: 85px;
-  width: auto;
-  max-width: 200px;
+    position: relative;
+    top: 10px;
+    left: 30px;
+    height: 85px;
+    display: inline-block;
 }
 
 .MenuElementContainer {

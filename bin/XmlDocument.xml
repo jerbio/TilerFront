@@ -691,9 +691,6 @@
         <member name="M:TilerFront.Controllers.GoogleNotificationController.GoogNextNotif(TilerFront.Models.GoogleNotificationRequestModel)">
             *
         </member>
-        <member name="M:TilerFront.Controllers.ManageController.SendRequestForGoogleNotification(TilerFront.Models.ThirdPartyCalendarAuthenticationModel)">
-            *
-        </member>
         <member name="T:TilerFront.Controllers.ScheduleController">
             <summary>
             Represents a users schedule. Provides access to schedule creation, modification and deletion
@@ -722,6 +719,13 @@
             <param name="ThirdPartyType"></param>
             <returns></returns>
         </member>
+        <member name="M:TilerFront.Controllers.ScheduleController.googleNotificationTrigger(System.String)">
+            <summary>
+            Handles the trigger when new google notification comes through.
+            </summary>
+            <param name="GoogleNotificationID"></param>
+            <returns></returns>
+        </member>
         <member name="M:TilerFront.Controllers.ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(My24HourTimerWPF.Schedule,System.String)">
             <summary>
             Function retrives the third party credential. Credential are used to retrieve calendar event. The retrieved events are used to populate mySchedule
@@ -744,11 +748,92 @@
             <param name="UserData"></param>
             <returns></returns>
         </member>
+        <member name="M:TilerFront.Controllers.ScheduleController.CompleteSubCalendarEvent(TilerFront.Models.getEventModel)">
+            <summary>
+            Marks an Event as complete.  Note this also triggers a readjust to the schedule
+            </summary>
+            <param name="UserData"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.Controllers.ScheduleController.CompleteSubCalendarEvents(TilerFront.Models.getEventModel)">
+            <summary>
+            Marks a series of Event as complete. It takes a collection of IDs and then marks them as complete
+            </summary>
+            <param name="UserData"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.Controllers.ScheduleController.Now(TilerFront.Models.getEventModel)">
+            <summary>
+            Sets the provided event as now. The ID has to be a Sub event ID
+            </summary>
+            <param name="myUser"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.Controllers.ScheduleController.Undo(TilerFront.Models.AuthorizedUser)">
+            <summary>
+            Undoes the last schedule changing effect triggered on tiler.
+            </summary>
+            <param name="myUser"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.Controllers.ScheduleController.DeleteEvent(TilerFront.Models.getEventModel)">
+            <summary>
+            Deletes a Sub event from Tiler. The deletion does not trigger a schedule readjustment.
+            </summary>
+            <param name="myUser"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.Controllers.ScheduleController.HandleOptionsEvent(TilerFront.Models.getEventModel)">
+            <summary>
+            Option needed to satisfy a delete request for deletion of a subevent.
+            </summary>
+            <param name="myUser"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.Controllers.ScheduleController.DeleteEvents(TilerFront.Models.getEventModel)">
+            <summary>
+            Deletes multiple subevents.
+            </summary>
+            <param name="myUser"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.Controllers.ScheduleController.HandleOptionsEvents(TilerFront.Models.getEventModel)">
+            <summary>
+            Option needed to satisfy a delete request for multiple subevents.
+            </summary>
+            <param name="myUser"></param>
+            <returns></returns>
+        </member>
         <member name="M:TilerFront.Controllers.ScheduleController.NewCalEvent(TilerFront.Models.UnregisteredEvent)">
             <summary>
             Adds an Event to Tiler. Returns data formatted as tiler endpoint together. Returns the earliest sub calendarevent generated. 
             </summary>
             <param name="newEvent"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.Controllers.ScheduleController.Notification(TilerFront.Models.AuthorizedUser)">
+            <summary>
+            Triggers a schedule update when a notification is received pertaining third party event modification
+            </summary>
+            <param name="newEvent"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.Controllers.ScheduleController.PeekCalEvent(TilerFront.Models.UnregisteredEvent)">
+            <summary>
+            Peeks into user schedule. Generates an update to a schedule for any changes.
+            </summary>
+            <param name="newEvent"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.Controllers.ScheduleController.CreateRestrictionProfile(System.String,System.String,System.String,System.TimeSpan,System.String)">
+            <summary>
+            Creates a restriction profile to be used when generating a new event.
+            </summary>
+            <param name="Start"></param>
+            <param name="End"></param>
+            <param name="workWeek"></param>
+            <param name="TimeZoneOffSet"></param>
+            <param name="DaySelection"></param>
             <returns></returns>
         </member>
         <member name="M:TilerFront.GoogleTilerEventControl.getThirdPartyControlForIndex">
@@ -776,6 +861,26 @@
             </summary>
             <param name="referenceDay"></param>
             <param name="LogFile"></param>
+        </member>
+        <member name="P:TilerFront.Models.getEventModel.EventID">
+            <summary>
+            ID of the Event in tiler format. It should be in the format a_b_c
+            </summary>
+        </member>
+        <member name="P:TilerFront.Models.getEventModel.ThirdPartyEventID">
+            <summary>
+            ID of the third party service. The ID is provided from the 3rd party
+            </summary>
+        </member>
+        <member name="P:TilerFront.Models.getEventModel.ThirdPartyUserID">
+            <summary>
+            User ID to the third party service for which this event was created from
+            </summary>
+        </member>
+        <member name="P:TilerFront.Models.getEventModel.ThirdPartyType">
+            <summary>
+            The type or provider of this scheduling service(e.g: google, outlook).
+            </summary>
         </member>
         <member name="T:TilerFront.Models.getScheduleModel">
             <summary>
@@ -859,6 +964,47 @@
         <member name="P:TilerFront.Models.UnregisteredEvent.DurationMins">
             <summary>
             Sets the number of Minutes component for the duration of event. for the given calendar event. Default is 0
+            </summary>
+        </member>
+        <member name="P:TilerFront.Models.UnregisteredEvent.EndDay">
+            <summary>
+            Day-date component of End date.
+            </summary>
+        </member>
+        <member name="P:TilerFront.Models.UnregisteredEvent.EndHour">
+            <summary>
+            Hour component of End date.
+            </summary>
+        </member>
+        <member name="P:TilerFront.Models.UnregisteredEvent.EndMins">
+            <summary>
+            Minute component of End date.
+            </summary>
+        </member>
+        <member name="P:TilerFront.Models.UnregisteredEvent.EndMonth">
+            <summary>
+            Month component of End date.
+            </summary>
+        </member>
+        <member name="P:TilerFront.Models.UnregisteredEvent.EndYear">
+            <summary>
+            Year component of End date.
+            </summary>
+        </member>
+        <member name="P:TilerFront.Models.UnregisteredEvent.LocationAddress">
+            <summary>
+            Full Address for new event. Fully described in default format. e.g 1234 stret apt 56 Kingston, CO 78901
+            </summary>
+        </member>
+        <!-- Badly formed XML comment ignored for member "P:TilerFront.Models.UnregisteredEvent.LocationTag" -->
+        <member name="P:TilerFront.Models.UnregisteredEvent.Name">
+            <summary>
+            Name of Newly added Tile/Event
+            </summary>
+        </member>
+        <member name="P:TilerFront.Models.UnregisteredEvent.RepeatData">
+            <summary>
+            ***No current use***
             </summary>
         </member>
         <member name="P:TilerFront.Models.UnregisteredEvent.isRestricted">

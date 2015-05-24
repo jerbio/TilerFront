@@ -346,26 +346,7 @@ namespace TilerFront.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> deleteGoogleAccount(ThirdPartyAuthenticationForView modelData)
         {
-            ThirdPartyCalendarAuthenticationModel ThirdPartyAuth = db.ThirdPartyAuthentication.Where(obj => obj.ID == modelData.ID).Single();
-
-            if (ThirdPartyAuth != null)
-            {
-                UserCredential googleCredential = ThirdPartyAuth.getGoogleOauthCredentials();
-                try 
-                {
-                    await googleCredential.RefreshTokenAsync(CancellationToken.None).ConfigureAwait(false);
-                    await googleCredential.RevokeTokenAsync(CancellationToken.None).ConfigureAwait(false);
-                    db.ThirdPartyAuthentication.Remove(ThirdPartyAuth);
-                }
-                catch(Exception e)
-                {
-
-                }
-                //await ThirdPartyAuth.getGoogleOauthCredentials().RevokeTokenAsync(CancellationToken.None).ConfigureAwait(false);
-                
-                await db.SaveChangesAsync().ConfigureAwait(false);
-            }
-
+            await ThirdPartyCalendarAuthenticationModelsController.deleteGoogleAccount(modelData).ConfigureAwait(false);
             return RedirectToAction("ImportCalendar");
         }
 
@@ -395,6 +376,18 @@ namespace TilerFront.Controllers
                 bool makeAdditionCall = false;
                 if (!deletGoogleCalendarFromLog)
                 {
+                    Controllers.ThirdPartyCalendarAuthenticationModelsController.initializeCurrentURI(System.Web.HttpContext.Current.Request.Url.Authority);
+                    bool successInCreation = await ThirdPartyCalendarAuthenticationModelsController.CreateGoogle(thirdPartyCalendarAuthentication).ConfigureAwait(false);
+                    if (successInCreation)
+                    {
+                        ;
+                    }
+                    else
+                    {
+                        ;
+                    }
+                    return RedirectToAction("ImportCalendar");
+                    /*
                     try
                     {
                         Object[] Param = { thirdPartyCalendarAuthentication.TilerID, thirdPartyCalendarAuthentication.Email, thirdPartyCalendarAuthentication.ProviderID };
@@ -428,6 +421,7 @@ namespace TilerFront.Controllers
                     {
                         ;
                     }
+                    */
                 }
                 else 
                 {
@@ -444,7 +438,7 @@ namespace TilerFront.Controllers
             return View("ImportCalendar");
         }
 
-        ///*
+        /*
         public async Task<bool> SendRequestForGoogleNotification(ThirdPartyCalendarAuthenticationModel AuthenticationData)
         {
             bool RetValue = false;
@@ -471,14 +465,6 @@ namespace TilerFront.Controllers
 
                 var requestText = JsonConvert.SerializeObject(NotificationRequest);
 
-                /*
-                GoogleNotificationWatchResponseModel testGoogleResponse = new GoogleNotificationWatchResponseModel();
-                testGoogleResponse.expiration = "98989";
-                testGoogleResponse.id = "jkhj2hkjhkjh";
-                testGoogleResponse.kind = "99898989";
-                testGoogleResponse.resourceUri= "hjhj98878";
-                requestText = JsonConvert.SerializeObject(testGoogleResponse);*/
-
                 using (var stream = httpWebRequest.GetRequestStream())
                 // replaced Encoding.UTF8 by new UTF8Encoding(false) to avoid the byte order mark
                 using (var streamWriter = new System.IO.StreamWriter(stream, new UTF8Encoding(false)))
@@ -499,46 +485,6 @@ namespace TilerFront.Controllers
                 RetValue = true;
 
 
-
-
-                /*
-                string url = "https://www.googleapis.com/calendar/v3/calendars/" + AuthenticationData.Email + "/events/watch";
-                //url = "https://mytilerkid.azurewebsites.net/api/GoogleNotification/Trigger";
-                var httpWebRequest = WebRequest.Create(url);
-                httpWebRequest.ContentType = "application/json";
-                string AuthorizationString = "Bearer " + AuthenticationData.Token;
-                httpWebRequest.Headers.Add("Authorization", AuthorizationString);
-                httpWebRequest.Method = "POST";
-
-                GoogleNotificationRequestModel NotificationRequest = AuthenticationData.getGoogleNotificationCredentials(Ctx.Request.Url.Authority);
-
-                
-                //GoogleNotificationWatchResponseModel testGoogleResponse = new GoogleNotificationWatchResponseModel();
-                //testGoogleResponse.expiration = "98989";
-                //testGoogleResponse.id = "jkhj2hkjhkjh";
-                //testGoogleResponse.kind = "99898989";
-                //testGoogleResponse.resourceUri= "hjhj98878";
-                //string JsonString = JsonConvert.SerializeObject(testGoogleResponse);
-                
-                
-                
-                string JsonString = JsonConvert.SerializeObject(NotificationRequest);
-                
-                using (var streamWriter = new System.IO.StreamWriter(httpWebRequest.GetRequestStream()))
-                {
-                    string json = JsonString;
-                    streamWriter.Write(json);
-                    streamWriter.Flush();
-                    streamWriter.Close();
-                }
-
-                var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
-                using (var streamReader = new System.IO.StreamReader(httpResponse.GetResponseStream()))
-                {
-                    var result = streamReader.ReadToEnd();
-                }
-                RetValue = true;
-                */
             }
             catch (Exception E)
             {
@@ -573,7 +519,7 @@ namespace TilerFront.Controllers
                     {
                         userInfo = service.Userinfo.Get().Execute();
                     }
-                    catch (Google.Apis.Auth.OAuth2.Responses.TokenResponseException e)
+                    catch (Exception e)
                     {
                         ResetThirdparty = true;
                         return RedirectToAction("ImportGoogle");
@@ -603,7 +549,18 @@ namespace TilerFront.Controllers
                     else //if user hasn authenticated tiler before, then update current credentials
                     {
                         ThirdPartyCalendarAuthenticationModel retrievedAuthentication = await getGoogleAuthenticationData(UserID, Email).ConfigureAwait(false);
-                        await retrievedAuthentication.refreshAndCommitToken().ConfigureAwait(false);
+                        try 
+                        {
+                            await retrievedAuthentication.refreshAndCommitToken().ConfigureAwait(false);
+                        }
+                        catch
+                        {
+                            if (retrievedAuthentication != null)
+                            {
+                                deleteGoogleAccount(retrievedAuthentication.getThirdPartyOut()).RunSynchronously();
+                            }
+                        }
+                        
                         return RedirectToAction("ImportCalendar");
                     }
             }

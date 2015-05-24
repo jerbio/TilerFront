@@ -11,7 +11,6 @@ namespace TilerFront
         {
             OldLog = HttpContext.Current.Server.MapPath("~\\OldLogs\\");
             string LogLocation = HttpContext.Current.Server.MapPath("~\\WagTapCalLogs\\");//initializes the log location
-            
             //LogLocation = @"C:\Users\OluJerome\Documents\Visual Studio 2010\Projects\LearnCuDAVS2010\LearnCUDAConsoleApplication\bin\Debug\WagTapCalLogs\";
             //LogLocation = @"C:\Users\OluJerome\Documents\Visual Studio 2010\Projects\LearnCuDAVS2010\LearnCUDAConsoleApplication\WagTapCalLogs\";
             TilerFront.LogControl.UpdateLogLocation(LogLocation);

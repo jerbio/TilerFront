@@ -46,14 +46,41 @@ namespace TilerFront.Models
         /// Sets the number of Minutes component for the duration of event. for the given calendar event. Default is 0
         /// </summary>
         public string DurationMins { get; set; }
+        /// <summary>
+        /// Day-date component of End date.
+        /// </summary>
         public string EndDay { get; set; }
+        /// <summary>
+        /// Hour component of End date.
+        /// </summary>
         public string EndHour { get; set; }
+        /// <summary>
+        /// Minute component of End date.
+        /// </summary>
         public string EndMins { get; set; }
+        /// <summary>
+        /// Month component of End date.
+        /// </summary>
         public string EndMonth { get; set; }
+        /// <summary>
+        /// Year component of End date.
+        /// </summary>
         public string EndYear { get; set; }
+        /// <summary>
+        /// Full Address for new event. Fully described in default format. e.g 1234 stret apt 56 Kingston, CO 78901
+        /// </summary>
         public string LocationAddress { get; set; }
+        /// <summary>
+        /// Prefereed Nick name for location. If Nick name already exists, it overwrites previous full address & long lat with new nick name
+        /// </summary>
         public string LocationTag { get; set; }
+        /// <summary>
+        /// Name of Newly added Tile/Event
+        /// </summary>
         public string Name { get; set; }
+        /// <summary>
+        /// ***No current use***
+        /// </summary>
         public string RepeatData { get; set; }
         public string RepeatEndDay { get; set; }
         public string RepeatEndMonth { get; set; }

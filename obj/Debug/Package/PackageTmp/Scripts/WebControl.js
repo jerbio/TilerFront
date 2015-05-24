@@ -89,12 +89,6 @@ var googleAPiKey = "AIzaSyAOnexWFxnoQ6nQI7p64lyR8YgXwB4qRvU";//Debug ? "AIzaSyAe
 
 var global_TimeZone_ms = new Date().getTimezoneOffset()*60000;
 
-
-
-//alert("Hi Jerome\n" + TestStart + "\n" + document.getElementById("hahahah"));
-
-
-
 function SetCookie(CookieValue)
 {
     var CookieName = "TilerCaluserWaggy"

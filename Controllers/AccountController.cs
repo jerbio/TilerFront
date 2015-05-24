@@ -308,6 +308,7 @@ namespace TilerFront.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Register(RegisterViewModel model)
         {
+            Controllers.ThirdPartyCalendarAuthenticationModelsController.initializeCurrentURI(System.Web.HttpContext.Current.Request.Url.Authority);
             if (ModelState.IsValid)
             {
                 int Min=Convert.ToInt32(model.TimeZoneOffSet);
@@ -377,7 +378,7 @@ namespace TilerFront.Controllers
 
         public async Task<ActionResult> SignUp(RegisterViewModel model)
         {
-
+            Controllers.ThirdPartyCalendarAuthenticationModelsController.initializeCurrentURI(System.Web.HttpContext.Current.Request.Url.Authority);
             PostBackData retPost = new PostBackData("Failed to register user", 3);
             JsonResult RetValue = new JsonResult();
             if (ModelState.IsValid)
@@ -682,18 +683,41 @@ namespace TilerFront.Controllers
         [AllowAnonymous]
         public async Task<ActionResult> ExternalLoginCallback(string returnUrl)
         {
+            ApplicationDbContext db = new ApplicationDbContext();
             var loginInfo = await AuthenticationManager.GetExternalLoginInfoAsync();
             if (loginInfo == null)
             {
                 return RedirectToAction("Login");
             }
-
-            // Sign in the user with this external login provider if the user already has a login
-            var result = await SignInManager.ExternalSignInAsync(loginInfo, isPersistent: false);
+            Controllers.ThirdPartyCalendarAuthenticationModelsController.initializeCurrentURI(System.Web.HttpContext.Current.Request.Url.Authority);
+            int ThirdPartyType = -1;
+            var result = await SignInManager.ExternalSignInAsync(loginInfo, isPersistent: false).ConfigureAwait(false);
             switch (result)
             {
                 case SignInStatus.Success:
-                    return RedirectToAction("Desktop", "Account");
+                    {
+                        ThirdPartyType = Convert.ToInt32(loginInfo.ExternalIdentity.FindFirst("ThirdPartyType").Value);
+                        DateTimeOffset Now = DateTimeOffset.UtcNow;
+                        if (ThirdPartyType==(int)TilerElements.ThirdPartyControl.CalendarTool.Google)
+                        {
+                            string RefreshToken = loginInfo.ExternalIdentity.FindFirst("RefreshToken").Value;
+                            if(!string.IsNullOrEmpty(RefreshToken ))
+                            {
+                                ApplicationUser AppUser = await UserManager.FindAsync(loginInfo.Login).ConfigureAwait(false);
+                                string Email = loginInfo.Email;
+                                string AccessToken = loginInfo.ExternalIdentity.FindFirst("AccessToken").Value;
+                                TimeSpan fiveMin = new TimeSpan(0,-5,0);
+                                TimeSpan Duration = TimeSpan.Parse(  loginInfo.ExternalIdentity.FindFirst("ExpiryDuration").Value);
+                                Duration = Duration.Add(fiveMin );
+                                Now = Now.Add(Duration);
+                                await PopulateGoogleAuthentication(AppUser.Id, AccessToken, RefreshToken, Email, Now).ConfigureAwait(false);
+                            }
+                        }
+                        
+                        
+                        return RedirectToAction("Desktop", "Account");
+                    }
+                    
                 case SignInStatus.LockedOut:
                     return View("Lockout");
                 case SignInStatus.RequiresVerification:
@@ -701,6 +725,30 @@ namespace TilerFront.Controllers
                 case SignInStatus.Failure:
                 default:
                     // If the user does not have an account, then prompt the user to create an account
+                    
+                    ThirdPartyType = Convert.ToInt32(loginInfo.ExternalIdentity.FindFirst("ThirdPartyType").Value);
+                    ThirdPartyCalendarAuthenticationModel thirdPartyModel = null;
+                    DateTimeOffset Deadline = DateTimeOffset.UtcNow;
+                    if (ThirdPartyType == (int)TilerElements.ThirdPartyControl.CalendarTool.Google)
+                    {
+                        string RefreshToken = loginInfo.ExternalIdentity.FindFirst("RefreshToken").Value;
+                        if (!string.IsNullOrEmpty(RefreshToken))
+                        {
+                            ApplicationUser AppUser = await UserManager.FindAsync(loginInfo.Login).ConfigureAwait(false);
+                            string Email = loginInfo.Email;
+                            string AccessToken = loginInfo.ExternalIdentity.FindFirst("AccessToken").Value;
+                            TimeSpan fiveMin = new TimeSpan(0, -5, 0);
+                            TimeSpan Duration = TimeSpan.Parse(loginInfo.ExternalIdentity.FindFirst("ExpiryDuration").Value);
+                            Duration = Duration.Add(fiveMin);
+                            Deadline = Deadline.Add(Duration);
+                            thirdPartyModel = new ThirdPartyCalendarAuthenticationModel();
+                            thirdPartyModel.Deadline = Deadline;
+                            thirdPartyModel.Email = Email;
+                            thirdPartyModel.Token = AccessToken;
+                            thirdPartyModel.RefreshToken= RefreshToken;
+                        }
+                    }
+                    
                     ViewBag.ReturnUrl = returnUrl;
                     ViewBag.LoginProvider = loginInfo.Login.LoginProvider;
                     if (string.IsNullOrEmpty( loginInfo.Email))
@@ -709,7 +757,7 @@ namespace TilerFront.Controllers
                     }
                     else
                     {
-                        return await ExternalLoginConfirmation(new ExternalLoginConfirmationViewModel { Email = loginInfo.Email }, returnUrl);
+                        return await ExternalLoginConfirmation(new ExternalLoginConfirmationViewModel { Email = loginInfo.Email }, returnUrl, thirdPartyModel);
                     }
                     
                     //return View("ExternalLoginConfirmation", new ExternalLoginConfirmationViewModel { Email = loginInfo.Email });
@@ -721,7 +769,7 @@ namespace TilerFront.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> ExternalLoginConfirmation(ExternalLoginConfirmationViewModel model, string returnUrl)
+        public async Task<ActionResult> ExternalLoginConfirmation(ExternalLoginConfirmationViewModel model, string returnUrl, ThirdPartyCalendarAuthenticationModel ThirdPartyCredentials =null)
         {
             if (User.Identity.IsAuthenticated)
             {
@@ -750,7 +798,28 @@ namespace TilerFront.Controllers
                     if (result.Succeeded && LogCreationresult.Succeeded)
                     {
                         await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
-
+                        Task SendThirdPartyAuthentication = new Task(() => { });
+                        if (ThirdPartyCredentials!=null)
+                        {
+                            string Email = ThirdPartyCredentials.Email;
+                            SendThirdPartyAuthentication = PopulateGoogleAuthentication(user.Id, ThirdPartyCredentials.Token, ThirdPartyCredentials.RefreshToken, Email, ThirdPartyCredentials.Deadline); ;
+                        }
+                        
+                        /*
+                        string RefreshToken = loginInfo.ExternalIdentity.FindFirst("RefreshToken").Value;
+                        if (!string.IsNullOrEmpty(RefreshToken))
+                        {
+                            ApplicationDbContext db = new ApplicationDbContext();
+                            string Email = loginInfo.Email;
+                            ApplicationUser AppUser = db.Users.Where(obj => obj.Email == Email).Single();
+                            string AccessToken = loginInfo.ExternalIdentity.FindFirst("AccessToken").Value;
+                            TimeSpan fiveMin = new TimeSpan(0, -5, 0);
+                            TimeSpan Duration = TimeSpan.Parse(loginInfo.ExternalIdentity.FindFirst("ExpiryDuration").Value);
+                            Duration = Duration.Add(fiveMin);
+                            Now = Now.Add(Duration);
+                            await PopulateGoogleAuthentication(Email, AccessToken, RefreshToken, Now).ConfigureAwait(false);
+                        }
+                        */
                         // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=320771
                         // Send an email with this link
                         // string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
@@ -758,13 +827,11 @@ namespace TilerFront.Controllers
                         // await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
 
                         string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
-                        var callbackUrl = Url.Action("ConfirmEmail", "Account",
-                           new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-                        await UserManager.SendEmailAsync(user.Id,
-                           "Confirm your account", "Please confirm your account by clicking <a href=\""
-                           + callbackUrl + "\">here </a>");
-                        
-                        
+                        var callbackUrl = Url.Action("ConfirmEmail", "Account",new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
+                        Task SendEmail =UserManager.SendEmailAsync(user.Id,"Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here </a>");
+                         
+                        await SendThirdPartyAuthentication.ConfigureAwait(false);
+                        await SendEmail.ConfigureAwait(false);
                         return RedirectToAction("Desktop", "Account");
                     }
                     else
@@ -798,6 +865,39 @@ namespace TilerFront.Controllers
             return View("ExternalLoginConfirmation", model);
         }
 
+
+        async Task<bool> PopulateGoogleAuthentication(string TilerUserID,string AccessToken,string RefreshToken, string GoogleEmail,DateTimeOffset ExpirationDate )
+        {
+            ApplicationDbContext db = new ApplicationDbContext();
+            ApplicationUser AppUser = UserManager.FindById(TilerUserID);
+            bool RetValue = false;
+            try
+            { 
+                ThirdPartyCalendarAuthenticationModel NewAccountCalendarImportation = new ThirdPartyCalendarAuthenticationModel();
+                string AuthenticationID = Guid.NewGuid().ToString();
+                NewAccountCalendarImportation.TilerID = TilerUserID;
+                NewAccountCalendarImportation.ID = AuthenticationID;
+                NewAccountCalendarImportation.Token = AccessToken;
+                NewAccountCalendarImportation.RefreshToken = RefreshToken;
+                NewAccountCalendarImportation.isLongLived = false;
+                NewAccountCalendarImportation.Email = GoogleEmail;
+                NewAccountCalendarImportation.Deadline = ExpirationDate;
+
+
+                //await NewAccountCalendarImportation.refreshAuthenticationToken().ConfigureAwait(false);
+
+                HttpContext myContext = System.Web.HttpContext.Current;
+                await ThirdPartyCalendarAuthenticationModelsController.CreateGoogle(NewAccountCalendarImportation);
+                RetValue = true;
+            }
+            catch
+            {
+                RetValue = false;
+            }
+
+            return RetValue;
+
+        }
 
         [AllowAnonymous]
         public ActionResult LogOff(string returnUrl)
