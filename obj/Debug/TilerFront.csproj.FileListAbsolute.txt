@@ -239,6 +239,10 @@ C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\TilerElements.dll
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\WebGrease.dll
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Zlib.Portable.dll
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Google.Maps.dll
+C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Google.Apis.Auth.Mvc4.dll
+C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\DBTilerElement.dll
+C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Google.Apis.Plus.v1.dll
+C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Google.Apis.Oauth2.v2.dll
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Antlr3.Runtime.pdb
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\EntityFramework.xml
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\EntityFramework.SqlServer.xml
@@ -293,8 +297,11 @@ C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\System.Web.Optimiza
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\TilerElements.pdb
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Zlib.Portable.xml
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Google.Maps.pdb
+C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Google.Apis.Auth.Mvc4.pdb
+C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\DBTilerElement.pdb
+C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Google.Apis.Plus.v1.pdb
+C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Google.Apis.Oauth2.v2.pdb
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.csproj.App.config
-C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.csprojResolveAssemblyReference.cache
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.Migrations.init.resources
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.Migrations.Initial.resources
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.csproj.GenerateResource.Cache
