@@ -703,6 +703,14 @@
             <param name="myAuthorizedUser"></param>
             <returns></returns>
         </member>
+        <member name="M:TilerFront.Controllers.ScheduleController.GetDeletedSchedule(TilerFront.Models.getScheduleModel)">
+            <summary>
+            Retrieve Events within a time frame. Required elements are UserID and UserName. Provided starttime and Endtime for the range of the schedule allows for retrieval of schedule within a timerange
+            </summary>
+            <param name="myAuthorizedUser"></param>
+            <returns></returns>
+            
+        </member>
         <member name="M:TilerFront.Controllers.ScheduleController.getAllThirdPartyAuthentication(System.String)">
             <summary>
             Retrieves the third party authentication credentials needed to retrieve third party calendar. Attaches an index for multiple calendar retrieval. Based on a specific userID

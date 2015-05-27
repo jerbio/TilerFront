@@ -429,31 +429,35 @@ namespace TilerFront
             bool errorWritingFile = false;
             CalendarEvent ErrorEvent = new CalendarEvent();
             EventScheduleNodes = xmldoc.DocumentElement.SelectNodes("/ScheduleLog/EventSchedules/EventSchedule");
+            DateTimeOffset purgeLimit = DateTimeOffset.UtcNow.AddMonths(-3);
             try
             {
                 foreach (CalendarEvent MyEvent in AllEvents)
                 {
                     //break;
-                    XmlElement EventScheduleNode;
-                    //EventScheduleNode = CreateEventScheduleNode(MyEvent);
-                    //*
-                    ErrorEvent = MyEvent;
-                    EventScheduleNode = CreateEventScheduleNode(MyEvent);
-                
-                
-                    //*/
-                
-                    //EventSchedulesNodes[0].PrependChild(xmldoc.CreateElement("EventSchedule"));
-                    //EventSchedulesNodes[0].ChildNodes[0].InnerXml = CreateEventScheduleNode(MyEvent).InnerXml;
-                    XmlNode MyImportedNode = xmldoc.ImportNode(EventScheduleNode as XmlNode, true);
-                    //(EventScheduleNode, true);
-                    if (!UpdateInnerXml(ref EventScheduleNodes, "ID", MyEvent.ID.ToString(), EventScheduleNode))
+                    if (MyEvent.End > purgeLimit)
                     {
-                        xmldoc.DocumentElement.SelectSingleNode("/ScheduleLog/EventSchedules").AppendChild(MyImportedNode);
-                    }
-                    else
-                    {
-                        ;
+                        XmlElement EventScheduleNode;
+                        //EventScheduleNode = CreateEventScheduleNode(MyEvent);
+                        //*
+                        ErrorEvent = MyEvent;
+                        EventScheduleNode = CreateEventScheduleNode(MyEvent);
+                
+                
+                        //*/
+                
+                        //EventSchedulesNodes[0].PrependChild(xmldoc.CreateElement("EventSchedule"));
+                        //EventSchedulesNodes[0].ChildNodes[0].InnerXml = CreateEventScheduleNode(MyEvent).InnerXml;
+                        XmlNode MyImportedNode = xmldoc.ImportNode(EventScheduleNode as XmlNode, true);
+                        //(EventScheduleNode, true);
+                        if (!UpdateInnerXml(ref EventScheduleNodes, "ID", MyEvent.ID.ToString(), EventScheduleNode))
+                        {
+                            xmldoc.DocumentElement.SelectSingleNode("/ScheduleLog/EventSchedules").AppendChild(MyImportedNode);
+                        }
+                        else
+                        {
+                            ;
+                        }
                     }
                 }
             }
