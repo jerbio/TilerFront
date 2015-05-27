@@ -2537,6 +2537,7 @@
     <Content Include="Views\ThirdPartyCalendarAuthenticationModels\Edit.cshtml" />
     <Content Include="Views\ThirdPartyCalendarAuthenticationModels\Index.cshtml" />
     <Content Include="Views\ThirdPartyCalendarAuthenticationModels\Authenticate.cshtml" />
+    <Content Include="Views\Account\CheckEmailForConfirmation.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Views\GoogleNotifications\" />

@@ -1,6 +1,6 @@
 ﻿"use strict"
 var DisableRegistration = false;
-var Debug =  false;
+var Debug = false;
 var DebugLocal = false;
 
 //var global_refTIlerUrl = "http://localhost:53201/api/";
@@ -11,7 +11,7 @@ if (Debug)
     global_refTIlerUrl = "http://mytilerKid.azurewebsites.net/api/";
     if(DebugLocal)
     {
-        global_refTIlerUrl = "https://localhost:44302/api/";
+        global_refTIlerUrl = "http://localhost:11919/api/";
     }
 }
 
@@ -211,6 +211,7 @@ function triggerUndoPanel(UndoMessage)
 
     function clickUnDoPanel()
     {
+        global_ExitManager.triggerLastExitAndPop();
         function undoCallBack() {
             hideUndoPanel();
             getRefreshedData.enableDataRefresh();
@@ -224,14 +225,15 @@ function triggerUndoPanel(UndoMessage)
 
 function StructuralizeNewData(NewData)
 {
-    if (NewData != "") {
-        TotalSubEventList = new Array();
-        ActiveSubEvents = new Array();
+    var TotalSubEventList = new Array();
+    var ActiveSubEvents = new Array();
+    var Dictionary_OfCalendarData = {};
+    var Dictionary_OfSubEvents = {};
+    if (NewData != "")
+    {
         generateNonRepeatEvents(NewData.Schedule.NonRepeatCalendarEvent);
         generateRepeatEvents(NewData.Schedule.RepeatCalendarEvent);
         CleanupData();
-        global_RemovedElemnts = global_DictionaryOfSubEvents;
-        global_DictionaryOfSubEvents = {};
     }
     else {
         console.log("Empty Data");
@@ -271,24 +273,26 @@ function StructuralizeNewData(NewData)
 
         
         var NowDate = new Date(CurrentTheme.Now);
-        TotalSubEventList.forEach(function (eachSubEvent) {
-            if (Dictionary_OfSubEvents[eachSubEvent.ID] == null) {
-                Dictionary_OfSubEvents[eachSubEvent.ID] = eachSubEvent;
-            }
-            else {
-                ToBeReorganized.push(eachSubEvent);
-                //if (Dictionary_OfSubEvents[eachSubEvent.ID].SubCalStartDate != eachSubEvent.SubCalStartDate)
-                {
-                    //global_DeltaSubevents.push(eachSubEvent);
+        TotalSubEventList.forEach(
+            function (eachSubEvent)
+            {
+                if (Dictionary_OfSubEvents[eachSubEvent.ID] == null) {
+                    Dictionary_OfSubEvents[eachSubEvent.ID] = eachSubEvent;
                 }
+                else {
+                    ToBeReorganized.push(eachSubEvent);
+                    //if (Dictionary_OfSubEvents[eachSubEvent.ID].SubCalStartDate != eachSubEvent.SubCalStartDate)
+                    {
+                        //global_DeltaSubevents.push(eachSubEvent);
+                    }
 
-            }
-            //debugger;
-            var RangeStart = new Date(NowDate.getTime() - (OneHourInMs * 12));
-            var RangeEned = new Date(CurrentTheme.Now + TwelveHourMilliseconds);
+                }
+                //debugger;
+                var RangeStart = new Date(NowDate.getTime() - (OneHourInMs * 12));
+                var RangeEned = new Date(CurrentTheme.Now + TwelveHourMilliseconds);
 
             
-        }
+            }
         )
 
     }
@@ -325,7 +329,7 @@ function StructuralizeNewData(NewData)
         //myEvent.Dom = MobileDom;
         return myEvent
     }
-
+    return { TotalSubEventList: TotalSubEventList,ActiveSubEvents: ActiveSubEvents,Dictionary_OfCalendarData: Dictionary_OfCalendarData,Dictionary_OfSubEvents:Dictionary_OfSubEvents};
 }
 
 function getEventsWithinRange(RangeStart, RangeEned) {

@@ -107,7 +107,75 @@ namespace TilerFront.Controllers
             
             return Ok(returnPostBack.getPostBack);
         }
+
+
+        // GET api/schedule
+        /// <summary>
+        /// Retrieve Events within a time frame. Required elements are UserID and UserName. Provided starttime and Endtime for the range of the schedule allows for retrieval of schedule within a timerange
+        /// </summary>
+        /// <param name="myAuthorizedUser"></param>
+        /// <returns></returns>
+        /// 
+
+        [HttpGet]
+        [ResponseType(typeof(PostBackStruct))]
+        [Route("api/Schedule/DeletedSchedule")]
+        public async Task<IHttpActionResult> GetDeletedSchedule([FromUri] getScheduleModel myAuthorizedUser)
+        {
+            UserAccountDirect myUserAccount = await myAuthorizedUser.getUserAccountDirect();
+            HttpContext myCOntext = HttpContext.Current;
+            await myUserAccount.Login();
+            PostBackData returnPostBack;
+            if (myUserAccount.Status)
+            {
+                DateTimeOffset StartTime = new DateTimeOffset(myAuthorizedUser.StartRange * TimeSpan.TicksPerMillisecond, new TimeSpan()).AddYears(1969).Add(-myAuthorizedUser.getTImeSpan);
+                DateTimeOffset EndTime = new DateTimeOffset(myAuthorizedUser.EndRange * TimeSpan.TicksPerMillisecond, new TimeSpan()).AddYears(1969).Add(-myAuthorizedUser.getTImeSpan);
+                TimeLine TimelineForData = new TimeLine(StartTime, EndTime);
+
+
+                LogControl LogAccess = myUserAccount.ScheduleLogControl;
+                List<CalendarEvent> ScheduleData = new List<CalendarEvent>();
+
+                Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, Location_Elements>> ProfileData = await LogAccess.getProfileInfo(TimelineForData);
+
+                ScheduleData = ScheduleData.Concat(ProfileData.Item1.Values).ToList();
+
+                IEnumerable<CalendarEvent> NonRepeatingEvents = ScheduleData.Where(obj => !obj.RepetitionStatus);
+
+
+
+
+                //IEnumerable<CalendarEvent> RepeatingEvents = ScheduleData.Where(obj => obj.RepetitionStatus).SelectMany(obj => obj.Repeat.RecurringCalendarEvents);
+                IList<UserSchedule.repeatedEventData> RepeatingEvents = ScheduleData.AsParallel().Where(obj => obj.RepetitionStatus).
+                    Select(obj => new UserSchedule.repeatedEventData
+                    {
+                        ID = obj.Calendar_EventID.ToString(),
+                        Latitude = obj.myLocation.XCoordinate,
+                        Longitude = obj.myLocation.YCoordinate,
+                        RepeatAddress = obj.myLocation.Address,
+                        RepeatAddressDescription = obj.myLocation.Description,
+                        RepeatCalendarName = obj.Name,
+                        RepeatCalendarEvents = obj.Repeat.RecurringCalendarEvents().AsParallel().
+                            Select(obj1 => obj1.ToDeletedCalEvent(TimelineForData)).ToList(),
+                        RepeatEndDate = obj.End,
+                        RepeatStartDate = obj.Start,
+                        RepeatTotalDuration = obj.ActiveDuration
+                    }).ToList();
+
+
+                UserSchedule currUserSchedule = new UserSchedule { NonRepeatCalendarEvent = NonRepeatingEvents.Select(obj => obj.ToDeletedCalEvent(TimelineForData)).ToArray(), RepeatCalendarEvent = RepeatingEvents };
+                InitScheduleProfile retValue = new InitScheduleProfile { Schedule = currUserSchedule, Name = myUserAccount.Usersname };
+                returnPostBack = new PostBackData(retValue, 0);
+            }
+            else
+            {
+                returnPostBack = new PostBackData("", 1);
+            }
+
+            return Ok(returnPostBack.getPostBack);
+        }
         
+
         /// <summary>
         /// Retrieves the third party authentication credentials needed to retrieve third party calendar. Attaches an index for multiple calendar retrieval. Based on a specific userID
         /// </summary>
@@ -579,7 +647,7 @@ namespace TilerFront.Controllers
                 RepeatEnd = RepeatEnd.Add(newEvent.getTImeSpan);
                 if (!RigidScheduleFlag)
                 {
-                    DateTimeOffset newEndTime = FullEndTime;
+                    //DateTimeOffset newEndTime = FullEndTime;
 
                     string Frequency = RepeatFrequency.Trim().ToUpper();
                     switch(Frequency)
@@ -600,7 +668,7 @@ namespace TilerFront.Controllers
                             break;
                     }
 
-                    RepeatEnd = newEndTime;
+                    //RepeatEnd = newEndTime;
                 }
 
 
@@ -618,7 +686,7 @@ namespace TilerFront.Controllers
                 //RepeatEnd = (DateTimeOffset.Now).AddDays(7);
                 RepetitionFlag = true;
                 MyRepetition = new Repetition(RepetitionFlag, new TimeLine(RepeatStart, RepeatEnd), RepeatFrequency, new TimeLine(FullStartTime, FullEndTime), selectedDaysOftheweek);
-                EndDateEntry = RepeatEnd;
+                EndDateEntry = MyRepetition.Range.End > EndDateEntry ? MyRepetition.Range.End : EndDateEntry;
             }
 
             

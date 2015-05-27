@@ -282,15 +282,13 @@ namespace TilerFront.Controllers
             }
         }
 
-        private async Task<string> SendEmailConfirmationTokenAsync(string userID, string subject)
+        private async Task SendEmailConfirmationAsync(string userID, string subject)
         {
             string code = await UserManager.GenerateEmailConfirmationTokenAsync(userID);
             var callbackUrl = Url.Action("ConfirmEmail", "Account",
                new { userId = userID, code = code }, protocol: Request.Url.Scheme);
-            await UserManager.SendEmailAsync(userID, subject,
-               "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
-
-            return callbackUrl;
+            Task RetValue=  UserManager.SendEmailAsync(userID, subject, "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
+            await RetValue.ConfigureAwait(false);
         }
 
         //
@@ -338,15 +336,16 @@ namespace TilerFront.Controllers
                             await OldUserAccount.DeleteLog();
                             LogControl.UpdateLogLocation(CurrentLogLocation);
                         }
-                        */
+                        
                         string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
                         var callbackUrl = Url.Action("ConfirmEmail", "Account",
                            new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
                         await UserManager.SendEmailAsync(user.Id,
                            "Confirm your account", "Please confirm your account by clicking <a href=\""
                            + callbackUrl + "\">here </a>");
-
-                        
+                        */
+                        Task SendEmail = SendEmailConfirmationAsync(user.Id, "Please Confirm Your Tiler Account!");
+                        await SendEmail.ConfigureAwait(false);
 
                         // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=320771
                         // Send an email with this link
@@ -411,12 +410,16 @@ namespace TilerFront.Controllers
                             LogControl.UpdateLogLocation(CurrentLogLocation);
                         }
                         */
+                        /*
                         string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
                         var callbackUrl = Url.Action("ConfirmEmail", "Account",
                            new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
                         await UserManager.SendEmailAsync(user.Id,
                            "Confirm your account", "Please confirm your account by clicking <a href=\""
-                           + callbackUrl + "\">here </a>");
+                           + callbackUrl + "\">here </a>");*/
+
+                        Task SendEmail = SendEmailConfirmationAsync(user.Id, "Please Confirm Your Tiler Account!");
+                        await SendEmail.ConfigureAwait(false);
 
                         string LoopBackUrl = "";
                         if (Request.Browser.IsMobileDevice)
@@ -562,11 +565,30 @@ namespace TilerFront.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = await UserManager.FindByNameAsync(model.Email);
-                if (user == null || !(await UserManager.IsEmailConfirmedAsync(user.Id)))
+
+                var user = await UserManager.FindByEmailAsync (model.Email);
+                if (user == null)
                 {
                     // Don't reveal that the user does not exist or is not confirmed
-                    return View("ForgotPasswordConfirmation");
+                    string Message0  = "Hmmm... I just got bounced, Tiler can't find an Account with the email\"" + model.Email + "\". Wanna try another email address. ";
+                    string Message1  = "The Interweb guards cant find your email\"" + model.Email + "\". Wanna try another email address. ";
+                    string Message2  = "Algore can't find the email address, \"" + model.Email + "\". Wanna try another email address. ";
+                    string Message3 = "\"YOU SHALL NOT PASS\", says the oracle. The email address \"" + model.Email + "\" is incorrect. Wanna try another email address. ";
+                    string[] Messages = { Message0, Message1, Message2, Message3 };
+
+
+                    Random myRand = new Random(DateTime.UtcNow.Millisecond);
+
+                   int indexError =  myRand.Next() %  Messages.Length ;
+
+                   ModelState.AddModelError("", Messages[indexError]);
+                   return View(model);
+                }
+
+                if (!(await UserManager.IsEmailConfirmedAsync(user.Id)))
+                {
+                    await SendEmailConfirmationAsync(user.Id, "Please Confirm Email Before Password Renewal");
+                    return View("CheckEmailForConfirmation");
                 }
 
 
@@ -826,10 +848,12 @@ namespace TilerFront.Controllers
                         // var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
                         // await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
 
-                        string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
+                        /*string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
                         var callbackUrl = Url.Action("ConfirmEmail", "Account",new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
                         Task SendEmail =UserManager.SendEmailAsync(user.Id,"Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here </a>");
-                         
+                         */
+
+                        Task SendEmail = SendEmailConfirmationAsync(user.Id, "Please Confirm Your Tiler Account!");
                         await SendThirdPartyAuthentication.ConfigureAwait(false);
                         await SendEmail.ConfigureAwait(false);
                         return RedirectToAction("Desktop", "Account");

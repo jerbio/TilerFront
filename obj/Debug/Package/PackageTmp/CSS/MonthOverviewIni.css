@@ -99,6 +99,42 @@ body {
   //background-color:brown;
 }
 
+.InActiveElementContainer
+{
+    font-size: 12px;
+    padding: 5px;
+    text-align:left;
+}
+.InActiveElementNameContainer
+{
+    overflow:hidden;
+    white-space:nowrap;
+    text-overflow:ellipsis;
+    display:inline-block;
+    width:100%;
+}
+
+.InActiveElementNameSpan 
+{
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+
+.CompletedInactive
+{
+    //text-decoration: line-through;
+    color:green;
+}
+
+.DeletedInactive
+{
+    text-decoration: line-through;
+    color:red;
+}
+
 .DayContainer
 {
   position:absolute;
@@ -171,11 +207,20 @@ body {
   display:inline-block;
 }
 
+.NameWeekDay
+{
+    height: 22px;
+    line-height: 16px !important;
+    overflow: hidden;
+}
+
 .NameOfDayContainer p {
-    font-family: 'texbold';
-    font-size: 25px;
-    line-height: 20px;
-    margin-top: 0;
+  font-family: 'texbold';
+  font-size: 25px;
+  margin-top: 0;
+  width: 100%;
+  overflow:hidden;
+  
 }
 
 .NameOfDayContainer span {
@@ -183,16 +228,69 @@ body {
   font-size: 14px;
 }
 
+.DayMoreOptions
+{
+    position: relative;
+    width: 100%;
+    height: 10px;
+    margin-top: 4px;
+}
+
+.DayMoreOptionsUnderlinesTop
+{
+    width:20px;
+    border-top:solid 1px;
+    position:absolute;
+    left:50%;
+    margin-left:-10px;
+    transition: all .3s;
+}
+
+.DayMoreOptionsUnderlinesBottom
+{
+  width: 10px;
+  border-bottom: solid 1px;
+  position: absolute;
+  left: 50%;
+  margin-left: -5px;
+  transition: all .3s;
+  margin-top: 3px;
+}
+
+.DayMoreOptions:hover .DayMoreOptionsUnderlinesBottom
+{
+  width: 10px;
+  border-bottom: solid 2px;
+  position: absolute;
+  left: 50%;
+  margin-left: -2px;
+  transition: all .3s;
+  margin-top: 3px;
+  transform: rotateZ(45deg);
+}
+
+.DayMoreOptions:hover .DayMoreOptionsUnderlinesTop
+{
+  width: 10px;
+  border-top: solid 2px;
+  position: absolute;
+  left: 50%;
+  margin-left: -8px;
+  transition: all .3s;
+  transform: rotateZ(-45deg);
+  margin-top: 3px;
+}
 
 
 .dateOfDay 
 {
     font-size: 11px !important;
     font-family: 'texreg', Helvetica, sans-serif !important;
-    position: absolute;
+    position: relative;
     /* top: 36%; */
-    /* height: 50%; */
+    height: 10px;
     width: 100%;
+    line-height: 10px;
 }
 
 
@@ -352,10 +450,17 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  padding: 2px;
+  padding: 0px;
   box-sizing: border-box;
   //background-color: rgba(255,0,0,.5);
 }
+
+.HideSubEventRenderPlane
+{
+    z-index:-5;
+}
+
+
 
 .NameOfWeekDayRenderPlane
 {
@@ -723,10 +828,10 @@ body {
 }
 .TimeOfDay 
 {
-    height:4.1667%;
-    width:calc(100% - 4px);
-    margin:0 2px 0 2px;
-
+    height: 4.1667%;
+    width: calc(100% - 4px);
+    margin: 0 2px 0 2px;
+    line-height: 9px;
 }
 
 .weekContainer 
@@ -877,6 +982,45 @@ body {
     border-radius: 5px;
     box-shadow: rgba(30,30,30,.8) 0 0 6px;
     font-size: 15px;
+}
+
+.MonthButton:hover
+{
+    box-shadow: rgba(10,10,10,.8) 0 0 2px;
+}
+
+.Checkmark
+{
+    content:'\2713';
+    display:inline-block;
+    color:green;
+    padding:0 6px 0 0;
+    position:relative;
+}
+
+.Checkmark:before
+{
+  content:'\2713';
+  display:inline-block;
+  color:green;
+  padding:0 6px 0 0;
+  position:relative;
+}
+
+.Crossmark
+{
+    content:'\2715';
+    display:inline-block;
+    color:red;
+    padding:0 6px 0 0;
+}
+
+.Crossmark:before
+{
+    content:'\2715';
+    display:inline-block;
+    color:red;
+    padding:0 6px 0 0;
 }
 
 .MonthBarDay 
@@ -1038,7 +1182,7 @@ body {
     width:3.22%;
     height:70%;
     top:15%;
-    //border:green 2px solid;
+    font-size:14px;
 }
 
 .MonthBarDayWeekContainer:hover .MonthBarDay {
@@ -1290,6 +1434,40 @@ width: auto;
 {
     font-size:12px;
 }
+#ThreeCircleButton
+{
+    width:30px;
+    height:100%;
+    display:inline-block;
+}
+
+
+#ThreeCircleButton:hover .ThreeButtonCircle
+{
+    background-color:transparent;
+}
+
+.CircleContainer
+{
+    height:33%;
+    width:100%;
+    position:relative;
+}
+
+.ThreeButtonCircle
+{
+    top: 50%;
+    margin-top: -4px;
+    height: 8px;
+    width: 8px;
+    box-sizing: border-box;
+    border: solid 1px black;
+    border-radius: 8px;
+    background-color: black;
+    position: absolute;
+    left: 50%;
+    margin-left: -4px;
+}
 
 
 #InfoBasePanel {
@@ -1381,6 +1559,8 @@ width: auto;
     width:100% !important;
 }
 
+
+
 .SubEventListContainer
 {
     position: absolute;
@@ -1390,6 +1570,30 @@ width: auto;
     max-height: 100%;
     overflow-y: auto;
     overflow-x: hidden;
+}
+
+.MoreInfoPanel
+{
+  position: absolute;
+  width: 100%;
+  left: 0;
+  /* padding-top: 10px; */
+  max-height: 100%;
+  background-color: rgba(255,255,0,.92);
+  /* height: 0; */
+  text-align: center;
+  opacity: 0;
+  transition: opacity ease-in-out 1s;
+  border: solid 1px;
+  box-sizing: border-box;
+  border-radius: 5px;
+}
+
+.RevealMoreInfoPanel
+{
+    z-index: 999;
+    height:100%;
+    opacity:1;
 }
 
 

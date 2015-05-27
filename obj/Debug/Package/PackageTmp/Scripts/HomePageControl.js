@@ -122,8 +122,11 @@ function generateHomePage(UserSchedule) {
     CurrentTheme.TransitionNewContainer(HomePageContainer.Dom);
     var HomePageDoms = generateHomePageDoms(HomePageContainer.Dom);
     var MiddleContentDom = HomePageDoms[1].childNodes[1];//second index selection selects content section
-
-    StructuralizeNewData(UserSchedule);
+    var StructuredData = StructuralizeNewData(UserSchedule)
+    TotalSubEventList = StructuredData.TotalSubEventList;
+    ActiveSubEvents = StructuredData.ActiveSubEvents;
+    Dictionary_OfCalendarData = StructuredData.Dictionary_OfCalendarData;
+    Dictionary_OfSubEvents = StructuredData.Dictionary_OfSubEvents;
     ActiveSubEvents = getEventsWithinRange(ActiveRange.Start, ActiveRange.End);
     if (ActiveSubEvents.length)
     {
@@ -364,8 +367,18 @@ function prepFunctionForCompletionOfEvent(EventID, CallBack) {
         Url = global_refTIlerUrl + "Schedule/Event/Complete";
         var HandleNEwPage = new LoadingScreenControl("Tiler is updating your schedule ...");
         HandleNEwPage.Launch();
-
+        SubEvent = Dictionary_OfSubEvents[EventID]
         var MarkAsCompleteData = { UserName: UserCredentials.UserName, UserID: UserCredentials.ID, EventID: EventID, TimeZoneOffset: TimeZone };
+
+        MarkAsCompleteData = {
+            UserName: UserCredentials.UserName,
+            UserID: UserCredentials.ID,
+            EventID: SubEvent.ID,
+            TimeZoneOffset: TimeZone,
+            ThirdPartyEventID: SubEvent.ThirdPartyEventID,
+            ThirdPartyUserID: SubEvent.ThirdPartyUserID,
+            ThirdPartyType: SubEvent.ThirdPartyType
+        };
         $.ajax({
             type: "POST",
             url: Url,
@@ -1558,7 +1571,18 @@ function generateModalForTIleOrModal()
         return function()
         {
             var TimeZone = new Date().getTimezoneOffset();
+            var SubEvent = Dictionary_OfSubEvents[EventID]
             var DeletionEvent = { UserName: UserCredentials.UserName, UserID: UserCredentials.ID, EventID: EventID, TimeZoneOffset: TimeZone };
+            DeletionEvent = {
+                UserName: UserCredentials.UserName,
+                UserID: UserCredentials.ID,
+                EventID: SubEvent.ID,
+                TimeZoneOffset: TimeZone,
+                ThirdPartyEventID: SubEvent.ThirdPartyEventID,
+                ThirdPartyUserID: SubEvent.ThirdPartyUserID,
+                ThirdPartyType: SubEvent.ThirdPartyType
+            };
+            //v
             //var URL = "RootWagTap/time.top?WagCommand=6"
             var URL = global_refTIlerUrl + "Schedule/Event";
             var HandleNEwPage = new LoadingScreenControl("Tiler is Deleting your event :)");
@@ -1666,7 +1690,11 @@ function generateModalForTIleOrModal()
     function sortOutData(PostData)
     {
         var UserSchedule = PostData.Content;
-        StructuralizeNewData(UserSchedule)
+        var StructuredData = StructuralizeNewData(UserSchedule)
+        TotalSubEventList = StructuredData.TotalSubEventList;
+        ActiveSubEvents = StructuredData.ActiveSubEvents;
+        Dictionary_OfCalendarData = StructuredData.Dictionary_OfCalendarData;
+        Dictionary_OfSubEvents = StructuredData.Dictionary_OfSubEvents;
         ActiveSubEvents = getEventsWithinRange(ActiveRange.Start, ActiveRange.End);
         if (ActiveSubEvents.length) {
             ClosestSubEventToNow = getClosestToNow(ActiveSubEvents, new Date());

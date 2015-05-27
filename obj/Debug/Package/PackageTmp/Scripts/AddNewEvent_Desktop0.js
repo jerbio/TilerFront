@@ -2922,7 +2922,23 @@ function affirmNewEvent(response)
         {
             if (global_GoToDay(StartOfEvent))
             {
-                setTimeout(function () { renderSubEventsClickEvents(EventID); }, 1500);
+                setTimeout(function () {
+                    //renderSubEventsClickEvents(EventID);
+
+                    //debugger;
+                    //if (true)
+                    {
+                        //debugger;
+                        var CurrentWeekContainer = $(getDomOrCreateNew("CurrentWeekContainer"));
+                        var TimeSizeDom = $(global_DictionaryOfSubEvents[EventID].TimeSizeDom)
+                        var bar = $(TimeSizeDom).offset().top - $(CurrentWeekContainer).offset().top
+                        var WidthInPixels = bar;
+                        //$("#NameOfWeekContainerPlane").animate({ scrollTop: WidthInPixels }, 1000);
+                        $("#CurrentWeekContainer").animate({ scrollTop: WidthInPixels }, 1000);
+                    }
+                    //debugger;
+                    global_UISetup.RenderOnSubEventClick(EventID);
+                }, 1500);
                 
             }
             else

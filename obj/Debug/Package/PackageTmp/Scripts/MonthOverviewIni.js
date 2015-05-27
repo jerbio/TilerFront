@@ -1121,6 +1121,8 @@ function generateDayContainer()
     var DayContextContainer = getDomOrCreateNew("DayContextContainer" + myID);
     var SubEventListContainer = getDomOrCreateNew("SubEventListContainer" + myID);
     $(SubEventListContainer).addClass("SubEventListContainer");
+    var MoreInfoPanel = getDomOrCreateNew("MoreInfoPanel" + myID);
+    $(MoreInfoPanel).addClass("MoreInfoPanel");
     $(DayContextContainer).addClass("DayContextContainer");
     DayContainer.appendChild(DayContextContainer);
     //DayContainer
@@ -1143,6 +1145,7 @@ function generateDayContainer()
     DayContainer.Dom.appendChild(NameOfDayContainer.Dom);
     DayContextContainer.Dom.appendChild(FullGridContainer.Dom);//Full grid
     DayContextContainer.Dom.appendChild(DayTimeContainer.Dom);
+    DayContextContainer.Dom.appendChild(MoreInfoPanel.Dom);
     DayContextContainer.Dom.appendChild(SubEventListContainer.Dom);
     //DayContainer.Dom.appendChild(DayTimeContainer.Dom);
     $(DayTimeContainer.Dom).addClass("DayTimeContainer");
@@ -1185,6 +1188,28 @@ function generateDayContainer()
 
         $(shadeContainer.Dom).addClass("shadeContainer");
     }
+
+    function revealMoreOptions()
+    {
+        $(MoreInfoPanel).removeClass("setAsDisplayNone")
+        $(MoreInfoPanel).addClass("RevealMoreInfoPanel")
+        AddCloseButoon(MoreInfoPanel, false);
+    }
+
+    function unRevealMoreOptions() {
+        
+        $(MoreInfoPanel).addClass("setAsDisplayNone");
+        $(MoreInfoPanel).removeClass("RevealMoreInfoPanel")
+        $(MoreInfoPanel).empty();
+    }
+
+
+    MoreInfoPanel.onclick=function(e)
+    {
+        e.stopPropagation();
+    }
+    unRevealMoreOptions();
+
     function onMouseIn()
     {
         //debugger;
@@ -1222,7 +1247,7 @@ function generateDayContainer()
     DayTimeContainer.Dom.appendChild(EventDayContainer.Dom);
     
 
-    return { renderPlane: SubEventListContainer, FullDayContext: DayContextContainer, Parent: DayContainer, EventDayContainer: EventDayContainer, NameOfDayContainer: NameOfDayContainer }
+    return { renderPlane: SubEventListContainer, FullDayContext: DayContextContainer, Parent: DayContainer, EventDayContainer: EventDayContainer, NameOfDayContainer: NameOfDayContainer, DayID: myID,MoreInfoPanel:MoreInfoPanel, RevealMoreOptions: revealMoreOptions, UnRevealMoreOptions: unRevealMoreOptions }
 }
 
 
@@ -1424,12 +1449,10 @@ function getRefreshedData(CallBackAfterRefresh)//RangeData)
     var DataHolder = { Data: "" };
     if (getRefreshedData.isEnabled)
     {
-        
         PopulateTotalSubEvents(DataHolder, global_WeekGrid,CallBackAfterRefresh);
-        
     }
-        global_ClearRefreshDataInterval = setTimeout(getRefreshedData, global_refreshDataInterval);
-        return global_ClearRefreshDataInterval;
+    global_ClearRefreshDataInterval = setTimeout(getRefreshedData, global_refreshDataInterval);
+    return global_ClearRefreshDataInterval;
 }
 getRefreshedData.isEnabled = true;
 
@@ -1485,7 +1508,7 @@ getRefreshedData.enableDataRefresh = function (pullLatest)
     function refreshIframe(Start, End)
     {
         //var mapFrameDom = document.getElementsByName("MapContainerFrame");
-
+        return;
         var AllEvents= getEventsInterferringInRange(Start, End);
         if (AllEvents.length > 0)
         {
@@ -1569,7 +1592,14 @@ getRefreshedData.enableDataRefresh = function (pullLatest)
             //NewData = JSON.parse(NewData);
             var PerformanceStart = new Date();
             NewData = NewData.Content;
-            StructuralizeNewData(NewData)
+            ActiveSubEvents = new Array();
+            var StructuredData = StructuralizeNewData(NewData)
+            TotalSubEventList = StructuredData.TotalSubEventList;
+            ActiveSubEvents = StructuredData.ActiveSubEvents;
+            Dictionary_OfCalendarData = StructuredData.Dictionary_OfCalendarData;
+            Dictionary_OfSubEvents = StructuredData.Dictionary_OfSubEvents;
+            global_RemovedElemnts = global_DictionaryOfSubEvents;
+            global_DictionaryOfSubEvents = {};
             DataContainer.Data = NewData;
             var PerformanceEnd = new Date();
             console.log("Processing Data From Back End" + (PerformanceEnd - PerformanceStart));
@@ -1578,6 +1608,41 @@ getRefreshedData.enableDataRefresh = function (pullLatest)
     }
 
 
+
+    function GetDeletedEvents(RangeData, CallBackAfterRefresh) {
+        ///Gets the data from tiler back end. Also sucks out the subcalendar events
+        var myurl = global_refTIlerUrl + "Schedule/DeletedSchedule";
+        var TimeZone = new Date().getTimezoneOffset();
+        if (new Date().dst()) {
+            //TimeZone += 60;
+        }
+        getRefreshedData.disableDataRefresh();
+        var PostData = { UserName: UserCredentials.UserName, UserID: UserCredentials.ID, StartRange: RangeData.Start.getTime(), EndRange: RangeData.End.getTime(), TimeZoneOffset: TimeZone };
+
+        $.ajax({
+            type: "GET",
+            url: myurl,
+            data: PostData,
+            // DO NOT SET CONTENT TYPE to json
+            // contentType: "application/json; charset=utf-8", 
+            // DataType needs to stay, otherwise the response object
+            // will be treated as a single string
+            //dataType: "json",
+            success: getSubEvents,
+            error: function (err) {
+                CallBackAfterRefresh();
+            }
+        }).done(function () {
+            getRefreshedData.enableDataRefresh();
+        });
+
+        function getSubEvents(NewData)
+        {
+            NewData=NewData.Content
+            var DeletedTotalSubEventList = StructuralizeNewData(NewData).TotalSubEventList;
+            CallBackAfterRefresh(DeletedTotalSubEventList);
+        }
+    }
 
 
     
@@ -2182,12 +2247,6 @@ function renderClassicSubEventLook(DayOfWeek, ID, MyArray, Index, TabCount)
 
         var NumberOfLeftShifts = ArrayElement.PrecedingOverlapers;
         var LeftShift = NumberOfLeftShifts;
-        
-        if (ID == "112000_7_112054_112055")
-        {
-            //debugger;
-        }
-
         var DomWidth = (GridSubEventWidth - NumberOfLeftShifts)
         DomWidth -= ArrayElement.OverlappingAfterMe;
         /*
@@ -2206,6 +2265,7 @@ function renderClassicSubEventLook(DayOfWeek, ID, MyArray, Index, TabCount)
 
         LeftPercent = LeftPercent + LeftShift;
         $(RefEvent.Dom).addClass("ClassicGridEvents");
+        RefEvent.Dom.setAttribute("tabindex", "0");
         RefEvent.Dom.style.left = (LeftPercent + 1) + "%"
         RefEvent.Dom.style.height = RefEvent.css.height + "%";
 
@@ -2311,7 +2371,7 @@ renderSubEventsClickEvents.isRefListSubEventClicked = false;
 
 
 function renderClassicSubEventsClickEvents(SubEventID) {
-    global_DictionaryOfSubEvents[SubEventID].Bind();
+    //global_DictionaryOfSubEvents[SubEventID].Bind();
     global_DictionaryOfSubEvents[SubEventID].showBottomPanel();
 
     var DayContainer = global_DictionaryOfSubEvents[SubEventID].Day
@@ -3038,6 +3098,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                 var myDom = AllDomsOfTheSameSubevent[i]
                 $(myDom).addClass("SelectedWeekGridSubcalEvent");
                 global_previousSelectedSubCalEvent.push(myDom);
+                myDom.focus();
         }
 
               var ControlPanelNameOfSubeventInfo = document.getElementById("ControlPanelNameOfSubeventInfo");
@@ -4017,8 +4078,89 @@ function genDivForEachWeek(RangeOfWeek, AllRanges)//generates each week containe
                 prev = currDate;
                 var Month = currDate.getMonth() +1;
                 var Day = currDate.getDate();
-                myDay.NameOfDayContainer.Dom.innerHTML = "<p>" + DayOfWeek.substring(0, 2) + "<p class='dateOfDay'>" + myDay.Start.getDate();
+                myDay.NameOfDayContainer.Dom.innerHTML = "<p class='NameWeekDay'>" + DayOfWeek.substring(0, 2) + "</p>" + "<p class='dateOfDay'>" + myDay.Start.getDate() + "</p>";
+                var MoreOptions = getDomOrCreateNew("DayMoreOptions" + myDay.DayID)
+                $(MoreOptions).addClass("DayMoreOptions")
+
+                var DayMoreOptionsUnderlinesTop = getDomOrCreateNew("DayMoreOptionsUnderlinesTop" + myDay.DayID)
+                $(DayMoreOptionsUnderlinesTop).addClass("DayMoreOptionsUnderlinesTop")
+                var DayMoreOptionsUnderlinesBottom = getDomOrCreateNew("DayMoreOptionsUnderlinesBottom" + myDay.DayID)
+                $(DayMoreOptionsUnderlinesBottom).addClass("DayMoreOptionsUnderlinesBottom")
+
+
+                MoreOptions.appendChild(DayMoreOptionsUnderlinesTop)
+                MoreOptions.appendChild(DayMoreOptionsUnderlinesBottom)
+                myDay.NameOfDayContainer.Dom.appendChild(MoreOptions);
                 NameOfWeekDayRenderPlane.appendChild(myDay.NameOfDayContainer);
+
+
+                MoreOptions.onclick =MoreOptionsClick;
+
+                function MoreOptionsClick()
+                {
+                    //return;
+                    global_ExitManager.triggerLastExitAndPop();
+                    myDay.RevealMoreOptions();
+                    MoreOptions.onclick = MoreOptionsOutsideClick;
+                    $(SubEventRenderPlane).addClass("HideSubEventRenderPlane");
+                    global_ExitManager.addNewExit(MoreOptionsOutsideClick);
+                    GetDeletedEvents(myDay, ProcessDeletedEvents);
+                    function ProcessDeletedEvents(DeletedData)
+                    {
+                        //debugger;
+                        function generateListDom(SubEventData)
+                        {
+                            var myID = generateListDom.Count++;
+                            var InActiveElementContainer = getDomOrCreateNew("InActiveElementContainer" + myID);
+                            $(InActiveElementContainer).addClass("InActiveElementContainer");
+                            var InActiveElementNameContainer = getDomOrCreateNew("InActiveElementNameContainer" + myID);
+                            $(InActiveElementNameContainer).addClass("InActiveElementNameContainer");
+                            InActiveElementNameContainer.setAttribute("title", SubEventData.Name);
+                            var InActiveElementNameSpan = getDomOrCreateNew("InActiveElementNameSpan" + myID,"span");
+                            $(InActiveElementNameSpan).addClass("InActiveElementNameSpan");
+                            
+
+                            InActiveElementNameSpan.innerHTML = SubEventData.Name;
+                            InActiveElementNameContainer.appendChild(InActiveElementNameSpan)
+                            var InActiveElementIconContainer = getDomOrCreateNew("InActiveElementIconContainer" + myID);
+                            $(InActiveElementIconContainer).addClass("InActiveElementIconContainer");
+                            if (SubEventData.isComplete) {
+                                $(InActiveElementNameSpan).addClass("CompletedInactive");
+                                $(InActiveElementNameSpan).addClass("Checkmark");
+                            }
+
+                            if (!SubEventData.isEnabled) {
+                                $(InActiveElementNameSpan).addClass("DeletedInactive");
+                                $(InActiveElementNameSpan).addClass("Crossmark");
+                            }
+
+                            InActiveElementContainer.appendChild(InActiveElementIconContainer);
+                            InActiveElementContainer.appendChild(InActiveElementNameContainer);
+                            myDay.MoreInfoPanel.appendChild(InActiveElementContainer);
+                        }
+                        generateListDom.Count = 0;
+                        DeletedData.forEach(generateListDom);
+                        if(!DeletedData.length)
+                        {
+
+                            var EmptySpan = getDomOrCreateNew("EmptySpan" + generateListDom.Count, "span");
+                            EmptySpan.innerHTML ="...Empty..."
+                            //$(InActiveElementNameSpan).addClass("InActiveElementNameSpan");
+                            myDay.MoreInfoPanel.appendChild(EmptySpan)
+                            setTimeout(function () { EmptySpan.innerHTML = "" }, 3000)
+                        }
+                        
+                    }
+                }
+
+                function MoreOptionsOutsideClick()
+                {
+                    $(SubEventRenderPlane).removeClass("HideSubEventRenderPlane");
+                    myDay.UnRevealMoreOptions();
+                    MoreOptions.onclick = MoreOptionsClick;
+                }
+
+
                 if (isToday)
                 {
                     var PreviousDay = $(".CurrentDay");
