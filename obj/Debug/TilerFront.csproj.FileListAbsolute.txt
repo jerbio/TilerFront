@@ -132,3 +132,5 @@ C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Google.Maps.pdb
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\ApplicationInsights.config
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.dll
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.pdb
+C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\sdk.dll
+C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\sdk.pdb
