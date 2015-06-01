@@ -8,7 +8,7 @@ var global_RangeMultiplier = 5;//range for number of weeks to be specified for c
 var global_CurrentRange;
 var global_ClearRefreshDataInterval = 0;
 var global_ColorAugmentation = 0;
-var refreshCounter = 1000000;
+var refreshCounter = 10000;
 var global_refreshDataInterval = 45000;
 var global_multiSelect;
 var global_ControlPanelIconSet = new IconSet();
@@ -4084,12 +4084,18 @@ function genDivForEachWeek(RangeOfWeek, AllRanges)//generates each week containe
 
                 var DayMoreOptionsUnderlinesTop = getDomOrCreateNew("DayMoreOptionsUnderlinesTop" + myDay.DayID)
                 $(DayMoreOptionsUnderlinesTop).addClass("DayMoreOptionsUnderlinesTop")
+                $(DayMoreOptionsUnderlinesTop).addClass("ThreeDot")
                 var DayMoreOptionsUnderlinesBottom = getDomOrCreateNew("DayMoreOptionsUnderlinesBottom" + myDay.DayID)
                 $(DayMoreOptionsUnderlinesBottom).addClass("DayMoreOptionsUnderlinesBottom")
+                $(DayMoreOptionsUnderlinesBottom).addClass("ThreeDot")
+                var DayMoreOptionsUnderlinesMiddle = getDomOrCreateNew("DayMoreOptionsUnderlinesMiddle" + myDay.DayID)
+                $(DayMoreOptionsUnderlinesMiddle).addClass("DayMoreOptionsUnderlinesMiddle")
+                $(DayMoreOptionsUnderlinesMiddle).addClass("ThreeDot")
 
 
                 MoreOptions.appendChild(DayMoreOptionsUnderlinesTop)
                 MoreOptions.appendChild(DayMoreOptionsUnderlinesBottom)
+                MoreOptions.appendChild(DayMoreOptionsUnderlinesMiddle)
                 myDay.NameOfDayContainer.Dom.appendChild(MoreOptions);
                 NameOfWeekDayRenderPlane.appendChild(myDay.NameOfDayContainer);
 

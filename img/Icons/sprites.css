@@ -1,40 +1,28 @@
-.ClassicUnhiglight, .ClassicHiglight, .ClassicColored, .SlabsUnHighLight, .SlabsHighLight, .SlabsColored{
+.ClassicHover, .ClassicIni, .SlabIni, .SlabHover{
 	background: url(sprites.png) no-repeat;
 }
 
-.ClassicUnhiglight{
-	background-position: 0 -102px ;
-	width: 39px;
-	height: 52px;
+.ClassicHover{
+	background-position: -49px 0;
+	width: 32px;
+	height: 43px;
 }
 
-.ClassicHiglight{
-	background-position: -102px -101px ;
-	width: 39px;
-	height: 52px;
+.ClassicIni{
+	background-position: 0 -0.0089111328125px ;
+	width: 32px;
+	height: 43px;
 }
 
-.ClassicColored{
-	background-position: -203px -100px ;
-	width: 39px;
-	height: 52px;
+.SlabIni{
+	background-position: -4.0089111328125px -60.0089111328125px ;
+	width: 26px;
+	height: 32px;
 }
 
-.SlabsUnHighLight{
-	background-position: -5px 0;
-	width: 39px;
-	height: 52px;
-}
-
-.SlabsHighLight{
-	background-position: -105px 0;
-	width: 39px;
-	height: 52px;
-}
-
-.SlabsColored{
-	background-position: -201px 0;
-	width: 39px;
-	height: 52px;
+.SlabHover{
+	background-position: -54px -60px ;
+	width: 26px;
+	height: 32px;
 }
 
