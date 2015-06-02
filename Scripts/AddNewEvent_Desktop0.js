@@ -190,6 +190,7 @@ function generateModal(x, y, height, width,WeekStart, RenderPlane,UseCurrentTime
 {
     //return;
     //debugger;
+    getLocation();
 
     if (generateModal.isOn)
     {
@@ -1438,6 +1439,12 @@ function AddTiledEvent()
 
         combinedCallBack.DomContainer = LocationAutoSuggestControl.getSuggestedValueContainer();
 
+        combinedCallBack.rePopulate = function () {
+
+        }
+
+
+
         combinedCallBack.clear = function ()
         {
             debugger;
@@ -1593,9 +1600,9 @@ function AddTiledEvent()
                 ReseAutoSuggest();
                 var dataInput = InputCOntainer.value
                 dataInput = dataInput.trim();
-                var pyrmont = new google.maps.LatLng(40.0274, -105.2519);
+                var defaultLocation = new google.maps.LatLng(global_PositionCoordinate.Latitude, global_PositionCoordinate.Longitude);
                 var request = {
-                    location: pyrmont,
+                    location: defaultLocation,
                     radius: 50,
                     query: dataInput
                 };

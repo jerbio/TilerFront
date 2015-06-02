@@ -14,7 +14,7 @@ if (Debug)
         global_refTIlerUrl = "http://localhost:11919/api/";
     }
 }
-
+var global_PositionCoordinate = { Latitude: 40.0274, Longitude: -105.2519, isInitialized: false, Message: "Uninitialized" };;
 
 var UserTheme = { Light: new Theme("Light"), Dark: new Theme("Dark") };
 var CurrentTheme = UserTheme.Light;
@@ -129,6 +129,41 @@ function GetCookieValue()//verifies that user has cookies
     }
 
     return CookieValue;
+}
+
+
+
+
+function getLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(populatePosition, showError);
+    } else {
+        //global_PositionCoordinate = null;
+    }
+
+    function populatePosition(position) {
+        global_PositionCoordinate.isInitialized = true;
+        global_PositionCoordinate.Latitude = position.coords.latitude;
+        global_PositionCoordinate.Longitude = position.coords.longitude;
+    }
+
+    function showError(error) {
+        switch (error.code) {
+            case error.PERMISSION_DENIED:
+                global_PositionCoordinate.Message = "User denied the request for Geolocation."
+                break;
+            case error.POSITION_UNAVAILABLE:
+                global_PositionCoordinate.Message = "Location information is unavailable."
+                break;
+            case error.TIMEOUT:
+                global_PositionCoordinate.Message = "The request to get user location timed out."
+                break;
+            case error.UNKNOWN_ERROR:
+                global_PositionCoordinate.Message = "An unknown error occurred."
+                break;
+        }
+    }
+
 }
 
 function removeElement(id)
