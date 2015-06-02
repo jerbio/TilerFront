@@ -1,38 +1,32 @@
 "use strict";
 
-function addNewEvent(x, y, height, refStart)
-{
+function addNewEvent(x, y, height, refStart) {
     //debugger;
     var AddEventPanel = getDomOrCreateNew("AddEventPanel");
     generateAddEventContainer(x, y, height, AddEventPanel.Dom, refStart);
-    
+
 }
 
-function generatePostBackDataForTimeRestriction(RestrictionSlider)
-{
+function generatePostBackDataForTimeRestriction(RestrictionSlider) {
     //debugger;
     var RestrictionStatusButtonStatus = RestrictionSlider.getStatus();
     var RestrictionStart = RestrictionSlider.getStart();
     var RestrictionEnd = RestrictionSlider.getEnd();
     var RestrictionWorkWeek = RestrictionSlider.isWorkWeek();
-    var RestrictEveryday= RestrictionSlider.isEveryDay();
+    var RestrictEveryday = RestrictionSlider.isEveryDay();
     var RestrictiveWeek = RestrictionSlider.getRestrictiveWeek().getPostData();
     var RetValue = { isRestriction: RestrictionStatusButtonStatus, Start: RestrictionStart, End: RestrictionEnd, isEveryDay: RestrictEveryday, isWorkWeek: RestrictionWorkWeek, RestrictiveWeek: RestrictiveWeek }
     return RetValue;
 }
 
-function generateOfficeHours(Place)
-{
-    var RetValue = { WeekDayData: [], IsTwentyFourHours: false,NoWeekData:true };
+function generateOfficeHours(Place) {
+    var RetValue = { WeekDayData: [], IsTwentyFourHours: false, NoWeekData: true };
 
-    if (Place.opening_hours.weekday_text.length)
-    {
-        for (var i = 0; i < Place.opening_hours.weekday_text.length; i++)
-        {
+    if (Place.opening_hours.weekday_text.length) {
+        for (var i = 0; i < Place.opening_hours.weekday_text.length; i++) {
             var CurrentWeekday = Place.opening_hours.weekday_text[i];
             var RestrivtiveDay = createRestrictedTimeData(CurrentWeekday);
-            if(RestrivtiveDay.IsTwentyFourHours)
-            {
+            if (RestrivtiveDay.IsTwentyFourHours) {
                 RetValue.IsTwentyFourHours = RestrivtiveDay.IsTwentyFourHours;
                 break;
             }
@@ -41,58 +35,50 @@ function generateOfficeHours(Place)
         }
     }
 
-    function createRestrictedTimeData(WeekdayText)
-    {
+    function createRestrictedTimeData(WeekdayText) {
         var WeekData = WeekdayText.split(":");
-        var DayData = WeekData [0].trim();
+        var DayData = WeekData[0].trim();
         var DayIndex = WeekDays.indexOf(DayData);
-        var TimeData = WeekData .slice(1,WeekData .length).join(":").trim();
-        var TimeSection =TimeData .split(",");
+        var TimeData = WeekData.slice(1, WeekData.length).join(":").trim();
+        var TimeSection = TimeData.split(",");
 
-        var RetValue = {DayIndex:DayIndex, Start:null, End:null,IsTwentyFourHours:false};
+        var RetValue = { DayIndex: DayIndex, Start: null, End: null, IsTwentyFourHours: false };
 
-        function PickTimeFrames(DayOfWeek,TimeSections)
-        {
+        function PickTimeFrames(DayOfWeek, TimeSections) {
             var DayIndex = WeekDays.indexOf(DayOfWeek);
             //var RetValue = { DayIndex: DayIndex, Start: null, End: null, IsTwentyFourHours: false, IsClosed:null };
 
             var AllTimeDataStart = [];
             var AllTimeDataEnd = [];
 
-            for (var i = 0 ; i < TimeSections.length; i++)
-            {
+            for (var i = 0 ; i < TimeSections.length; i++) {
                 var TimeText = TimeSections[i].toLowerCase();
                 var timeee = "hakh hkjahjks";
-                
-                if(TimeText !="open 24 hours")
-                {
-                    if(TimeText !="closed")
-                    {
+
+                if (TimeText != "open 24 hours") {
+                    if (TimeText != "closed") {
                         var BeginAndEndArray = TimeText.split("–");
                         var Begin = BeginAndEndArray[0].trim();
                         Begin = Begin.trim();
                         //Begin = Begin.slice(0, -1);
-                        Begin =spliceSlice(Begin, Begin.length - 3, 0, " ");
+                        Begin = spliceSlice(Begin, Begin.length - 3, 0, " ");
                         var End = BeginAndEndArray[1].trim();
                         End = spliceSlice(End, End.length - 3, 0, " ");
-                        var Begin = Date.parse((new Date()).toLocaleDateString()+" " + Begin);
+                        var Begin = Date.parse((new Date()).toLocaleDateString() + " " + Begin);
                         End = Date.parse((new Date()).toLocaleDateString() + " " + End);
                         var EndData = new Date(End);
-                        if ((EndData.getHours() == 0) && (EndData.getMinutes() == 0))
-                        {
+                        if ((EndData.getHours() == 0) && (EndData.getMinutes() == 0)) {
                             End -= 1000;
                         }
                         AllTimeDataStart.push(Begin);
                         AllTimeDataEnd.push(End);
                         RetValue.IsClosed = false;
                     }
-                    else
-                    {
+                    else {
                         RetValue.IsClosed = true;
                     }
                 }
-                else
-                {
+                else {
                     RetValue.IsTwentyFourHours = true;
                     return RetValue;
                     break;
@@ -101,14 +87,12 @@ function generateOfficeHours(Place)
             AllTimeDataStart.sort(function (a, b) { return (a) - (b) });
             AllTimeDataEnd.sort(function (a, b) { return (a) - (b) });
 
-            for (var i = 0 ; i < AllTimeDataStart.length; i++)
-            {
+            for (var i = 0 ; i < AllTimeDataStart.length; i++) {
                 AllTimeDataStart[i] = new Date(AllTimeDataStart[i]);
             }
 
 
-            for (var i = 0; i < AllTimeDataEnd.length; i++)
-            {
+            for (var i = 0; i < AllTimeDataEnd.length; i++) {
                 AllTimeDataEnd[i] = new Date(AllTimeDataEnd[i]);
             }
 
@@ -143,24 +127,20 @@ function spliceSlice(str, index, count, add) {
 }
 
 
-function prepSendTile(NameInput, AddressInput, NickNameSlider, SpliInput, HourInput, MinuteInput, DeadlineInput, RepetitionInput, RepetitionFlag, ColorSelection,TimeRestrictions)
-{
-    return function ()
-    {
+function prepSendTile(NameInput, AddressInput, NickNameSlider, SpliInput, HourInput, MinuteInput, DeadlineInput, RepetitionInput, RepetitionFlag, ColorSelection, TimeRestrictions) {
+    return function () {
         var calendarColor = ColorSelection;
         var restrictionData = generatePostBackDataForTimeRestriction(TimeRestrictions);
         var NickName = "";
-        if (NickNameSlider.getStatus())
-        {
+        if (NickNameSlider.getStatus()) {
             NickName = NickNameSlider.getAllElements()[0].TileInput.getInputDom().value;
         }
-        var newEvent= SubmitTile(NameInput.value, AddressInput.value,NickName, SpliInput.value, HourInput.value, MinuteInput.value, DeadlineInput.value, RepetitionInput.value, calendarColor, RepetitionFlag, restrictionData);
+        var newEvent = SubmitTile(NameInput.value, AddressInput.value, NickName, SpliInput.value, HourInput.value, MinuteInput.value, DeadlineInput.value, RepetitionInput.value, calendarColor, RepetitionFlag, restrictionData);
         SendScheduleInformation(newEvent, global_ExitManager.triggerLastExitAndPop);
     }
 }
 
-function SubmitTile(Name, Address,AddressNick, Splits, Hour, Minutes, Deadline, Repetition, CalendarColor,RepetitionFlag,TimeRestrictions)
-{
+function SubmitTile(Name, Address, AddressNick, Splits, Hour, Minutes, Deadline, Repetition, CalendarColor, RepetitionFlag, TimeRestrictions) {
     var DictOfData = {};
     DictOfData["day"] = { Range: OneDayInMs, Type: { Name: "Daily", Index: 0 }, Misc: null }
     DictOfData["week"] = { Range: OneWeekInMs, Type: { Name: "Weekly", Index: 1 }, Misc: { AllDoms: [] } }
@@ -182,7 +162,7 @@ function SubmitTile(Name, Address,AddressNick, Splits, Hour, Minutes, Deadline, 
     Hour = Hour != "" ? Hour : 0;
     Minutes = Minutes != "" ? Minutes : 0;
 
-    
+
     var Start = new Date();
     var EventStart = {}
     EventStart.Date = new Date(Start.getFullYear(), Start.getMonth(), Start.getDate());
@@ -201,7 +181,7 @@ function SubmitTile(Name, Address,AddressNick, Splits, Hour, Minutes, Deadline, 
     */
 
     Splits = Splits != "" ? Splits : 1;
-    
+
     Repetition = Repetition.trim().toLowerCase();
     var DayPlusOne = new Date();
     var Day = DayPlusOne.getDate();
@@ -214,8 +194,7 @@ function SubmitTile(Name, Address,AddressNick, Splits, Hour, Minutes, Deadline, 
 
 
     var repeteOpitonSelect = "none"
-    if( (Repetition != "")&&(RepetitionFlag))
-    {
+    if ((Repetition != "") && (RepetitionFlag)) {
         repeteOpitonSelect = DictOfData[Repetition];
         if (repeteOpitonSelect != undefined) {
             RepetitionEnd = (End.getMonth() + 1) + "/" + End.getDate() + "/" + End.getFullYear();
@@ -230,25 +209,22 @@ function SubmitTile(Name, Address,AddressNick, Splits, Hour, Minutes, Deadline, 
 
             //End = new Date(Start.getTime() + repeteOpitonSelect.Range);
         }
-        else
-        {
+        else {
             alert("Seems like you have invalid data for repetition. Please check your repetition");
             return;
         }
-        
+
     }
-    else
-    {
-        if (!RepetitionFlag)
-        {
+    else {
+        if (!RepetitionFlag) {
             Splits = 1;
         }
     }
     var EventEnd = {}
     EventEnd.Date = new Date(End.getFullYear(), End.getMonth(), End.getDate());
     EventEnd.Time = { Hour: 23, Minute: 59 };
-    
-    var NewEvent = new CalEventData(EventName, EventLocation, Splits, CalendarColor, EventDuration, EventStart, EventEnd, repeteOpitonSelect, RepetitionStart, RepetitionEnd, false,TimeRestrictions);
+
+    var NewEvent = new CalEventData(EventName, EventLocation, Splits, CalendarColor, EventDuration, EventStart, EventEnd, repeteOpitonSelect, RepetitionStart, RepetitionEnd, false, TimeRestrictions);
     //NewEvent.RepeatData = null;
     if (NewEvent == null) {
         return;
@@ -309,14 +285,12 @@ function SubmitTile(Name, Address,AddressNick, Splits, Hour, Minutes, Deadline, 
 }
 
 /*generates modal "Add New Event & Add New Tile" for creating new item. Note: width is distance in pixels between left click and End of window */
-function generateModal(x, y, height, width,WeekStart, RenderPlane,UseCurrentTime)
-{
+function generateModal(x, y, height, width, WeekStart, RenderPlane, UseCurrentTime) {
     //return;
     //debugger;
     initializeUserLocation();
 
-    if (generateModal.isOn)
-    {
+    if (generateModal.isOn) {
         global_ExitManager.triggerLastExitAndPop();
         generateModal.isOn = false;
         return;
@@ -331,9 +305,9 @@ function generateModal(x, y, height, width,WeekStart, RenderPlane,UseCurrentTime
     var AddTile = getDomOrCreateNew("AddTileDom", "button");
     var AddEvent = getDomOrCreateNew("AddEventDom", "button");
     var SpanEscape = getDomOrCreateNew("SpanEscape", "span");
-    SpanEscape.Dom.innerHTML=("Press Escape to Exit.");
-    AddEvent.Dom.innerHTML=("New Event");
-    AddTile.Dom.innerHTML=("New Tile");
+    SpanEscape.Dom.innerHTML = ("Press Escape to Exit.");
+    AddEvent.Dom.innerHTML = ("New Event");
+    AddTile.Dom.innerHTML = ("New Tile");
     modalAddDom.Dom.appendChild(AddTile.Dom);
     modalAddDom.Dom.appendChild(AddEvent.Dom);
     modalAddDom.Dom.appendChild(SpanEscape.Dom);
@@ -341,16 +315,16 @@ function generateModal(x, y, height, width,WeekStart, RenderPlane,UseCurrentTime
     $(AddEvent.Dom).addClass("SubmitButton");
     RenderPlane.appendChild(modalAddDom.Dom);
     var modalHeight = ($(modalAddDom).height());
-    var modalWidth= ($(modalAddDom).width());
-    var MaxY = height -modalHeight;
-    var MaxX = width -modalWidth;
-    var modalXPos = x > MaxX?(x-modalWidth):x;
-    var modalYPos = y > MaxY ?(y-modalHeight):y;
-    if (height<10)// hack to ensure selection of add button
+    var modalWidth = ($(modalAddDom).width());
+    var MaxY = height - modalHeight;
+    var MaxX = width - modalWidth;
+    var modalXPos = x > MaxX ? (x - modalWidth) : x;
+    var modalYPos = y > MaxY ? (y - modalHeight) : y;
+    if (height < 10)// hack to ensure selection of add button
     {
         modalYPos = 0;
     }
-    
+
 
     modalAddDom.Dom.style.left = modalXPos + "px";
     modalAddDom.Dom.style.top = modalYPos + "px";
@@ -363,9 +337,8 @@ function generateModal(x, y, height, width,WeekStart, RenderPlane,UseCurrentTime
         var myDate = new Date(new Date().getTime() + OneHourInMs);
         myDate.setMinutes(0);
         var NewDay = 0;
-        if(!UseCurrentTime)
-        {
-            floatalTime = (y ) / (height );// Hack alert the sutractions are hacks to make it work within the UIrenderplace.
+        if (!UseCurrentTime) {
+            floatalTime = (y) / (height);// Hack alert the sutractions are hacks to make it work within the UIrenderplace.
             Hour = Math.floor((floatalTime) * 24);
             Min = 0;
             WeekDayIndex = Math.floor(x / weekDayWidth);
@@ -375,13 +348,12 @@ function generateModal(x, y, height, width,WeekStart, RenderPlane,UseCurrentTime
             myDate.setHours(Hour);
             myDate.setMinutes(0);
         }
-        
+
 
         addNewEvent(x, y, height, myDate);
     });
 
-    $(AddTile.Dom).click(function ()
-    {
+    $(AddTile.Dom).click(function () {
         (modalAddDom.Dom.parentElement.removeChild(modalAddDom.Dom));
         var modalData = AddTiledEvent();
         //RenderPlane.appendChild(modalData.Dom);
@@ -404,8 +376,7 @@ function generateModal(x, y, height, width,WeekStart, RenderPlane,UseCurrentTime
         e.stopPropagation();
     }*/
 
-    function removePanel()
-    {
+    function removePanel() {
         //debugger;
         CloseModal();
     }
@@ -432,46 +403,42 @@ function generateModal(x, y, height, width,WeekStart, RenderPlane,UseCurrentTime
         }, 1);
         //*/
 
-        
 
-        
+
+
     };
     $(modalAddDom).removeClass("setAsDisplayNone");
-    
-    
+
+
     $(modalAddDom.Dom).attr('tabindex', 0).focus();
-    AddCloseButoon(modalAddDom,false);
+    AddCloseButoon(modalAddDom, false);
 
 }
 generateModal.isOn = false;
 
-function CloseModal()
-{
+function CloseModal() {
     setTimeout(function () { generateModal.isOn = false; }, 200);
-    
+
     var myAddPanel = getDomOrCreateNew("AddModalDom");
-    if (myAddPanel.Dom.parentElement != null)
-    {
+    if (myAddPanel.Dom.parentElement != null) {
         myAddPanel.Dom.parentElement.removeChild(myAddPanel.Dom);
         //generateModal.isOn = false;
     }
 
 }
 
-function generatePeek(CalEvent,Container)
-{
+function generatePeek(CalEvent, Container) {
     //var CalEvent = new CalEventData();
-    var CalEndTime =null;
-    var TotalDuration=null;
+    var CalEndTime = null;
+    var TotalDuration = null;
     var peekValidityTest = isCalEvenValidForPeek(CalEvent)
-    if (peekValidityTest.isError)
-    {
+    if (peekValidityTest.isError) {
         //Container.innerHTML = "not peekable because " + peekValidityTest.ErrorMessage;
         HidePeekUI(Container)
         return;
     }
 
-    
+
     createPeekUI(CalEvent, Container)
     //RevealPeekUI(Container, PeekData);
 
@@ -483,10 +450,8 @@ function generatePeek(CalEvent,Container)
     }
     */
 
-    function createPeekUI(CalEvent, Container)
-    {
-        if (createPeekUI.Connection!=null)
-        {
+    function createPeekUI(CalEvent, Container) {
+        if (createPeekUI.Connection != null) {
             createPeekUI.Connection.abort();
             createPeekUI.Connection = null;
         }
@@ -527,21 +492,18 @@ function generatePeek(CalEvent,Container)
                 //var ExitAfter = { ExitNow: true, Delay: 1000 };
             }
 
-        }).done(function (response)
-        {
+        }).done(function (response) {
         });
     }
 
     createPeekUI.Connection = null;
 
-    function HidePeekUI(Container)
-    {
+    function HidePeekUI(Container) {
         generatePeek.ChartData = null;
         $(Container).removeClass("RevealPreviewPanel");
     }
 
-    function RevealPeekUI(Container, PeekData)
-    {
+    function RevealPeekUI(Container, PeekData) {
         $(Container).addClass("RevealPreviewPanel");
         /*
         debugger;
@@ -566,7 +528,7 @@ function generatePeek(CalEvent,Container)
             xAxis: {
                 //categories: ['Apples', 'Oranges', 'Pears', 'Grapes', 'Bananas']
                 categories: []
-                
+
             },
             yAxis: {
                 min: 0,
@@ -604,16 +566,15 @@ function generatePeek(CalEvent,Container)
             ]
         }
 
-        
 
-        
+
+
         var labelData = [];
         var SleepData = [];
         var WorkData = [];
-        var InitialDayOfWeek =PeekData.PeekDays[0].DayIndex;
-        for (var i = 0; i < PeekData.PeekDays.length; i++)
-        {
-            labelData.push(WeekDays[(InitialDayOfWeek + i)%7]);
+        var InitialDayOfWeek = PeekData.PeekDays[0].DayIndex;
+        for (var i = 0; i < PeekData.PeekDays.length; i++) {
+            labelData.push(WeekDays[(InitialDayOfWeek + i) % 7]);
             SleepData.push(PeekData.PeekDays[i].SleepTime);
             WorkData.push(PeekData.PeekDays[i].TotalDuration);
         }
@@ -621,40 +582,37 @@ function generatePeek(CalEvent,Container)
         HighChartsData.series[0].data = SleepData;
         HighChartsData.xAxis.categories = labelData;
 
-        
-        if (!generatePeek.ChartData)
-        {
-            setTimeout(function ()
-            {
+
+        if (!generatePeek.ChartData) {
+            setTimeout(function () {
                 var mydata1 = $(Container).highcharts(HighChartsData);
                 generatePeek.ChartData = mydata1;
             }, 700)
-            
+
         }
         else {
             //debugger;
-            generatePeek.ChartData.highcharts().series[1].setData(WorkData,true);
-            generatePeek.ChartData.highcharts().series[0].setData(SleepData,true);
+            generatePeek.ChartData.highcharts().series[1].setData(WorkData, true);
+            generatePeek.ChartData.highcharts().series[0].setData(SleepData, true);
         }
 
-        
+
 
         var startWithDataset = 1;
         var startWithData = 1;
 
 
     }
-    
 
-    
-    
+
+
+
 }
 
 generatePeek.peekIsOn = false;
 generatePeek.ChartData = null;
 
-function generateAddEventContainer(x,y,height,Container,refStartTime)
-{
+function generateAddEventContainer(x, y, height, Container, refStartTime) {
     global_ExitManager.triggerLastExitAndPop();
     getRefreshedData.disableDataRefresh();
     ActivateUserSearch.setSearchAsOff();
@@ -675,10 +633,9 @@ function generateAddEventContainer(x,y,height,Container,refStartTime)
         e.stopPropagation();
     }
     */
-    
 
-    function CloseEventAddition()
-    {
+
+    function CloseEventAddition() {
         //$(document).off("keyup", document, removePanel);
         if (NewEventcontainer != null) {
             if (NewEventcontainer.Dom.parentElement != null) {
@@ -691,7 +648,7 @@ function generateAddEventContainer(x,y,height,Container,refStartTime)
     }
     //$(document).keyup(removePanel);
 
-    
+
 
     //myClickManager.AddNewElement(NewEventcontainer.Dom);
     //NewEventcontainer.Dom.style.left = x+"px";
@@ -708,7 +665,7 @@ function generateAddEventContainer(x,y,height,Container,refStartTime)
     $(ColorPicker.Selector.Container).addClass("ColorPickerContainerRigid");
     var recurrence = createCalEventRecurrence();
     global_ExitManager.addNewExit(CloseEventAddition);
-  //  var EnableTiler = generateTilerEnabled(EndDom.Selector.Container, SplitCount.Selector.Container);
+    //  var EnableTiler = generateTilerEnabled(EndDom.Selector.Container, SplitCount.Selector.Container);
 
     NewEventcontainer.Dom.appendChild(NameDom.Selector.Container);
     NewEventcontainer.Dom.appendChild(StartDom.Selector.Container);
@@ -720,11 +677,11 @@ function generateAddEventContainer(x,y,height,Container,refStartTime)
     NewEventcontainer.Dom.appendChild(ColorPicker.Selector.Container);
 
     NewEventcontainer.Dom.appendChild(SubmitButton.Selector.Container);
-    
-    
-    
-    
-    
+
+
+
+
+
 
     $(SubmitButton.Selector.Button.Dom).click(function () {
         var NewEvent = BindSubmitClick(NameDom.Selector.Input.Dom.value, LocationDom.Selector.Address.Dom.value, LocationDom.Selector.NickName.Dom.value, SplitCount.Selector.Input.Dom.value, StartDom, EndDom, DurationDom, null, true, ColorPicker.Selector.getColor(), global_ExitManager.triggerLastExitAndPop, recurrence);
@@ -734,8 +691,7 @@ function generateAddEventContainer(x,y,height,Container,refStartTime)
     //var RepetitionDom = generateRepetitionContainer();
 }
 
-function generateNameContainer()
-{
+function generateNameContainer() {
     var NameContainer = getDomOrCreateNew("NameContainer");
     var InputContainer = getDomOrCreateNew("NameInput", "input");
     var EscapeMessage = getDomOrCreateNew("EscapeMessage", "span");
@@ -748,8 +704,7 @@ function generateNameContainer()
     return NameContainer;
 }
 
-function generateLocationContainer()
-{
+function generateLocationContainer() {
     var LocationContainer = getDomOrCreateNew("LocationContainer");
     var LocationInputContainer = getDomOrCreateNew("LocationInput", "input");
     var NickLocationInputContainer = getDomOrCreateNew("NickLocationInput", "input");
@@ -761,26 +716,25 @@ function generateLocationContainer()
     return LocationContainer;
 }
 
-function generateDurationSliderContainer()
-{
+function generateDurationSliderContainer() {
     var DurationExplanation = getDomOrCreateNew("DurationExplanation", "span");
     DurationExplanation.Dom.innerHTML = "<p>Duration of the event</p>";
     var DurationContainer = getDomOrCreateNew("DurationContainer");
     var HourSliderValue = getDomOrCreateNew("HourSliderValue", "input");
     HourSliderValue.setAttribute("type", "number")
-    HourSliderValue.Dom.value=0;
+    HourSliderValue.Dom.value = 0;
     var HourLabel = getDomOrCreateNew("HourLabel", "span");
-    HourLabel.Dom.innerHTML="H";
+    HourLabel.Dom.innerHTML = "H";
     var MinSliderValue = getDomOrCreateNew("MinSliderValue", "input");
     MinSliderValue.setAttribute("type", "number")
     MinSliderValue.Dom.value = 0;
     var MinLabel = getDomOrCreateNew("MinLabel", "span");
-    MinLabel.Dom.innerHTML="M";
+    MinLabel.Dom.innerHTML = "M";
     var DaySliderValue = getDomOrCreateNew("DaySliderValue", "input");
-    DaySliderValue.setAttribute("type","number")
+    DaySliderValue.setAttribute("type", "number")
     DaySliderValue.Dom.value = 0;
     var DayLabel = getDomOrCreateNew("DayLabel", "span");
-    DayLabel.Dom.innerHTML="D"
+    DayLabel.Dom.innerHTML = "D"
     DurationContainer.Selector = {};
 
 
@@ -792,25 +746,23 @@ function generateDurationSliderContainer()
     DurationContainer.Dom.appendChild(DaySliderValue.Dom);
     DurationContainer.Dom.appendChild(DayLabel.Dom);
 
-    var TimeHolder = function ()
-    {
+    var TimeHolder = function () {
         return { Days: DaySliderValue.Dom.value, Hours: HourSliderValue.Dom.value, Mins: MinSliderValue.Dom.value }
     }
     DurationContainer.Selector = { Container: DurationContainer.Dom, Minute: MinSliderValue, Hour: HourSliderValue, Day: DaySliderValue, TimeHolder: TimeHolder };
     return DurationContainer;
 }
 
-function generateStartContainer(refDate)
-{
+function generateStartContainer(refDate) {
     var StartDateTimeContainer = getDomOrCreateNew("StartTimeContainer");
-    var StartTimeInputContainer= getDomOrCreateNew("StartTimeInputContainer");
+    var StartTimeInputContainer = getDomOrCreateNew("StartTimeInputContainer");
     var StartTimeInput = getDomOrCreateNew("StartTimeInput", "Input");
     StartTimeInput.Dom.setAttribute("placeholder", "Start Time(Default Now)");
     var StartDateInputContainer = getDomOrCreateNew("StartDateInputContainer");
     var StartDateInput = getDomOrCreateNew("StartDateInput", "Input");
     var CurrentDate = new Date();
     var CurrentDate = FormatTime(CurrentDate);
-    var CurrentDate = CurrentDate.month_num+1 + '/' + CurrentDate.date + '/' + CurrentDate.year;
+    var CurrentDate = CurrentDate.month_num + 1 + '/' + CurrentDate.date + '/' + CurrentDate.year;
 
     StartDateInput.Dom.setAttribute("placeholder", CurrentDate);
     StartTimeInputContainer.Dom.appendChild(StartTimeInput.Dom);
@@ -829,35 +781,32 @@ function generateStartContainer(refDate)
     return StartDateTimeContainer;
 }
 
-function generateTilerEnabled(EndTimeContainer,SplitContainer)
-{
+function generateTilerEnabled(EndTimeContainer, SplitContainer) {
     var ButtonID = "SlideButton";
-    var Button = generateMyButton(ResilveSLider,ButtonID);
+    var Button = generateMyButton(ResilveSLider, ButtonID);
     //Button.status = 1;
     var EnableSplitAndEndContainer = "EnableSplitAndEndContainer";
     EnableSplitAndEndContainer = getDomOrCreateNew(EnableSplitAndEndContainer);
     EnableSplitAndEndContainer.Dom.appendChild(EndTimeContainer);
     EnableSplitAndEndContainer.Dom.appendChild(SplitContainer);
-    
+
     $(EnableSplitAndEndContainer.Dom).addClass("DisableTiler");
     function ResilveSLider()//call back function to be triggered with the button slider
     {
-        if (Button.status == 1)
-        {
-            $(EnableSplitAndEndContainer.Dom).addClass("DisableTiler"); 
+        if (Button.status == 1) {
+            $(EnableSplitAndEndContainer.Dom).addClass("DisableTiler");
         }
-        else
-        {
+        else {
             $(EnableSplitAndEndContainer.Dom).removeClass("DisableTiler");
         }
     }
 
     var EnableTIlerContainer = "EnableTilerContainer";
-    EnableTIlerContainer=getDomOrCreateNew(EnableTIlerContainer);
+    EnableTIlerContainer = getDomOrCreateNew(EnableTIlerContainer);
     EnableTIlerContainer.Dom.appendChild(Button.Dom);
     EnableTIlerContainer.Dom.appendChild(EnableSplitAndEndContainer.Dom);
 
-    
+
     EnableTIlerContainer.Selector = { Container: EnableTIlerContainer.Dom, Button: Button };
     return EnableTIlerContainer;
 }
@@ -869,18 +818,16 @@ function AddToTileContainer(TileInptObject, Container) {
     for (var i = 0; i < AllElements.length; i++) {
         //debugger;
         var myElement = AllElements[i];
-        if (myElement != null)
-        {
+        if (myElement != null) {
             Container.Dom.appendChild(myElement);
         }
     }
 }
 
 //Handles the activities of sliders. Sliders show up beneath the done button
-function InactiveSlider(InActiveDom, ActiveDom, ButtonElements, AutoSentence)
-{
+function InactiveSlider(InActiveDom, ActiveDom, ButtonElements, AutoSentence) {
     //debugger;
-    var InactiveSliderID =  InactiveSlider.ID++;
+    var InactiveSliderID = InactiveSlider.ID++;
     var ButtonSlide = generateMyButton(LoopBackFunction);
     var InActiveMessage = ButtonElements.InActiveMessage;
     var InActiveMessageContainer = getDomOrCreateNew("InActiveMessage" + InactiveSliderID, "span");
@@ -900,12 +847,12 @@ function InactiveSlider(InActiveDom, ActiveDom, ButtonElements, AutoSentence)
     var ActiveContainerID = "ActiveSliderContainer" + InactiveSliderID;
 
     var ActiveContainer = getDomOrCreateNew(ActiveContainerID);//Container for All Slider Data. In deactivated mode it shows only deactivated message
-  
+
     $(ActiveContainer.Dom).addClass("ActiveContainerSlider");
     var AllInputData = ButtonElements.ButtonElements;
     ActiveContainer.Dom.appendChild(ButtonSlide.Dom);
     ActiveContainer.Dom.appendChild(SliderMessageContainer.Dom);
-    
+
     var AlInputDataContainerID = "AlInputDataContainerID" + InactiveSliderID;
     var AllInputDataContainer = getDomOrCreateNew(AlInputDataContainerID);
     ActiveContainer.Dom.appendChild(AllInputDataContainer.Dom);
@@ -915,16 +862,14 @@ function InactiveSlider(InActiveDom, ActiveDom, ButtonElements, AutoSentence)
     var LastElement = new TileInputBox(AllInputData[AllInputData.length - 1], AllInputDataContainer, undefined, global_ExitManager.triggerLastExitAndPop, undefined, null, AutoSentence);
     AllTileElements.push(LastElement);
 
-    for (var i = AllInputData.length - 2, j = AllInputData.length - 1; i >= 0; i--, j--)
-    {
+    for (var i = AllInputData.length - 2, j = AllInputData.length - 1; i >= 0; i--, j--) {
         AllInputData[i].NextElement = LastElement;
         LastElement = new TileInputBox(AllInputData[i], AllInputDataContainer, undefined, global_ExitManager.triggerLastExitAndPop, undefined, null, AutoSentence);
         AllTileElements.push(LastElement);
     }
 
     var FirstElement = LastElement;
-    while (LastElement.NextElement != undefined)
-    {
+    while (LastElement.NextElement != undefined) {
         AddToTileContainer(LastElement, AllInputDataContainer);
         //AllInputDataContainer.Dom.appendChild(LastElement.FullContainer.Dom);
         LastElement = LastElement.NextElement;
@@ -933,22 +878,18 @@ function InactiveSlider(InActiveDom, ActiveDom, ButtonElements, AutoSentence)
     AddToTileContainer(LastElement, AllInputDataContainer);
     //AllInputDataContainer.Dom.appendChild(LastElement.FullContainer.Dom);
 
-    this.getAllElements =function()
-    {
+    this.getAllElements = function () {
         return AllInputData;
     }
 
-    
+
     FirstElement.reveal();
 
-    function LoopBackFunction()
-    {
-        if (ButtonSlide.status == 0)
-        {
+    function LoopBackFunction() {
+        if (ButtonSlide.status == 0) {
             Deactivate();
         }
-        else
-        {
+        else {
             Activate();
             //debugger;
 
@@ -957,14 +898,13 @@ function InactiveSlider(InActiveDom, ActiveDom, ButtonElements, AutoSentence)
             ButtonSlide.blur()
             var InputDom = $(ButtonSlide).next("div").next().children("input")[0];
             setTimeout(function () { InputDom.focus(); }, 0)
-            
+
             ButtonSlide.blur()
-            
+
         }
     }
 
-    function ShowMessage()
-    {
+    function ShowMessage() {
         var message = getDomOrCreateNew("ButtonMessage" + InactiveSliderID, "Span");
         message.innerHTML = "Press Spacebar to activate";
         $(message).addClass('pressSpacebarSpan');
@@ -972,8 +912,7 @@ function InactiveSlider(InActiveDom, ActiveDom, ButtonElements, AutoSentence)
         $(ButtonSlide.Dom.parentElement).addClass('spanParent');
         $(message).removeClass("HideInactiveElement");
     }
-    function HideMessage()
-    {
+    function HideMessage() {
         var message = getDomOrCreateNew("ButtonMessage" + InactiveSliderID, "Span");
         $(message).addClass("HideInactiveElement");
         $(message).removeClass('pressSpacebarSpan');
@@ -982,8 +921,7 @@ function InactiveSlider(InActiveDom, ActiveDom, ButtonElements, AutoSentence)
     ButtonSlide.Dom.addEventListener("focus", ShowMessage);
     ButtonSlide.Dom.addEventListener("blur", HideMessage);
 
-    function Activate()
-    {
+    function Activate() {
         $(ActiveMessageContainer.Dom).addClass("RevealInactiveElement");
         $(ActiveMessageContainer.Dom).removeClass("HideInactiveElement");
 
@@ -996,9 +934,8 @@ function InactiveSlider(InActiveDom, ActiveDom, ButtonElements, AutoSentence)
         ActiveDom.addOptions(ActiveContainer.Dom);
     }
 
-    function Deactivate()
-    {
-        
+    function Deactivate() {
+
         $(InActiveMessageContainer.Dom).addClass("RevealInactiveElement");
         $(InActiveMessageContainer.Dom).removeClass("HideInactiveElement");
 
@@ -1009,17 +946,15 @@ function InactiveSlider(InActiveDom, ActiveDom, ButtonElements, AutoSentence)
         $(AllInputDataContainer.Dom).addClass("HideInactiveElement");
         ActiveDom.removeOptions(ActiveContainer.Dom)
         InActiveDom.addOptions(ActiveContainer.Dom);
-        
+
 
     }
 
-    this.getStatus = function ()
-    {
+    this.getStatus = function () {
         return ButtonSlide.status;
     }
 
-    function turnOnButton()
-    {
+    function turnOnButton() {
         ButtonSlide.SetAsOn();
     }
 
@@ -1031,8 +966,7 @@ function InactiveSlider(InActiveDom, ActiveDom, ButtonElements, AutoSentence)
 
     this.turnOffSlide = turnOffButton
 
-    function getContainer()
-    {
+    function getContainer() {
         return AllInputDataContainer;
     }
 
@@ -1045,18 +979,17 @@ function InactiveSlider(InActiveDom, ActiveDom, ButtonElements, AutoSentence)
 InactiveSlider.ID = 0;
 
 
-function cleanUpTimeRestriction(TimeRestrictionSlider)
-{
+function cleanUpTimeRestriction(TimeRestrictionSlider) {
     var TimeRestrictionAllElements = TimeRestrictionSlider.getAllElements();
     //for (var i = 0; i < TimeRestrictionAllElements.length; i++)
-    
+
     var StartInputLabel = TimeRestrictionAllElements[3].TileInput.getLabelBefore()
     var StartInputDom = TimeRestrictionAllElements[3].TileInput.getInputDom();
     BindTimePicker(StartInputDom);
     $(StartInputDom).addClass("TimeInput");
     StartInputDom.setAttribute("placeholder", "24 Hrs");
     StartInputDom.onkeypress = onKeyPress;
-    
+
     var EndInputLabel = TimeRestrictionAllElements[4].TileInput.getLabelBefore()
     var EndInputDom = TimeRestrictionAllElements[4].TileInput.getInputDom();
     EndInputDom.onkeypress = onKeyPress;
@@ -1069,9 +1002,9 @@ function cleanUpTimeRestriction(TimeRestrictionSlider)
     var WeekDayCheckBox = TimeRestrictionAllElements[2].TileInput.getInputDom()
     var WeekDayLabel = TimeRestrictionAllElements[2].TileInput.getLabelAfter();
     WeekDayCheckBox.onchange = onWeekDayCheckboxClick;
-    
 
-    
+
+
     var parentDom = WorkDayCheckBox.parentElement;
     var WeekDayDom = getDomOrCreateNew("WorkDayDom")
     var StartEndInutContainer = getDomOrCreateNew("StartEndInutContainer");
@@ -1091,79 +1024,65 @@ function cleanUpTimeRestriction(TimeRestrictionSlider)
     EveryDayCheckBox.onchange = onEverydayCheckBoxChange;
 
 
-    function onKeyPress(e)
-    {
+    function onKeyPress(e) {
         e.stopPropagation();
     }
 
-    function onEverydayCheckBoxChange()
-    {
-        if (EveryDayCheckBox.checked)
-        {
+    function onEverydayCheckBoxChange() {
+        if (EveryDayCheckBox.checked) {
             WorkDayCheckBox.checked = false;
             showTimeInput();
             DisableWeekDay();
         }
-        else
-        {
+        else {
             hideTimeInput()
         }
     }
-    function onCheckBoxChange(e)
-    {
+    function onCheckBoxChange(e) {
         //debugger;
-        if (WorkDayCheckBox.checked)
-        {
+        if (WorkDayCheckBox.checked) {
             triggerChangeInTime();
             EveryDayCheckBox.checked = false;
             EveryDayCheckBox.onchange();
-            showTimeInput(); 
+            showTimeInput();
             DisableWeekDay();
         }
-        else
-        {
+        else {
             hideTimeInput()
         }
-        function triggerChangeInTime()
-        {
+        function triggerChangeInTime() {
 
             StartInputDom.value = "9:00 am"
             EndInputDom.value = "6:00 pm"
         }
     }
-    
 
-    function onWeekDayCheckboxClick(e)
-    {
+
+    function onWeekDayCheckboxClick(e) {
         //debugger;
-        if (WeekDayCheckBox.checked)
-        {
+        if (WeekDayCheckBox.checked) {
             EveryDayCheckBox.checked = false;
             WorkDayCheckBox.checked = false;
             WorkDayCheckBox.onchange();
             EveryDayCheckBox.onchange();
             RestrictiveWeek.showWeekDayButtons();
         }
-        else
-        {
+        else {
             DisableWeekDay();
             return;
         }
     }
 
 
-    function showTimeInput()
-    {
+    function showTimeInput() {
         $(StartEndInutContainer).removeClass("setAsDisplayNone");
     }
 
-    function hideTimeInput()
-    {
+    function hideTimeInput() {
         $(StartEndInutContainer).addClass("setAsDisplayNone");
     }
 
-    function WeekDayButton(IndexData)
-    {
+    function WeekDayButton(IndexData) {
         var Index = IndexData;
         var Start = "";
         var End = "";
@@ -1171,8 +1090,7 @@ function cleanUpTimeRestriction(TimeRestrictionSlider)
         var EndDom = null;
         var isInitialized = false;
 
-        function updateStart(StartData)
-        {
+        function updateStart(StartData) {
             Start = StartData
             isInitialized = initializationTest();
         }
@@ -1181,15 +1099,13 @@ function cleanUpTimeRestriction(TimeRestrictionSlider)
             End = EndData
             isInitialized = initializationTest();
         }
-        function reset()
-        {
+        function reset() {
             Start = "";
             End = "";
             isInitialized = false;
         }
 
-        function setStartDom(StartDomData)
-        {
+        function setStartDom(StartDomData) {
             StartDom = StartDomData;
             StartDom.onchange = function () {
                 updateStart(StartDom.value);
@@ -1197,17 +1113,15 @@ function cleanUpTimeRestriction(TimeRestrictionSlider)
             }
         }
 
-        function setEndDom(EndDomData)
-        {
+        function setEndDom(EndDomData) {
             EndDom = EndDomData;
-            EndDom.onchange = function()
-            {
+            EndDom.onchange = function () {
                 updateEnd(EndDom.value);
             }
         }
 
         function getStartDom() {
-            var RetValue = StartDom ;
+            var RetValue = StartDom;
             return RetValue;
         }
 
@@ -1216,8 +1130,7 @@ function cleanUpTimeRestriction(TimeRestrictionSlider)
             return RetValue;
         }
 
-        function enableStartInput()
-        {
+        function enableStartInput() {
             StartDom.disabled = false;
             Start = StartDom.value;
         }
@@ -1235,35 +1148,29 @@ function cleanUpTimeRestriction(TimeRestrictionSlider)
             EndDom.disabled = true;
         }
 
-        function initializationTest()
-        {
+        function initializationTest() {
             var RetValue = false;
-            RetValue = (Start && End)&&true;
+            RetValue = (Start && End) && true;
             return RetValue;
         }
-        function getStart()
-        {
+        function getStart() {
             return Start;
         }
 
-        function getEnd()
-        {
+        function getEnd() {
             return End;
         }
 
-        function getDayName()
-        {
+        function getDayName() {
             return WeekDays[Index];
         }
 
-        function getPostData()
-        {
+        function getPostData() {
             var RetValue = { Start: Start, End: End, Index: Index }
             return RetValue;
         }
 
-        function disableInputs()
-        {
+        function disableInputs() {
             disableStartInput();
             disableEndInput();
         }
@@ -1288,7 +1195,7 @@ function cleanUpTimeRestriction(TimeRestrictionSlider)
         this.isInitialized = isWeekdayInitialized;
 
         this.getEnd = getEnd;
-        this.getStart = getStart; 
+        this.getStart = getStart;
         this.setStart = updateStart;
         this.setEnd = updateEnd;
         this.reset = reset;
@@ -1299,18 +1206,14 @@ function cleanUpTimeRestriction(TimeRestrictionSlider)
         this.getEndDom = getEndDom;
     }
 
-    function RestrictiveWeekControl()
-    {
+    function RestrictiveWeekControl() {
         var WeekDayButtons = [];
         var isEnabled = false;
         InitializeWeekDayButtons();
-        function InitializeWeekDayButtons()
-        {
-            for (var i = 0; i < WeekDayButtons.length; i++)
-            {
+        function InitializeWeekDayButtons() {
+            for (var i = 0; i < WeekDayButtons.length; i++) {
                 var meButton = WeekDayButtons[i];
-                if (meButton.WeekDayButton.parentElement!=null)
-                {
+                if (meButton.WeekDayButton.parentElement != null) {
                     (meButton.WeekDayButton.parentElement.removeChild(meButton.WeekDayButton))
                     meButton.WeekDayButton = null;;
                 }
@@ -1322,9 +1225,8 @@ function cleanUpTimeRestriction(TimeRestrictionSlider)
                 WeekDayButtons.push(meButton);
             }
         }
-        
-        function generateWeekDayButton()
-        {
+
+        function generateWeekDayButton() {
             var RestrictiveWeekDayButtonContainer = getDomOrCreateNew("RestrictiveWeekDayButtonContainer");
             $(RestrictiveWeekDayButtonContainer).empty();
             RestrictiveWeekControl.RestrictionWeekDayContainer.appendChild(RestrictiveWeekDayButtonContainer);
@@ -1333,15 +1235,12 @@ function cleanUpTimeRestriction(TimeRestrictionSlider)
             InitializeWeekDayButtons();
 
 
-            function OnSelectWeekDayButton(index, isSelected)
-            {
+            function OnSelectWeekDayButton(index, isSelected) {
                 var ButtonMe = WeekDayButtons[index].WeekDayButton;
-                if (isSelected)
-                {
+                if (isSelected) {
                     ButtonMe.enableInputs();
                 }
-                else
-                {
+                else {
                     ButtonMe.disableInputs();
                     ButtonMe.reset();
                 }
@@ -1350,11 +1249,9 @@ function cleanUpTimeRestriction(TimeRestrictionSlider)
             if (RestrictiveWeekControl.RestrictionWeekDayContainer.status) {
                 $(RestrictiveWeekControl.RestrictionWeekDayContainer).empty();
             }
-            
-            function genreateWeekInputConainer()
-            {
-                for (var i= 0 ; i<WeekDayButtons.length;i++)
-                {
+
+            function genreateWeekInputConainer() {
+                for (var i = 0 ; i < WeekDayButtons.length; i++) {
                     //debugger;
                     var RestrictedWeekdayInputContainer = getDomOrCreateNew("RestrictedWeekdayInputContainer" + i);
                     $(RestrictedWeekdayInputContainer).addClass("RestrictedWeekdayInputContainer");
@@ -1363,7 +1260,7 @@ function cleanUpTimeRestriction(TimeRestrictionSlider)
                     var StartRestrictedWeekdayInputContainerInput = getDomOrCreateNew("StartRestrictedWeekdayInputContainerInput" + i);
                     $(StartRestrictedWeekdayInputContainerInput).addClass("StartRestrictedWeekdayInputContainerInput");
                     $(StartRestrictedWeekdayInputContainerInput).addClass("RestrictedWeekdayInputContainerInput");
-                    var StartRestrictedWeekdayInput = getDomOrCreateNew("StartRestrictedWeekdayInput" + i,"input");
+                    var StartRestrictedWeekdayInput = getDomOrCreateNew("StartRestrictedWeekdayInput" + i, "input");
                     $(StartRestrictedWeekdayInput).addClass("StartRestrictedWeekdayInput");
                     StartRestrictedWeekdayInputContainerInput.appendChild(StartRestrictedWeekdayInput);
                     StartRestrictedWeekdayInput.setAttribute("placeholder", "Start");;
@@ -1381,7 +1278,7 @@ function cleanUpTimeRestriction(TimeRestrictionSlider)
                     $(EndRestrictedWeekdayInput).addClass("EndRestrictedWeekdayInput");
                     EndRestrictedWeekdayInputContainerInput.appendChild(EndRestrictedWeekdayInput);
                     BindTimePicker(EndRestrictedWeekdayInput);
-                    
+
 
 
 
@@ -1404,8 +1301,7 @@ function cleanUpTimeRestriction(TimeRestrictionSlider)
                 }
             }
 
-            for (var i = 0; i < weekButtons.AllDoms.length; i++)
-            {
+            for (var i = 0; i < weekButtons.AllDoms.length; i++) {
                 var UIElement = weekButtons.AllDoms[i];
                 RestrictiveWeekDayButtonContainer.Dom.appendChild(UIElement.Dom);
                 WeekDayButtons[UIElement.DayOfWeekIndex].UIElement = UIElement;
@@ -1433,13 +1329,10 @@ function cleanUpTimeRestriction(TimeRestrictionSlider)
             isEnabled = false;
         }
 
-        function getPostData()
-        {
-            var RetValue = {isEnabled:isEnabled, WeekDayOption:[]}
-            if (isEnabled)
-            {
-                for (var i = 0; i < WeekDayButtons.length; i++)
-                {
+        function getPostData() {
+            var RetValue = { isEnabled: isEnabled, WeekDayOption: [] }
+            if (isEnabled) {
+                for (var i = 0; i < WeekDayButtons.length; i++) {
                     var meButton = WeekDayButtons[i].WeekDayButton;
                     if (meButton.isInitialized()) {
                         RetValue.WeekDayOption.push(meButton.getPostData());
@@ -1450,9 +1343,8 @@ function cleanUpTimeRestriction(TimeRestrictionSlider)
             return RetValue;
         }
 
-        function getWeekDayButton(Index)
-        {
-            var RetValue= WeekDayButtons[Index];
+        function getWeekDayButton(Index) {
+            var RetValue = WeekDayButtons[Index];
             return RetValue;
         }
 
@@ -1467,40 +1359,35 @@ function cleanUpTimeRestriction(TimeRestrictionSlider)
 
     var RestrictiveWeek = new RestrictiveWeekControl();
 
-    function DisableWeekDay()
-    {
+    function DisableWeekDay() {
         RestrictiveWeek.hideWeekDayButtons();
         WeekDayCheckBox.checked = false;
     }
 
-    TimeRestrictionSlider.getRestirctionPostData = function () { return RestrictiveWeek.getPostData();}
+    TimeRestrictionSlider.getRestirctionPostData = function () { return RestrictiveWeek.getPostData(); }
 
-    TimeRestrictionSlider.getStart= function()
-    {
-        var retValue= StartInputDom.value;
+    TimeRestrictionSlider.getStart = function () {
+        var retValue = StartInputDom.value;
         return retValue;
     }
 
-    TimeRestrictionSlider.getEnd= function()
-    {
-        var retValue= EndInputDom.value;
+    TimeRestrictionSlider.getEnd = function () {
+        var retValue = EndInputDom.value;
         return retValue;
     }
 
-    TimeRestrictionSlider.isWorkWeek = function ()
-    {
+    TimeRestrictionSlider.isWorkWeek = function () {
         var retValue = WorkDayCheckBox.checked;
         return retValue;
     }
-    TimeRestrictionSlider.isEveryDay = function ()
-    {
+    TimeRestrictionSlider.isEveryDay = function () {
         var retValue = EveryDayCheckBox.checked;
         return retValue;
     }
 
-    
-    TimeRestrictionSlider.getRestrictiveWeek = function () { return RestrictiveWeek ;};
-    
+
+    TimeRestrictionSlider.getRestrictiveWeek = function () { return RestrictiveWeek; };
+
     TimeRestrictionSlider.EnableEveryDayCheckBox = function () {
         EveryDayCheckBox.checked = true;
         onEverydayCheckBoxChange();
@@ -1515,13 +1402,12 @@ function cleanUpTimeRestriction(TimeRestrictionSlider)
         WeekDayCheckBox.checked = true;
         onWeekDayCheckboxClick();
     }
-    
+
 }
 
 
 
-function PopulateSliders(AcitveSection, InAcitveSection, AutoSentence)
-{
+function PopulateSliders(AcitveSection, InAcitveSection, AutoSentence) {
     var RepetionSliderData = GenerateTileRepetition();
     var RepetitionSlider = new InactiveSlider(InAcitveSection.Dom, AcitveSection.Dom, RepetionSliderData, AutoSentence);
     var TimeRestriction = generateTimeRestriction();
@@ -1535,8 +1421,7 @@ function PopulateSliders(AcitveSection, InAcitveSection, AutoSentence)
     return RetValue;
 }
 
-function generateAddressNickName()
-{
+function generateAddressNickName() {
     var PerElementData = {
         LabelAfter: "Nick Name", Message:
             {
@@ -1563,25 +1448,22 @@ function generateAddressNickName()
     return RetValue;
 }
 
-function GenerateTileRepetition()
-{
+function GenerateTileRepetition() {
     var CountElementData = {
         LabelBefore: "I need to do this",
-        InputType:"number",
+        InputType: "number",
         Message:
         {
             Index: 5,
             LoopBack: function (value) {
                 var message = "";
                 var invalidMessage = false;
-                if (value != "")
-                {
+                if (value != "") {
                     value = Number(value);
-                    switch(value)
-                    {
+                    switch (value) {
                         case 1:
                             {
-                                value="once";
+                                value = "once";
                             }
                             break;
                         case 2:
@@ -1600,17 +1482,15 @@ function GenerateTileRepetition()
                                 if (typeof (value) === "number") {
                                     value = value + " times";
                                 }
-                                else
-                                {
+                                else {
                                     invalidMessage = true;
                                 }
 
-                                
+
                             }
                             break;
                     }
-                    if (!invalidMessage)
-                    {
+                    if (!invalidMessage) {
                         message = " I need to do this " + value;
                     }
                 }
@@ -1619,16 +1499,15 @@ function GenerateTileRepetition()
             }
         }
     };
-    
+
     var PerElementData = {
-        LabelBefore: "times per", CustomType:{Type:"select",InnerHtml: "<option></option><option>Day</option><option>Week</option><option>Month</option><option>Year</option>"}, Message:
+        LabelBefore: "times per", CustomType: { Type: "select", InnerHtml: "<option></option><option>Day</option><option>Week</option><option>Month</option><option>Year</option>" }, Message:
         {
             Index: 6,
             LoopBack: function (value) {
                 var message = "";
                 var invalidMessage = false;
-                if (value != "")
-                {
+                if (value != "") {
                     {
                         message = " per " + value;
                     }
@@ -1636,7 +1515,8 @@ function GenerateTileRepetition()
 
                 return message;
             }
-        }, DefaultText: "Day/Week/Month/Year" };
+        }, DefaultText: "Day/Week/Month/Year"
+    };
     //DropDown: { url: [{ repetition: "Day" }, { repetition: "Week" }, { repetition: "Month" }, { repetition: "Year" }, { repetition: "Decade" }], LookOut: "repetition" } 
     var ButtonElements = [];
     ButtonElements.push(CountElementData);
@@ -1647,8 +1527,7 @@ function GenerateTileRepetition()
     return RetValue;
 }
 
-function generateTimeRestriction()
-{
+function generateTimeRestriction() {
     var StartTime = { LabelBefore: "Start Time" };
     var EndTime = { LabelBefore: "End Time" };
     var WorkDays = { LabelAfter: "Only Work days and Work Hours", DoNothing: true, InputType: "checkbox" };
@@ -1660,8 +1539,8 @@ function generateTimeRestriction()
     ButtonElements.push(Weekdays);
     ButtonElements.push(StartTime);
     ButtonElements.push(EndTime);
-    
-    
+
+
     var InActiveMessage = "Time Restrictions? Currently: No";
     var ActiveMessage = "Time Of Day Resrictions";
     var RetValue = { InActiveMessage: InActiveMessage, ActiveMessage: ActiveMessage, ButtonElements: ButtonElements }
@@ -1671,8 +1550,7 @@ function generateTimeRestriction()
 
 
 //handles the whole addition of tiled events. Handles the UI component and tabbing
-function AddTiledEvent()
-{
+function AddTiledEvent() {
     global_ExitManager.triggerLastExitAndPop();
     getRefreshedData.disableDataRefresh();
     ActivateUserSearch.setSearchAsOff();
@@ -1689,7 +1567,7 @@ function AddTiledEvent()
     var ActiveContainer = getDomOrCreateNew(ActiveSectionID);
     var InActiveSectionID = "ModalInActiveTileContainer";
     var InActiveContainer = getDomOrCreateNew(InActiveSectionID);
-    
+
 
 
     $(modalTileEvent.Dom).addClass("ModalTileContainer");
@@ -1700,12 +1578,10 @@ function AddTiledEvent()
     var ModalDoneContentContainer = getDomOrCreateNew(ModalDoneContainerID);//Contains the done section
     var ModalActiveOptionsContainerID = "ModalActiveOptionsContainer"
     var ModalActiveOptionsContainer = getDomOrCreateNew(ModalActiveOptionsContainerID);//Contains the options when turned on
-    
 
-    function changeSummaryBackgroundColor(ColorData)
-    {
-        if (changeSummaryBackgroundColor.CurrentColor != null)
-        {
+
+    function changeSummaryBackgroundColor(ColorData) {
+        if (changeSummaryBackgroundColor.CurrentColor != null) {
             $(AutoSentence.getContainer()).removeClass(changeSummaryBackgroundColor.CurrentColor);
         }
         changeSummaryBackgroundColor.CurrentColor = ColorData.ColorClass;
@@ -1713,21 +1589,19 @@ function AddTiledEvent()
     }
     changeSummaryBackgroundColor.CurrentColor = null;
 
-    
-    
+
+
 
     ActiveContainer.Dom.appendChild(ModalContentContainer.Dom);
     ActiveContainer.Dom.appendChild(ModalActiveOptionsContainer.Dom)
-    
-    
 
-    ModalActiveOptionsContainer.addOptions = function (NewOption)
-    {
+
+
+    ModalActiveOptionsContainer.addOptions = function (NewOption) {
         ModalActiveOptionsContainer.appendChild(NewOption.Dom);
     }
 
-    function sentenceCompletion()
-    {
+    function sentenceCompletion() {
         var ModalSenetenceContainerID = "ModalSenetenceContainer";
         var ModalSenetenceContainer = getDomOrCreateNew(ModalSenetenceContainerID);
         var FullSentenceContentID = "FullSentenceContent"
@@ -1739,14 +1613,12 @@ function AddTiledEvent()
         ModalSenetenceContainer.appendChild(FullSentenceContent);
         hideAutoSentence();
         var Messages = {};
-        var orderedMessage =[]
-        function addTileInput(tileInput)
-        {
+        var orderedMessage = []
+        function addTileInput(tileInput) {
             Messages[tileInput.Message.Index] = tileInput;
             orderedMessage.push(tileInput);
             orderedMessage.sort(
-                function (a, b)
-                {
+                function (a, b) {
                     var retvalue = (a.Message.Index) - (b.Message.Index);
                     return retvalue;
                 });
@@ -1754,11 +1626,9 @@ function AddTiledEvent()
         }
 
         this.addTileInput = addTileInput;
-        function updateSentence()
-        {
+        function updateSentence() {
             var fullMessage = "";
-            for (var i = 0 ; i < orderedMessage.length; i++)
-            {
+            for (var i = 0 ; i < orderedMessage.length; i++) {
                 fullMessage += orderedMessage[i].getSentenceMessage()
             }
             if (fullMessage != "") {
@@ -1771,13 +1641,11 @@ function AddTiledEvent()
             FullSentenceContent.innerHTML = fullMessage;
         }
 
-        function showAutoSentence()
-        {
+        function showAutoSentence() {
             $(ModalSenetenceContainer).removeClass("HideInactiveElement");
         }
 
-        function hideAutoSentence()
-        {
+        function hideAutoSentence() {
             $(ModalSenetenceContainer).addClass("HideInactiveElement");
         }
 
@@ -1804,24 +1672,21 @@ function AddTiledEvent()
     modalTileEvent.Dom.appendChild(ActiveContainer.Dom);
     modalTileEvent.Dom.appendChild(InActiveContainer.Dom);
     modalTileEvent.Dom.appendChild(AutoSentenceCOntainer);
-    
-    ModalActiveOptionsContainer.removeOptions = function (NewOption)
-    {
+
+    ModalActiveOptionsContainer.removeOptions = function (NewOption) {
         if (NewOption.Dom.parentElement != null) {
             (NewOption.Dom.parentElement.removeChild(NewOption.Dom));
         }
     }
 
     InActiveContainer.Options = {};
-    InActiveContainer.addOptions = function (NewOption)
-    {
+    InActiveContainer.addOptions = function (NewOption) {
         InActiveContainer.appendChild(NewOption.Dom);
         InActiveContainer.Show();
         InActiveContainer.Options[NewOption.DomID] = NewOption;
     }
 
-    InActiveContainer.Show = function ()
-    {
+    InActiveContainer.Show = function () {
         $(InActiveContainer).removeClass("HideInactiveElement");
         $(InActiveContainer).addClass("RevealInActivePanel");
     }
@@ -1831,69 +1696,61 @@ function AddTiledEvent()
         $(InActiveContainer).removeClass("RevealInActivePanel");
     }
 
-    InActiveContainer.removeOptions = function (NewOption)
-    {
+    InActiveContainer.removeOptions = function (NewOption) {
         if (NewOption.Dom.parentElement != null) {
             (NewOption.Dom.parentElement.removeChild(NewOption.Dom));
-             delete InActiveContainer.Options[NewOption.DomID]
+            delete InActiveContainer.Options[NewOption.DomID]
         }
 
-        if (Object.keys(InActiveContainer.Options).length < 1)
-        {
+        if (Object.keys(InActiveContainer.Options).length < 1) {
             InActiveContainer.Hide();
         }
     }
     //Checks to see if there are any options available before showing panel
-    InActiveContainer.reveal = function ()
-    {
-        if (Object.keys(InActiveContainer.Options).length < 1)
-        {
+    InActiveContainer.reveal = function () {
+        if (Object.keys(InActiveContainer.Options).length < 1) {
             InActiveContainer.Hide();
             return;
         }
         InActiveContainer.Show();
     }
 
-    InActiveContainer.unReveal = function ()
-    {
+    InActiveContainer.unReveal = function () {
         InActiveContainer.Hide();
     }
 
-    
+
     var SliderData = PopulateSliders(ModalActiveOptionsContainer, InActiveContainer, AutoSentence);
     var RepetionSlider = SliderData.RepetitionSlider;
     var TimeRestrictionSlider = SliderData.TimeRestrictionSlider;
     var NickNameSlider = SliderData.AddressNickNameSlider;
-    
-    
+
+
     var DoneContainerID = "ModalTileContainerDone";
     var DoneButton = getDomOrCreateNew(DoneContainerID);
     var Element1 = {
         LabelBefore: "I need to",
         Message:
             {
-               Index: 0,
-               LoopBack: function (value) {
+                Index: 0,
+                LoopBack: function (value) {
                     var message = "";
-                    if (value!="")
+                    if (value != "")
                     { message = "I need to " + value }
 
                     return message;
                 }
-        },DefaultText: "Task"
+            }, DefaultText: "Task"
     };
 
 
 
-    function DayOfTheWeekControl()
-    {
-        function DisplayDaysOfTheWeek()
-        {
+    function DayOfTheWeekControl() {
+        function DisplayDaysOfTheWeek() {
 
         }
 
-        function ButtonClickCallBack()
-        {
+        function ButtonClickCallBack() {
 
         }
     }
@@ -1901,56 +1758,48 @@ function AddTiledEvent()
     /*
     Function handles the call back for the autoSuggest Box of location
     */
-    function LocationSearchCallBack(ExitCallBack, InputBox)
-    {
+    function LocationSearchCallBack(ExitCallBack, InputBox) {
         $(InputBox).off();
         var AutoSuggestEndPoint = global_refTIlerUrl + "User/Location";
         //var GoogleAutoSuggestEndPoint = "https://maps.googleapis.com/maps/api/place/textsearch/json";
         var GoogleAutoSuggestEndPoint = "";
 
         var googleSendData = {};
-        
+
         googleSendData.key = googleAPiKey
         googleSendData.query = "";
-        
+
         var LocationAutoSuggestControl = new AutoSuggestControl(AutoSuggestEndPoint, "GET", AddressCallBack, InputBox);
         var GoogleAutoSuggestControl = new AutoSuggestControl(GoogleAutoSuggestEndPoint, "GET", googleAddressCallBack, InputBox, true, googleSendData);
         var MyDataContainer = { AllData: [], Index: -1 };
         var GoogleDataContainer = { AllData: [], Index: -1 };
-        var CombinedData= { AllData: [], Index: -1 };
+        var CombinedData = { AllData: [], Index: -1 };
         var FullContainer = LocationAutoSuggestControl.getAutoSuggestControlContainer();
 
 
         //Combined callback
-        function combinedCallBack(typeOfData,MyData)
-        {
+        function combinedCallBack(typeOfData, MyData) {
             //if (combinedCallBack.currentIndex == 0)
-            if (typeOfData == 0)
-            {
+            if (typeOfData == 0) {
                 combinedCallBack.cleanUI();
                 LaunchPopulation(typeOfData)
             }
-            else
-            {
+            else {
                 combinedCallBack.indexContainer[typeOfData] = MyData;
                 return;
             }
 
-            
-            function LaunchPopulation(Index)
-            {
-                if (combinedCallBack.indexContainer[Index]!=null)
-                {
+
+            function LaunchPopulation(Index) {
+                if (combinedCallBack.indexContainer[Index] != null) {
                     combinedCallBack.indexContainer[Index].forEach
                     (
-                        function (myData)
-                        {
+                        function (myData) {
                             CombinedData.AllData.push(myData);
                             myData.Index = LaunchPopulation.Index;
                             ++LaunchPopulation.Index;
                             myData.Hover = HoverMe;
-                            function HoverMe()
-                            {
+                            function HoverMe() {
                                 if (combinedCallBack.CurrentHover != null) {
                                     combinedCallBack.CurrentHover.UnHover();
                                 }
@@ -1965,42 +1814,36 @@ function AddTiledEvent()
                     combinedCallBack.currentIndex = Index;
                     LaunchPopulation(combinedCallBack.currentIndex);
                 }
-                else
-                {
-                    if (combinedCallBack.currentIndex >= combinedCallBack.indexContainer.length)
-                    {
+                else {
+                    if (combinedCallBack.currentIndex >= combinedCallBack.indexContainer.length) {
                         combinedCallBack.currentIndex = 0;
                         combinedCallBack.clearData();
                         PopulateteContainerDom();
                         return;
                     }
-                    else
-                    {
+                    else {
                         setTimeout(function () { LaunchPopulation(combinedCallBack.currentIndex) }, 200);
                     }
                 }
             }
 
-            function PopulateteContainerDom()
-            {
-                for (var i=0;i<CombinedData.AllData.length;i++)
-                {
-                    var Data=CombinedData.AllData[i];
+            function PopulateteContainerDom() {
+                for (var i = 0; i < CombinedData.AllData.length; i++) {
+                    var Data = CombinedData.AllData[i];
                     justPushIntoContainer(Data);
                 }
-                
-                function justPushIntoContainer(myData)
-                {
+
+                function justPushIntoContainer(myData) {
                     combinedCallBack.DomContainer.Dom.appendChild(myData.Container);
                 }
-                
+
             }
             LaunchPopulation.Index = 0;
 
         }
 
         combinedCallBack.CurrentHover = null;
-        combinedCallBack.indexContainer = [null,null];
+        combinedCallBack.indexContainer = [null, null];
         combinedCallBack.currentIndex = 0;
 
         combinedCallBack.DomContainer = LocationAutoSuggestControl.getSuggestedValueContainer();
@@ -2008,8 +1851,10 @@ function AddTiledEvent()
         combinedCallBack.rePopulate = function () {
 
         }
-        combinedCallBack.clear = function ()
-        {
+
+
+
+        combinedCallBack.clear = function () {
             debugger;
             MyDataContainer.AllData.splice(0, MyDataContainer.AllData.length)
             MyDataContainer.Index = -1;
@@ -2028,16 +1873,14 @@ function AddTiledEvent()
             LocationAutoSuggestControl.HideContainer();
         }
 
-        combinedCallBack.clearData=function()
-        {
+        combinedCallBack.clearData = function () {
             MyDataContainer.AllData.splice(0, MyDataContainer.AllData.length)
             MyDataContainer.Index = -1;
             GoogleDataContainer.AllData.splice(0, GoogleDataContainer.AllData.length)
             GoogleDataContainer.Index = -1;
         }
 
-        combinedCallBack.cleanUI = function ()
-        {
+        combinedCallBack.cleanUI = function () {
             //console.log("Called Clear " + combinedCallBack.currentIndex);
             CombinedData.AllData.splice(0, CombinedData.AllData.length);
             CombinedData.Index = -1;
@@ -2045,14 +1888,13 @@ function AddTiledEvent()
         }
 
         //Tiler Address callback
-        function AddressCallBack(data, DomContainer, InputCOntainer)
-        {
+        function AddressCallBack(data, DomContainer, InputCOntainer) {
             //debugger;
             var FullContainer = LocationAutoSuggestControl.getAutoSuggestControlContainer();
             InputBox.parentNode.appendChild(FullContainer);
             positionSearchResultContainer();
-            
-            
+
+
 
             MyDataContainer.AllData.splice(0, MyDataContainer.AllData.length);
             //debugger;
@@ -2066,14 +1908,13 @@ function AddTiledEvent()
             }
 
             */
-            
+
 
             InputBox.onblur = function () { setTimeout(function () { ReseAutoSuggest() }, 300) }
-            
+
             LocationAutoSuggestControl.ShowContainer();
 
-            for (var i = 0; ((i < data.length)&&(i<5)); i++)
-            {
+            for (var i = 0; ((i < data.length) && (i < 5)) ; i++) {
                 resolveEachRetrievedEvent(data[i]);
             }
 
@@ -2098,7 +1939,7 @@ function AddTiledEvent()
                 ++resolveEachRetrievedEvent.ID;
             }
             resolveEachRetrievedEvent.ID = 0;
-            
+
 
             function generateDomForEach(LocationData)//,Index)
             {
@@ -2116,10 +1957,8 @@ function AddTiledEvent()
 
                 var RetValue = { Container: CacheAddressContainer, Hover: HoverMe, UnHover: UnHoverMe, Select: SelectMe, /*Index: Index,*/ Insert: InsertIntoInput };
 
-                function HoverMe()
-                {
-                    if(generateDomForEach.CurrentHover!=null)
-                    {
+                function HoverMe() {
+                    if (generateDomForEach.CurrentHover != null) {
                         generateDomForEach.CurrentHover.UnHover();
                     }
                     generateDomForEach.CurrentHover = RetValue;
@@ -2127,13 +1966,11 @@ function AddTiledEvent()
                     $(CacheAddressContainer).addClass("HoveLocationCacheContainer");
                 }
 
-                function UnHoverMe()
-                {
+                function UnHoverMe() {
                     $(CacheAddressContainer).removeClass("HoveLocationCacheContainer");
                 }
 
-                function SelectMe()
-                {
+                function SelectMe() {
                     //InputCOntainer.value = LocationData.Address;
                     InsertIntoInput();
                     LocationAutoSuggestControl.HideContainer();
@@ -2144,8 +1981,7 @@ function AddTiledEvent()
                     setTimeout(function () { InputBox.focus(), 200 });
                 }
 
-                function InsertIntoInput()
-                {
+                function InsertIntoInput() {
                     InputCOntainer.value = LocationData.Address;
                 }
 
@@ -2156,11 +1992,9 @@ function AddTiledEvent()
 
 
         //Google Address callback
-        function googleAddressCallBack(data, DomContainer, InputCOntainer)
-        {
+        function googleAddressCallBack(data, DomContainer, InputCOntainer) {
 
-            function initialize()
-            {
+            function initialize() {
                 ReseAutoSuggest();
                 var dataInput = InputCOntainer.value
                 dataInput = dataInput.trim();
@@ -2177,11 +2011,11 @@ function AddTiledEvent()
             }
 
             function callback(results, status) {
-                
+
                 if (status == google.maps.places.PlacesServiceStatus.OK) {
-                    for (var i = 0; ((i < results.length)&&(i<5)); i++) {
+                    for (var i = 0; ((i < results.length) && (i < 5)) ; i++) {
                         //debugger
-                        resolveEachRetrievedEvent(results[i],i);
+                        resolveEachRetrievedEvent(results[i], i);
                     }
                 }
 
@@ -2192,8 +2026,8 @@ function AddTiledEvent()
 
             initialize();
 
-            
-            
+
+
 
             function ReseAutoSuggest() {
                 GoogleDataContainer.AllData.splice(0, GoogleDataContainer.AllData.length)
@@ -2262,28 +2096,23 @@ function AddTiledEvent()
                     setTimeout(function () { InputBox.focus(), 200 });
                 }
 
-                function getBusinessHourData(LocationData)
-                {
+                function getBusinessHourData(LocationData) {
                     debugger;
                     var request = {
                         placeId: LocationData.place_id
                     };
                     var service = new google.maps.places.PlacesService(DomContainer);
                     service.getDetails(request, LocationUpdateCallBack);
-                    function LocationUpdateCallBack(place, status)
-                    {
+                    function LocationUpdateCallBack(place, status) {
                         if (status == google.maps.places.PlacesServiceStatus.OK) {
                             var RestrictedTimeData = generateOfficeHours(place);
-                            if((!RestrictedTimeData.IsTwentyFourHours)&&(!RestrictedTimeData.NoWeekData))
-                            {
-                                RestrictiveWeekSlider .turnOnSlide();
+                            if ((!RestrictedTimeData.IsTwentyFourHours) && (!RestrictedTimeData.NoWeekData)) {
+                                RestrictiveWeekSlider.turnOnSlide();
                                 RestrictiveWeekSlider.EnableWeekDayCheckBox();
                                 var RestrictiveWeek = RestrictiveWeekSlider.getRestrictiveWeek();
-                                for (var i=0;i<RestrictedTimeData.WeekDayData.length;i++)
-                                {
+                                for (var i = 0; i < RestrictedTimeData.WeekDayData.length; i++) {
                                     var myDay = RestrictedTimeData.WeekDayData[i];
-                                    if (!myDay.IsClosed)
-                                    {
+                                    if (!myDay.IsClosed) {
                                         var myButton = RestrictiveWeek.getWeekDayButton(myDay.DayIndex);
                                         var Start = myDay.Start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                                         var End = myDay.End.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -2309,10 +2138,9 @@ function AddTiledEvent()
             generateDomForEach.CurrentHover = null;
         }
 
-        
 
-        function positionSearchResultContainer()
-        {
+
+        function positionSearchResultContainer() {
             var InputBox = LocationAutoSuggestControl.getInputBox();
             var Position = $(InputBox.Dom).position();
             var Left = 50;// Position.left;
@@ -2322,19 +2150,15 @@ function AddTiledEvent()
             $(FullContainer).css({ left: Left + "px", top: Top + "px", position: "absolute", width: "calc(100% - 100px)" });
         }
 
-        
-        function ReturnFunction(e, ExitFunction)
-        {
-            if(e.which == 27)
-            {
-                if (LocationAutoSuggestControl.isContentOn() || GoogleAutoSuggestControl.isContentOn())
-                {
+
+        function ReturnFunction(e, ExitFunction) {
+            if (e.which == 27) {
+                if (LocationAutoSuggestControl.isContentOn() || GoogleAutoSuggestControl.isContentOn()) {
                     debugger;
                     combinedCallBack.clear();
                     return;
                 }
-                else
-                {
+                else {
                     ExitFunction();
                 }
                 return;
@@ -2343,7 +2167,7 @@ function AddTiledEvent()
             LocationAutoSuggestControl.disableSendRequest();
             GoogleAutoSuggestControl.disableSendRequest();
             var OldIndex = CombinedData.Index;
-            if(e.which == 38)//UpArrow Press
+            if (e.which == 38)//UpArrow Press
             {
                 var NewIndex = ((CombinedData.Index - 1) + CombinedData.AllData.length) % CombinedData.AllData.length
                 CombinedData.Index = NewIndex;
@@ -2365,8 +2189,7 @@ function AddTiledEvent()
                 positionSearchResultContainer();
                 return;
             }
-            if (e.which == 13)
-            {
+            if (e.which == 13) {
                 CombinedData.AllData[CombinedData.Index].Select();
                 return;
             }
@@ -2383,8 +2206,7 @@ function AddTiledEvent()
             Index: 1,
             LoopBack: function (value) {
                 var message = "";
-                if (value != "")
-                {
+                if (value != "") {
                     message = " at " + value;
                 }
 
@@ -2393,9 +2215,9 @@ function AddTiledEvent()
         },
         DefaultText: "Location", DropDown: LocationSearchCallBack
     };
-    
+
     var Hour = new TileInputBox({
-        LabelAfter: "Hr",InputType:"number", Message: {
+        LabelAfter: "Hr", InputType: "number", Message: {
             Index: 3,
             LoopBack: function (value) {
                 var message = "";
@@ -2403,14 +2225,12 @@ function AddTiledEvent()
                     if (value > 1) {
                         message = value + " hours";
                     }
-                    else
-                    {
-                        if (value != 0)
-                        {
+                    else {
+                        if (value != 0) {
                             message = value + " hour";
                         }
                     }
-                    
+
                 }
 
                 return message;
@@ -2424,14 +2244,13 @@ function AddTiledEvent()
                 var message = "";
                 if (value != "") {
                     if (value > 1) {
-                        message =" "+ value + " minutes";
+                        message = " " + value + " minutes";
                     }
                     else {
-                        if (value != 0)
-                        {
+                        if (value != 0) {
                             message = " " + value + " minute";
                         }
-                        
+
 
                     }
                 }
@@ -2480,11 +2299,9 @@ function AddTiledEvent()
     function Exit()///forces the removal of the Div
     {
         getRefreshedData.enableDataRefresh();
-        if (modalTileEvent != null)
-        {
+        if (modalTileEvent != null) {
             $(modalTileEvent.Dom).empty();
-            if (modalTileEvent.Dom.parentElement!=null)
-            {
+            if (modalTileEvent.Dom.parentElement != null) {
                 (modalTileEvent.Dom.parentElement.removeChild(modalTileEvent.Dom));
             }
         }
@@ -2497,14 +2314,14 @@ function AddTiledEvent()
     var AllTileElements = [];
 
     TileInputBox.DoneButton = new TileDoneButton(InActiveContainer);//creates a done button and makes it a static member of TileInputBox.
-    TileInputBox.DoneButton.GetDom().onkeypress =(
+    TileInputBox.DoneButton.GetDom().onkeypress = (
         function (e) {
             if (e.which == 13) {
                 SendData()
             }
         })
 
-    
+
     AddTiledEvent.Exit = global_ExitManager.triggerLastExitAndPop;
     AllInputData.push(Element1);
     AllInputData.push(Element2);
@@ -2512,16 +2329,15 @@ function AddTiledEvent()
     AllInputData.push(Element4);
     var LastElement = new TileInputBox(AllInputData[AllInputData.length - 1], ModalContentContainer, DoneButton, global_ExitManager.triggerLastExitAndPop, undefined, null, AutoSentence);
     AllTileElements.push(LastElement);
-    
-    for (var i = AllInputData.length-2, j = AllInputData.length - 1; i >= 0; i--, j--)
-    {
+
+    for (var i = AllInputData.length - 2, j = AllInputData.length - 1; i >= 0; i--, j--) {
         AllInputData[i].NextElement = LastElement;
         LastElement = new TileInputBox(AllInputData[i], ModalContentContainer, DoneButton, global_ExitManager.triggerLastExitAndPop, undefined, null, AutoSentence);
         AllTileElements.push(LastElement);
     }
 
     var BoundTimePicerObj = BindDatePicker(TileInputBox.Dictionary[Element4.ID].Me.getInputDom());//Set inbox as date time picker box
-    
+
 
     BoundTimePicerObj.on("show", function () {
         //alert("show triggered");
@@ -2549,28 +2365,25 @@ function AddTiledEvent()
             TileInputBox.Dictionary[Element4.ID].Me.getInputDom().focus();//ensures focus is returned after clicking date
             TileInputBox.DoneButton.Show();
         }
-        else
-        {
+        else {
             TileInputBox.DoneButton.Hide();
         }
     })
 
     var FirstElement = LastElement;
-    
-    while (LastElement.NextElement!=undefined)
-    {
+
+    while (LastElement.NextElement != undefined) {
         AddToTileContainer(LastElement, ModalContentContainer);
         //ModalContentContainer.Dom.appendChild(LastElement.FullContainer.Dom);
         LastElement = LastElement.NextElement;
     }
     AddToTileContainer(LastElement, ModalContentContainer);
     //ModalContentContainer.Dom.appendChild(LastElement.FullContainer.Dom);
-    
-    
+
+
 
     //sends schedule information to backend
-    function SendData()
-    {
+    function SendData() {
         var Splits = RepetionSlider.getAllElements()[0].TileInput;
         var RepetionChoice = RepetionSlider.getAllElements()[1].TileInput;
         var myColor = ColorPicker.Selector.getColor();
@@ -2579,8 +2392,7 @@ function AddTiledEvent()
             SendIt();
             //AddTiledEvent.Exit();
         }
-        else
-        {
+        else {
             alert("please provide viable deadline");
         }
     }
@@ -2597,14 +2409,15 @@ function AddTiledEvent()
     var frequencyInput = RepetionSlider.getAllElements()[1].TileInput.getInputDom();
     frequencyInput.addEventListener("input", peekData);
 
-    function peekData()
-    {
+
+    function peekData() {
+        debugger;
         var Splits = RepetionSlider.getAllElements()[0].TileInput;
         var RepetionChoice = RepetionSlider.getAllElements()[1].TileInput;
         var myColor = ColorPicker.Selector.getColor();
         var restrictionData = generatePostBackDataForTimeRestriction(TimeRestrictionSlider);
-        
-        var peekEvent = SubmitTile(Element1.TileInput.getInputDom().value, "","", Splits.getInputDom().value, Hour.getInputDom().value, Min.getInputDom().value, Element4.TileInput.getInputDom().value, RepetionChoice.getInputDom().value, myColor, RepetionSlider.getStatus(), restrictionData);
+
+        var peekEvent = SubmitTile(Element1.TileInput.getInputDom().value, "", "", Splits.getInputDom().value, Hour.getInputDom().value, Min.getInputDom().value, Element4.TileInput.getInputDom().value, RepetionChoice.getInputDom().value, myColor, RepetionSlider.getStatus(), restrictionData);
         setTimeout(function () { generatePeek(peekEvent, PreviewPanel) }, 300);
     }
 
@@ -2620,9 +2433,9 @@ function AddTiledEvent()
         
     }
     */
-    
+
     TileInputBox.Send = SendData;
-    
+
     $(TileInputBox.DoneButton.GetDom()).click(SendData);
     ModalDoneContentContainer.Dom.appendChild(TileInputBox.DoneButton.GetDom());
 
@@ -2637,8 +2450,7 @@ function AddTiledEvent()
 
 
 //Creates the Tile Done Button
-function TileDoneButton(InActivePanel)
-{
+function TileDoneButton(InActivePanel) {
     var AddTileButtonDoneButton = "TileInputDoneButton";
     var DoneButton = getDomOrCreateNew(AddTileButtonDoneButton);
     var ReturnText = getDomOrCreateNew("ReturnText", "span");
@@ -2655,57 +2467,49 @@ function TileDoneButton(InActivePanel)
     DoneButton.Dom.appendChild(WhenDoneText.Dom);
     $(DoneButton.Dom).click(SendDataToBackEnd);
     var ready = false;
-    this.Show = function ()
-    {
+    this.Show = function () {
         $(DoneButton.Dom).removeClass("HideTileDoneButton");
         InActivePanel.reveal();
         ready = true;
     }
 
-    this.Hide = function ()
-    {
+    this.Hide = function () {
         $(DoneButton.Dom).addClass("HideTileDoneButton");
         InActivePanel.Hide();
         ready = false;
     }
 
-    this.GetDom = function ()
-    {
+    this.GetDom = function () {
         return DoneButton.Dom;
     }
     this.Hide();
 
-    function onFocus()
-    {
+    function onFocus() {
 
     }
     $(DoneButton.Dom).attr('tabindex', 0).focus(onFocus);
 
 
-    function RevealSecondPanel()
-    {
+    function RevealSecondPanel() {
         InActivePanel.reveal();
     }
 
     this.RevealSecondPanel = RevealSecondPanel;
-    this.getStatus = function ()
-    {
+    this.getStatus = function () {
         return ready;
     }
-    
-}
-
-function SendDataToBackEnd()
-{
 
 }
 
+function SendDataToBackEnd() {
+
+}
 
 
-function TileInputBox(TabElement, ModalContainer, SendTile, Exit, HideInput, getDataFunction, SenetenceCompletion)
-{
+
+function TileInputBox(TabElement, ModalContainer, SendTile, Exit, HideInput, getDataFunction, SenetenceCompletion) {
     var LabelBefore = TabElement.LabelBefore == null ? "" : TabElement.LabelBefore;
-    LabelBefore+=" "
+    LabelBefore += " "
     var LabelAfter = TabElement.LabelAfter == null ? "" : TabElement.LabelAfter;
     var myTabElement = TabElement;
     var myTIleInputID = TileInputBox.ID++
@@ -2721,7 +2525,7 @@ function TileInputBox(TabElement, ModalContainer, SendTile, Exit, HideInput, get
     var InputBoxLabelAfter = getDomOrCreateNew(InputBoxLabelAfterID, "label");
     InputBoxLabelAfter.Dom.innerHTML = LabelAfter;
 
-    if (TabElement.LabelCSS!=undefined)
+    if (TabElement.LabelCSS != undefined)
         $(InputBoxLabelBefore.Dom).css(TabElement.LabelCSS);
 
     TabElement.isInFocus = false;
@@ -2729,26 +2533,23 @@ function TileInputBox(TabElement, ModalContainer, SendTile, Exit, HideInput, get
     var InputBoxID = "InputBox" + myTIleInputID;
     this.NextElement = NextElement.Data;
     NextElement.Previous = this;
-    var InputBox ;//= getDomOrCreateNew(InputBoxID, "input");
-    if (!TabElement.CustomType)
-    {
+    var InputBox;//= getDomOrCreateNew(InputBoxID, "input");
+    if (!TabElement.CustomType) {
         InputBox = getDomOrCreateNew(InputBoxID, "input");
     }
-    else
-    {
-        InputBox = getDomOrCreateNew(InputBoxID,TabElement.CustomType.Type);
+    else {
+        InputBox = getDomOrCreateNew(InputBoxID, TabElement.CustomType.Type);
         InputBox.innerHTML = TabElement.CustomType.InnerHtml;
     }
     var InputDataDomain = InputBox;
-    InputDataDomain.CleanUp = function ()
-    {
+    InputDataDomain.CleanUp = function () {
         return;
     }
-    
+
     var labelAndInputContainerID = "labelAndInputContainer" + myTIleInputID;;
     var labelAndInputContainer = getDomOrCreateNew(labelAndInputContainerID);
 
-    
+
     var invisibleSpan = getDomOrCreateNew("measureSpan" + myTIleInputID, "span");
     $(invisibleSpan.Dom).addClass("invisibleSpan");
     //labelAndInputContainer.Dom.appendChild(invisibleSpan.Dom);
@@ -2756,19 +2557,17 @@ function TileInputBox(TabElement, ModalContainer, SendTile, Exit, HideInput, get
 
     //$(labelAndInputContainer.Dom).addClass("NonReveal");
     //$(labelAndInputContainer.Dom).addClass("labelAndInputContainer");
-    
+
     var OtherElements = [];
-    
+
     var AutoSuggestFunction = null;
-    
+
 
     //fuction generates and binds all elements for a drop down menu option
-    function GenerateAutoSuggest()
-    {
+    function GenerateAutoSuggest() {
         var dropDown;
         var JSONProperty;
-        if (TabElement.DropDown != undefined)
-        {
+        if (TabElement.DropDown != undefined) {
             ///debugger;
             AutoSuggestFunction = TabElement.DropDown(Exit, InputBox.Dom);
         }
@@ -2903,44 +2702,36 @@ function TileInputBox(TabElement, ModalContainer, SendTile, Exit, HideInput, get
         */
     }
 
-    function GenerateAlreadyCreatedBoxes()
-    {
+    function GenerateAlreadyCreatedBoxes() {
         //
-        if (TabElement.SubTileInputBox != undefined)
-        {
+        if (TabElement.SubTileInputBox != undefined) {
             //debugger;
             TabElement.SubTileInputBox.forEach(revealEachElement);
         }
 
-        function revealEachElement(eachSubTileInputBox)
-        {
+        function revealEachElement(eachSubTileInputBox) {
             //debugger;
-            OtherElements= OtherElements.concat(eachSubTileInputBox.getAllElements());
+            OtherElements = OtherElements.concat(eachSubTileInputBox.getAllElements());
             eachSubTileInputBox.ReplaceNextElement(NextElement.Data);
             eachSubTileInputBox.reveal();
         }
     }
 
-    function DeployInputSettings()
-    {
-        if (TabElement.InputCss!=undefined)
-        {
+    function DeployInputSettings() {
+        if (TabElement.InputCss != undefined) {
             $(InputBox.Dom).css(TabElement.InputCss);
         }
-        
+
     }
 
 
-    var tabfunction = function ()
-    {
-        if (NextElement.Data!= undefined)
-        {
+    var tabfunction = function () {
+        if (NextElement.Data != undefined) {
 
             NextElement.Data.reveal();
         }
     };
-    var reveal = function ()
-    {
+    var reveal = function () {
         var AllElements = getAllElements();
         for (var i = 0; i < AllElements.length; i++) {
             $(AllElements[i]).addClass("reveal");
@@ -2950,8 +2741,7 @@ function TileInputBox(TabElement, ModalContainer, SendTile, Exit, HideInput, get
 
     this.reveal = reveal;
 
-    var unReveal = function ()
-    {
+    var unReveal = function () {
         return;
         var AllElements = getAllElements();
         for (var i = 0; i < AllElements.length; i++) {
@@ -2963,36 +2753,30 @@ function TileInputBox(TabElement, ModalContainer, SendTile, Exit, HideInput, get
     this.forceFocus = function () {
         $(InputBox.Dom).focus();
         InputBox.Dom.setAttribute("autofocus", true);
-        
+
     }
 
-    this.getInputDom=function ()
-    {
+    this.getInputDom = function () {
         return InputBox.Dom;
     }
 
-    this.getLabelBefore=function()
-    {
+    this.getLabelBefore = function () {
         return InputBoxLabelBefore.Dom;
     }
 
     this.getLabelAfter = function () {
         return InputBoxLabelAfter.Dom;
     }
-    
+
     //Function tries to attached to sentence completion if it has a message.
-    function getSentenceCompletionMessage()
-    {
-        var retValue = function () { return ""};
-        if (TabElement.Message != null)
-        {
-            retValue = function ()
-            {
-                var loopBackArg ="";
+    function getSentenceCompletionMessage() {
+        var retValue = function () { return "" };
+        if (TabElement.Message != null) {
+            retValue = function () {
+                var loopBackArg = "";
                 if (TabElement.SubTileInputBox != undefined) {
-                    for(var i=0;i< TabElement.SubTileInputBox.length;i++)
-                    {
-                        loopBackArg+=TabElement.SubTileInputBox[i].getSentenceCompletionMessage();
+                    for (var i = 0; i < TabElement.SubTileInputBox.length; i++) {
+                        loopBackArg += TabElement.SubTileInputBox[i].getSentenceCompletionMessage();
                     }
                 }
                 if (InputBox != null)//scenario where tileinputbox has no input box, usually when label is used
@@ -3009,17 +2793,14 @@ function TileInputBox(TabElement, ModalContainer, SendTile, Exit, HideInput, get
         return retValue;
     }
 
-    
-    var getAllElements=function()
-    {
+
+    var getAllElements = function () {
 
         var retValue = [InputBoxLabelBefore, InputBox, InputBoxLabelAfter, InputDataDomain.Dom, invisibleSpan];
-        if (InputBox == InputDataDomain)
-        {
+        if (InputBox == InputDataDomain) {
             retValue = [InputBoxLabelBefore, InputBox, InputBoxLabelAfter, invisibleSpan];
         }
-        for (var i = 0; i < OtherElements.length; i++)
-        {
+        for (var i = 0; i < OtherElements.length; i++) {
             retValue.push(OtherElements[i]);
         }
         return retValue;
@@ -3027,12 +2808,11 @@ function TileInputBox(TabElement, ModalContainer, SendTile, Exit, HideInput, get
 
     this.getAllElements = getAllElements;
 
-    this.getID = function ()
-    {
+    this.getID = function () {
         return MyID;
     }
 
-    var resizeInput = function() {
+    var resizeInput = function () {
         var value = $(InputBox.Dom).val();
         var span = invisibleSpan.Dom;
         span.innerHTML = value;
@@ -3041,11 +2821,9 @@ function TileInputBox(TabElement, ModalContainer, SendTile, Exit, HideInput, get
         return span_width;
     }
 
-    var ResizeInputTrim = function ()
-    {
+    var ResizeInputTrim = function () {
         var value = $(InputBox.Dom).val();
-        if (!(value.trim()))
-        {
+        if (!(value.trim())) {
             $(InputBox.Dom).addClass("EmptyTileInput");
             return 0;
         }
@@ -3058,14 +2836,13 @@ function TileInputBox(TabElement, ModalContainer, SendTile, Exit, HideInput, get
         return span_width;
     }
 
-    function KeyEntry(e)
-    {
+    function KeyEntry(e) {
         resizeInput();
         setTimeout(function ()//delaying just to allow for input to post to UI on keydown
         {
             SenetenceCompletion.UpdateAutoSentence();
-        },10)
-        
+        }, 10)
+
         if (e == null)//handles scenario when this called randomly. E.g when triggered by calendar UI trigger
         {
             return;
@@ -3079,28 +2856,23 @@ function TileInputBox(TabElement, ModalContainer, SendTile, Exit, HideInput, get
         }
 
 
-        
-        if ((e.shiftKey) && (e.which == 9))
-        {
+
+        if ((e.shiftKey) && (e.which == 9)) {
             return;
         }
-        
-        
 
-        if (e.which == 9)
-        {
+
+
+        if (e.which == 9) {
             if (myTabElement.TriggerDone == true)//checks if the tab should navigate to done
             {
 
             }
         }
 
-        if (e.which == 13)
-        {
-            if (TabElement.DropDown != undefined)
-            {
-                if(TabElement.DropDown.status)
-                {
+        if (e.which == 13) {
+            if (TabElement.DropDown != undefined) {
+                if (TabElement.DropDown.status) {
                     TabElement.DropDown.CurrentOnFocus.SetAsActive();
                     return;
                 }
@@ -3122,26 +2894,22 @@ function TileInputBox(TabElement, ModalContainer, SendTile, Exit, HideInput, get
             }
         }*/
 
-        if (((e.which == 40)))
-        {
-            if (TabElement.DropDown != undefined)
-            {
-                if (TabElement.DropDown.OnDownKey!=undefined)
-                {
+        if (((e.which == 40))) {
+            if (TabElement.DropDown != undefined) {
+                if (TabElement.DropDown.OnDownKey != undefined) {
                     TabElement.DropDown.OnDownKey();
                 }
             }
         }
-        
+
     }
 
     function CleanUp()// cleans up the UI element when it goes out of focus
     {
 
     }
-    
-    this.ReplaceNextElement=function(newNext)
-    {
+
+    this.ReplaceNextElement = function (newNext) {
         NextElement.Data = newNext;
     }
 
@@ -3159,8 +2927,7 @@ function TileInputBox(TabElement, ModalContainer, SendTile, Exit, HideInput, get
         }
     }
 
-    function outFocus()
-    {
+    function outFocus() {
         $(InputBox.Dom).removeClass("FocusTileEvent");
         $(InputBox.Dom).addClass("OutFocusTileInputBox ")
         TabElement.isInFocus = false;
@@ -3169,8 +2936,7 @@ function TileInputBox(TabElement, ModalContainer, SendTile, Exit, HideInput, get
 
     $(InputBox.Dom).focusout(InputDataDomain.CleanUp);//handles clean up when element goest out of focus
 
-    this.getFocusStatus= function()
-    {
+    this.getFocusStatus = function () {
         return TabElement.isInFocus;
     }
 
@@ -3180,10 +2946,9 @@ function TileInputBox(TabElement, ModalContainer, SendTile, Exit, HideInput, get
     }
 
 
-    
+
     var AllElements = getAllElements();
-    for (var i = 0; i < AllElements.length; i++)
-    {
+    for (var i = 0; i < AllElements.length; i++) {
         $(AllElements[i]).addClass("tileInputBoxElement");
     }
 
@@ -3192,7 +2957,7 @@ function TileInputBox(TabElement, ModalContainer, SendTile, Exit, HideInput, get
     //labelAndInputContainer.Dom.appendChild(InputBox.Dom);
     //labelAndInputContainer.Dom.appendChild(InputBoxLabelAfter.Dom);
 
-    
+
     //labelAndInputContainer.Dom.appendChild(InputDataDomain.Dom);
     /*
     function InsertEachElement(EachSubTile)
@@ -3207,14 +2972,11 @@ function TileInputBox(TabElement, ModalContainer, SendTile, Exit, HideInput, get
     }
     */
 
-    if (TabElement.InputType != undefined)
-    {
+    if (TabElement.InputType != undefined) {
         (InputBox).setAttribute("type", TabElement.InputType)
     }
-    function focusInputBox()
-    {
-        if(InputBox!=null)
-        {
+    function focusInputBox() {
+        if (InputBox != null) {
             InputBox.focus();
         }
     }
@@ -3227,9 +2989,8 @@ function TileInputBox(TabElement, ModalContainer, SendTile, Exit, HideInput, get
         unReveal();
     }
 
-    
-    if (TabElement.DefaultText!=null)
-    {
+
+    if (TabElement.DefaultText != null) {
         InputBox.Dom.setAttribute("placeholder", TabElement.DefaultText);
     }
 
@@ -3238,16 +2999,14 @@ function TileInputBox(TabElement, ModalContainer, SendTile, Exit, HideInput, get
 
     this.getSentenceCompletionMessage = getSentenceCompletionMessage();
 
-    if (TabElement.HideInput)
-    {
+    if (TabElement.HideInput) {
         InputBox = null;
     }
 
-    if (TabElement.HideInputDomain)
-    {
+    if (TabElement.HideInputDomain) {
         InputDataDomain.Dom = null;
     }
-    
+
     InputBoxLabelBefore.onclick = focusInputBox
     InputBoxLabelAfter.onclick = focusInputBox
 }
@@ -3260,8 +3019,7 @@ TileInputBox.DoneButton = {}
 
 
 
-function generateEndContainer()
-{
+function generateEndContainer() {
     var EndDateTimeContainer = getDomOrCreateNew("EndTimeContainer");
     var EndDateInputContainer = getDomOrCreateNew("EndDateInputContainer");
     var EndDateInput = getDomOrCreateNew("EndDateInput", "Input");
@@ -3286,8 +3044,7 @@ function generateEndContainer()
 
 
 
-function generateRepetitionContainer()
-{
+function generateRepetitionContainer() {
     var RepetitionContainer = getDomOrCreateNew("RepetitionContainer");
     var FrequencySelectorContainer = getDomOrCreateNew("FrequencySelectorContainer");
     var RepetitionEndDateTimeContainer = getDomOrCreateNew("RepetitionEndTimeContainer");
@@ -3301,21 +3058,19 @@ function generateRepetitionContainer()
 
 
 
-function splitInputText()
-{
+function splitInputText() {
     var splitInputContainer = getDomOrCreateNew("splitInputContainer");
     var splitInput = getDomOrCreateNew("splitInput", "input");
     splitInput.Dom.setAttribute("placeholder", "Counts(Default 1)");
     //splitInput.Dom.setAttribute("value",1);
     splitInputContainer.Dom.appendChild(splitInput.Dom);
-    splitInputContainer.Selector = { Container: splitInputContainer.Dom,Input:splitInput };
+    splitInputContainer.Selector = { Container: splitInputContainer.Dom, Input: splitInput };
     return splitInputContainer;
 }
 
 
 
-function generateSubmitButton()
-{
+function generateSubmitButton() {
     var SubmitButtonContainer = getDomOrCreateNew("SubmitButtonContainer");
     var SubmitButton = getDomOrCreateNew("SubmitButton", "Button");
     SubmitButton.Dom.innerHTML = "Add New Event";
@@ -3326,8 +3081,7 @@ function generateSubmitButton()
 }
 
 
-function BindSubmitClick(Name, Address, AddressNick, Splits, Start, End, EventNonRigidDurationHolder, RepetitionEnd, RigidFlag, CalendarColor,ExitAdditionScreen,EventRepetition)
-{
+function BindSubmitClick(Name, Address, AddressNick, Splits, Start, End, EventNonRigidDurationHolder, RepetitionEnd, RigidFlag, CalendarColor, ExitAdditionScreen, EventRepetition) {
     var EventLocation = new Location(AddressNick, Address);
     var EventName = Name;
     var EventName = Name;
@@ -3337,14 +3091,13 @@ function BindSubmitClick(Name, Address, AddressNick, Splits, Start, End, EventNo
         return null;
     }
     */
-    
-    if (Splits == "")
-    {
+
+    if (Splits == "") {
         Splits = 1;
     }
     Splits = 1;
     var EventDuration = EventNonRigidDurationHolder.Selector.TimeHolder();
-     //CalendarColor = { r: 200, g: 200, b: 200,a:1,selection:0 };
+    //CalendarColor = { r: 200, g: 200, b: 200,a:1,selection:0 };
     CalendarColor = { r: CalendarColor.r, g: CalendarColor.g, b: CalendarColor.b, s: CalendarColor.Selection, o: CalendarColor.a };
 
     var EventStart = Start.getDateTimeData();
@@ -3374,11 +3127,9 @@ function BindSubmitClick(Name, Address, AddressNick, Splits, Start, End, EventNo
     var RepetitionEnd = EventRepetition.RepeatEnd.value;
 
     if (EventRepetition.RepetitionStatus.status) {
-        EventRepetition.RepetitionSelection.forEach(function (Selection)
-        {
+        EventRepetition.RepetitionSelection.forEach(function (Selection) {
             Selection.Dom = null;
-            if (Selection.status)
-            {
+            if (Selection.status) {
                 repeteOpitonSelect = Selection;
             }
         });
@@ -3389,20 +3140,18 @@ function BindSubmitClick(Name, Address, AddressNick, Splits, Start, End, EventNo
     if (NewEvent == null) {
         return;
     }
-    
+
     return NewEvent;
 }
 
 
 
-function SendScheduleInformation(NewEvent, CallBack)
-{
+function SendScheduleInformation(NewEvent, CallBack) {
     //var url = "RootWagTap/time.top?WagCommand=1"
     //debugger;
     //NewEvent = null;
     var ErrorCheck = isCalEvenValidForSend(NewEvent)
-    if (ErrorCheck.isError)
-    {
+    if (ErrorCheck.isError) {
         alert(ErrorCheck.ErrorMessage);
         return;
     }
@@ -3425,7 +3174,7 @@ function SendScheduleInformation(NewEvent, CallBack)
         // will be treated as a single string
         //dataType: "json",
         success: function (response) {
-            triggerUndoPanel("Undo addition of \"" + NewEvent.Name+"\"");
+            triggerUndoPanel("Undo addition of \"" + NewEvent.Name + "\"");
             var b = 3;
 
 
@@ -3443,14 +3192,13 @@ function SendScheduleInformation(NewEvent, CallBack)
         getRefreshedData.enableDataRefresh();
         debugger;
         var AffirmCallBack = affirmNewEvent(response);
-        
+
         getRefreshedData(AffirmCallBack);
         CallBack();
     });
 }
 
-function isCalEvenValidForPeek(CalEvent)
-{
+function isCalEvenValidForPeek(CalEvent) {
     var Result = { isError: false, ErrorMessage: "" };
     var TotalDuration = getTotalDurationFromCalEvent(CalEvent);
     var EndDate = getCalEventEnd(CalEvent);
@@ -3475,46 +3223,39 @@ function isCalEvenValidForPeek(CalEvent)
     return Result;
 }
 
-function isCalEvenValidForSend(CalEvent)
-{
+function isCalEvenValidForSend(CalEvent) {
     var Result = { isError: false, ErrorMessage: "" };
     var TotalDuration = getTotalDurationFromCalEvent(CalEvent);
     var EndDate = getCalEventEnd(CalEvent);
-    
-    if (!(TotalDuration > 0)) 
-    {
+
+    if (!(TotalDuration > 0)) {
         Result.isError = true;
         Result.ErrorMessage = "You havent set the duration for your tile";
         return Result;
     }
-    if(!isDateValid(EndDate))
-    {
+    if (!isDateValid(EndDate)) {
         Result.isError = true;
         Result.ErrorMessage = "Please provide the deadline for your event";
         return Result;
     }
     var Name = CalEvent.Name;
-    
-    if (Name!=null)
-    {
-        Name=Name.trim()
-        if (Name == "")
-        {
+
+    if (Name != null) {
+        Name = Name.trim()
+        if (Name == "") {
             Result.isError = true;
             Result.ErrorMessage = "Your tile needs a name";
             return Result;
-        }   
+        }
     }
-    else
-    {
+    else {
         Result.isError = true;
         Result.ErrorMessage = "Your tile has an invalid name";
         return Result;
-        
+
     }
 
-    if (!(CalEvent.Count > 0))
-    {
+    if (!(CalEvent.Count > 0)) {
         Result.isError = true;
         Result.ErrorMessage = "Your tile has an invalid Repetition Count";
         return Result;
@@ -3526,16 +3267,12 @@ function isCalEvenValidForSend(CalEvent)
 
 
 
-function affirmNewEvent(response)
-{
-    var StartOfEvent=null;
+function affirmNewEvent(response) {
+    var StartOfEvent = null;
     var EventID = null;
-    function retValue(CallBack)
-    {
-        if (StartOfEvent != null)
-        {
-            if (global_GoToDay(StartOfEvent))
-            {
+    function retValue(CallBack) {
+        if (StartOfEvent != null) {
+            if (global_GoToDay(StartOfEvent)) {
                 setTimeout(function () {
                     //renderSubEventsClickEvents(EventID);
 
@@ -3553,20 +3290,17 @@ function affirmNewEvent(response)
                     //debugger;
                     global_UISetup.RenderOnSubEventClick(EventID);
                 }, 1500);
-                
+
             }
-            else
-            {
+            else {
                 populateMonth(StartOfEvent, retValue);
             }
         }
-        if(CallBack!=null)
-        {
+        if (CallBack != null) {
             CallBack();
         }
     }
-    if (response.Error.code == 0)
-    {
+    if (response.Error.code == 0) {
         StartOfEvent = new Date(response.Content.SubCalCalEventStart);
         EventID = response.Content.ID;
 
@@ -3585,9 +3319,8 @@ function affirmNewEvent(response)
     return retValue;
 }
 
-function createCalEventRecurrence()
-{
-    
+function createCalEventRecurrence() {
+
     var RecurrenceTabContentID = "RecurrenceTabContent";
     var RecurrenceTabContent = getDomOrCreateNew(RecurrenceTabContentID);
     RecurrenceTabContent.Misc = { Selection: null };
@@ -3595,7 +3328,7 @@ function createCalEventRecurrence()
     var EventRepetitionSelection;
     var EventRepeatStart;
     var EventRepeatEnd;
-    
+
     $(RecurrenceTabContent.Dom).addClass("TabContent");
 
     //Enable Recurrence
@@ -3603,7 +3336,7 @@ function createCalEventRecurrence()
     var EnableRecurrenceContainer = getDomOrCreateNew(EnableRecurrenceContainerID);
 
     var EnableRecurrenceLabelID = "EnableRecurrenceLabel";
-    var EnableRecurrenceLabel = getDomOrCreateNew(EnableRecurrenceLabelID,"label");
+    var EnableRecurrenceLabel = getDomOrCreateNew(EnableRecurrenceLabelID, "label");
     EnableRecurrenceContainer.Dom.appendChild(EnableRecurrenceLabel.Dom);
     $(EnableRecurrenceContainer.Dom).addClass(CurrentTheme.FontColor);
     EnableRecurrenceLabel.Dom.innerHTML = "Do you want this event to recurr?<br/> <span class='PressSpacebar'>Press Spacebar to toggle and/or to select a color below.</span>"
@@ -3644,14 +3377,13 @@ function createCalEventRecurrence()
 
     RecurrenceTabContent.Dom.appendChild(EnableRecurrenceContainer.Dom);
 
-//    $(EnableRecurrenceContainer.Dom).click(genFunctionForButtonClick(EnableRecurrenceButton, EnabledRecurrenceContainer));
+    //    $(EnableRecurrenceContainer.Dom).click(genFunctionForButtonClick(EnableRecurrenceButton, EnabledRecurrenceContainer));
     EventrepeatStatus = EnabledRecurrenceContainer;
 
     EnableRecurrenceButton.SetAsOff();
 
-    
-    function ButtonClick () 
-    {
+
+    function ButtonClick() {
         switch (EnableRecurrenceButton.status) {
             case 0:
                 {
@@ -3667,7 +3399,7 @@ function createCalEventRecurrence()
                 break;
         }
     }
-    
+
 
 
 
@@ -3679,7 +3411,7 @@ function createCalEventRecurrence()
     var RecurrenceButtonContainer = getDomOrCreateNew(RecurrenceButtonContainerID);
 
     var dailyRecurrenceButtonID = "dailyRecurrenceButton";
-    var dailyRecurrenceButton = getDomOrCreateNew(dailyRecurrenceButtonID,"button");
+    var dailyRecurrenceButton = getDomOrCreateNew(dailyRecurrenceButtonID, "button");
     dailyRecurrenceButton.Range = OneDayInMs;
     dailyRecurrenceButton.Type = { Name: "Daily", Index: 0 };
     dailyRecurrenceButton.Misc = null;
@@ -3896,7 +3628,7 @@ function createCalEventRecurrence()
     var RepetitionRangeContainerEndContainerID = "RepetitionRangeContainerEndContainer";
     var RepetitionRangeContainerEndContainer = getDomOrCreateNew(RepetitionRangeContainerEndContainerID);
     var RepetitionRangeContainerEndContainerLabelID = "RepetitionRangeContainerEndContainerLabel";
-    var RepetitionRangeContainerEndContainerLabel = getDomOrCreateNew(RepetitionRangeContainerEndContainerLabelID,"label");
+    var RepetitionRangeContainerEndContainerLabel = getDomOrCreateNew(RepetitionRangeContainerEndContainerLabelID, "label");
     RepetitionRangeContainerEndContainerLabel.Dom.innerHTML = "Repeat End:";
     $(RepetitionRangeContainerEndContainerLabel.Dom).addClass("DateInputLabel");
 
@@ -3910,7 +3642,7 @@ function createCalEventRecurrence()
     //$(RepetitionRangeContainerEndInput.Dom).datepicker();
     EventRepeatEnd = RepetitionRangeContainerEndInput;
     BindDatePicker(RepetitionRangeContainerEndInput);
-    RepetitionRangeContainerEndInput.onkeyup = (function (e) { e.stopPropagation;})
+    RepetitionRangeContainerEndInput.onkeyup = (function (e) { e.stopPropagation; })
 
     RepetitionRangeCOntainer.Dom.appendChild(RepetitionRangeContainerEndContainer.Dom);
 
@@ -3934,14 +3666,14 @@ function createCalEventRecurrence()
     createDomEnablingFunction(AllDoms[3], 3, RecurrenceTabContent, DaysOfTheWeekContainer, DaysOfTheWeek.RevealDayOfWeek)();//defaults call to yearly
 
 
-    
-
-
-    
 
 
 
-    
+
+
+
+
+
     function LaunchTab(MiscData) {
         //var CurrentRange = MiscData[0].Content.getCurrentRangeOfAutoContainer();
         var i = 0;
@@ -3970,7 +3702,7 @@ function createCalEventRecurrence()
         $(RecurrenceTabTitle.Dom).removeClass(CurrentTheme.InActiveTabTitle);
         $(RecurrenceTabTitle.Dom).addClass(CurrentTheme.ActiveTabTitle);*/
     }
-    
+
     LaunchTab();
 
     var retValue =
@@ -4018,8 +3750,7 @@ function generateDayOfWeekRepetitionDom(CallBack) {
             }
             */
 
-            function TurnOffButton ()
-            {
+            function TurnOffButton() {
                 DayDom.status = 0;
                 $(DayDom.Dom).removeClass("SelectedDayOfWeek");
                 $(DayDom.Dom).addClass("deSelectedDayOfWeek");
@@ -4037,11 +3768,10 @@ function generateDayOfWeekRepetitionDom(CallBack) {
                 }
             }
 
-            DayDom.TurnOnButton=TurnOnButton;
+            DayDom.TurnOnButton = TurnOnButton;
             DayDom.TurnOffButton = TurnOffButton;
 
-            function clickTrigger ()
-            {
+            function clickTrigger() {
                 DayDom.status += 1;
                 DayDom.status %= 2;
                 switch (DayDom.status) {
