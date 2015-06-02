@@ -349,7 +349,6 @@
     <Compile Include="Controllers\SubCalendarEventController.cs" />
     <Compile Include="Controllers\ThirdPartyCalendarAuthenticationModelsController.cs" />
     <Compile Include="Controllers\UserController.cs" />
-    <Compile Include="Controllers\ValuesController.cs" />
     <Content Include="App_Data\XmlDocument.xml" />
     <Content Include="Areas\HelpPage\HelpPage.css" />
     <Compile Include="DTOs\PostBackStruct.cs" />

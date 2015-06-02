@@ -7,9 +7,11 @@ using System.Web.Http;
 using System.Web.Http.Results;
 using System.Threading.Tasks;
 using TilerFront.Models;
+using System.Web.Http.Description;
 
 namespace TilerFront.Controllers
 {
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class GoogleNotificationController : ApiController
     {
         ApplicationDbContext db = new ApplicationDbContext();
