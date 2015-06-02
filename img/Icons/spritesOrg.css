@@ -1,0 +1,40 @@
+.ClassicUnhiglight, .ClassicHiglight, .ClassicColored, .SlabsUnHighLight, .SlabsHighLight, .SlabsColored{
+	background: url(sprites.png) no-repeat;
+}
+
+.ClassicUnhiglight{
+	background-position: 0 -102px ;
+	width: 39px;
+	height: 52px;
+}
+
+.ClassicHiglight{
+	background-position: -102px -101px ;
+	width: 39px;
+	height: 52px;
+}
+
+.ClassicColored{
+	background-position: -203px -100px ;
+	width: 39px;
+	height: 52px;
+}
+
+.SlabsUnHighLight{
+	background-position: -5px 0;
+	width: 39px;
+	height: 52px;
+}
+
+.SlabsHighLight{
+	background-position: -105px 0;
+	width: 39px;
+	height: 52px;
+}
+
+.SlabsColored{
+	background-position: -201px 0;
+	width: 39px;
+	height: 52px;
+}
+

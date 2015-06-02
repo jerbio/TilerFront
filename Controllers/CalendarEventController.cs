@@ -30,6 +30,12 @@ namespace TilerFront.Controllers
         }*/
 
         // GET api/CalendarEvent/5
+        /// <summary>
+        /// Retrieve a calendar event by the ID, and registered user account
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="myUser"></param>
+        /// <returns></returns>
         [ResponseType(typeof(PostBackStruct))]
         public async Task<IHttpActionResult> GetCalEvent(string id,[FromUri]AuthorizedUser myUser )
         {
@@ -41,8 +47,14 @@ namespace TilerFront.Controllers
 
             return Ok(retValue.getPostBack);
         }
-
+        
         // GET api/CalendarEvent/Name
+        
+        /// <summary>
+        /// Look up a calendar event by name
+        /// </summary>
+        /// <param name="myUser"></param>
+        /// <returns></returns>
         [HttpGet]
         [ResponseType(typeof(PostBackStruct))]
         [Route("api/CalendarEvent/Name")]
@@ -118,7 +130,11 @@ namespace TilerFront.Controllers
             return Ok(retValue.getPostBack);
         }
         */
-
+        /// <summary>
+        /// Deletes a calendar event.
+        /// </summary>
+        /// <param name="myUser"></param>
+        /// <returns></returns>
         [HttpDelete]
         [ResponseType(typeof(PostBackStruct))]
         [Route("api/CalendarEvent")]
@@ -139,6 +155,8 @@ namespace TilerFront.Controllers
             }
             return Ok(retValue.getPostBack);
         }
+
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpOptions]
         [ResponseType(typeof(PostBackStruct))]
         [Route("api/CalendarEvent")]
@@ -147,7 +165,11 @@ namespace TilerFront.Controllers
             return Ok();
         }
 
-
+        /// <summary>
+        /// MArks the whole calendar event as complete.
+        /// </summary>
+        /// <param name="myUser"></param>
+        /// <returns></returns>
         [HttpPost]
         [ResponseType(typeof(PostBackStruct))]
         [Route("api/CalendarEvent/Complete")]
@@ -170,6 +192,11 @@ namespace TilerFront.Controllers
         }
 
 
+        /// <summary>
+        /// Sets the earleiest valid sub event to current time. Essentially, makes the event have a start time of now.
+        /// </summary>
+        /// <param name="myUser"></param>
+        /// <returns></returns>
         [HttpPost]
         [ResponseType(typeof(PostBackStruct))]
         [Route("api/CalendarEvent/Now")]
@@ -196,6 +223,11 @@ namespace TilerFront.Controllers
             return Ok(retValue.getPostBack);
         }
 
+        /// <summary>
+        /// Updates the calendar event properties in the information  sent.
+        /// </summary>
+        /// <param name="myUser"></param>
+        /// <returns></returns>
         [HttpPost]
         [ResponseType(typeof(PostBackStruct))]
         [Route("api/CalendarEvent/Update")]
