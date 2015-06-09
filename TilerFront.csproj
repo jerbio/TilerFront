@@ -396,6 +396,7 @@
     <Compile Include="Models\UnregisteredUser.cs" />
     <Compile Include="Models\UrgencyTier.cs" />
     <Compile Include="Models\UserSchedule.cs" />
+    <Compile Include="OutLookConnector.cs" />
     <Compile Include="PeekResult.cs" />
     <Compile Include="PostBackData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
