@@ -9,12 +9,6 @@
             Thread-safe OAuth 2.0 authorization code flow for a MVC web application that persists end-user credentials.
             </summary>
         </member>
-        <member name="P:Google.Apis.Auth.OAuth2.Mvc.AuthorizationCodeMvcApp.Controller">
-            <summary>Gets the controller which is the owner of this authorization code MVC app instance.</summary>
-        </member>
-        <member name="P:Google.Apis.Auth.OAuth2.Mvc.AuthorizationCodeMvcApp.FlowData">
-            <summary>Gets the <see cref="T:Google.Apis.Auth.OAuth2.Mvc.FlowMetadata"/> object.</summary>
-        </member>
         <member name="M:Google.Apis.Auth.OAuth2.Mvc.AuthorizationCodeMvcApp.#ctor(System.Web.Mvc.Controller,Google.Apis.Auth.OAuth2.Mvc.FlowMetadata)">
             <summary>Constructs a new authorization code MVC app using the given controller and flow data.</summary>
         </member>
@@ -22,12 +16,18 @@
             <summary>
             Asynchronously authorizes the installed application to access user's protected data. It gets the user 
             identifier by calling to <see cref="M:Google.Apis.Auth.OAuth2.Mvc.FlowMetadata.GetUserId(System.Web.Mvc.Controller)"/> and then calls to
-            <see cref="M:Google.Apis.Auth.OAuth2.Web.AuthorizationCodeWebApp.AuthorizeAsync(System.String,System.Threading.CancellationToken)"/>.
+            <see cref="!:Google.Apis.Auth.OAuth2.AuthorizationCodeWebApp.AuthorizeAsync"/>.
             </summary>
             <param name="taskCancellationToken">Cancellation token to cancel an operation</param>
             <returns>
             Auth result object which contains the user's credential or redirect URI for the authorization server
             </returns>
+        </member>
+        <member name="P:Google.Apis.Auth.OAuth2.Mvc.AuthorizationCodeMvcApp.Controller">
+            <summary>Gets the controller which is the owner of this authorization code MVC app instance.</summary>
+        </member>
+        <member name="P:Google.Apis.Auth.OAuth2.Mvc.AuthorizationCodeMvcApp.FlowData">
+            <summary>Gets the <see cref="T:Google.Apis.Auth.OAuth2.Mvc.FlowMetadata"/> object.</summary>
         </member>
         <member name="T:Google.Apis.Auth.OAuth2.Mvc.Filters.AuthorizationCodeActionFilter">
             <summary>
@@ -50,17 +50,6 @@
             <summary>
             Auth callback to process the authorization code or error response from the authorization redirect page.
             </summary>
-        </member>
-        <member name="P:Google.Apis.Auth.OAuth2.Mvc.Controllers.AuthCallbackController.Flow">
-            <summary>Gets the authorization code flow.</summary>
-        </member>
-        <member name="P:Google.Apis.Auth.OAuth2.Mvc.Controllers.AuthCallbackController.UserId">
-            <summary>
-            Gets the user identifier. Potential logic is to use session variables to retrieve that information.
-            </summary>
-        </member>
-        <member name="P:Google.Apis.Auth.OAuth2.Mvc.Controllers.AuthCallbackController.FlowData">
-            <summary>Gets the flow data which contains </summary>
         </member>
         <member name="M:Google.Apis.Auth.OAuth2.Mvc.Controllers.AuthCallbackController.OnTokenError(Google.Apis.Auth.OAuth2.Responses.TokenErrorResponse)">
             <summary>

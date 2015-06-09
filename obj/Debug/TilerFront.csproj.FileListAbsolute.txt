@@ -154,3 +154,20 @@ C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.cs
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\ApplicationInsights.config
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.dll
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.pdb
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> Added Split rigid and non-rigid for log. Added deviation list for modifications. I still feel there are issues with repetition yet to be found. We need extensive debugging.
+<<<<<<< HEAD
+>>>>>>> Added Split rigid and non-rigid for log. Added deviation list for modifications. I still feel there are issues with repetition yet to be found. We need extensive debugging.
+=======
+=======
+C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.csprojResolveAssemblyReference.cache
+C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\sdk.dll
+C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\sdk.pdb
+C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Google.Apis.Auth.Mvc4.xml
+C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Google.Apis.Plus.v1.xml
+C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Google.Apis.Oauth2.v2.xml
+>>>>>>> Moved code around to improve codebase architecture of application
+>>>>>>> Moved code around to improve codebase architecture of application
+>>>>>>> Moved code around to improve codebase architecture of application
