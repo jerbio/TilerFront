@@ -4,12 +4,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using TilerElements;
+
 
 #if EnableOutlook
 using Outlook = Microsoft.Office.Interop.Outlook;
 #endif
 
-namespace TilerElements
+
+namespace TilerFront
 {
     public class OutlookThirdPartyControl : ThirdPartyCalendarControl
     {

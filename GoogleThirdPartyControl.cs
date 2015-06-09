@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using TilerElements;
 
-namespace TilerElements
+namespace TilerFront
 {
     public class GoogleThirdPartyControl:ThirdPartyCalendarControl
     {
