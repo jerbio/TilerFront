@@ -3,6 +3,7 @@
   <LastIDCounter>1024</LastIDCounter>
   <referenceDay>8:00 AM</referenceDay>
   <EventSchedules>
+<<<<<<< HEAD
     <EventSchedule>
       <Recurrence />
       <ProcrastinationProfile>
@@ -696,5 +697,12 @@
       </Location>
     </Locations>
     <LastID>11</LastID>
+=======
+  </EventSchedules>
+  <LocationCache>
+    <Locations>
+    </Locations>
+    <LastID>5</LastID>
+>>>>>>> No Major changes in storage relative to path optimization. Only difference
   </LocationCache>
 </ScheduleLog>
