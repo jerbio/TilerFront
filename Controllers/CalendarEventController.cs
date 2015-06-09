@@ -255,7 +255,7 @@ namespace TilerFront.Controllers
                             GoogleThirdPartyControl googleEvents = new GoogleThirdPartyControl(AllCalendarEvents);
 
                             My24HourTimerWPF.Schedule NewSchedule = new My24HourTimerWPF.Schedule(retrievedUser, myUser.getRefNow());
-                            await NewSchedule.updateDataSetWithThirdPartyDataAndTriggerNewAddition (googleEvents).ConfigureAwait(false);
+                            await NewSchedule.updateDataSetWithThirdPartyDataAndTriggerNewAddition(new Tuple<ThirdPartyControl.CalendarTool, IEnumerable<CalendarEvent>>(ThirdPartyControl.CalendarTool.Google, new List<CalendarEvent> { googleEvents.getThirdpartyCalendarEvent() })).ConfigureAwait(false);
                             //await (NewSchedule.triggerNewlyAddedThirdparty()).ConfigureAwait(false);
 
                             retValue = new PostBackData("\"Success\"", 0);
