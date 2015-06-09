@@ -6,10 +6,15 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> Added location examples for calculation test.
 =======
 >>>>>>> No Major changes in storage relative to path optimization. Only difference
+=======
+=======
+>>>>>>> Added location examples for calculation test.
+>>>>>>> Added location examples for calculation test.
     <EventSchedule>
       <Recurrence />
       <ProcrastinationProfile>
@@ -971,6 +976,7 @@
       <Completed>False</Completed>
     </EventSchedule>
 <<<<<<< HEAD
+<<<<<<< HEAD
   </EventSchedules>
   <LocationCache>
     <Locations>
@@ -1037,6 +1043,8 @@
     </Locations>
     <LastID>12</LastID>
 =======
+=======
+>>>>>>> Added location examples for calculation test.
 =======
 >>>>>>> Added location examples for calculation test.
   </EventSchedules>
@@ -1112,12 +1120,81 @@
 >>>>>>> Added location examples for calculation test.
 =======
 =======
+=======
+>>>>>>> Added location examples for calculation test.
   </EventSchedules>
   <LocationCache>
     <Locations>
+      <Location>
+        <CachedName>home</CachedName>
+        <LocationID>7</LocationID>
+        <CheckCalendarEvent>0</CheckCalendarEvent>
+        <isNull>False</isNull>
+        <Description>Home</Description>
+        <Address>1170 alter way, broomfield, co 80020, usa</Address>
+        <YCoordinate>-105.093098</YCoordinate>
+        <XCoordinate>39.933352</XCoordinate>
+      </Location>
+      <Location>
+        <CachedName>spencer's house</CachedName>
+        <LocationID>8</LocationID>
+        <CheckCalendarEvent>0</CheckCalendarEvent>
+        <isNull>False</isNull>
+        <Description>Spencer's House</Description>
+        <Address>3003 valmont road, boulder, co 80301, usa</Address>
+        <YCoordinate>-105.250556</YCoordinate>
+        <XCoordinate>40.030965</XCoordinate>
+      </Location>
+      <Location>
+        <CachedName>starbucks</CachedName>
+        <LocationID>9</LocationID>
+        <CheckCalendarEvent>0</CheckCalendarEvent>
+        <isNull>False</isNull>
+        <Description>Starbucks</Description>
+        <Address>1352 college avenue, boulder, co 80302, usa</Address>
+        <YCoordinate>-105.2754506</YCoordinate>
+        <XCoordinate>40.0072251</XCoordinate>
+      </Location>
+      <Location>
+        <CachedName>galvanize denver</CachedName>
+        <LocationID>10</LocationID>
+        <CheckCalendarEvent>0</CheckCalendarEvent>
+        <isNull>False</isNull>
+        <Description>Galvanize Denver</Description>
+        <Address>1062 delaware street, denver, co 80204, usa</Address>
+        <YCoordinate>-104.992611</YCoordinate>
+        <XCoordinate>39.733536</XCoordinate>
+      </Location>
+      <Location>
+        <CachedName>galvanize boulder</CachedName>
+        <LocationID>11</LocationID>
+        <CheckCalendarEvent>0</CheckCalendarEvent>
+        <isNull>False</isNull>
+        <Description>Galvanize Boulder</Description>
+        <Address>1035 pearl street, boulder, co 80302, usa</Address>
+        <YCoordinate>-105.2819596</YCoordinate>
+        <XCoordinate>40.0177185</XCoordinate>
+      </Location>
+      <Location>
+        <CachedName>work</CachedName>
+        <LocationID>12</LocationID>
+        <CheckCalendarEvent>0</CheckCalendarEvent>
+        <isNull>False</isNull>
+        <Description>Work</Description>
+        <Address>engineering center, 1111 engineering drive, boulder, co 80309, usa</Address>
+        <YCoordinate>-105.2627072</YCoordinate>
+        <XCoordinate>40.0071656</XCoordinate>
+      </Location>
     </Locations>
+<<<<<<< HEAD
     <LastID>6</LastID>
 >>>>>>> No Major changes in storage relative to path optimization. Only difference
+<<<<<<< HEAD
 >>>>>>> No Major changes in storage relative to path optimization. Only difference
+=======
+=======
+    <LastID>12</LastID>
+>>>>>>> Added location examples for calculation test.
+>>>>>>> Added location examples for calculation test.
   </LocationCache>
 </ScheduleLog>
