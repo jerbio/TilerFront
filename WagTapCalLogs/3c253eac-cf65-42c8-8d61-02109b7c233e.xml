@@ -5,8 +5,11 @@
   <EventSchedules>
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> Added location examples for calculation test.
+=======
+>>>>>>> No Major changes in storage relative to path optimization. Only difference
     <EventSchedule>
       <Recurrence />
       <ProcrastinationProfile>
@@ -1105,6 +1108,16 @@
 >>>>>>> No Major changes in storage relative to path optimization. Only difference
 =======
     <LastID>12</LastID>
+<<<<<<< HEAD
 >>>>>>> Added location examples for calculation test.
+=======
+=======
+  </EventSchedules>
+  <LocationCache>
+    <Locations>
+    </Locations>
+    <LastID>6</LastID>
+>>>>>>> No Major changes in storage relative to path optimization. Only difference
+>>>>>>> No Major changes in storage relative to path optimization. Only difference
   </LocationCache>
 </ScheduleLog>
