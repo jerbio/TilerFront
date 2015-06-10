@@ -12,7 +12,8 @@ using TilerElements;
 using System.Web;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity.Owin;
-using Microsoft.AspNet.Identity; 
+using Microsoft.AspNet.Identity;
+using DBTilerElement;
 #if ForceReadFromXml
 #else
 using CassandraUserLog;
