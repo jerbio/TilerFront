@@ -480,9 +480,7 @@ namespace TilerFront
             bool errorWritingFile = false;
             CalendarEvent ErrorEvent = new CalendarEvent();
             EventScheduleNodes = xmldoc.DocumentElement.SelectNodes("/ScheduleLog/EventSchedules/EventSchedule");
-<<<<<<< HEAD
             DateTimeOffset purgeLimit = DateTimeOffset.UtcNow.AddMonths(-3);
-=======
             XmlNode RigidNode = xmldoc.DocumentElement.SelectSingleNode("/ScheduleLog/EventSchedules/Rigids");
             if(RigidNode==null)
             {
@@ -498,56 +496,41 @@ namespace TilerFront
             }
             
 
->>>>>>> Added Split rigid and non-rigid for log. Added deviation list for modifications. I still feel there are issues with repetition yet to be found. We need extensive debugging.
             try
             {
                 foreach (CalendarEvent MyEvent in AllEvents)
                 {
                     //break;
-<<<<<<< HEAD
                     if (MyEvent.End > purgeLimit)
-=======
-                    XmlElement EventScheduleNode;
-                    //EventScheduleNode = CreateEventScheduleNode(MyEvent);
-                    //*
-                    ErrorEvent = MyEvent;
-                    EventScheduleNode = CreateEventScheduleNode(MyEvent);
-                
-                
-                    //*/
-                
-                    //EventSchedulesNodes[0].PrependChild(xmldoc.CreateElement("EventSchedule"));
-                    //EventSchedulesNodes[0].ChildNodes[0].InnerXml = CreateEventScheduleNode(MyEvent).InnerXml;
-                    XmlNode MyImportedNode = xmldoc.ImportNode(EventScheduleNode as XmlNode, true);
-                    //(EventScheduleNode, true);
-                    if (!UpdateInnerXml(ref EventScheduleNodes, "ID", MyEvent.ID.ToString(), EventScheduleNode))
                     {
-                        if (MyEvent.Rigid)
-                        {
-                            RigidNode.AppendChild(MyImportedNode);
-                        }
-                        else
-                        {
-                            NonRigidNode.AppendChild(MyImportedNode);
-                        }
+                                    XmlElement EventScheduleNode;
+                                    //EventScheduleNode = CreateEventScheduleNode(MyEvent);
+                                    //*
+                                    ErrorEvent = MyEvent;
+                                    EventScheduleNode = CreateEventScheduleNode(MyEvent);
 
-                        
-                    }
-                    else
->>>>>>> Added Split rigid and non-rigid for log. Added deviation list for modifications. I still feel there are issues with repetition yet to be found. We need extensive debugging.
-                    {
-                        XmlElement EventScheduleNode;
-                        ErrorEvent = MyEvent;
-                        EventScheduleNode = CreateEventScheduleNode(MyEvent);
-                
-                        XmlNode MyImportedNode = xmldoc.ImportNode(EventScheduleNode as XmlNode, true);
-                        //(EventScheduleNode, true);
-                        if (!UpdateInnerXml(ref EventScheduleNodes, "ID", MyEvent.ID.ToString(), EventScheduleNode))
-                        {
-                            xmldoc.DocumentElement.SelectSingleNode("/ScheduleLog/EventSchedules").AppendChild(MyImportedNode);
-                        }
-                        else
-                        {
+
+                                    //*/
+
+                                    //EventSchedulesNodes[0].PrependChild(xmldoc.CreateElement("EventSchedule"));
+                                    //EventSchedulesNodes[0].ChildNodes[0].InnerXml = CreateEventScheduleNode(MyEvent).InnerXml;
+                                    XmlNode MyImportedNode = xmldoc.ImportNode(EventScheduleNode as XmlNode, true);
+                                    //(EventScheduleNode, true);
+                                    if (!UpdateInnerXml(ref EventScheduleNodes, "ID", MyEvent.ID.ToString(), EventScheduleNode))
+                                    {
+                                        if (MyEvent.Rigid)
+                                        {
+                                            RigidNode.AppendChild(MyImportedNode);
+                                        }
+                                        else
+                                        {
+                                            NonRigidNode.AppendChild(MyImportedNode);
+                                        }
+
+
+                                    }
+                                    else
+                                    {
                             ;
                         }
                     }
@@ -1076,13 +1059,11 @@ namespace TilerFront
             MyEventSubScheduleNode.ChildNodes[0].InnerXml = CreateConflictProfile(MySubEvent.Conflicts, "ConflictProfile").InnerXml;
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("Restricted"));
             MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.isEventRestricted.ToString();
-<<<<<<< HEAD
             MyEventSubScheduleNode.PrependChild(CreatePauseUsedUpNode(MySubEvent, xmldoc));
 
-=======
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("NowProfile"));
             MyEventSubScheduleNode.ChildNodes[0].InnerXml = (generateNowProfileNode(MySubEvent.NowInfo).InnerXml);
->>>>>>> Added Split rigid and non-rigid for log. Added deviation list for modifications. I still feel there are issues with repetition yet to be found. We need extensive debugging.
+
             if (MySubEvent.isEventRestricted)
             {
                 restrictedMySub = (SubCalendarEventRestricted)MySubEvent;
@@ -1846,16 +1827,13 @@ namespace TilerFront
                 retrievedSubEvent.ThirdPartyID = MyXmlNode.ChildNodes[i].SelectSingleNode("ThirdPartyID").InnerText;//this is a hack to just update the Third partyID
                 XmlNode restrictedNode = MyXmlNode.ChildNodes[i].SelectSingleNode("Restricted");
 
-<<<<<<< HEAD
+
                 retrievedSubEvent = new DB_SubCalendarEvent(retrievedSubEvent, MyParent.NowInfo, MyParent.ProcrastinationInfo);
                 
                 Tuple<TimeSpan, DateTimeOffset> PauseData = getPauseData(SubEventNode);
                 (retrievedSubEvent as DB_SubCalendarEvent).UsedTime = PauseData.Item1;
                 (retrievedSubEvent as DB_SubCalendarEvent).PauseTime = PauseData.Item2;
 
-=======
-                retrievedSubEvent = new DB_SubCalendarEventExtra(retrievedSubEvent, nowInfo, MyParent.ProcrastinationInfo);
->>>>>>> Added Split rigid and non-rigid for log. Added deviation list for modifications. I still feel there are issues with repetition yet to be found. We need extensive debugging.
 
 
                 if (restrictedNode != null)
