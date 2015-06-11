@@ -5,6 +5,7 @@
     </assembly>
     <members>
 <<<<<<< HEAD
+<<<<<<< HEAD
         <member name="T:Google.Apis.Plus.v1.PlusService">
             <summary>The Plus Service.</summary>
         </member>
@@ -1351,6 +1352,8 @@
         <member name="P:Google.Apis.Plus.v1.Data.PlusAclentryResource.ETag">
             <summary>The ETag of the item.</summary>
 =======
+=======
+>>>>>>> Made changes to enable code to be compatible with current azure storage
         <member name="P:Google.Apis.Plus.v1.Data.Acl.Description">
             <summary>Description of the access granted, suitable for display.</summary>
         </member>
@@ -3010,7 +3013,10 @@
         </member>
         <member name="P:Google.Apis.Plus.v1.PeopleResource.SearchRequest.RestPath">
             <summary>Gets the REST path.</summary>
+<<<<<<< HEAD
 >>>>>>> Moved code around to improve codebase architecture of application
+=======
+>>>>>>> Made changes to enable code to be compatible with current azure storage
         </member>
     </members>
 </doc>
