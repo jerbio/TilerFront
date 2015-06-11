@@ -162,22 +162,6 @@ C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.csproj.GenerateResource.Cache
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.dll
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.pdb
-<<<<<<< HEAD
-=======
-C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\BouncyCastle.Crypto.dll
-C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\Microsoft.AI.Agent.Intercept.dll
-C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\Microsoft.AI.DependencyCollector.dll
-C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\Microsoft.AI.PerfCounterCollector.dll
-C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\Microsoft.AI.ServerTelemetryChannel.dll
-C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\Microsoft.AI.Web.dll
-C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\Microsoft.AI.WindowsServer.dll
-C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\SendGrid.dll
-C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\Microsoft.AI.DependencyCollector.xml
-C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\Microsoft.AI.ServerTelemetryChannel.xml
-C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\Microsoft.AI.Web.xml
-C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\Microsoft.AI.WindowsServer.xml
-C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\DBTilerElement.dll
-C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.Migrations.addedPausedEventForeignKeyRelationship.resources
 =======
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\ApplicationInsights.config
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Microsoft.ApplicationInsights.Extensions.Intercept_x86.dll
@@ -302,23 +286,13 @@ C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.cs
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\ApplicationInsights.config
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.dll
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.pdb
-<<<<<<< HEAD
 >>>>>>> Added Split rigid and non-rigid for log. Added deviation list for modifications. I still feel there are issues with repetition yet to be found. We need extensive debugging.
-<<<<<<< HEAD
->>>>>>> Added Split rigid and non-rigid for log. Added deviation list for modifications. I still feel there are issues with repetition yet to be found. We need extensive debugging.
-=======
-=======
+>>>>>>> Made changes to enable code to be compatible with current azure storage
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.csprojResolveAssemblyReference.cache
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\sdk.dll
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\sdk.pdb
-<<<<<<< HEAD
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Google.Apis.Auth.Mvc4.xml
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Google.Apis.Plus.v1.xml
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Google.Apis.Oauth2.v2.xml
 >>>>>>> Moved code around to improve codebase architecture of application
-<<<<<<< HEAD
->>>>>>> Moved code around to improve codebase architecture of application
-=======
-=======
->>>>>>> Change location of thirdparty control. Moved to backend code for more stability.
 >>>>>>> Change location of thirdparty control. Moved to backend code for more stability.
