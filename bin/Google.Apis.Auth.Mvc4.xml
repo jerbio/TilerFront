@@ -73,10 +73,28 @@
             Redirect action to the state parameter or <see cref="M:Google.Apis.Auth.OAuth2.Mvc.Controllers.AuthCallbackController.OnTokenError(Google.Apis.Auth.OAuth2.Responses.TokenErrorResponse)"/> in case of an error.
             </returns>
         </member>
+<<<<<<< HEAD
         <member name="T:Google.Apis.Auth.OAuth2.Mvc.FlowMetadata">
             <summary>
             Flow metadata abstract class which contains the reference to the
             <see cref="T:Google.Apis.Auth.OAuth2.Flows.IAuthorizationCodeFlow"/> and
+=======
+        <member name="P:Google.Apis.Auth.OAuth2.Mvc.Controllers.AuthCallbackController.Flow">
+            <summary>Gets the authorization code flow.</summary>
+        </member>
+        <member name="P:Google.Apis.Auth.OAuth2.Mvc.Controllers.AuthCallbackController.UserId">
+            <summary>
+            Gets the user identifier. Potential logic is to use session variables to retrieve that information.
+            </summary>
+        </member>
+        <member name="P:Google.Apis.Auth.OAuth2.Mvc.Controllers.AuthCallbackController.FlowData">
+            <summary>Gets the flow data which contains </summary>
+        </member>
+        <member name="T:Google.Apis.Auth.OAuth2.Mvc.FlowMetadata">
+            <summary>
+            Flow metadata abstract class which contains the reference to the
+            <see cref="!:Google.Apis.Auth.OAuth2.FlowsIAuthorizationCodeFlow"/> and
+>>>>>>> Made changes to enable code to be compatible with current azure storage
             method to get the user identifier.
             </summary>
         </member>
