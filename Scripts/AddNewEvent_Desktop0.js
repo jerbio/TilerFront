@@ -15,8 +15,131 @@ function generatePostBackDataForTimeRestriction(RestrictionSlider)
     var RestrictionStart = RestrictionSlider.getStart();
     var RestrictionEnd = RestrictionSlider.getEnd();
     var RestrictionWorkWeek = RestrictionSlider.isWorkWeek();
-    var retValue = { isRestriction: RestrictionStatusButtonStatus, Start: RestrictionStart, End: RestrictionEnd, isWorkWeek: RestrictionWorkWeek }
-    return retValue;
+    var RestrictEveryday= RestrictionSlider.isEveryDay();
+    var RestrictiveWeek = RestrictionSlider.getRestrictiveWeek().getPostData();
+    var RetValue = { isRestriction: RestrictionStatusButtonStatus, Start: RestrictionStart, End: RestrictionEnd, isEveryDay: RestrictEveryday, isWorkWeek: RestrictionWorkWeek, RestrictiveWeek: RestrictiveWeek }
+    return RetValue;
+}
+
+function generateOfficeHours(Place)
+{
+    var RetValue = { WeekDayData: [], IsTwentyFourHours: false,NoWeekData:true };
+
+    if (Place.opening_hours.weekday_text.length)
+    {
+        for (var i = 0; i < Place.opening_hours.weekday_text.length; i++)
+        {
+            var CurrentWeekday = Place.opening_hours.weekday_text[i];
+            var RestrivtiveDay = createRestrictedTimeData(CurrentWeekday);
+            if(RestrivtiveDay.IsTwentyFourHours)
+            {
+                RetValue.IsTwentyFourHours = RestrivtiveDay.IsTwentyFourHours;
+                break;
+            }
+            RetValue.NoWeekData = false;
+            RetValue.WeekDayData.push(RestrivtiveDay);
+        }
+    }
+
+    function createRestrictedTimeData(WeekdayText)
+    {
+        var WeekData = WeekdayText.split(":");
+        var DayData = WeekData [0].trim();
+        var DayIndex = WeekDays.indexOf(DayData);
+        var TimeData = WeekData .slice(1,WeekData .length).join(":").trim();
+        var TimeSection =TimeData .split(",");
+
+        var RetValue = {DayIndex:DayIndex, Start:null, End:null,IsTwentyFourHours:false};
+
+        function PickTimeFrames(DayOfWeek,TimeSections)
+        {
+            var DayIndex = WeekDays.indexOf(DayOfWeek);
+            //var RetValue = { DayIndex: DayIndex, Start: null, End: null, IsTwentyFourHours: false, IsClosed:null };
+
+            var AllTimeDataStart = [];
+            var AllTimeDataEnd = [];
+
+            for (var i = 0 ; i < TimeSections.length; i++)
+            {
+                var TimeText = TimeSections[i].toLowerCase();
+                var timeee = "hakh hkjahjks";
+                
+                if(TimeText !="open 24 hours")
+                {
+                    if(TimeText !="closed")
+                    {
+                        var BeginAndEndArray = TimeText.split("–");
+                        var Begin = BeginAndEndArray[0].trim();
+                        Begin = Begin.trim();
+                        //Begin = Begin.slice(0, -1);
+                        Begin =spliceSlice(Begin, Begin.length - 3, 0, " ");
+                        var End = BeginAndEndArray[1].trim();
+                        End = spliceSlice(End, End.length - 3, 0, " ");
+                        var Begin = Date.parse((new Date()).toLocaleDateString()+" " + Begin);
+                        End = Date.parse((new Date()).toLocaleDateString() + " " + End);
+                        var EndData = new Date(End);
+                        if ((EndData.getHours() == 0) && (EndData.getMinutes() == 0))
+                        {
+                            End -= 1000;
+                        }
+                        AllTimeDataStart.push(Begin);
+                        AllTimeDataEnd.push(End);
+                        RetValue.IsClosed = false;
+                    }
+                    else
+                    {
+                        RetValue.IsClosed = true;
+                    }
+                }
+                else
+                {
+                    RetValue.IsTwentyFourHours = true;
+                    return RetValue;
+                    break;
+                }
+            }
+            AllTimeDataStart.sort(function (a, b) { return (a) - (b) });
+            AllTimeDataEnd.sort(function (a, b) { return (a) - (b) });
+
+            for (var i = 0 ; i < AllTimeDataStart.length; i++)
+            {
+                AllTimeDataStart[i] = new Date(AllTimeDataStart[i]);
+            }
+
+
+            for (var i = 0; i < AllTimeDataEnd.length; i++)
+            {
+                AllTimeDataEnd[i] = new Date(AllTimeDataEnd[i]);
+            }
+
+            RetValue.Start = AllTimeDataStart[0];
+            RetValue.End = AllTimeDataEnd[AllTimeDataEnd.length - 1];
+            return RetValue;
+        }
+
+        var RetValue = PickTimeFrames(DayData, TimeSection);
+
+
+        return RetValue;
+        /*
+        0: "Monday: Open 24 hours"
+        1: "Tuesday: Open 24 hours"
+        2: "Wednesday: Open 24 hours"
+        3: "Thursday: Open 24 hours"
+        4: "Friday: Open 24 hours"
+        5: "Saturday: Open 24 hours"
+        6: "Sunday: Open 24 hours"
+        */
+    }
+
+    return RetValue;
+}
+
+
+
+
+function spliceSlice(str, index, count, add) {
+    return str.slice(0, index) + (add || "") + str.slice(index + count);
 }
 
 
@@ -908,6 +1031,14 @@ function InactiveSlider(InActiveDom, ActiveDom, ButtonElements, AutoSentence)
 
     this.turnOffSlide = turnOffButton
 
+    function getContainer()
+    {
+        return AllInputDataContainer;
+    }
+
+    this.getContainer = getContainer;
+
+
     ButtonSlide.SetAsOff();
 }
 
@@ -919,37 +1050,430 @@ function cleanUpTimeRestriction(TimeRestrictionSlider)
     var TimeRestrictionAllElements = TimeRestrictionSlider.getAllElements();
     //for (var i = 0; i < TimeRestrictionAllElements.length; i++)
     
-        var StartInputDom = TimeRestrictionAllElements[0].TileInput.getInputDom();
-        BindTimePicker(StartInputDom);
-        $(StartInputDom).addClass(".TimeInput")
-        var EndInputDom = TimeRestrictionAllElements[1].TileInput.getInputDom();
-        BindTimePicker(EndInputDom);
-        $(EndInputDom).addClass(".TimeInput")
-        var WorkDayLabel = TimeRestrictionAllElements[2].TileInput.getLabelAfter()
-        var WorkDayCheckBox = TimeRestrictionAllElements[2].TileInput.getInputDom()
-        
+    var StartInputLabel = TimeRestrictionAllElements[3].TileInput.getLabelBefore()
+    var StartInputDom = TimeRestrictionAllElements[3].TileInput.getInputDom();
+    BindTimePicker(StartInputDom);
+    $(StartInputDom).addClass("TimeInput");
+    StartInputDom.setAttribute("placeholder", "24 Hrs");
+    StartInputDom.onkeypress = onKeyPress;
+    
+    var EndInputLabel = TimeRestrictionAllElements[4].TileInput.getLabelBefore()
+    var EndInputDom = TimeRestrictionAllElements[4].TileInput.getInputDom();
+    EndInputDom.onkeypress = onKeyPress;
+    BindTimePicker(EndInputDom);
+    $(EndInputDom).addClass("TimeInput");
+    EndInputDom.setAttribute("placeholder", "24 Hrs");
+    var WorkDayLabel = TimeRestrictionAllElements[1].TileInput.getLabelAfter()
+    var WorkDayCheckBox = TimeRestrictionAllElements[1].TileInput.getInputDom()
+    var EveryDayCheckBox = TimeRestrictionAllElements[0].TileInput.getInputDom()
+    var WeekDayCheckBox = TimeRestrictionAllElements[2].TileInput.getInputDom()
+    var WeekDayLabel = TimeRestrictionAllElements[2].TileInput.getLabelAfter();
+    WeekDayCheckBox.onchange = onWeekDayCheckboxClick;
+    
 
-        var parentDom = WorkDayCheckBox.parentElement;
-        var WorkDayDom = getDomOrCreateNew("WorkDayDom")
-        WorkDayDom.appendChild(WorkDayCheckBox)
-        WorkDayDom.appendChild(WorkDayLabel);
-        parentDom.appendChild(WorkDayDom);
-        WorkDayCheckBox.onclick = onCheckBoxChange;
-        
+    
+    var parentDom = WorkDayCheckBox.parentElement;
+    var WeekDayDom = getDomOrCreateNew("WorkDayDom")
+    var StartEndInutContainer = getDomOrCreateNew("StartEndInutContainer");
+    $(StartEndInutContainer).addClass("setAsDisplayNone");
 
-        function onCheckBoxChange(e)
+    StartEndInutContainer.appendChild(StartInputLabel);
+    StartEndInutContainer.appendChild(StartInputDom);
+    StartEndInutContainer.appendChild(EndInputLabel);
+    StartEndInutContainer.appendChild(EndInputDom);
+
+
+    WeekDayDom.appendChild(WeekDayCheckBox)
+    WeekDayDom.appendChild(WeekDayLabel);
+    parentDom.appendChild(WeekDayDom);
+    parentDom.appendChild(StartEndInutContainer);
+    WorkDayCheckBox.onchange = onCheckBoxChange;
+    EveryDayCheckBox.onchange = onEverydayCheckBoxChange;
+
+
+    function onKeyPress(e)
+    {
+        e.stopPropagation();
+    }
+
+    function onEverydayCheckBoxChange()
+    {
+        if (EveryDayCheckBox.checked)
         {
-            if (this.checked)
-            {
-                triggerChangeInTime();
-            }
-            function triggerChangeInTime()
-            {
-                StartInputDom.value = "9:00 am"
-                EndInputDom.value = "6:00 pm"
+            WorkDayCheckBox.checked = false;
+            showTimeInput();
+            DisableWeekDay();
+        }
+        else
+        {
+            hideTimeInput()
+        }
+    }
+    function onCheckBoxChange(e)
+    {
+        //debugger;
+        if (WorkDayCheckBox.checked)
+        {
+            triggerChangeInTime();
+            EveryDayCheckBox.checked = false;
+            EveryDayCheckBox.onchange();
+            showTimeInput(); 
+            DisableWeekDay();
+        }
+        else
+        {
+            hideTimeInput()
+        }
+        function triggerChangeInTime()
+        {
+
+            StartInputDom.value = "9:00 am"
+            EndInputDom.value = "6:00 pm"
+        }
+    }
+    
+
+    function onWeekDayCheckboxClick(e)
+    {
+        //debugger;
+        if (WeekDayCheckBox.checked)
+        {
+            EveryDayCheckBox.checked = false;
+            WorkDayCheckBox.checked = false;
+            WorkDayCheckBox.onchange();
+            EveryDayCheckBox.onchange();
+            RestrictiveWeek.showWeekDayButtons();
+        }
+        else
+        {
+            DisableWeekDay();
+            return;
+        }
+    }
+
+
+    function showTimeInput()
+    {
+        $(StartEndInutContainer).removeClass("setAsDisplayNone");
+    }
+
+    function hideTimeInput()
+    {
+        $(StartEndInutContainer).addClass("setAsDisplayNone");
+    }
+
+    function WeekDayButton(IndexData)
+    {
+        var Index = IndexData;
+        var Start = "";
+        var End = "";
+        var StartDom = null;
+        var EndDom = null;
+        var isInitialized = false;
+
+        function updateStart(StartData)
+        {
+            Start = StartData
+            isInitialized = initializationTest();
+        }
+
+        function updateEnd(EndData) {
+            End = EndData
+            isInitialized = initializationTest();
+        }
+        function reset()
+        {
+            Start = "";
+            End = "";
+            isInitialized = false;
+        }
+
+        function setStartDom(StartDomData)
+        {
+            StartDom = StartDomData;
+            StartDom.onchange = function () {
+                updateStart(StartDom.value);
+
             }
         }
-    
+
+        function setEndDom(EndDomData)
+        {
+            EndDom = EndDomData;
+            EndDom.onchange = function()
+            {
+                updateEnd(EndDom.value);
+            }
+        }
+
+        function getStartDom() {
+            var RetValue = StartDom ;
+            return RetValue;
+        }
+
+        function getEndDom() {
+            var RetValue = EndDom;
+            return RetValue;
+        }
+
+        function enableStartInput()
+        {
+            StartDom.disabled = false;
+            Start = StartDom.value;
+        }
+
+        function enableEndInput() {
+            EndDom.disabled = false;
+            Start = StartDom.value;
+        }
+
+        function disableStartInput() {
+            StartDom.disabled = true;
+        }
+
+        function disableEndInput() {
+            EndDom.disabled = true;
+        }
+
+        function initializationTest()
+        {
+            var RetValue = false;
+            RetValue = (Start && End)&&true;
+            return RetValue;
+        }
+        function getStart()
+        {
+            return Start;
+        }
+
+        function getEnd()
+        {
+            return End;
+        }
+
+        function getDayName()
+        {
+            return WeekDays[Index];
+        }
+
+        function getPostData()
+        {
+            var RetValue = { Start: Start, End: End, Index: Index }
+            return RetValue;
+        }
+
+        function disableInputs()
+        {
+            disableStartInput();
+            disableEndInput();
+        }
+
+        function enableInputs() {
+            enableStartInput();
+            enableEndInput();
+        }
+
+        function isWeekdayInitialized() {
+            return isInitialized;
+        }
+
+        this.getDayName = getDayName;
+        this.disableStartInput = disableStartInput;
+        this.disableEndInput = disableEndInput;
+        this.enableStartInput = enableStartInput;
+        this.enableEndInput = enableEndInput;
+
+        this.disableInputs = disableInputs;
+        this.enableInputs = enableInputs;
+        this.isInitialized = isWeekdayInitialized;
+
+        this.getEnd = getEnd;
+        this.getStart = getStart; 
+        this.setStart = updateStart;
+        this.setEnd = updateEnd;
+        this.reset = reset;
+        this.getPostData = getPostData;
+        this.setStartDom = setStartDom;
+        this.setEndDom = setEndDom;
+        this.getStartDom = getStartDom;
+        this.getEndDom = getEndDom;
+    }
+
+    function RestrictiveWeekControl()
+    {
+        var WeekDayButtons = [];
+        var isEnabled = false;
+        InitializeWeekDayButtons();
+        function InitializeWeekDayButtons()
+        {
+            for (var i = 0; i < WeekDayButtons.length; i++)
+            {
+                var meButton = WeekDayButtons[i];
+                if (meButton.WeekDayButton.parentElement!=null)
+                {
+                    (meButton.WeekDayButton.parentElement.removeChild(meButton.WeekDayButton))
+                    meButton.WeekDayButton = null;;
+                }
+                //WeekDayButtons.push(meButton);
+            }
+            WeekDayButtons = [];
+            for (var i = 0; i < WeekDays.length; i++) {
+                var meButton = { WeekDayButton: new WeekDayButton(i), UIElement: null };
+                WeekDayButtons.push(meButton);
+            }
+        }
+        
+        function generateWeekDayButton()
+        {
+            var RestrictiveWeekDayButtonContainer = getDomOrCreateNew("RestrictiveWeekDayButtonContainer");
+            $(RestrictiveWeekDayButtonContainer).empty();
+            RestrictiveWeekControl.RestrictionWeekDayContainer.appendChild(RestrictiveWeekDayButtonContainer);
+            var RestrictiveWeekDayButtonInputContainer = getDomOrCreateNew("RestrictiveWeekDayButtonInputContainer")
+            RestrictiveWeekControl.RestrictionWeekDayContainer.appendChild(RestrictiveWeekDayButtonInputContainer);
+            InitializeWeekDayButtons();
+
+
+            function OnSelectWeekDayButton(index, isSelected)
+            {
+                var ButtonMe = WeekDayButtons[index].WeekDayButton;
+                if (isSelected)
+                {
+                    ButtonMe.enableInputs();
+                }
+                else
+                {
+                    ButtonMe.disableInputs();
+                    ButtonMe.reset();
+                }
+            }
+            var weekButtons = generateDayOfWeekRepetitionDom(OnSelectWeekDayButton);
+            if (RestrictiveWeekControl.RestrictionWeekDayContainer.status) {
+                $(RestrictiveWeekControl.RestrictionWeekDayContainer).empty();
+            }
+            
+            function genreateWeekInputConainer()
+            {
+                for (var i= 0 ; i<WeekDayButtons.length;i++)
+                {
+                    //debugger;
+                    var RestrictedWeekdayInputContainer = getDomOrCreateNew("RestrictedWeekdayInputContainer" + i);
+                    $(RestrictedWeekdayInputContainer).addClass("RestrictedWeekdayInputContainer");
+                    var StartRestrictedWeekdayInputContainer = getDomOrCreateNew("StartRestrictedWeekdayInputContainer" + i);
+                    $(StartRestrictedWeekdayInputContainer).addClass("TimeRestrictedWeekdayInputContainer");
+                    var StartRestrictedWeekdayInputContainerInput = getDomOrCreateNew("StartRestrictedWeekdayInputContainerInput" + i);
+                    $(StartRestrictedWeekdayInputContainerInput).addClass("StartRestrictedWeekdayInputContainerInput");
+                    $(StartRestrictedWeekdayInputContainerInput).addClass("RestrictedWeekdayInputContainerInput");
+                    var StartRestrictedWeekdayInput = getDomOrCreateNew("StartRestrictedWeekdayInput" + i,"input");
+                    $(StartRestrictedWeekdayInput).addClass("StartRestrictedWeekdayInput");
+                    StartRestrictedWeekdayInputContainerInput.appendChild(StartRestrictedWeekdayInput);
+                    StartRestrictedWeekdayInput.setAttribute("placeholder", "Start");;
+                    StartRestrictedWeekdayInput.disabled = true;
+                    BindTimePicker(StartRestrictedWeekdayInput);
+
+                    var EndRestrictedWeekdayInputContainer = getDomOrCreateNew("EndRestrictedWeekdayInputContainer" + i);
+                    $(EndRestrictedWeekdayInputContainer).addClass("TimeRestrictedWeekdayInputContainer");
+                    var EndRestrictedWeekdayInputContainerInput = getDomOrCreateNew("EndRestrictedWeekdayInputContainerInput" + i);
+                    $(EndRestrictedWeekdayInputContainerInput).addClass("EndRestrictedWeekdayInputContainerInput");
+                    $(EndRestrictedWeekdayInputContainerInput).addClass("RestrictedWeekdayInputContainerInput");
+                    var EndRestrictedWeekdayInput = getDomOrCreateNew("EndRestrictedWeekdayInput" + i, "input");
+                    EndRestrictedWeekdayInput.setAttribute("placeholder", "End");
+                    EndRestrictedWeekdayInput.disabled = true;
+                    $(EndRestrictedWeekdayInput).addClass("EndRestrictedWeekdayInput");
+                    EndRestrictedWeekdayInputContainerInput.appendChild(EndRestrictedWeekdayInput);
+                    BindTimePicker(EndRestrictedWeekdayInput);
+                    
+
+
+
+
+                    EndRestrictedWeekdayInputContainer.appendChild(EndRestrictedWeekdayInputContainerInput);
+                    StartRestrictedWeekdayInputContainer.appendChild(StartRestrictedWeekdayInputContainerInput);
+
+
+
+                    RestrictedWeekdayInputContainer.appendChild(StartRestrictedWeekdayInputContainer);
+                    RestrictedWeekdayInputContainer.appendChild(EndRestrictedWeekdayInputContainer);
+
+                    $(RestrictedWeekdayInputContainer).addClass("RestrictedWeekdayInputContainer");
+                    $(StartRestrictedWeekdayInputContainer).addClass("StartRestrictedWeekdayInputContainer");
+                    $(EndRestrictedWeekdayInputContainer).addClass("EndRestrictedWeekdayInputContainer");
+                    RestrictiveWeekDayButtonInputContainer.appendChild(RestrictedWeekdayInputContainer);
+
+                    WeekDayButtons[i].WeekDayButton.setStartDom(StartRestrictedWeekdayInput);
+                    WeekDayButtons[i].WeekDayButton.setEndDom(EndRestrictedWeekdayInput)
+                }
+            }
+
+            for (var i = 0; i < weekButtons.AllDoms.length; i++)
+            {
+                var UIElement = weekButtons.AllDoms[i];
+                RestrictiveWeekDayButtonContainer.Dom.appendChild(UIElement.Dom);
+                WeekDayButtons[UIElement.DayOfWeekIndex].UIElement = UIElement;
+            }
+
+
+            //weekButtons.AllDoms.forEach(function (eachDom) {  });
+            var ContainerDom = TimeRestrictionSlider.getContainer()
+            ContainerDom.appendChild(RestrictiveWeekControl.RestrictionWeekDayContainer);
+            genreateWeekInputConainer();
+            weekButtons.RevealDayOfWeek();
+            isEnabled = true;
+        }
+
+        function hideWeekDayButtons() {
+            //debugger;
+            InitializeWeekDayButtons();
+            var RestrictionWeekDayContainer = RestrictiveWeekControl.RestrictionWeekDayContainer;
+
+            $(RestrictionWeekDayContainer).empty();
+            if (RestrictionWeekDayContainer.Dom.parentElement != null) {
+                (RestrictionWeekDayContainer.Dom.parentElement.removeChild(RestrictionWeekDayContainer.Dom));
+            }
+
+            isEnabled = false;
+        }
+
+        function getPostData()
+        {
+            var RetValue = {isEnabled:isEnabled, WeekDayOption:[]}
+            if (isEnabled)
+            {
+                for (var i = 0; i < WeekDayButtons.length; i++)
+                {
+                    var meButton = WeekDayButtons[i].WeekDayButton;
+                    if (meButton.isInitialized()) {
+                        RetValue.WeekDayOption.push(meButton.getPostData());
+                    }
+                }
+            }
+
+            return RetValue;
+        }
+
+        function getWeekDayButton(Index)
+        {
+            var RetValue= WeekDayButtons[Index];
+            return RetValue;
+        }
+
+
+        this.getWeekDayButton = getWeekDayButton;
+        this.getPostData = getPostData;
+        this.showWeekDayButtons = generateWeekDayButton;
+        this.hideWeekDayButtons = hideWeekDayButtons;
+    }
+
+    RestrictiveWeekControl.RestrictionWeekDayContainer = getDomOrCreateNew("RestrictionWeekDayContainer");
+
+    var RestrictiveWeek = new RestrictiveWeekControl();
+
+    function DisableWeekDay()
+    {
+        RestrictiveWeek.hideWeekDayButtons();
+        WeekDayCheckBox.checked = false;
+    }
+
+    TimeRestrictionSlider.getRestirctionPostData = function () { return RestrictiveWeek.getPostData();}
 
     TimeRestrictionSlider.getStart= function()
     {
@@ -968,8 +1492,29 @@ function cleanUpTimeRestriction(TimeRestrictionSlider)
         var retValue = WorkDayCheckBox.checked;
         return retValue;
     }
-    
+    TimeRestrictionSlider.isEveryDay = function ()
+    {
+        var retValue = EveryDayCheckBox.checked;
+        return retValue;
+    }
 
+    
+    TimeRestrictionSlider.getRestrictiveWeek = function () { return RestrictiveWeek ;};
+    
+    TimeRestrictionSlider.EnableEveryDayCheckBox = function () {
+        EveryDayCheckBox.checked = true;
+        onEverydayCheckBoxChange();
+    }
+
+    TimeRestrictionSlider.EnableWorkDayCheckBox = function () {
+        WorkDayCheckBox.checked = true;
+        onCheckBoxChange();
+    }
+
+    TimeRestrictionSlider.EnableWeekDayCheckBox = function () {
+        WeekDayCheckBox.checked = true;
+        onWeekDayCheckboxClick();
+    }
     
 }
 
@@ -1106,11 +1651,17 @@ function generateTimeRestriction()
 {
     var StartTime = { LabelBefore: "Start Time" };
     var EndTime = { LabelBefore: "End Time" };
-    var WorkDays = { LabelAfter: "Work days and Work Hours", DoNothing: true, InputType: "checkbox" };
+    var WorkDays = { LabelAfter: "Only Work days and Work Hours", DoNothing: true, InputType: "checkbox" };
+    var Everyday = { LabelAfter: "Everyday", DoNothing: true, InputType: "checkbox" };
+    var Weekdays = { LabelAfter: "Show Weekdays", DoNothing: true, InputType: "checkbox" };
     var ButtonElements = [];
+    ButtonElements.push(Everyday);
+    ButtonElements.push(WorkDays);
+    ButtonElements.push(Weekdays);
     ButtonElements.push(StartTime);
     ButtonElements.push(EndTime);
-    ButtonElements.push(WorkDays);
+    
+    
     var InActiveMessage = "Time Restrictions? Currently: No";
     var ActiveMessage = "Time Of Day Resrictions";
     var RetValue = { InActiveMessage: InActiveMessage, ActiveMessage: ActiveMessage, ButtonElements: ButtonElements }
@@ -1332,6 +1883,21 @@ function AddTiledEvent()
         },DefaultText: "Task"
     };
 
+
+
+    function DayOfTheWeekControl()
+    {
+        function DisplayDaysOfTheWeek()
+        {
+
+        }
+
+        function ButtonClickCallBack()
+        {
+
+        }
+    }
+
     /*
     Function handles the call back for the autoSuggest Box of location
     */
@@ -1461,7 +2027,8 @@ function AddTiledEvent()
             CombinedData.AllData.splice(0, CombinedData.AllData.length);
             CombinedData.Index = -1;
             $(combinedCallBack.DomContainer).empty();
-            LocationAutoSuggestControl.clear();
+            //LocationAutoSuggestControl.clear();
+            LocationAutoSuggestControl.HideContainer();
         }
 
         combinedCallBack.clearData=function()
@@ -1605,6 +2172,7 @@ function AddTiledEvent()
                     location: defaultLocation,
                     radius: 50,
                     query: dataInput
+                    //query: "vectra bank"
                 };
 
                 var service = new google.maps.places.PlacesService(DomContainer);
@@ -1649,6 +2217,7 @@ function AddTiledEvent()
 
             function generateDomForEach(LocationData)//, Index)
             {
+                var RestrictiveWeekSlider = TimeRestrictionSlider;
                 var TagSpan = getDomOrCreateNew(("GoogleTagSpan" + resolveEachRetrievedEvent.ID), "span");
                 TagSpan.innerHTML = LocationData.name + " &mdash; ";
 
@@ -1690,9 +2259,48 @@ function AddTiledEvent()
                     LocationAutoSuggestControl.HideContainer();
                     NickNameSlider.turnOnSlide();
                     //debugger
-                    var NickElements = NickNameSlider.getAllElements()
+                    var NickElements = NickNameSlider.getAllElements();
+                    getBusinessHourData(LocationData);
                     NickElements[0].TileInput.getInputDom().value = LocationData.name;
                     setTimeout(function () { InputBox.focus(), 200 });
+                }
+
+                function getBusinessHourData(LocationData)
+                {
+                    debugger;
+                    var request = {
+                        placeId: LocationData.place_id
+                    };
+                    var service = new google.maps.places.PlacesService(DomContainer);
+                    service.getDetails(request, LocationUpdateCallBack);
+                    function LocationUpdateCallBack(place, status)
+                    {
+                        if (status == google.maps.places.PlacesServiceStatus.OK) {
+                            var RestrictedTimeData = generateOfficeHours(place);
+                            if((!RestrictedTimeData.IsTwentyFourHours)&&(!RestrictedTimeData.NoWeekData))
+                            {
+                                RestrictiveWeekSlider .turnOnSlide();
+                                RestrictiveWeekSlider.EnableWeekDayCheckBox();
+                                var RestrictiveWeek = RestrictiveWeekSlider.getRestrictiveWeek();
+                                for (var i=0;i<RestrictedTimeData.WeekDayData.length;i++)
+                                {
+                                    var myDay = RestrictedTimeData.WeekDayData[i];
+                                    if (!myDay.IsClosed)
+                                    {
+                                        var myButton = RestrictiveWeek.getWeekDayButton(myDay.DayIndex);
+                                        var Start = myDay.Start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                                        var End = myDay.End.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                                        myButton.UIElement.TurnOnButton();
+                                        myButton.WeekDayButton.getStartDom().value = Start;
+                                        myButton.WeekDayButton.setStart(Start);
+                                        myButton.WeekDayButton.getEndDom().value = End;
+                                        myButton.WeekDayButton.setEnd(End);
+                                    }
+                                }
+                                setTimeout(function () { InputCOntainer.focus(); });//need to return focus to auto suggest input box. After selecting element system seems to shift focus to checkbox. 
+                            }
+                        }
+                    }
                 }
 
                 function InsertIntoInput() {
@@ -1703,6 +2311,8 @@ function AddTiledEvent()
             }
             generateDomForEach.CurrentHover = null;
         }
+
+        
 
         function positionSearchResultContainer()
         {
@@ -1992,6 +2602,7 @@ function AddTiledEvent()
 
     function peekData()
     {
+        debugger;
         var Splits = RepetionSlider.getAllElements()[0].TileInput;
         var RepetionChoice = RepetionSlider.getAllElements()[1].TileInput;
         var myColor = ColorPicker.Selector.getColor();
@@ -3327,75 +3938,7 @@ function createCalEventRecurrence()
     createDomEnablingFunction(AllDoms[3], 3, RecurrenceTabContent, DaysOfTheWeekContainer, DaysOfTheWeek.RevealDayOfWeek)();//defaults call to yearly
 
 
-    function generateDayOfWeekRepetitionDom() {
-        var i = 0;
-        var AllDoms = new Array();
-        for (i = 0; i < WeekDays.length; i++) {
-            AllDoms.push(createDoms(WeekDays[i], i));
-        }
-
-        var retValue = { AllDoms: AllDoms, RevealDayOfWeek: createRevealFunction(AllDoms) };
-
-        function createDoms(DayOfWeek, index) {
-            var DayDomID = DayOfWeek + "Recurrence";
-            var DayDom = getDomOrCreateNew(DayDomID, "span");
-
-            //DayDom.Dom.innerHTML = "<p class=\"DayOfWeekLetter\">" + DayOfWeek[0] + "</p>";
-            DayDom.Dom.innerHTML = DayOfWeek[0];
-            DayDom.DayOfWeekIndex = index;
-            DayDom.Dom.style.left = ((index * 14.29) + (14.29 / 2)) + "%";
-            DayDom.setAttribute('tabindex', 0)
-            DayDom.onkeypress = keyEntry
-            $(DayDom.Dom).addClass("DayofWeekCircle");
-            DayDom.status = 0;
-            $(DayDom.Dom).click(generateFunctionForSelectedDayofWeek(DayDom));
-            generateFunctionForSelectedDayofWeek(DayDom);
-            function generateFunctionForSelectedDayofWeek(DayDom) {
-                return function () {
-                    DayDom.status += 1;
-                    DayDom.status %= 2;
-                    switch (DayDom.status) {
-                        case 0:
-                            {
-                                $(DayDom.Dom).removeClass("SelectedDayOfWeek");
-                                $(DayDom.Dom).addClass("deSelectedDayOfWeek");
-                            }
-                            break;
-                        case 1:
-                            {
-                                $(DayDom.Dom).removeClass("deSelectedDayOfWeek");
-                                $(DayDom.Dom).addClass("SelectedDayOfWeek");
-                            }
-                            break;
-                    }
-                }
-            }
-
-
-            function keyEntry(e)
-            {
-                if (e.which == 32) {
-                    $(e.target).trigger("click");
-                    return;
-                }
-            }
-            return DayDom;
-        }
-
-
-        function createRevealFunction(AllDoms) {//creates function that slowly displays the day of the week circles
-            return function () {
-                var i = 0;
-                AllDoms.forEach(function (myDom) {
-                    setTimeout(function () { myDom.Dom.style.opacity = 1; myDom.Dom.style.top = "0px"; }, i * 200);
-                }
-                )
-            }
-        }
-
-        return retValue;
-    }
-
+    
 
 
     
@@ -3441,3 +3984,108 @@ function createCalEventRecurrence()
 
     return retValue;
 }
+
+
+function generateDayOfWeekRepetitionDom(CallBack) {
+    var i = 0;
+    var AllDoms = new Array();
+    for (i = 0; i < WeekDays.length; i++) {
+        AllDoms.push(createDoms(WeekDays[i], i));
+    }
+
+    var retValue = { AllDoms: AllDoms, RevealDayOfWeek: createRevealFunction(AllDoms) };
+
+    function createDoms(DayOfWeek, index) {
+        var DayDomID = DayOfWeek + "Recurrence" + generateDayOfWeekRepetitionDom.ID++;
+        var DayDom = getDomOrCreateNew(DayDomID, "span");
+
+        //DayDom.Dom.innerHTML = "<p class=\"DayOfWeekLetter\">" + DayOfWeek[0] + "</p>";
+        DayDom.Dom.innerHTML = DayOfWeek[0];
+        DayDom.DayOfWeekIndex = index;
+        DayDom.Dom.style.left = ((index * 14.29) + (14.29 / 2)) + "%";
+        DayDom.setAttribute('tabindex', 0)
+        DayDom.onkeypress = keyEntry
+        $(DayDom.Dom).addClass("DayofWeekCircle");
+        DayDom.status = 0;
+        $(DayDom.Dom).click(generateFunctionForSelectedDayofWeek(DayDom));
+        generateFunctionForSelectedDayofWeek(DayDom);
+        function generateFunctionForSelectedDayofWeek(DayDom) {
+
+            /*
+            DayDom.onfocus=function()
+            {
+                $(DayDom.Dom).addClass("DayofWeekCircle:hover");
+            }
+            DayDom.onblur =function()
+            {
+                $(DayDom.Dom).removeClass("DayofWeekCircle:hover");
+            }
+            */
+
+            function TurnOffButton ()
+            {
+                DayDom.status = 0;
+                $(DayDom.Dom).removeClass("SelectedDayOfWeek");
+                $(DayDom.Dom).addClass("deSelectedDayOfWeek");
+                if (CallBack) {
+                    CallBack(index, DayDom.status);
+                }
+            }
+
+            function TurnOnButton() {
+                DayDom.status = 1;
+                $(DayDom.Dom).removeClass("deSelectedDayOfWeek");
+                $(DayDom.Dom).addClass("SelectedDayOfWeek");
+                if (CallBack) {
+                    CallBack(index, DayDom.status);
+                }
+            }
+
+            DayDom.TurnOnButton=TurnOnButton;
+            DayDom.TurnOffButton = TurnOffButton;
+
+            function clickTrigger ()
+            {
+                DayDom.status += 1;
+                DayDom.status %= 2;
+                switch (DayDom.status) {
+                    case 0:
+                        {
+                            TurnOffButton();
+                        }
+                        break;
+                    case 1:
+                        {
+                            TurnOnButton();
+                        }
+                        break;
+                }
+            }
+
+            return clickTrigger
+        }
+
+
+        function keyEntry(e) {
+            if (e.which == 32) {
+                $(e.target).trigger("click");
+                return;
+            }
+        }
+        return DayDom;
+    }
+
+    function createRevealFunction(AllDoms) {//creates function that slowly displays the day of the week circles
+        return function () {
+            var i = 0;
+            AllDoms.forEach(function (myDom) {
+                setTimeout(function () { myDom.Dom.style.opacity = 1; myDom.Dom.style.top = "0px"; }, i * 200);
+            }
+            )
+        }
+    }
+
+    return retValue;
+}
+
+generateDayOfWeekRepetitionDom.ID = 0;

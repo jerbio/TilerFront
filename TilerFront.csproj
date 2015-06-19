@@ -388,6 +388,7 @@
     <Compile Include="Models\ProcrastinateModel.cs" />
     <Compile Include="Models\ProcrastinateSubEventModel.cs" />
     <Compile Include="Models\IndexedThirdPartyAuthentication.cs" />
+    <Compile Include="Models\RestrictionWeekConfig.cs" />
     <Compile Include="Models\ThirdPartyCalendarAuthenticationModel.cs" />
     <Compile Include="Models\TimeDuration.cs" />
     <Compile Include="Models\TimeLine_Client.cs" />

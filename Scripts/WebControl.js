@@ -1,6 +1,6 @@
 ﻿"use strict"
 var DisableRegistration = false;
-var Debug = true;
+var Debug = false;
 var DebugLocal = false;
 
 //var global_refTIlerUrl = "http://localhost:53201/api/";
@@ -165,6 +165,7 @@ function getLocation() {
     }
 
 }
+
 
 function removeElement(id)
 {
@@ -1694,6 +1695,8 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
         var RestrictionStart = "12:00am"
         var RestrictionEnd = "12:00am"
         var isWorkWeek = false;
+        var isEveryDay = false;
+        var RestrictiveWeek = RestrictionData.RestrictiveWeek;
 
         if ((RestrictionData != null)&&(!rigidFlag))
         {
@@ -1703,6 +1706,8 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
                 RestrictionStart = RestrictionData.Start;
                 RestrictionEnd = RestrictionData.End;
                 isWorkWeek = RestrictionData.isWorkWeek;
+                isEveryDay = RestrictionData.isEveryDay;
+                //RestrictiveWeek = RestrictionData.RestrictiveWeek;
             }
         }
 
@@ -1711,6 +1716,8 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
         this.RestrictionStart = RestrictionStart;
         this.RestrictionEnd = RestrictionEnd;
         this.isWorkWeek = isWorkWeek;
+        this.isEveryDay = isEveryDay;
+        this.RestrictiveWeek = RestrictiveWeek;
 
         this.RepeatData = eventRepeatData;
         var RepeatType = "";
@@ -1943,7 +1950,16 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
     }
     LoadingScreenControl.Counter = 0;
 
+/*
+*Creates an auto suggest Control Object.
+*Full URI to get to desired resource
+*Method Restful api request, POST,PUT, GET, DELETE, Defaults to POST
+*GenerateEachDomCallBack: CallBack after response has been received. Callback is also passed the response data
+*UserInputBox: Input Box DOM Element. If Null/undefined, Autosuggestcontrol creates one. This has to be an input box.
+*IsNotTilerEndPoint: boolean flag to check if data expected is formated from a tile endpoint
+*DataStructure: Extra data element needed sending autosuggestion request
 
+*/
     function AutoSuggestControl(Url,Method, GenerateEachDomCallBack, UserInputBox,IsNotTilerEndPoint,DataStructure)
     {
         var myID = AutoSuggestControl.Counter++;
@@ -1996,11 +2012,15 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
             return myID;
         }
 
+
+        /*
+        Function emmpties the Dom element containing the list of returned values. It also sets the content status to false;
+        */
         var clear = function () {
             //debugger;
             if (InputBarContainer.Dom.parentNode != null) {
                 $(InputBarContainer.Dom).empty();
-                InputBarContainer.Dom.parentNode.removeChild(InputBarContainer.Dom);
+                //InputBarContainer.Dom.parentNode.removeChild(InputBarContainer.Dom);
             }
             IsContentOn = false;
         }

@@ -8,7 +8,7 @@ var global_RangeMultiplier = 5;//range for number of weeks to be specified for c
 var global_CurrentRange;
 var global_ClearRefreshDataInterval = 0;
 var global_ColorAugmentation = 0;
-var refreshCounter = 10000;
+var refreshCounter = 0;
 var global_refreshDataInterval = 45000;
 var global_multiSelect;
 var global_ControlPanelIconSet = new IconSet();
@@ -1602,7 +1602,7 @@ getRefreshedData.enableDataRefresh = function (pullLatest)
             global_DictionaryOfSubEvents = {};
             DataContainer.Data = NewData;
             var PerformanceEnd = new Date();
-            console.log("Processing Data From Back End" + (PerformanceEnd - PerformanceStart));
+            //console.log("Processing Data From Back End" + (PerformanceEnd - PerformanceStart));
         }
 
     }
@@ -1682,7 +1682,7 @@ getRefreshedData.enableDataRefresh = function (pullLatest)
         var PerformanceEnd = new Date();
 
 
-        console.log("Marking as false took " + (PerformanceEnd - PerformanceStart));
+        //console.log("Marking as false took " + (PerformanceEnd - PerformanceStart));
 
         PerformanceStart = new Date();
         TotalSubEventList.forEach(
@@ -1696,7 +1696,7 @@ getRefreshedData.enableDataRefresh = function (pullLatest)
                 global_DictionaryOfSubEvents[subEvent.ID].AllCallBacks = new Array();
             });
         PerformanceEnd = new Date();
-        console.log("Processing TotalSubEventList " + (PerformanceEnd - PerformanceStart));
+        //console.log("Processing TotalSubEventList " + (PerformanceEnd - PerformanceStart));
 
 
         PerformanceStart = new Date();
@@ -1723,7 +1723,7 @@ getRefreshedData.enableDataRefresh = function (pullLatest)
 
 
         PerformanceEnd = new Date();
-        console.log("Removing elements from DOM " + (PerformanceEnd - PerformanceStart));
+//        console.log("Removing elements from DOM " + (PerformanceEnd - PerformanceStart));
 
         PerformanceStart = new Date();
         RangeData.forEach(
@@ -1745,7 +1745,7 @@ getRefreshedData.enableDataRefresh = function (pullLatest)
                 });
             });
         PerformanceEnd = new Date();
-        console.log("Place SubEvents in expected weeks " + (PerformanceEnd - PerformanceStart));
+        //console.log("Place SubEvents in expected weeks " + (PerformanceEnd - PerformanceStart));
 
         global_CurrentWeekArrangedData = RangeData;
 
@@ -1754,7 +1754,7 @@ getRefreshedData.enableDataRefresh = function (pullLatest)
         PerformanceStart = new Date();
         TriggerWeekUIupdate(global_CurrentWeekArrangedData);
         PerformanceEnd = new Date();
-        console.log("TriggerUI motion " + (PerformanceEnd - PerformanceStart));
+        //console.log("TriggerUI motion " + (PerformanceEnd - PerformanceStart));
         
         /*
         RangeData.forEach(
