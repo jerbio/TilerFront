@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using TilerElements;
 
 namespace TilerFront.Models
 {
@@ -112,7 +113,51 @@ namespace TilerFront.Models
         /// <summary>
         /// is the restrcition to be for only work week.
         /// </summary>
-        public string isWorkWeek {get;set;} 
+        public string isWorkWeek {get;set;}
+        public string isEveryDay { get; set; }
+        public RestrictionWeekConfig RestrictiveWeek { get; set; }
+
+        public RestrictionProfile getRestrictionProfile()
+        {
+            bool EveryDayFlag = Boolean.Parse(isEveryDay);
+            bool WorkWeek = Boolean.Parse(isWorkWeek);
+            DateTimeOffset myNow = DateTimeOffset.UtcNow;;
+            DateTimeOffset RestrictStart = new DateTimeOffset(myNow.Year, myNow.Month, myNow.Day, 0,0, 0,new TimeSpan());
+            RestrictStart = RestrictStart.Add(-getTImeSpan);
+            DateTimeOffset RestrictEnd = RestrictStart.AddSeconds(-1);
+            RestrictionProfile retValue;
+            DayOfWeek[] selectedDaysOftheweek = { };
+            if(EveryDayFlag||WorkWeek)
+            {
+                if ((DateTimeOffset.TryParse(RestrictionStart, out RestrictStart)) && ((DateTimeOffset.TryParse(RestrictionEnd, out RestrictEnd))))
+                {
+                    RestrictStart = RestrictStart.Add(getTImeSpan);
+                    RestrictEnd = RestrictEnd.Add(getTImeSpan);
+                    selectedDaysOftheweek = RestrictionProfile.AllDaysOfWeek.ToArray();
+                    if (WorkWeek)
+                    {
+                        retValue = new RestrictionProfile(7, DayOfWeek.Monday, RestrictStart, RestrictEnd);
+                    }
+                    else
+                    {
+
+                        RestrictionTimeLine RestrictionTimeLine = new TilerElements.RestrictionTimeLine(RestrictStart, RestrictEnd);
+                        retValue = new RestrictionProfile(selectedDaysOftheweek, RestrictionTimeLine);
+                    }
+                    return retValue;
+                }
+                else
+                {
+                    retValue = null;
+                }
+            }
+
+
+            retValue = RestrictiveWeek.getRestriction(getTImeSpan);
+
+            
+            return retValue;
+        }
         
     }
 }

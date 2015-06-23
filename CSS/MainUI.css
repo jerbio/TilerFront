@@ -894,7 +894,7 @@ input
 
 .TimeInput 
 {
-    width:5em;
+    width:5em !important;
 }
 
 .setAsDisplayNone 

@@ -166,7 +166,9 @@ namespace TilerFront.Controllers
                             await googleControl.updateSubEvent(myUser).ConfigureAwait(false);
                             Dictionary<string, CalendarEvent> AllCalendarEvents = (await googleControl.getCalendarEvents().ConfigureAwait(false)).ToDictionary(obj => obj.ID, obj => obj);
                             GoogleThirdPartyControl googleEvents = new GoogleThirdPartyControl(AllCalendarEvents);
-                            await NewSchedule.updateDataSetWithThirdPartyDataAndTriggerNewAddition(googleEvents).ConfigureAwait(false);
+
+                            
+                            await NewSchedule.updateDataSetWithThirdPartyDataAndTriggerNewAddition(new Tuple<ThirdPartyControl.CalendarTool, IEnumerable<CalendarEvent>>(ThirdPartyControl.CalendarTool.Google, new List<CalendarEvent> { googleEvents.getThirdpartyCalendarEvent() })).ConfigureAwait(false);
 
                             retValue = new PostBackData("\"Success\"", 0);
                         }

@@ -639,3 +639,70 @@ input:focus:-ms-input-placeholder { color:rgba(0,0,0, 0.2); }
 {
     background-color:yellow !important;
 }
+
+
+#RestrictionWeekDayContainer
+{
+  width: 406px;
+  height: 100px;
+  left: 50%;
+  margin-left: -203px;
+  position: relative;
+}
+
+#RestrictiveWeekDayButtonInputContainer{
+    width:100%;
+    height:50px;
+    position:relative;
+}
+
+.RestrictedWeekdayInputContainer
+{
+    width:calc(100%/7);
+    height:100%;
+    box-sizing:border-box;
+    position:relative;
+    display:inline-block;
+}
+
+.TimeRestrictedWeekdayInputContainer
+{
+    width:100%;
+    height:50%;
+    box-sizing:border-box;
+    position:relative;
+    display:block;
+}
+
+#RestrictionWeekDayContainer input
+{
+  width: 80%;
+  left: 10%;
+  height: 80%;
+  top: 10%;
+  position: absolute;
+  font-size: 0.7em;
+  padding: 0;
+  max-width:100%;
+  text-align: center;
+}
+.RestrictedWeekdayInputContainerInput{
+    position:absolute;
+    height:100%;
+    width:100%;
+}
+
+
+#StartEndInutContainer
+{
+    padding-left:53px;
+}
+
+.DayofWeekCircle:hover{
+    background-color: rgb(200,200,200);
+}
+
+.DayofWeekCircle:focus
+{
+    background-color: rgb(200,200,200);
+}

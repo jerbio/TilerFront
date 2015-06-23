@@ -253,7 +253,8 @@ namespace TilerFront.Controllers
 
             Tuple<List<GoogleTilerEventControl>, GoogleThirdPartyControl> GoogleEvents = await GoogleTilerEventControl.getThirdPartyControlForIndex(AllGoogleTilerEvents).ConfigureAwait(false);
             Task DeleteInvalidAuthentication = ManageController.delelteGoogleAuthentication(GoogleEvents.Item1.Select(obj => obj.getDBAuthenticationData()));
-            mySchedule.updateDataSetWithThirdPartyData(GoogleEvents.Item2);
+            mySchedule.updateDataSetWithThirdPartyData(new Tuple<ThirdPartyControl.CalendarTool, IEnumerable<CalendarEvent>>(ThirdPartyControl.CalendarTool.Google,new List<CalendarEvent> {GoogleEvents.Item2.getThirdpartyCalendarEvent()}));
+            //mySchedule.updateDataSetWithThirdPartyData(new Tuple<ThirdPartyControl.CalendarTool.Google, GoogleEvents.Item2.);
             await DeleteInvalidAuthentication.ConfigureAwait(false);
         }
 
@@ -704,7 +705,8 @@ namespace TilerFront.Controllers
                 
 
                 CalendarEvent newCalendarEvent;
-                if(restrictionFlag )
+                RestrictionProfile myRestrictionProfile = newEvent.getRestrictionProfile();
+                if (myRestrictionProfile != null)
                 {
                     string TimeString = StartDateEntry.Date.ToShortDateString() + " " + StartTime;
                     DateTimeOffset StartDateTime = DateTimeOffset.Parse(TimeString).UtcDateTime; ;
@@ -714,7 +716,7 @@ namespace TilerFront.Controllers
                     EndDateTime = EndDateTime.Add(newEvent.getTImeSpan);
 
 
-                    RestrictionProfile myRestrictionProfile = CreateRestrictionProfile(newEvent.RestrictionStart, newEvent.RestrictionEnd, newEvent.isWorkWeek, newEvent.getTImeSpan);
+                    //RestrictionProfile myRestrictionProfile = CreateRestrictionProfile(newEvent.RestrictionStart, newEvent.RestrictionEnd, newEvent.isWorkWeek, newEvent.getTImeSpan);
                     newCalendarEvent = new CalendarEventRestricted(Name, StartDateTime, EndDateTime, myRestrictionProfile, TimeSpan.Parse(EventDuration), MyRepetition, false, true, Convert.ToInt32(Count), RigidScheduleFlag, new Location_Elements(), new TimeSpan(0, 15, 0), new TimeSpan(0, 15, 0), new EventDisplay(true, userColor, userColor.User < 1 ? 0 : 1), new MiscData());
                 }
                 else
@@ -945,7 +947,8 @@ namespace TilerFront.Controllers
                 await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, myUser.UserID).ConfigureAwait(false);
 
                 CalendarEvent newCalendarEvent;
-                if (restrictionFlag)
+                RestrictionProfile myRestrictionProfile = newEvent.getRestrictionProfile();
+                if (myRestrictionProfile!=null)
                 {
                     string TimeString = StartDateEntry.Date.ToShortDateString() + " " + StartTime;
                     DateTimeOffset StartDateTime = DateTimeOffset.Parse(TimeString).UtcDateTime; ;
@@ -955,7 +958,7 @@ namespace TilerFront.Controllers
                     EndDateTime = EndDateTime.Add(newEvent.getTImeSpan);
 
 
-                    RestrictionProfile myRestrictionProfile = CreateRestrictionProfile(newEvent.RestrictionStart, newEvent.RestrictionEnd, newEvent.isWorkWeek, newEvent.getTImeSpan);
+                    // CreateRestrictionProfile(newEvent.RestrictionStart, newEvent.RestrictionEnd, newEvent.isWorkWeek, newEvent.getTImeSpan);
                     newCalendarEvent = new CalendarEventRestricted(Name, StartDateTime, EndDateTime, myRestrictionProfile, TimeSpan.Parse(EventDuration), MyRepetition, false, true, Convert.ToInt32(Count), RigidScheduleFlag, new Location_Elements(), new TimeSpan(0, 15, 0), new TimeSpan(0, 15, 0), new EventDisplay(true, userColor, userColor.User < 1 ? 0 : 1), new MiscData());
                 }
                 else
@@ -1013,6 +1016,7 @@ namespace TilerFront.Controllers
         /// <param name="DaySelection"></param>
         /// <returns></returns>
         [ApiExplorerSettings(IgnoreApi = true)]
+        /*
         RestrictionProfile CreateRestrictionProfile(string Start, string End,string workWeek,TimeSpan TimeZoneOffSet ,string DaySelection="")
         { 
             DateTimeOffset RestrictStart = DateTimeOffset.Parse(Start).UtcDateTime;
@@ -1053,7 +1057,7 @@ namespace TilerFront.Controllers
             }
             return retValue;
         }
-        
+        */
 
         protected override void Dispose(bool disposing)
         {
