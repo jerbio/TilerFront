@@ -1,0 +1,20 @@
+{
+  "manifest_version": 2,
+
+  "name": "Tiler Mobile",
+  "description": "This extension launches quick access to tiler",
+  "version": "1.0",
+
+  "browser_action": {
+    "default_icon": "icon.png",
+    "default_popup": "LoggedInUser.html"
+  },
+  "permissions": [
+    "activeTab",
+	"http://yui.yahooapis.com/3.17.2/build/yui/yui-min.js",
+    "https://ajax.googleapis.com/",
+	"https://code.jquery.com/*",
+	"https://cdn.jtsage.com/*"
+  ],
+  "content_security_policy": "script-src 'self' 'unsafe-eval' https://*.jquery.com https://localhost:44305; object-src 'self'"
+}
