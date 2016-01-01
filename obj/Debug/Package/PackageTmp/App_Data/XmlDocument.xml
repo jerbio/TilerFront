@@ -688,6 +688,49 @@
             Returns true if this request is from local
             </summary>
         </member>
+        <member name="M:TilerFront.Controllers.CalendarEventController.GetCalEvent(System.String,TilerFront.Models.AuthorizedUser)">
+            <summary>
+            Retrieve a calendar event by the ID, and registered user account
+            </summary>
+            <param name="id"></param>
+            <param name="myUser"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.Controllers.CalendarEventController.CalEventName(TilerFront.Models.NameSearchModel)">
+            <summary>
+            Look up a calendar event by name
+            </summary>
+            <param name="myUser"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.Controllers.CalendarEventController.DeleteCalEvent(TilerFront.Models.getEventModel)">
+            <summary>
+            Deletes a calendar event.
+            </summary>
+            <param name="myUser"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.Controllers.CalendarEventController.CompleteCalEvent(TilerFront.Models.getEventModel)">
+            <summary>
+            MArks the whole calendar event as complete.
+            </summary>
+            <param name="myUser"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.Controllers.CalendarEventController.Now(TilerFront.Models.NowEventModel)">
+            <summary>
+            Sets the earleiest valid sub event to current time. Essentially, makes the event have a start time of now.
+            </summary>
+            <param name="myUser"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.Controllers.CalendarEventController.UpdateCalEvent(TilerFront.Models.EditCalEventModel)">
+            <summary>
+            Updates the calendar event properties in the information  sent.
+            </summary>
+            <param name="myUser"></param>
+            <returns></returns>
+        </member>
         <member name="M:TilerFront.Controllers.GoogleNotificationController.GoogNextNotif(TilerFront.Models.GoogleNotificationRequestModel)">
             *
         </member>

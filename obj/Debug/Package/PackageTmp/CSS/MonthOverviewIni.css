@@ -230,54 +230,76 @@ body {
 
 .DayMoreOptions
 {
-    position: relative;
-    width: 100%;
-    height: 10px;
-    margin-top: 4px;
+  position: relative;
+  width: 30px;
+  height: 10px;
+  margin-top: 4px;
+  left: calc(50% - 15px);
+}
+
+.ThreeDot{
+  height: 6px;
+  width: 6px;
+  background-color: black;
+  border: none;
+  box-sizing: border-box;
+  border-radius: 3px;
 }
 
 .DayMoreOptionsUnderlinesTop
 {
-    width:20px;
-    border-top:solid 1px;
-    position:absolute;
-    left:50%;
-    margin-left:-10px;
+    border-top: solid 1px;
+    position: absolute;
     transition: all .3s;
+    left: calc(16.5% - 4px);
+}
+
+
+
+.DayMoreOptionsUnderlinesMiddle
+{
+  border-top: solid 1px;
+  position: absolute;
+  transition: all .3s;
+  left: calc(50% - 4px);
 }
 
 .DayMoreOptionsUnderlinesBottom
 {
-  width: 10px;
-  border-bottom: solid 1px;
+  //border-top: solid 1px;
   position: absolute;
-  left: 50%;
-  margin-left: -5px;
   transition: all .3s;
-  margin-top: 3px;
+  left: calc(83.166666% - 4px);
 }
 
 .DayMoreOptions:hover .DayMoreOptionsUnderlinesBottom
 {
   width: 10px;
+  height:0;
   border-bottom: solid 2px;
   position: absolute;
   left: 50%;
   margin-left: -2px;
   transition: all .3s;
   margin-top: 3px;
-  transform: rotateZ(45deg);
+  transform: rotateZ(135deg);
+}
+
+.DayMoreOptions:hover .DayMoreOptionsUnderlinesMiddle
+{
+    display:none
 }
 
 .DayMoreOptions:hover .DayMoreOptionsUnderlinesTop
 {
   width: 10px;
+  height:0;
   border-top: solid 2px;
   position: absolute;
   left: 50%;
   margin-left: -8px;
   transition: all .3s;
-  transform: rotateZ(-45deg);
+  transform: rotateZ(-135deg);
   margin-top: 3px;
 }
 
@@ -736,32 +758,59 @@ body {
 
 #ListViewButtonImg
 {
+    /*
     background-position: -5px 0;
 	width: 39px;
-	height: 52px;
+	height: 52px;*/
+	background-position: -4.0089111328125px -60.0089111328125px ;
+	width: 26px;
+	height: 32px;
+    left:50%;
+    top:50%;
+    margin-left:-13px;
+    margin-top:-16px;
 }
 
 
 #ListViewButtonImg:hover
 {
+    /*
 	background-position: -105px 0;
 	width: 39px;
-	height: 52px;
+	height: 52px;*/
+
+	background-position: -54px -60px ;
+	/*width: 26px;
+	height: 32px;*/
 }
 
 
 #ClassicViewButtonImg
 {
+    /*
     background-position: 0 -102px ;
 	width: 39px;
 	height: 52px;
+        */
+	background-position: 0 -0.0089111328125px ;
+	width: 32px;
+	height: 43px;
+    left:50%;
+    top:50%;
+    margin-left:-16px;
+    margin-top:-21.5px;
 }
 
 #ClassicViewButtonImg:hover
 {
+    /*
     background-position: -203px -100px ;
 	width: 39px;
 	height: 52px;
+    */
+	background-position: -49px 0;
+	/*width: 32px;
+	height: 43px*/
 }
 .ViewButtonImg
 {
@@ -980,8 +1029,9 @@ body {
     /* border: solid black 1px; */
     text-align: center;
     border-radius: 5px;
-    box-shadow: rgba(30,30,30,.8) 0 0 6px;
+    //box-shadow: rgba(30,30,30,.8) 0 0 6px;
     font-size: 15px;
+    color:rgba(0, 114, 206,1);
 }
 
 .MonthButton:hover
@@ -1046,14 +1096,14 @@ body {
 
 .CurrentDay
 {
-    color: orange;
+    color: rgba(0, 114, 206,1);
     text-shadow: rgba(10,10,10,.3) 0 0 10px;
 }
 
 
 .CurrentDayMonthBar
 {
-    color: orange;
+    color: rgba(0, 114, 206,1);
     //text-shadow: rgba(10,10,10,.3) 0 0 10px;
     font-weight: bolder;
 }
@@ -1109,6 +1159,9 @@ body {
     height:100%;
     text-align:center;
     display:inline-block;
+    border: solid 1px rgba(128,128,128,.45);
+    box-sizing:border-box;
+    
 }
 #YearDomContainer {
     position:absolute;
@@ -1119,15 +1172,19 @@ body {
 
 .MonthBar 
 {
-    position:absolute;
-    width:8.33333%;
-    height:100%;
-    cursor:pointer;
+    position: absolute;
+    width: 8.33333%;
+    height: 100%;
+    cursor: pointer;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 4px;
+    font-size: 14px;
 }
 
 
 .MonthSelected {
-    background:yellow;//rgba(20,50,45,.2);
+    background:rgba(0, 114, 206,.6);
     border:solid rgb(250,250,250) 1px;
     box-sizing:border-box;
 }
@@ -1135,7 +1192,7 @@ body {
 .YearSelected
 {
     //position:absolute;
-    background: yellow;//rgba(20,50,45,.2);
+    background: rgba(0, 114, 206,.6);
     border:solid rgb(250,250,250) 1px;
     box-sizing:border-box;
 }
@@ -1160,8 +1217,8 @@ body {
     border-top:none;
     border-left:none;
     position: absolute;
-    height: 18px;
-    width: 18px;
+    height: 9px;
+    width: 9px;
     top: 8px;
     left: 24px;
 }
@@ -1547,7 +1604,7 @@ width: auto;
 
 .MenuElementContainer:hover 
 {
-    background-color:rgb(200,200,200);
+    background-color:yellow;
 }
 
 #LogoutMenuContainer
@@ -1579,7 +1636,7 @@ width: auto;
   left: 0;
   /* padding-top: 10px; */
   max-height: 100%;
-  background-color: rgba(255,255,0,.92);
+  background-color: rgba(0, 114, 206,.92);
   /* height: 0; */
   text-align: center;
   opacity: 0;

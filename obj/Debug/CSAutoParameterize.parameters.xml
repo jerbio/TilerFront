@@ -1,9 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <parameters>
   <parameter name="DefaultConnection-Web.config Connection String" description="DefaultConnection Connection String used in web.config by the application to access the database." defaultValue="Server=tcp:gjjadsh2tt.database.windows.net,1433;Database=mytiler_db;User ID=wagtap@gjjadsh2tt;Password=Tagwapadminazure007#;Trusted_Connection=False;Encrypt=True;Connection Timeout=30;" tags="SqlConnectionString">
-    <parameterEntry kind="XmlFile" scope="C:\\Users\\OluJerome\\Documents\\WagTap\\WagTapWeb\\TilerFront\\obj\\Debug\\Package\\PackageTmp\\Web\.config$" match="/configuration/connectionStrings/add[@name='DefaultConnection']/@connectionString" />
-  </parameter>
-  <parameter name="TilerFront.Models.TilerContext-Web.config Connection String" description="TilerFront.Models.TilerContext Connection String used in web.config by the application to access the database." defaultValue="TilerFront.Models.TilerContext_ConnectionString" tags="SqlConnectionString">
-    <parameterEntry kind="XmlFile" scope="C:\\Users\\OluJerome\\Documents\\WagTap\\WagTapWeb\\TilerFront\\obj\\Debug\\Package\\PackageTmp\\Web\.config$" match="/configuration/connectionStrings/add[@name='TilerFront.Models.TilerContext']/@connectionString" />
+    <parameterEntry kind="XmlFile" scope="C:\\Users\\jerom\\Documents\\Visual\ Studio\ 2013\\Projects\\WagTap\\WagTapWeb\\TilerFront\\obj\\Debug\\Package\\PackageTmp\\Web\.config$" match="/configuration/connectionStrings/add[@name='DefaultConnection']/@connectionString" />
   </parameter>
 </parameters>
