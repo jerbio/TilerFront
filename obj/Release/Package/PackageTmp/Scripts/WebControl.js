@@ -1,7 +1,6 @@
 ﻿"use strict"
-
-
-var Debug = false;
+var DisableRegistration = false;
+var Debug = true;
 var DebugLocal = false;
 
 //var global_refTIlerUrl = "http://localhost:53201/api/";
@@ -15,11 +14,25 @@ if (Debug)
         global_refTIlerUrl = "http://localhost:11919/api/";
     }
 }
-
+var global_PositionCoordinate = { Latitude: 40.0274, Longitude: -105.2519, isInitialized: false, Message: "Uninitialized" };;
 
 var UserTheme = { Light: new Theme("Light"), Dark: new Theme("Dark") };
 var CurrentTheme = UserTheme.Light;
-var UserCredentials = {UserName:"",ID:"", Name:""};
+var UserCredentials;
+try
+{
+    //debugger;
+    UserCredentials=  RetrieveUserCredentials();
+}
+catch(e)
+{
+    //debugger;
+    UserCredentials= { UserName: "", ID: "", Name: "" };
+}
+
+var global_DictionaryOfSubEvents = {};
+var global_RemovedElemnts = {};
+
 var OneDayInMs = 86400000;
 var OneWeekInMs = OneDayInMs * 7;
 var FourWeeksInMs = OneWeekInMs * 4;
@@ -69,17 +82,12 @@ Date.prototype.dst = function () {
     return this.getTimezoneOffset() < this.stdTimezoneOffset();
 }
 
+var googleAPiKey = "AIzaSyAOnexWFxnoQ6nQI7p64lyR8YgXwB4qRvU";//Debug ? "AIzaSyAeFh3yjsRCmTEL1ujbaA_CBk_r_LUNPY8" : "AIzaSyAd2zKjpB7lw4FS41oLzC2SPwtCP6HXHoc";
 
 
 
 
 var global_TimeZone_ms = new Date().getTimezoneOffset()*60000;
-
-
-
-//alert("Hi Jerome\n" + TestStart + "\n" + document.getElementById("hahahah"));
-
-
 
 function SetCookie(CookieValue)
 {
@@ -110,7 +118,7 @@ function GetCookieValue()//verifies that user has cookies
         if (Debug)
             {
         ///*
-            CookieValue = { UserName: "jerbio", UserID: "d350ba4d-fe0b-445c-bed6-b6411c2156b3" }
+            CookieValue = { UserName: "jerbio", UserID: "d350ba4d-fe0b-445c-bed6-b6411c2156b3",FullName:"Jerome" }
         //*/
         /*
         CookieValue = {};
@@ -122,6 +130,42 @@ function GetCookieValue()//verifies that user has cookies
 
     return CookieValue;
 }
+
+
+
+
+function getLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(populatePosition, showError);
+    } else {
+        //global_PositionCoordinate = null;
+    }
+
+    function populatePosition(position) {
+        global_PositionCoordinate.isInitialized = true;
+        global_PositionCoordinate.Latitude = position.coords.latitude;
+        global_PositionCoordinate.Longitude = position.coords.longitude;
+    }
+
+    function showError(error) {
+        switch (error.code) {
+            case error.PERMISSION_DENIED:
+                global_PositionCoordinate.Message = "User denied the request for Geolocation."
+                break;
+            case error.POSITION_UNAVAILABLE:
+                global_PositionCoordinate.Message = "Location information is unavailable."
+                break;
+            case error.TIMEOUT:
+                global_PositionCoordinate.Message = "The request to get user location timed out."
+                break;
+            case error.UNKNOWN_ERROR:
+                global_PositionCoordinate.Message = "An unknown error occurred."
+                break;
+        }
+    }
+
+}
+
 
 function removeElement(id)
 {
@@ -136,6 +180,304 @@ function removeElement(id)
 
 }
 
+
+function triggerUndoPanel(UndoMessage)
+{
+
+    var UndoPanelContainerID = "UndoPanelContainer"
+    var UndoPanelContainer = getDomOrCreateNew(UndoPanelContainerID);
+
+    var UndoTextContainerID = "UndoTextContainer"
+    var UndoTextContainer = getDomOrCreateNew(UndoTextContainerID, "span");
+    UndoTextContainer.innerHTML = UndoMessage == null ? "Undo Last Act in ..." : UndoMessage;
+
+
+    var UndoCountDownTextContainerID = "UndoCountDownTextContainer"
+    var UndoCountDownTextContainer = getDomOrCreateNew(UndoCountDownTextContainerID, "span");
+    
+    
+
+    UndoPanelContainer.appendChild(UndoTextContainer);
+    UndoPanelContainer.appendChild(UndoCountDownTextContainer);
+    UndoPanelContainer.onclick = clickUnDoPanel;
+
+    var NumberOfSeconds = 10;
+    showUndoPanel();
+
+    function showUndoPanel()
+    {
+        var weekContainer = getDomOrCreateNew("MonthBar");
+        weekContainer.appendChild(UndoPanelContainer);
+        triggerTimer(NumberOfSeconds)
+        $(UndoPanelContainer).removeClass("setAsDisplayNone");
+        
+        function triggerTimer(CountDownInSecs)
+        {
+            updateCountDown(CountDownInSecs);
+            function updateCountDown(CurrentSec)
+            {
+                UndoCountDownTextContainer.innerHTML = "... "+CurrentSec + "s"
+                if(CurrentSec>0)
+                {
+                    --CurrentSec;
+                    setTimeout(function () { updateCountDown(CurrentSec) }, 1000);
+                }
+                else
+                {
+                    hideUndoPanel();
+                }
+            }
+
+
+        }
+
+    }
+
+    
+
+    function hideUndoPanel()
+    {
+        console.log("Hiding undo pannel")
+        $(UndoPanelContainer).addClass("setAsDisplayNone");
+        if (UndoPanelContainer.parentNode != null)
+        {
+            UndoPanelContainer.parentNode.removeChild(UndoPanelContainer);
+        }
+    }
+
+    function clickUnDoPanel()
+    {
+        global_ExitManager.triggerLastExitAndPop();
+        function undoCallBack() {
+            hideUndoPanel();
+            getRefreshedData.enableDataRefresh();
+            getRefreshedData();
+        }
+        sendUndoRequest(undoCallBack);
+        
+    }
+}
+
+
+function StructuralizeNewData(NewData)
+{
+    var TotalSubEventList = new Array();
+    var ActiveSubEvents = new Array();
+    var Dictionary_OfCalendarData = {};
+    var Dictionary_OfSubEvents = {};
+    if (NewData != "")
+    {
+        generateNonRepeatEvents(NewData.Schedule.NonRepeatCalendarEvent);
+        generateRepeatEvents(NewData.Schedule.RepeatCalendarEvent);
+        CleanupData();
+    }
+    else {
+        console.log("Empty Data");
+    }
+
+    function generateRepeatEvents(AllRepeatSchedules) {
+        AllRepeatSchedules.forEach(function (EachRepeatEvent) { EachRepeatEvent.RepeatCalendarEvents.forEach(CalendarCreateDomElement) });
+    }
+
+    function generateNonRepeatEvents(AllNonRepeatingEvents) {
+        AllNonRepeatingEvents.forEach(CalendarCreateDomElement);
+        //return AllNonRepeatingEvents;
+    }
+
+
+    function CalendarCreateDomElement(CalendarEvent) {
+        //function is responsible for populating Dictionary_OfSubEvents. It also tries to populate the respective sub event dom
+        var UIColor = {};
+        UIColor.R = CalendarEvent.RColor;
+        UIColor.G = CalendarEvent.GColor;
+        UIColor.B = CalendarEvent.BColor;
+        UIColor.O = CalendarEvent.OColor;
+        UIColor.S = CalendarEvent.ColorSelection;
+        var CalendarData = { CompletedEvents: CalendarEvent.NumberOfCompletedTasks, DeletedEvents: CalendarEvent.NumberOfDeletedEvents, TotalNumberOfEvents: CalendarEvent.NumberOfSubEvents, UI: UIColor, Rigid: CalendarEvent.Rigid };
+        Dictionary_OfCalendarData[CalendarEvent.ID] = CalendarData;
+        var i = 0;
+        for (; i < CalendarEvent.AllSubCalEvents.length; i++) {
+            CalendarEvent.AllSubCalEvents[i].Name = CalendarEvent.CalendarName;
+            TotalSubEventList.push(PopulateDomForScheduleEvent(CalendarEvent.AllSubCalEvents[i], CalendarEvent.Tiers));
+        }
+    }
+
+
+    function CleanupData()
+    {
+        TotalSubEventList.sort(function (a, b) { return (a.SubCalStartDate) - (b.SubCalStartDate) });
+
+        
+        var NowDate = new Date(CurrentTheme.Now);
+        TotalSubEventList.forEach(
+            function (eachSubEvent)
+            {
+                if (Dictionary_OfSubEvents[eachSubEvent.ID] == null) {
+                    Dictionary_OfSubEvents[eachSubEvent.ID] = eachSubEvent;
+                }
+                else {
+                    ToBeReorganized.push(eachSubEvent);
+                    //if (Dictionary_OfSubEvents[eachSubEvent.ID].SubCalStartDate != eachSubEvent.SubCalStartDate)
+                    {
+                        //global_DeltaSubevents.push(eachSubEvent);
+                    }
+
+                }
+                //debugger;
+                var RangeStart = new Date(NowDate.getTime() - (OneHourInMs * 12));
+                var RangeEned = new Date(CurrentTheme.Now + TwelveHourMilliseconds);
+
+            
+            }
+        )
+
+    }
+
+
+
+
+    function PopulateDomForScheduleEvent(myEvent, Tiers) {
+        
+
+        //debugger;
+        /*
+        myEvent.SubCalStartDate = new Date(myEvent.SubCalStartDate + global_TimeZone_ms );
+        myEvent.SubCalEndDate = new Date(myEvent.SubCalEndDate + global_TimeZone_ms );
+        myEvent.SubCalCalEventStart = new Date(myEvent.SubCalCalEventStart + global_TimeZone_ms );
+        myEvent.SubCalCalEventEnd = new Date(myEvent.SubCalCalEventEnd + global_TimeZone_ms );
+        //*/
+
+        ///*
+        myEvent.SubCalStartDate = new Date(myEvent.SubCalStartDate);// + global_TimeZone_ms);
+        myEvent.SubCalEndDate = new Date(myEvent.SubCalEndDate);// + global_TimeZone_ms);
+        myEvent.SubCalCalEventStart = new Date(myEvent.SubCalCalEventStart);//+ global_TimeZone_ms);
+        myEvent.SubCalCalEventEnd = new Date(myEvent.SubCalCalEventEnd);// + global_TimeZone_ms);
+        myEvent.Tiers = Tiers;
+        //*/
+        /*myEvent.SubCalStartDate = !myEvent.SubCalStartDate.dst() ? new Date(Number(myEvent.SubCalStartDate.getTime()) + OneHourInMs) : myEvent.SubCalStartDate;
+        myEvent.SubCalEndDate =! myEvent.SubCalEndDate.dst() ? new Date(Number(myEvent.SubCalEndDate.getTime()) + OneHourInMs) : myEvent.SubCalEndDate;
+        myEvent.SubCalCalEventStart = !myEvent.SubCalCalEventStart.dst() ? new Date(Number(myEvent.SubCalCalEventStart.getTime()) + OneHourInMs) : myEvent.SubCalCalEventStart;
+        myEvent.SubCalCalEventEnd = !myEvent.SubCalCalEventEnd.dst() ? new Date(Number(myEvent.SubCalCalEventEnd.getTime()) + OneHourInMs) : myEvent.SubCalCalEventEnd;*/
+
+
+
+        //var MobileDom = genereateMobileDoms(myEvent);
+        //myEvent.Dom = MobileDom;
+        return myEvent
+    }
+    return { TotalSubEventList: TotalSubEventList,ActiveSubEvents: ActiveSubEvents,Dictionary_OfCalendarData: Dictionary_OfCalendarData,Dictionary_OfSubEvents:Dictionary_OfSubEvents};
+}
+
+function getEventsWithinRange(RangeStart, RangeEned) {
+    var RetValue = new Array();
+    for (var i = 0 ; i < TotalSubEventList.length; i++) {
+        var eachSubEvent = TotalSubEventList[i];
+        if ((eachSubEvent.SubCalEndDate > RangeStart)  ) {
+            if ((eachSubEvent.SubCalStartDate <= RangeEned))
+            {
+                RetValue.push(eachSubEvent);
+            }
+            else
+            {
+                break;
+            }
+        }
+        
+    }
+
+    return RetValue;
+
+    /*
+    if ((eachSubEvent.SubCalEndDate > RangeStart) && (eachSubEvent.SubCalStartDate < RangeEned) && (RetValue.indexOf(eachSubEvent) < 0))
+    {
+        var Difference = eachSubEvent.SubCalEndDate.getTime() - NowDate.getTime();
+        if (Difference < 0) {
+            Difference *= -1;
+        }
+
+        if (Difference < lowestMsToNow) {
+            ClosestSubEventToNow = eachSubEvent;
+        }
+        RetValue.push(eachSubEvent);
+    }
+    */
+}
+
+function getClosestToNow(AllEvents, ReferenceTime) {
+    var RetValue;
+
+    if (AllEvents.length) {
+        RetValue = AllEvents[0];
+        var lowestMsToNow = AllEvents[0].SubCalEndDate.getTime() - ReferenceTime.getTime();
+        if (lowestMsToNow < 0) {
+            lowestMsToNow *= -1;
+        }
+        for (var i = 0 ; i < AllEvents.length; i++) {
+            var eachSubEvent = AllEvents[i];
+            var Difference = eachSubEvent.SubCalEndDate.getTime() - ReferenceTime.getTime();
+            if (Difference < 0) {
+                Difference *= -1;
+            }
+
+            if (Difference < lowestMsToNow) {
+                RetValue = eachSubEvent;
+            }
+        }
+    }
+    return RetValue;
+}
+
+
+
+
+function sendUndoRequest(CallBack)
+{
+    var TimeZone = new Date().getTimezoneOffset();
+    var UndoData = {
+        UserName: UserCredentials.UserName, UserID: UserCredentials.ID, TimeZoneOffset: TimeZone
+    };
+
+    var HandleNEwPage = new LoadingScreenControl("Tiler is undoing your last request :)");
+    HandleNEwPage.Launch();
+
+    var exitSendMessage = function (data) {
+        HandleNEwPage.Hide();
+    }
+    
+    //var URL= "RootWagTap/time.top?WagCommand=2";
+    var URL = global_refTIlerUrl + "Schedule/Undo";
+    var HandleNEwPage = new LoadingScreenControl("Tiler is Undoing :)");
+    HandleNEwPage.Launch();
+    var ProcrastinateRequest = $.ajax({
+        type: "POST",
+        url: URL,
+        data: UndoData,
+        // DO NOT SET CONTENT TYPE to json
+        // contentType: "application/json; charset=utf-8", 
+        // DataType needs to stay, otherwise the response object
+        // will be treated as a single string
+        dataType: "json",
+        success: CallBackSuccess,
+        error: CallBackFailure,
+    })
+
+    function CallBackSuccess()
+    {
+        HandleNEwPage.Hide();
+        CallBack();
+        return;
+    }
+
+    function CallBackFailure()
+    {
+        var NewMessage = "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
+        var ExitAfter = {
+            ExitNow: true, Delay: 1000
+        };
+        HandleNEwPage.UpdateMessage(NewMessage, ExitAfter, exitSendMessage);
+        return;
+    }
+}
 
 function delete_cookie()
 {
@@ -265,6 +607,7 @@ function OutOfFocusManager()
             triggerLastExit();
             AllCallBackFunc.pop();
             --CurrIndex;
+            AddCloseButoon.HideClosButton();
         }
     }
 
@@ -400,9 +743,9 @@ function generateuserInput(InputParams, JqueryCss)
 
     var FullLabel = getDomOrCreateNew(InputParams.ID);
     //(FullLabel.Dom).style.width = "100%";
-    (FullLabel.Dom).style.height = "100px";
-    (FullLabel.Dom).style.position = "absolute";
-    (FullLabel.Dom).style.display = "table";
+    //(FullLabel.Dom).style.height = "100px";
+    (FullLabel.Dom).style.position = "relative";
+    //(FullLabel.Dom).style.display = "table";
     //(FullLabel.Dom).style.borderBottom = "3px solid rgb(127,127,127)";
     if (JqueryCss != null)
     {
@@ -410,7 +753,7 @@ function generateuserInput(InputParams, JqueryCss)
     }
 
     
-    var LabelContainer = getDomOrCreateNew(InputParams.ID + "Label");
+    var LabelContainer = getDomOrCreateNew(InputParams.ID + "Label","label");
     var InputContainer = getDomOrCreateNew(InputParams.ID + "Input", "input");
     LabelContainer.Dom.innerHTML = InputParams.Name;
     LabelContainer.Dom.style.width = "20%";
@@ -421,8 +764,8 @@ function generateuserInput(InputParams, JqueryCss)
     InputContainer.Dom.style.left = "20%";
     InputContainer.Dom.style.height = "40px";
     //InputContainer.Dom.style.maxHeight = "40%";
-    InputContainer.Dom.style.fontSize = "12px";
-    InputContainer.Dom.style.position = "absolute";
+    //InputContainer.Dom.style.fontSize = "12px";
+    InputContainer.Dom.style.position = "relative";
     
     InputContainer.Dom.setAttribute("placeholder", InputParams.Default);
 
@@ -562,6 +905,7 @@ function Theme(color)
     function HideCurrentContainer(SlideRight)
     {
         CurrentContainer = GetCurrentContainer();
+        /*
         if (CurrentContainer != null)
         {
             if (SlideRight===true)
@@ -573,6 +917,7 @@ function Theme(color)
                 CurrentContainer.style.left = "-100%";
             }
         }
+        */
     }
 
     function GetCurrentContainer()
@@ -587,6 +932,25 @@ function Theme(color)
     }
 }
 
+function formatTimePortionOfStringToRightFormat(TimeString)
+{
+
+    //"jkjkjkj".
+    TimeString = TimeString.toLocaleLowerCase().split("");
+    var IndexOfA = TimeString.indexOf("a");
+    var IndexOfB = TimeString.indexOf("p");
+    var myIndex = IndexOfA > IndexOfB ? IndexOfA : IndexOfB;
+    var TimeCOncat = [];
+    var retValue = "";
+    var i = 0;
+    for (; i < myIndex; i++)
+    {
+        retValue+=TimeString[i]
+    }
+    retValue += (" " + TimeString[i] + "m");
+    return retValue;
+
+}
 
 function getTimeStringFromDate(date)
 {
@@ -943,8 +1307,8 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
         $(ActiveEventProcratination).addClass("ActiveEventProcrastination");
         var CurrentDial, SelectedDialOptionDomButton;
 
-        var DayTextBox = getDomOrCreateNew("DialDayInput" + DialOnEvent.id);
-        DayTextBox.Dom.innerHTML = "<p>Day(s)</p>";
+        var DayTextBox = getDomOrCreateNew("DialDayInput" + DialOnEvent.id,"button");
+        DayTextBox.Dom.innerHTML = "Day(s)";
         DayTextBox.Dom.setAttribute("class", "DialInput DialDayInput");
         $(DayTextBox.Dom).click(function () {
             var CurrentDayValue = new Dial(0, 1, 1, 0);
@@ -957,9 +1321,9 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
         })
 
 
-        var HourTextBox = getDomOrCreateNew("DialHourInput" + DialOnEvent.id);
+        var HourTextBox = getDomOrCreateNew("DialHourInput" + DialOnEvent.id, "button");
         HourTextBox.Dom.setAttribute("class", "DialInput DialHourInput");
-        HourTextBox.Dom.innerHTML = "<p>Hour(s)</p>";
+        HourTextBox.Dom.innerHTML = "Hour(s)";
         $(HourTextBox.Dom).click(function () {
             var CurrentHourValue = new Dial(0, 5, 0, 60 * 2);
             CurrentDial = CurrentHourValue;
@@ -969,9 +1333,9 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
             InitializeDialDial(CurrentHourValue, EventDialContainer.Dom);
         })
 
-        var MinTextBox = getDomOrCreateNew("DialMinInput" + DialOnEvent.id);;
+        var MinTextBox = getDomOrCreateNew("DialMinInput" + DialOnEvent.id, "button");
         MinTextBox.Dom.setAttribute("class", "DialInput DialMinInput");
-        MinTextBox.Dom.innerHTML = "<p>Min(s)</p>";
+        MinTextBox.Dom.innerHTML = "Min(s)";
 
 
 
@@ -1299,7 +1663,7 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
         this.Address = Address;
     }
 
-    function CalEventData(eventName, eventLocation, eventCounts, eventColor, eventDuration, eventStart, eventEnd, eventRepeatData, eventRepeatStart, eventRepeatEnd, rigidFlag)
+    function CalEventData(eventName, eventLocation, eventCounts, eventColor, eventDuration, eventStart, eventEnd, eventRepeatData, eventRepeatStart, eventRepeatEnd, rigidFlag, RestrictionData)
     {
         this.Name = eventName;
         this.LocationTag = eventLocation.Tag;
@@ -1309,7 +1673,7 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
         this.BColor = eventColor.b;
         this.ColorSelection = null == eventColor.s ? 0 : eventColor.s;
         this.Opacity = null == eventColor.o ? 1 : eventColor.o;
-        this.DurationDays = eventDuration.Days;
+        this.DurationDays = 0;// eventDuration.Days;
         this.DurationHours = eventDuration.Hours;
         this.DurationMins = eventDuration.Mins;
         this.StartHour = eventStart.Time.Hour;
@@ -1325,7 +1689,36 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
         this.StartYear = eventStart.Date.getFullYear();
         this.EndYear = eventEnd.Date.getFullYear();
 
-    
+        this.Rigid = rigidFlag ? true : false;
+
+        var isRestricted = false;
+        var RestrictionStart = "12:00am"
+        var RestrictionEnd = "12:00am"
+        var isWorkWeek = false;
+        var isEveryDay = false;
+        var RestrictiveWeek = RestrictionData.RestrictiveWeek;
+
+        if ((RestrictionData != null)&&(!rigidFlag))
+        {
+            if (RestrictionData.isRestriction)
+            {
+                isRestricted = true;
+                RestrictionStart = RestrictionData.Start;
+                RestrictionEnd = RestrictionData.End;
+                isWorkWeek = RestrictionData.isWorkWeek;
+                isEveryDay = RestrictionData.isEveryDay;
+                //RestrictiveWeek = RestrictionData.RestrictiveWeek;
+            }
+        }
+
+
+        this.isRestricted = isRestricted;
+        this.RestrictionStart = RestrictionStart;
+        this.RestrictionEnd = RestrictionEnd;
+        this.isWorkWeek = isWorkWeek;
+        this.isEveryDay = isEveryDay;
+        this.RestrictiveWeek = RestrictiveWeek;
+
         this.RepeatData = eventRepeatData;
         var RepeatType = "";
         this.RepeatType = "";
@@ -1360,14 +1753,46 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
         this.RepeatEndDay = repeatEndDate.getDate();
         this.RepeatEndMonth = repeatEndDate.getMonth() + 1;
         this.RepeatEndYear = repeatEndDate.getFullYear();
-        this.Rigid = rigidFlag?true:false;
+        
         //alert(rigidFlag);
         this.Count = eventCounts;
+    }
 
-    
 
-        //{ Days: Days, Hours: Hours, Mins: Mins };
+    function getTotalDurationFromCalEvent(CalEvent)
+    {
+        var TotalDurationInMs = (CalEvent.DurationDays * OneDayInMs) + (CalEvent.DurationHours * OneHourInMs) + (CalEvent.DurationMins * OneHourInMs);
+        return TotalDurationInMs;
+    }
 
+    function getCalEventEnd(CalEvent)
+    {
+        //CalEvent = new CalEventData();
+        var RetValue = new Date(CalEvent.EndYear,CalEvent.EndMonth-1,CalEvent.EndDay,0,0,0,0)
+        return RetValue;
+    }
+
+    /*Function tries to check if the passed object (d) is a valid date object*/
+    function isDateValid(d)
+    {
+        var RetValue = true;
+        if (Object.prototype.toString.call(d) === "[object Date]")
+        {
+            if (isNaN(d.getTime())) {  // d.valueOf() could also work
+                // date is not valid
+                RetValue = false;
+            }
+            else {
+                // date is valid
+                RetValue = true;
+            }
+        }
+        else {
+            // not a date
+            RetValue = false;
+        }
+
+        return RetValue;
     }
 
     function date_mm_dd__yyyy_ToDateObj(DateString,Delimiter)
@@ -1525,15 +1950,25 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
     }
     LoadingScreenControl.Counter = 0;
 
+/*
+*Creates an auto suggest Control Object.
+*Full URI to get to desired resource
+*Method Restful api request, POST,PUT, GET, DELETE, Defaults to POST
+*GenerateEachDomCallBack: CallBack after response has been received. Callback is also passed the response data
+*UserInputBox: Input Box DOM Element. If Null/undefined, Autosuggestcontrol creates one. This has to be an input box.
+*IsNotTilerEndPoint: boolean flag to check if data expected is formated from a tile endpoint
+*DataStructure: Extra data element needed sending autosuggestion request
 
-    function AutoSuggestControl(Url,Method, GenerateEachDomCallBack, UserInputBox)
+*/
+    function AutoSuggestControl(Url,Method, GenerateEachDomCallBack, UserInputBox,IsNotTilerEndPoint,DataStructure)
     {
         var myID = AutoSuggestControl.Counter++;
         var InputBarContainerID = "InputBarContainer" + myID++;
         var InputBarContainer = getDomOrCreateNew(InputBarContainerID);
         var myRequest = null;
-        var DomAndContainer = generateFullInputBar(UserInputBox);
-
+        var DomAndContainer = generateFullInputBar(UserInputBox, IsNotTilerEndPoint,DataStructure);
+        var IsContentOn = false;
+        var SendRequest = true;
 
         var InputBarAndContentContainerID = "InputBarAndContentContainer" + myID;
         var InputBarAndContentContainer = getDomOrCreateNew(InputBarAndContentContainerID);
@@ -1576,16 +2011,44 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
         {
             return myID;
         }
-        this.clear = function ()
-        {
-            if (InputBarContainer.Dom.parentNode != null)
-            {
+
+
+        /*
+        Function emmpties the Dom element containing the list of returned values. It also sets the content status to false;
+        */
+        var clear = function () {
+            //debugger;
+            if (InputBarContainer.Dom.parentNode != null) {
                 $(InputBarContainer.Dom).empty();
-                InputBarContainer.Dom.parentNode.removeChild(InputBarContainer.Dom);
-            }   
+                //InputBarContainer.Dom.parentNode.removeChild(InputBarContainer.Dom);
+            }
+            IsContentOn = false;
         }
-    
-        function generateFullInputBar(UserInputBox)
+        this.clear = clear
+
+
+        function HideContainer()
+        {
+            //debugger;
+            $(InputBarContainer.Dom).addClass("setAsDisplayNone");
+            IsContentOn = false;
+        }
+
+        function ShowContainer()
+        {
+            $(InputBarContainer.Dom).removeClass("setAsDisplayNone");
+            IsContentOn = true;
+        }
+        this.HideContainer = HideContainer;
+        this.ShowContainer = ShowContainer;
+
+        var IsTilerAutoContentOn = function ()
+        {
+            return IsContentOn;
+        }
+        this.isContentOn = IsTilerAutoContentOn;
+
+        function generateFullInputBar(UserInputBox, IsNotTilerEndPoint, DataStructure)
         {
             var InputBarID = "InputBar" + AutoSuggestControl.Counter;
             var InputBar = getDomOrCreateNew(InputBarID, "input");
@@ -1598,11 +2061,28 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
             var returnedValueContainer = getDomOrCreateNew(returnedValueContainerID);
             $(returnedValueContainer.Dom).addClass("returnedValueContainer");
             //$(returnedValueContainer.Dom).addClass(CurrentTheme.ContentSection);
-            (InputBar.Dom).onkeyup = prepCall(InputBar.Dom, Url, Method, returnedValueContainer);
-        
+            //(InputBar.Dom).oninput = prepCall(InputBar.Dom, Url, Method, returnedValueContainer, IsNotTilerEndPoint);
+            $(InputBar.Dom).on("input", prepCall(InputBar.Dom, Url, Method, returnedValueContainer, IsNotTilerEndPoint, DataStructure));
+            //InputBar.onchange= clear;
 
             var retValue = { InputBar: InputBar, returnedValue: returnedValueContainer };
             return retValue;
+        }
+
+        function disableSendRequest()
+        {
+            SendRequest = false;
+        }
+
+        function enableSendRequest() {
+            SendRequest = true;
+        }
+
+        this.enableSendRequest = enableSendRequest;
+        this.disableSendRequest = disableSendRequest;
+        function getSendRequestStatus()
+        {
+            return SendRequest;
         }
 
         var ini_TimerResetID = -67767;
@@ -1621,10 +2101,19 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
 
 
 
-        function prepCall(InputDom, url, Method, SuggestedValuesContainer)//[reps timer
+        function prepCall(InputDom, url, Method, SuggestedValuesContainer, IsNotTilerEndPoint, DataStructure)//[reps timer
         {
             return function(e)
             {
+                if (e.which == 27)
+                {
+                    clear();
+                    return;
+                }
+                if (!getSendRequestStatus())
+                {
+                    return;
+                }
                 if (TimerResetID == ini_TimerResetID)
                 {
                     ;
@@ -1633,32 +2122,43 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
                 {
                     clearTimeout(TimerResetID);
                 }
-                TimerResetID = setTimeout(prepCalToBackEnd(InputDom, url, Method, SuggestedValuesContainer,e), 50);
+                TimerResetID = setTimeout(prepCalToBackEnd(InputDom, url, Method, SuggestedValuesContainer, e, IsNotTilerEndPoint, DataStructure), 50);
             }
         }
-
-
-        function prepCalToBackEnd(InputDom, url, Method, SuggestedValuesContainer,e) {
+        function prepCalToBackEnd(InputDom, url, Method, SuggestedValuesContainer, e, IsNotTilerEndPoint,DataStructure) {
             return function ()
             {
                 //debugger;
-                if (typeof (url) != "string")//checks if data set is already provided. If it is provided then it should just call the call back.
+                
+                cancelRequest();//cancels any preceeding requests
+                var FullLetter = InputDom.value;
+                FullLetter = FullLetter.trim();
+                myRequest = null;
+                if (!(url))//checks if data set is already provided. If it is provided then it should just call the call back.
                 {
+                    //debugger;
                     var Data = url;
                     var AllDom = GenerateEachDomCallBack(Data, SuggestedValuesContainer, InputDom);
                     TimerResetID = ini_TimerResetID;
                     return;
                 }
-                cancelRequest();//cancels any preceeding requests
-                var FullLetter = InputDom.value;
-                FullLetter = FullLetter.trim();
-                myRequest=null;
+
                 if (FullLetter == "")
                 {
                     var AllDom = GenerateEachDomCallBack([], SuggestedValuesContainer, InputDom);
                     return;
                 }
-                var postData = { Data: FullLetter, UserName: UserCredentials.UserName, UserID: UserCredentials.ID };
+                var postData ={}
+                if (IsNotTilerEndPoint)
+                {
+                    debugger;
+                    postData = DataStructure;
+                    postData["query"] = FullLetter;
+                }
+                else
+                {
+                    postData={ Data: FullLetter, UserName: UserCredentials.UserName, UserID: UserCredentials.ID };
+                }
                 if (Method == null)
                 {
                     Method="POST"
@@ -1667,9 +2167,12 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
                 myRequest = $.ajax({
                     type: Method,
                     url: url,
+                    //jsonp: "callback",
+                    //dataType: 'jsonp',
                     data: postData/*,
                 success: function (response)
                 {
+                    debugger;
                     response = JSON.parse(response);
                     var data = response.Content;
                     var AllDom = GenerateEachDomCallBack(data, SuggestedValuesContainer);
@@ -1677,10 +2180,12 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
                 }).done(function (response)
                 {
                     //response = JSON.parse(response);
-                    var data = response.Content;
+                    
+                    var data = IsNotTilerEndPoint ? response : response.Content;
                     var AllDom = GenerateEachDomCallBack(data, SuggestedValuesContainer, InputDom);
                     TimerResetID = ini_TimerResetID;
                     myRequest = null;
+                    IsContentOn = true;
                 });;
 
                 //var returnedValue = getReturnedValueContainer(FullLetter);
@@ -1941,7 +2446,7 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
 
         for (var i = 0; i < AllColors.length; i++) {
             var MyCOntainer = AllColors[i];
-            $(MyCOntainer.Selector.Container).click(genMoveOuterOrb(i))
+            (MyCOntainer.Selector.Container).onclick=(genMoveOuterOrb(i))
         }
 
         $(AllColors[0].Selector.Container).trigger("click");
@@ -2005,8 +2510,162 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
         ColorPickerContainer.Selector = { Container: ColorPickerContainer.Dom, OuterOrb: OuterBlackColor.Dom, myColor: innerColor.Dom }
         return ColorPickerContainer;
     }
+    
+    function generateCompletionMap(SelectedEvent)
+{
+    var CompletionMapID = "CompletionMap";
+    var CompletionMap = getDomOrCreateNew(CompletionMapID);
+    //$(CompletionMap.Dom).addClass("SubEventNonLabelSection");
+    //$(CompletionMap.Dom).addClass(CurrentTheme.ContentSection)
+    //$(CompletionMap.Dom).addClass(CurrentTheme.FontColor);
+
+    generatePieChart(CompletionMap, SelectedEvent);
+
+    
+
+
+
+
+    function generatePieChart(getDomObj, myEvent)
+    {
+        var pieChartContainerID = "pieChartContainer";
+        var pieChartContainer = getDomOrCreateNew(pieChartContainerID,"canvas");
+        var LegendContainerID = "LegendContainer";
+        var LegendContainer = getDomOrCreateNew(LegendContainerID);
+        $(LegendContainer.Dom).addClass("LegendContainer");
+
+        
+
+
+        var ctx = pieChartContainer.Dom;
+        ctx = ctx.getContext("2d");
+        var myNewChart = new Chart(ctx);
+        
+        getDomObj.Dom.appendChild(pieChartContainer.Dom);
+        getDomObj.Dom.appendChild(LegendContainer.Dom);
+
+        $(pieChartContainer.Dom).addClass("PieChart");
+
+        var TotalNumberOfTask = parseInt(Dictionary_OfCalendarData[myEvent.CalendarID].TotalNumberOfEvents)
+        var DelededEvents=parseInt(Dictionary_OfCalendarData[myEvent.CalendarID].DeletedEvents);
+        var NumberOfCompleteTask =parseInt(Dictionary_OfCalendarData[myEvent.CalendarID].CompletedEvents);
+
+
+        var CompletedTask={
+            value: NumberOfCompleteTask,
+            color: "green"
+        };
+        var CompletedTaskLegend = makeMyLegend("CompletedTask");
+        CompletedTaskLegend[1].Dom.innerHTML = "Completed";
+        LegendContainer.Dom.appendChild(CompletedTaskLegend[2].Dom);
+        CompletedTaskLegend[2].Dom.style.top = "0";
+        CompletedTaskLegend[0].Dom.style.backgroundColor = "green";
+
+        var DisabledTask={
+            value: DelededEvents,
+            color: "red"
+        };
+        var DisabledTaskLegend = makeMyLegend("DisabledTask");
+        DisabledTaskLegend[1].Dom.innerHTML = "Disabled";
+        LegendContainer.Dom.appendChild(DisabledTaskLegend[2].Dom);
+        DisabledTaskLegend[2].Dom.style.top = "33%";
+        DisabledTaskLegend[0].Dom.style.backgroundColor = "red";
+
+        var NotCompleted =
+            {
+                value: TotalNumberOfTask - (DelededEvents + NumberOfCompleteTask),
+            color: "gray"
+            };
+        var NotCompletedLegend = makeMyLegend("NotCompleted");
+        NotCompletedLegend[1].Dom.innerHTML = "Not Completed";
+        LegendContainer.Dom.appendChild(NotCompletedLegend[2].Dom);
+        NotCompletedLegend[2].Dom.style.top = "66%";
+        NotCompletedLegend[0].Dom.style.backgroundColor = "gray";
+
+
+        var data = [CompletedTask, DisabledTask, NotCompleted];
+
+        var option= {
+        //Boolean - Whether we should show a stroke on each segment
+        segmentShowStroke : true,
+	
+        //String - The colour of each segment stroke
+        segmentStrokeColor : "rgba(50,50,50,.8)",
+	
+        //Number - The width of each segment stroke
+        segmentStrokeWidth : 1,
+	
+        //The percentage of the chart that we cut out of the middle.
+        percentageInnerCutout : 45,
+	
+        //Boolean - Whether we should animate the chart	
+        animation : true,
+	
+        //Number - Amount of animation steps
+        animationSteps : 100,
+	
+        //String - Animation easing effect
+        animationEasing : "easeOutBounce",
+	
+        //Boolean - Whether we animate the rotation of the Doughnut
+        animateRotate : true,
+
+        //Boolean - Whether we animate scaling the Doughnut from the centre
+        animateScale : false,
+	
+        //Function - Will fire on animation completion.
+        onAnimationComplete : null
+    }
+
+        myNewChart.Doughnut(data, option);
+        //pieChartContainer.Dom.style.height = "70px";
+        //pieChartContainer.Dom.style.width = "140px";
+    }
+
+    function makeMyLegend(ID)
+    {
+        var Color = getDomOrCreateNew(ID + "Color");
+        $(Color.Dom).addClass("LegendColor");
+        var Text = getDomOrCreateNew(ID + "Text");
+        $(Text.Dom).addClass("LegendText");
+        var EncasingDom = getDomOrCreateNew(ID + "LegendEncasing");
+        $(EncasingDom.Dom).addClass("LegendEncasingDom");
+        EncasingDom.Dom.appendChild(Color.Dom);
+        EncasingDom.Dom.appendChild(Text.Dom);
+
+        return [Color, Text, EncasingDom];
+    }
+    return CompletionMap.Dom;
+
+}
+
+    function BindDatePicker(InputDom, format) {
+        if (format == null) {
+            format = 'm/d/yyyy';
+        }
+        ///*
+        $(InputDom).datepicker({
+            'format': format,
+            'autoclose': true
+        });
+        //*/
+
+        return $(InputDom).datepicker();
+    }
+
+    function BindTimePicker(InputDom) {
+        $(InputDom).timepicker({
+            'showDuration': true,
+            'timeFormat': 'g:ia'
+        });
+        return $(InputDom).timepicker();
+    }
+
+
     generateColorCircle.ID = 0;
 
 
 
     generateMyButton.ID = 0;
+
+
