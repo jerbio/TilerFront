@@ -166,7 +166,10 @@ function getLocation() {
 
 }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> master
 function removeElement(id)
 {
     var elem;
