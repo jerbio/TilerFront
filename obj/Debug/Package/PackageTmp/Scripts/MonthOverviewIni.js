@@ -6,13 +6,9 @@ var global_WeekWidth;
 var global_DayTop;
 var global_RangeMultiplier = 5;//range for number of weeks to be specified for calculation
 var global_CurrentRange;
-var global_ClearRefreshDataInterval = 0;
+var global_ClearRefreshDataInterval = 10000;
 var global_ColorAugmentation = 0;
-<<<<<<< HEAD
-var refreshCounter = 0;
-=======
-var refreshCounter = 10000;
->>>>>>> master
+var refreshCounter = 1000;
 var global_refreshDataInterval = 45000;
 var global_multiSelect;
 var global_ControlPanelIconSet = new IconSet();

@@ -654,16 +654,16 @@ namespace TilerFront.Controllers
                     switch(Frequency)
                     {
                         case "DAILY":
-                            FullEndTime = FullStartTime.AddDays(1);
+                            //FullEndTime = FullStartTime.AddDays(1);
                             break;
                         case "WEEKLY":
-                            FullEndTime = FullStartTime.AddDays(7);
+                            //FullEndTime = FullStartTime.AddDays(7);
                             break;
                         case "MONTHLY":
-                            FullEndTime = FullStartTime.AddMonths(1);
+                            //FullEndTime = FullStartTime.AddMonths(1);
                             break;
                         case "YEARLY":
-                            FullEndTime = FullStartTime.AddYears(1);
+                            //FullEndTime = FullStartTime.AddYears(1);
                             break;
                         default:
                             break;
@@ -897,16 +897,16 @@ namespace TilerFront.Controllers
                     switch (Frequency)
                     {
                         case "DAILY":
-                            FullEndTime = FullStartTime.AddDays(1);
+                            //FullEndTime = FullStartTime.AddDays(1);
                             break;
                         case "WEEKLY":
-                            FullEndTime = FullStartTime.AddDays(7);
+                            //FullEndTime = FullStartTime.AddDays(7);
                             break;
                         case "MONTHLY":
-                            FullEndTime = FullStartTime.AddMonths(1);
+                            //FullEndTime = FullStartTime.AddMonths(1);
                             break;
                         case "YEARLY":
-                            FullEndTime = FullStartTime.AddYears(1);
+                            //FullEndTime = FullStartTime.AddYears(1);
                             break;
                         default:
                             break;
