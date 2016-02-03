@@ -84,6 +84,16 @@ namespace TilerFront
         virtual async public Task Initialize()
         {
             TilerElementExtension.CurrentTime = DateTimeOffset.UtcNow;
+            string message = "Halt JEROME !!!!!. This was a commit knowing this error will happen" +
+                " You did this because you want to figure out your next steps.\n"
+                + " You deleted all refereneces to the NowProfile in SubCalendarEVents and TilerEVents because they were inherited from TIler Events.\n"
+                + "You did this because you think it was not needed and could easily be stored in the calendar event object. Since the calendar object can explicitly store a deviating subcalendar event and update the calculated rigid event with the deviation.\n"
+                + "Beware Jerome of the case where a repeating rigid event gets created and then now is pressed. Tiler needs to know which rigid event was pressed to accomplish this now activity\n"
+                + " You deleted the now profile because it was making the xml file too big and was hampering read performnace\n"
+                + " You realized that non-rigid subevents still get persisted and are not calculated on the fly which is unlike their rigid counterparts(I havent tested the latter part because, but this branch is called newrigidimplementation aka on the fly rigid calculations).\n"
+                + " You might want to resdesign the calls for the creation of non-rigid subevents to be calculated on the fly";
+
+            throw new Exception(message);
             Tuple<bool, string, string> VerifiedUser = LogDBDataAccess.LogIn();
             CurrentLog = "";
             if (VerifiedUser.Item1)
@@ -1059,11 +1069,14 @@ namespace TilerFront
             MyEventSubScheduleNode.ChildNodes[0].InnerXml = CreateConflictProfile(MySubEvent.Conflicts, "ConflictProfile").InnerXml;
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("Restricted"));
             MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.isEventRestricted.ToString();
+<<<<<<< HEAD
             MyEventSubScheduleNode.PrependChild(CreatePauseUsedUpNode(MySubEvent, xmldoc));
 
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("NowProfile"));
             MyEventSubScheduleNode.ChildNodes[0].InnerXml = (generateNowProfileNode(MySubEvent.NowInfo).InnerXml);
 
+=======
+>>>>>>> Removed unnecessary calls to now profile
             if (MySubEvent.isEventRestricted)
             {
                 restrictedMySub = (SubCalendarEventRestricted)MySubEvent;
@@ -1819,6 +1832,7 @@ namespace TilerFront
                 retrievedSubEvent.ThirdPartyID = MyXmlNode.ChildNodes[i].SelectSingleNode("ThirdPartyID").InnerText;//this is a hack to just update the Third partyID
                 XmlNode restrictedNode = MyXmlNode.ChildNodes[i].SelectSingleNode("Restricted");
 
+<<<<<<< HEAD
 
                 retrievedSubEvent = new DB_SubCalendarEvent(retrievedSubEvent, MyParent.NowInfo, MyParent.ProcrastinationInfo);
                 
@@ -1826,6 +1840,9 @@ namespace TilerFront
                 (retrievedSubEvent as DB_SubCalendarEvent).UsedTime = PauseData.Item1;
                 (retrievedSubEvent as DB_SubCalendarEvent).PauseTime = PauseData.Item2;
 
+=======
+                retrievedSubEvent = new DB_SubCalendarEventExtra(retrievedSubEvent, MyParent.ProcrastinationInfo);
+>>>>>>> Removed unnecessary calls to now profile
 
 
                 if (restrictedNode != null)
