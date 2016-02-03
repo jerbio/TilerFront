@@ -1628,7 +1628,8 @@ namespace TilerFront
             Deadline = EventScheduleNode.SelectSingleNode("Deadline").InnerText;
             Rigid = EventScheduleNode.SelectSingleNode("RigidFlag").InnerText;
             XmlNode RecurrenceXmlNode = EventScheduleNode.SelectSingleNode("Recurrence");
-            EventRepetitionflag = EventScheduleNode.SelectSingleNode("RepetitionFlag").InnerText;
+            XmlNode repetitionFlagNode = EventScheduleNode.SelectSingleNode("RepetitionFlag");
+            EventRepetitionflag = repetitionFlagNode.InnerText;
 
 
             DateTimeOffset StartDateTimeStruct = DateTimeOffset.Parse(EventScheduleNode.SelectSingleNode("StartTime").InnerText).UtcDateTime;
@@ -1652,21 +1653,12 @@ namespace TilerFront
             Repetition Recurrence;
             if (Convert.ToBoolean(EventRepetitionflag))
             {
-                /*
-                RepeatStart = RecurrenceXmlNode.SelectSingleNode("RepeatStartDate").InnerText;
-                RepeatEnd = RecurrenceXmlNode.SelectSingleNode("RepeatEndDate").InnerText;
-                RepeatFrequency = RecurrenceXmlNode.SelectSingleNode("RepeatFrequency").InnerText;
-                XmlNode XmlNodeWithList = RecurrenceXmlNode.SelectSingleNode("RepeatCalendarEvents");
-                Recurrence = new Repetition(true, new TimeLine(DateTimeOffset.Parse(RepeatStart), DateTimeOffset.Parse(RepeatEnd)), RepeatFrequency, getAllRepeatCalendarEvents(XmlNodeWithList, RangeOfLookUP));*/
-                Recurrence = getRepetitionObject(RecurrenceXmlNode, RangeOfLookUP, implementation); ;
+                Recurrence = getRepetitionObject(repetitionFlagNode,  RecurrenceXmlNode, RangeOfLookUP, implementation);
 
                 StartTimeConverted = (Recurrence.Range.Start);
                 EndTimeConverted = (Recurrence.Range.End);
             }
-            else
-            {
-                Recurrence = new Repetition();
-            }
+            Recurrence = new Repetition();
             Split = EventScheduleNode.SelectSingleNode("Split").InnerText;
             PreDeadline = EventScheduleNode.SelectSingleNode("PreDeadline").InnerText;
             //PreDeadlineFlag = EventScheduleNode.SelectSingleNode("PreDeadlineFlag").InnerText;
@@ -1948,36 +1940,50 @@ namespace TilerFront
             return retValue;
         }
 
-        Repetition getRepetitionObject(XmlNode RecurrenceXmlNode, TimeLine RangeOfLookUP, int implementation)
+        Repetition getRepetitionObject(XmlNode repetitionFlagNode, XmlNode RecurrenceXmlNode, TimeLine RangeOfLookUP, int implementation)
         {
+            bool repetitionFlag = Convert.ToBoolean(repetitionFlagNode.InnerText);
             Repetition RetValue = new Repetition();
             string RepeatSubEventStart;
             string RepeatSubEventEnd;
 
             if (implementation == 1)
             {
-                string Frequency= RecurrenceXmlNode.SelectSingleNode("RepeatFrequency").InnerText;
-                string RepeatStartData= RecurrenceXmlNode.SelectSingleNode("RepeatStart").InnerText;
-                string RepeatEndData= RecurrenceXmlNode.SelectSingleNode("RepeatEnd").InnerText;
-                string RepeatWeekDays = RecurrenceXmlNode.SelectSingleNode("RepeatWeekDays").InnerText;
-                RepeatSubEventStart = RecurrenceXmlNode.SelectSingleNode("RepeatSubEventStart").InnerText;
-                RepeatSubEventEnd = RecurrenceXmlNode.SelectSingleNode("RepeatSubEventEnd").InnerText;
-
-
-                TimeLine rangeTImeLine = new TimeLine(DateTimeOffset.Parse(RepeatStartData),DateTimeOffset.Parse(RepeatEndData));
-                TimeLine SubeventTImeLine = new TimeLine(DateTimeOffset.Parse(RepeatSubEventStart),DateTimeOffset.Parse(RepeatSubEventEnd));
-
-                int[] WeekDays = new int[0];
-                if (!string.IsNullOrEmpty( RepeatWeekDays))
+                if (repetitionFlag) 
                 {
-                    WeekDays = RepeatWeekDays.Split(',').Select(obj => Convert.ToInt32(obj)).ToArray();
+                    RetValue = new DB_Repetition();
                 }
-                
-                RetValue = new DB_Repetition(true, rangeTImeLine, Frequency, SubeventTImeLine, WeekDays);
+                else
+                {
+                    string Frequency = RecurrenceXmlNode.SelectSingleNode("RepeatFrequency").InnerText;
+                    string RepeatStartData = RecurrenceXmlNode.SelectSingleNode("RepeatStart").InnerText;
+                    string RepeatEndData = RecurrenceXmlNode.SelectSingleNode("RepeatEnd").InnerText;
+                    string RepeatWeekDays = RecurrenceXmlNode.SelectSingleNode("RepeatWeekDays").InnerText;
+                    RepeatSubEventStart = RecurrenceXmlNode.SelectSingleNode("RepeatSubEventStart").InnerText;
+                    RepeatSubEventEnd = RecurrenceXmlNode.SelectSingleNode("RepeatSubEventEnd").InnerText;
+
+
+                    TimeLine rangeTImeLine = new TimeLine(DateTimeOffset.Parse(RepeatStartData), DateTimeOffset.Parse(RepeatEndData));
+                    TimeLine SubeventTImeLine = new TimeLine(DateTimeOffset.Parse(RepeatSubEventStart), DateTimeOffset.Parse(RepeatSubEventEnd));
+
+                    int[] WeekDays = new int[0];
+                    if (!string.IsNullOrEmpty(RepeatWeekDays))
+                    {
+                        WeekDays = RepeatWeekDays.Split(',').Select(obj => Convert.ToInt32(obj)).ToArray();
+                    }
+
+                    RetValue = new DB_Repetition(true, rangeTImeLine, Frequency, SubeventTImeLine, WeekDays);
+                }
+
                 
                 return RetValue;
             }
 
+
+            if (repetitionFlag)
+            {
+                return RetValue;
+            }
             string RepeatStart = RecurrenceXmlNode.SelectSingleNode("RepeatStartDate").InnerText;
             string RepeatEnd = RecurrenceXmlNode.SelectSingleNode("RepeatEndDate").InnerText;
             string RepeatFrequency = RecurrenceXmlNode.SelectSingleNode("RepeatFrequency").InnerText;
@@ -2013,7 +2019,7 @@ namespace TilerFront
                     List<Repetition> repetitionNodes = new List<Repetition>();
                     foreach (XmlNode eacXmlNode in AllRepeatingDays)
                     {
-                        repetitionNodes.Add(getRepetitionObject(eacXmlNode, RangeOfLookUP, implementation));
+                        repetitionNodes.Add(getRepetitionObject(repetitionFlagNode, eacXmlNode, RangeOfLookUP, implementation));
                     }
 
                     RetValue = new DB_Repetition(true, new TimeLine(DateTimeOffset.Parse(RepeatStart).UtcDateTime, DateTimeOffset.Parse(RepeatEnd).UtcDateTime), RepeatFrequency, repetitionNodes.ToArray(), repetitionDay);
