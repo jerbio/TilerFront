@@ -8,7 +8,7 @@ namespace TilerFront
 {
     public class DB_SubCalendarEventExtra:SubCalendarEvent
     {
-        internal DB_SubCalendarEventExtra(SubCalendarEvent mySubCalEvent, NowProfile NowProfileData, Procrastination ProcrastinationData)
+        internal DB_SubCalendarEventExtra(SubCalendarEvent mySubCalEvent, Procrastination ProcrastinationData)
         {
             this.BusyFrame = mySubCalEvent.ActiveSlot;
             this.CalendarEventRange = mySubCalEvent.getCalendarEventRange;
@@ -30,7 +30,7 @@ namespace TilerFront
             this.preferredDayIndex = mySubCalEvent.UniversalDayIndex;
             this.PrepTime = mySubCalEvent.Preparation;
             this.Priority = mySubCalEvent.EventPriority;
-            this.ProfileOfNow = NowProfileData;
+            //this.ProfileOfNow = NowProfileData;
             this.ProfileOfProcrastination = ProcrastinationData;
             //this.RepetitionFlag = mySubCalEvent.FromRepeat;
             this.RigidSchedule = mySubCalEvent.Rigid;
