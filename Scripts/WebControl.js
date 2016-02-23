@@ -1,6 +1,6 @@
 ﻿"use strict"
 var DisableRegistration = false;
-var Debug = false;
+var Debug = true;
 var DebugLocal = false;
 
 //var global_refTIlerUrl = "http://localhost:53201/api/";
@@ -495,6 +495,7 @@ function global_goToError()
 }
 
 function global_goToLoginPage() {
+    debugger
     var urlString = "Index.html"
     window.location.href = urlString;
     return;
