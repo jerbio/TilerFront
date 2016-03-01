@@ -134,6 +134,7 @@ function GetCookieValue()//verifies that user has cookies
 
 
 
+
 function getLocation() {
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(populatePosition, showError);

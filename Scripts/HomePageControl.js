@@ -65,6 +65,7 @@ function retrieveUserSchedule(myurl, UserEntry,SuccessCallBack)
 {
     //$.get(myurl, generateCalendarEvents);
     //debugger;
+    retrieveUserSchedule.callAllBeforeRefreshCallbacks();
     var TimeZone = new Date().getTimezoneOffset();
     UserCredentials.UserName= UserEntry.UserName;//, : ,TimeZoneOffset: TimeZone };
     UserCredentials.ID = UserEntry.UserID;
@@ -73,6 +74,10 @@ function retrieveUserSchedule(myurl, UserEntry,SuccessCallBack)
     UserEntry.StartRange = (new Date()).getTime() - TwelveHourMilliseconds;
     UserEntry.EndRange = (new Date()).getTime()+TwelveHourMilliseconds;
     var HandleNEwPage = new LoadingScreenControl("Tiler is retrieving your schedule :)");
+    if(!!SuccessCallBack) 
+    {
+        retrieveUserSchedule.subscribeToSuccessfulRefresh(SuccessCallBack);
+    }
     HandleNEwPage.Launch();
     $.ajax({
         type: "GET",
@@ -83,7 +88,7 @@ function retrieveUserSchedule(myurl, UserEntry,SuccessCallBack)
         // DataType needs to stay, otherwise the response object
         // will be treated as a single string
         //dataType: "json",
-        success: SuccessCallBack,
+        success: retrieveUserSchedule.callAllCallbacks,
         error: function (err) {
             var myError = err;
             var step = "err";
@@ -93,6 +98,46 @@ function retrieveUserSchedule(myurl, UserEntry,SuccessCallBack)
         HandleNEwPage.Hide();
         var a = 1;
     });
+}
+retrieveUserSchedule.beforeRefreshCallbacks = {}
+retrieveUserSchedule.callbacks = {}
+
+retrieveUserSchedule.subscribeToBeforeRefresh = function (callbackFunction) {
+    if ((!retrieveUserSchedule.beforeRefreshCallbacks)) {
+        retrieveUserSchedule.beforeRefreshCallbacks = {}
+    }
+    retrieveUserSchedule.beforeRefreshCallbacks[Math.random().toString(36).substring(9)] = callbackFunction;
+}
+
+retrieveUserSchedule.subscribeToSuccessfulRefresh = function (callbackFunction) {
+    if ((!retrieveUserSchedule.callbacks))
+    {
+        retrieveUserSchedule.callbacks = {}
+    }
+    retrieveUserSchedule.callbacks[Math.random().toString(36).substring(9)] = callbackFunction;
+}
+
+retrieveUserSchedule.callAllBeforeRefreshCallbacks = function (data) {
+    debugger;
+    var keys = Object.keys(retrieveUserSchedule.beforeRefreshCallbacks);
+    for (var index in keys) {
+        var callback = retrieveUserSchedule.beforeRefreshCallbacks[keys[index]];
+        if (typeof callback === "function") {
+            callback(data)
+        }
+    }
+}
+
+retrieveUserSchedule.callAllCallbacks = function (data) {
+    debugger;
+    for (var index in Object.keys(retrieveUserSchedule.callbacks))
+    {
+        var callback = retrieveUserSchedule.callbacks[Object.keys(retrieveUserSchedule.callbacks)[index]];
+        if (typeof callback === "function") 
+        {
+            callback(data)
+        }
+    }
 }
 
 

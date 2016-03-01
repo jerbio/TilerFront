@@ -1,13 +1,13 @@
 {
   "manifest_version": 2,
 
-  "name": "Tiler Mobile",
+  "name": "Tiler",
   "description": "This extension launches quick access to tiler",
   "version": "1.0",
 
   "browser_action": {
-    "default_icon": "icon.png",
-    "default_popup": "LoggedInUser.html"
+    "default_icon": "img/Icons/logo.png",
+    "default_popup": "ChromeExtension.html"
   },
   "permissions": [
     "activeTab",
