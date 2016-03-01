@@ -257,6 +257,31 @@
             Initializes a new instance of the <see cref="T:TilerFront.Areas.HelpPage.HelpPageSampleGenerator"/> class.
             </summary>
         </member>
+        <member name="P:TilerFront.Areas.HelpPage.HelpPageSampleGenerator.ActualHttpMessageTypes">
+            <summary>
+            Gets CLR types that are used as the content of <see cref="T:System.Net.Http.HttpRequestMessage"/> or <see cref="T:System.Net.Http.HttpResponseMessage"/>.
+            </summary>
+        </member>
+        <member name="P:TilerFront.Areas.HelpPage.HelpPageSampleGenerator.ActionSamples">
+            <summary>
+            Gets the objects that are used directly as samples for certain actions.
+            </summary>
+        </member>
+        <member name="P:TilerFront.Areas.HelpPage.HelpPageSampleGenerator.SampleObjects">
+            <summary>
+            Gets the objects that are serialized as samples by the supported formatters.
+            </summary>
+        </member>
+        <member name="P:TilerFront.Areas.HelpPage.HelpPageSampleGenerator.SampleObjectFactories">
+            <summary>
+            Gets factories for the objects that the supported formatters will serialize as samples. Processed in order,
+            stopping when the factory successfully returns a non-<see langref="null"/> object.
+            </summary>
+            <remarks>
+            Collection includes just <see cref="M:TilerFront.Areas.HelpPage.ObjectGenerator.GenerateObject(System.Type)"/> initially. Use
+            <code>SampleObjectFactories.Insert(0, func)</code> to provide an override and
+            <code>SampleObjectFactories.Add(func)</code> to provide a fallback.</remarks>
+        </member>
         <member name="M:TilerFront.Areas.HelpPage.HelpPageSampleGenerator.GetSampleRequests(System.Web.Http.Description.ApiDescription)">
             <summary>
             Gets the request body samples for a given <see cref="T:System.Web.Http.Description.ApiDescription"/>.
@@ -329,31 +354,6 @@
             <param name="type">The type.</param>
             <param name="mediaType">Type of the media.</param>
             <returns></returns>
-        </member>
-        <member name="P:TilerFront.Areas.HelpPage.HelpPageSampleGenerator.ActualHttpMessageTypes">
-            <summary>
-            Gets CLR types that are used as the content of <see cref="T:System.Net.Http.HttpRequestMessage"/> or <see cref="T:System.Net.Http.HttpResponseMessage"/>.
-            </summary>
-        </member>
-        <member name="P:TilerFront.Areas.HelpPage.HelpPageSampleGenerator.ActionSamples">
-            <summary>
-            Gets the objects that are used directly as samples for certain actions.
-            </summary>
-        </member>
-        <member name="P:TilerFront.Areas.HelpPage.HelpPageSampleGenerator.SampleObjects">
-            <summary>
-            Gets the objects that are serialized as samples by the supported formatters.
-            </summary>
-        </member>
-        <member name="P:TilerFront.Areas.HelpPage.HelpPageSampleGenerator.SampleObjectFactories">
-            <summary>
-            Gets factories for the objects that the supported formatters will serialize as samples. Processed in order,
-            stopping when the factory successfully returns a non-<see langref="null"/> object.
-            </summary>
-            <remarks>
-            Collection includes just <see cref="M:TilerFront.Areas.HelpPage.ObjectGenerator.GenerateObject(System.Type)"/> initially. Use
-            <code>SampleObjectFactories.Insert(0, func)</code> to provide an override and
-            <code>SampleObjectFactories.Add(func)</code> to provide a fallback.</remarks>
         </member>
         <member name="T:TilerFront.Areas.HelpPage.HelpPageSampleKey">
             <summary>
@@ -887,32 +887,6 @@
             <param name="DaySelection"></param>
             <returns></returns>
         </member>
-        <member name="M:TilerFront.GoogleTilerEventControl.getThirdPartyControlForIndex">
-            <summary>
-            Function generates google calendar control. Its populated with events retrieved within +/- 90 days of google calendar update. It returns null if access to google api is lost.
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:TilerFront.GoogleTilerEventControl.getThirdPartyControlForIndex(System.Collections.Generic.IEnumerable{TilerFront.GoogleTilerEventControl})">
-            <summary>
-            Function generates google calendar control. Its populated with events retrieved within +/- 90 days of google calendar update. It returns null if access to google api is lost.
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:TilerFront.LogControl.getRestrictionTimeLine(System.Xml.XmlNode)">
-            <summary>
-            Funciton returns aall the possible active restriction timelines for the restriciton profile
-            </summary>
-            <param name="RestrictionTimeLineNode"></param>
-            <returns></returns>
-        </member>
-        <member name="M:TilerFront.LogControlDirect.UpdateReferenceDayInXMLLog(System.DateTimeOffset,System.String)">
-            <summary>
-            Function does nothing because updating start of day gets triggered in the manage controller
-            </summary>
-            <param name="referenceDay"></param>
-            <param name="LogFile"></param>
-        </member>
         <member name="P:TilerFront.Models.getEventModel.EventID">
             <summary>
             ID of the Event in tiler format. It should be in the format a_b_c
@@ -1077,6 +1051,32 @@
             <summary>
             is the restrcition to be for only work week.
             </summary>
+        </member>
+        <member name="M:TilerFront.GoogleTilerEventControl.getThirdPartyControlForIndex">
+            <summary>
+            Function generates google calendar control. Its populated with events retrieved within +/- 90 days of google calendar update. It returns null if access to google api is lost.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.GoogleTilerEventControl.getThirdPartyControlForIndex(System.Collections.Generic.IEnumerable{TilerFront.GoogleTilerEventControl})">
+            <summary>
+            Function generates google calendar control. Its populated with events retrieved within +/- 90 days of google calendar update. It returns null if access to google api is lost.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.LogControlDirect.UpdateReferenceDayInXMLLog(System.DateTimeOffset,System.String)">
+            <summary>
+            Function does nothing because updating start of day gets triggered in the manage controller
+            </summary>
+            <param name="referenceDay"></param>
+            <param name="LogFile"></param>
+        </member>
+        <member name="M:TilerFront.LogControl.getRestrictionTimeLine(System.Xml.XmlNode)">
+            <summary>
+            Funciton returns aall the possible active restriction timelines for the restriciton profile
+            </summary>
+            <param name="RestrictionTimeLineNode"></param>
+            <returns></returns>
         </member>
     </members>
 </doc>
