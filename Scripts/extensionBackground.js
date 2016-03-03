@@ -107,11 +107,15 @@ function getLatestData(data) {
 
     var subEvent = getSubEventWithEndTimeClosestToReftime(new Date(), formattedScheduleData.TotalSubEventList);
     if(!!subEvent)
-    {
+    {   
+        var title = { title: subEvent.SubCalCalendarName};
+        chrome.browserAction.setTitle(title)
         if (subEvent.SubCalStartDate.getTime() < (new Date()).getTime())
         {
             //setOrangeLogoIcon()
             chrome.browserAction.setBadgeBackgroundColor({ color: [255, 106, 0, 255] });
+
+            
             updateTimeSpanBadge(subEvent.SubCalEndDate)
         } else { 
             if (subEvent.SubCalStartDate.getTime() > (new Date()).getTime())
