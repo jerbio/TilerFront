@@ -1,4 +1,4 @@
-﻿"use strict"
+"use strict"
 var DisableRegistration = false;
 var Debug = true;
 var DebugLocal = false;
@@ -369,10 +369,14 @@ function StructuralizeNewData(NewData)
     return { TotalSubEventList: TotalSubEventList,ActiveSubEvents: ActiveSubEvents,Dictionary_OfCalendarData: Dictionary_OfCalendarData,Dictionary_OfSubEvents:Dictionary_OfSubEvents};
 }
 
-function getEventsWithinRange(RangeStart, RangeEned) {
+function getEventsWithinRange(RangeStart, RangeEned, subEvents) {
     var RetValue = new Array();
-    for (var i = 0 ; i < TotalSubEventList.length; i++) {
-        var eachSubEvent = TotalSubEventList[i];
+    if (!subEvents) {
+        subEvents = TotalSubEventList;
+    }
+    
+    for (var i = 0 ; i < subEvents.length; i++) {
+        var eachSubEvent = subEvents[i];
         if ((eachSubEvent.SubCalEndDate > RangeStart)  ) {
             if ((eachSubEvent.SubCalStartDate <= RangeEned))
             {
@@ -1874,7 +1878,13 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
         ImageAndTextContainer.Dom.appendChild(LoadScreenMessage.Dom);
         ImageAndTextContainer.Dom.appendChild(LaodingImageDom.Dom);
     
-        LoadingScreenPanel.appendChild(ImageAndTextContainer.Dom);
+        if(!!LoadingScreenPanel) {
+            LoadingScreenPanel.appendChild(ImageAndTextContainer.Dom);
+        }
+        else {
+            return;
+        }
+        
 
         LaunchImage();
     

@@ -23,6 +23,7 @@
     <IISExpressUseClassicPipelineMode />
     <NuGetPackageImportStamp>a9516574</NuGetPackageImportStamp>
     <ApplicationInsightsResourceId>/subscriptions/d6d53995-468d-414f-bf34-d7c3381b2429/resourcegroups/Default-ApplicationInsights-CentralUS/providers/microsoft.insights/components/TilerFront</ApplicationInsightsResourceId>
+    <UseGlobalApplicationHostFile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -445,6 +446,7 @@
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Scripts\exporting.js" />
+    <Content Include="Scripts\extensionBackground.js" />
     <Content Include="Scripts\highcharts.js" />
     <Content Include="Scripts\jqm-datebox-1.4.4.core.min.js" />
     <Content Include="Scripts\jqm-datebox-1.4.4.mode.flipbox.min.js" />

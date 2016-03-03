@@ -1,4 +1,4 @@
-﻿var TotalSubEventList = new Array();
+var TotalSubEventList = new Array();
 var ActiveSubEvents = new Array();
 var TwelveHourMilliseconds = OneHourInMs * 12;
 var Dictionary_OfSubEvents = {};
@@ -73,12 +73,19 @@ function retrieveUserSchedule(myurl, UserEntry,SuccessCallBack)
     UserEntry.TimeZoneOffset = UserCredentials.TimeZoneOffset;
     UserEntry.StartRange = (new Date()).getTime() - TwelveHourMilliseconds;
     UserEntry.EndRange = (new Date()).getTime()+TwelveHourMilliseconds;
-    var HandleNEwPage = new LoadingScreenControl("Tiler is retrieving your schedule :)");
+    var HandleNewPage = new LoadingScreenControl("Tiler is retrieving your schedule :)");
     if(!!SuccessCallBack) 
     {
-        retrieveUserSchedule.subscribeToSuccessfulRefresh(SuccessCallBack);
+        if (typeof SuccessCallBack === "function")
+        {
+            retrieveUserSchedule.subscribeToSuccessfulRefresh(SuccessCallBack);
+        }
+        
     }
-    HandleNEwPage.Launch();
+    if(!!HandleNewPage.Launch){
+        HandleNewPage.Launch();
+    }
+    
     $.ajax({
         type: "GET",
         url: myurl,
@@ -95,7 +102,9 @@ function retrieveUserSchedule(myurl, UserEntry,SuccessCallBack)
         }
 
     }).done(function (data) {
-        HandleNEwPage.Hide();
+        if(!!HandleNewPage.Hide){    
+            HandleNewPage.Hide();
+        }
         var a = 1;
     });
 }
@@ -118,25 +127,18 @@ retrieveUserSchedule.subscribeToSuccessfulRefresh = function (callbackFunction) 
 }
 
 retrieveUserSchedule.callAllBeforeRefreshCallbacks = function (data) {
-    debugger;
     var keys = Object.keys(retrieveUserSchedule.beforeRefreshCallbacks);
     for (var index in keys) {
         var callback = retrieveUserSchedule.beforeRefreshCallbacks[keys[index]];
-        if (typeof callback === "function") {
-            callback(data)
-        }
+        callback(data)
     }
 }
 
 retrieveUserSchedule.callAllCallbacks = function (data) {
-    debugger;
     for (var index in Object.keys(retrieveUserSchedule.callbacks))
     {
         var callback = retrieveUserSchedule.callbacks[Object.keys(retrieveUserSchedule.callbacks)[index]];
-        if (typeof callback === "function") 
-        {
-            callback(data)
-        }
+        callback(data)
     }
 }
 
