@@ -813,6 +813,7 @@
             <param name="UserData"></param>
             <returns></returns>
         </member>
+<<<<<<< HEAD
         <member name="M:TilerFront.Controllers.ScheduleController.ProcrastinateSubCalendarEvent(TilerFront.Models.ProcrastinateEventModel)">
             <summary>
             Procrastinate a given event. 
@@ -994,6 +995,8 @@
             </summary>
             <returns></returns>
         </member>
+=======
+>>>>>>> fixed schedule population with a performance boost. However, I need to ensure that the new schedule can be recreated there is an error that is being thrown.
         <member name="T:TilerFront.Models.UnregisteredEvent">
             <summary>
             Represents an Event that has not being added to a users schedule. 
@@ -1105,6 +1108,7 @@
             is the restrcition to be for only work week.
             </summary>
         </member>
+<<<<<<< HEAD
         <member name="M:TilerFront.GoogleTilerEventControl.getThirdPartyControlForIndex">
             <summary>
             Function generates google calendar control. Its populated with events retrieved within +/- 90 days of google calendar update. It returns null if access to google api is lost.
@@ -1117,6 +1121,8 @@
             </summary>
             <returns></returns>
         </member>
+=======
+>>>>>>> fixed schedule population with a performance boost. However, I need to ensure that the new schedule can be recreated there is an error that is being thrown.
         <member name="M:TilerFront.LogControlDirect.UpdateReferenceDayInXMLLog(System.DateTimeOffset,System.String)">
             <summary>
             Function does nothing because updating start of day gets triggered in the manage controller
@@ -1124,6 +1130,7 @@
             <param name="referenceDay"></param>
             <param name="LogFile"></param>
         </member>
+<<<<<<< HEAD
         <member name="M:TilerFront.LogControl.updateBigData(System.Xml.XmlDocument,System.Xml.XmlDocument)">
             <summary>
             Function is to be called for the generation of auto logs for a user interaction with the schedule
@@ -1144,6 +1151,8 @@
             <param name="SubEvent"></param>
             <returns></returns>
         </member>
+=======
+>>>>>>> fixed schedule population with a performance boost. However, I need to ensure that the new schedule can be recreated there is an error that is being thrown.
         <member name="M:TilerFront.LogControl.getRestrictionTimeLine(System.Xml.XmlNode)">
             <summary>
             Funciton returns aall the possible active restriction timelines for the restriciton profile
