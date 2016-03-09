@@ -11,6 +11,8 @@ using DBTilerElement;
 using TilerElements;
 using System.Threading.Tasks;
 using System.IO.Compression;
+using DBTilerElement;
+using System.Diagnostics;
 #if ForceReadFromXml
 #else
 using CassandraUserLog;
@@ -35,10 +37,12 @@ namespace TilerFront
         protected bool UpdateLocaitionCache = false;
         protected Dictionary<string, Location_Elements> CachedLocation;
         protected Location_Elements DefaultLocation= new Location_Elements();
+
         protected Location_Elements NewLocation;
         protected DB_UserActivity activity;
-
-
+        protected int newImplementation = 0;
+        Stopwatch debugStopWatch = new Stopwatch();
+        public long totalReadMS = 0;
 #if ForceReadFromXml
 #else
         protected CassandraUserLog.CassandraLog myCassandraAccess;
@@ -93,7 +97,7 @@ namespace TilerFront
                 + " You realized that non-rigid subevents still get persisted and are not calculated on the fly which is unlike their rigid counterparts(I havent tested the latter part because, but this branch is called newrigidimplementation aka on the fly rigid calculations).\n"
                 + " You might want to resdesign the calls for the creation of non-rigid subevents to be calculated on the fly";
 
-            throw new Exception(message);
+            //throw new Exception(message);
             Tuple<bool, string, string> VerifiedUser = LogDBDataAccess.LogIn();
             CurrentLog = "";
             if (VerifiedUser.Item1)
@@ -1069,14 +1073,10 @@ namespace TilerFront
             MyEventSubScheduleNode.ChildNodes[0].InnerXml = CreateConflictProfile(MySubEvent.Conflicts, "ConflictProfile").InnerXml;
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("Restricted"));
             MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.isEventRestricted.ToString();
-<<<<<<< HEAD
             MyEventSubScheduleNode.PrependChild(CreatePauseUsedUpNode(MySubEvent, xmldoc));
 
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("NowProfile"));
             MyEventSubScheduleNode.ChildNodes[0].InnerXml = (generateNowProfileNode(MySubEvent.NowInfo).InnerXml);
-
-=======
->>>>>>> Removed unnecessary calls to now profile
             if (MySubEvent.isEventRestricted)
             {
                 restrictedMySub = (SubCalendarEventRestricted)MySubEvent;
@@ -1529,7 +1529,7 @@ namespace TilerFront
                     foreach (XmlNode EventScheduleNode in RigidNode.ChildNodes)
                     {
                         CalendarEvent RetrievedEvent;
-                        RetrievedEvent = getCalendarEventObjFromNode(EventScheduleNode, RangeOfLookUP,1);
+                        RetrievedEvent = getCalendarEventObjFromNode(EventScheduleNode, RangeOfLookUP, newImplementation);
                         if (RetrievedEvent != null)
                         { MyCalendarEventDictionary.Add(RetrievedEvent.Calendar_EventID.getCalendarEventComponent(), RetrievedEvent); }
                     }
@@ -1541,7 +1541,7 @@ namespace TilerFront
                     foreach (XmlNode EventScheduleNode in NonRigidNode.ChildNodes)
                     {
                         CalendarEvent RetrievedEvent;
-                        RetrievedEvent = getCalendarEventObjFromNode(EventScheduleNode, RangeOfLookUP, 0);
+                        RetrievedEvent = getCalendarEventObjFromNode(EventScheduleNode, RangeOfLookUP, newImplementation);
                         if (RetrievedEvent != null)
                         { MyCalendarEventDictionary.Add(RetrievedEvent.Calendar_EventID.getCalendarEventComponent(), RetrievedEvent); }
                     }
@@ -1702,7 +1702,8 @@ namespace TilerFront
             
             //
             CalendarEvent RetrievedEvent;
-            if(implementation==1)
+            //debugStopWatch.Start();
+            if (implementation == 1)
             {
                 TimeSpan SpanPerSplit = TimeSpan.Parse(EventScheduleNode.SelectSingleNode("TimePerSplit").InnerText);
                 RetrievedEvent = new DB_CalendarEventFly(ID, Name, StartDateTimeStruct, EndDateTimeStruct, 0, Recurrence, var3, SpanPerSplit, OriginalStart, PrepTimeData, PreDeadlineData, RigidFlag, SplitCount, UiData, noteData, completedFlag, 0, procrastinationData, NowProfileData, CompleteCount, DeleteCount, AllUserIDs);
@@ -1731,25 +1732,27 @@ namespace TilerFront
 
                 RetrievedEvent.InitializeCounts(DeleteCount, CompleteCount);
             }
+            /*
+            debugStopWatch.Stop();
 
+            totalReadMS += debugStopWatch.ElapsedMilliseconds;*/
 
-            
 
 
             //((DB_CalendarEventFly)RetrievedEvent).UpdateModifiable(AllSubCalEvents);
-            
+
             //AllSubCalEvents
-            
-            
-            
+
+
+
             /*if (AllSubCalEvents.Length < 1)
             {
                 return null;
             }*/
             //RetrievedEvent = new CalendarEvent(RetrievedEvent, AllSubCalEvents);
-            
-            
-            
+
+
+
 
             return RetrievedEvent;
         }
@@ -1773,66 +1776,66 @@ namespace TilerFront
         List<SubCalendarEvent> ReadSubSchedulesFromXMLNode(XmlNode MyXmlNode, CalendarEvent MyParent, TimeLine RangeOfLookUP)
         {
             List<SubCalendarEvent> MyArrayOfNodes = new List<SubCalendarEvent>();
-            string ID = "";
-            DateTimeOffset Start = new DateTimeOffset();
-            DateTimeOffset End = new DateTimeOffset();
-            TimeSpan SubScheduleDuration = new TimeSpan();
-            TimeSpan PrepTime = new TimeSpan();
-            BusyTimeLine BusySlot = new BusyTimeLine();
-            bool Enabled;
-            for (int i = 0; i < MyXmlNode.ChildNodes.Count; i++)
+            if (MyXmlNode != null)
             {
-
-                XmlNode SubEventNode = MyXmlNode.ChildNodes[i];
-                BusyTimeLine SubEventActivePeriod = new BusyTimeLine(MyXmlNode.ChildNodes[i].SelectSingleNode("ID").InnerText, stringToDateTime(MyXmlNode.ChildNodes[i].SelectSingleNode("ActiveStartTime").InnerText), stringToDateTime(MyXmlNode.ChildNodes[i].SelectSingleNode("ActiveEndTime").InnerText));
-                ID = EventID.convertToSubcalendarEventID(MyXmlNode.ChildNodes[i].SelectSingleNode("ID").InnerText).ToString();
-                Start = DateTimeOffset.Parse(MyXmlNode.ChildNodes[i].SelectSingleNode("ActiveStartTime").InnerText).UtcDateTime;
-                End = DateTimeOffset.Parse(MyXmlNode.ChildNodes[i].SelectSingleNode("ActiveEndTime").InnerText).UtcDateTime;
-
-                bool rigidFlag =MyParent.Rigid;
-                XmlNode rigidNode = MyXmlNode.ChildNodes[i].SelectSingleNode("Rigid");
-                if (rigidNode!=null)
+                string ID = "";
+                DateTimeOffset Start = new DateTimeOffset();
+                DateTimeOffset End = new DateTimeOffset();
+                TimeSpan SubScheduleDuration = new TimeSpan();
+                TimeSpan PrepTime = new TimeSpan();
+                BusyTimeLine BusySlot = new BusyTimeLine();
+                bool Enabled;
+                for (int i = 0; i < MyXmlNode.ChildNodes.Count; i++)
                 {
-                    rigidFlag=Convert.ToBoolean(rigidNode.InnerText);
-                }
+                    XmlNode SubEventNode = MyXmlNode.ChildNodes[i];
+                    BusyTimeLine SubEventActivePeriod = new BusyTimeLine(MyXmlNode.ChildNodes[i].SelectSingleNode("ID").InnerText, stringToDateTime(MyXmlNode.ChildNodes[i].SelectSingleNode("ActiveStartTime").InnerText), stringToDateTime(MyXmlNode.ChildNodes[i].SelectSingleNode("ActiveEndTime").InnerText));
+                    ID = EventID.convertToSubcalendarEventID(MyXmlNode.ChildNodes[i].SelectSingleNode("ID").InnerText).ToString();
+                    Start = DateTimeOffset.Parse(MyXmlNode.ChildNodes[i].SelectSingleNode("ActiveStartTime").InnerText).UtcDateTime;
+                    End = DateTimeOffset.Parse(MyXmlNode.ChildNodes[i].SelectSingleNode("ActiveEndTime").InnerText).UtcDateTime;
 
-                if (RangeOfLookUP.InterferringTimeLine(new TimeLine(Start, End)) == null)
-                {
-                    continue;
-                }
+                    bool rigidFlag = MyParent.Rigid;
+                    XmlNode rigidNode = MyXmlNode.ChildNodes[i].SelectSingleNode("Rigid");
+                    if (rigidNode != null)
+                    {
+                        rigidFlag = Convert.ToBoolean(rigidNode.InnerText);
+                    }
 
-                BusySlot = new BusyTimeLine(ID, Start, End);
-                PrepTime = new TimeSpan(ConvertToMinutes(MyXmlNode.ChildNodes[i].SelectSingleNode("PrepTime").InnerText) * 60 * 10000000);
-                //stringToDateTime();
-                Start = DateTimeOffset.Parse(MyXmlNode.ChildNodes[i].SelectSingleNode("StartTime").InnerText).UtcDateTime;
-                End = DateTimeOffset.Parse(MyXmlNode.ChildNodes[i].SelectSingleNode("EndTime").InnerText).UtcDateTime;
-                Enabled = Convert.ToBoolean(MyXmlNode.ChildNodes[i].SelectSingleNode("Enabled").InnerText);
-                bool CompleteFlag = Convert.ToBoolean(MyXmlNode.ChildNodes[i].SelectSingleNode("Complete").InnerText);
-                Location_Elements var1 = getLocation(MyXmlNode.ChildNodes[i]);
-                MiscData noteData = getMiscData(MyXmlNode.ChildNodes[i]);
-                EventDisplay UiData = getDisplayUINode(MyXmlNode.ChildNodes[i]);
-                ConflictProfile conflictProfile = getConflctProfile(MyXmlNode.ChildNodes[i]);
+                    if (RangeOfLookUP.InterferringTimeLine(new TimeLine(Start, End)) == null)
+                    {
+                        continue;
+                    }
 
-                NowProfile nowInfo = generateNowProfile(MyXmlNode.ChildNodes[i]);
+                    BusySlot = new BusyTimeLine(ID, Start, End);
+                    PrepTime = new TimeSpan(ConvertToMinutes(MyXmlNode.ChildNodes[i].SelectSingleNode("PrepTime").InnerText) * 60 * 10000000);
+                    //stringToDateTime();
+                    Start = DateTimeOffset.Parse(MyXmlNode.ChildNodes[i].SelectSingleNode("StartTime").InnerText).UtcDateTime;
+                    End = DateTimeOffset.Parse(MyXmlNode.ChildNodes[i].SelectSingleNode("EndTime").InnerText).UtcDateTime;
+                    Enabled = Convert.ToBoolean(MyXmlNode.ChildNodes[i].SelectSingleNode("Enabled").InnerText);
+                    bool CompleteFlag = Convert.ToBoolean(MyXmlNode.ChildNodes[i].SelectSingleNode("Complete").InnerText);
+                    Location_Elements var1 = getLocation(MyXmlNode.ChildNodes[i]);
+                    MiscData noteData = getMiscData(MyXmlNode.ChildNodes[i]);
+                    EventDisplay UiData = getDisplayUINode(MyXmlNode.ChildNodes[i]);
+                    ConflictProfile conflictProfile = getConflctProfile(MyXmlNode.ChildNodes[i]);
 
-                XmlNode OriginalStartNode = MyXmlNode.ChildNodes[i].SelectSingleNode("OriginalStart");
-                DateTimeOffset OriginalStart;
-                if (OriginalStartNode == null)
-                {
-                    OriginalStart = MyParent.Start;
-                }
-                else
-                {
-                    OriginalStart = DateTimeOffset.Parse(MyXmlNode.ChildNodes[i].SelectSingleNode("OriginalStart").InnerText).UtcDateTime;
-                }
+                    NowProfile nowInfo = generateNowProfile(MyXmlNode.ChildNodes[i]);
+
+                    XmlNode OriginalStartNode = MyXmlNode.ChildNodes[i].SelectSingleNode("OriginalStart");
+                    DateTimeOffset OriginalStart;
+                    if (OriginalStartNode == null)
+                    {
+                        OriginalStart = MyParent.Start;
+                    }
+                    else
+                    {
+                        OriginalStart = DateTimeOffset.Parse(MyXmlNode.ChildNodes[i].SelectSingleNode("OriginalStart").InnerText).UtcDateTime;
+                    }
 
 
 
-                SubCalendarEvent retrievedSubEvent = new DB_SubCalendarEvent(ID, BusySlot, Start, End, PrepTime, OriginalStart, MyParent.ID, rigidFlag, Enabled, UiData, noteData, CompleteFlag, var1, MyParent.RangeTimeLine, conflictProfile);
-                retrievedSubEvent.ThirdPartyID = MyXmlNode.ChildNodes[i].SelectSingleNode("ThirdPartyID").InnerText;//this is a hack to just update the Third partyID
-                XmlNode restrictedNode = MyXmlNode.ChildNodes[i].SelectSingleNode("Restricted");
+                    SubCalendarEvent retrievedSubEvent = new DB_SubCalendarEvent(ID, BusySlot, Start, End, PrepTime, OriginalStart, MyParent.ID, rigidFlag, Enabled, UiData, noteData, CompleteFlag, var1, MyParent.RangeTimeLine, conflictProfile);
+                    retrievedSubEvent.ThirdPartyID = MyXmlNode.ChildNodes[i].SelectSingleNode("ThirdPartyID").InnerText;//this is a hack to just update the Third partyID
+                    XmlNode restrictedNode = MyXmlNode.ChildNodes[i].SelectSingleNode("Restricted");
 
-<<<<<<< HEAD
 
                 retrievedSubEvent = new DB_SubCalendarEvent(retrievedSubEvent, MyParent.NowInfo, MyParent.ProcrastinationInfo);
                 
@@ -1840,23 +1843,23 @@ namespace TilerFront
                 (retrievedSubEvent as DB_SubCalendarEvent).UsedTime = PauseData.Item1;
                 (retrievedSubEvent as DB_SubCalendarEvent).PauseTime = PauseData.Item2;
 
-=======
                 retrievedSubEvent = new DB_SubCalendarEventExtra(retrievedSubEvent, MyParent.ProcrastinationInfo);
->>>>>>> Removed unnecessary calls to now profile
 
 
-                if (restrictedNode != null)
-                {
-                    if (Convert.ToBoolean(restrictedNode.InnerText))
-                    { 
-                        XmlNode RestrictionProfileNode =MyXmlNode.ChildNodes[i].SelectSingleNode("RestrictionProfile");
-                        DB_RestrictionProfile myRestrictionProfile = (DB_RestrictionProfile)getRestrictionProfile(RestrictionProfileNode);
-                        retrievedSubEvent = new DB_SubCalendarEventRestricted(retrievedSubEvent, myRestrictionProfile);
-                        (retrievedSubEvent as DB_SubCalendarEventRestricted).UsedTime = PauseData.Item1;
-                        (retrievedSubEvent as DB_SubCalendarEventRestricted).PauseTime = PauseData.Item2;
+
+                    if (restrictedNode != null)
+                    {
+                        if (Convert.ToBoolean(restrictedNode.InnerText))
+                        {
+                            XmlNode RestrictionProfileNode = MyXmlNode.ChildNodes[i].SelectSingleNode("RestrictionProfile");
+                            DB_RestrictionProfile myRestrictionProfile = (DB_RestrictionProfile)getRestrictionProfile(RestrictionProfileNode);
+                            retrievedSubEvent = new DB_SubCalendarEventRestricted(retrievedSubEvent, myRestrictionProfile);
+                            (retrievedSubEvent as DB_SubCalendarEventRestricted).UsedTime = PauseData.Item1;
+                            (retrievedSubEvent as DB_SubCalendarEventRestricted).PauseTime = PauseData.Item2;
+                        }
                     }
+                    MyArrayOfNodes.Add(retrievedSubEvent);
                 }
-                MyArrayOfNodes.Add(retrievedSubEvent);
             }
 
             return MyArrayOfNodes;
