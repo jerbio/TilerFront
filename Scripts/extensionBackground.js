@@ -99,6 +99,7 @@ function getLatestData(data) {
             }
         }
         else {
+            chrome.alarms.clear("RefreshTimeSpanForSubEvent")
             getNewData()
         }
     }

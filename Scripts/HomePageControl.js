@@ -74,14 +74,6 @@ function retrieveUserSchedule(myurl, UserEntry,SuccessCallBack)
     UserEntry.StartRange = (new Date()).getTime() - TwelveHourMilliseconds;
     UserEntry.EndRange = (new Date()).getTime()+TwelveHourMilliseconds;
     var HandleNewPage = new LoadingScreenControl("Tiler is retrieving your schedule :)");
-    if(!!SuccessCallBack) 
-    {
-        if (typeof SuccessCallBack === "function")
-        {
-            retrieveUserSchedule.subscribeToSuccessfulRefresh(SuccessCallBack);
-        }
-        
-    }
     if(!!HandleNewPage.Launch){
         HandleNewPage.Launch();
     }
@@ -95,7 +87,10 @@ function retrieveUserSchedule(myurl, UserEntry,SuccessCallBack)
         // DataType needs to stay, otherwise the response object
         // will be treated as a single string
         //dataType: "json",
-        success: retrieveUserSchedule.callAllCallbacks,
+        success: function(response) {
+            SuccessCallBack(response)
+            retrieveUserSchedule.callAllCallbacks(response)
+        },
         error: function (err) {
             var myError = err;
             var step = "err";
