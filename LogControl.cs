@@ -10,6 +10,8 @@ using System.Threading;
 using DBTilerElement;
 using TilerElements;
 using System.Threading.Tasks;
+using System.IO.Compression;
+
 #if ForceReadFromXml
 #else
 using CassandraUserLog;
@@ -33,6 +35,7 @@ namespace TilerFront
         protected bool LogStatus;
         protected Dictionary<string, Location_Elements> CachedLocation;
         protected Location_Elements DefaultLocation= new Location_Elements();
+        protected DB_UserActivity activity;
 
 #if ForceReadFromXml
 #else
@@ -122,7 +125,10 @@ namespace TilerFront
 
                     ScheduleMetadata = resultofLatestChange;
                 }
-
+                if(activity == null)
+                {
+                    activity = new DB_UserActivity(new ReferenceNow(DateTimeOffset.Now, ScheduleMetadata.Item3), UserActivity.ActivityType.None);
+                }
                 NameOfUser = VerifiedUser.Item3;
             }
         }
@@ -296,6 +302,71 @@ namespace TilerFront
             }
 
             return retValue;
+        }
+
+        public void updateBigData (XmlDocument oldData, XmlDocument newData)
+        {
+            XmlDocument combinedDoc = new XmlDocument();
+            XmlNode timeOfCreation = combinedDoc.CreateElement("TimeOfCreation");
+            timeOfCreation.InnerXml = activity.ToXML();
+            XmlNode beforeProcessing = combinedDoc.CreateElement("BeforeProcessing");
+            XmlNode importedNBeforeProcessingNode = combinedDoc.ImportNode(oldData as XmlNode, true);
+            beforeProcessing.PrependChild(importedNBeforeProcessingNode);
+
+            XmlNode afterProcessing = combinedDoc.CreateElement("AfterProcessing");
+            XmlNode importedNAfterProcessingNode = combinedDoc.ImportNode(newData as XmlNode, true);
+            afterProcessing.PrependChild(importedNAfterProcessingNode);
+
+            combinedDoc.PrependChild(beforeProcessing);
+            combinedDoc.PrependChild(afterProcessing);
+            MemoryStream xmlStream = new MemoryStream();
+            combinedDoc.Save(xmlStream);
+            string zipFile = LoggedUserID + ".zip";
+            string zipFolder = LoggedUserID;
+            DateTimeOffset javascriptStart = new DateTimeOffset(1970, 1, 1, 0, 0, 0,new TimeSpan());
+            string beforFileName = DateTimeOffset.UtcNow
+               .Subtract(javascriptStart)
+               .TotalMilliseconds.ToString();
+            try
+            {
+                if(Directory.Exists(zipFile))
+                {
+                    using (FileStream zipToOpen = new FileStream(@zipFile, FileMode.Open))
+                    {
+                        using (ZipArchive archive = new ZipArchive(zipToOpen, ZipArchiveMode.Update))
+                        {
+                            ZipArchiveEntry readmeEntry = archive.CreateEntry("Readme.txt");
+                            using (StreamWriter writer = new StreamWriter(readmeEntry.Open()))
+                            {
+                                writer.WriteLine("Information about this package.");
+                                writer.WriteLine("========================");
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    DirectoryInfo zipFolderDir = System.IO.Directory.CreateDirectory(zipFolder);
+                    string fileDir = @zipFolderDir.ToString() + zipFile + ".zip";
+                    var fileStream = File.Create(fileDir);
+                    xmlStream.CopyTo(fileStream);
+                    ZipFile.CreateFromDirectory(zipFolderDir.Name, fileDir);
+                }
+
+                string NameOfFile = zipFile;
+                if (File.Exists(NameOfFile))
+                {
+                    File.Delete(NameOfFile);
+                }
+
+                FileStream myFileStream = File.Create(NameOfFile);
+                myFileStream.Close();
+                EmptyCalendarXMLFile(NameOfFile);
+            }
+            catch (Exception e)
+            {
+                retValue = new CustomErrors(true, "Error generating log\n" + e.ToString(), 20000000);
+            }
         }
 
         virtual public void UpdateReferenceDayInXMLLog(DateTimeOffset referenceDay, string LogFile = "")
