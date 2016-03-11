@@ -1,7 +1,7 @@
 "use strict"
 var DisableRegistration = false;
 var Debug = true;
-var DebugLocal = false;
+var DebugLocal = true;
 
 //var global_refTIlerUrl = "http://localhost:53201/api/";
 //var global_refTIlerUrl = "http://tilersmart.azurewebsites.net/api/";
@@ -11,7 +11,7 @@ if (Debug)
     global_refTIlerUrl = "http://mytilerKid.azurewebsites.net/api/";
     if(DebugLocal)
     {
-        global_refTIlerUrl = "http://localhost:11919/api/";
+        global_refTIlerUrl = "https://localhost:44305/api/";
     }
 }
 var global_PositionCoordinate = { Latitude: 40.0274, Longitude: -105.2519, isInitialized: false, Message: "Uninitialized" };;

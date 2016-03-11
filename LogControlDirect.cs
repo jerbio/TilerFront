@@ -45,6 +45,7 @@ namespace TilerFront
             SessionUser = User;
             LogStatus = false;
             CachedLocation = new Dictionary<string, Location_Elements>();
+            
             if ((PassiveInitialization)&&(SessionUser!=null))
             {
 #if ForceReadFromXml
@@ -59,9 +60,7 @@ namespace TilerFront
                 ID = SessionUser.Id;
                 UserName = SessionUser.UserName;
                 LogDBDataAccess = new DBControlDirect(User.Id,User.UserName);
-
             }
-
         }
 
         public async Task<Models.ApplicationUser> forceLogin()
@@ -101,47 +100,44 @@ namespace TilerFront
                 return;
             }
             CurrentLog = "";
-            //if (VerifiedUser.Item1)
-            {
 
-                if (SessionUser == null)
-                {
-                    return;
-                }
-                if (true)
-                {
-                    Tuple<bool, string, string> VerifiedUser = LogDBDataAccess.LogIn();
-                    CurrentLog = SessionUser.Id.ToString() + ".xml";
-                    string LogDir = (WagTapLogLocation + CurrentLog);
-                    string myCurrDir = Directory.GetCurrentDirectory();
-                    Console.WriteLine("Log DIR is:" + LogDir);
-                    LogStatus = File.Exists(LogDir);
+            if (SessionUser == null)
+            {
+                return;
+            }
+            if (true)
+            {
+                Tuple<bool, string, string> VerifiedUser = LogDBDataAccess.LogIn();
+                CurrentLog = SessionUser.Id.ToString() + ".xml";
+                string LogDir = (WagTapLogLocation + CurrentLog);
+                string myCurrDir = Directory.GetCurrentDirectory();
+                Console.WriteLine("Log DIR is:" + LogDir);
+                LogStatus = File.Exists(LogDir);
 #if ForceReadFromXml
 
 #else
-                    Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, Location_Elements>> tempProfileData = await getProfileInfo();
-                    LogDBDataAccess.CreateLatestChange(this.ID, new DateTimeOffset(), Convert.ToInt64(LastIDNumber));
-                    Tuple<bool, string, DateTimeOffset, long> resultofLatestChange = await LogDBDataAccess.getLatestChanges(VerifiedUser.Item2);
-                    myCassandraAccess.BatchMigrateXMLToCassandra(this);
+                Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, Location_Elements>> tempProfileData = await getProfileInfo();
+                LogDBDataAccess.CreateLatestChange(this.ID, new DateTimeOffset(), Convert.ToInt64(LastIDNumber));
+                Tuple<bool, string, DateTimeOffset, long> resultofLatestChange = await LogDBDataAccess.getLatestChanges(VerifiedUser.Item2);
+                myCassandraAccess.BatchMigrateXMLToCassandra(this);
 #endif
-                }
-                else
-                {
+            }
+            else
+            {
                     
 #if ForceReadFromXml
-                    CurrentLog = SessionUser.Id.ToString() + ".xml";
-                    string LogDir = (WagTapLogLocation + CurrentLog);
-                    string myCurrDir = Directory.GetCurrentDirectory();
-                    Console.WriteLine("Log DIR is:" + LogDir);
-                    LogStatus = File.Exists(LogDir);
+                CurrentLog = SessionUser.Id.ToString() + ".xml";
+                string LogDir = (WagTapLogLocation + CurrentLog);
+                string myCurrDir = Directory.GetCurrentDirectory();
+                Console.WriteLine("Log DIR is:" + LogDir);
+                LogStatus = File.Exists(LogDir);
 #else
-                    LogStatus = true;
-                    //LastIDNumber = resultofLatestChange.Item4.ToString();
-                    useCassandra = true;
+                LogStatus = true;
+                //LastIDNumber = resultofLatestChange.Item4.ToString();
+                useCassandra = true;
 #endif
 
-                    //ScheduleMetadata = resultofLatestChange;
-                }
+                //ScheduleMetadata = resultofLatestChange;
             }
         }
 

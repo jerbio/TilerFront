@@ -166,8 +166,9 @@ namespace TilerFront.Controllers
                             await googleControl.updateSubEvent(myUser).ConfigureAwait(false);
                             Dictionary<string, CalendarEvent> AllCalendarEvents = (await googleControl.getCalendarEvents().ConfigureAwait(false)).ToDictionary(obj => obj.ID, obj => obj);
                             GoogleThirdPartyControl googleEvents = new GoogleThirdPartyControl(AllCalendarEvents);
+                            DB_UserActivity activity = new DB_UserActivity(myNow, UserActivity.ActivityType.ThirdPartyUpdate);
+                            retrievedUser.ScheduleLogControl.updateUserActivty(activity);
 
-                            
                             await NewSchedule.updateDataSetWithThirdPartyDataAndTriggerNewAddition(new Tuple<ThirdPartyControl.CalendarTool, IEnumerable<CalendarEvent>>(ThirdPartyControl.CalendarTool.Google, new List<CalendarEvent> { googleEvents.getThirdpartyCalendarEvent() })).ConfigureAwait(false);
 
                             retValue = new PostBackData("\"Success\"", 0);
@@ -196,6 +197,8 @@ namespace TilerFront.Controllers
                             int SplitCount = (int)myUser.Split;
                             //TimeSpan SpanPerSplit = TimeSpan.FromMilliseconds(myUser.Duration);
                             Tuple<CustomErrors, Dictionary<string, CalendarEvent>> ScheduleUpdateMessage = NewSchedule.BundleChangeUpdate(myUser.EventID, myUser.EventName, newStart, newEnd, Begin, Deadline, SplitCount);//, SpanPerSplit);
+                            DB_UserActivity activity = new DB_UserActivity(myNow, UserActivity.ActivityType.InternalUpdate, new List<String>() { myUser.EventID });
+                            retrievedUser.ScheduleLogControl.updateUserActivty(activity);
                             await NewSchedule.UpdateWithProcrastinateSchedule(ScheduleUpdateMessage.Item2).ConfigureAwait(false);
                             retValue = new PostBackData(ScheduleUpdateMessage.Item1);
                         }

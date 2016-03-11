@@ -721,7 +721,7 @@
             <summary>
             Sets the earleiest valid sub event to current time. Essentially, makes the event have a start time of now.
             </summary>
-            <param name="myUser"></param>
+            <param name="nowEvent"></param>
             <returns></returns>
         </member>
         <member name="M:TilerFront.Controllers.CalendarEventController.UpdateCalEvent(TilerFront.Models.EditCalEventModel)">
@@ -1070,6 +1070,13 @@
             </summary>
             <param name="referenceDay"></param>
             <param name="LogFile"></param>
+        </member>
+        <member name="M:TilerFront.LogControl.updateBigData(System.Xml.XmlDocument,System.Xml.XmlDocument)">
+            <summary>
+            Function is to be called for the generation of auto logs for a user interaction with the schedule
+            </summary>
+            <param name="oldData"></param>
+            <param name="newData"></param>
         </member>
         <member name="M:TilerFront.LogControl.getRestrictionTimeLine(System.Xml.XmlNode)">
             <summary>

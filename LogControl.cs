@@ -28,6 +28,7 @@ namespace TilerFront
         protected string UserName;
         string NameOfUser;
         protected static string WagTapLogLocation = "WagTapCalLogs\\";
+        protected static string BigDataLogLocation = "BigDataLogs\\";
         protected DBControl LogDBDataAccess;
         protected long LastIDNumber;
         protected int LastLocationID;
@@ -68,7 +69,7 @@ namespace TilerFront
         }
 
 
-        public LogControl(DBControl DBAccess, string logLocation = "")
+        public LogControl(DBControl DBAccess, string logLocation = "", DB_UserActivity useractivity = null)
         {
             if (!string.IsNullOrEmpty(logLocation))
             {
@@ -77,6 +78,7 @@ namespace TilerFront
             LogDBDataAccess = DBAccess;
             LogStatus = false;
             CachedLocation = new Dictionary<string, Location_Elements>();
+
         }
         #region Functions
         virtual async public Task Initialize()
@@ -125,10 +127,6 @@ namespace TilerFront
 
                     ScheduleMetadata = resultofLatestChange;
                 }
-                if(activity == null)
-                {
-                    activity = new DB_UserActivity(new ReferenceNow(DateTimeOffset.Now, ScheduleMetadata.Item3), UserActivity.ActivityType.None);
-                }
                 NameOfUser = VerifiedUser.Item3;
             }
         }
@@ -137,6 +135,11 @@ namespace TilerFront
         public static void UpdateLogLocation(string LogLocation)
         {
             WagTapLogLocation = LogLocation;
+        }
+
+        public static void UpdateBigDataLogLocation(string bigLogLocation)
+        {
+            BigDataLogLocation = bigLogLocation;
         }
         public static string getLogLocation()
         {
@@ -242,6 +245,7 @@ namespace TilerFront
                 {
                     xmldoc.Save(LogFile);
                     xmldocCopy.Save(LogFileCopy);
+                    updateBigData(xmldocCopy, xmldoc);
                     break;
                 }
                 catch (Exception e)
@@ -304,68 +308,90 @@ namespace TilerFront
             return retValue;
         }
 
-        public void updateBigData (XmlDocument oldData, XmlDocument newData)
+        public void updateUserActivty(UserActivity activity)
         {
-            XmlDocument combinedDoc = new XmlDocument();
-            XmlNode timeOfCreation = combinedDoc.CreateElement("TimeOfCreation");
-            timeOfCreation.InnerXml = activity.ToXML();
-            XmlNode beforeProcessing = combinedDoc.CreateElement("BeforeProcessing");
-            XmlNode importedNBeforeProcessingNode = combinedDoc.ImportNode(oldData as XmlNode, true);
-            beforeProcessing.PrependChild(importedNBeforeProcessingNode);
+            this.activity = new DB_UserActivity(activity);
+        }
 
-            XmlNode afterProcessing = combinedDoc.CreateElement("AfterProcessing");
-            XmlNode importedNAfterProcessingNode = combinedDoc.ImportNode(newData as XmlNode, true);
-            afterProcessing.PrependChild(importedNAfterProcessingNode);
-
-            combinedDoc.PrependChild(beforeProcessing);
-            combinedDoc.PrependChild(afterProcessing);
-            MemoryStream xmlStream = new MemoryStream();
-            combinedDoc.Save(xmlStream);
-            string zipFile = LoggedUserID + ".zip";
-            string zipFolder = LoggedUserID;
-            DateTimeOffset javascriptStart = new DateTimeOffset(1970, 1, 1, 0, 0, 0,new TimeSpan());
-            string beforFileName = DateTimeOffset.UtcNow
-               .Subtract(javascriptStart)
-               .TotalMilliseconds.ToString();
+        /// <summary>
+        /// Function is to be called for the generation of auto logs for a user interaction with the schedule
+        /// </summary>
+        /// <param name="oldData"></param>
+        /// <param name="newData"></param>
+        public async void updateBigData(XmlDocument oldData, XmlDocument newData)
+        {
             try
             {
-                if(Directory.Exists(zipFile))
+                if (activity == null)
                 {
-                    using (FileStream zipToOpen = new FileStream(@zipFile, FileMode.Open))
+                    activity = new DB_UserActivity(DateTimeOffset.UtcNow, UserActivity.ActivityType.None);
+                }
+                XmlDocument combinedDoc = new XmlDocument();
+
+                XmlNode timeOfCreation = combinedDoc.CreateElement("TimeOfCreation");
+                XmlNode bigDataLog = combinedDoc.CreateElement("BigDataLog");
+                timeOfCreation.InnerXml = activity.ToXML();
+                bigDataLog.AppendChild(timeOfCreation);
+                XmlNode beforeProcessing = combinedDoc.CreateElement("BeforeProcessing");
+                XmlNode importedNBeforeProcessingNode = combinedDoc.ImportNode(oldData.DocumentElement.LastChild as XmlNode, true);
+                beforeProcessing.PrependChild(importedNBeforeProcessingNode);
+
+                XmlNode afterProcessing = combinedDoc.CreateElement("AfterProcessing");
+                XmlNode importedNAfterProcessingNode = combinedDoc.ImportNode(newData.DocumentElement.LastChild as XmlNode, true);
+                afterProcessing.PrependChild(importedNAfterProcessingNode);
+
+                bigDataLog.AppendChild(beforeProcessing);
+                bigDataLog.AppendChild(afterProcessing);
+                combinedDoc.AppendChild(bigDataLog);
+                MemoryStream xmlStream = new MemoryStream();
+                combinedDoc.Save(xmlStream);
+                DateTimeOffset javascriptStart = new DateTimeOffset(1970, 1, 1, 0, 0, 0, new TimeSpan());
+                string beforFileName = DateTimeOffset.UtcNow
+                   .Subtract(javascriptStart)
+                   .TotalMilliseconds.ToString();
+
+
+                string zipFile = LoggedUserID + ".zip";
+                string zipFolder = LoggedUserID;
+
+                string fullZipPath = @BigDataLogLocation + zipFile;
+
+                if (File.Exists(fullZipPath))
+                {
+                    using (FileStream zipToOpen = new FileStream(@fullZipPath, FileMode.Open))
                     {
                         using (ZipArchive archive = new ZipArchive(zipToOpen, ZipArchiveMode.Update))
                         {
-                            ZipArchiveEntry readmeEntry = archive.CreateEntry("Readme.txt");
-                            using (StreamWriter writer = new StreamWriter(readmeEntry.Open()))
-                            {
-                                writer.WriteLine("Information about this package.");
-                                writer.WriteLine("========================");
-                            }
+                            ZipArchiveEntry readmeEntry = archive.CreateEntry(beforFileName + ".xml");
+                            xmlStream.WriteTo(readmeEntry.Open());
                         }
                     }
                 }
                 else
                 {
-                    DirectoryInfo zipFolderDir = System.IO.Directory.CreateDirectory(zipFolder);
-                    string fileDir = @zipFolderDir.ToString() + zipFile + ".zip";
-                    var fileStream = File.Create(fileDir);
-                    xmlStream.CopyTo(fileStream);
-                    ZipFile.CreateFromDirectory(zipFolderDir.Name, fileDir);
-                }
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        using (var archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
+                        {
+                            var demoFile = archive.CreateEntry(beforFileName + ".xml");
 
-                string NameOfFile = zipFile;
-                if (File.Exists(NameOfFile))
-                {
-                    File.Delete(NameOfFile);
-                }
+                            using (var entryStream = demoFile.Open())
+                            {
+                                xmlStream.WriteTo(entryStream);
+                            }
+                        }
 
-                FileStream myFileStream = File.Create(NameOfFile);
-                myFileStream.Close();
-                EmptyCalendarXMLFile(NameOfFile);
+                        using (var fileStream = new FileStream(@fullZipPath, FileMode.Create))
+                        {
+                            memoryStream.Seek(0, SeekOrigin.Begin);
+                            memoryStream.CopyTo(fileStream);
+                        }
+                    }
+                }
             }
             catch (Exception e)
             {
-                retValue = new CustomErrors(true, "Error generating log\n" + e.ToString(), 20000000);
+                CustomErrors retValue = new CustomErrors(true, "Error generating bigdata log\n" + e.ToString(), 20000000);
             }
         }
 
@@ -398,44 +424,6 @@ namespace TilerFront
             return;
         }
 
-        /*
-        public void WriteToLog(CalendarEvent MyEvent, string LogFile = "")//writes to an XML Log file. Takes calendar event as an argument
-        {
-            if (LogFile == "")
-            { LogFile = WagTapLogLocation + CurrentLog; }
-            XmlDocument xmldoc = new XmlDocument();
-            xmldoc.Load(LogFile);
-            CachedLocation = getLocationCache();//populates with current location info
-
-            xmldoc.DocumentElement.SelectSingleNode("/ScheduleLog/LastIDCounter").InnerText = MyEvent.ID;
-            XmlNodeList EventSchedulesNodes = xmldoc.DocumentElement.SelectNodes("/ScheduleLog/EventSchedules");
-            XmlNodeList EventScheduleNodes = xmldoc.DocumentElement.SelectNodes("/ScheduleLog/EventSchedules/EventSchedule");
-
-            XmlElement EventScheduleNode = CreateEventScheduleNode(MyEvent);
-            //EventSchedulesNodes[0].PrependChild(xmldoc.CreateElement("EventSchedule"));
-            //EventSchedulesNodes[0].ChildNodes[0].InnerXml = CreateEventScheduleNode(MyEvent).InnerXml;
-            XmlNode MyImportedNode = xmldoc.ImportNode(EventScheduleNode as XmlNode, true);
-            //(EventScheduleNode, true);
-            if (!UpdateInnerXml(ref EventScheduleNodes, "ID", MyEvent.ID.ToString(), EventScheduleNode))
-            {
-                xmldoc.DocumentElement.SelectSingleNode("/ScheduleLog/EventSchedules").AppendChild(MyImportedNode);
-            }
-
-            UpdateCacheLocation(xmldoc);
-            while (true)
-            {
-                try
-                {
-                    xmldoc.Save(LogFile);
-                    break;
-                }
-                catch (Exception e)
-                {
-                    Thread.Sleep(160);
-                }
-            }
-        }
-        */
         async public Task<bool> WriteToLogOld(IEnumerable<CalendarEvent> AllEvents, string LatestID, string LogFile = "")
         {
             Task<bool>  retValue;
@@ -509,16 +497,9 @@ namespace TilerFront
                     if (MyEvent.End > purgeLimit)
                     {
                         XmlElement EventScheduleNode;
-                        //EventScheduleNode = CreateEventScheduleNode(MyEvent);
-                        //*
                         ErrorEvent = MyEvent;
                         EventScheduleNode = CreateEventScheduleNode(MyEvent);
                 
-                
-                        //*/
-                
-                        //EventSchedulesNodes[0].PrependChild(xmldoc.CreateElement("EventSchedule"));
-                        //EventSchedulesNodes[0].ChildNodes[0].InnerXml = CreateEventScheduleNode(MyEvent).InnerXml;
                         XmlNode MyImportedNode = xmldoc.ImportNode(EventScheduleNode as XmlNode, true);
                         //(EventScheduleNode, true);
                         if (!UpdateInnerXml(ref EventScheduleNodes, "ID", MyEvent.ID.ToString(), EventScheduleNode))
@@ -546,6 +527,7 @@ namespace TilerFront
                 {
                     xmldoc.Save(LogFile);
                     xmldocCopy.Save(LogFileCopy);
+                    updateBigData(xmldocCopy, xmldoc);
                     break;
                 }
                 catch (Exception e)

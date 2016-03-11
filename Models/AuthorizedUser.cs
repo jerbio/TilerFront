@@ -11,7 +11,7 @@ namespace TilerFront.Models
     {
         public bool MobileFlag { get; set; }
         public int TimeZoneOffset { get; set; }
-
+        protected DateTimeOffset refNow = DateTimeOffset.UtcNow;
         public TimeSpan getTImeSpan
         {
             get 
@@ -24,12 +24,7 @@ namespace TilerFront.Models
 
         public DateTimeOffset getRefNow()
         {
-           //get
-           {
-            DateTimeOffset refNow = DateTimeOffset.UtcNow;
-            //refNow = refNow.Add(this.getTImeSpan);
             return refNow;
-           }
         }
 
         async public Task<UserAccountDirect> getUserAccountDirect(bool Passive=true)

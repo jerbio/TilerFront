@@ -283,6 +283,8 @@ namespace TilerFront.Controllers
 
 
             Tuple<CustomErrors, Dictionary<string, CalendarEvent>> ScheduleUpdateMessage = MySchedule.ProcrastinateAll(ProcrastinateDuration.TotalTimeSpan);
+            DB_UserActivity activity = new DB_UserActivity(myAuthorizedUser.getRefNow(), UserActivity.ActivityType.ProcrastinateAll);
+            myUserAccount.ScheduleLogControl.updateUserActivty(activity);
             await MySchedule.UpdateWithProcrastinateSchedule(ScheduleUpdateMessage.Item2);
             PostBackData myPostData = new PostBackData("\"Success\"", 0);
             return Ok(myPostData.getPostBack);
@@ -307,7 +309,8 @@ namespace TilerFront.Controllers
             DateTimeOffset myNow = DateTimeOffset.Parse("5/5/2015 2:45:00 PM");
             myNow = DateTimeOffset.UtcNow;// myAuthorizedUser.getRefNow();
             My24HourTimerWPF.Schedule MySchedule = new My24HourTimerWPF.Schedule(myUser,myNow);
-
+            DB_UserActivity activity = new DB_UserActivity(myNow, UserActivity.ActivityType.ProcrastinateSingle);
+            myUser.ScheduleLogControl.updateUserActivty(activity);
             await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, UserData.UserID).ConfigureAwait(false);
 
             Tuple<CustomErrors, Dictionary<string, CalendarEvent>> ScheduleUpdateMessage = MySchedule.ProcrastinateJustAnEvent(UserData.EventID, ProcrastinateDuration.TotalTimeSpan);
@@ -330,6 +333,7 @@ namespace TilerFront.Controllers
             UserAccountDirect retrievedUser = await UserData.getUserAccountDirect();
             await retrievedUser.Login();
             PostBackData retValue = new PostBackData("", 1);
+            DB_UserActivity activity = new DB_UserActivity(UserData.getRefNow(), UserActivity.ActivityType.CompleteSingle);
             if (retrievedUser.Status)
             {
                 string CalendarType = UserData.ThirdPartyType.ToLower();
@@ -350,7 +354,7 @@ namespace TilerFront.Controllers
                             //myNOw = UserData.getRefNow();
                             My24HourTimerWPF.Schedule MySchedule = new My24HourTimerWPF.Schedule(retrievedUser, myNow );
                             await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, UserData.UserID).ConfigureAwait(false);
-
+                            retrievedUser.ScheduleLogControl.updateUserActivty(activity);
                             MySchedule.markSubEventAsCompleteCalendarEventAndReadjust(UserData.EventID);
                             retValue = new PostBackData("\"Success\"", 0);
                         }
@@ -377,10 +381,13 @@ namespace TilerFront.Controllers
             DateTimeOffset myNow = DateTimeOffset.UtcNow;
             //myNow = UserData.getRefNow();
             My24HourTimerWPF.Schedule MySchedule = new My24HourTimerWPF.Schedule(myUser, myNow);
+            IEnumerable<string> AllEventIDs = UserData.EventID.Split(',');
+            DB_UserActivity activity = new DB_UserActivity(myNow, UserActivity.ActivityType.CompleteMultiple, AllEventIDs);
+            myUser.ScheduleLogControl.updateUserActivty(activity);
             await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, UserData.UserID).ConfigureAwait(false);
 
-            IEnumerable<string> AllEVentIDs = UserData.EventID.Split(',');
-            MySchedule.markSubEventsAsComplete(AllEVentIDs);
+            
+            MySchedule.markSubEventsAsComplete(AllEventIDs);
             PostBackData myPostData = new PostBackData("\"Success\"", 0);
             return Ok(myPostData.getPostBack);
         }
@@ -405,6 +412,8 @@ namespace TilerFront.Controllers
                 //myNow = UserData.getRefNow();
 
                 My24HourTimerWPF.Schedule MySchedule = new My24HourTimerWPF.Schedule(retrievedUser, myNow);
+                DB_UserActivity activity = new DB_UserActivity(myNow, UserActivity.ActivityType.SetAsNowSingle);
+                retrievedUser.ScheduleLogControl.updateUserActivty(activity);
 
                 await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, myUser.UserID).ConfigureAwait(false);
 
@@ -434,6 +443,8 @@ namespace TilerFront.Controllers
             PostBackData retValue;
             if (retrievedUser.Status)
             {
+                DB_UserActivity activity = new DB_UserActivity(DateTimeOffset.UtcNow, UserActivity.ActivityType.SetAsNowSingle);
+                retrievedUser.ScheduleLogControl.updateUserActivty(activity);
                 retrievedUser.ScheduleLogControl.Undo();
                 retValue = new PostBackData("\"Success\"", 0);
             }
@@ -476,7 +487,8 @@ namespace TilerFront.Controllers
                     case "tiler":
                         {
                             My24HourTimerWPF.Schedule MySchedule = new My24HourTimerWPF.Schedule(retrievedUser, myUser.getRefNow());
-                            
+                            DB_UserActivity activity = new DB_UserActivity(myUser.getRefNow(), UserActivity.ActivityType.DeleteSingle);
+                            retrievedUser.ScheduleLogControl.updateUserActivty(activity);
                             await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, myUser.UserID).ConfigureAwait(false);
 
                             MySchedule.deleteSubCalendarEvent(myUser.EventID);
@@ -526,8 +538,10 @@ namespace TilerFront.Controllers
             {
                 My24HourTimerWPF.Schedule MySchedule = new My24HourTimerWPF.Schedule(retrievedUser, myUser.getRefNow());
                 await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, myUser.UserID).ConfigureAwait(false);
-                IEnumerable<string> AllEVentIDs = myUser.EventID.Split(',');
-                MySchedule.deleteSubCalendarEvents(AllEVentIDs);
+                IEnumerable<string> AllEventIDs = myUser.EventID.Split(',');
+                DB_UserActivity activity = new DB_UserActivity(myUser.getRefNow(), UserActivity.ActivityType.DeleteMultiple, AllEventIDs);
+                retrievedUser.ScheduleLogControl.updateUserActivty(activity);
+                MySchedule.deleteSubCalendarEvents(AllEventIDs);
                 retValue = new PostBackData("\"Success\"", 0);
             }
             else
@@ -752,6 +766,8 @@ namespace TilerFront.Controllers
                 else
 #endif
                 {
+                    DB_UserActivity activity = new DB_UserActivity(myNow, UserActivity.ActivityType.NewEventCreation);
+                    myUser.ScheduleLogControl.updateUserActivty(activity);
                     await MySchedule.AddToScheduleAndCommit(newCalendarEvent);
                 }
 

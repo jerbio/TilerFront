@@ -30,7 +30,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;LocalDebug ForceReadFromXml readfromBeforeInsertionFixingStiticRestricted</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;LocalDebug ForceReadFromXml //readfromBeforeInsertionFixingStiticRestricted</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>App_Data\XmlDocument.xml</DocumentationFile>
@@ -197,6 +197,8 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.IdentityModel" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.Net" />
     <Reference Include="System.Net.Http.Extensions, Version=2.2.29.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -2548,6 +2550,7 @@
     <Content Include="Views\Account\CheckEmailForConfirmation.cshtml" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="BigDataLogs\" />
     <Folder Include="Views\GoogleNotifications\" />
     <Folder Include="Views\GoogleNotification\" />
     <Folder Include="WagTapCalLogs\" />
