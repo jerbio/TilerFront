@@ -342,13 +342,18 @@ namespace TilerFront
 
                 bigDataLog.AppendChild(beforeProcessing);
                 bigDataLog.AppendChild(afterProcessing);
+
+                XmlDeclaration xmldecl;
+                xmldecl = combinedDoc.CreateXmlDeclaration("1.0", "utf-8", null);
                 combinedDoc.AppendChild(bigDataLog);
+                XmlElement root = combinedDoc.DocumentElement;
+                combinedDoc.InsertBefore(xmldecl, root);
                 MemoryStream xmlStream = new MemoryStream();
                 combinedDoc.Save(xmlStream);
                 DateTimeOffset javascriptStart = new DateTimeOffset(1970, 1, 1, 0, 0, 0, new TimeSpan());
-                string beforFileName = DateTimeOffset.UtcNow
+                string beforFileName = ((long)(DateTimeOffset.UtcNow
                    .Subtract(javascriptStart)
-                   .TotalMilliseconds.ToString();
+                   .TotalMilliseconds)).ToString();
 
 
                 string zipFile = LoggedUserID + ".zip";
