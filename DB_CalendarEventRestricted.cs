@@ -31,7 +31,7 @@ namespace TilerFront
             this.DataBlob = CalendarEventData.Notes;
             this.Enabled = CalendarEventData.isEnabled;
             //this.isRestricted = CalendarEventData.isEventRestricted;
-            this.LocationInfo = CalendarEventData.myLocation;//hack you might need to make copy
+            this.LocationInfo = CalendarEventData.Location;//hack you might need to make copy
             this.ProfileOfProcrastination = CalendarEventData.ProcrastinationInfo;
             this.DeadlineElapsed = CalendarEventData.isDeadlineElapsed;
             this.UserDeleted = CalendarEventData.isUserDeleted;

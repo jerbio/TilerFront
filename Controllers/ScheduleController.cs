@@ -50,7 +50,14 @@ namespace TilerFront.Controllers
                 TimeLine TimelineForData = new TimeLine(StartTime.AddYears(-100), EndTime.AddYears(100));
                 
 
-                LogControl LogAccess = myUserAccount.ScheduleLogControl;
+                //LogControl LogAccess = myUserAccount.ScheduleLogControl;
+                //Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, Location_Elements>> ProfileData = await LogAccess.getProfileInfo(TimelineForData);
+                //ScheduleData = ScheduleData.Concat(ProfileData.Item1.Values.Where(obj => obj.isActive)).ToList();
+
+                ScheduleControl LogAccess = myUserAccount.ScheduleLogControl;
+                //Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, Location_Elements>> ProfileData =await LogAccess.getProfileInfo(TimelineForData);
+                IEnumerable<CalendarEvent> ScheduleData = (await LogAccess.getCalendarEvents(TimelineForData)).Values;
+
                 List<IndexedThirdPartyAuthentication> AllIndexedThirdParty = await getAllThirdPartyAuthentication(myUserAccount.UserID).ConfigureAwait(false);
 
                 List<GoogleTilerEventControl> AllGoogleTilerEvents = AllIndexedThirdParty.Select(obj => new GoogleTilerEventControl(obj)).ToList();
@@ -71,12 +78,9 @@ namespace TilerFront.Controllers
 
                 Task<ConcurrentBag<CalendarEvent>> GoogleCalEventsTask =  GoogleTilerEventControl.getAllCalEvents(AllGoogleTilerEvents);
 
-                Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, Location_Elements>> ProfileData =await LogAccess.getProfileInfo(TimelineForData);
+                
 
                 IEnumerable<CalendarEvent> GoogleCalEvents = await GoogleCalEventsTask.ConfigureAwait(false);
-
-                ScheduleData = ScheduleData.Concat(ProfileData.Item1.Values.Where(obj => obj.isActive)).ToList();
-
                 ScheduleData = ScheduleData.Concat(GoogleCalEvents).ToList();
                 IEnumerable<CalendarEvent> NonRepeatingEvents = ScheduleData.Where(obj => !obj.RepetitionStatus);
 

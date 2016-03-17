@@ -42,8 +42,8 @@ namespace TilerFront
                 retValue.SubCalEndDate = (long)(SubCalendarEventEntry.End - JSStartTime).TotalMilliseconds;
                 retValue.SubCalTotalDuration = SubCalendarEventEntry.ActiveDuration;
                 retValue.SubCalRigid = SubCalendarEventEntry.Rigid;
-                retValue.SubCalAddressDescription = SubCalendarEventEntry.myLocation.Description;
-                retValue.SubCalAddress = SubCalendarEventEntry.myLocation.Address;
+                retValue.SubCalAddressDescription = SubCalendarEventEntry.Location.Description;
+                retValue.SubCalAddress = SubCalendarEventEntry.Location.Address;
                 if (CalendarEventEntry != null)
                 {
                     retValue.SubCalCalendarName = CalendarEventEntry.Name;
@@ -51,8 +51,8 @@ namespace TilerFront
                     retValue.SubCalCalEventEnd = (long)(CalendarEventEntry.End - JSStartTime).TotalMilliseconds;
                 }
 
-                retValue.SubCalEventLong = SubCalendarEventEntry.myLocation.YCoordinate;
-                retValue.SubCalEventLat = SubCalendarEventEntry.myLocation.XCoordinate;
+                retValue.SubCalEventLong = SubCalendarEventEntry.Location.YCoordinate;
+                retValue.SubCalEventLat = SubCalendarEventEntry.Location.XCoordinate;
                 retValue.RColor = SubCalendarEventEntry.UIParam.UIColor.R;
                 retValue.GColor = SubCalendarEventEntry.UIParam.UIColor.G;
                 retValue.BColor = SubCalendarEventEntry.UIParam.UIColor.B;
@@ -77,10 +77,10 @@ namespace TilerFront
                 retValue.EndDate = (long)(CalendarEventEntry.End - JSStartTime).TotalMilliseconds;
                 retValue.TotalDuration = CalendarEventEntry.Duration;
                 retValue.Rigid = CalendarEventEntry.Rigid;
-                retValue.AddressDescription = CalendarEventEntry.myLocation.Description;
-                retValue.Address = CalendarEventEntry.myLocation.Address;
-                retValue.Longitude = CalendarEventEntry.myLocation.YCoordinate;
-                retValue.Latitude = CalendarEventEntry.myLocation.XCoordinate;
+                retValue.AddressDescription = CalendarEventEntry.Location.Description;
+                retValue.Address = CalendarEventEntry.Location.Address;
+                retValue.Longitude = CalendarEventEntry.Location.YCoordinate;
+                retValue.Latitude = CalendarEventEntry.Location.XCoordinate;
                 retValue.NumberOfSubEvents = CalendarEventEntry.AllSubEvents.Count();// CalendarEventEntry.NumberOfSplit;// AllSubEvents.Count();
                 retValue.RColor = CalendarEventEntry.UIParam.UIColor.R;
                 retValue.GColor = CalendarEventEntry.UIParam.UIColor.G;

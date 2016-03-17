@@ -24,7 +24,7 @@ namespace TilerFront
             this.EventPreDeadline = mySubCalEvent.PreDeadline;
             this.EventScore = mySubCalEvent.Score;
             this.isRestricted = mySubCalEvent.isEventRestricted;
-            this.LocationInfo = mySubCalEvent.myLocation;
+            this.LocationInfo = mySubCalEvent.Location;
             this.OldPreferredIndex = mySubCalEvent.OldUniversalIndex;
             this.otherPartyID = mySubCalEvent.ThirdPartyID;
             this.preferredDayIndex = mySubCalEvent.UniversalDayIndex;

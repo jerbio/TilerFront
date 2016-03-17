@@ -16,12 +16,18 @@ namespace TilerFront
     public class UserAccount
     {
         
-        protected LogControl UserLog;
+        protected ScheduleControl UserLog;
         protected string ID="";
         protected string Name;
         protected string Username;
         string Password;
         protected TilerFront.DBControl UserAccountDBAccess;
+        protected Models.ApplicationUser sessionUser;
+        /// <summary>
+        /// controls access to location elements for a given user account(s)
+        /// </summary>
+        protected LocationControl UserLocation;
+        
         public UserAccount()
         {
             Username = "";
@@ -43,66 +49,24 @@ namespace TilerFront
 
         virtual public async Task<bool> Login()
         {
-            if(string.IsNullOrEmpty(ID))
-            {
-                UserAccountDBAccess = new DBControl(Username, Password);
-                UserLog = new LogControl(UserAccountDBAccess);
-            }
-            else
-            {
-                UserAccountDBAccess = new DBControl(Username, ID);
-                UserLog = new LogControl(UserAccountDBAccess);
-            }
-            await UserLog.Initialize();
-            ID = UserLog.LoggedUserID;
-            Name = UserLog.Usersname;
-            
-            return UserLog.Status;
+            throw new NotImplementedException();
         }
 
 
 
 
-        async virtual public Task<Tuple<string, CustomErrors>> RegisterOld(string FirstName, string LastName, string Email, string UserName, string PassWord)
-        {
-            CustomErrors retValue = new CustomErrors(false,"success");
-            { 
-                PassWord=(DBControl.encryptString(PassWord));
-            }
-            UserAccountDBAccess = new DBControl(UserName, PassWord);
-            Tuple<string, CustomErrors> registrationStatus = await UserAccountDBAccess.RegisterUser(FirstName, LastName, Email);//, UserName, PassWord);
-            retValue = registrationStatus.Item2;
-            UserLog = new LogControl(UserAccountDBAccess);
-            await UserLog.Initialize();
-            if (!registrationStatus.Item2.Status)
-            {
-                Username = UserName;
-                Password = PassWord;
-                retValue =UserLog.genereateNewLogFile(registrationStatus.Item1.ToString());
-
-                if (retValue.Status && retValue.Code >= 20000000)//error 20000000 denotes log creation issue
-                {
-                    UserAccountDBAccess.deleteUser();
-                }
-            }
-
-            Tuple<string, CustomErrors> RetValue = new Tuple<string, CustomErrors>(registrationStatus.Item1, retValue);
-
-            return RetValue;
-        }
 
 
-
-        virtual protected Dictionary<string, CalendarEvent>  getAllCalendarElements(TimeLine RangeOfLookup, string desiredDirectory="")
+        virtual async protected Task<Dictionary<string, CalendarEvent>>  getAllCalendarElements(TimeLine RangeOfLookup, string desiredDirectory="")
         {
             Dictionary<string, CalendarEvent> retValue=new Dictionary<string,CalendarEvent>();
-            retValue = UserLog.getAllCalendarFromXml(RangeOfLookup);
+            retValue = await UserLog.getCalendarEvents(RangeOfLookup);
             return retValue;
         }
 
         virtual async protected Task<DateTimeOffset> getDayReferenceTime(string desiredDirectory = "")
         {
-            DateTimeOffset retValue = await  UserLog.getDayReferenceTime(desiredDirectory);
+            DateTimeOffset retValue = sessionUser.ReferenceDay;
             return retValue;
         }
 
@@ -112,7 +76,7 @@ namespace TilerFront
             
             if (UserLog.Status)
             {
-                UserLog.deleteAllCalendarEvets();
+                UserLog.deleteAllCalendarEvents();
                 retValue = true;
             }
             else
@@ -122,14 +86,22 @@ namespace TilerFront
             return retValue;
         }
 
+
         virtual async public Task<CustomErrors> DeleteLog()
         {
             return await UserLog.DeleteLog();
         }
 
-        virtual public void UpdateReferenceDayTime(DateTimeOffset referenceTime)
+
+        /// <summary>
+        /// updates the end of day with referenceTime
+        /// </summary>
+        /// <param name="referenceTime"></param>
+        async virtual public void UpdateReferenceDayTime(DateTimeOffset referenceTime)
         {
-            UserLog.UpdateReferenceDayInXMLLog(referenceTime);
+            sessionUser.ReferenceDay = referenceTime;
+            Task SaveChangesToDB = new Controllers.UserController().SaveUser(sessionUser);
+            await SaveChangesToDB;
         }
         /*
         public void CommitEventToLog(CalendarEvent MyCalEvent)
@@ -137,12 +109,20 @@ namespace TilerFront
             UserLog.WriteToLog(MyCalEvent);
         }
         */
-        virtual async public Task  CommitEventToLogOld(IEnumerable<CalendarEvent> AllEvents,string LatestID,string LogFile="")
+        virtual async public Task  CommitEventToLogOld(IEnumerable<CalendarEvent> AllEvents)
         {
-            await UserLog.WriteToLogOld(AllEvents, LatestID, LogFile).ConfigureAwait(false);
+            await UserLog.PersistCalendarEvents(AllEvents);//, LatestID, LogFile).ConfigureAwait(false);
         }
 
-        
+
+        virtual protected async Task<Dictionary<string, CalendarEvent>> getAllCalendarElements(TimeLine RangeOfLookup)//, string desiredDirectory = "")
+        {
+            Dictionary<string, CalendarEvent> retValue = new Dictionary<string, CalendarEvent>();
+            retValue = await UserLog.getCalendarEvents(RangeOfLookup);
+            return retValue;
+        }
+
+
 #if ForceReadFromXml
 #else
         async public Task batchMigrateXML()
@@ -167,18 +147,18 @@ namespace TilerFront
 
 
         #region properties
-        public int LastEventTopNodeID
+
+
+        /// <summary>
+        /// gets the reference time that represents the end of the day for a given user. Its sent as a Datetimeoffset object so the date portin of the object isn't too useful
+        /// </summary>
+        public DateTimeOffset endOfdayTime
         {
             get
             {
-                if (UserLog.Status)
-                {
-                    return UserLog.LastUserID;
-                }
-                return 0;
+                return this.sessionUser.ReferenceDay;
             }
         }
-
 
         public bool Status
         {
@@ -212,19 +192,20 @@ namespace TilerFront
             }
         }
 
-        public string getFullLogDir
-        {
-            get 
-            {
-                return UserLog.getFullLogDir;
-            }
-        }
 
-        virtual public LogControl ScheduleData
+        virtual public ScheduleControl ScheduleData
         {
             get
             {
                 return UserLog;
+            }
+        }
+
+        virtual public LocationControl Location
+        {
+            get
+            {
+                return UserLocation;
             }
         }
 

@@ -13,6 +13,9 @@ namespace TilerFront.Models
     {
         public string FullName { get; set; }
         public  DateTime LastChange { get; set; }
+
+        public DateTimeOffset ReferenceDay { get; set; } = new DateTimeOffset();
+
         //public string UserName { get; set; }
         public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager)
         {

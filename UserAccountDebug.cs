@@ -9,8 +9,9 @@ namespace TilerFront
     {
         public UserAccountDebug(Models.ApplicationUser user, bool Passive = false)
         {
+            throw new NotImplementedException();
             sessionUser = user;
-            UserLog = new LogControlDebug(user, "", Passive);
+            //UserLog = new LogControlDebug(user, "", Passive);
             ID = sessionUser.Id;
         }
         protected override async System.Threading.Tasks.Task<DateTimeOffset> getDayReferenceTime(string desiredDirectory = "")

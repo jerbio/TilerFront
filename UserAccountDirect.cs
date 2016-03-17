@@ -9,7 +9,6 @@ namespace TilerFront
 {
     public class UserAccountDirect:UserAccount
     {
-        protected Models.ApplicationUser sessionUser;
         //LogControl UserLog;
         protected UserAccountDirect()
         {
@@ -21,8 +20,8 @@ namespace TilerFront
         public UserAccountDirect(Models.ApplicationUser user, bool Passive=false)
         {
             sessionUser = user;
-            UserLog = new LogControlDirect(sessionUser, "", Passive);
             ID = sessionUser.Id;
+            throw new NotImplementedException();
         }
 
         /*
@@ -41,27 +40,16 @@ namespace TilerFront
         public override async System.Threading.Tasks.Task<bool> Login()
         {
             HttpContext ctx = HttpContext.Current;
-            
-            if (ctx != null)
-            {
-                await UserLog.Initialize();
-            }
             return UserLog.Status;
         }
 
         
 
 
-        override protected Dictionary<string, CalendarEvent> getAllCalendarElements(TimeLine RangeOfLookup, string desiredDirectory = "")
-        {
-            Dictionary<string, CalendarEvent> retValue = new Dictionary<string, CalendarEvent>();
-            retValue = UserLog.getAllCalendarFromXml(RangeOfLookup);
-            return retValue;
-        }
-
+   
         async override protected Task<DateTimeOffset> getDayReferenceTime(string desiredDirectory = "")
         {
-            DateTimeOffset retValue = await UserLog.getDayReferenceTime(desiredDirectory);
+            DateTimeOffset retValue = sessionUser.ReferenceDay;
             return retValue;
         }
 
@@ -69,14 +57,14 @@ namespace TilerFront
         async protected Task<DateTimeOffset> getDayReferenceTimeFromXml(string desiredDirectory = "")
         {
 
-            DateTimeOffset retValue = await ((LogControlDirect)UserLog).getDayReferenceTimeFromXml(desiredDirectory);
+            DateTimeOffset retValue = sessionUser.ReferenceDay;
             return retValue;
         }
 
 
         async public Task<CustomErrors> Register(Models.ApplicationUser user)
         {
-            CustomErrors retValue = UserLog.genereateNewLogFile(user.Id);
+            CustomErrors retValue = new CustomErrors(false,"");
             return retValue;
         }
 
@@ -85,13 +73,14 @@ namespace TilerFront
             return await UserLog.DeleteLog();
         }
         
-        //async public Task CommitEventToLog(IEnumerable<CalendarEvent> AllEvents, string LatestID, string LogFile = "")
-        //{
-        //    await ((LogControlDirect)UserLog).WriteToLog(AllEvents, LatestID, LogFile);
-        //    sessionUser.LastChange = DateTimeOffset.Now.DateTime;
-        //    Task SaveChangesToDB = new Controllers.UserController().SaveUser(sessionUser);
-        //    await SaveChangesToDB;
-        //}
+
+        async public Task CommitEventToLog(IEnumerable<CalendarEvent> AllEvents, string LogFile = "")
+        {
+            await (UserLog).PersistCalendarEvents(AllEvents);
+            sessionUser.LastChange = DateTimeOffset.Now.DateTime;
+            Task SaveChangesToDB = new Controllers.UserController().SaveUser(sessionUser);
+            await SaveChangesToDB;
+        }
         
         override public bool DeleteAllCalendarEvents()
         {
@@ -99,7 +88,7 @@ namespace TilerFront
 
             if (UserLog.Status)
             {
-                UserLog.deleteAllCalendarEvets();
+                UserLog.deleteAllCalendarEvents();
                 retValue = true;
             }
             else
@@ -110,23 +99,9 @@ namespace TilerFront
         }
 
 
-        override public void UpdateReferenceDayTime(DateTimeOffset referenceTime)
-        {
-            UserLog.UpdateReferenceDayInXMLLog(referenceTime);
-        }
 
         #region properties
-        public int LastEventTopNodeID
-        {
-            get
-            {
-                if (UserLog.Status)
-                {
-                    return UserLog.LastUserID;
-                }
-                return 0;
-            }
-        }
+
 
 
         public bool Status
@@ -161,15 +136,8 @@ namespace TilerFront
             }
         }
 
-        public string getFullLogDir
-        {
-            get
-            {
-                return UserLog.getFullLogDir;
-            }
-        }
 
-        virtual public LogControl ScheduleLogControl
+        virtual public ScheduleControl ScheduleLogControl
         {
             get
             {

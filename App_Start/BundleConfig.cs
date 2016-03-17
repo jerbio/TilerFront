@@ -19,7 +19,6 @@ namespace TilerFront
             bundles.Add(new ScriptBundle("~/Scripts/signalR").Include(
                         "~/Scripts/jquery.signalR-2.2.0.min.js"));
 
-
             bundles.Add(new ScriptBundle("~/bundles/jquery").Include(
                         "~/Scripts/jquery-{version}.js"));
 

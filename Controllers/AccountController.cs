@@ -312,8 +312,7 @@ namespace TilerFront.Controllers
                 int Min=Convert.ToInt32(model.TimeZoneOffSet);
                 TimeSpan OffSet = TimeSpan.FromMinutes(Min);
                 DateTimeOffset EndOfDay = new DateTimeOffset(2014, 1, 1, 22, 0, 0, OffSet);
-                var user = new ApplicationUser { UserName = model.Username, Email = model.Email, FullName = model.FullName, LastChange = EndOfDay.UtcDateTime};
-                var logGenerationresult = await generateLog(user);
+                var user = new ApplicationUser { UserName = model.Username, Email = model.Email, FullName = model.FullName, LastChange = EndOfDay.UtcDateTime, ReferenceDay = new DateTimeOffset()};
                 //var result = logGenerationresult.Item1;
                 //if (result.Succeeded)
                 //{
@@ -356,11 +355,6 @@ namespace TilerFront.Controllers
                         //return RedirectToAction("Index", "Home");
                         return RedirectToAction("Desktop", "Account");
                     }
-                    else
-                    {
-                        LogControlDirect LogToBedeleted = new LogControlDirect(user, "", true);
-                        await LogToBedeleted.DeleteLog();
-                    }
                 //}
                 AddErrors(result);
             }
@@ -385,69 +379,62 @@ namespace TilerFront.Controllers
                 int Min = Convert.ToInt32(model.TimeZoneOffSet);
                 TimeSpan OffSet = TimeSpan.FromMinutes(Min);
                 DateTimeOffset EndOfDay = new DateTimeOffset(2014, 1, 1, 22, 0, 0, OffSet);
-                var user = new ApplicationUser { UserName = model.Username, Email = model.Email, FullName = model.FullName, LastChange = EndOfDay.UtcDateTime };
-                var logGenerationresult = await generateLog(user);
-                var result = logGenerationresult.Item1;
+                var user = new ApplicationUser { UserName = model.Username, Email = model.Email, FullName = model.FullName, LastChange = EndOfDay.UtcDateTime, ReferenceDay = new DateTimeOffset() };
+                var result = await UserManager.CreateAsync(user, model.Password);
+
                 if (result.Succeeded)
                 {
-                    result = await UserManager.CreateAsync(user, model.Password);
-
-                    if (result.Succeeded)
+                    await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
+                    /*
+                    if (logGenerationresult.Item2 > 0)
                     {
                         await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
                         /*
                         if (logGenerationresult.Item2 > 0)
                         {
                             string CurrentLogLocation = LogControl.getLogLocation();
-                            DBControl newDB = new DBControl(model.Username, logGenerationresult.Item2);
-                            LogControl OldLog = new LogControl(newDB);
-                            string OldLogLocation = BundleConfig.OldLog;
-                            LogControl.UpdateLogLocation(OldLogLocation);
-                            UserAccount OldUserAccount = new UserAccount(model.Username, logGenerationresult.Item2);
-                            await OldUserAccount.Login();
-                            newDB.deleteUser();
-                            await OldUserAccount.DeleteLog();
-                            LogControl.UpdateLogLocation(CurrentLogLocation);
-                        }
-                        */
-                        /*
-                        string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
-                        var callbackUrl = Url.Action("ConfirmEmail", "Account",
-                           new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-                        await UserManager.SendEmailAsync(user.Id,
-                           "Confirm your account", "Please confirm your account by clicking <a href=\""
-                           + callbackUrl + "\">here </a>");*/
+                            
+                        string CurrentLogLocation = LogControl.getLogLocation();
+                        DBControl newDB = new DBControl(model.Username, logGenerationresult.Item2);
+                        LogControl OldLog = new LogControl(newDB);
+                        string OldLogLocation = BundleConfig.OldLog;
+                        LogControl.UpdateLogLocation(OldLogLocation);
+                        UserAccount OldUserAccount = new UserAccount(model.Username, logGenerationresult.Item2);
+                        await OldUserAccount.Login();
+                        newDB.deleteUser();
+                        await OldUserAccount.DeleteLog();
+                        LogControl.UpdateLogLocation(CurrentLogLocation);
+                    }
+                    */
+                    string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
+                    var callbackUrl = Url.Action("ConfirmEmail", "Account",
+                        new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
+                    await UserManager.SendEmailAsync(user.Id,
+                        "Confirm your account", "Please confirm your account by clicking <a href=\""
+                        + callbackUrl + "\">here </a>");
 
-                        Task SendEmail = SendEmailConfirmationAsync(user.Id, "Please Confirm Your Tiler Account!");
-                        await SendEmail.ConfigureAwait(false);
-
-                        string LoopBackUrl = "";
-                        if (Request.Browser.IsMobileDevice)
-                        {
-                            LoopBackUrl = "/Account/Mobile";
-                        }
-                        else
-                        {
-                            LoopBackUrl = "/Account/Desktop";
-                        }
-                        
-                        retPost = new PostBackData(LoopBackUrl, 0);
-                        RetValue.Data = (retPost.getPostBack);
-                        return RetValue;
-
-
-                        // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=320771
-                        // Send an email with this link
-                        // string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
-                        // var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-                        // await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
+                    string LoopBackUrl = "";
+                    if (Request.Browser.IsMobileDevice)
+                    {
+                        LoopBackUrl = "/Account/Mobile";
                     }
                     else
                     {
-                        LogControlDirect LogToBedeleted = new LogControlDirect(user,"",true);
-                        await LogToBedeleted.DeleteLog();
+                        LoopBackUrl = "/Account/Desktop";
                     }
+                        
+                    retPost = new PostBackData(LoopBackUrl, 0);
+                    RetValue.Data = (retPost.getPostBack);
+                    return RetValue;
+
+
+                    // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=320771
+                    // Send an email with this link
+                    // string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
+                    // var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
+                    // await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
                 }
+                
                 retPost = new PostBackData(string.Join("\n", result.Errors), 3);
                 RetValue.Data= (retPost.getPostBack);
                 return RetValue;
@@ -460,61 +447,6 @@ namespace TilerFront.Controllers
         }
 
 
-
-        async Task<Tuple<IdentityResult,int>> generateLog(ApplicationUser model)
-        {
-            Tuple<bool, int> ExistInOldDB = DBControl.doesUserExistInOldDB(model.UserName);
-            string CurrentLogLocation = LogControl.getLogLocation();
-            bool NewLogCreationSuccess=false;
-            Tuple<IdentityResult, int> retValue;
-            int OldID = -1;
-            if (ExistInOldDB.Item1)
-            {
-                /*
-                OldID = ExistInOldDB.Item2;
-                DBControl newDB = new DBControl(model.UserName, model.PasswordHash);
-                LogControl OldLog = new LogControl(newDB);
-
-                
-                string OldLogLocation = BundleConfig.OldLog;
-                LogControl.UpdateLogLocation(OldLogLocation);
-                UserAccount OldUserAccount = new UserAccount(model.UserName, ExistInOldDB.Item2);
-                await OldUserAccount.Login();
-                ///*
-                if (OldUserAccount.Status)
-                {
-                    Task<Tuple<Dictionary<string, TilerElements.CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location_Elements>>> Task_profileData = OldUserAccount.ScheduleData.getProfileInfo();
-                    Tuple<Dictionary<string, TilerElements.CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location_Elements>> profileData = await Task_profileData;
-                    //OldUserAccount.DeleteLog();
-
-                    LogControlDirect newLog = new LogControlDirect(model, CurrentLogLocation);
-                    newLog.genereateNewLogFile(model.Id);
-                    newLog.UpdateReferenceDay(profileData.Item2);
-                    NewLogCreationSuccess = await newLog.WriteToLog(profileData.Item1.Values, OldUserAccount.LastEventTopNodeID.ToString());
-                }
-                
-                //*/
-            }
-            else
-            {
-
-                LogControlDirect newLog = new LogControlDirect(model, CurrentLogLocation);
-                UserAccountDirect newUser = new UserAccountDirect(model);
-                List<string> NameDist = model.FullName.Split().ToList();
-                Task< TilerElements.CustomErrors> registerStatus =  newUser.Register(model);
-                NewLogCreationSuccess =! (await registerStatus).Status;
-            }
-
-            if (NewLogCreationSuccess)
-            {
-                retValue = new Tuple<IdentityResult, int>(IdentityResult.Success, OldID);
-                return retValue;
-            }
-
-            retValue = new Tuple<IdentityResult, int>(IdentityResult.Failed("Registration is currently unavailable"), OldID);
-
-            return retValue;
-        }
         //
         // GET: /Account/ConfirmEmail
         [AllowAnonymous]
@@ -814,10 +746,8 @@ namespace TilerFront.Controllers
                 
                 if (result.Succeeded)
                 {
-                    var logGenerationresult = await generateLog(user);
-                    var LogCreationresult = logGenerationresult.Item1;
                     result = await UserManager.AddLoginAsync(user.Id, info.Login);
-                    if (result.Succeeded && LogCreationresult.Succeeded)
+                    if (result.Succeeded)
                     {
                         await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
                         Task SendThirdPartyAuthentication = new Task(() => { });
@@ -857,11 +787,6 @@ namespace TilerFront.Controllers
                         await SendThirdPartyAuthentication.ConfigureAwait(false);
                         await SendEmail.ConfigureAwait(false);
                         return RedirectToAction("Desktop", "Account");
-                    }
-                    else
-                    {
-                        LogControlDirect LogToBedeleted = new LogControlDirect(user);
-                        await LogToBedeleted.DeleteLog();
                     }
                 }
 
