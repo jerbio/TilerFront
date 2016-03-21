@@ -431,6 +431,8 @@
     <Compile Include="DB_SubCalendarEvent.cs" />
     <Compile Include="DB_SubCalendarEventExtra.cs" />
     <Compile Include="DB_SubCalendarEventRestricted.cs" />
+    <Compile Include="DBControlDirect.cs" />
+    <Compile Include="DBControl.cs" />
     <Compile Include="DTOs\PostBackStruct.cs" />
     <Compile Include="DTOs\PostError.cs" />
     <Compile Include="DTOs\VerifiedUser.cs" />
