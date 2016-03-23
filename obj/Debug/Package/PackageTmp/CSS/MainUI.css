@@ -17,8 +17,9 @@ body {
     background-attachment: fixed;
     background-position: center; 
     //background-color:black;
-    min-height:200px;
-
+    //min-height:200px;
+    min-width: 320px;
+    min-height:480px;
 }
 
 
