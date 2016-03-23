@@ -1,4 +1,4 @@
-﻿var TotalSubEventList = new Array();
+var TotalSubEventList = new Array();
 var ActiveSubEvents = new Array();
 var TwelveHourMilliseconds = OneHourInMs * 12;
 var Dictionary_OfSubEvents = {};
@@ -65,6 +65,7 @@ function retrieveUserSchedule(myurl, UserEntry,SuccessCallBack)
 {
     //$.get(myurl, generateCalendarEvents);
     //debugger;
+    retrieveUserSchedule.callAllBeforeRefreshCallbacks();
     var TimeZone = new Date().getTimezoneOffset();
     UserCredentials.UserName= UserEntry.UserName;//, : ,TimeZoneOffset: TimeZone };
     UserCredentials.ID = UserEntry.UserID;
@@ -72,8 +73,11 @@ function retrieveUserSchedule(myurl, UserEntry,SuccessCallBack)
     UserEntry.TimeZoneOffset = UserCredentials.TimeZoneOffset;
     UserEntry.StartRange = (new Date()).getTime() - TwelveHourMilliseconds;
     UserEntry.EndRange = (new Date()).getTime()+TwelveHourMilliseconds;
-    var HandleNEwPage = new LoadingScreenControl("Tiler is retrieving your schedule :)");
-    HandleNEwPage.Launch();
+    var HandleNewPage = new LoadingScreenControl("Tiler is retrieving your schedule :)");
+    if(!!HandleNewPage.Launch){
+        HandleNewPage.Launch();
+    }
+    
     $.ajax({
         type: "GET",
         url: myurl,
@@ -83,16 +87,54 @@ function retrieveUserSchedule(myurl, UserEntry,SuccessCallBack)
         // DataType needs to stay, otherwise the response object
         // will be treated as a single string
         //dataType: "json",
-        success: SuccessCallBack,
+        success: function(response) {
+            SuccessCallBack(response)
+            retrieveUserSchedule.callAllCallbacks(response)
+        },
         error: function (err) {
             var myError = err;
             var step = "err";
         }
 
     }).done(function (data) {
-        HandleNEwPage.Hide();
+        if(!!HandleNewPage.Hide){    
+            HandleNewPage.Hide();
+        }
         var a = 1;
     });
+}
+retrieveUserSchedule.beforeRefreshCallbacks = {}
+retrieveUserSchedule.callbacks = {}
+
+retrieveUserSchedule.subscribeToBeforeRefresh = function (callbackFunction) {
+    if ((!retrieveUserSchedule.beforeRefreshCallbacks)) {
+        retrieveUserSchedule.beforeRefreshCallbacks = {}
+    }
+    retrieveUserSchedule.beforeRefreshCallbacks[Math.random().toString(36).substring(9)] = callbackFunction;
+}
+
+retrieveUserSchedule.subscribeToSuccessfulRefresh = function (callbackFunction) {
+    if ((!retrieveUserSchedule.callbacks))
+    {
+        retrieveUserSchedule.callbacks = {}
+    }
+    retrieveUserSchedule.callbacks[Math.random().toString(36).substring(9)] = callbackFunction;
+}
+
+retrieveUserSchedule.callAllBeforeRefreshCallbacks = function (data) {
+    var keys = Object.keys(retrieveUserSchedule.beforeRefreshCallbacks);
+    for (var index in keys) {
+        var callback = retrieveUserSchedule.beforeRefreshCallbacks[keys[index]];
+        callback(data)
+    }
+}
+
+retrieveUserSchedule.callAllCallbacks = function (data) {
+    for (var index in Object.keys(retrieveUserSchedule.callbacks))
+    {
+        var callback = retrieveUserSchedule.callbacks[Object.keys(retrieveUserSchedule.callbacks)[index]];
+        callback(data)
+    }
 }
 
 

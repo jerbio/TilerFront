@@ -1,12 +1,21 @@
 "use strict"
 
+    function callbacsssk() {
+        if (chrome.runtime.lastError) {
+            console.log(chrome.runtime.lastError.message);
+        } else {
+            // Tab exists
+        }
+    }
+
+
 function updateIcon() {
     console.log(retrieveUserSchedule);
     function subscriber() {
     }
     retrieveUserSchedule.c
     setTimeout(updateIcon, 3000)
-    chrome.browserAction.setIcon({ path: "img/Icons/logoYellow.png", });
+    chrome.browserAction.setIcon({ path: "img/Icons/logoYellow.png", }, callbacsssk);
 }
 
 var logos = ["logo.png", "logoYellow.png"]
@@ -14,7 +23,7 @@ var logos = ["logo.png", "logoYellow.png"]
 function setYellowLogoIcon () {
     if(!!chrome.browserAction)
     {
-        chrome.browserAction.setIcon({ path: "img/Icons/logoYellow.png", });
+        chrome.browserAction.setIcon({ path: "img/Icons/logoYellow.png", }, callbacsssk);
     }
     
 }
@@ -22,7 +31,7 @@ function setYellowLogoIcon () {
 function setGreenLogoIcon () {
     if(!!chrome.browserAction)
     {
-        chrome.browserAction.setIcon({ path: "img/Icons/logoGreen.png", });
+        chrome.browserAction.setIcon({ path: "img/Icons/logoGreen.png", }, callbacsssk);
     }
     
 }
@@ -30,7 +39,7 @@ function setGreenLogoIcon () {
 function setOrangeLogoIcon () {
     if(!!chrome.browserAction)
     {
-        chrome.browserAction.setIcon({ path: "img/Icons/logoOrange.png", });
+        chrome.browserAction.setIcon({ path: "img/Icons/logoOrange.png", }, callbacsssk);
     }
     
 }
@@ -38,7 +47,7 @@ function setOrangeLogoIcon () {
 function setBlackLogoIcon() {
     if(!!chrome.browserAction)
     {
-        chrome.browserAction.setIcon({ path: "img/Icons/logo.png", });
+        chrome.browserAction.setIcon({ path: "img/Icons/logo.png", }, callbacsssk);
     }
 }
 
@@ -78,8 +87,6 @@ function getLatestData(data) {
         } else {
             refreshCycle = OneSecondInMs/OneMinInMs
         }
-        console.log(refreshCycle)
-        chrome.browserAction.setBadgeText({text: time.formattedSpan});
         
         //cleans out previous async call before new async call.
         chrome.alarms.clear("RefreshTimeSpanForSubEvent")
@@ -101,7 +108,10 @@ function getLatestData(data) {
         else {
             chrome.alarms.clear("RefreshTimeSpanForSubEvent")
             getNewData()
+            return;
         }
+        console.log(refreshCycle)
+        chrome.browserAction.setBadgeText({text: time.formattedSpan});
     }
     // flag is set to true if updateTimeSpanBadge is added to the alarm listener. This initializes the flag to zero
     updateTimeSpanBadge.isEnrolled = false;

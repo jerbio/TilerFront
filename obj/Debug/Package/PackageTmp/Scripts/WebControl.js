@@ -1,7 +1,7 @@
-﻿"use strict"
+"use strict"
 var DisableRegistration = false;
-var Debug = false;
-var DebugLocal = false;
+var Debug = true;
+var DebugLocal = true;
 
 //var global_refTIlerUrl = "http://localhost:53201/api/";
 //var global_refTIlerUrl = "http://tilersmart.azurewebsites.net/api/";
@@ -11,7 +11,7 @@ if (Debug)
     global_refTIlerUrl = "http://mytilerKid.azurewebsites.net/api/";
     if(DebugLocal)
     {
-        global_refTIlerUrl = "http://localhost:11919/api/";
+        global_refTIlerUrl = "https://localhost:44305/api/";
     }
 }
 var global_PositionCoordinate = { Latitude: 40.0274, Longitude: -105.2519, isInitialized: false, Message: "Uninitialized" };;
@@ -130,6 +130,7 @@ function GetCookieValue()//verifies that user has cookies
 
     return CookieValue;
 }
+
 
 
 
@@ -368,10 +369,14 @@ function StructuralizeNewData(NewData)
     return { TotalSubEventList: TotalSubEventList,ActiveSubEvents: ActiveSubEvents,Dictionary_OfCalendarData: Dictionary_OfCalendarData,Dictionary_OfSubEvents:Dictionary_OfSubEvents};
 }
 
-function getEventsWithinRange(RangeStart, RangeEned) {
+function getEventsWithinRange(RangeStart, RangeEned, subEvents) {
     var RetValue = new Array();
-    for (var i = 0 ; i < TotalSubEventList.length; i++) {
-        var eachSubEvent = TotalSubEventList[i];
+    if (!subEvents) {
+        subEvents = TotalSubEventList;
+    }
+    
+    for (var i = 0 ; i < subEvents.length; i++) {
+        var eachSubEvent = subEvents[i];
         if ((eachSubEvent.SubCalEndDate > RangeStart)  ) {
             if ((eachSubEvent.SubCalStartDate <= RangeEned))
             {
@@ -495,6 +500,7 @@ function global_goToError()
 }
 
 function global_goToLoginPage() {
+    debugger
     var urlString = "Index.html"
     window.location.href = urlString;
     return;
@@ -1872,7 +1878,13 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
         ImageAndTextContainer.Dom.appendChild(LoadScreenMessage.Dom);
         ImageAndTextContainer.Dom.appendChild(LaodingImageDom.Dom);
     
-        LoadingScreenPanel.appendChild(ImageAndTextContainer.Dom);
+        if(!!LoadingScreenPanel) {
+            LoadingScreenPanel.appendChild(ImageAndTextContainer.Dom);
+        }
+        else {
+            return;
+        }
+        
 
         LaunchImage();
     

@@ -333,11 +333,11 @@ namespace TilerFront
                 timeOfCreation.InnerXml = activity.ToXML();
                 bigDataLog.AppendChild(timeOfCreation);
                 XmlNode beforeProcessing = combinedDoc.CreateElement("BeforeProcessing");
-                XmlNode importedNBeforeProcessingNode = combinedDoc.ImportNode(oldData.DocumentElement.LastChild as XmlNode, true);
+                XmlNode importedNBeforeProcessingNode = combinedDoc.ImportNode(oldData.DocumentElement as XmlNode, true);
                 beforeProcessing.PrependChild(importedNBeforeProcessingNode);
 
                 XmlNode afterProcessing = combinedDoc.CreateElement("AfterProcessing");
-                XmlNode importedNAfterProcessingNode = combinedDoc.ImportNode(newData.DocumentElement.LastChild as XmlNode, true);
+                XmlNode importedNAfterProcessingNode = combinedDoc.ImportNode(newData.DocumentElement as XmlNode, true);
                 afterProcessing.PrependChild(importedNAfterProcessingNode);
 
                 bigDataLog.AppendChild(beforeProcessing);
@@ -367,7 +367,7 @@ namespace TilerFront
                     {
                         using (ZipArchive archive = new ZipArchive(zipToOpen, ZipArchiveMode.Update))
                         {
-                            ZipArchiveEntry readmeEntry = archive.CreateEntry(beforFileName + ".xml");
+                            ZipArchiveEntry readmeEntry = archive.CreateEntry(beforFileName + ".xml", CompressionLevel.Optimal);
                             xmlStream.WriteTo(readmeEntry.Open());
                         }
                     }
@@ -378,7 +378,7 @@ namespace TilerFront
                     {
                         using (var archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
                         {
-                            var demoFile = archive.CreateEntry(beforFileName + ".xml");
+                            var demoFile = archive.CreateEntry(beforFileName + ".xml", CompressionLevel.Optimal);
 
                             using (var entryStream = demoFile.Open())
                             {
