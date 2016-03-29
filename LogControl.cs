@@ -525,7 +525,7 @@ namespace TilerFront
             }
 
             UpdateCacheLocation(xmldoc, OldLocationCache);
-
+            int loopCounter = 0;
             while (true)
             {
                 try
@@ -533,11 +533,20 @@ namespace TilerFront
                     xmldoc.Save(LogFile);
                     xmldocCopy.Save(LogFileCopy);
                     updateBigData(xmldocCopy, xmldoc);
+                    var context = Microsoft.AspNet.SignalR.GlobalHost.ConnectionManager.GetHubContext<TilerFront.SocketHubs.ScheduleChange>();
+                    context.Clients.All.Send("we gott it ", "its happening");
+
+                    //new TilerFront.SocketHubs.ScheduleChange().Send("we gott it ", "its happening");
                     break;
                 }
                 catch (Exception e)
                 {
                     Thread.Sleep(160);
+                    
+                    if(++loopCounter > 3)
+                    {
+                        break;
+                    }
                 }
             }
 

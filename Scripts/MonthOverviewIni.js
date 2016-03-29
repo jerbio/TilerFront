@@ -1434,16 +1434,28 @@ function InitiateGrid(refDate)
 }
 
 
-
+function onSocketDataReceipt(data) {
+    alert("yo son! " + onSocketDataReceipt.counter);
+    /*$('#sendmessage').click(function () {
+        // Call the Send method on the hub.
+        chat.server.send($('#displayname').val(), $('#message').val());
+        // Clear text box and reset focus for next comment.
+        $('#message').val('').focus();
+    });*/
+    ++onSocketDataReceipt.counter
+}
+onSocketDataReceipt.counter = 0;
 
 
 function getRefreshedData(CallBackAfterRefresh)//RangeData)
 {
     //setTimeout(refreshIframe,200);
+    
     if (--refreshCounter < 0)//debugging counter. THis allows us to set a max number of refreshes before stopping calls to backend
     {
         return;
     }
+    refreshCounter = 0
     StopPullingData();
     monthViewResetData();
     var DataHolder = { Data: "" };
@@ -1452,6 +1464,12 @@ function getRefreshedData(CallBackAfterRefresh)//RangeData)
         PopulateTotalSubEvents(DataHolder, global_WeekGrid,CallBackAfterRefresh);
     }
     global_ClearRefreshDataInterval = setTimeout(getRefreshedData, global_refreshDataInterval);
+
+    $.connection.hub.start().done(onSocketDataReceipt);
+    var chat = $.connection.scheduleChange;
+    chat.client.sendToAll = onSocketDataReceipt;
+    chat.client.send = onSocketDataReceipt;
+
     return global_ClearRefreshDataInterval;
 }
 getRefreshedData.isEnabled = true;

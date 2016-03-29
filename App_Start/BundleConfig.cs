@@ -16,6 +16,10 @@ namespace TilerFront
             //LogLocation = @"C:\Users\OluJerome\Documents\Visual Studio 2010\Projects\LearnCuDAVS2010\LearnCUDAConsoleApplication\WagTapCalLogs\";
             TilerFront.LogControl.UpdateLogLocation(LogLocation);
             TilerFront.LogControl.UpdateBigDataLogLocation(BigDataocation);
+            bundles.Add(new ScriptBundle("~/Scripts/signalR").Include(
+                        "~/Scripts/jquery.signalR-2.2.0.min.js"));
+
+
             bundles.Add(new ScriptBundle("~/bundles/jquery").Include(
                         "~/Scripts/jquery-{version}.js"));
 
@@ -90,7 +94,9 @@ namespace TilerFront
                     "~/Scripts/AddNewEvent_Desktop0.js",
                     "~/Scripts/jquery-ui.min.js",
                     "~/Scripts/SeachHandlerDesktop.js",
-                    "~/Scripts/bootstrap-datepicker.js"
+                    "~/Scripts/bootstrap-datepicker.js",
+                    "~/Scripts/jquery.signalR-2.2.0.min.js"
+
                       ));
 
             bundles.Add(new ScriptBundle("~/Content/TilerMobileJS").Include(
