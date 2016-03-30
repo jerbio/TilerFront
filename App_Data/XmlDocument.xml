@@ -912,6 +912,11 @@
             Represents schedule for user. The StartRange is the start time in JS in milliseconds. The EndRange is the start time in JS in milliseconds. Default is 2 weeks before today to 90 days from today.
             </summary>
         </member>
+        <member name="P:TilerFront.Models.getScheduleModel.AuthoriZationId">
+            <summary>
+            Id which authorizes the request to make a request for requesting a schedule
+            </summary>
+        </member>
         <member name="T:TilerFront.Models.ProcrastinateEventModel">
             <summary>
             Represents a request for procrastination of an event. EventID is required.

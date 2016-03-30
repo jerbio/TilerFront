@@ -30,7 +30,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;LocalDebug ForceReadFromXml readfromBeforeInsertionFixingStiticRestricted</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;LocalDebug ForceReadFromXml //readfromBeforeInsertionFixingStiticRestricted</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>App_Data\XmlDocument.xml</DocumentationFile>
@@ -433,7 +433,6 @@
     <Compile Include="PostBackData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SocketHubs\ScheduleChange.cs" />
-    <None Include="SocketHubs\Startup.cs.old" />
     <Compile Include="Startup.cs" />
     <Compile Include="UserAccount.cs" />
     <Compile Include="UserAccountDebug.cs" />

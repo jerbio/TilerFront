@@ -25,6 +25,7 @@ $(document).ready(function () {
     LaumchUIOPtion(0);
     $(document).tooltip({ track: true });
     $('body').hide();
+    initializeWebSockets();
     InitializeMonthlyOverview();
     MenuManger();
     
@@ -660,7 +661,7 @@ function RevealControlPanelSection(SelectedEvents)
                 HandleNEwPage.Hide();
                 //triggerUIUPdate();//hack alert
                 global_ExitManager.triggerLastExitAndPop();
-                getRefreshedData();
+                //getRefreshedData();
             }
 
             $.ajax({
@@ -685,7 +686,7 @@ function RevealControlPanelSection(SelectedEvents)
             }).done(function (data) {
                 HandleNEwPage.Hide();
                 triggerUIUPdate();//hack alert
-                getRefreshedData();
+                //getRefreshedData();
             });
         }
         function triggerUIUPdate() {
@@ -721,7 +722,7 @@ function RevealControlPanelSection(SelectedEvents)
                 HandleNEwPage.Hide();
                 //triggerUIUPdate();//hack alert
                 global_ExitManager.triggerLastExitAndPop();
-                getRefreshedData();
+                //getRefreshedData();
             }
 
 
@@ -761,7 +762,7 @@ function RevealControlPanelSection(SelectedEvents)
             }).done(function (data) {
                 HandleNEwPage.Hide();
                 triggerUIUPdate();//hack alert
-                getRefreshedData();
+                //getRefreshedData();
             });
         }
         function triggerUIUPdate() {
@@ -1435,16 +1436,27 @@ function InitiateGrid(refDate)
 
 
 function onSocketDataReceipt(data) {
-    alert("yo son! " + onSocketDataReceipt.counter);
-    /*$('#sendmessage').click(function () {
-        // Call the Send method on the hub.
-        chat.server.send($('#displayname').val(), $('#message').val());
-        // Clear text box and reset focus for next comment.
-        $('#message').val('').focus();
-    });*/
+    console.log("yo son! " + onSocketDataReceipt.counter);
+    if (!!data.refreshData) {
+        if (data.refreshData.trigger) {
+            refreshCounter = 1;
+            console.log("refresh is  " + getRefreshedData.isEnabled);
+            global_ExitManager.triggerLastExitAndPop();
+            //getRefreshedData.enableDataRefresh();
+            getRefreshedData();
+        }
+    }
+    
     ++onSocketDataReceipt.counter
 }
 onSocketDataReceipt.counter = 0;
+
+function initializeWebSockets() {
+    var chat = $.connection.scheduleChange;
+    //chat.client.sendToAll = onSocketDataReceipt;
+    chat.client.refereshDataFromSockets = onSocketDataReceipt;
+    $.connection.hub.start().done();
+}
 
 
 function getRefreshedData(CallBackAfterRefresh)//RangeData)
@@ -1463,12 +1475,7 @@ function getRefreshedData(CallBackAfterRefresh)//RangeData)
     {
         PopulateTotalSubEvents(DataHolder, global_WeekGrid,CallBackAfterRefresh);
     }
-    global_ClearRefreshDataInterval = setTimeout(getRefreshedData, global_refreshDataInterval);
-
-    $.connection.hub.start().done(onSocketDataReceipt);
-    var chat = $.connection.scheduleChange;
-    chat.client.sendToAll = onSocketDataReceipt;
-    chat.client.send = onSocketDataReceipt;
+    //global_ClearRefreshDataInterval = setTimeout(getRefreshedData, global_refreshDataInterval);
 
     return global_ClearRefreshDataInterval;
 }
@@ -3457,7 +3464,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                         HandleNEwPage.Hide();
                         //triggerUIUPdate();//hack alert
                         global_ExitManager.triggerLastExitAndPop();
-                        getRefreshedData();
+                        //getRefreshedData();
                     }
 
                     $.ajax({
@@ -3482,7 +3489,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                     }).done(function (data) {
                         HandleNEwPage.Hide();
                         triggerUIUPdate();//hack alert
-                        getRefreshedData();
+                        //getRefreshedData();
                     });
             }
                 function triggerUIUPdate() {
@@ -3519,7 +3526,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                     HandleNEwPage.Hide();
                     //triggerUIUPdate();//hack alert
                     global_ExitManager.triggerLastExitAndPop();
-                    getRefreshedData();
+                    //getRefreshedData();
                 }
                 $.ajax({
                         type: "POST",
@@ -3550,7 +3557,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                 }).done(function (data) {
                     HandleNEwPage.Hide();
                     triggerUIUPdate();//hack alert
-                    getRefreshedData();
+                    //getRefreshedData();
 
                 });
 
@@ -3583,7 +3590,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                         HandleNEwPage.Hide();
                         //triggerUIUPdate();//hack alert
                         global_ExitManager.triggerLastExitAndPop();
-                        getRefreshedData();
+                        //getRefreshedData();
                     }
                     $.ajax({
                             type: "POST",
@@ -3621,7 +3628,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                         debugger;
                         HandleNEwPage.Hide();
                         triggerUIUPdate();//hack alert
-                        getRefreshedData();
+                        //getRefreshedData();
                     });
             }
                 function triggerUIUPdate() {
@@ -3885,7 +3892,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                     HandleNEwPage.Hide();
                     //triggerUIUPdate();//hack alert
                     global_ExitManager.triggerLastExitAndPop();
-                    getRefreshedData();
+                    //getRefreshedData();
                 }
                 $.ajax({
                     type: "POST",

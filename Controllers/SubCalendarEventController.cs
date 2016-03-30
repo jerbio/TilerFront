@@ -207,7 +207,8 @@ namespace TilerFront.Controllers
                         break;
                 }
             }
-
+            TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
+            scheduleChangeSocket.triggerRefreshData();
             return Ok(retValue.getPostBack);
         }
     }
