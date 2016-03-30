@@ -320,6 +320,11 @@ namespace TilerFront
         /// <param name="newData"></param>
         public async void updateBigData(XmlDocument oldData, XmlDocument newData)
         {
+            bool corruptZipFile = false;
+            string zipFile = LoggedUserID + ".zip";
+            string zipFolder = LoggedUserID;
+
+            string fullZipPath = @BigDataLogLocation + zipFile;
             try
             {
                 if (activity == null)
@@ -356,13 +361,11 @@ namespace TilerFront
                    .TotalMilliseconds)).ToString();
 
 
-                string zipFile = LoggedUserID + ".zip";
-                string zipFolder = LoggedUserID;
-
-                string fullZipPath = @BigDataLogLocation + zipFile;
+                
 
                 if (File.Exists(fullZipPath))
                 {
+                    corruptZipFile = true;
                     using (FileStream zipToOpen = new FileStream(@fullZipPath, FileMode.Open))
                     {
                         using (ZipArchive archive = new ZipArchive(zipToOpen, ZipArchiveMode.Update))
@@ -396,6 +399,10 @@ namespace TilerFront
             }
             catch (Exception e)
             {
+                if(corruptZipFile)
+                {
+                    File.Delete(fullZipPath);
+                }
                 CustomErrors retValue = new CustomErrors(true, "Error generating bigdata log\n" + e.ToString(), 20000000);
             }
         }
@@ -533,8 +540,6 @@ namespace TilerFront
                     xmldoc.Save(LogFile);
                     xmldocCopy.Save(LogFileCopy);
                     updateBigData(xmldocCopy, xmldoc);
-                    var context = Microsoft.AspNet.SignalR.GlobalHost.ConnectionManager.GetHubContext<TilerFront.SocketHubs.ScheduleChange>();
-                    context.Clients.All.Send("we gott it ", "its happening");
 
                     //new TilerFront.SocketHubs.ScheduleChange().Send("we gott it ", "its happening");
                     break;

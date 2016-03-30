@@ -11,7 +11,6 @@ namespace TilerFront
         {
             ConfigureAuth(app);
             app.MapSignalR();
-
         }
     }
 

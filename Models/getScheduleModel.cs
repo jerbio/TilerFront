@@ -12,5 +12,9 @@ namespace TilerFront.Models
     {
         public long StartRange { get; set; }
         public long EndRange { get; set; }
+        /// <summary>
+        /// Id which authorizes the request to make a request for requesting a schedule
+        /// </summary>
+        public string AuthoriZationId { get; set; }
     }
 }

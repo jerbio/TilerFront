@@ -12,6 +12,8 @@ using TilerElements;
 using DBTilerElement;
 //using TilerGoogleCalendarLib;
 using System.Collections.Concurrent;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 //using System.Web.Http.Cors;
 
 namespace TilerFront.Controllers
@@ -23,13 +25,14 @@ namespace TilerFront.Controllers
     /// </summary>
     public class ScheduleController : ApiController
     {
-        
+
         // GET api/schedule
         /// <summary>
         /// Retrieve Events within a time frame. Required elements are UserID and UserName. Provided starttime and Endtime for the range of the schedule allows for retrieval of schedule within a timerange
         /// </summary>
         /// <param name="myAuthorizedUser"></param>
         /// <returns></returns>
+        //[ValidateAntiForgeryTokenAttribute]
         [HttpGet]
         [ResponseType(typeof(PostBackStruct))]
         public async Task<IHttpActionResult> GetSchedule([FromUri] getScheduleModel myAuthorizedUser)
@@ -363,6 +366,9 @@ namespace TilerFront.Controllers
                         break;
                 }
             }
+
+            TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
+            scheduleChangeSocket.triggerRefreshData();
             return Ok(retValue.getPostBack);
         }
 
@@ -389,6 +395,9 @@ namespace TilerFront.Controllers
             
             MySchedule.markSubEventsAsComplete(AllEventIDs);
             PostBackData myPostData = new PostBackData("\"Success\"", 0);
+
+            TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
+            scheduleChangeSocket.triggerRefreshData();
             return Ok(myPostData.getPostBack);
         }
 
@@ -425,6 +434,9 @@ namespace TilerFront.Controllers
             {
                 retValue = new PostBackData("", 1);
             }
+
+            TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
+            scheduleChangeSocket.triggerRefreshData();
             return Ok(retValue.getPostBack);
         }
 
@@ -452,6 +464,9 @@ namespace TilerFront.Controllers
             {
                 retValue = new PostBackData("", 1);
             }
+
+            TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
+            scheduleChangeSocket.triggerRefreshData();
             return Ok(retValue.getPostBack);
         }
 
@@ -502,7 +517,8 @@ namespace TilerFront.Controllers
 
                 
             }
-            
+            TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
+            scheduleChangeSocket.triggerRefreshData();
             return Ok(retValue.getPostBack);
         }
 
@@ -548,6 +564,8 @@ namespace TilerFront.Controllers
             {
                 retValue = new PostBackData("", 1);
             }
+            TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
+            scheduleChangeSocket.triggerRefreshData();
             return Ok(retValue.getPostBack);
         }
 
@@ -770,7 +788,7 @@ namespace TilerFront.Controllers
                     myUser.ScheduleLogControl.updateUserActivty(activity);
                     await MySchedule.AddToScheduleAndCommit(newCalendarEvent);
                 }
-
+                
 
                 CustomErrors userError = newCalendarEvent.Error;
                 retValue = new PostBackData(newCalendarEvent.ActiveSubEvents.First().ToSubCalEvent(newCalendarEvent), userError.Code);
@@ -780,7 +798,8 @@ namespace TilerFront.Controllers
             {
                 retValue = new PostBackData("", 1);
             }
-
+            TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
+            scheduleChangeSocket.triggerRefreshData();
             return Ok(retValue.getPostBack);
         }
 

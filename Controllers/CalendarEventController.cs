@@ -155,6 +155,9 @@ namespace TilerFront.Controllers
             {
                 retValue = new PostBackData("", 1);
             }
+
+            TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
+            scheduleChangeSocket.triggerRefreshData();
             return Ok(retValue.getPostBack);
         }
 
@@ -226,6 +229,8 @@ namespace TilerFront.Controllers
             {
                 retValue = new PostBackData("", 1);
             }
+            TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
+            scheduleChangeSocket.triggerRefreshData();
             return Ok(retValue.getPostBack);
         }
 
@@ -310,6 +315,8 @@ namespace TilerFront.Controllers
                 retValue = new PostBackData("", 1);
             }
             */
+            TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
+            scheduleChangeSocket.triggerRefreshData();
             return Ok(retValue.getPostBack);
         }
 
