@@ -14,6 +14,9 @@ using DBTilerElement;
 using System.Collections.Concurrent;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using TilerElements.Wpf;
+using TilerElements.DB;
+
 //using System.Web.Http.Cors;
 using Microsoft.AspNet.Identity;
 using System.Data.Entity;
@@ -1293,7 +1296,7 @@ namespace TilerFront.Controllers
             }
             else
             {
-                RestrictionTimeLine  RestrictionTimeLine = new TilerElements.RestrictionTimeLine(RestrictStart,RestrictEnd);
+                RestrictionTimeLine  RestrictionTimeLine = new RestrictionTimeLine(RestrictStart,RestrictEnd);
                 retValue = new RestrictionProfile(selectedDaysOftheweek, RestrictionTimeLine);
             }
             return retValue;

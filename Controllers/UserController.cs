@@ -15,6 +15,9 @@ using System.Web.Configuration;
 using System.Web.Http.Description;
 using TilerFront.Models;
 using DBTilerElement;
+using TilerElements;
+using TilerElements.Wpf;
+using TilerElements.DB;
 //using System.Web.Http.Cors;
 
 namespace TilerFront.Controllers
@@ -27,7 +30,7 @@ namespace TilerFront.Controllers
         
         // GET api/User
         [NonAction]
-        public IQueryable<ApplicationUser> GetUsers()
+        public IQueryable<TilerUser> GetUsers()
         {   
             return db.Users;
         }
@@ -48,11 +51,11 @@ namespace TilerFront.Controllers
         */
 
 
-        async public Task<ApplicationUser> GetUser(string ID,string userName)
+        async public Task<TilerUser> GetUser(string ID,string userName)
         {
-            List<ApplicationUser> AllUsers = await db.Users.Where(obj => obj.Id == ID).ToListAsync();
+            List<TilerUser> AllUsers = await db.Users.Where(obj => obj.Id == ID).ToListAsync();
 
-            ApplicationUser user = null;
+            TilerUser user = null;
             if (AllUsers.Count > 0)
             {
                 if (user != null)
@@ -68,10 +71,10 @@ namespace TilerFront.Controllers
         }
 
 
-        public async Task SaveUser(ApplicationUser user)
+        public async Task SaveUser(TilerUser user)
         {
             
-            var store = new UserStore<ApplicationUser>(db);
+            var store = new UserStore<TilerUser>(db);
 
             var manager = new ApplicationUserManager(store);
             await manager.UpdateAsync(user);
@@ -167,7 +170,7 @@ namespace TilerFront.Controllers
             PostBackData retValue = new PostBackData("", 4);
             if (retrievedUser.Status)
             {
-                IEnumerable<TilerElements.Location_Elements> retrievedCalendarEvents = await retrievedUser.ScheduleLogControl.getCachedLocationByName(SearchData.Data);
+                IEnumerable<Location_Elements> retrievedCalendarEvents = await retrievedUser.Location.getCachedLocationByName(SearchData.Data);
                 retValue = new PostBackData(retrievedCalendarEvents.Select(obj => obj.ToLocationModel()).ToList(), 0);
             }
 

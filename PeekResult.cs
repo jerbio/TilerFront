@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using TilerElements;
 using DBTilerElement;
+using TilerElements.Wpf;
 using TilerFront.Models;
 
 namespace TilerFront

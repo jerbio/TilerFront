@@ -10,10 +10,13 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Description;
 using TilerElements;
+using TilerElements.DB;
+using TilerElements.Wpf;
 using TilerFront.Models;
 using DBTilerElement;
 using Newtonsoft.Json.Linq;
 //using TilerGoogleCalendarLib;
+
 
 namespace TilerFront.Controllers
 {
@@ -42,7 +45,7 @@ namespace TilerFront.Controllers
         {
             UserAccountDirect retrievedUser = await myUser.getUserAccountDirect();
             await retrievedUser.Login();
-            TilerElements.CalendarEvent retrievedCalendarEvent = retrievedUser.ScheduleLogControl.getCalendarEventWithID(id);
+            CalendarEvent retrievedCalendarEvent = retrievedUser.ScheduleLogControl.getCalendarEvent(id);
             PostBackData retValue = new PostBackData(retrievedCalendarEvent.ToCalEvent(), 0);
 
 
