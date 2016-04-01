@@ -12,7 +12,8 @@ using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using Microsoft.AspNet.Identity.EntityFramework;
 using TilerFront.Models;
-
+using TilerElements.DB;
+using TilerElements;
 
 namespace TilerFront.Controllers
 {
@@ -223,7 +224,7 @@ namespace TilerFront.Controllers
                 case SignInStatus.Success:
                     {
                         UserController myUserCtrl = new UserController();
-                        ApplicationUser SessionUser = await myUserCtrl.GetUser(User.Identity.GetUserId(), User.Identity.GetUserName());
+                        TilerUser SessionUser = await myUserCtrl.GetUser(User.Identity.GetUserId(), User.Identity.GetUserName());
                         RetValue = new UserAccountDirect(SessionUser);
                         return RetValue;   
                     }
@@ -312,7 +313,7 @@ namespace TilerFront.Controllers
                 int Min=Convert.ToInt32(model.TimeZoneOffSet);
                 TimeSpan OffSet = TimeSpan.FromMinutes(Min);
                 DateTimeOffset EndOfDay = new DateTimeOffset(2014, 1, 1, 22, 0, 0, OffSet);
-                var user = new ApplicationUser { UserName = model.Username, Email = model.Email, FullName = model.FullName, LastChange = EndOfDay.UtcDateTime, ReferenceDay = new DateTimeOffset()};
+                var user = new TilerUser { UserName = model.Username, Email = model.Email, FullName = model.FullName, LastChange = EndOfDay.UtcDateTime, ReferenceDay = new DateTimeOffset()};
                 //var result = logGenerationresult.Item1;
                 //if (result.Succeeded)
                 //{
@@ -379,7 +380,7 @@ namespace TilerFront.Controllers
                 int Min = Convert.ToInt32(model.TimeZoneOffSet);
                 TimeSpan OffSet = TimeSpan.FromMinutes(Min);
                 DateTimeOffset EndOfDay = new DateTimeOffset(2014, 1, 1, 22, 0, 0, OffSet);
-                var user = new ApplicationUser { UserName = model.Username, Email = model.Email, FullName = model.FullName, LastChange = EndOfDay.UtcDateTime, ReferenceDay = new DateTimeOffset() };
+                var user = new TilerUser { UserName = model.Username, Email = model.Email, FullName = model.FullName, LastChange = EndOfDay.UtcDateTime, ReferenceDay = new DateTimeOffset() };
                 var result = await UserManager.CreateAsync(user, model.Password);
 
                 if (result.Succeeded)
@@ -481,7 +482,7 @@ namespace TilerFront.Controllers
         public ActionResult Mobile()
         {
             ViewBag.Message = "Welcome To Tiler";
-            ApplicationUser myUser = UserManager.FindById(User.Identity.GetUserId());
+            TilerUser myUser = UserManager.FindById(User.Identity.GetUserId());
 
             return View(myUser);
         }
@@ -738,7 +739,7 @@ namespace TilerFront.Controllers
                 {
                     return View("ExternalLoginFailure");
                 }
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email, FullName = info.ExternalIdentity.Name, LastChange = DateTime.Now };
+                var user = new TilerUser { UserName = model.Email, Email = model.Email, FullName = info.ExternalIdentity.Name, LastChange = DateTime.Now };
 
 
                 var result = await UserManager.CreateAsync(user);

@@ -458,13 +458,12 @@
     </Compile>
     <None Include="LogControlDebug.cs.old" />
     <None Include="LogControlDirect.cs.old" />
-    <Compile Include="LocationControl.cs" />
     <Compile Include="Migrations\201603171733317_init.cs" />
     <Compile Include="Migrations\201603171733317_init.Designer.cs">
       <DependentUpon>201603171733317_init.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
-    <Compile Include="ScheduleControl.cs" />
+    <None Include="ScheduleControl.cs.old" />
     <Compile Include="Models\AccountBindingModels.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\AuthorizedUser.cs" />
@@ -486,7 +485,6 @@
     <Compile Include="Models\RestrictionWeekConfig.cs" />
     <Compile Include="Models\ShuffleModel.cs" />
     <Compile Include="Models\ThirdPartyCalendarAuthenticationModel.cs" />
-    <Compile Include="Models\SubCalEvent.cs" />
     <Compile Include="Models\TimeDuration.cs" />
     <Compile Include="Models\TimeLine_Client.cs" />
     <Compile Include="Models\UnAuthorizedUser.cs" />
@@ -494,14 +492,11 @@
     <Compile Include="Models\UnregisteredUser.cs" />
     <Compile Include="Models\UrgencyTier.cs" />
     <Compile Include="Models\UserSchedule.cs" />
-    <Compile Include="OutLookConnector.cs" />
     <Compile Include="PeekResult.cs" />
     <Compile Include="PostBackData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SocketHubs\ScheduleChange.cs" />
     <Compile Include="Startup.cs" />
-    <Compile Include="UserAccount.cs" />
-    <Compile Include="UserAccountDebug.cs" />
     <Compile Include="UserAccountDirect.cs" />
     <Content Include="Areas\RouteDebugger\Content\rdstyle.css" />
     <Content Include="Areas\RouteDebugger\Scripts\detect.js" />

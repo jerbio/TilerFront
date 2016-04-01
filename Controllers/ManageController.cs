@@ -30,6 +30,7 @@ using Google.Apis.Plus.v1.Data;
 using Google.Apis.Auth.OAuth2.Flows;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Util.Store;
+using TilerElements;
 
 namespace TilerFront.Controllers
 {
@@ -270,7 +271,7 @@ namespace TilerFront.Controllers
         // GET: /Manage/ChangeStartOfDay
         public ActionResult ChangeStartOfDay()
         {
-            ApplicationUser myUser = UserManager.FindById(User.Identity.GetUserId());
+            TilerUser myUser = UserManager.FindById(User.Identity.GetUserId());
             long Milliseconds = (long)(new DateTimeOffset(myUser.LastChange.AddDays(10)) - TilerElementExtension.JSStartTime).TotalMilliseconds;
             var model = new ChangeStartOfDayModel
             {
@@ -301,7 +302,7 @@ namespace TilerFront.Controllers
                     TimeOfDay=TimeOfDay.AddHours(-1);
                 }
                 */
-                ApplicationUser myUser = await UserManager.FindByIdAsync(User.Identity.GetUserId());
+                TilerUser myUser = await UserManager.FindByIdAsync(User.Identity.GetUserId());
                 TimeSpan OffSetSpan= TimeSpan.FromMinutes(Convert.ToInt32( model.TimeZoneOffSet));
                 TimeOfDay = TimeOfDay.ToOffset(OffSetSpan);
                 myUser.LastChange=TimeOfDay.DateTime;

@@ -1105,7 +1105,6 @@
             is the restrcition to be for only work week.
             </summary>
         </member>
-<<<<<<< HEAD
         <member name="M:TilerFront.GoogleTilerEventControl.getThirdPartyControlForIndex">
             <summary>
             Function generates google calendar control. Its populated with events retrieved within +/- 90 days of google calendar update. It returns null if access to google api is lost.
@@ -1118,10 +1117,7 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:TilerFront.LogControlDirect.UpdateReferenceDayInXMLLog(System.DateTimeOffset,System.String)">
-=======
         <member name="M:TilerFront.ScheduleControl.getCalendarEvent(System.String)">
->>>>>>> removed logcontrol for introduction and separation of db functionallity
             <summary>
             Function returns the only calendar event with the specified ID
             </summary>
@@ -1150,7 +1146,6 @@
             </summary>
             <returns></returns>
         </member>
-<<<<<<< HEAD
         <member name="M:TilerFront.LogControl.updateBigData(System.Xml.XmlDocument,System.Xml.XmlDocument)">
             <summary>
             Function is to be called for the generation of auto logs for a user interaction with the schedule
@@ -1171,10 +1166,7 @@
             <param name="SubEvent"></param>
             <returns></returns>
         </member>
-        <member name="M:TilerFront.LogControl.getRestrictionTimeLine(System.Xml.XmlNode)">
-=======
         <member name="M:TilerFront.ScheduleControl.deleteAllCalendarEvents">
->>>>>>> removed logcontrol for introduction and separation of db functionallity
             <summary>
             Function deletes all calendar events associated with a user account
             </summary>

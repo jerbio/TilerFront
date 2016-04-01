@@ -1110,6 +1110,7 @@
         </member>
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
         <member name="M:TilerFront.GoogleTilerEventControl.getThirdPartyControlForIndex">
             <summary>
             Function generates google calendar control. Its populated with events retrieved within +/- 90 days of google calendar update. It returns null if access to google api is lost.
@@ -1212,5 +1213,7 @@
             gets the reference time that represents the end of the day for a given user. Its sent as a Datetimeoffset object so the date portin of the object isn't too useful
             </summary>
         </member>
+=======
+>>>>>>> finally added the ability for the core tiler data types. It can run, but there is a strong possibility that the db will migrate. I am yet to run a db upgrade. Also there are still botimplemented exception every where.
     </members>
 </doc>

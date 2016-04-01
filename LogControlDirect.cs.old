@@ -9,6 +9,7 @@ using System.IO;
 using System.Threading;
 using DBTilerElement;
 using TilerElements;
+using TilerElements.Wpf;
 using System.Web;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity.Owin;
