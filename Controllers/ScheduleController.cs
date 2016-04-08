@@ -290,6 +290,8 @@ namespace TilerFront.Controllers
             myUserAccount.ScheduleLogControl.updateUserActivty(activity);
             await MySchedule.UpdateWithProcrastinateSchedule(ScheduleUpdateMessage.Item2);
             PostBackData myPostData = new PostBackData("\"Success\"", 0);
+            TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
+            scheduleChangeSocket.triggerRefreshData();
             return Ok(myPostData.getPostBack);
         }
 
@@ -309,8 +311,7 @@ namespace TilerFront.Controllers
             UserAccountDirect myUser = await UserData.getUserAccountDirect();
             await myUser.Login();
 
-            DateTimeOffset myNow = DateTimeOffset.Parse("5/5/2015 2:45:00 PM");
-            myNow = DateTimeOffset.UtcNow;// myAuthorizedUser.getRefNow();
+            DateTimeOffset myNow = DateTimeOffset.UtcNow;// myAuthorizedUser.getRefNow();
             My24HourTimerWPF.Schedule MySchedule = new My24HourTimerWPF.Schedule(myUser,myNow);
             DB_UserActivity activity = new DB_UserActivity(myNow, UserActivity.ActivityType.ProcrastinateSingle);
             myUser.ScheduleLogControl.updateUserActivty(activity);
@@ -319,6 +320,41 @@ namespace TilerFront.Controllers
             Tuple<CustomErrors, Dictionary<string, CalendarEvent>> ScheduleUpdateMessage = MySchedule.ProcrastinateJustAnEvent(UserData.EventID, ProcrastinateDuration.TotalTimeSpan);
             await MySchedule.UpdateWithProcrastinateSchedule(ScheduleUpdateMessage.Item2);
             PostBackData myPostData = new PostBackData("\"Success\"", 0);
+            TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
+            scheduleChangeSocket.triggerRefreshData();
+            return Ok(myPostData.getPostBack);
+        }
+
+        /// <summary>
+        /// Have Tiler get you something to do. 
+        /// </summary>
+        /// <param name="UserData"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [ResponseType(typeof(PostBackStruct))]
+        [Route("api/Schedule/Shuffle")]
+        public async Task<IHttpActionResult> Shuffle([FromBody]ShuffleModel UserData)
+        {
+            AuthorizedUser myAuthorizedUser = UserData.User;
+            UserAccountDirect myUser = await UserData.getUserAccountDirect();
+            await myUser.Login();
+            DateTimeOffset myNow = myNow = DateTimeOffset.UtcNow;
+            My24HourTimerWPF.Schedule MySchedule = new My24HourTimerWPF.Schedule(myUser, myNow);
+            await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, UserData.UserID).ConfigureAwait(false);
+
+            Location_Elements location;
+            if(UserData.IsInitialized)
+            {
+                location = new Location_Elements(UserData.Latitude, UserData.Longitude,"","",false,1);
+            }
+            else
+            {
+                location = Location_Elements.getDefaultLocation();
+            }
+            await MySchedule.FindMeSomethingToDo(location);
+            PostBackData myPostData = new PostBackData("\"Success\"", 0);
+            TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
+            scheduleChangeSocket.triggerRefreshData();
             return Ok(myPostData.getPostBack);
         }
 

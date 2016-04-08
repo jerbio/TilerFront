@@ -30,7 +30,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;LocalDebug ForceReadFromXml readfromBeforeInsertionFixingStiticRestricted</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;LocalDebug ForceReadFromXml //readfromBeforeInsertionFixingStiticRestricted</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>App_Data\XmlDocument.xml</DocumentationFile>
@@ -420,6 +420,7 @@
     <Compile Include="Models\ProcrastinateSubEventModel.cs" />
     <Compile Include="Models\IndexedThirdPartyAuthentication.cs" />
     <Compile Include="Models\RestrictionWeekConfig.cs" />
+    <Compile Include="Models\ShuffleModel.cs" />
     <Compile Include="Models\ThirdPartyCalendarAuthenticationModel.cs" />
     <Compile Include="Models\TimeDuration.cs" />
     <Compile Include="Models\TimeLine_Client.cs" />
