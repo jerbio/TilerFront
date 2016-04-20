@@ -34,9 +34,12 @@ namespace TilerFront
         protected int LastLocationID;
         protected string CurrentLog;
         protected bool LogStatus;
+        protected bool UpdateLocaitionCache = false;
         protected Dictionary<string, Location_Elements> CachedLocation;
         protected Location_Elements DefaultLocation= new Location_Elements();
+        protected Location_Elements NewLocation;
         protected DB_UserActivity activity;
+
 
 #if ForceReadFromXml
 #else

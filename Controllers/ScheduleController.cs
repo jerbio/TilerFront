@@ -769,7 +769,8 @@ namespace TilerFront.Controllers
             string EventDuration = TimeSpan.FromSeconds(fullTimeSpan.TotalSeconds * Convert.ToInt32(Count)).ToString();
 
             bool RigidScheduleFlag = Convert.ToBoolean(Rigid);
-            TilerElements.Location EventLocation = new TilerElements.Location(LocationAddress, LocationTag);
+            Location_Elements EventLocation = new Location_Elements(LocationAddress, LocationTag);
+            EventLocation.Validate();
 
             Repetition MyRepetition = new Repetition();
             DateTimeOffset RepeatStart = new DateTimeOffset();
