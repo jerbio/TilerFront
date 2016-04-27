@@ -135,21 +135,32 @@ function GetCookieValue()//verifies that user has cookies
 
 
 
-function getLocation() {
+function getLocation(onSuccessLocationRetrieval, onfailure) {
+    global_PositionCoordinate.Message ="Initializing"
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(populatePosition, showError);
     } else {
-        //global_PositionCoordinate = null;
+        if ((!!onSuccessLocationRetrieval) && (typeof (onSuccessLocationRetrieval) === "function"))
+        {
+            global_PositionCoordinate.Message = "Location services not suppported in browser"
+            onfailure(global_PositionCoordinate.Message)
+        }
     }
 
     function populatePosition(position) {
         global_PositionCoordinate.isInitialized = true;
         global_PositionCoordinate.Latitude = position.coords.latitude;
         global_PositionCoordinate.Longitude = position.coords.longitude;
+        if ((!!onSuccessLocationRetrieval) && (typeof (onSuccessLocationRetrieval) === "function")) {
+            onSuccessLocationRetrieval(global_PositionCoordinate);
+        }
+        global_PositionCoordinate.Message = "Done"
     }
 
-    function showError(error) {
-        switch (error.code) {
+    function showError(error)
+    {
+        switch (error.code)
+        {
             case error.PERMISSION_DENIED:
                 global_PositionCoordinate.Message = "User denied the request for Geolocation."
                 break;
@@ -163,6 +174,11 @@ function getLocation() {
                 global_PositionCoordinate.Message = "An unknown error occurred."
                 break;
         }
+        if ((!!onSuccessLocationRetrieval) && (typeof (onSuccessLocationRetrieval) === "function"))
+        {
+            onfailure(global_PositionCoordinate.Message)
+        }
+        
     }
 
 }

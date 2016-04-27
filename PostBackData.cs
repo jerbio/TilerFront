@@ -32,7 +32,8 @@ namespace TilerFront
             {8,"User needs to be Verified"},
             {10001000,"User Already exists"},
             {30001000,"Registration exception. Check DB control with user credentials"},
-            {40001000,"Publication Error."}//Just testing
+            {40001000,"Publication Error."},//Just testing
+            {100,"I have no idea"}
         };
         dynamic Data;
         int Status=0;

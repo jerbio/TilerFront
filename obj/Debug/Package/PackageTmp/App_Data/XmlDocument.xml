@@ -799,6 +799,13 @@
             <param name="UserData"></param>
             <returns></returns>
         </member>
+        <member name="M:TilerFront.Controllers.ScheduleController.Shuffle(TilerFront.Models.ShuffleModel)">
+            <summary>
+            Have Tiler get you something to do. 
+            </summary>
+            <param name="UserData"></param>
+            <returns></returns>
+        </member>
         <member name="M:TilerFront.Controllers.ScheduleController.CompleteSubCalendarEvent(TilerFront.Models.getEventModel)">
             <summary>
             Marks an Event as complete.  Note this also triggers a readjust to the schedule

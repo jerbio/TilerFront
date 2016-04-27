@@ -340,6 +340,8 @@ namespace TilerFront.Controllers
             await myUser.Login();
             DateTimeOffset myNow = myNow = DateTimeOffset.UtcNow;
             My24HourTimerWPF.Schedule MySchedule = new My24HourTimerWPF.Schedule(myUser, myNow);
+            DB_UserActivity activity = new DB_UserActivity(myNow, UserActivity.ActivityType.Shuffle);
+            myUser.ScheduleLogControl.updateUserActivty(activity);
             await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, UserData.UserID).ConfigureAwait(false);
 
             Location_Elements location;
