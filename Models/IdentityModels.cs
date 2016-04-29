@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.AspNet.Identity.EntityFramework;
 using TilerElements;
+using DBTilerElement;
 
 namespace TilerFront.Models
 {
@@ -14,7 +15,7 @@ namespace TilerFront.Models
     {
     }*/
 
-    public class ApplicationDbContext : IdentityDbContext<TilerUser>
+    public class ApplicationDbContext : ScheduleContext//IdentityDbContext<TilerUser>
     {
         public ApplicationDbContext()
             : base("DefaultConnection", throwIfV1Schema: false)

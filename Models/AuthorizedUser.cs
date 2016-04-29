@@ -45,20 +45,20 @@ namespace TilerFront.Models
             return new UserAccountDirect(User, Passive);
         }
 
-        async public Task<UserAccountDebug> getUserAccountDebug(bool Passive = true)
-        {
-            Controllers.UserController myUserController = new Controllers.UserController();
-            TilerUser User;
+        //async public Task<UserAccountDebug> getUserAccountDebug(bool Passive = true)
+        //{
+        //    Controllers.UserController myUserController = new Controllers.UserController();
+        //    TilerUser User;
 
-            if (Passive)
-            {
-                User = new TilerUser() { UserName = UserName, Id = UserID, FullName = "" };
-            }
-            else
-            {
-                User = await myUserController.GetUser(UserID, UserName);
-            }
-            return new UserAccountDebug(User, Passive);
-        }
+        //    if (Passive)
+        //    {
+        //        User = new TilerUser() { UserName = UserName, Id = UserID, FullName = "" };
+        //    }
+        //    else
+        //    {
+        //        User = await myUserController.GetUser(UserID, UserName);
+        //    }
+        //    return new UserAccountDebug(User, Passive);
+        //}
     }
 }
