@@ -142,7 +142,6 @@ C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\TilerFront.pdb
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\XmlDocument.xml
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\Antlr3.Runtime.dll
-C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\DBTilerElement.dll
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\EntityFramework.dll
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\EntityFramework.SqlServer.dll
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\Google.Apis.Auth.dll
@@ -284,3 +283,4 @@ C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\Microsoft.Owin.Diagnostics.xml
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\Microsoft.Owin.Host.HttpListener.xml
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\Microsoft.Owin.Hosting.xml
+C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\DBTilerElement.dll

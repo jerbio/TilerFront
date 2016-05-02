@@ -3,6 +3,100 @@
   <LastIDCounter>155561</LastIDCounter>
   <referenceDay>3/5/2015 12:30:00 PM +00:00</referenceDay>
   <EventSchedules>
+    <EventSchedule>
+      <Recurrence />
+      <ProcrastinationProfile>
+        <ProcrastinationPreferredStart>1/1/0001 12:00:00 AM +00:00</ProcrastinationPreferredStart>
+        <ProcrastinationDislikedStart>1/1/0001 12:00:00 AM +00:00</ProcrastinationDislikedStart>
+        <ProcrastinationDislikedDaySection>0</ProcrastinationDislikedDaySection>
+      </ProcrastinationProfile>
+      <NowProfile>
+        <Initialized>False</Initialized>
+        <PreferredStart>1/1/0001 12:00:00 AM +00:00</PreferredStart>
+      </NowProfile>
+      <Restricted>False</Restricted>
+      <MiscData>
+        <TypeSelection>0</TypeSelection>
+        <UserNote />
+      </MiscData>
+      <UIParams>
+        <Type>0</Type>
+        <Color>
+          <UserSelection>0</UserSelection>
+          <Blue>255</Blue>
+          <Green>0</Green>
+          <Red>255</Red>
+          <Opacity>1</Opacity>
+        </Color>
+        <Visible>True</Visible>
+      </UIParams>
+      <Location>
+        <CheckCalendarEvent>0</CheckCalendarEvent>
+        <isNull>True</isNull>
+        <Description />
+        <Address />
+        <YCoordinate>1.79769313486232E+308</YCoordinate>
+        <XCoordinate>1.79769313486232E+308</XCoordinate>
+      </Location>
+      <Enabled>True</Enabled>
+      <ID>155562_7_0_0</ID>
+      <Name>2 hour duration</Name>
+      <StartTime>3/13/2016 5:50:00 AM</StartTime>
+      <PreDeadline>00:00:00</PreDeadline>
+      <DeletionCount>0</DeletionCount>
+      <CompletionCount>0</CompletionCount>
+      <PrepTime>00:00:00</PrepTime>
+      <Deadline>3/13/2016 8:50:00 AM</Deadline>
+      <Split>1</Split>
+      <Duration>03:00:00</Duration>
+      <RigidFlag>True</RigidFlag>
+      <EventSubSchedules>
+        <EventSubSchedule>
+          <Restricted>False</Restricted>
+          <ConflictProfile>
+            <ConflictIDs />
+            <Flag>False</Flag>
+            <Type>0</Type>
+          </ConflictProfile>
+          <MiscData>
+            <TypeSelection>0</TypeSelection>
+            <UserNote />
+          </MiscData>
+          <UIParams>
+            <Type>0</Type>
+            <Color>
+              <UserSelection>0</UserSelection>
+              <Blue>255</Blue>
+              <Green>0</Green>
+              <Red>255</Red>
+              <Opacity>1</Opacity>
+            </Color>
+            <Visible>True</Visible>
+          </UIParams>
+          <Location>
+            <CheckCalendarEvent>0</CheckCalendarEvent>
+            <isNull>True</isNull>
+            <Description />
+            <Address />
+            <YCoordinate>1.79769313486232E+308</YCoordinate>
+            <XCoordinate>1.79769313486232E+308</XCoordinate>
+          </Location>
+          <Complete>False</Complete>
+          <Enabled>True</Enabled>
+          <ID>155562_7_0_155563</ID>
+          <Rigid>True</Rigid>
+          <ThirdPartyID />
+          <PrepTime>00:00:00</PrepTime>
+          <ActiveStartTime>3/13/2016 5:50:00 AM</ActiveStartTime>
+          <ActiveEndTime>3/13/2016 8:50:00 AM</ActiveEndTime>
+          <Duration>03:00:00</Duration>
+          <StartTime>3/13/2016 5:50:00 AM</StartTime>
+          <EndTime>3/13/2016 8:50:00 AM</EndTime>
+        </EventSubSchedule>
+      </EventSubSchedules>
+      <RepetitionFlag>False</RepetitionFlag>
+      <Completed>False</Completed>
+    </EventSchedule>
   </EventSchedules>
   <LocationCache>
     <Locations>

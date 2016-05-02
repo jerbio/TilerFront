@@ -52,6 +52,10 @@ namespace TilerFront.Models
         /// </summary>
         public string EndDay { get; set; }
         /// <summary>
+        /// TIme In milliseconds from 1970 ,1,1 utc when this event ends
+        /// </summary>
+        public string EndInMS { get; set; }
+        /// <summary>
         /// Hour component of End date.
         /// </summary>
         public string EndHour { get; set; }
@@ -93,6 +97,7 @@ namespace TilerFront.Models
         public string RepeatWeeklyData { get; set; }
         public string Rigid { get; set; }
         public string StartDay { get; set; }
+        public string StartInMS { get; set; }
         public string StartHour { get; set; }
         public string StartMins { get; set; }
         public string StartMonth { get; set; }
@@ -116,6 +121,7 @@ namespace TilerFront.Models
         public string isWorkWeek {get;set;}
         public string isEveryDay { get; set; }
         public RestrictionWeekConfig RestrictiveWeek { get; set; }
+        public string TimeZone { get; set; }
 
         public RestrictionProfile getRestrictionProfile()
         {
