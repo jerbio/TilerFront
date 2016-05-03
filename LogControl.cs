@@ -31,7 +31,6 @@ namespace TilerFront
         protected static string BigDataLogLocation = "BigDataLogs\\";
         protected DBControl LogDBDataAccess;
         protected long LastIDNumber;
-        protected int LastLocationID;
         protected string CurrentLog;
         protected bool LogStatus;
         protected bool UpdateLocaitionCache = false;
@@ -60,7 +59,6 @@ namespace TilerFront
             UserName="";
             NameOfUser="";
             LastIDNumber = 0;
-            LastLocationID= 0;
             CurrentLog="";
             LogStatus=false;
 #if ForceReadFromXml
@@ -148,45 +146,6 @@ namespace TilerFront
         {
             return WagTapLogLocation;
         }
-
-        
-#if ForceReadFromXml
-#else
-        async internal Task BatchMigrateXML()
-        {
-            bool oldCassandraValue = useCassandra;
-            useCassandra=false;
-
-            getAllCalendarFromXml(new TimeLine());//empty TImeline, just doing this to force initialization of LastIDNumber
-            Task<bool> createLatestChange = LogDBDataAccess.CreateLatestChange(ID, DateTimeOffset.Now, LastIDNumber);
-            
-            Task AddAllEvents = NameSearcher.Add(getAllCalendarFromXml(new TimeLine(new DateTimeOffset(1970, 1, 1, 0, 0, 0, new TimeSpan()), new DateTimeOffset(2970, 1, 1, 0, 0, 0, new TimeSpan()))), ID);
-            Task<Dictionary<string, Location_Elements>> LocationCache = (getLocationCache());
-            Task AddAllLocations = LocationSearcher.Add((await LocationCache).Values, ID);
-            myCassandraAccess.BatchMigrateXMLToCassandra(this);
-
-            bool status = await createLatestChange;
-            await AddAllEvents;
-            await AddAllLocations;
-            useCassandra = oldCassandraValue;
-            return;
-
-            
-        }
-        public Task<bool> CommitToCassadra(IEnumerable<CalendarEvent> AllCalEvents)
-        {
-            return myCassandraAccess.Commit(AllCalEvents);
-        }
-
-        /// <summary>
-        /// Adds a new event to the cassandra db. Do not use with the old XML system.
-        /// </summary>
-        /// <param name="myEvent"></param>
-        async public Task AddNewEventToCassandra(CalendarEvent newEvent)
-        {
-            await myCassandraAccess.AddNewEventToTiler(newEvent);
-        }
-#endif
 
 
         #region Write Data
@@ -537,7 +496,7 @@ namespace TilerFront
                 errorWritingFile = true;
             }
 
-            UpdateCacheLocation(xmldoc, OldLocationCache);
+            UpdateCacheLocation(xmldoc, OldLocationCache,NewLocation);
             int loopCounter = 0;
             while (true)
             {
@@ -569,7 +528,7 @@ namespace TilerFront
             return await retValue.ConfigureAwait(false); ;
         }
 
-        public void UpdateCacheLocation(XmlDocument xmldoc, Dictionary<string, Location_Elements> currentCache)
+        public void UpdateCacheLocation(XmlDocument xmldoc, Dictionary<string, Location_Elements> currentCache, Location_Elements NewLocation )
         {
             XmlNode LocationCacheNode = xmldoc.DocumentElement.SelectSingleNode("/ScheduleLog/LocationCache");
             if (LocationCacheNode == null)
@@ -582,48 +541,61 @@ namespace TilerFront
                 LocationCacheNode = xmldoc.DocumentElement.SelectSingleNode("/ScheduleLog/LocationCache");
             }
 
-            LastLocationID = Convert.ToInt32(LocationCacheNode.SelectSingleNode("LastID").InnerText);//gets the last Location ID from xmldoc
 
             XmlNode AllLocationsCacheContainer = xmldoc.DocumentElement.SelectSingleNode("/ScheduleLog/LocationCache/Locations");
 
             XmlNodeList AllCachedLocations = xmldoc.DocumentElement.SelectNodes("/ScheduleLog/LocationCache/Locations/Location");
 
-            int LocationID = LastLocationID;
+
+            if (NewLocation != null)
+            {
+                if (!NewLocation.isNull)
+                {
+                    if (!CachedLocation.ContainsKey(NewLocation.Description.ToLower()))
+                    {
+
+                    }
+                }
+            }
+            
             foreach (KeyValuePair<string, Location_Elements> eachKeyValuePair in CachedLocation)
             {
                 if (!currentCache.ContainsKey(eachKeyValuePair.Key))
                 {
-                    if (eachKeyValuePair.Value.ID == 0)//new cached location detected
+                    if (!eachKeyValuePair.Value.isNull)
                     {
-                        LocationID = ++LastLocationID;
-                    }
-                    else //Location already in cache
-                    {
-                        LocationID = eachKeyValuePair.Value.ID;
-                    }
+                        string LocationID = eachKeyValuePair.Value.ID;
+                        XmlElement myCacheLocationNode = CreateLocationNode(eachKeyValuePair.Value, "Location");
 
-                    XmlElement myCacheLocationNode = CreateLocationNode(eachKeyValuePair.Value, "Location");
-
-                    XmlNode MyImportedNode = xmldoc.ImportNode(myCacheLocationNode as XmlNode, true);
-                    myCacheLocationNode = MyImportedNode as XmlElement;
+                        XmlNode MyImportedNode = xmldoc.ImportNode(myCacheLocationNode as XmlNode, true);
+                        myCacheLocationNode = MyImportedNode as XmlElement;
 
 
-                    XmlNode LocationIDNOde = xmldoc.CreateElement("LocationID");
-                    XmlNode CacheNameNode = xmldoc.CreateElement("CachedName");
-                    CacheNameNode.InnerText = eachKeyValuePair.Value.Description.ToLower();
-                    LocationIDNOde.InnerText = LocationID.ToString();
-                    MyImportedNode.PrependChild(LocationIDNOde);
-                    MyImportedNode.PrependChild(CacheNameNode);
-                    MyImportedNode = xmldoc.ImportNode(myCacheLocationNode as XmlNode, true);
+                        XmlNode LocationIDNode = xmldoc.CreateElement("LocationID");
+                        XmlNode CacheNameNode = xmldoc.CreateElement("CachedName");
+                        CacheNameNode.InnerText = eachKeyValuePair.Value.Description.ToLower();
+                        LocationIDNode.InnerText = LocationID.ToString();
+                        MyImportedNode.PrependChild(LocationIDNode);
+                        MyImportedNode.PrependChild(CacheNameNode);
+                        MyImportedNode = xmldoc.ImportNode(myCacheLocationNode as XmlNode, true);
 
-                    if (!UpdateInnerXml(ref AllCachedLocations, "LocationID", LocationID.ToString(), myCacheLocationNode))
-                    {
-                        xmldoc.DocumentElement.SelectSingleNode("/ScheduleLog/LocationCache/Locations").AppendChild(MyImportedNode);
+                        if (!UpdateInnerXml(ref AllCachedLocations, "LocationID", LocationID.ToString(), myCacheLocationNode))
+                        {
+                            xmldoc.DocumentElement.SelectSingleNode("/ScheduleLog/LocationCache/Locations").AppendChild(MyImportedNode);
+                        }
                     }
                 }
             }
+        }
 
-            LocationCacheNode.SelectSingleNode("LastID").InnerXml = LastLocationID.ToString();
+        virtual XmlNode getLocationNodeByTagName(XmlNode cacheLocationNode, string TagName)
+        {
+
+        }
+
+        virtual public XmlNode updateLocationNode(XmlNode node, Location_Elements Location )
+        {
+
         }
 
         public XmlElement generateNowProfileNode(NowProfile myNowProfile)
@@ -644,11 +616,7 @@ namespace TilerFront
         {
             XmlDocument xmldoc = new XmlDocument();
             XmlElement LocationCacheNode = xmldoc.CreateElement("LocationCache");
-            XmlElement LastIDNode = xmldoc.CreateElement("LastID");
             XmlElement LocationsNode = xmldoc.CreateElement("Locations");
-            LastLocationID = 1;
-            LastIDNode.InnerText = LastLocationID.ToString();
-            LocationCacheNode.PrependChild(LastIDNode);
             LocationCacheNode.PrependChild(LocationsNode);
             return LocationCacheNode;
         }
@@ -873,7 +841,7 @@ namespace TilerFront
                 EndTime = StartTime.Add(EventTimeSpan);
             }
 
-            if ((!string.IsNullOrEmpty(MySubEvent.myLocation.Description)) || (MySubEvent.myLocation.ID != 0))
+            if ((!string.IsNullOrEmpty(MySubEvent.myLocation.Description)) || (!MySubEvent.myLocation.isNull))
             {
                 string TaggedLocation = MySubEvent.myLocation.Description;
                 TaggedLocation = TaggedLocation.ToLower();
@@ -964,7 +932,7 @@ namespace TilerFront
             string MappedAddress = "";
             string IsNull = true.ToString(); ;
             string CheckCalendarEvent = 0.ToString();
-            if ((Arg1 != null) && (Arg1.ID != -1))
+            if ((Arg1 != null) && (!Arg1.isNull))
             {
                 XCoordinate = Arg1.XCoordinate.ToString();
                 YCoordinate = Arg1.YCoordinate.ToString();
@@ -1290,10 +1258,8 @@ namespace TilerFront
             XmlNode node = doc.DocumentElement.SelectSingleNode("/ScheduleLog/LocationCache");
             if (node == null)
             {
-                LastLocationID = 1;
                 return retValue;
             }
-            LastLocationID = Convert.ToInt32(node.SelectSingleNode("LastID").InnerText);
             XmlNodeList AllLocationNodes = node.SelectNodes("Locations/Location");
             foreach (XmlNode eachXmlNode in AllLocationNodes)
             {
@@ -2067,18 +2033,6 @@ namespace TilerFront
             DefaultLocation = retValue;
             
         }
-
-        #region Cassandra Functions
-
-        void TransferXmlFileToCassandra()
-        { 
-        
-        }
-        
-        #endregion
-
-
-
         #endregion
 
         #region Properties

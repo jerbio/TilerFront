@@ -313,133 +313,78 @@ namespace TilerFront
             }
         }
         */
-        async public Task<bool> WriteToLog(IEnumerable<CalendarEvent> AllEvents, string LatestID, string LogFile = "")
-        {
-            Task<bool>  retValue;
+//        async public Task<bool> WriteToLog(IEnumerable<CalendarEvent> AllEvents, string LatestID, string LogFile = "")
+//        {
+//            Task<bool>  retValue;
             
-#if ForceReadFromXml
-#else
-            if (useCassandra)
-            {
-                retValue =  myCassandraAccess.Commit(AllEvents);
-                Task<bool> WritingLatestData =LogDBDataAccess.WriteLatestData(DateTime.Now,Convert.ToInt64( LatestID), ID);
+//#if ForceReadFromXml
+//#else
+//            if (useCassandra)
+//            {
+//                retValue =  myCassandraAccess.Commit(AllEvents);
+//                Task<bool> WritingLatestData =LogDBDataAccess.WriteLatestData(DateTime.Now,Convert.ToInt64( LatestID), ID);
                 
-                bool LatestDataSuccess = await WritingLatestData;
-                bool boolRetValue =await retValue;
-                return boolRetValue;
-            }
-#endif
+//                bool LatestDataSuccess = await WritingLatestData;
+//                bool boolRetValue =await retValue;
+//                return boolRetValue;
+//            }
+//#endif
 
 
 
-            retValue = new Task<bool>(() => { return true; });
-            retValue.Start();
-            if (LogFile == "")
-            { LogFile = WagTapLogLocation + CurrentLog; }
-            XmlDocument xmldoc = new XmlDocument();
-            xmldoc.Load(LogFile);
-            CachedLocation = await getLocationCache();//populates with current location info
-            Dictionary<string, Location_Elements> OldLocationCache = new Dictionary<string, Location_Elements>(CachedLocation);
-            xmldoc.DocumentElement.SelectSingleNode("/ScheduleLog/LastIDCounter").InnerText = LatestID;
-            XmlNodeList EventSchedulesNodes = xmldoc.DocumentElement.SelectNodes("/ScheduleLog/EventSchedules");
+//            retValue = new Task<bool>(() => { return true; });
+//            retValue.Start();
+//            if (LogFile == "")
+//            { LogFile = WagTapLogLocation + CurrentLog; }
+//            XmlDocument xmldoc = new XmlDocument();
+//            xmldoc.Load(LogFile);
+//            CachedLocation = await getLocationCache();//populates with current location info
+//            Dictionary<string, Location_Elements> OldLocationCache = new Dictionary<string, Location_Elements>(CachedLocation);
+//            xmldoc.DocumentElement.SelectSingleNode("/ScheduleLog/LastIDCounter").InnerText = LatestID;
+//            XmlNodeList EventSchedulesNodes = xmldoc.DocumentElement.SelectNodes("/ScheduleLog/EventSchedules");
 
-            XmlNode EventSchedulesNodesNode = xmldoc.DocumentElement.SelectSingleNode("/ScheduleLog/EventSchedules");
-            EventSchedulesNodesNode.RemoveAll();
-            XmlNodeList EventScheduleNodes = xmldoc.DocumentElement.SelectNodes("/ScheduleLog/EventSchedules/EventSchedule");
-
-
-            EventScheduleNodes = xmldoc.DocumentElement.SelectNodes("/ScheduleLog/EventSchedules/EventSchedule");
-
-            foreach (CalendarEvent MyEvent in AllEvents)
-            {
-                XmlElement EventScheduleNode = CreateEventScheduleNode(MyEvent);
-                //EventSchedulesNodes[0].PrependChild(xmldoc.CreateElement("EventSchedule"));
-                //EventSchedulesNodes[0].ChildNodes[0].InnerXml = CreateEventScheduleNode(MyEvent).InnerXml;
-                XmlNode MyImportedNode = xmldoc.ImportNode(EventScheduleNode as XmlNode, true);
-                //(EventScheduleNode, true);
-                if (!UpdateInnerXml(ref EventScheduleNodes, "ID", MyEvent.ID.ToString(), EventScheduleNode))
-                {
-                    xmldoc.DocumentElement.SelectSingleNode("/ScheduleLog/EventSchedules").AppendChild(MyImportedNode);
-                }
-                else
-                {
-                    ;
-                }
-            }
-
-            UpdateCacheLocation(xmldoc, OldLocationCache);
-
-            while (true)
-            {
-                try
-                {
-                    xmldoc.Save(LogFile);
-                    break;
-                }
-                catch (Exception e)
-                {
-                    Thread.Sleep(160);
-                }
-            }
-            return await retValue;
-        }
-
-        public void UpdateCacheLocation(XmlDocument xmldoc, Dictionary<string, Location_Elements> currentCache)
-        {
-            XmlNode LocationCacheNode = xmldoc.DocumentElement.SelectSingleNode("/ScheduleLog/LocationCache");
-            if (LocationCacheNode == null)
-            {
-                XmlNode ScheduleLogNode = xmldoc.DocumentElement.SelectSingleNode("/ScheduleLog");
-                LocationCacheNode = CreateLocationCacheNode();
-
-                XmlNode MyImportedNode = xmldoc.ImportNode(LocationCacheNode as XmlNode, true);
-                xmldoc.DocumentElement.SelectSingleNode("/ScheduleLog").AppendChild(MyImportedNode);
-                LocationCacheNode = xmldoc.DocumentElement.SelectSingleNode("/ScheduleLog/LocationCache");
-            }
-
-            LastLocationID = Convert.ToInt32(LocationCacheNode.SelectSingleNode("LastID").InnerText);//gets the last Location ID from xmldoc
-
-            XmlNode AllLocationsCacheContainer = xmldoc.DocumentElement.SelectSingleNode("/ScheduleLog/LocationCache/Locations");
-
-            XmlNodeList AllCachedLocations = xmldoc.DocumentElement.SelectNodes("/ScheduleLog/LocationCache/Locations/Location");
-
-            int LocationID = LastLocationID;
-            foreach (KeyValuePair<string, Location_Elements> eachKeyValuePair in CachedLocation)
-            {
-                if (!currentCache.ContainsKey(eachKeyValuePair.Key))
-                {
-                    if (eachKeyValuePair.Value.ID == 0)//new cached location detected
-                    {
-                        LocationID = ++LastLocationID;
-                    }
-                    else //Location already in cache
-                    {
-                        LocationID = eachKeyValuePair.Value.ID;
-                    }
-
-                    XmlElement myCacheLocationNode = CreateLocationNode(eachKeyValuePair.Value, "Location");
-
-                    XmlNode MyImportedNode = xmldoc.ImportNode(myCacheLocationNode as XmlNode, true);
-                    myCacheLocationNode = MyImportedNode as XmlElement;
+//            XmlNode EventSchedulesNodesNode = xmldoc.DocumentElement.SelectSingleNode("/ScheduleLog/EventSchedules");
+//            EventSchedulesNodesNode.RemoveAll();
+//            XmlNodeList EventScheduleNodes = xmldoc.DocumentElement.SelectNodes("/ScheduleLog/EventSchedules/EventSchedule");
 
 
-                    XmlNode LocationIDNOde = xmldoc.CreateElement("LocationID");
-                    XmlNode CacheNameNode = xmldoc.CreateElement("CachedName");
-                    CacheNameNode.InnerText = eachKeyValuePair.Value.Description.ToLower();
-                    LocationIDNOde.InnerText = LocationID.ToString();
-                    MyImportedNode.PrependChild(LocationIDNOde);
-                    MyImportedNode.PrependChild(CacheNameNode);
-                    MyImportedNode = xmldoc.ImportNode(myCacheLocationNode as XmlNode, true);
+//            EventScheduleNodes = xmldoc.DocumentElement.SelectNodes("/ScheduleLog/EventSchedules/EventSchedule");
 
-                    if (!UpdateInnerXml(ref AllCachedLocations, "LocationID", LocationID.ToString(), myCacheLocationNode))
-                    {
-                        xmldoc.DocumentElement.SelectSingleNode("/ScheduleLog/LocationCache/Locations").AppendChild(MyImportedNode);
-                    }
-                }
-            }
+//            foreach (CalendarEvent MyEvent in AllEvents)
+//            {
+//                XmlElement EventScheduleNode = CreateEventScheduleNode(MyEvent);
+//                //EventSchedulesNodes[0].PrependChild(xmldoc.CreateElement("EventSchedule"));
+//                //EventSchedulesNodes[0].ChildNodes[0].InnerXml = CreateEventScheduleNode(MyEvent).InnerXml;
+//                XmlNode MyImportedNode = xmldoc.ImportNode(EventScheduleNode as XmlNode, true);
+//                //(EventScheduleNode, true);
+//                if (!UpdateInnerXml(ref EventScheduleNodes, "ID", MyEvent.ID.ToString(), EventScheduleNode))
+//                {
+//                    xmldoc.DocumentElement.SelectSingleNode("/ScheduleLog/EventSchedules").AppendChild(MyImportedNode);
+//                }
+//                else
+//                {
+//                    ;
+//                }
+//            }
 
-            LocationCacheNode.SelectSingleNode("LastID").InnerXml = LastLocationID.ToString();
-        }
+//            UpdateCacheLocation(xmldoc, OldLocationCache, NewLocation);
+
+//            while (true)
+//            {
+//                try
+//                {
+//                    xmldoc.Save(LogFile);
+//                    break;
+//                }
+//                catch (Exception e)
+//                {
+//                    Thread.Sleep(160);
+//                }
+//            }
+//            return await retValue;
+//        }
+
+        
 
 
 
@@ -447,11 +392,7 @@ namespace TilerFront
         {
             XmlDocument xmldoc = new XmlDocument();
             XmlElement LocationCacheNode = xmldoc.CreateElement("LocationCache");
-            XmlElement LastIDNode = xmldoc.CreateElement("LastID");
             XmlElement LocationsNode = xmldoc.CreateElement("Locations");
-            LastLocationID = 1;
-            LastIDNode.InnerText = LastLocationID.ToString();
-            LocationCacheNode.PrependChild(LastIDNode);
             LocationCacheNode.PrependChild(LocationsNode);
             return LocationCacheNode;
         }
@@ -531,160 +472,7 @@ namespace TilerFront
             return dateTime.AddTicks(-(dateTime.Ticks % timeSpan.Ticks));
         }
 
-        public XmlElement CreateRepetitionNode(Repetition RepetitionObjEntry)//This takes a repetition object, and creates a Repetition XmlNode
-        {
-            int Layer = 0;
-
-            List<XmlNode> lowerLayers = new List<XmlNode>();
-            XmlDocument xmldoc = new XmlDocument();
-            if (RepetitionObjEntry.isExtraLayers())
-            {
-                foreach (Repetition eachRepetition in RepetitionObjEntry.getDayRepetitions())
-                {
-                    XmlElement LayerData = CreateRepetitionNode(eachRepetition);
-                    XmlNode MyImportedNode = xmldoc.ImportNode(LayerData as XmlNode, true);
-                    lowerLayers.Add(MyImportedNode);
-                }
-            }
-
-
-            int i = 0;
-
-            XmlElement RepeatCalendarEventsNode = xmldoc.CreateElement("Recurrence");//Defines umbrella Repeat XmlNode 
-            RepeatCalendarEventsNode.PrependChild(xmldoc.CreateElement("RepeatStartDate"));
-            RepeatCalendarEventsNode.ChildNodes[0].InnerText = RepetitionObjEntry.Range.Start.ToString();
-            RepeatCalendarEventsNode.PrependChild(xmldoc.CreateElement("RepeatEndDate"));
-            RepeatCalendarEventsNode.ChildNodes[0].InnerText = RepetitionObjEntry.Range.End.ToString();
-            RepeatCalendarEventsNode.PrependChild(xmldoc.CreateElement("RepeatFrequency"));
-            RepeatCalendarEventsNode.ChildNodes[0].InnerText = RepetitionObjEntry.Frequency;
-            RepeatCalendarEventsNode.PrependChild(xmldoc.CreateElement("RepeatDay"));
-            RepeatCalendarEventsNode.ChildNodes[0].InnerText = RepetitionObjEntry.weekDay.ToString();
-            RepeatCalendarEventsNode.PrependChild(xmldoc.CreateElement("RepeatDays"));
-
-            foreach (XmlNode eachXmlNode in lowerLayers)
-            {
-                RepeatCalendarEventsNode.ChildNodes[0].PrependChild(eachXmlNode);
-            }
-            RepeatCalendarEventsNode.PrependChild(xmldoc.CreateElement("RepeatCountOfLowerLayer"));
-            RepeatCalendarEventsNode.ChildNodes[0].InnerText = Layer.ToString();
-            XmlNode XmlNodeForRepeatListOfEvents = xmldoc.CreateElement("RepeatCalendarEvents");
-
-
-            XmlElement RepeatCalendarEventNode;//Declares Repeat XmlNode 
-            CalendarEvent[] allRecurringEVents = RepetitionObjEntry.RecurringCalendarEvents();
-            for (; i < allRecurringEVents.Length; i++)//For loop goes through each classEvent in repeat object and generates an xmlnode
-            {
-                RepeatCalendarEventNode = xmldoc.CreateElement("RepeatCalendarEvent");
-                RepeatCalendarEventNode.InnerXml = CreateEventScheduleNode(allRecurringEVents[i]).InnerXml;
-                XmlNodeForRepeatListOfEvents.PrependChild(RepeatCalendarEventNode);
-            }
-            RepeatCalendarEventsNode.PrependChild(XmlNodeForRepeatListOfEvents);
-            return RepeatCalendarEventsNode;
-        }
-
-        public XmlElement CreateSubScheduleNode(SubCalendarEvent MySubEvent)
-        {
-            XmlDocument xmldoc = new XmlDocument();
-            XmlElement MyEventSubScheduleNode = xmldoc.CreateElement("EventSubSchedule");
-            DateTimeOffset StartTime = MySubEvent.Start;
-            StartTime = Truncate(StartTime, TimeSpan.FromSeconds(1));
-            DateTimeOffset EndTime = MySubEvent.End;
-            EndTime = Truncate(EndTime, TimeSpan.FromSeconds(1));
-            TimeSpan EventTimeSpan = MySubEvent.ActiveDuration;
-            long AllSecs = (long)EventTimeSpan.TotalSeconds;
-            long AllTicks = (long)EventTimeSpan.TotalMilliseconds;
-            long DiffSecs = (long)(EndTime - StartTime).TotalSeconds;
-            long DiffTicks = (long)(EndTime - StartTime).TotalMilliseconds;
-            EventTimeSpan = TimeSpan.FromSeconds(AllSecs);
-            if ((EndTime - StartTime) != EventTimeSpan)
-            {
-                EndTime = StartTime.Add(EventTimeSpan);
-            }
-
-            if ((!string.IsNullOrEmpty(MySubEvent.myLocation.Description)) || (MySubEvent.myLocation.ID != 0))
-            {
-                string TaggedLocation = MySubEvent.myLocation.Description;
-                TaggedLocation = TaggedLocation.ToLower();
-                if (!CachedLocation.ContainsKey(TaggedLocation))
-                {
-                    CachedLocation.Add(TaggedLocation, MySubEvent.myLocation);
-                }
-
-            }
-
-
-
-
-
-            MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("EndTime"));
-            MyEventSubScheduleNode.ChildNodes[0].InnerText = EndTime.ToString();
-            MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("StartTime"));
-            MyEventSubScheduleNode.ChildNodes[0].InnerText = StartTime.ToString();
-            MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("Duration"));
-            MyEventSubScheduleNode.ChildNodes[0].InnerText = EventTimeSpan.ToString();
-            MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("ActiveEndTime"));
-            MyEventSubScheduleNode.ChildNodes[0].InnerText = EndTime.ToString();
-            MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("ActiveStartTime"));
-            MyEventSubScheduleNode.ChildNodes[0].InnerText = StartTime.ToString();
-            MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("PrepTime"));
-            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.Preparation.ToString();
-            MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("ThirdPartyID"));
-            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.ThirdPartyID;
-            //MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("Name"));
-            //MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.Name.ToString();
-            MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("ID"));
-            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.ID.ToString();
-            MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("Enabled"));
-            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.isEnabled.ToString();
-            MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("Complete"));
-            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.isComplete.ToString();
-            MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("Location"));
-            MyEventSubScheduleNode.ChildNodes[0].InnerXml = CreateLocationNode(MySubEvent.myLocation, "EventSubScheduleLocation").InnerXml;
-            MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("UIParams"));
-            MyEventSubScheduleNode.ChildNodes[0].InnerXml = createDisplayUINode(MySubEvent.UIParam, "UIParams").InnerXml;
-            MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("MiscData"));
-            MyEventSubScheduleNode.ChildNodes[0].InnerXml = createMiscDataNode(MySubEvent.Notes, "MiscData").InnerXml;
-            MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("ConflictProfile"));
-            MyEventSubScheduleNode.ChildNodes[0].InnerXml = CreateConflictProfile(MySubEvent.Conflicts, "ConflictProfile").InnerXml;
-
-
-            return MyEventSubScheduleNode;
-        }
-
-        public XmlElement CreateLocationNode(Location_Elements Arg1, string ElementIdentifier)
-        {
-            XmlDocument xmldoc = new XmlDocument();
-            XmlElement var1 = xmldoc.CreateElement(ElementIdentifier);
-            string XCoordinate = "";
-            string YCoordinate = "";
-            string Descripion = "";
-            string MappedAddress = "";
-            string IsNull = true.ToString(); ;
-            string CheckCalendarEvent = 0.ToString();
-            if ((Arg1 != null) && (Arg1.ID != -1))
-            {
-                XCoordinate = Arg1.XCoordinate.ToString();
-                YCoordinate = Arg1.YCoordinate.ToString();
-                Descripion = Arg1.Description;
-                MappedAddress = Arg1.Address;
-                IsNull = Arg1.isNull.ToString();
-                CheckCalendarEvent = Arg1.DefaultCheck.ToString();
-            }
-            var1.PrependChild(xmldoc.CreateElement("XCoordinate"));
-            var1.ChildNodes[0].InnerText = XCoordinate;
-            var1.PrependChild(xmldoc.CreateElement("YCoordinate"));
-            var1.ChildNodes[0].InnerText = YCoordinate;
-            var1.PrependChild(xmldoc.CreateElement("Address"));
-            var1.ChildNodes[0].InnerText = MappedAddress;
-            var1.PrependChild(xmldoc.CreateElement("Description"));
-            var1.ChildNodes[0].InnerText = Descripion;
-            var1.PrependChild(xmldoc.CreateElement("isNull"));
-            var1.ChildNodes[0].InnerText = IsNull;
-            var1.PrependChild(xmldoc.CreateElement("CheckCalendarEvent"));
-            var1.ChildNodes[0].InnerText = CheckCalendarEvent;
-            return var1;
-        }
-
+        
 
         public XmlElement CreateConflictProfile(ConflictProfile Arg1, string ElementIdentifier)
         {
