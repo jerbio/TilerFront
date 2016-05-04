@@ -790,6 +790,9 @@ RevealControlPanelSection.CallBack = RevealControlPanelSection;
 
 function IconSet()
 {
+    if (!IconSet.ID) {
+        IconSet.ID = 0;
+    }
     var myID = IconSet.ID++;
     var IconSetContainerID = "IconSetContainer"+myID
     var IconSetContainer = getDomOrCreateNew(IconSetContainerID);
@@ -823,9 +826,18 @@ function IconSet()
     $(CloseIcon).addClass("ControlPanelButton");
     $(CloseIcon).addClass("ControlPanelCloseButton");
 
+    var PauseResumeIconID = "ControlPanelResumePauseButton" + myID;
+    var PauseResumeIcon = getDomOrCreateNew(PauseResumeIconID);
+    PauseResumeIcon.setAttribute("Title", "Pause Panel");
+    $(PauseResumeIcon).addClass("ControlPanelButton");
+
     this.getCloseButton = function ()
     {
         return CloseIcon;
+    }
+
+    this.getPauseResumeButton = function () {
+        return PauseResumeIcon;
     }
 
     this.getLocationButton = function () {
@@ -849,11 +861,23 @@ function IconSet()
         return IconSetContainer;
     }
 
+
+    this.switchToPauseButton = function () {
+        $(PauseResumeIcon).addClass("ControlPanelPausePanelButton");
+        $(PauseResumeIcon).removeClass("ControlPanelResumePanelButton");
+    }
+
+    this.switchToResumeButton = function () {
+        $(PauseResumeIcon).addClass("ControlPanelResumePanelButton");
+        $(PauseResumeIcon).removeClass("ControlPanelPausePanelButton");
+    }
+
     IconSetContainer.appendChild(LocationIcon)
     IconSetContainer.appendChild(ProcrastinateIcon)
     IconSetContainer.appendChild(DeleteIcon)
     IconSetContainer.appendChild(CompleteIcon)
-    IconSetContainer.appendChild(CloseIcon)
+    IconSetContainer.appendChild(PauseResumeIcon)
+    //IconSetContainer.appendChild(CloseIcon)
 }
 
 IconSet.ID=0;
@@ -3283,6 +3307,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
             var yeaButton = getDomOrCreateNew("YeaToConfirmDelete");
             var nayButton = getDomOrCreateNew("NayToConfirmDelete");
             var completeButton = global_ControlPanelIconSet.getCompleteButton();
+            var PauseResumeButton = global_ControlPanelIconSet.getPauseResumeButton()
             var deleteButton = global_ControlPanelIconSet.getDeleteButton();
             var DeleteMessage = getDomOrCreateNew("DeleteMessage")
             var ProcatinationButton = getDomOrCreateNew("submitProcatination");
@@ -3443,6 +3468,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                 closeProcrastinatePanel();
                 deleteButton.onclick = null;
                 completeButton.onclick = null;
+                PauseResumeButton.onclick = null;
                 $(ControlPanelContainer).slideUp(500);
                 document.removeEventListener("keydown", containerKeyPress);
                 global_UISetup.RenderOnSubEventClick.isRefListSubEventClicked = false;
@@ -3472,7 +3498,124 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
 
             ControlPanelCloseButton.onclick = global_ExitManager.triggerLastExitAndPop;
 
+            function pauseEvent()
+            {
+                SendMessage();
+                function SendMessage() {
+                    var TimeZone = new Date().getTimezoneOffset();
+                    debugger;
 
+                    var PauseEvent = {
+                        UserName: UserCredentials.UserName,
+                        UserID: UserCredentials.ID,
+                        EventID: SubEvent.ID,
+                        TimeZoneOffset: TimeZone,
+                        ThirdPartyEventID: SubEvent.ThirdPartyEventID,
+                        ThirdPartyUserID: SubEvent.ThirdPartyUserID,
+                        ThirdPartyType: SubEvent.ThirdPartyType
+                    };
+                    
+                    var URL = global_refTIlerUrl + "Schedule/Event/Pause";
+                    var HandleNEwPage = new LoadingScreenControl("Tiler is Pausing your event :)");
+                    HandleNEwPage.Launch();
+
+                    var exit = function (data) {
+                        HandleNEwPage.Hide();
+                        //triggerUIUPdate();//hack alert
+                        global_ExitManager.triggerLastExitAndPop();
+                        //getRefreshedData();
+                    }
+
+                    $.ajax({
+                        type: "POST",
+                        url: URL,
+                        data: PauseEvent,
+                        success: function (response) {
+                            exit();
+                            //triggerUndoPanel("Undo Pause?");
+                            //alert("alert 0-b");
+                        },
+                        error: function () {
+                            var NewMessage = "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
+                            var ExitAfter = {
+                                ExitNow: true, Delay: 1000
+                            };
+                            HandleNEwPage.UpdateMessage(NewMessage, ExitAfter, exit);
+                        }
+                    }).done(function (data) {
+                        HandleNEwPage.Hide();
+                        triggerUIUPdate();//hack alert
+                        //getRefreshedData();
+                    });
+                }
+                function triggerUIUPdate() {
+                    //alert("we are deleting " + SubEvent.ID);
+                    //$('#ConfirmDeleteModal').slideToggle();
+                    //$('#ControlPanelContainer').slideUp(500);
+                    //resetButtons();
+                    global_ExitManager.triggerLastExitAndPop();
+                }
+
+            }
+
+            function continueEvent() {
+                SendMessage();
+                function SendMessage() {
+                    var TimeZone = new Date().getTimezoneOffset();
+                    debugger;
+
+                    var ContinueEvent = {
+                        UserName: UserCredentials.UserName,
+                        UserID: UserCredentials.ID,
+                        EventID: SubEvent.ID,
+                        TimeZoneOffset: TimeZone,
+                        ThirdPartyEventID: SubEvent.ThirdPartyEventID,
+                        ThirdPartyUserID: SubEvent.ThirdPartyUserID,
+                        ThirdPartyType: SubEvent.ThirdPartyType
+                    };
+
+                    var URL = global_refTIlerUrl + "Schedule/Event/Resume";
+                    var HandleNEwPage = new LoadingScreenControl("Tiler resuming your event :)");
+                    HandleNEwPage.Launch();
+
+                    var exit = function (data) {
+                        HandleNEwPage.Hide();
+                        //triggerUIUPdate();//hack alert
+                        global_ExitManager.triggerLastExitAndPop();
+                        //getRefreshedData();
+                    }
+
+                    $.ajax({
+                        type: "POST",
+                        url: URL,
+                        data: ContinueEvent,
+                        success: function (response) {
+                            exit();
+                            //triggerUndoPanel("Undo Pause?");
+                            //alert("alert 0-b");
+                        },
+                        error: function () {
+                            var NewMessage = "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
+                            var ExitAfter = {
+                                ExitNow: true, Delay: 1000
+                            };
+                            HandleNEwPage.UpdateMessage(NewMessage, ExitAfter, exit);
+                        }
+                    }).done(function (data) {
+                        HandleNEwPage.Hide();
+                        triggerUIUPdate();//hack alert
+                        //getRefreshedData();
+                    });
+                }
+                function triggerUIUPdate() {
+                    //alert("we are deleting " + SubEvent.ID);
+                    //$('#ConfirmDeleteModal').slideToggle();
+                    //$('#ControlPanelContainer').slideUp(500);
+                    //resetButtons();
+                    global_ExitManager.triggerLastExitAndPop();
+                }
+
+            }
 
             function deleteSubevent()//triggers the yea / nay deletion of events
             {
@@ -3693,6 +3836,16 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
         }
             deleteButton.onclick = deleteSubevent;
             completeButton.onclick = markAsComplete;
+            if (SubEvent.isPaused) {
+                global_ControlPanelIconSet.switchToResumeButton();
+                PauseResumeButton.onclick = continueEvent;
+            }
+            else {
+                global_ControlPanelIconSet.switchToPauseButton();
+                PauseResumeButton.onclick = pauseEvent;
+            }
+
+            //continueButton.onclick = continueEvent;
 
             var ControlPanelContainer = getDomOrCreateNew("ControlPanelContainer");
             ControlPanelContainer.focus();

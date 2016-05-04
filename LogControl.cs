@@ -335,8 +335,12 @@ namespace TilerFront
 
                 XmlNode timeOfCreation = combinedDoc.CreateElement("TimeOfCreation");
                 XmlNode bigDataLog = combinedDoc.CreateElement("BigDataLog");
+                XmlNode miscDataLog = combinedDoc.CreateElement("MiscData");
+                miscDataLog.InnerText = activity.getMiscdata();
+
                 timeOfCreation.InnerXml = activity.ToXML();
                 bigDataLog.AppendChild(timeOfCreation);
+                bigDataLog.AppendChild(miscDataLog);
                 XmlNode beforeProcessing = combinedDoc.CreateElement("BeforeProcessing");
                 XmlNode importedNBeforeProcessingNode = combinedDoc.ImportNode(oldData.DocumentElement as XmlNode, true);
                 beforeProcessing.PrependChild(importedNBeforeProcessingNode);
@@ -482,7 +486,6 @@ namespace TilerFront
                 {
                     Console.Write(e.Message);
                 }
-                
             }
 
 
@@ -915,6 +918,8 @@ namespace TilerFront
             MyEventSubScheduleNode.ChildNodes[0].InnerXml = CreateConflictProfile(MySubEvent.Conflicts, "ConflictProfile").InnerXml;
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("Restricted"));
             MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.isEventRestricted.ToString();
+            MyEventSubScheduleNode.PrependChild(CreatePauseUsedUpNode(MySubEvent, xmldoc));
+
             if (MySubEvent.isEventRestricted)
             {
                 restrictedMySub = (SubCalendarEventRestricted)MySubEvent;
@@ -923,11 +928,28 @@ namespace TilerFront
                 MyEventSubScheduleNode.ChildNodes[0].InnerXml = restrictionProfileData.InnerXml;
             }
 
-
             return MyEventSubScheduleNode;
         }
 
+        /// <summary>
+        /// Class generates the pause xml mode for a given schedule
+        /// </summary>
+        /// <param name="SubEvent"></param>
+        /// <returns></returns>
+        public XmlElement CreatePauseUsedUpNode(SubCalendarEvent SubEvent, XmlDocument xmldoc)
+        {
+            
 
+            XmlElement UsedUpTime = xmldoc.CreateElement("UsedUpTime");
+            XmlElement PauseTime = xmldoc.CreateElement("PauseTime");
+            XmlElement RetValue = xmldoc.CreateElement("PauseInformation");
+            UsedUpTime.InnerText = SubEvent.UsedTime.ToString();
+            PauseTime.InnerText = SubEvent.getPauseTime().ToString();
+            RetValue.AppendChild(UsedUpTime);
+            RetValue.AppendChild(PauseTime);
+
+            return RetValue;
+        }
 
         public XmlElement CreateLocationNode(Location_Elements Arg1, string ElementIdentifier)
         {
@@ -1536,6 +1558,8 @@ namespace TilerFront
             bool Enabled;
             for (int i = 0; i < MyXmlNode.ChildNodes.Count; i++)
             {
+
+                XmlNode SubEventNode = MyXmlNode.ChildNodes[i];
                 BusyTimeLine SubEventActivePeriod = new BusyTimeLine(MyXmlNode.ChildNodes[i].SelectSingleNode("ID").InnerText, stringToDateTime(MyXmlNode.ChildNodes[i].SelectSingleNode("ActiveStartTime").InnerText), stringToDateTime(MyXmlNode.ChildNodes[i].SelectSingleNode("ActiveEndTime").InnerText));
                 ID = EventID.convertToSubcalendarEventID(MyXmlNode.ChildNodes[i].SelectSingleNode("ID").InnerText).ToString();
                 Start = DateTimeOffset.Parse(MyXmlNode.ChildNodes[i].SelectSingleNode("ActiveStartTime").InnerText).UtcDateTime;
@@ -1569,8 +1593,10 @@ namespace TilerFront
                 retrievedSubEvent.ThirdPartyID = MyXmlNode.ChildNodes[i].SelectSingleNode("ThirdPartyID").InnerText;//this is a hack to just update the Third partyID
                 XmlNode restrictedNode = MyXmlNode.ChildNodes[i].SelectSingleNode("Restricted");
                 retrievedSubEvent = new DB_SubCalendarEvent(retrievedSubEvent, MyParent.NowInfo, MyParent.ProcrastinationInfo);
-
-
+                
+                Tuple<TimeSpan, DateTimeOffset> PauseData = getPauseData(SubEventNode);
+                (retrievedSubEvent as DB_SubCalendarEvent).UsedTime = PauseData.Item1;
+                (retrievedSubEvent as DB_SubCalendarEvent).PauseTime = PauseData.Item2;
                 if (restrictedNode != null)
                 {
                     if (Convert.ToBoolean(restrictedNode.InnerText))
@@ -1578,12 +1604,30 @@ namespace TilerFront
                         XmlNode RestrictionProfileNode =MyXmlNode.ChildNodes[i].SelectSingleNode("RestrictionProfile");
                         DB_RestrictionProfile myRestrictionProfile = (DB_RestrictionProfile)getRestrictionProfile(RestrictionProfileNode);
                         retrievedSubEvent = new DB_SubCalendarEventRestricted(retrievedSubEvent, myRestrictionProfile);
+                        (retrievedSubEvent as DB_SubCalendarEventRestricted).UsedTime = PauseData.Item1;
+                        (retrievedSubEvent as DB_SubCalendarEventRestricted).PauseTime = PauseData.Item2;
                     }
                 }
                 MyArrayOfNodes.Add(retrievedSubEvent);
             }
 
             return MyArrayOfNodes;
+        }
+
+
+        Tuple<TimeSpan, DateTimeOffset> getPauseData (XmlNode ReferenceNode)
+        {
+            Tuple<TimeSpan, DateTimeOffset> RetValue = new Tuple<TimeSpan, DateTimeOffset>(new TimeSpan(), new DateTimeOffset());
+            XmlNode PauseInformation = ReferenceNode.SelectSingleNode("PauseInformation");
+            if(PauseInformation!= null)
+            {
+                TimeSpan UsedUpTime = TimeSpan.Parse(PauseInformation.SelectSingleNode("UsedUpTime").InnerText);
+                DateTimeOffset PauseTime = DateTimeOffset.Parse(PauseInformation.SelectSingleNode("PauseTime").InnerText);
+                RetValue = new Tuple<TimeSpan, DateTimeOffset>(UsedUpTime, PauseTime);
+            }
+            
+            return RetValue;
+
         }
 
         NowProfile generateNowProfile(XmlNode ReferenceNode)

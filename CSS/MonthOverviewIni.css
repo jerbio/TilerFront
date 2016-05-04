@@ -661,6 +661,22 @@ body {
   cursor: pointer;
 }
 
+.ControlPanelPausePanelButton {
+  background-position: -405px 0;
+}
+
+.ControlPanelPausePanelButton:hover {
+  background-position: -405px -44px;
+}
+
+.ControlPanelResumePanelButton {
+  background-position: -450px 0;
+}
+
+.ControlPanelResumePanelButton:hover {
+  background-position: -450px -44px;
+}
+
 
 .ControlPanelButton.SomethingNew{
     background-position: -360px 1px;

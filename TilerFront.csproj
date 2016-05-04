@@ -401,6 +401,14 @@
     <Compile Include="Migrations\201505080639133_GoogleNotificationAuthentication1.Designer.cs">
       <DependentUpon>201505080639133_GoogleNotificationAuthentication1.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201605031337223_pauseEventTable.cs" />
+    <Compile Include="Migrations\201605031337223_pauseEventTable.Designer.cs">
+      <DependentUpon>201605031337223_pauseEventTable.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201605040341293_modifiedPuaseData.cs" />
+    <Compile Include="Migrations\201605040341293_modifiedPuaseData.Designer.cs">
+      <DependentUpon>201605040341293_modifiedPuaseData.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -416,6 +424,7 @@
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\NameSearchModel.cs" />
     <Compile Include="Models\NowEventModel.cs" />
+    <Compile Include="Models\PausedEvent.cs" />
     <Compile Include="Models\ProcrastinateModel.cs" />
     <Compile Include="Models\ProcrastinateSubEventModel.cs" />
     <Compile Include="Models\IndexedThirdPartyAuthentication.cs" />
@@ -470,9 +479,29 @@
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="google30a8eacf5f2892b7.html" />
     <Content Include="Icon.png" />
+    <Content Include="img\ClassicColored.png" />
+    <Content Include="img\ClassicHiglight.png" />
     <Content Include="img\Icons\googleSearchIcon.png" />
     <Content Include="img\Icons\locked2.svg" />
     <Content Include="img\Icons\ViewButtonSprites.png" />
+    <Content Include="img\portfolio\cabin.png" />
+    <Content Include="img\portfolio\cake.png" />
+    <Content Include="img\portfolio\circus.png" />
+    <Content Include="img\portfolio\game.png" />
+    <Content Include="img\portfolio\safe.png" />
+    <Content Include="img\portfolio\submarine.png" />
+    <Content Include="img\profile.png" />
+    <Content Include="img\SlabsColored.png" />
+    <Content Include="img\SlabsColoredLarge.png" />
+    <Content Include="img\SlabsHighLight.png" />
+    <Content Include="img\SlabsHighLightLarge.png" />
+    <Content Include="img\SlabsUnHighLight.png" />
+    <Content Include="img\SlabsUnHighLightLarge.png" />
+    <Content Include="img\TilerScreenShot.png" />
+    <Content Include="img\TilerScreenShot0.png" />
+    <Content Include="img\TilerScreenWithMac.png" />
+    <Content Include="img\TilerScreenWithMacNoBgrnd.png" />
+    <Content Include="img\TilerScreenWithMacNoBgrndCropped.png" />
     <Content Include="LoggedInUser.html" />
     <Content Include="MonthOverView.html" />
     <Content Include="Scripts\bootstrap.js" />
@@ -2480,6 +2509,8 @@
     <Content Include="Content\bootstrap.css.map" />
     <Content Include="Areas\RouteDebugger\Views\Web.config" />
     <Content Include="Areas\RouteDebugger\Views\RouteDebugger\Index.cshtml" />
+    <Content Include="img\Thumbs.db" />
+    <Content Include="img\portfolio\Thumbs.db" />
     <None Include="Properties\PublishProfiles\mytiler.pubxml" />
     <Content Include="Scripts\Chart.min.js" />
     <Content Include="Scripts\Datepair.js" />
@@ -2598,6 +2629,12 @@
     <EmbeddedResource Include="Migrations\201505080639133_GoogleNotificationAuthentication1.resx">
       <DependentUpon>201505080639133_GoogleNotificationAuthentication1.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201605031337223_pauseEventTable.resx">
+      <DependentUpon>201605031337223_pauseEventTable.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201605040341293_modifiedPuaseData.resx">
+      <DependentUpon>201605040341293_modifiedPuaseData.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
@@ -2617,7 +2654,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>11919</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>https://localhost:44305/</IISUrl>
+          <IISUrl>https://localhost:44322/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

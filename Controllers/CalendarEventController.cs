@@ -12,6 +12,7 @@ using System.Web.Http.Description;
 using TilerElements;
 using TilerFront.Models;
 using DBTilerElement;
+using Newtonsoft.Json.Linq;
 //using TilerGoogleCalendarLib;
 
 namespace TilerFront.Controllers
@@ -147,6 +148,8 @@ namespace TilerFront.Controllers
             {
                 My24HourTimerWPF.Schedule NewSchedule = new My24HourTimerWPF.Schedule(retrievedUser, myUser.getRefNow());
                 DB_UserActivity activity = new DB_UserActivity(myUser.getRefNow(), UserActivity.ActivityType.DeleteCalendarEvent, new List<String>() { myUser.EventID });
+                JObject json = JObject.FromObject(myUser);
+                activity.updateMiscelaneousInfo(json.ToString());
                 retrievedUser.ScheduleLogControl.updateUserActivty(activity);
                 CustomErrors messageReturned = NewSchedule.deleteCalendarEventAndReadjust(myUser.EventID);
                 retValue = new PostBackData(messageReturned, messageReturned.Code);
@@ -187,6 +190,8 @@ namespace TilerFront.Controllers
             {
                 My24HourTimerWPF.Schedule NewSchedule = new My24HourTimerWPF.Schedule(retrievedUser, myUser.getRefNow());
                 DB_UserActivity activity = new DB_UserActivity(myUser.getRefNow(), UserActivity.ActivityType.CompleteCalendarEvent, new List<String>(){myUser.EventID});
+                JObject json = JObject.FromObject(myUser);
+                activity.updateMiscelaneousInfo(json.ToString());
                 retrievedUser.ScheduleLogControl.updateUserActivty(activity);
                 CustomErrors messageReturned = NewSchedule.markAsCompleteCalendarEventAndReadjust(myUser.EventID);
                 retValue = new PostBackData(messageReturned, messageReturned.Code);
@@ -221,6 +226,8 @@ namespace TilerFront.Controllers
 
                 Tuple<CustomErrors, Dictionary<string, CalendarEvent>> ScheduleUpdateMessage = NewSchedule.SetCalendarEventAsNow(nowEvent.ID);
                 DB_UserActivity activity = new DB_UserActivity(nowEvent.getRefNow(), UserActivity.ActivityType.SetAsNowCalendarEvent, new List<String>() { nowEvent.ID });
+                JObject json = JObject.FromObject(nowEvent);
+                activity.updateMiscelaneousInfo(json.ToString());
                 retrievedUser.ScheduleLogControl.updateUserActivty(activity);
                 await NewSchedule.UpdateWithProcrastinateSchedule(ScheduleUpdateMessage.Item2).ConfigureAwait(false);
                 retValue = new PostBackData(ScheduleUpdateMessage.Item1);
@@ -283,6 +290,9 @@ namespace TilerFront.Controllers
                             TimeSpan SpanPerSplit = TimeSpan.FromMilliseconds(myUser.Duration);
                             Tuple<CustomErrors, Dictionary<string, CalendarEvent>> ScheduleUpdateMessage = NewSchedule.BundleChangeUpdate(myUser.EventID, myUser.EventName, newStart, newEnd, SplitCount);//, SpanPerSplit);
                             DB_UserActivity activity = new DB_UserActivity(myUser.getRefNow(), UserActivity.ActivityType.InternalUpdateCalendarEvent, new List<String>() { myUser.EventID });
+                            JObject json = JObject.FromObject(myUser);
+                            activity.updateMiscelaneousInfo(json.ToString());
+
                             retrievedUser.ScheduleLogControl.updateUserActivty(activity);
 
                             await NewSchedule.UpdateWithProcrastinateSchedule(ScheduleUpdateMessage.Item2).ConfigureAwait(false);
