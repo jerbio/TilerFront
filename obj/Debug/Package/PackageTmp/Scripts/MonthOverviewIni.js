@@ -828,7 +828,7 @@ function IconSet()
 
     var PauseResumeIconID = "ControlPanelResumePauseButton" + myID;
     var PauseResumeIcon = getDomOrCreateNew(PauseResumeIconID);
-    PauseResumeIcon.setAttribute("Title", "Pause Panel");
+    
     $(PauseResumeIcon).addClass("ControlPanelButton");
 
     this.getCloseButton = function ()
@@ -865,11 +865,13 @@ function IconSet()
     this.switchToPauseButton = function () {
         $(PauseResumeIcon).addClass("ControlPanelPausePanelButton");
         $(PauseResumeIcon).removeClass("ControlPanelResumePanelButton");
+        PauseResumeIcon.setAttribute("Title", "Pause Event");
     }
 
     this.switchToResumeButton = function () {
         $(PauseResumeIcon).addClass("ControlPanelResumePanelButton");
         $(PauseResumeIcon).removeClass("ControlPanelPausePanelButton");
+        PauseResumeIcon.setAttribute("Title", "Resume Event");
     }
 
     IconSetContainer.appendChild(LocationIcon)
@@ -3574,7 +3576,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                         ThirdPartyType: SubEvent.ThirdPartyType
                     };
 
-                    var URL = global_refTIlerUrl + "Schedule/Event/Continue";
+                    var URL = global_refTIlerUrl + "Schedule/Event/Resume";
                     var HandleNEwPage = new LoadingScreenControl("Tiler resuming your event :)");
                     HandleNEwPage.Launch();
 
