@@ -537,7 +537,7 @@ function RevealControlPanelSection(SelectedEvents)
     var ProcatinationButton = getDomOrCreateNew("submitProcatination");
     var ProcatinationCancelButton = getDomOrCreateNew("cancelProcatination");
     var ControlPanelCloseButton = RevealControlPanelSection.IconSet.getCloseButton();
-    
+    $(ControlPanelCloseButton).removeClass("setAsDisplayNone")
     var ProcrastinateEventModalContainer = getDomOrCreateNew("ProcrastinateEventModal");
     var ControlPanelProcrastinateButton = RevealControlPanelSection.IconSet.getProcrastinateButton();
     $(ControlPanelProcrastinateButton).addClass("setAsDisplayNone");
@@ -546,6 +546,8 @@ function RevealControlPanelSection(SelectedEvents)
     var MultiSelectPanel = getDomOrCreateNew("MultiSelectPanel")
     var ControlPanelContainer = getDomOrCreateNew("ControlPanelContainer");
     var IconSetContainer = RevealControlPanelSection.IconSet.getIconSetContainer();
+    var PauseResumeButton = RevealControlPanelSection.IconSet.getPauseResumeButton();
+    $(PauseResumeButton).addClass("setAsDisplayNone")
     $(ControlPanelContainer).addClass("ControlPanelContainerLowerBar");
     if (Object.keys(SelectedEvents).length < 1) {
         $(MultiSelectPanel).addClass("hideMultiSelectPanel");
@@ -828,7 +830,6 @@ function IconSet()
 
     var PauseResumeIconID = "ControlPanelResumePauseButton" + myID;
     var PauseResumeIcon = getDomOrCreateNew(PauseResumeIconID);
-    
     $(PauseResumeIcon).addClass("ControlPanelButton");
 
     this.getCloseButton = function ()
@@ -879,7 +880,7 @@ function IconSet()
     IconSetContainer.appendChild(DeleteIcon)
     IconSetContainer.appendChild(CompleteIcon)
     IconSetContainer.appendChild(PauseResumeIcon)
-    //IconSetContainer.appendChild(CloseIcon)
+    IconSetContainer.appendChild(CloseIcon)
 }
 
 IconSet.ID=0;
@@ -3841,10 +3842,12 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
             if (SubEvent.isPaused) {
                 global_ControlPanelIconSet.switchToResumeButton();
                 PauseResumeButton.onclick = continueEvent;
+                $(ControlPanelCloseButton).addClass("setAsDisplayNone");
             }
             else {
                 global_ControlPanelIconSet.switchToPauseButton();
                 PauseResumeButton.onclick = pauseEvent;
+                $(ControlPanelCloseButton).addClass("setAsDisplayNone");
             }
 
             //continueButton.onclick = continueEvent;

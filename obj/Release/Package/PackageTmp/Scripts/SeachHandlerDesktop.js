@@ -1,6 +1,5 @@
-﻿function ActivateUserSearch(e)
+function ActivateUserSearch(e)
 {
-    //    debugger;
     e.stopPropagation();
     var SearchInput = getDomOrCreateNew("SearchBarInput");
     var SearchContainer = getDomOrCreateNew("SearchBarAndContentContainer");
