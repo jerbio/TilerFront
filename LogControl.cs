@@ -549,23 +549,10 @@ namespace TilerFront
                 LocationCacheNode = xmldoc.DocumentElement.SelectSingleNode("/ScheduleLog/LocationCache");
             }
 
-
-            XmlNode AllLocationsCacheContainer = xmldoc.DocumentElement.SelectSingleNode("/ScheduleLog/LocationCache/Locations");
-
             XmlNodeList AllCachedLocations = xmldoc.DocumentElement.SelectNodes("/ScheduleLog/LocationCache/Locations/Location");
 
 
-            if (NewLocation != null)
-            {
-                if (!NewLocation.isNull)
-                {
-                    if (!CachedLocation.ContainsKey(NewLocation.Description.ToLower()))
-                    {
-
-                    }
-                }
-            }
-            
+           
             foreach (KeyValuePair<string, Location_Elements> eachKeyValuePair in CachedLocation)
             {
                 if (!currentCache.ContainsKey(eachKeyValuePair.Key))
@@ -595,11 +582,13 @@ namespace TilerFront
                 }
                 else
                 {
-                    if(NewLocation.Description.ToLower() == eachKeyValuePair.Key)
+                    if (NewLocation != null)
                     {
-                        updateLocationNode(NewLocation, xmldoc);
+                        if (NewLocation.Description.ToLower() == eachKeyValuePair.Key)
+                        {
+                            updateLocationNode(NewLocation, xmldoc);
+                        }
                     }
-                    
                 }
             }
         }

@@ -151,7 +151,6 @@ namespace TilerFront.Controllers
             if (retrievedUser.Status)
             {
                 string CalendarType = myUser.ThirdPartyType.ToLower();
-
                 switch (CalendarType)
                 {
                     case "google":
