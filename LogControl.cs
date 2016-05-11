@@ -585,17 +585,46 @@ namespace TilerFront
                         }
                     }
                 }
+                else
+                {
+                    updateLocationNode(NewLocation, xmldoc);
+                }
             }
         }
 
-        virtual XmlNode getLocationNodeByTagName(XmlNode cacheLocationNode, string TagName)
+        virtual protected XmlNode getLocationNodeByTagName(string TagName, XmlDocument DocNode = null)
         {
-
+            TagName = TagName.Trim().ToLower();
+            XmlNode retValue = null;
+            XmlDocument doc = DocNode;
+            if (DocNode == null)
+            {
+                doc = getLogDataStore();
+            }
+            XmlNode node = doc.DocumentElement.SelectSingleNode("/ScheduleLog/LocationCache");
+            if (node == null)
+            {
+                return retValue;
+            }
+            XmlNodeList AllLocationNodes = node.SelectNodes("Locations/Location");
+            foreach (XmlNode eachXmlNode in AllLocationNodes)
+            {
+                string desciption = eachXmlNode.SelectSingleNode("Description").InnerText;
+                if (desciption == TagName)
+                {
+                    retValue = eachXmlNode;
+                    break;
+                }
+            }
+            return retValue;
         }
 
-        virtual public XmlNode updateLocationNode(XmlNode node, Location_Elements Location )
+        virtual public XmlNode updateLocationNode(Location_Elements Location, XmlDocument DocNode = null)
         {
-
+            XmlNode Node = getLocationNodeByTagName(Location.Description, DocNode);
+            XmlElement newNode = CreateLocationNode(Location);
+            Node.InnerXml = newNode.InnerXml;
+            return Node;
         }
 
         public XmlElement generateNowProfileNode(NowProfile myNowProfile)
@@ -922,10 +951,10 @@ namespace TilerFront
             return RetValue;
         }
 
-        public XmlElement CreateLocationNode(Location_Elements Arg1, string ElementIdentifier)
+        public XmlElement CreateLocationNode(Location_Elements Arg1, string Identifier = "Location")
         {
             XmlDocument xmldoc = new XmlDocument();
-            XmlElement var1 = xmldoc.CreateElement(ElementIdentifier);
+            XmlElement var1 = xmldoc.CreateElement(Identifier);
             string XCoordinate = "";
             string YCoordinate = "";
             string Descripion = "";
