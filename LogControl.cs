@@ -1,4 +1,4 @@
-﻿#define UseDefaultLocation
+﻿//#define UseDefaultLocation
 
 using System;
 using System.Collections.Generic;
@@ -527,6 +527,14 @@ namespace TilerFront
 
             return await retValue.ConfigureAwait(false); ;
         }
+        /// <summary>
+        /// updates the logcontrol with a possible new location
+        /// </summary>
+        /// <param name="NewLocation"></param>
+        public void updateNewLocation(Location_Elements NewLocation)
+        {
+            this.NewLocation = NewLocation;
+        }
 
         public void UpdateCacheLocation(XmlDocument xmldoc, Dictionary<string, Location_Elements> currentCache, Location_Elements NewLocation )
         {
@@ -562,7 +570,7 @@ namespace TilerFront
             {
                 if (!currentCache.ContainsKey(eachKeyValuePair.Key))
                 {
-                    if (!eachKeyValuePair.Value.isNull)
+                    //if (!eachKeyValuePair.Value.isNull)
                     {
                         string LocationID = eachKeyValuePair.Value.ID;
                         XmlElement myCacheLocationNode = CreateLocationNode(eachKeyValuePair.Value, "Location");
@@ -587,9 +595,20 @@ namespace TilerFront
                 }
                 else
                 {
-                    updateLocationNode(NewLocation, xmldoc);
+                    if(NewLocation.Description.ToLower() == eachKeyValuePair.Key)
+                    {
+                        updateLocationNode(NewLocation, xmldoc);
+                    }
+                    
                 }
             }
+        }
+
+        public bool isLocationIsDifferent(Location_Elements OldLocation, Location_Elements NewLocation)
+        {
+            double newDistance = Location_Elements.calculateDistance(OldLocation, NewLocation);
+            bool retValue = newDistance >= 0.5;
+            return retValue;
         }
 
         virtual protected XmlNode getLocationNodeByTagName(string TagName, XmlDocument DocNode = null)
@@ -609,8 +628,9 @@ namespace TilerFront
             XmlNodeList AllLocationNodes = node.SelectNodes("Locations/Location");
             foreach (XmlNode eachXmlNode in AllLocationNodes)
             {
-                string desciption = eachXmlNode.SelectSingleNode("Description").InnerText;
-                if (desciption == TagName)
+                string desciption = eachXmlNode.SelectSingleNode("Description").InnerText.ToLower(); 
+                string CachedName = eachXmlNode.SelectSingleNode("CachedName").InnerText.ToLower();
+                if ((desciption == TagName)|| (CachedName == TagName))
                 {
                     retValue = eachXmlNode;
                     break;
@@ -621,10 +641,31 @@ namespace TilerFront
 
         virtual public XmlNode updateLocationNode(Location_Elements Location, XmlDocument DocNode = null)
         {
-            XmlNode Node = getLocationNodeByTagName(Location.Description, DocNode);
+            XmlNode OldNode = getLocationNodeByTagName(Location.Description, DocNode);
+            Location_Elements OldLocation;
+            if(OldNode != null)
+            {
+                OldLocation = getLocation(OldNode);
+            }
+            else
+            {
+                OldLocation = new Location_Elements();
+            }
+            
+
             XmlElement newNode = CreateLocationNode(Location);
-            Node.InnerXml = newNode.InnerXml;
-            return Node;
+            if(isLocationIsDifferent(OldLocation, Location))
+            {
+                OldNode.InnerXml = newNode.InnerXml;
+                XmlNode LocationIDNode = DocNode.CreateElement("LocationID");
+                XmlNode CacheNameNode = DocNode.CreateElement("CachedName");
+                CacheNameNode.InnerText = Location.Description.ToLower();
+                LocationIDNode.InnerText = Location.ID;
+                OldNode.PrependChild(LocationIDNode);
+                OldNode.PrependChild(CacheNameNode);
+            }
+
+            return OldNode;
         }
 
         public XmlElement generateNowProfileNode(NowProfile myNowProfile)
@@ -961,14 +1002,14 @@ namespace TilerFront
             string MappedAddress = "";
             string IsNull = true.ToString(); ;
             string CheckCalendarEvent = 0.ToString();
-            if ((Arg1 != null) && (!Arg1.isNull))
+            if ((Arg1 != null) )//&& (!Arg1.isNull))
             {
                 XCoordinate = Arg1.XCoordinate.ToString();
                 YCoordinate = Arg1.YCoordinate.ToString();
                 Descripion = Arg1.Description;
                 MappedAddress = Arg1.Address;
                 IsNull = Arg1.isNull.ToString();
-                CheckCalendarEvent = Arg1.DefaultCheck.ToString();
+                CheckCalendarEvent = Arg1.isDefault.ToString();
             }
             var1.PrependChild(xmldoc.CreateElement("XCoordinate"));
             var1.ChildNodes[0].InnerText = XCoordinate;
@@ -1776,12 +1817,20 @@ namespace TilerFront
                     double xCoOrdinate = double.MaxValue;
                     double yCoOrdinate = double.MaxValue;
 
-
-                    int CheckDefault = Convert.ToInt32(CheckDefault_Str);
+                    bool isDefault;
+                    if(CheckDefault_Str == "0")
+                    {
+                        isDefault = false;
+                    }
+                    else
+                    {
+                        isDefault = Convert.ToBoolean(CheckDefault_Str);
+                    }
+                        
 
                     if (!(double.TryParse(XCoordinate_Str, out xCoOrdinate)))
                     {
-                        xCoOrdinate = double.MaxValue;
+                        xCoOrdinate = Location_Elements.MaxLatitude;
                         UninitializedLocation = true;
 #if UseDefaultLocation
                         return DefaultLocation;
@@ -1797,7 +1846,7 @@ namespace TilerFront
 #endif
                     }
 
-                    return new Location_Elements(xCoOrdinate, yCoOrdinate, Address, Descripion, UninitializedLocation, CheckDefault);
+                    return new Location_Elements(xCoOrdinate, yCoOrdinate, Address, Descripion, UninitializedLocation, isDefault);
                 }
             }
         }
@@ -2032,15 +2081,15 @@ namespace TilerFront
 
         
 
-        async Task populateDefaultLocation(Dictionary<string, Location_Elements> locations = null)
+        async protected Task populateDefaultLocation(Dictionary<string, Location_Elements> locations = null)
         {
             double xLocation = 40.083319;
             double yLocation = -105.3505482;
             Location_Elements retValue;
             if ((locations == null))
             {
-                
-                retValue = new Location_Elements(xLocation, yLocation, -1);
+
+                retValue = Location_Elements.getDefaultLocation();
                 DefaultLocation = retValue;
                 locations = await getLocationCache().ConfigureAwait(false);
                 return;
@@ -2048,18 +2097,18 @@ namespace TilerFront
 
             if ((locations.Count < 1))
             {
-                retValue = new Location_Elements(xLocation, yLocation, -1);
+                retValue = Location_Elements.getDefaultLocation();
                 DefaultLocation = retValue;
                 locations = await getLocationCache().ConfigureAwait(false);
                 return;
             }
 
-            xLocation = locations.Values.Average(obj => obj.XCoordinate);
-            yLocation = locations.Values.Average(obj => obj.YCoordinate);
+            Location_Elements AverageLocations = Location_Elements.AverageGPSLocation(locations.Values);
 
-            retValue = new Location_Elements(xLocation, yLocation, -1);
+            xLocation = AverageLocations.XCoordinate;
+            yLocation = AverageLocations.YCoordinate;
             Location_Elements.InitializeDefaultLongLat(xLocation, yLocation);
-            DefaultLocation = retValue;
+            DefaultLocation = AverageLocations;
             
         }
         #endregion

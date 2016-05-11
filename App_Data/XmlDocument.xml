@@ -1105,6 +1105,12 @@
             <param name="oldData"></param>
             <param name="newData"></param>
         </member>
+        <member name="M:TilerFront.LogControl.updateNewLocation(TilerElements.Location_Elements)">
+            <summary>
+            updates the logcontrol with a possible new location
+            </summary>
+            <param name="NewLocation"></param>
+        </member>
         <member name="M:TilerFront.LogControl.CreatePauseUsedUpNode(TilerElements.SubCalendarEvent,System.Xml.XmlDocument)">
             <summary>
             Class generates the pause xml mode for a given schedule

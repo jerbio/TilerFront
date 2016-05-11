@@ -4,466 +4,165 @@
         <name>Microsoft.Diagnostics.Tracing.EventSource</name>
     </assembly>
     <members>
-        <member name="T:Microsoft.Diagnostics.Tracing.TraceLoggingTypeInfo`1">
-            <summary>
-            TraceLogging: used when implementing a custom TraceLoggingTypeInfo.
-            Implementations of this type provide the behaviors that TraceLogging
-            uses to turn objects into event data. TraceLogging provides default
-            implementations of this type, but custom implementations can be used
-            when the default TraceLogging implementation is insufficient.
-            </summary>
-            <typeparam name="DataType">
-            The type of object that is handled by this implementation.
-            </typeparam>
-        </member>
-        <member name="T:Microsoft.Diagnostics.Tracing.TraceLoggingTypeInfo">
-            <summary>
-            TraceLogging: used when implementing a custom TraceLoggingTypeInfo.
-            Non-generic base class for TraceLoggingTypeInfo&lt;DataType>. Do not derive
-            from this class. Instead, derive from TraceLoggingTypeInfo&lt;DataType>.
-            </summary>
-        </member>
-        <member name="M:Microsoft.Diagnostics.Tracing.TraceLoggingTypeInfo.WriteMetadata(Microsoft.Diagnostics.Tracing.TraceLoggingMetadataCollector,System.String,Microsoft.Diagnostics.Tracing.EventFieldFormat)">
-            <summary>
-            When overridden by a derived class, writes the metadata (schema) for
-            this type. Note that the sequence of operations in WriteMetadata should be
-            essentially identical to the sequence of operations in
-            WriteData/WriteObjectData. Otherwise, the metadata and data will not match,
-            which may cause trouble when decoding the event.
-            </summary>
-            <param name="collector">
-            The object that collects metadata for this object's type. Metadata is written
-            by calling methods on the collector object. Note that if the type contains
-            sub-objects, the implementation of this method may need to call the
-            WriteMetadata method for the type of the sub-object, e.g. by calling
-            TraceLoggingTypeInfo&lt;SubType&gt;.Instance.WriteMetadata(...).
-            </param>
-            <param name="name">
-            The name of the property that contains an object of this type, or null if this
-            object is being written as a top-level object of an event. Typical usage
-            is to pass this value to collector.AddGroup.
-            </param>
-            <param name="format">
-            The format attribute for the field that contains an object of this type.
-            </param>
-        </member>
-        <member name="M:Microsoft.Diagnostics.Tracing.TraceLoggingTypeInfo.WriteObjectData(Microsoft.Diagnostics.Tracing.TraceLoggingDataCollector,System.Object)">
-            <summary>
-            Refer to TraceLoggingTypeInfo.WriteObjectData for information about this
-            method.
-            </summary>
-            <param name="collector">
-            Refer to TraceLoggingTypeInfo.WriteObjectData for information about this
-            method.
-            </param>
-            <param name="value">
-            Refer to TraceLoggingTypeInfo.WriteObjectData for information about this
-            method.
-            </param>
-        </member>
-        <member name="P:Microsoft.Diagnostics.Tracing.TraceLoggingTypeInfo.Name">
-            <summary>
-            Gets the name to use for the event if this type is the top-level type,
-            or the name to use for an implicitly-named field.
-            Never null.
-            </summary>
-        </member>
-        <member name="P:Microsoft.Diagnostics.Tracing.TraceLoggingTypeInfo.Level">
-            <summary>
-            Gets the event level associated with this type. Any value in the range 0..255
-            is an associated event level. Any value outside the range 0..255 is invalid and
-            indicates that this type has no associated event level.
-            </summary>
-        </member>
-        <member name="P:Microsoft.Diagnostics.Tracing.TraceLoggingTypeInfo.Opcode">
-            <summary>
-            Gets the event opcode associated with this type. Any value in the range 0..255
-            is an associated event opcode. Any value outside the range 0..255 is invalid and
-            indicates that this type has no associated event opcode.
-            </summary>
-        </member>
-        <member name="P:Microsoft.Diagnostics.Tracing.TraceLoggingTypeInfo.Keywords">
-            <summary>
-            Gets the keyword(s) associated with this type.
-            </summary>
-        </member>
-        <member name="P:Microsoft.Diagnostics.Tracing.TraceLoggingTypeInfo.Tags">
-            <summary>
-            Gets the event tags associated with this type.
-            </summary>
-        </member>
-        <member name="M:Microsoft.Diagnostics.Tracing.TraceLoggingTypeInfo`1.#ctor">
-            <summary>
-            Initializes a new instance of the TraceLoggingTypeInfo class with
-            default settings. Uses typeof(DataType).Name for EventName and FieldName.
-            Marks Level and Opcode as unset. Sets Keywords and Traits to 0.
-            </summary>
-        </member>
-        <member name="M:Microsoft.Diagnostics.Tracing.TraceLoggingTypeInfo`1.#ctor(System.String,Microsoft.Diagnostics.Tracing.EventLevel,Microsoft.Diagnostics.Tracing.EventOpcode,Microsoft.Diagnostics.Tracing.EventKeywords,Microsoft.Diagnostics.Tracing.EventTags)">
-            <summary>
-            Initializes a new instance of the TraceLoggingTypeInfo class, using
-            the specified values for the EventName, Level, Opcode, Keywords,
-            FieldName, and Traits properties.
-            </summary>
-            <param name="name">
-            The value for the Name property. Must not contain '\0' characters.
-            Must not be null.
-            </param>
-            <param name="level">
-            The value for the Level property, or -1 to mark Level as unset.
-            </param>
-            <param name="opcode">
-            The value for the Opcode property, or -1 to mark Opcode as unset.
-            </param>
-            <param name="keywords">
-            The value for the Keywords property.
-            </param>
-            <param name="tags">
-            The value for the Tags property.
-            </param>
-        </member>
-        <member name="M:Microsoft.Diagnostics.Tracing.TraceLoggingTypeInfo`1.WriteData(Microsoft.Diagnostics.Tracing.TraceLoggingDataCollector,`0@)">
-            <summary>
-            When overridden by a derived class, writes the data (fields) for an instance
-            of DataType. Note that the sequence of operations in WriteData should be
-            essentially identical to the sequence of operations in WriteMetadata. Otherwise,
-            the metadata and data will not match, which may cause trouble when decoding the
-            event.
-            </summary>
-            <param name="collector">
-            The object that collects the data for the instance. Data is written by calling
-            methods on the collector object. Note that if the type contains sub-objects,
-            the implementation of this method may need to call the WriteData method
-            for the sub-object, e.g. by calling
-            TraceLoggingTypeInfo&lt;SubType&gt;.Instance.WriteData(...).
-            </param>
-            <param name="value">
-            The value for which data is to be written.
-            </param>
-        </member>
-        <member name="M:Microsoft.Diagnostics.Tracing.TraceLoggingTypeInfo`1.WriteObjectData(Microsoft.Diagnostics.Tracing.TraceLoggingDataCollector,System.Object)">
-            <summary>
-            When overridden in a derived class, writes the data (fields) for an instance
-            of DataType. The default implementation of WriteObjectData calls
-            WriteData(collector, (DataType)value). Normally, you will override WriteData
-            and not WriteObjectData. However, if your implementation of WriteData has to
-            cast the value to object, it may be more efficient to reverse this calling
-            pattern, i.e. to implement WriteObjectData, and then implement WriteData as a
-            call to WriteObjectData.
-            </summary>
-            <param name="collector">
-            The object that collects the data for the instance. Data is written by calling
-            methods on the collector object. Note that if the type contains sub-objects,
-            the implementation of this method may need to call the WriteData method
-            for the sub-object, e.g. by calling
-            TraceLoggingTypeInfo&lt;SubType&gt;.Instance.WriteData(...).
-            </param>
-            <param name="value">
-            The value for which data is to be written. Note that this value may be null
-            (even for value types) if the property from which the value was read is
-            missing or null.
-            </param>
-        </member>
-        <member name="P:Microsoft.Diagnostics.Tracing.TraceLoggingTypeInfo`1.Instance">
-            <summary>
-            Gets the type info that will be used for handling instances of
-            DataType. If the instance has not already been set, this will
-            call TrySetInstance(automaticSerializer) to set one, where
-            automaticSerializer is the value returned from CreateDefault(),
-            or a do-nothing serializer if CreateDefault() fails.
-            </summary>
-        </member>
-        <member name="T:Microsoft.Diagnostics.Tracing.ConcurrentSet`2">
-            <summary>
-            TraceLogging: A very simple lock-free add-only dictionary.
-            Warning: this is a copy-by-value type. Copying performs a snapshot.
-            Accessing a readonly field always makes a copy of the field, so the
-            GetOrAdd method will not work as expected if called on a readonly field.
-            </summary>
-            <typeparam name="KeyType">
-            The type of the key, used for TryGet.
-            </typeparam>
-            <typeparam name="ItemType">
-            The type of the item, used for GetOrAdd.
-            </typeparam>
-        </member>
-        <member name="T:Microsoft.Diagnostics.Tracing.ConcurrentSetItem`2">
-            <summary>
-            TraceLogging: Abstract base class that must be inherited by items in a
-            ConcurrentSet.
-            </summary>
-            <typeparam name="KeyType">Type of the set's key.</typeparam>
-            <typeparam name="ItemType">Type of the derived class.</typeparam>
-        </member>
-        <member name="T:Microsoft.Diagnostics.Tracing.DataCollector">
-            <summary>
-            TraceLogging: This is the implementation of the DataCollector
-            functionality. To enable safe access to the DataCollector from
-            untrusted code, there is one thread-local instance of this structure
-            per thread. The instance must be Enabled before any data is written to
-            it. The instance must be Finished before the data is passed to
-            EventWrite. The instance must be Disabled before the arrays referenced
-            by the pointers are freed or unpinned.
-            </summary>
-        </member>
-        <member name="M:Microsoft.Diagnostics.Tracing.DataCollector.Finish">
-            <summary>
-            Completes the list of scalars. Finish must be called before the data
-            descriptor array is passed to EventWrite.
-            </summary>
-            <returns>
-            A pointer to the next unused data descriptor, or datasEnd if they were
-            all used. (Descriptors may be unused if a string or array was null.)
-            </returns>
-        </member>
-        <member name="M:Microsoft.Diagnostics.Tracing.DataCollector.BeginBufferedArray">
-            <summary>
-            Marks the start of a non-blittable array or enumerable.
-            </summary>
-            <returns>Bookmark to be passed to EndBufferedArray.</returns>
-        </member>
-        <member name="M:Microsoft.Diagnostics.Tracing.DataCollector.EndBufferedArray(System.Int32,System.Int32)">
-            <summary>
-            Marks the end of a non-blittable array or enumerable.
-            </summary>
-            <param name="bookmark">The value returned by BeginBufferedArray.</param>
-            <param name="count">The number of items in the array.</param>
-        </member>
-        <member name="M:Microsoft.Diagnostics.Tracing.DataCollector.BeginBuffered">
-            <summary>
-            Marks the start of dynamically-buffered data.
-            </summary>
-        </member>
-        <member name="M:Microsoft.Diagnostics.Tracing.DataCollector.EndBuffered">
-            <summary>
-            Marks the end of dynamically-buffered data.
-            </summary>
-        </member>
-        <member name="T:Microsoft.Diagnostics.Tracing.EmptyStruct">
-            <summary>
-            TraceLogging: Empty struct indicating no payload data.
-            </summary>
-        </member>
-        <member name="T:Microsoft.Diagnostics.Tracing.EnumHelper`1">
-            <summary>
-            Provides support for casting enums to their underlying type
-            from within generic context.
-            </summary>
-            <typeparam name="UnderlyingType">
-            The underlying type of the enum.
-            </typeparam>
-        </member>
-        <member name="T:Microsoft.Diagnostics.Tracing.SimpleEventTypes`1">
-            <summary>
-            TraceLogging: Contains the metadata needed to emit an event, optimized
-            for events with one top-level compile-time-typed payload object.
-            </summary>
-            <typeparam name="T">
-            Type of the top-level payload object. Should be EmptyStruct if the
-            event has no payload.
-            </typeparam>
-        </member>
-        <member name="T:Microsoft.Diagnostics.Tracing.TraceLoggingEventTypes">
-            <summary>
-            TraceLogging: Used when calling EventSource.WriteMultiMerge.
-            Stores the type information to use when writing the event fields.
-            </summary>
-        </member>
-        <member name="M:Microsoft.Diagnostics.Tracing.TraceLoggingEventTypes.#ctor(System.String,Microsoft.Diagnostics.Tracing.EventTags,System.Type[])">
-            <summary>
-            Initializes a new instance of TraceLoggingEventTypes corresponding
-            to the name, flags, and types provided. Always uses the default
-            TypeInfo for each Type.
-            </summary>
-            <param name="name">
-            The name to use when the name parameter passed to
-            EventSource.Write is null. This value must not be null.
-            </param>
-            <param name="tags">
-            Tags to add to the event if the tags are not set via options.
-            </param>
-            <param name="types">
-            The types of the fields in the event. This value must not be null.
-            </param>
-        </member>
-        <member name="M:Microsoft.Diagnostics.Tracing.TraceLoggingEventTypes.#ctor(System.String,Microsoft.Diagnostics.Tracing.EventTags,Microsoft.Diagnostics.Tracing.TraceLoggingTypeInfo[])">
-            <summary>
-            Returns a new instance of TraceLoggingEventInfo corresponding to the name,
-            flags, and typeInfos provided.
-            </summary>
-            <param name="name">
-            The name to use when the name parameter passed to
-            EventSource.Write is null. This value must not be null.
-            </param>
-            <param name="tags">
-            Tags to add to the event if the tags are not set via options.
-            </param>
-            <param name="typeInfos">
-            The types of the fields in the event. This value must not be null.
-            </param>
-            <returns>
-            An instance of TraceLoggingEventInfo with DefaultName set to the specified name
-            and with the specified typeInfos.
-            </returns>
-        </member>
-        <member name="P:Microsoft.Diagnostics.Tracing.TraceLoggingEventTypes.Name">
-            <summary>
-            Gets the default name that will be used for events with this descriptor.
-            </summary>
-        </member>
-        <member name="P:Microsoft.Diagnostics.Tracing.TraceLoggingEventTypes.Level">
-            <summary>
-            Gets the default level that will be used for events with this descriptor.
-            </summary>
-        </member>
-        <member name="P:Microsoft.Diagnostics.Tracing.TraceLoggingEventTypes.Opcode">
-            <summary>
-            Gets the default opcode that will be used for events with this descriptor.
-            </summary>
-        </member>
-        <member name="P:Microsoft.Diagnostics.Tracing.TraceLoggingEventTypes.Keywords">
-            <summary>
-            Gets the default set of keywords that will added to events with this descriptor.
-            </summary>
-        </member>
-        <member name="P:Microsoft.Diagnostics.Tracing.TraceLoggingEventTypes.Tags">
-            <summary>
-            Gets the default tags that will be added events with this descriptor.
-            </summary>
-        </member>
-        <member name="T:Microsoft.Diagnostics.Tracing.EventProvider">
-            <summary>
-            Only here because System.Diagnostics.EventProvider needs one more extensibility hook (when it gets a 
-            controller callback)
-            </summary>
-        </member>
-        <member name="M:Microsoft.Diagnostics.Tracing.EventProvider.#ctor(System.Guid)">
-            <summary>
-            Constructs a new EventProvider.  This causes the class to be registered with the OS and
-            if an ETW controller turns on the logging then logging will start. 
-            </summary>
-            <param name="providerGuid">The GUID that identifies this provider to the system.</param>
-        </member>
-        <member name="M:Microsoft.Diagnostics.Tracing.EventProvider.Register(System.Guid)">
-            <summary>
-            This method registers the controlGuid of this class with ETW. We need to be running on
-            Vista or above. If not a PlatformNotSupported exception will be thrown. If for some 
-            reason the ETW Register call failed a NotSupported exception will be thrown. 
-            </summary>
-        </member>
-        <member name="M:Microsoft.Diagnostics.Tracing.EventProvider.Close">
-            <summary>
-            This method deregisters the controlGuid of this class with ETW.
-            
-            </summary>
-        </member>
-        <member name="M:Microsoft.Diagnostics.Tracing.EventProvider.Deregister">
-            <summary>
-            This method un-registers from ETW.
-            </summary>
-        </member>
-        <member name="M:Microsoft.Diagnostics.Tracing.EventProvider.GetSessions">
+        <member name="T:Microsoft.Diagnostics.Tracing.ActivityTracker">
              <summary>
-             Determines the ETW sessions that have been added and/or removed to the set of
-             sessions interested in the current provider. It does so by (1) enumerating over all
-             ETW sessions that enabled 'this.m_Guid' for the current process ID, and (2)
-             comparing the current list with a list it cached on the previous invocation.
+             Tracks activities.  This is meant to be a singleton (accessed by the ActivityTracer.Instance static property)
+              
+             Logically this is simply holds the m_current variable that holds the async local that holds the current ActivityInfo
+             An ActivityInfo is represents a activity (which knows its creator and thus knows its path). 
             
-             The return value is a list of tuples, where the SessionInfo specifies the
-             ETW session that was added or remove, and the bool specifies whether the
-             session was added or whether it was removed from the set.
+             Most of the magic is in the async local (it gets copied to new tasks)
+             
+             On every start event call OnStart 
+             
+                 Guid activityID;
+                 Guid relatedActivityID;
+                 if (OnStart(activityName, out activityID, out relatedActivityID, ForceStop, options))
+                     // Log Start event with activityID and relatedActivityID
+                 
+             On every stop event call OnStop
+             
+                 Guid activityID;
+                 if (OnStop(activityName, ref activityID  ForceStop))
+                     // Stop event with activityID
+                        
+             On any normal event log the event with activityTracker.CurrentActivityId
              </summary>
         </member>
-        <member name="M:Microsoft.Diagnostics.Tracing.EventProvider.GetSessionInfoCallback(System.Int32,System.Int64,System.Collections.Generic.List{Microsoft.Diagnostics.Tracing.EventProvider.SessionInfo}@)">
+        <member name="M:Microsoft.Diagnostics.Tracing.ActivityTracker.OnStart(System.String,System.String,System.Int32,System.Guid@,System.Guid@,Microsoft.Diagnostics.Tracing.EventActivityOptions)">
             <summary>
-            This method is the callback used by GetSessions() when it calls into GetSessionInfo(). 
-            It updates a List{SessionInfo} based on the etwSessionId and matchAllKeywords that 
-            GetSessionInfo() passes in.
+            Called on work item begins.  The activity name = providerName + activityName without 'Start' suffix.
+            It updates CurrentActivityId to track.   
+            
+            It returns true if the Start should be logged, otherwise (if it is illegal recursion) it return false. 
+            
+            The start event should use as its activity ID the CurrentActivityId AFTER calling this routine and its
+            RelatedActivityID the CurrentActivityId BEFORE calling this routine (the creator).  
+            
+            If activity tracing is not on, then activityId and relatedActivityId are not set
             </summary>
         </member>
-        <member name="M:Microsoft.Diagnostics.Tracing.EventProvider.GetSessionInfo(System.Action{System.Int32,System.Int64})">
+        <member name="M:Microsoft.Diagnostics.Tracing.ActivityTracker.OnStop(System.String,System.String,System.Int32,System.Guid@)">
+             <summary>
+             Called when a work item stops.  The activity name = providerName + activityName without 'Stop' suffix.
+             It updates m_current variable to track this fact.   The Stop event associated with stop should log the ActivityID associated with the event.
+            
+             If activity tracing is not on, then activityId and relatedActivityId are not set
+             </summary>
+        </member>
+        <member name="M:Microsoft.Diagnostics.Tracing.ActivityTracker.Enable">
             <summary>
-            This method enumerates over all active ETW sessions that have enabled 'this.m_Guid' 
-            for the current process ID, calling 'action' for each session, and passing it the
-            ETW session and the 'AllKeywords' the session enabled for the current provider.
+            Turns on activity tracking.    It is sticky, once on it stays on (race issues otherwise)
             </summary>
         </member>
-        <member name="M:Microsoft.Diagnostics.Tracing.EventProvider.IndexOfSessionInList(System.Collections.Generic.List{Microsoft.Diagnostics.Tracing.EventProvider.SessionInfo},System.Int32)">
+        <member name="M:Microsoft.Diagnostics.Tracing.ActivityTracker.FindActiveActivity(System.String,Microsoft.Diagnostics.Tracing.ActivityTracker.ActivityInfo)">
             <summary>
-            Returns the index of the SesisonInfo from 'sessions' that has the specified 'etwSessionId'
-            or -1 if the value is not present.
+            Searched for a active (nonstopped) activity with the given name.  Returns null if not found.  
             </summary>
         </member>
-        <member name="M:Microsoft.Diagnostics.Tracing.EventProvider.GetDataFromController(System.Int32,Microsoft.Win32.UnsafeNativeMethods.ManifestEtw.EVENT_FILTER_DESCRIPTOR*,Microsoft.Diagnostics.Tracing.ControllerCommand@,System.Byte[]@,System.Int32@)">
+        <member name="M:Microsoft.Diagnostics.Tracing.ActivityTracker.NormalizeActivityName(System.String,System.String,System.Int32)">
             <summary>
-            Gets any data to be passed from the controller to the provider.  It starts with what is passed
-            into the callback, but unfortunately this data is only present for when the provider is active
-            at the time the controller issues the command.  To allow for providers to activate after the
-            controller issued a command, we also check the registry and use that to get the data.  The function
-            returns an array of bytes representing the data, the index into that byte array where the data
-            starts, and the command being issued associated with that data.  
+            Strip out "Start" or "End" suffix from activity name and add providerName prefix.
+            If 'task'  it does not end in Start or Stop and Task is non-zero use that as the name of the activity
             </summary>
         </member>
-        <member name="M:Microsoft.Diagnostics.Tracing.EventProvider.IsEnabled">
+        <member name="F:Microsoft.Diagnostics.Tracing.ActivityTracker.m_current">
             <summary>
-            IsEnabled, method used to test if provider is enabled
+            Async local variables have the properly that the are automatically copied whenever a task is created and used
+            while that task is running.   Thus m_current 'flows' to any task that is caused by the current thread that
+            last set it.   
+            
+            This variable points a a linked list that represents all Activities that have started but have not stopped.  
             </summary>
         </member>
-        <member name="M:Microsoft.Diagnostics.Tracing.EventProvider.IsEnabled(System.Byte,System.Int64)">
+        <member name="P:Microsoft.Diagnostics.Tracing.ActivityTracker.Instance">
             <summary>
-            IsEnabled, method used to test if event is enabled
+            An activity tracker is a singleton, this is how you get the one and only instance.
             </summary>
-            <param name="level">
-            Level  to test
-            </param>
-            <param name="keywords">
-            Keyword  to test
-            </param>
         </member>
-        <member name="M:Microsoft.Diagnostics.Tracing.EventProvider.WriteEvent(Microsoft.Diagnostics.Tracing.EventDescriptor@,System.Guid*,System.Object[])">
+        <member name="P:Microsoft.Diagnostics.Tracing.ActivityTracker.CurrentActivityId">
             <summary>
-            WriteEvent, method to write a parameters with event schema properties
+            The current activity ID.  Use this to log normal events.  
             </summary>
-            <param name="eventDescriptor">
-            Event Descriptor for this event. 
-            </param>
-            <param name="childActivityID">
-            childActivityID is marked as 'related' to the current activity ID. 
-            </param>
-            <param name="eventPayload">
-            Payload for the ETW event. 
-            </param>
         </member>
-        <member name="M:Microsoft.Diagnostics.Tracing.EventProvider.WriteEvent(Microsoft.Diagnostics.Tracing.EventDescriptor@,System.Guid*,System.Int32,System.IntPtr)">
+        <member name="T:Microsoft.Diagnostics.Tracing.ActivityTracker.ActivityInfo">
             <summary>
-            WriteEvent, method to be used by generated code on a derived class
+            An ActivityInfo represents a particular activity.   It is almost read-only.   The only
+            fields that change after creation are
+               m_lastChildID - used to generate unique IDs for the children activities and for the most part can be ignored.
+               m_stopped - indicates that this activity is dead 
+            This read-only-ness is important because an activity's  m_creator chain forms the 
+            'Path of creation' for the activity (which is also its unique ID) but is also used as
+            the 'list of live parents' which indicate of those ancestors, which are alive (if they
+            are not marked dead they are alive).   
             </summary>
-            <param name="eventDescriptor">
-            Event Descriptor for this event. 
-            </param>
-            <param name="childActivityID">
-            If this event is generating a child activity (WriteEventTransfer related activity) this is child activity
-            This can be null for events that do not generate a child activity.  
-            </param>
-            <param name="dataCount">
-            number of event descriptors 
-            </param>
-            <param name="data">
-            pointer  do the event data
-            </param>
         </member>
-        <member name="T:Microsoft.Diagnostics.Tracing.EventProvider.SessionInfo">
+        <member name="M:Microsoft.Diagnostics.Tracing.ActivityTracker.ActivityInfo.CreateActivityPathGuid(System.Guid@,System.Int32@)">
+             <summary>
+             Logically every activity Path (see Path()) that describes the activities that caused this 
+             (rooted in an activity that predates activity tracking.  
+            
+             We wish to encode this path in the Guid to the extent that we can.  Many of the paths have
+             many small numbers in them and we take advantage of this in the encoding to output as long
+             a path in the GUID as possible.   
+             
+             Because of the possibility of GUID collision, we only use 96 of the 128 bits of the GUID
+             for encoding the path.  The last 32 bits are a simple checksum (and random number) that 
+             identifies this as using the convention defined here.   
+            
+             It returns both the GUID which has the path as well as the offset that points just beyond
+             the end of the activity (so it can be appended to).  Note that if the end is in a nibble
+             (it uses nibbles instead of bytes as the unit of encoding, then it will point at the unfinished
+             byte (since the top nibble can't be zero you can determine if this is true by seeing if 
+             this byte is nonZero.   This offset is needed to efficiently create the ID for child activities. 
+             </summary>
+        </member>
+        <member name="M:Microsoft.Diagnostics.Tracing.ActivityTracker.ActivityInfo.CreateOverflowGuid(System.Guid*)">
             <summary>
-            A struct characterizing ETW sessions (identified by the etwSessionId) as
-            activity-tracing-aware or legacy. A session that's activity-tracing-aware
-            has specified one non-zero bit in the reserved range 44-47 in the 
-            'allKeywords' value it passed in for a specific EventProvider.
+            If we can't fit the activity Path into the GUID we come here.   What we do is simply
+            generate a 4 byte number (s_nextOverflowId).  Then look for an ancestor that has  
+            sufficient space for this ID.   By doing this, we preserve the fact that this activity
+            is a child (of unknown depth) from that ancestor.
             </summary>
+        </member>
+        <member name="M:Microsoft.Diagnostics.Tracing.ActivityTracker.ActivityInfo.AddIdToGuid(System.Guid*,System.Int32,System.UInt32,System.Boolean)">
+            Add the activity id 'id' to the output Guid 'outPtr' starting at the offset 'whereToAddId'
+            Thus if this number is 6 that is where 'id' will be added.    This will return 13 (12
+            is the maximum number of bytes that fit in a GUID) if the path did not fit.  
+            If 'overflow' is true, then the number is encoded as an 'overflow number (which has a
+            special (longer prefix) that indicates that this ID is allocated differently 
+        </member>
+        <member name="M:Microsoft.Diagnostics.Tracing.ActivityTracker.ActivityInfo.WriteNibble(System.Byte*@,System.Byte*,System.UInt32)">
+            <summary>
+            Write a single Nible 'value' (must be 0-15) to the byte buffer represented by *ptr.  
+            Will not go past 'endPtr'.  Also it assumes that we never write 0 so we can detect
+            whether a nibble has already been written to ptr  because it will be nonzero.   
+            Thus if it is non-zero it adds to the current byte, otherwise it advances and writes
+            the new byte (in the high bits) of the next byte.  
+            </summary>
+        </member>
+        <member name="T:Microsoft.Diagnostics.Tracing.ActivityTracker.ActivityInfo.NumberListCodes">
+            <summary>
+            The encoding for a list of numbers used to make Activity  GUIDs.   Basically
+            we operate on nibbles (which are nice because they show up as hex digits).  The
+            list is ended with a end nibble (0) and depending on the nibble value (Below)
+            the value is either encoded into nibble itself or it can spill over into the
+            bytes that follow.   
+            </summary>
+        </member>
+        <member name="T:Microsoft.Diagnostics.Tracing.TplEtwProvider">
+            <summary>
+            This is supplied by the framework.   It is has the semantics that the value is copied to any new Tasks that is created
+            by the current task.   Thus all causally related code gets this value.    Note that reads and writes to this VARIABLE 
+            (not what it points it) to this does not need to be protected by locks because it is inherently thread local (you always
+            only get your thread local copy which means that you never have races.  
+            </summary>
+            
         </member>
         <member name="T:Microsoft.Diagnostics.Tracing.EventSource">
             <summary>
             This class is meant to be inherited by a user-defined event source in order to define a managed
-            ETW provider.
+            ETW provider.   Please See DESIGN NOTES above for the internal architecture.  
             The minimal definition of an EventSource simply specifies a number of ETW event methods that
             call one of the EventSource.WriteEvent overloads, <see cref="M:Microsoft.Diagnostics.Tracing.EventSource.WriteEventCore(System.Int32,System.Int32,Microsoft.Diagnostics.Tracing.EventSource.EventData*)"/>, 
             or <see cref="M:Microsoft.Diagnostics.Tracing.EventSource.WriteEventWithRelatedActivityIdCore(System.Int32,System.Guid*,System.Int32,Microsoft.Diagnostics.Tracing.EventSource.EventData*)"/> to log them. This functionality 
@@ -676,31 +375,9 @@
             <param name="settings">See EventSourceSettings for more.</param>
             <param name="traits">A collection of key-value strings (must be an even number).</param>
         </member>
-        <member name="M:Microsoft.Diagnostics.Tracing.EventSource.Initialize(System.Guid,System.String,System.String[])">
-            <summary>
-            This method is responsible for the common initialization path from our constructors. It must
-            not leak any exceptions (otherwise, since most EventSource classes define a static member, 
-            "Log", such an exception would become a cached exception for the initialization of the static
-            member, and any future access to the "Log" would throw the cached exception).
-            </summary>
-        </member>
         <member name="M:Microsoft.Diagnostics.Tracing.EventSource.OnEventCommand(Microsoft.Diagnostics.Tracing.EventCommandEventArgs)">
             <summary>
             This method is called when the eventSource is updated by the controller.  
-            </summary>
-        </member>
-        <member name="M:Microsoft.Diagnostics.Tracing.EventSource.WriteString(System.String,Microsoft.Diagnostics.Tracing.SessionMask,System.Boolean)">
-            <summary>
-            Best effort method to notify all listeners (ETW or otherwise) of a "message" of interest.
-            Since this is a means of reporting errors (see ReportoutOfBandMessage) any failure encountered 
-            while writing the message to any one of the listeners will be silently ignored.
-            </summary>
-        </member>
-        <member name="M:Microsoft.Diagnostics.Tracing.EventSource.WriteString(System.String,System.Boolean)">
-            <summary>
-            Best effort method to notify all listeners (ETW or otherwise) of a "message" of interest.
-            Since this is a means of reporting errors (see ReportoutOfBandMessage) any failure encountered 
-            while writing the message to any one of the listeners will be silently ignored.
             </summary>
         </member>
         <member name="M:Microsoft.Diagnostics.Tracing.EventSource.WriteEventCore(System.Int32,System.Int32,Microsoft.Diagnostics.Tracing.EventSource.EventData*)">
@@ -797,6 +474,22 @@
             Finalizer for EventSource
             </summary>
         </member>
+        <member name="M:Microsoft.Diagnostics.Tracing.EventSource.Initialize(System.Guid,System.String,System.String[])">
+            <summary>
+            This method is responsible for the common initialization path from our constructors. It must
+            not leak any exceptions (otherwise, since most EventSource classes define a static member, 
+            "Log", such an exception would become a cached exception for the initialization of the static
+            member, and any future access to the "Log" would throw the cached exception).
+            </summary>
+        </member>
+        <member name="M:Microsoft.Diagnostics.Tracing.EventSource.LogEventArgsMismatches(System.Reflection.ParameterInfo[],System.Object[])">
+            <summary>
+            We expect that the arguments to the Event method and the arguments to WriteEvent match. This function 
+            checks that they in fact match and logs a warning to the debugger if they don't.
+            </summary>
+            <param name="infos"></param>
+            <param name="args"></param>
+        </member>
         <member name="M:Microsoft.Diagnostics.Tracing.EventSource.WriteStringToAllListeners(System.String,System.String)">
             <summary>
             Since this is a means of reporting errors (see ReportoutOfBandMessage) any failure encountered 
@@ -807,6 +500,14 @@
             <summary>
             Returns true if 'eventNum' is enabled if you only consider the level and matchAnyKeyword filters.
             It is possible that eventSources turn off the event based on additional filtering criteria.  
+            </summary>
+        </member>
+        <member name="M:Microsoft.Diagnostics.Tracing.EventSource.DoCommand(Microsoft.Diagnostics.Tracing.EventCommandEventArgs)">
+            <summary>
+            We want the eventSource to be fully initialized when we do commands because that way we can send 
+            error messages and other logging directly to the event stream.   Unfortunately we can get callbacks
+            when we are not fully initialized.  In that case we store them in 'commandArgs' and do them later. 
+            This helper actually does all actual command logic. 
             </summary>
         </member>
         <member name="M:Microsoft.Diagnostics.Tracing.EventSource.EnableEventForDispatcher(Microsoft.Diagnostics.Tracing.EventDispatcher,System.Int32,System.Boolean)">
@@ -845,6 +546,13 @@
             </summary>
             <param name="method">The method to probe.</param>
             <returns>The literal value or -1 if the value could not be determined. </returns>
+        </member>
+        <member name="M:Microsoft.Diagnostics.Tracing.EventSource.ReportOutOfBandMessage(System.String,System.Boolean)">
+            <summary>
+            Sends an error message to the debugger (outputDebugString), as well as the EventListeners 
+            It will do this even if the EventSource is not enabled.  
+            TODO remove flush parameter it is not used.  
+            </summary>
         </member>
         <member name="M:Microsoft.Diagnostics.Tracing.EventSource.#ctor(System.String)">
             <summary>
@@ -1006,7 +714,7 @@
             create the fields of the event.
             </param>
         </member>
-        <member name="M:Microsoft.Diagnostics.Tracing.EventSource.WriteMultiMerge(System.String,Microsoft.Diagnostics.Tracing.EventSourceOptions@,Microsoft.Diagnostics.Tracing.TraceLoggingEventTypes,System.Object[])">
+        <member name="M:Microsoft.Diagnostics.Tracing.EventSource.WriteMultiMerge(System.String,Microsoft.Diagnostics.Tracing.EventSourceOptions@,Microsoft.Diagnostics.Tracing.TraceLoggingEventTypes,System.Guid*,System.Guid*,System.Object[])">
             <summary>
             Writes an extended event, where the values of the event are the
             combined properties of any number of values. This method is
@@ -1029,13 +737,18 @@
             Must not be null. Note that the eventTypes object should be created once and
             saved. It should not be recreated for each event.
             </param>
+            <param name="activityID">
+            A pointer to the activity ID GUID to log 
+            </param>
+            <param name="childActivityID">
+            A pointer to the child activity ID to log (can be null) </param>
             <param name="values">
             The values to include in the event. Must not be null. The number and types of
             the values must match the number and types of the fields described by the
             eventTypes parameter.
             </param>
         </member>
-        <member name="M:Microsoft.Diagnostics.Tracing.EventSource.WriteMultiMergeInner(System.String,Microsoft.Diagnostics.Tracing.EventSourceOptions@,Microsoft.Diagnostics.Tracing.TraceLoggingEventTypes,System.Object[])">
+        <member name="M:Microsoft.Diagnostics.Tracing.EventSource.WriteMultiMergeInner(System.String,Microsoft.Diagnostics.Tracing.EventSourceOptions@,Microsoft.Diagnostics.Tracing.TraceLoggingEventTypes,System.Guid*,System.Guid*,System.Object[])">
             <summary>
             Writes an extended event, where the values of the event are the
             combined properties of any number of values. This method is
@@ -1060,13 +773,19 @@
             Must not be null. Note that the eventTypes object should be created once and
             saved. It should not be recreated for each event.
             </param>
+            <param name="activityID">
+            A pointer to the activity ID GUID to log 
+            </param>
+            <param name="childActivityID">
+            A pointer to the child activity ID to log (can be null)
+            </param>
             <param name="values">
             The values to include in the event. Must not be null. The number and types of
             the values must match the number and types of the fields described by the
             eventTypes parameter.
             </param>
         </member>
-        <member name="M:Microsoft.Diagnostics.Tracing.EventSource.WriteMultiMerge(System.String,Microsoft.Diagnostics.Tracing.EventSourceOptions@,Microsoft.Diagnostics.Tracing.TraceLoggingEventTypes,Microsoft.Diagnostics.Tracing.EventSource.EventData*)">
+        <member name="M:Microsoft.Diagnostics.Tracing.EventSource.WriteMultiMerge(System.String,Microsoft.Diagnostics.Tracing.EventSourceOptions@,Microsoft.Diagnostics.Tracing.TraceLoggingEventTypes,System.Guid*,System.Guid*,Microsoft.Diagnostics.Tracing.EventSource.EventData*)">
             <summary>
             Writes an extended event, where the values of the event have already
             been serialized in "data".
@@ -1086,6 +805,12 @@
             Must not be null. Note that the eventTypes object should be created once and
             saved. It should not be recreated for each event.
             </param>
+            <param name="activityID">
+            A pointer to the activity ID GUID to log 
+            </param>
+            <param name="childActivityID">
+            A pointer to the child activity ID to log (can be null)
+            </param> 
             <param name="data">
             The previously serialized values to include in the event. Must not be null.
             The number and types of the values must match the number and types of the 
@@ -1126,6 +851,11 @@
                 
             The event source constructor does not throw exceptions.  Instead we remember any exception that 
             was generated (it is also logged to Trace.WriteLine).
+            </summary>
+        </member>
+        <member name="E:Microsoft.Diagnostics.Tracing.EventSource.EventCommandExecuted">
+            <summary>
+            Fires when a Command (e.g. Enable) comes from a an EventListener.  
             </summary>
         </member>
         <member name="T:Microsoft.Diagnostics.Tracing.EventSource.EventData">
@@ -1206,11 +936,523 @@
             This class lets us hook the 'OnEventCommand' from the eventSource.  
             </summary>
         </member>
+        <member name="T:Microsoft.Diagnostics.Tracing.EventProvider">
+            <summary>
+            Only here because System.Diagnostics.EventProvider needs one more extensibility hook (when it gets a 
+            controller callback)
+            </summary>
+        </member>
+        <member name="M:Microsoft.Diagnostics.Tracing.EventProvider.Register(System.Guid)">
+            <summary>
+            This method registers the controlGuid of this class with ETW. We need to be running on
+            Vista or above. If not a PlatformNotSupported exception will be thrown. If for some 
+            reason the ETW Register call failed a NotSupported exception will be thrown. 
+            </summary>
+        </member>
+        <member name="M:Microsoft.Diagnostics.Tracing.EventProvider.Close">
+            <summary>
+            This method deregisters the controlGuid of this class with ETW.
+            
+            </summary>
+        </member>
+        <member name="M:Microsoft.Diagnostics.Tracing.EventProvider.Deregister">
+            <summary>
+            This method un-registers from ETW.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Diagnostics.Tracing.EventProvider.GetSessions">
+             <summary>
+             Determines the ETW sessions that have been added and/or removed to the set of
+             sessions interested in the current provider. It does so by (1) enumerating over all
+             ETW sessions that enabled 'this.m_Guid' for the current process ID, and (2)
+             comparing the current list with a list it cached on the previous invocation.
+            
+             The return value is a list of tuples, where the SessionInfo specifies the
+             ETW session that was added or remove, and the bool specifies whether the
+             session was added or whether it was removed from the set.
+             </summary>
+        </member>
+        <member name="M:Microsoft.Diagnostics.Tracing.EventProvider.GetSessionInfoCallback(System.Int32,System.Int64,System.Collections.Generic.List{Microsoft.Diagnostics.Tracing.EventProvider.SessionInfo}@)">
+            <summary>
+            This method is the callback used by GetSessions() when it calls into GetSessionInfo(). 
+            It updates a List{SessionInfo} based on the etwSessionId and matchAllKeywords that 
+            GetSessionInfo() passes in.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Diagnostics.Tracing.EventProvider.GetSessionInfo(System.Action{System.Int32,System.Int64})">
+            <summary>
+            This method enumerates over all active ETW sessions that have enabled 'this.m_Guid' 
+            for the current process ID, calling 'action' for each session, and passing it the
+            ETW session and the 'AllKeywords' the session enabled for the current provider.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Diagnostics.Tracing.EventProvider.IndexOfSessionInList(System.Collections.Generic.List{Microsoft.Diagnostics.Tracing.EventProvider.SessionInfo},System.Int32)">
+            <summary>
+            Returns the index of the SesisonInfo from 'sessions' that has the specified 'etwSessionId'
+            or -1 if the value is not present.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Diagnostics.Tracing.EventProvider.GetDataFromController(System.Int32,Microsoft.Win32.UnsafeNativeMethods.ManifestEtw.EVENT_FILTER_DESCRIPTOR*,Microsoft.Diagnostics.Tracing.ControllerCommand@,System.Byte[]@,System.Int32@)">
+            <summary>
+            Gets any data to be passed from the controller to the provider.  It starts with what is passed
+            into the callback, but unfortunately this data is only present for when the provider is active
+            at the time the controller issues the command.  To allow for providers to activate after the
+            controller issued a command, we also check the registry and use that to get the data.  The function
+            returns an array of bytes representing the data, the index into that byte array where the data
+            starts, and the command being issued associated with that data.  
+            </summary>
+        </member>
+        <member name="M:Microsoft.Diagnostics.Tracing.EventProvider.IsEnabled">
+            <summary>
+            IsEnabled, method used to test if provider is enabled
+            </summary>
+        </member>
+        <member name="M:Microsoft.Diagnostics.Tracing.EventProvider.IsEnabled(System.Byte,System.Int64)">
+            <summary>
+            IsEnabled, method used to test if event is enabled
+            </summary>
+            <param name="level">
+            Level  to test
+            </param>
+            <param name="keywords">
+            Keyword  to test
+            </param>
+        </member>
+        <member name="M:Microsoft.Diagnostics.Tracing.EventProvider.WriteEvent(Microsoft.Diagnostics.Tracing.EventDescriptor@,System.Guid*,System.Guid*,System.Object[])">
+            <summary>
+            WriteEvent, method to write a parameters with event schema properties
+            </summary>
+            <param name="eventDescriptor">
+            Event Descriptor for this event. 
+            </param>
+            <param name="activityID">
+            A pointer to the activity ID GUID to log 
+            </param>
+            <param name="childActivityID">
+            childActivityID is marked as 'related' to the current activity ID. 
+            </param>
+            <param name="eventPayload">
+            Payload for the ETW event. 
+            </param>
+        </member>
+        <member name="M:Microsoft.Diagnostics.Tracing.EventProvider.WriteEvent(Microsoft.Diagnostics.Tracing.EventDescriptor@,System.Guid*,System.Guid*,System.Int32,System.IntPtr)">
+            <summary>
+            WriteEvent, method to be used by generated code on a derived class
+            </summary>
+            <param name="eventDescriptor">
+            Event Descriptor for this event. 
+            </param>
+            <param name="activityID">
+            A pointer to the activity ID to log 
+            </param>
+            <param name="childActivityID">
+            If this event is generating a child activity (WriteEventTransfer related activity) this is child activity
+            This can be null for events that do not generate a child activity.  
+            </param>
+            <param name="dataCount">
+            number of event descriptors 
+            </param>
+            <param name="data">
+            pointer  do the event data
+            </param>
+        </member>
+        <member name="T:Microsoft.Diagnostics.Tracing.EventProvider.SessionInfo">
+            <summary>
+            A struct characterizing ETW sessions (identified by the etwSessionId) as
+            activity-tracing-aware or legacy. A session that's activity-tracing-aware
+            has specified one non-zero bit in the reserved range 44-47 in the 
+            'allKeywords' value it passed in for a specific EventProvider.
+            </summary>
+        </member>
         <member name="T:Microsoft.Diagnostics.Tracing.EventSource.EventMetadata">
             <summary>
             Used to hold all the static information about an event.  This includes everything in the event
             descriptor as well as some stuff we added specifically for EventSource. see the
             code:m_eventData for where we use this.  
+            </summary>
+        </member>
+        <member name="T:Microsoft.Diagnostics.Tracing.EventActivityOptions">
+            <summary>
+            EventActivityOptions flags allow to specify different activity related characteristics.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Diagnostics.Tracing.EventActivityOptions.None">
+            <summary>
+            No special options are added to the event.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Diagnostics.Tracing.EventActivityOptions.Disable">
+            <summary>
+            Disable Implicit Activity Tracking
+            </summary>
+        </member>
+        <member name="F:Microsoft.Diagnostics.Tracing.EventActivityOptions.Recursive">
+            <summary>
+            Allow activity event to call itself (directly or indirectly)
+            </summary>
+        </member>
+        <member name="F:Microsoft.Diagnostics.Tracing.EventActivityOptions.Detachable">
+            <summary>
+            Allows event activity to live beyond its parent.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Diagnostics.Tracing.EventCounter">
+            <summary>
+            Provides the ability to collect statistics through EventSource
+            </summary>
+        </member>
+        <member name="M:Microsoft.Diagnostics.Tracing.EventCounter.#ctor(System.String,Microsoft.Diagnostics.Tracing.EventSource)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Diagnostics.Tracing.EventCounter"/> class.
+            </summary>
+            <param name="name">The name.</param>
+            <param name="eventSource">The event source.</param>
+        </member>
+        <member name="M:Microsoft.Diagnostics.Tracing.EventCounter.WriteMetric(System.Single)">
+            <summary>
+            Writes the metric.
+            </summary>
+            <param name="value">The value.</param>
+        </member>
+        <member name="T:Microsoft.Diagnostics.Tracing.TraceLoggingTypeInfo`1">
+            <summary>
+            TraceLogging: used when implementing a custom TraceLoggingTypeInfo.
+            Implementations of this type provide the behaviors that TraceLogging
+            uses to turn objects into event data. TraceLogging provides default
+            implementations of this type, but custom implementations can be used
+            when the default TraceLogging implementation is insufficient.
+            </summary>
+            <typeparam name="DataType">
+            The type of object that is handled by this implementation.
+            </typeparam>
+        </member>
+        <member name="T:Microsoft.Diagnostics.Tracing.TraceLoggingTypeInfo">
+            <summary>
+            TraceLogging: used when implementing a custom TraceLoggingTypeInfo.
+            Non-generic base class for TraceLoggingTypeInfo&lt;DataType>. Do not derive
+            from this class. Instead, derive from TraceLoggingTypeInfo&lt;DataType>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Diagnostics.Tracing.TraceLoggingTypeInfo.WriteMetadata(Microsoft.Diagnostics.Tracing.TraceLoggingMetadataCollector,System.String,Microsoft.Diagnostics.Tracing.EventFieldFormat)">
+            <summary>
+            When overridden by a derived class, writes the metadata (schema) for
+            this type. Note that the sequence of operations in WriteMetadata should be
+            essentially identical to the sequence of operations in
+            WriteData/WriteObjectData. Otherwise, the metadata and data will not match,
+            which may cause trouble when decoding the event.
+            </summary>
+            <param name="collector">
+            The object that collects metadata for this object's type. Metadata is written
+            by calling methods on the collector object. Note that if the type contains
+            sub-objects, the implementation of this method may need to call the
+            WriteMetadata method for the type of the sub-object, e.g. by calling
+            TraceLoggingTypeInfo&lt;SubType&gt;.Instance.WriteMetadata(...).
+            </param>
+            <param name="name">
+            The name of the property that contains an object of this type, or null if this
+            object is being written as a top-level object of an event. Typical usage
+            is to pass this value to collector.AddGroup.
+            </param>
+            <param name="format">
+            The format attribute for the field that contains an object of this type.
+            </param>
+        </member>
+        <member name="M:Microsoft.Diagnostics.Tracing.TraceLoggingTypeInfo.WriteObjectData(Microsoft.Diagnostics.Tracing.TraceLoggingDataCollector,System.Object)">
+            <summary>
+            Refer to TraceLoggingTypeInfo.WriteObjectData for information about this
+            method.
+            </summary>
+            <param name="collector">
+            Refer to TraceLoggingTypeInfo.WriteObjectData for information about this
+            method.
+            </param>
+            <param name="value">
+            Refer to TraceLoggingTypeInfo.WriteObjectData for information about this
+            method.
+            </param>
+        </member>
+        <member name="M:Microsoft.Diagnostics.Tracing.TraceLoggingTypeInfo.GetData(System.Object)">
+            <summary>
+            Fetches the event parameter data for internal serialization. 
+            </summary>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="P:Microsoft.Diagnostics.Tracing.TraceLoggingTypeInfo.Name">
+            <summary>
+            Gets the name to use for the event if this type is the top-level type,
+            or the name to use for an implicitly-named field.
+            Never null.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Diagnostics.Tracing.TraceLoggingTypeInfo.Level">
+            <summary>
+            Gets the event level associated with this type. Any value in the range 0..255
+            is an associated event level. Any value outside the range 0..255 is invalid and
+            indicates that this type has no associated event level.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Diagnostics.Tracing.TraceLoggingTypeInfo.Opcode">
+            <summary>
+            Gets the event opcode associated with this type. Any value in the range 0..255
+            is an associated event opcode. Any value outside the range 0..255 is invalid and
+            indicates that this type has no associated event opcode.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Diagnostics.Tracing.TraceLoggingTypeInfo.Keywords">
+            <summary>
+            Gets the keyword(s) associated with this type.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Diagnostics.Tracing.TraceLoggingTypeInfo.Tags">
+            <summary>
+            Gets the event tags associated with this type.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Diagnostics.Tracing.TraceLoggingTypeInfo`1.#ctor">
+            <summary>
+            Initializes a new instance of the TraceLoggingTypeInfo class with
+            default settings. Uses typeof(DataType).Name for EventName and FieldName.
+            Marks Level and Opcode as unset. Sets Keywords and Traits to 0.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Diagnostics.Tracing.TraceLoggingTypeInfo`1.#ctor(System.String,Microsoft.Diagnostics.Tracing.EventLevel,Microsoft.Diagnostics.Tracing.EventOpcode,Microsoft.Diagnostics.Tracing.EventKeywords,Microsoft.Diagnostics.Tracing.EventTags)">
+            <summary>
+            Initializes a new instance of the TraceLoggingTypeInfo class, using
+            the specified values for the EventName, Level, Opcode, Keywords,
+            FieldName, and Traits properties.
+            </summary>
+            <param name="name">
+            The value for the Name property. Must not contain '\0' characters.
+            Must not be null.
+            </param>
+            <param name="level">
+            The value for the Level property, or -1 to mark Level as unset.
+            </param>
+            <param name="opcode">
+            The value for the Opcode property, or -1 to mark Opcode as unset.
+            </param>
+            <param name="keywords">
+            The value for the Keywords property.
+            </param>
+            <param name="tags">
+            The value for the Tags property.
+            </param>
+        </member>
+        <member name="M:Microsoft.Diagnostics.Tracing.TraceLoggingTypeInfo`1.WriteData(Microsoft.Diagnostics.Tracing.TraceLoggingDataCollector,`0@)">
+            <summary>
+            When overridden by a derived class, writes the data (fields) for an instance
+            of DataType. Note that the sequence of operations in WriteData should be
+            essentially identical to the sequence of operations in WriteMetadata. Otherwise,
+            the metadata and data will not match, which may cause trouble when decoding the
+            event.
+            </summary>
+            <param name="collector">
+            The object that collects the data for the instance. Data is written by calling
+            methods on the collector object. Note that if the type contains sub-objects,
+            the implementation of this method may need to call the WriteData method
+            for the sub-object, e.g. by calling
+            TraceLoggingTypeInfo&lt;SubType&gt;.Instance.WriteData(...).
+            </param>
+            <param name="value">
+            The value for which data is to be written.
+            </param>
+        </member>
+        <member name="M:Microsoft.Diagnostics.Tracing.TraceLoggingTypeInfo`1.WriteObjectData(Microsoft.Diagnostics.Tracing.TraceLoggingDataCollector,System.Object)">
+            <summary>
+            When overridden in a derived class, writes the data (fields) for an instance
+            of DataType. The default implementation of WriteObjectData calls
+            WriteData(collector, (DataType)value). Normally, you will override WriteData
+            and not WriteObjectData. However, if your implementation of WriteData has to
+            cast the value to object, it may be more efficient to reverse this calling
+            pattern, i.e. to implement WriteObjectData, and then implement WriteData as a
+            call to WriteObjectData.
+            </summary>
+            <param name="collector">
+            The object that collects the data for the instance. Data is written by calling
+            methods on the collector object. Note that if the type contains sub-objects,
+            the implementation of this method may need to call the WriteData method
+            for the sub-object, e.g. by calling
+            TraceLoggingTypeInfo&lt;SubType&gt;.Instance.WriteData(...).
+            </param>
+            <param name="value">
+            The value for which data is to be written. Note that this value may be null
+            (even for value types) if the property from which the value was read is
+            missing or null.
+            </param>
+        </member>
+        <member name="P:Microsoft.Diagnostics.Tracing.TraceLoggingTypeInfo`1.Instance">
+            <summary>
+            Gets the type info that will be used for handling instances of
+            DataType. If the instance has not already been set, this will
+            call TrySetInstance(automaticSerializer) to set one, where
+            automaticSerializer is the value returned from CreateDefault(),
+            or a do-nothing serializer if CreateDefault() fails.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Diagnostics.Tracing.ConcurrentSet`2">
+            <summary>
+            TraceLogging: A very simple lock-free add-only dictionary.
+            Warning: this is a copy-by-value type. Copying performs a snapshot.
+            Accessing a readonly field always makes a copy of the field, so the
+            GetOrAdd method will not work as expected if called on a readonly field.
+            </summary>
+            <typeparam name="KeyType">
+            The type of the key, used for TryGet.
+            </typeparam>
+            <typeparam name="ItemType">
+            The type of the item, used for GetOrAdd.
+            </typeparam>
+        </member>
+        <member name="T:Microsoft.Diagnostics.Tracing.ConcurrentSetItem`2">
+            <summary>
+            TraceLogging: Abstract base class that must be inherited by items in a
+            ConcurrentSet.
+            </summary>
+            <typeparam name="KeyType">Type of the set's key.</typeparam>
+            <typeparam name="ItemType">Type of the derived class.</typeparam>
+        </member>
+        <member name="T:Microsoft.Diagnostics.Tracing.DataCollector">
+            <summary>
+            TraceLogging: This is the implementation of the DataCollector
+            functionality. To enable safe access to the DataCollector from
+            untrusted code, there is one thread-local instance of this structure
+            per thread. The instance must be Enabled before any data is written to
+            it. The instance must be Finished before the data is passed to
+            EventWrite. The instance must be Disabled before the arrays referenced
+            by the pointers are freed or unpinned.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Diagnostics.Tracing.DataCollector.Finish">
+            <summary>
+            Completes the list of scalars. Finish must be called before the data
+            descriptor array is passed to EventWrite.
+            </summary>
+            <returns>
+            A pointer to the next unused data descriptor, or datasEnd if they were
+            all used. (Descriptors may be unused if a string or array was null.)
+            </returns>
+        </member>
+        <member name="M:Microsoft.Diagnostics.Tracing.DataCollector.BeginBufferedArray">
+            <summary>
+            Marks the start of a non-blittable array or enumerable.
+            </summary>
+            <returns>Bookmark to be passed to EndBufferedArray.</returns>
+        </member>
+        <member name="M:Microsoft.Diagnostics.Tracing.DataCollector.EndBufferedArray(System.Int32,System.Int32)">
+            <summary>
+            Marks the end of a non-blittable array or enumerable.
+            </summary>
+            <param name="bookmark">The value returned by BeginBufferedArray.</param>
+            <param name="count">The number of items in the array.</param>
+        </member>
+        <member name="M:Microsoft.Diagnostics.Tracing.DataCollector.BeginBuffered">
+            <summary>
+            Marks the start of dynamically-buffered data.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Diagnostics.Tracing.DataCollector.EndBuffered">
+            <summary>
+            Marks the end of dynamically-buffered data.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Diagnostics.Tracing.EmptyStruct">
+            <summary>
+            TraceLogging: Empty struct indicating no payload data.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Diagnostics.Tracing.EnumHelper`1">
+            <summary>
+            Provides support for casting enums to their underlying type
+            from within generic context.
+            </summary>
+            <typeparam name="UnderlyingType">
+            The underlying type of the enum.
+            </typeparam>
+        </member>
+        <member name="T:Microsoft.Diagnostics.Tracing.EventPayload">
+            <summary>
+            EventPayload class holds the list of parameters and their corresponding values for user defined types passed to 
+            EventSource APIs.
+            Preserving the order of the elements as they were found inside user defined types is the most important characteristic of this class.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Diagnostics.Tracing.SimpleEventTypes`1">
+            <summary>
+            TraceLogging: Contains the metadata needed to emit an event, optimized
+            for events with one top-level compile-time-typed payload object.
+            </summary>
+            <typeparam name="T">
+            Type of the top-level payload object. Should be EmptyStruct if the
+            event has no payload.
+            </typeparam>
+        </member>
+        <member name="T:Microsoft.Diagnostics.Tracing.TraceLoggingEventTypes">
+            <summary>
+            TraceLogging: Used when calling EventSource.WriteMultiMerge.
+            Stores the type information to use when writing the event fields.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Diagnostics.Tracing.TraceLoggingEventTypes.#ctor(System.String,Microsoft.Diagnostics.Tracing.EventTags,System.Type[])">
+            <summary>
+            Initializes a new instance of TraceLoggingEventTypes corresponding
+            to the name, flags, and types provided. Always uses the default
+            TypeInfo for each Type.
+            </summary>
+            <param name="name">
+            The name to use when the name parameter passed to
+            EventSource.Write is null. This value must not be null.
+            </param>
+            <param name="tags">
+            Tags to add to the event if the tags are not set via options.
+            </param>
+            <param name="types">
+            The types of the fields in the event. This value must not be null.
+            </param>
+        </member>
+        <member name="M:Microsoft.Diagnostics.Tracing.TraceLoggingEventTypes.#ctor(System.String,Microsoft.Diagnostics.Tracing.EventTags,Microsoft.Diagnostics.Tracing.TraceLoggingTypeInfo[])">
+            <summary>
+            Returns a new instance of TraceLoggingEventInfo corresponding to the name,
+            flags, and typeInfos provided.
+            </summary>
+            <param name="name">
+            The name to use when the name parameter passed to
+            EventSource.Write is null. This value must not be null.
+            </param>
+            <param name="tags">
+            Tags to add to the event if the tags are not set via options.
+            </param>
+            <param name="typeInfos">
+            The types of the fields in the event. This value must not be null.
+            </param>
+            <returns>
+            An instance of TraceLoggingEventInfo with DefaultName set to the specified name
+            and with the specified typeInfos.
+            </returns>
+        </member>
+        <member name="P:Microsoft.Diagnostics.Tracing.TraceLoggingEventTypes.Name">
+            <summary>
+            Gets the default name that will be used for events with this descriptor.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Diagnostics.Tracing.TraceLoggingEventTypes.Level">
+            <summary>
+            Gets the default level that will be used for events with this descriptor.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Diagnostics.Tracing.TraceLoggingEventTypes.Opcode">
+            <summary>
+            Gets the default opcode that will be used for events with this descriptor.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Diagnostics.Tracing.TraceLoggingEventTypes.Keywords">
+            <summary>
+            Gets the default set of keywords that will added to events with this descriptor.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Diagnostics.Tracing.TraceLoggingEventTypes.Tags">
+            <summary>
+            Gets the default tags that will be added events with this descriptor.
             </summary>
         </member>
         <member name="T:Microsoft.Diagnostics.Tracing.EventSourceSettings">
@@ -1344,6 +1586,15 @@
             This call never has an effect on other EventListeners.      
             </summary>
         </member>
+        <member name="M:Microsoft.Diagnostics.Tracing.EventListener.EventSourceIndex(Microsoft.Diagnostics.Tracing.EventSource)">
+            <summary>
+            EventSourceIndex is small non-negative integer (suitable for indexing in an array)
+            identifying EventSource. It is unique per-appdomain. Some EventListeners might find
+            it useful to store additional information about each eventSource connected to it,
+            and EventSourceIndex allows this extra information to be efficiently stored in a
+            (growable) array (eg List(T)).
+            </summary>
+        </member>
         <member name="M:Microsoft.Diagnostics.Tracing.EventListener.OnEventSourceCreated(Microsoft.Diagnostics.Tracing.EventSource)">
             <summary>
             This method is called whenever a new eventSource is 'attached' to the dispatcher.
@@ -1364,15 +1615,7 @@
             This method is called whenever an event has been written by a EventSource for which 
             the EventListener has enabled events.  
             </summary>
-        </member>
-        <member name="M:Microsoft.Diagnostics.Tracing.EventListener.EventSourceIndex(Microsoft.Diagnostics.Tracing.EventSource)">
-            <summary>
-            EventSourceIndex is small non-negative integer (suitable for indexing in an array)
-            identifying EventSource. It is unique per-appdomain. Some EventListeners might find
-            it useful to store additional information about each eventSource connected to it,
-            and EventSourceIndex allows this extra information to be efficiently stored in a
-            (growable) array (eg List(T)).
-            </summary>
+            <param name="eventData"></param>
         </member>
         <member name="M:Microsoft.Diagnostics.Tracing.EventListener.AddEventSource(Microsoft.Diagnostics.Tracing.EventSource)">
             <summary>
@@ -1415,6 +1658,36 @@
             to filter those out.  
             </summary>
         </member>
+        <member name="F:Microsoft.Diagnostics.Tracing.EventListener.s_CreatingListener">
+            <summary>
+            Used to disallow reentrancy.  
+            </summary>
+        </member>
+        <member name="F:Microsoft.Diagnostics.Tracing.EventListener.s_EventSourceShutdownRegistered">
+            <summary>
+            Used to register AD/Process shutdown callbacks.
+            </summary>
+        </member>
+        <member name="E:Microsoft.Diagnostics.Tracing.EventListener.EventSourceCreated">
+            <summary>
+            This event is raised whenever a new eventSource is 'attached' to the dispatcher.
+            This can happen for all existing EventSources when the EventListener is created
+            as well as for any EventSources that come into existence after the EventListener
+            has been created.
+            
+            These 'catch up' events are called during the construction of the EventListener.
+            Subclasses need to be prepared for that.
+            
+            In a multi-threaded environment, it is possible that 'EventSourceEventWrittenCallback' 
+            events for a particular eventSource to occur BEFORE the EventSourceCreatedCallback is issued.
+            </summary>
+        </member>
+        <member name="E:Microsoft.Diagnostics.Tracing.EventListener.EventWritten">
+            <summary>
+            This event is raised whenever an event has been written by a EventSource for which 
+            the EventListener has enabled events.  
+            </summary>
+        </member>
         <member name="P:Microsoft.Diagnostics.Tracing.EventListener.EventListenersLock">
             <summary>
             Gets a global lock that is intended to protect the code:s_Listeners linked list and the
@@ -1451,6 +1724,16 @@
             Gets the arguments for the callback.
             </summary>
         </member>
+        <member name="T:Microsoft.Diagnostics.Tracing.EventSourceCreatedEventArgs">
+            <summary>
+            EventSourceCreatedEventArgs is passed to <see cref="E:Microsoft.Diagnostics.Tracing.EventListener.EventSourceCreated"/>
+            </summary>
+        </member>
+        <member name="P:Microsoft.Diagnostics.Tracing.EventSourceCreatedEventArgs.EventSource">
+            <summary>
+            The EventSource that is attaching to the listener.
+            </summary>
+        </member>
         <member name="T:Microsoft.Diagnostics.Tracing.EventWrittenEventArgs">
             <summary>
             EventWrittenEventArgs is passed to the user-provided override for
@@ -1482,6 +1765,11 @@
             Gets the payload for the event.
             </summary>
         </member>
+        <member name="P:Microsoft.Diagnostics.Tracing.EventWrittenEventArgs.PayloadNames">
+            <summary>
+            Gets the payload argument names.
+            </summary>
+        </member>
         <member name="P:Microsoft.Diagnostics.Tracing.EventWrittenEventArgs.EventSource">
             <summary>
             Gets the event source object.
@@ -1506,7 +1794,6 @@
             <summary>
             Any provider/user defined options associated with the event.  
             </summary>
-            TODO FIX NOW expose this
         </member>
         <member name="P:Microsoft.Diagnostics.Tracing.EventWrittenEventArgs.Message">
             <summary>
@@ -1612,6 +1899,11 @@
             <summary>
             User defined options associated with the event.  These do not have meaning to the EventSource but
             are passed through to listeners which given them semantics.  
+            </summary>
+        </member>
+        <member name="P:Microsoft.Diagnostics.Tracing.EventAttribute.ActivityOptions">
+            <summary>
+            Allows fine control over the Activity IDs generated by start and stop events
             </summary>
         </member>
         <member name="T:Microsoft.Diagnostics.Tracing.NonEventAttribute">
@@ -1879,6 +2171,12 @@
             <summary>
             TraceLogging: Stores the metadata and event identifier corresponding
             to a tracelogging event type+name+tags combination.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Diagnostics.Tracing.NameInfo.ReserveEventIDsBelow(System.Int32)">
+            <summary>
+            Insure that eventIds strictly less than 'eventId' will not be
+            used by the SelfDescribing events.   
             </summary>
         </member>
         <member name="T:Microsoft.Diagnostics.Tracing.PropertyAccessor`1">
@@ -3015,18 +3313,6 @@
             <summary>
             Gets or sets the flags for an event. These flags are ignored by ETW,
             but can have meaning to the event consumer.
-            Note that the Flags attribute can bubble-up, i.e. if a type contains a
-            sub-object (a field or property), and the sub-object's type has a
-            TraceLoggingEvent attribute, the Flags from the sub-object's attribute can
-            affect the event.
-            Example: for EventSource.Write(name, options, data), the flags for the
-            event will be determined as follows:
-            
-            eventFlags = None;
-            if (data.GetType() has a TraceLoggingEvent attribute)
-                eventFlags |= attribute.Flags;
-            if (a field/property contained in data has a TraceLoggingEvent attribute)
-                eventFlags |= attribute.Flags;
             </summary>
         </member>
         <member name="T:Microsoft.Diagnostics.Tracing.EventTags">
@@ -3268,9 +3554,22 @@
             unset, the event's tags will be 0.
             </summary>
         </member>
+        <member name="P:Microsoft.Diagnostics.Tracing.EventSourceOptions.ActivityOptions">
+            <summary>
+            Gets or sets the activity options for this specified events. If this property is
+            unset, the event's activity options will be 0.
+            </summary>
+        </member>
         <member name="T:Microsoft.Diagnostics.Tracing.TypeAnalysis">
             <summary>
             TraceLogging: stores the per-type information obtained by reflecting over a type.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Win32.UnsafeNativeMethods.ManifestEtw.EventWriteTransferWrapper(System.Int64,Microsoft.Diagnostics.Tracing.EventDescriptor@,System.Guid*,System.Guid*,System.Int32,Microsoft.Diagnostics.Tracing.EventProvider.EventData*)">
+            <summary>
+             Call the ETW native API EventWriteTransfer and checks for invalid argument error. 
+             The implementation of EventWriteTransfer on some older OSes (Windows 2008) does not accept null relatedActivityId.
+             So, for these cases we will retry the call with an empty Guid.
             </summary>
         </member>
         <member name="T:Microsoft.Diagnostics.Tracing.EventLevel">
@@ -3413,11 +3712,6 @@
         <member name="F:Microsoft.Diagnostics.Tracing.EventKeywords.All">
             <summary>
             All Events 
-            </summary>
-        </member>
-        <member name="F:Microsoft.Diagnostics.Tracing.EventKeywords.MicrosoftTelemetry">
-            <summary>
-            Telemetry events
             </summary>
         </member>
         <member name="F:Microsoft.Diagnostics.Tracing.EventKeywords.WdiContext">

@@ -19,6 +19,9 @@
             combination of type and key. This file data store stores a JSON format of the specified object.
             </summary>
         </member>
+        <member name="P:Google.Apis.Util.Store.FileDataStore.FolderPath">
+            <summary>Gets the full folder path.</summary>
+        </member>
         <member name="M:Google.Apis.Util.Store.FileDataStore.#ctor(System.String,System.Boolean)">
             <summary>
             Constructs a new file data store. If <c>fullPath</c> is <c>false</c> the path will be used as relative to 
@@ -66,9 +69,6 @@
             <summary>Creates a unique stored key based on the key and the class type.</summary>
             <param name="key">The object key.</param>
             <param name="t">The type to store or retrieve.</param>
-        </member>
-        <member name="P:Google.Apis.Util.Store.FileDataStore.FolderPath">
-            <summary>Gets the full folder path.</summary>
         </member>
     </members>
 </doc>

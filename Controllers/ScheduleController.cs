@@ -420,7 +420,7 @@ namespace TilerFront.Controllers
             Location_Elements location;
             if(UserData.IsInitialized)
             {
-                location = new Location_Elements(UserData.Latitude, UserData.Longitude,"","",false,1);
+                location = new Location_Elements(UserData.Latitude, UserData.Longitude,"","",false,false);
             }
             else
             {
@@ -908,6 +908,7 @@ namespace TilerFront.Controllers
                 else
 #endif
                 {
+                    myUser.ScheduleLogControl.updateNewLocation(EventLocation);
                     DB_UserActivity activity = new DB_UserActivity(myNow, UserActivity.ActivityType.NewEventCreation);
                     JObject json = JObject.FromObject(newEvent);
                     activity.updateMiscelaneousInfo(json.ToString());
@@ -986,8 +987,8 @@ namespace TilerFront.Controllers
             string EndMonth = newEvent.EndMonth; ;
             string EndYear = newEvent.EndYear; ;
 
-            string LocationAddress = newEvent.LocationAddress; ;
-            string LocationTag = newEvent.LocationTag; ;
+            string LocationAddress = string.IsNullOrEmpty( newEvent.LocationAddress)?"": newEvent.LocationAddress;
+            string LocationTag = LocationAddress = string.IsNullOrEmpty(newEvent.LocationTag) ? "" : newEvent.LocationTag;
             string Name = newEvent.Name; ;
 
             string RepeatData = newEvent.RepeatData; ;
