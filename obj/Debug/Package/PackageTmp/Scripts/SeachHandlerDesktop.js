@@ -1,6 +1,5 @@
 ﻿function ActivateUserSearch(e)
 {
-    //    debugger;
     e.stopPropagation();
     var SearchInput = getDomOrCreateNew("SearchBarInput");
     var SearchContainer = getDomOrCreateNew("SearchBarAndContentContainer");
@@ -246,6 +245,7 @@ function CallBackFunctionForReturnedValuesDesktop(data, DomContainer) {
         $(MyIconSet.getCloseButton()).addClass("setAsDisplayNone");
         $(MyIconSet.getLocationButton()).addClass("setAsDisplayNone");
         $(MyIconSet.getProcrastinateButton()).addClass("setAsDisplayNone");
+        $(MyIconSet.getPauseResumeButton()).addClass("setAsDisplayNone");
         
         var DeleteButton = MyIconSet.getDeleteButton();
         DeleteButton.onclick = function () { DeleteTrigger(DoNowButtonOfSearchedEventContainer, MyCalendarEVent, function () { }) }

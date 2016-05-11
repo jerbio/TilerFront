@@ -1,4 +1,4 @@
-﻿"use strict"
+"use strict"
 var NumberOfDom = 0;
 function getSearchOverlay()
 {
@@ -10,6 +10,7 @@ function getSearchOverlay()
 }
 
 function CallBackFunctionForReturnedValues(data, DomContainer) {
+    debugger;
     var EventIndex = 0;
     var HeightOfDom = 50;
 
