@@ -11,6 +11,7 @@ using DBTilerElement;
 using TilerElements;
 using System.Threading.Tasks;
 using System.IO.Compression;
+using System.Xml.Serialization;
 
 #if ForceReadFromXml
 #else
@@ -38,6 +39,7 @@ namespace TilerFront
         protected Location_Elements DefaultLocation= new Location_Elements();
         protected Location_Elements NewLocation;
         protected DB_UserActivity activity;
+        Dictionary<string, Func<XmlNode, Reason>> createDictionaryOfOPtionToFunction;
 
 
 #if ForceReadFromXml
@@ -67,6 +69,13 @@ namespace TilerFront
             LocationSearcher = new LocationSearchHandler();
 #endif
             Dictionary<string, Location_Elements> CachedLocation = new Dictionary<string, Location_Elements>();
+
+            createDictionaryOfOPtionToFunction = new Dictionary<string, Func<XmlNode, Reason>>
+            {
+                {Reason.Options.BestFit.ToString(),(XmlNode node)=> { return  getBestFitReason(node); } },
+                {Reason.Options.PreservedOrder.ToString(),(XmlNode node)=> { return  getPreservedOrderReason(node); } },
+                {Reason.Options.Weather.ToString(), (XmlNode node)=> { return  getWeatherReason(node); } }
+            };
         }
 
 
@@ -491,7 +500,7 @@ namespace TilerFront
                     }
                 }
             }
-            catch
+            catch(Exception e)
             {
                 EventSchedulesNodesNode.InnerXml = EventSchedulesNodesNodeCpy.InnerXml;
                 errorWritingFile = true;
@@ -947,6 +956,8 @@ namespace TilerFront
             MyEventSubScheduleNode.ChildNodes[0].InnerXml = createMiscDataNode(MySubEvent.Notes, "MiscData").InnerXml;
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("ConflictProfile"));
             MyEventSubScheduleNode.ChildNodes[0].InnerXml = CreateConflictProfile(MySubEvent.Conflicts, "ConflictProfile").InnerXml;
+            MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("TimePositionReasons"));
+            MyEventSubScheduleNode.ChildNodes[0].InnerXml = ReasonForPosition(MySubEvent.ReasonsForPosiition.SelectMany(obj => obj.Value).ToList(), "TimePositionReasons").InnerXml;
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("Restricted"));
             MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.isEventRestricted.ToString();
             MyEventSubScheduleNode.PrependChild(CreatePauseUsedUpNode(MySubEvent, xmldoc));
@@ -969,7 +980,7 @@ namespace TilerFront
         /// <returns></returns>
         public XmlElement CreatePauseUsedUpNode(SubCalendarEvent SubEvent, XmlDocument xmldoc)
         {
-            
+
 
             XmlElement UsedUpTime = xmldoc.CreateElement("UsedUpTime");
             XmlElement PauseTime = xmldoc.CreateElement("PauseTime");
@@ -980,6 +991,17 @@ namespace TilerFront
             RetValue.AppendChild(PauseTime);
 
             return RetValue;
+        }
+        public XmlElement ReasonForPosition(List<Reason> reasons, string ElementIdentifier= "TimePositionReasons") {
+            XmlSerializer serializer = new XmlSerializer(typeof(List<Reason>));
+            XmlDocument xmldoc = new XmlDocument();
+            XmlElement retValue = xmldoc.CreateElement(ElementIdentifier);
+            using (XmlWriter writer = xmldoc.CreateNavigator().AppendChild())
+            {
+                serializer.Serialize(writer, reasons);
+            }
+            retValue.InnerXml = xmldoc.FirstChild.InnerXml;
+            return retValue;
         }
 
         public XmlElement CreateLocationNode(Location_Elements Arg1, string Identifier = "Location")
@@ -1393,7 +1415,7 @@ namespace TilerFront
                     {
                         RetrievedEvent = getCalendarEventObjFromNode(EventScheduleNode, RangeOfLookUP);
                     }
-                    catch
+                    catch(Exception e)
                     {
                         RetrievedEvent = new CalendarEvent();
                     }
@@ -1559,6 +1581,59 @@ namespace TilerFront
             return RetrievedEvent;
         }
         
+        public WeatherReason getWeatherReason(XmlNode ReasonNode)
+        {
+            //DBWeatherReason retValue = new DBWeatherReason();
+            MemoryStream stm = new MemoryStream();
+
+            StreamWriter stw = new StreamWriter(stm);
+            stw.Write(ReasonNode.OuterXml);
+            stw.Flush();
+
+            stm.Position = 0;
+            XmlRootAttribute xRoot = new XmlRootAttribute();
+            xRoot.ElementName = ReasonNode.Name;
+            xRoot.IsNullable = true;
+            XmlSerializer ser = new XmlSerializer(typeof(WeatherReason), xRoot);
+            WeatherReason result = (ser.Deserialize(stm) as WeatherReason);
+
+            return result;
+        }
+
+        public BestFitReason getBestFitReason(XmlNode ReasonNode)
+        {
+            MemoryStream stm = new MemoryStream();
+            StreamWriter stw = new StreamWriter(stm);
+            stw.Write(ReasonNode.OuterXml);
+            stw.Flush();
+
+            stm.Position = 0;
+            XmlRootAttribute xRoot = new XmlRootAttribute();
+            xRoot.ElementName = ReasonNode.Name;
+            xRoot.IsNullable = true;
+            XmlSerializer ser = new XmlSerializer(typeof(BestFitReason), xRoot);
+            BestFitReason result = (ser.Deserialize(stm) as BestFitReason);
+
+            return result;
+        }
+
+        public PreservedOrder getPreservedOrderReason(XmlNode ReasonNode)
+        {
+            MemoryStream stm = new MemoryStream();
+            StreamWriter stw = new StreamWriter(stm);
+            stw.Write(ReasonNode.OuterXml);
+            stw.Flush();
+
+            stm.Position = 0;
+            XmlRootAttribute xRoot = new XmlRootAttribute();
+            xRoot.ElementName = ReasonNode.Name;
+            xRoot.IsNullable = true;
+            XmlSerializer ser = new XmlSerializer(typeof(PreservedOrder), xRoot);
+            PreservedOrder result = (ser.Deserialize(stm) as PreservedOrder);
+
+            return result;
+        }
+
         Procrastination generateProcrastinationObject(XmlNode ReferenceNode)
         {
             XmlNode ProcrastinationProfileNode = ReferenceNode.SelectSingleNode("ProcrastinationProfile");
@@ -1638,9 +1713,27 @@ namespace TilerFront
                     }
                 }
                 MyArrayOfNodes.Add(retrievedSubEvent);
+                createReasonObjects(retrievedSubEvent, MyXmlNode.ChildNodes[i]);
+            }
+            
+            return MyArrayOfNodes;
+        }
+        
+        void createReasonObjects(dynamic subCalevent, XmlNode node)
+        {
+            node = node.SelectSingleNode("TimePositionReasons");
+            List<Reason> reasons = new List<Reason>();
+            if (node != null)
+            {
+                foreach(XmlNode eachNode in node.ChildNodes)
+                {
+                    string OPtionName = eachNode.SelectSingleNode("Option").InnerText;
+                    Reason generatedReason = createDictionaryOfOPtionToFunction[OPtionName](eachNode);
+                    reasons.Add(generatedReason);
+                }
             }
 
-            return MyArrayOfNodes;
+            subCalevent.updateReasons(reasons);
         }
 
 
@@ -1750,6 +1843,7 @@ namespace TilerFront
 
             return RetValue;
         }
+
         CalendarEvent[] getAllRepeatCalendarEvents(XmlNode RepeatEventSchedulesNode, TimeLine RangeOfLookUP)
         {
             XmlNodeList ListOfRepeatEventScheduleNode = RepeatEventSchedulesNode.ChildNodes;
