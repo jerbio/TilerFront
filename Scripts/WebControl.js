@@ -1718,7 +1718,7 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
         var RestrictionEnd = "12:00am"
         var isWorkWeek = false;
         var isEveryDay = false;
-        var RestrictiveWeek = RestrictionData.RestrictiveWeek;
+        var RestrictiveWeek = null
 
         if ((RestrictionData != null)&&(!rigidFlag))
         {
@@ -1729,8 +1729,8 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
                 RestrictionEnd = RestrictionData.End;
                 isWorkWeek = RestrictionData.isWorkWeek;
                 isEveryDay = RestrictionData.isEveryDay;
-                //RestrictiveWeek = RestrictionData.RestrictiveWeek;
             }
+            RestrictiveWeek = RestrictionData.RestrictiveWeek;
         }
 
 
