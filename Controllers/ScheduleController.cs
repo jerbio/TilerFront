@@ -15,6 +15,8 @@ using System.Collections.Concurrent;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 //using System.Web.Http.Cors;
+using Microsoft.AspNet.Identity;
+using System.Data.Entity;
 
 namespace TilerFront.Controllers
 {
@@ -184,30 +186,59 @@ namespace TilerFront.Controllers
         public async Task<IHttpActionResult> PauseSchedule([FromBody]getEventModel myAuthorizedUser)
         {
             ApplicationDbContext db = new ApplicationDbContext();
+            List<PausedEvent> pausedEvents = getCurrentPausedEventAndPausedEventWithId(db, myAuthorizedUser.EventID);
+            PausedEvent currentPausedEvent = pausedEvents.FirstOrDefault(obj => !obj.isPauseDeleted);
+            
+            string currentPausedEventId;
+            if(currentPausedEvent == null)
+            {
+                currentPausedEventId = "";
+            }
+            else
+            {
+                currentPausedEventId = currentPausedEvent.EventId;
+                currentPausedEvent.isPauseDeleted = true;
+                db.Entry(currentPausedEvent).State = EntityState.Modified;
+            }
+
             UserAccountDirect myUser = await myAuthorizedUser.getUserAccountDirect();
             await myUser.Login();
             DateTimeOffset myNow = DateTimeOffset.UtcNow;
             My24HourTimerWPF.Schedule MySchedule = new My24HourTimerWPF.Schedule(myUser, myNow);
-            DB_UserActivity activity = new DB_UserActivity(myAuthorizedUser.getRefNow(), UserActivity.ActivityType.Pause);
+            SubCalendarEvent SubEvent = MySchedule.getSubCalendarEvent(myAuthorizedUser.EventID);
+            if ((!SubEvent.Rigid) && (SubEvent.ID != currentPausedEvent.EventId))
+            { 
+                DB_UserActivity activity = new DB_UserActivity(myAuthorizedUser.getRefNow(), UserActivity.ActivityType.Pause);
 
-            JObject json = JObject.FromObject(myAuthorizedUser);
-            activity.updateMiscelaneousInfo(json.ToString());
+                JObject json = JObject.FromObject(myAuthorizedUser);
+                activity.updateMiscelaneousInfo(json.ToString());
 
-            myUser.ScheduleLogControl.updateUserActivty(activity);
-            await MySchedule.PauseEvent(myAuthorizedUser.EventID);
-            PostBackData myPostData = new PostBackData("\"Success\"", 0);
-
+                myUser.ScheduleLogControl.updateUserActivty(activity);
+                await MySchedule.PauseEvent(myAuthorizedUser.EventID, currentPausedEventId);
+                
             
-            PausedEvent paused = new PausedEvent() { };
-            paused.EventId = myAuthorizedUser.EventID;
-            paused.isPauseDeleted = false;
-            paused.User = db.Users.Find(myAuthorizedUser.UserID);
-            paused.PauseTime = myNow;
 
-            db.PausedEvents.Add(paused);
-            await db.SaveChangesAsync();
-
-
+                PausedEvent paused;
+                PausedEvent InstanceOfPausedEventAlreadyInDb = pausedEvents.FirstOrDefault(obj => obj.EventId == myAuthorizedUser.EventID);
+                
+                if (InstanceOfPausedEventAlreadyInDb == null)
+                {
+                    paused = new PausedEvent() { };
+                    paused.EventId = myAuthorizedUser.EventID;
+                    paused.isPauseDeleted = false;
+                    paused.User = db.Users.Find(myAuthorizedUser.UserID);
+                    paused.PauseTime = myNow;
+                    db.PausedEvents.Add(paused);
+                }
+                else
+                {
+                    InstanceOfPausedEventAlreadyInDb.PauseTime = myNow;
+                    InstanceOfPausedEventAlreadyInDb.isPauseDeleted = false;
+                    db.Entry(InstanceOfPausedEventAlreadyInDb).State = EntityState.Modified;
+                }
+                await db.SaveChangesAsync();
+            }
+            PostBackData myPostData = new PostBackData("\"Success\"", 0);
             TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
             scheduleChangeSocket.triggerRefreshData();
             return Ok(myPostData.getPostBack);
@@ -216,35 +247,70 @@ namespace TilerFront.Controllers
         [HttpPost]
         [ResponseType(typeof(PostBackStruct))]
         [Route("api/Schedule/Event/Resume")]
-        public async Task<IHttpActionResult> ContinueSchedule([FromBody]getEventModel myAuthorizedUser)
+        public async Task<IHttpActionResult> ResumeSchedule([FromBody]getEventModel myAuthorizedUser)
         {
+
             ApplicationDbContext db = new ApplicationDbContext();
             UserAccountDirect myUser = await myAuthorizedUser.getUserAccountDirect();
-            await myUser.Login();
-            DateTimeOffset myNow = DateTimeOffset.UtcNow;
-            My24HourTimerWPF.Schedule MySchedule = new My24HourTimerWPF.Schedule(myUser, myNow);
-            DB_UserActivity activity = new DB_UserActivity(myAuthorizedUser.getRefNow(), UserActivity.ActivityType.Resume);
+            PausedEvent PausedEvent = getCurrentPausedEvent(db);
+            if (PausedEvent != null)
+            {
+                await myUser.Login();
+                DateTimeOffset myNow = DateTimeOffset.UtcNow;
+                My24HourTimerWPF.Schedule MySchedule = new My24HourTimerWPF.Schedule(myUser, myNow);
+                DB_UserActivity activity = new DB_UserActivity(myAuthorizedUser.getRefNow(), UserActivity.ActivityType.Resume);
 
-            JObject json = JObject.FromObject(myAuthorizedUser);
-            activity.updateMiscelaneousInfo(json.ToString());
-            myUser.ScheduleLogControl.updateUserActivty(activity);
-            await MySchedule.ContinueEvent(myAuthorizedUser.EventID);
+                JObject json = JObject.FromObject(myAuthorizedUser);
+                activity.updateMiscelaneousInfo(json.ToString());
+                myUser.ScheduleLogControl.updateUserActivty(activity);
+                await MySchedule.ContinueEvent(PausedEvent.EventId);
+                
+
+                PausedEvent.isPauseDeleted = true;
+                db.Entry(PausedEvent).State = EntityState.Modified;
+                await db.SaveChangesAsync();
+
+                TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
+                scheduleChangeSocket.triggerRefreshData();
+            }
+
             PostBackData myPostData = new PostBackData("\"Success\"", 0);
-
-
-            PausedEvent paused = new PausedEvent() { };
-            paused.EventId = myAuthorizedUser.EventID;
-            paused.isPauseDeleted = false;
-            paused.User = db.Users.Find(myAuthorizedUser.UserID);
-            paused.PauseTime = myNow;
-
-            db.PausedEvents.Add(paused);
-            await db.SaveChangesAsync();
-
-            TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
-            scheduleChangeSocket.triggerRefreshData();
-
             return Ok(myPostData.getPostBack);
+        }
+        /// <summary>
+        /// This contains the functionality for retrieveing the paused event from the db.
+        /// THis is supposed to be part of logcontrol.cs. This should be done after the move to an rdbms like storage
+        /// TODO: move to logcontrol.cs after switching to an rdbms db
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        PausedEvent getCurrentPausedEvent(ApplicationDbContext db, string userId = null)
+        {
+            if(string.IsNullOrEmpty(userId))
+            {
+                userId = User.Identity.GetUserId();
+            }
+            PausedEvent RetValue = db.PausedEvents.SingleOrDefault(obj => obj.UserId == userId && obj.isPauseDeleted == false);
+            return RetValue;
+        }
+        /// <summary>
+        /// Function gets you the paused event and its the paused events with the ID EventId
+        /// THis is supposed to be part of logcontrol.cs. This should be done after the move to an rdbms like storage
+        /// TODO: move to logcontrol.cs after switching to an rdbms db
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="EventId"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        List<PausedEvent> getCurrentPausedEventAndPausedEventWithId(ApplicationDbContext db, string EventId, string userId = null)
+        {
+            if (string.IsNullOrEmpty(userId))
+            {
+                userId = User.Identity.GetUserId();
+            }
+            List<PausedEvent> retValue = db.PausedEvents.Where(obj => ((obj.UserId == userId) && ((obj.isPauseDeleted == false) || (obj.EventId == EventId)))).ToList();
+            return retValue;
         }
 
 

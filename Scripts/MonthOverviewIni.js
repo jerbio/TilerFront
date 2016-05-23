@@ -862,6 +862,14 @@ function IconSet()
         return IconSetContainer;
     }
 
+    this.HidePausePauseResumeButton = function () 
+    {
+        $(PauseResumeIcon).addClass("setAsDisplayNone");
+    }
+
+    this.ShowPausePauseResumeButton = function () {
+        $(PauseResumeIcon).removeClass("setAsDisplayNone");
+    }
 
     this.switchToPauseButton = function () {
         $(PauseResumeIcon).addClass("ControlPanelPausePanelButton");
@@ -3843,11 +3851,18 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                 global_ControlPanelIconSet.switchToResumeButton();
                 PauseResumeButton.onclick = continueEvent;
                 $(ControlPanelCloseButton).addClass("setAsDisplayNone");
+                global_ControlPanelIconSet.ShowPausePauseResumeButton();
             }
             else {
                 global_ControlPanelIconSet.switchToPauseButton();
                 PauseResumeButton.onclick = pauseEvent;
                 $(ControlPanelCloseButton).addClass("setAsDisplayNone");
+                if (!SubEvent.isPauseAble) {
+                    global_ControlPanelIconSet.HidePausePauseResumeButton();
+                }
+                else {
+                    global_ControlPanelIconSet.ShowPausePauseResumeButton();
+                }
             }
 
             //continueButton.onclick = continueEvent;

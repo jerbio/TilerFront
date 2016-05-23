@@ -449,6 +449,10 @@
     <Compile Include="Migrations\201605040341293_modifiedPuaseData.Designer.cs">
       <DependentUpon>201605040341293_modifiedPuaseData.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201605230745399_addedPausedEventForeignKeyRelationship.cs" />
+    <Compile Include="Migrations\201605230745399_addedPausedEventForeignKeyRelationship.Designer.cs">
+      <DependentUpon>201605230745399_addedPausedEventForeignKeyRelationship.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -2678,6 +2682,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201605040341293_modifiedPuaseData.resx">
       <DependentUpon>201605040341293_modifiedPuaseData.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201605230745399_addedPausedEventForeignKeyRelationship.resx">
+      <DependentUpon>201605230745399_addedPausedEventForeignKeyRelationship.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
