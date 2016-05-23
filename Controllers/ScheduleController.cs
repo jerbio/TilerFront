@@ -193,6 +193,7 @@ namespace TilerFront.Controllers
             if(currentPausedEvent == null)
             {
                 currentPausedEventId = "";
+                currentPausedEvent = new PausedEvent();
             }
             else
             {
@@ -207,7 +208,7 @@ namespace TilerFront.Controllers
             My24HourTimerWPF.Schedule MySchedule = new My24HourTimerWPF.Schedule(myUser, myNow);
             SubCalendarEvent SubEvent = MySchedule.getSubCalendarEvent(myAuthorizedUser.EventID);
             if ((!SubEvent.Rigid) && (SubEvent.ID != currentPausedEvent.EventId))
-            { 
+            {
                 DB_UserActivity activity = new DB_UserActivity(myAuthorizedUser.getRefNow(), UserActivity.ActivityType.Pause);
 
                 JObject json = JObject.FromObject(myAuthorizedUser);

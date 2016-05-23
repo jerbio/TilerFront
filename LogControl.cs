@@ -84,6 +84,7 @@ namespace TilerFront
         #region Functions
         virtual async public Task Initialize()
         {
+            TilerElementExtension.CurrentTime = DateTimeOffset.UtcNow;
             Tuple<bool, string, string> VerifiedUser = LogDBDataAccess.LogIn();
             CurrentLog = "";
             if (VerifiedUser.Item1)
