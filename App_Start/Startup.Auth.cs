@@ -19,6 +19,7 @@ using Google.Apis.Plus.v1;
 using Google.Apis.Calendar.v3.Data;
 using Google.Apis.Util.Store;
 using TilerElements;
+using TilerElements.Connectors;
 using TilerElements.DB;
 
 namespace TilerFront
@@ -78,7 +79,7 @@ namespace TilerFront
                             // All data from facebook in this object. 
                             var rawUserObjectFromFacebookAsJson = context.User;
                             var myToken= context.AccessToken;
-                            context.Identity.AddClaim(new Claim("ThirdPartyType", ((int)TilerElements.ThirdPartyControl.CalendarTool.Facebook).ToString()));
+                            context.Identity.AddClaim(new Claim("ThirdPartyType", ((int)ThirdPartyControl.CalendarTool.Facebook).ToString()));
                             // Only some of the basic details from facebook 
                             // like id, username, email etc are added as claims.
                             // But you can retrieve any other details from this
@@ -105,7 +106,7 @@ namespace TilerFront
                         context.Identity.AddClaim(new Claim(ClaimTypes.Name, context.Identity.FindFirstValue(ClaimTypes.Name)));
                         context.Identity.AddClaim(new Claim(ClaimTypes.Email, context.Identity.FindFirstValue(ClaimTypes.Email)));
                         context.Identity.AddClaim(new Claim("AccessToken", context.AccessToken));
-                        context.Identity.AddClaim(new Claim("ThirdPartyType", ((int)TilerElements.ThirdPartyControl.CalendarTool.Google).ToString()));
+                        context.Identity.AddClaim(new Claim("ThirdPartyType", ((int)ThirdPartyControl.CalendarTool.Google).ToString()));
                         context.Identity.AddClaim(new Claim("ExpiryDuration", context.ExpiresIn.ToString()));
                         if (context.RefreshToken != null)
                         {

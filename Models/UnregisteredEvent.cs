@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using TilerElements;
+using TilerElements.Wpf;
+using TilerElements.DB;
 
 namespace TilerFront.Models
 {
@@ -141,7 +143,7 @@ namespace TilerFront.Models
                     else
                     {
 
-                        RestrictionTimeLine RestrictionTimeLine = new TilerElements.RestrictionTimeLine(RestrictStart, RestrictEnd);
+                        RestrictionTimeLine RestrictionTimeLine = new RestrictionTimeLine(RestrictStart, RestrictEnd);
                         retValue = new RestrictionProfile(selectedDaysOftheweek, RestrictionTimeLine);
                     }
                     return retValue;

@@ -31,6 +31,8 @@ using Google.Apis.Auth.OAuth2.Flows;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Util.Store;
 using TilerElements;
+using TilerElements.Wpf;
+using TilerElements.Connectors;
 
 namespace TilerFront.Controllers
 {
@@ -337,7 +339,7 @@ namespace TilerFront.Controllers
 
         async Task<ThirdPartyCalendarAuthenticationModel> getGoogleAuthenticationData(string TilerUSerID,string EmailID )
         {
-            Object[] Param = { TilerUSerID, EmailID, (int)TilerElements.ThirdPartyControl.CalendarTool.Google};
+            Object[] Param = { TilerUSerID, EmailID, (int)ThirdPartyControl.CalendarTool.Google};
             ThirdPartyCalendarAuthenticationModel checkingThirdPartyCalendarAuthentication = await db.ThirdPartyAuthentication.FindAsync(Param);
             return checkingThirdPartyCalendarAuthentication;
         }
@@ -541,7 +543,7 @@ namespace TilerFront.Controllers
                         double totalSeconds = myCredential.Token.ExpiresInSeconds == null ? 0 : (double)myCredential.Token.ExpiresInSeconds;
                         DateTime myDate = myCredential.Token.Issued.AddSeconds(totalSeconds);
                         thirdpartydata.Deadline = new DateTimeOffset(myDate);
-                        thirdpartydata.ProviderID = (int)TilerElements.ThirdPartyControl.CalendarTool.Google;
+                        thirdpartydata.ProviderID = ThirdPartyControl.CalendarTool.Google.ToString();
                         thirdpartydata.Token = myCredential.Token.AccessToken;
                         thirdpartydata.RefreshToken = myCredential.Token.RefreshToken;
 

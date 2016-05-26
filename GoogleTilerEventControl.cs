@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TilerElements;
+using TilerElements.Wpf;
+using TilerElements.DB;
 using DBTilerElement;
 using System.Collections.Concurrent;
 using System.Xml;
@@ -226,7 +228,7 @@ namespace TilerFront
         static async public Task<ConcurrentBag<CalendarEvent>> getAllCalEvents(IEnumerable<GoogleTilerEventControl>AllGoogleCalControl)
         {
             ConcurrentBag<List<CalendarEvent>> RetValueListContainer = new System.Collections.Concurrent.ConcurrentBag<List<CalendarEvent>>();
-            ConcurrentBag<Task<List<CalendarEvent>>> ConcurrentTask = new System.Collections.Concurrent.ConcurrentBag<System.Threading.Tasks.Task<List<TilerElements.CalendarEvent>>>();
+            ConcurrentBag<Task<List<CalendarEvent>>> ConcurrentTask = new System.Collections.Concurrent.ConcurrentBag<System.Threading.Tasks.Task<List<CalendarEvent>>>();
             ConcurrentBag<CalendarEvent> RetValue = new System.Collections.Concurrent.ConcurrentBag<CalendarEvent>();
             //AllGoogleCalControl.AsParallel().ForAll(obj=>
 

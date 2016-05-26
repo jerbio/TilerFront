@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using TilerElements;
+using TilerElements.Wpf;
+using TilerElements.DB;
 using System.Threading.Tasks;
 
 namespace TilerFront
@@ -17,7 +19,7 @@ namespace TilerFront
 
 
 
-        public UserAccountDirect(Models.ApplicationUser user, bool Passive=false)
+        public UserAccountDirect(TilerUser user, bool Passive=false)
         {
             sessionUser = user;
             ID = sessionUser.Id;
@@ -62,11 +64,6 @@ namespace TilerFront
         }
 
 
-        async public Task<CustomErrors> Register(Models.ApplicationUser user)
-        {
-            CustomErrors retValue = new CustomErrors(false,"");
-            return retValue;
-        }
 
         override async public Task<CustomErrors> DeleteLog()
         {

@@ -13,6 +13,7 @@ using Microsoft.Owin.Security;
 using Microsoft.AspNet.Identity.EntityFramework;
 using TilerFront.Models;
 using TilerElements.DB;
+using TilerElements.Connectors;
 using TilerElements;
 using DBTilerElement;
 
@@ -654,12 +655,12 @@ namespace TilerFront.Controllers
                     {
                         ThirdPartyType = Convert.ToInt32(loginInfo.ExternalIdentity.FindFirst("ThirdPartyType").Value);
                         DateTimeOffset Now = DateTimeOffset.UtcNow;
-                        if (ThirdPartyType==(int)TilerElements.ThirdPartyControl.CalendarTool.Google)
+                        if (ThirdPartyType==(int)ThirdPartyControl.CalendarTool.Google)
                         {
                             string RefreshToken = loginInfo.ExternalIdentity.FindFirst("RefreshToken").Value;
                             if(!string.IsNullOrEmpty(RefreshToken ))
                             {
-                                ApplicationUser AppUser = await UserManager.FindAsync(loginInfo.Login).ConfigureAwait(false);
+                                TilerUser AppUser = await UserManager.FindAsync(loginInfo.Login).ConfigureAwait(false);
                                 string Email = loginInfo.Email;
                                 string AccessToken = loginInfo.ExternalIdentity.FindFirst("AccessToken").Value;
                                 TimeSpan fiveMin = new TimeSpan(0,-5,0);
@@ -685,12 +686,12 @@ namespace TilerFront.Controllers
                     ThirdPartyType = Convert.ToInt32(loginInfo.ExternalIdentity.FindFirst("ThirdPartyType").Value);
                     ThirdPartyCalendarAuthenticationModel thirdPartyModel = null;
                     DateTimeOffset Deadline = DateTimeOffset.UtcNow;
-                    if (ThirdPartyType == (int)TilerElements.ThirdPartyControl.CalendarTool.Google)
+                    if (ThirdPartyType == (int)ThirdPartyControl.CalendarTool.Google)
                     {
                         string RefreshToken = loginInfo.ExternalIdentity.FindFirst("RefreshToken").Value;
                         if (!string.IsNullOrEmpty(RefreshToken))
                         {
-                            ApplicationUser AppUser = await UserManager.FindAsync(loginInfo.Login).ConfigureAwait(false);
+                            TilerUser AppUser = await UserManager.FindAsync(loginInfo.Login).ConfigureAwait(false);
                             string Email = loginInfo.Email;
                             string AccessToken = loginInfo.ExternalIdentity.FindFirst("AccessToken").Value;
                             TimeSpan fiveMin = new TimeSpan(0, -5, 0);
@@ -820,7 +821,7 @@ namespace TilerFront.Controllers
         async Task<bool> PopulateGoogleAuthentication(string TilerUserID,string AccessToken,string RefreshToken, string GoogleEmail,DateTimeOffset ExpirationDate )
         {
             ApplicationDbContext db = new ApplicationDbContext();
-            ApplicationUser AppUser = UserManager.FindById(TilerUserID);
+            TilerUser AppUser = UserManager.FindById(TilerUserID);
             bool RetValue = false;
             try
             { 

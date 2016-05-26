@@ -703,13 +703,6 @@
             <param name="myUser"></param>
             <returns></returns>
         </member>
-        <member name="M:TilerFront.Controllers.CalendarEventController.DeleteCalEvent(TilerFront.Models.getEventModel)">
-            <summary>
-            Deletes a calendar event.
-            </summary>
-            <param name="myUser"></param>
-            <returns></returns>
-        </member>
         <member name="M:TilerFront.Controllers.CalendarEventController.CompleteCalEvent(TilerFront.Models.getEventModel)">
             <summary>
             MArks the whole calendar event as complete.
@@ -1116,84 +1109,6 @@
             Function generates google calendar control. Its populated with events retrieved within +/- 90 days of google calendar update. It returns null if access to google api is lost.
             </summary>
             <returns></returns>
-        </member>
-        <member name="M:TilerFront.ScheduleControl.getCalendarEvent(System.String)">
-            <summary>
-            Function returns the only calendar event with the specified ID
-            </summary>
-            <param name="calendareventId"></param>
-            <returns></returns>
-        </member>
-        <member name="M:TilerFront.ScheduleControl.getCalendarEventByName(System.String)">
-            <summary>
-            Funciton gets calendar events with names similar to the getCalendarEventByName
-            </summary>
-            <param name="Name"></param>
-            <returns>
-            returns a list of calendar event with names closely matching the specified values
-            </returns>
-        </member>
-        <member name="M:TilerFront.ScheduleControl.PersistCalendarEvents(System.Collections.Generic.IEnumerable{TilerElements.CalendarEvent})">
-            <summary>
-            function persists the provided calendar events to the DB
-            </summary>
-            <param name="AllEvents"></param>
-            <returns></returns>
-        </member>
-        <member name="M:TilerFront.ScheduleControl.DeleteLog">
-            <summary>
-            Funtion deletes a user's tiler account
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:TilerFront.LogControl.updateBigData(System.Xml.XmlDocument,System.Xml.XmlDocument)">
-            <summary>
-            Function is to be called for the generation of auto logs for a user interaction with the schedule
-            </summary>
-            <param name="oldData"></param>
-            <param name="newData"></param>
-        </member>
-        <member name="M:TilerFront.LogControl.updateNewLocation(TilerElements.Location_Elements)">
-            <summary>
-            updates the logcontrol with a possible new location
-            </summary>
-            <param name="NewLocation"></param>
-        </member>
-        <member name="M:TilerFront.LogControl.CreatePauseUsedUpNode(TilerElements.SubCalendarEvent,System.Xml.XmlDocument)">
-            <summary>
-            Class generates the pause xml mode for a given schedule
-            </summary>
-            <param name="SubEvent"></param>
-            <returns></returns>
-        </member>
-        <member name="M:TilerFront.ScheduleControl.deleteAllCalendarEvents">
-            <summary>
-            Function deletes all calendar events associated with a user account
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:TilerFront.ScheduleControl.getCalendarEvents(TilerElements.TimeLine)">
-            <summary>
-            function returns all calendarevents that interfer with RangeOfLookup
-            </summary>
-            <param name="RangeOfLookup"></param>
-            <returns></returns>
-        </member>
-        <member name="F:TilerFront.UserAccount.UserLocation">
-            <summary>
-            controls access to location elements for a given user account(s)
-            </summary>
-        </member>
-        <member name="M:TilerFront.UserAccount.UpdateReferenceDayTime(System.DateTimeOffset)">
-            <summary>
-            updates the end of day with referenceTime
-            </summary>
-            <param name="referenceTime"></param>
-        </member>
-        <member name="P:TilerFront.UserAccount.endOfdayTime">
-            <summary>
-            gets the reference time that represents the end of the day for a given user. Its sent as a Datetimeoffset object so the date portin of the object isn't too useful
-            </summary>
         </member>
     </members>
 </doc>

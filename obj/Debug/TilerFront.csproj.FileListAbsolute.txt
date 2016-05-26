@@ -1,4 +1,16 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.csproj.App.config
+C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.csprojResolveAssemblyReference.cache
+C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.Migrations.GoogleNotificationAuthentication.resources
+C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.Migrations.GoogleNotificationAuthentication1.resources
+C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.Migrations.pauseEventTable.resources
+C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.Migrations.modifiedPuaseData.resources
+C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.Migrations.addedPausedEventForeignKeyRelationship.resources
+C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.Migrations.init.resources
+C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.csproj.GenerateResource.Cache
+>>>>>>> After rebasing Made changes to make code compileable
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\ApplicationInsights.config
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\Microsoft.ApplicationInsights.Extensions.Intercept_x86.dll
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\Microsoft.ApplicationInsights.Extensions.Intercept_x64.dll
@@ -79,6 +91,13 @@ C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\WebGrease.dll
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\Zlib.Portable.dll
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\Google.Maps.dll
+<<<<<<< HEAD
+=======
+C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\TilerSearch.exe
+C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\Lucene.Net.dll
+C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\Microsoft.WindowsAzure.Storage.dll
+C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\Lucene.Net.Store.Azure.dll
+>>>>>>> After rebasing Made changes to make code compileable
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\Antlr3.Runtime.pdb
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\DBTilerElement.pdb
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\EntityFramework.xml
@@ -149,6 +168,7 @@ C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\TilerElements.pdb
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\Zlib.Portable.xml
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\Google.Maps.pdb
+<<<<<<< HEAD
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.csproj.App.config
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.csprojResolveAssemblyReference.cache
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.Migrations.GoogleNotificationAuthentication.resources
@@ -444,7 +464,14 @@ C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\Microsoft.ApplicationInsights.Extensibility.Web.pdb
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\Microsoft.ApplicationInsights.Extensibility.Web.xml
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\obj\Debug\ApplicationInsights.config
+=======
+>>>>>>> After rebasing Made changes to make code compileable
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\TilerSearch.pdb
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\Lucene.Net.pdb
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\Lucene.Net.xml
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\Microsoft.WindowsAzure.Storage.xml
+<<<<<<< HEAD
+=======
+C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.dll
+C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.pdb
+>>>>>>> After rebasing Made changes to make code compileable

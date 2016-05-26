@@ -16,6 +16,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using TilerElements.Wpf;
 using TilerElements.DB;
+using TilerElements.Connectors;
 using DBTilerElement;
 
 //using System.Web.Http.Cors;
@@ -70,15 +71,6 @@ namespace TilerFront.Controllers
                 {
                     var GoogleTilerEventControlobj = new GoogleTilerEventControl(obj);
                 }
-                
-                
-                
-
-
-
-                //List<Task<List<CalendarEvent>>> getAllCalTasks = AllGoogleTilerEvents.Select(obj => obj.getCalendarEvents()).ToList();
-
-                List<CalendarEvent> ScheduleData = new List<CalendarEvent>();
 
                 Task<ConcurrentBag<CalendarEvent>> GoogleCalEventsTask =  GoogleTilerEventControl.getAllCalEvents(AllGoogleTilerEvents);
 
@@ -146,12 +138,12 @@ namespace TilerFront.Controllers
                 TimeLine TimelineForData = new TimeLine(StartTime, EndTime);
 
 
-                LogControl LogAccess = myUserAccount.ScheduleLogControl;
+                ScheduleControl LogAccess = myUserAccount.ScheduleLogControl;
                 List<CalendarEvent> ScheduleData = new List<CalendarEvent>();
 
-                Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, Location_Elements>> ProfileData = await LogAccess.getProfileInfo(TimelineForData);
+                Dictionary<string, CalendarEvent> Events = await LogAccess.getCalendarEvents(TimelineForData);
 
-                ScheduleData = ScheduleData.Concat(ProfileData.Item1.Values).ToList();
+                ScheduleData = ScheduleData.Concat(Events.Values).ToList();
 
                 IEnumerable<CalendarEvent> NonRepeatingEvents = ScheduleData.Where(obj => !obj.RepetitionStatus);
 
@@ -362,12 +354,12 @@ namespace TilerFront.Controllers
             ApplicationDbContext db = new ApplicationDbContext();
             ThirdPartyCalendarAuthenticationModel ThirdPartAuthData= db.ThirdPartyAuthentication.Where(obj => obj.ID == GoogleNotificationID).Single();
             object[] LookUpParams = {ThirdPartAuthData.TilerID};
-            ApplicationUser myUser = db.Users.Find(LookUpParams);
+            TilerUser myUser = db.Users.Find(LookUpParams);
             await notificationTrigger(myUser).ConfigureAwait(false);
         }
 
 
-        static async Task notificationTrigger(ApplicationUser TilerUser)
+        static async Task notificationTrigger(TilerUser TilerUser)
         {
             UserAccountDirect RetrievedUSer = new UserAccountDirect(TilerUser, true);
             ApplicationDbContext db = new ApplicationDbContext();
