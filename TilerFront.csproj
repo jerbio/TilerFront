@@ -426,7 +426,6 @@
     <Content Include="Content\bootstrap-theme.css.map" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.css.map" />
-    <Compile Include="DB_SubCalendarEventRestricted.cs" />
     <Compile Include="DTOs\PostBackStruct.cs" />
     <Compile Include="DTOs\PostError.cs" />
     <Compile Include="DTOs\VerifiedUser.cs" />
@@ -435,7 +434,7 @@
     </Compile>
     <Compile Include="GoogleCalExtension.cs" />
     <Compile Include="GoogleTilerEventControl.cs" />
-    <Compile Include="LogControl.cs" />
+    <None Include="LogControl.cs.old" />
     <Compile Include="Migrations\201505070935055_GoogleNotificationAuthentication.cs" />
     <Compile Include="Migrations\201505070935055_GoogleNotificationAuthentication.Designer.cs">
       <DependentUpon>201505070935055_GoogleNotificationAuthentication.cs</DependentUpon>

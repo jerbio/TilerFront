@@ -4,6 +4,9 @@ using System.Linq;
 using System.Web;
 using DBTilerElement;
 using TilerElements;
+using TilerElements.Wpf;
+using TilerElements.DB;
+using TilerElements.Connectors;
 using System.Threading.Tasks;
 using System.Collections.Concurrent;
 
@@ -24,7 +27,7 @@ namespace TilerFront
         {
             SubCalEvent retValue = new SubCalEvent();
             retValue.ThirdPartyEventID = myEvent.Id;
-            retValue.ThirdPartyType = TilerElementExtension.ProviderNames[(int)ThirdPartyControl.CalendarTool.Google];
+            retValue.ThirdPartyType = TilerElementExtension.ProviderNames[ThirdPartyControl.CalendarTool.Google];
             retValue.ThirdPartyUserID = myEvent.Organizer.Email;
             EventID SubEVentID = EventID.generateRepeatGoogleSubCalendarEventID(CalendarID, CurrentCount);
             retValue.ID = SubEVentID.ToString();
@@ -62,7 +65,7 @@ namespace TilerFront
         {
             SubCalEvent retValue = new SubCalEvent();
             retValue.ThirdPartyEventID = myEvent.Id;
-            retValue.ThirdPartyType = TilerElementExtension.ProviderNames[(int)ThirdPartyControl.CalendarTool.Google];
+            retValue.ThirdPartyType = TilerElementExtension.ProviderNames[ThirdPartyControl.CalendarTool.Google];
             retValue.ThirdPartyUserID = myEvent.Organizer.Email;
 
 

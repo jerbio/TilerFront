@@ -703,13 +703,6 @@
             <param name="myUser"></param>
             <returns></returns>
         </member>
-        <member name="M:TilerFront.Controllers.CalendarEventController.DeleteCalEvent(TilerFront.Models.getEventModel)">
-            <summary>
-            Deletes a calendar event.
-            </summary>
-            <param name="myUser"></param>
-            <returns></returns>
-        </member>
         <member name="M:TilerFront.Controllers.CalendarEventController.CompleteCalEvent(TilerFront.Models.getEventModel)">
             <summary>
             MArks the whole calendar event as complete.
@@ -1117,6 +1110,7 @@
             </summary>
             <returns></returns>
         </member>
+<<<<<<< HEAD
         <member name="M:TilerFront.LogControlDirect.UpdateReferenceDayInXMLLog(System.DateTimeOffset,System.String)">
             <summary>
             Function does nothing because updating start of day gets triggered in the manage controller
@@ -1151,5 +1145,7 @@
             <param name="RestrictionTimeLineNode"></param>
             <returns></returns>
         </member>
+=======
+>>>>>>> After rebasing Made changes to make code compileable
     </members>
 </doc>

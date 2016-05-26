@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Description;
 using TilerElements;
+using TilerElements.Connectors;
 using TilerElements.DB;
 using TilerElements.Wpf;
 using TilerFront.Models;
@@ -72,7 +73,7 @@ namespace TilerFront.Controllers
             if (retrievedUser.Status)
             {
                 long myNow = (long)(DateTimeOffset.Now - TilerElementExtension.JSStartTime).TotalMilliseconds; ;
-                IEnumerable<CalendarEvent> retrievedCalendarEvents = retrievedUser.ScheduleLogControl.getCalendarEventWithName(phrase).Where(obj => obj.isActive);
+                IEnumerable<CalendarEvent> retrievedCalendarEvents = retrievedUser.ScheduleLogControl.getCalendarEventByName(phrase).Where(obj => obj.isActive);
                 retValue = new PostBackData(retrievedCalendarEvents.Select(obj => obj.ToCalEvent()).OrderBy(obj => Math.Abs(myNow - obj.EndDate)).ToList(), 0);
             }
             
@@ -150,7 +151,7 @@ namespace TilerFront.Controllers
             if (retrievedUser.Status)
             {
                 My24HourTimerWPF.Schedule NewSchedule = new My24HourTimerWPF.Schedule(retrievedUser, myUser.getRefNow());
-                DB_UserActivity activity = new DB_UserActivity(myUser.getRefNow(), UserActivity.ActivityType.DeleteCalendarEvent, new List<String>() { myUser.EventID });
+                UserActivity activity = new UserActivity(myUser.getRefNow(), UserActivity.ActivityType.DeleteCalendarEvent, new List<String>() { myUser.EventID });
                 JObject json = JObject.FromObject(myUser);
                 activity.updateMiscelaneousInfo(json.ToString());
                 retrievedUser.ScheduleLogControl.updateUserActivty(activity);

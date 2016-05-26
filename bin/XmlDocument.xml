@@ -703,13 +703,6 @@
             <param name="myUser"></param>
             <returns></returns>
         </member>
-        <member name="M:TilerFront.Controllers.CalendarEventController.DeleteCalEvent(TilerFront.Models.getEventModel)">
-            <summary>
-            Deletes a calendar event.
-            </summary>
-            <param name="myUser"></param>
-            <returns></returns>
-        </member>
         <member name="M:TilerFront.Controllers.CalendarEventController.CompleteCalEvent(TilerFront.Models.getEventModel)">
             <summary>
             MArks the whole calendar event as complete.
@@ -813,7 +806,6 @@
             <param name="UserData"></param>
             <returns></returns>
         </member>
-<<<<<<< HEAD
         <member name="M:TilerFront.Controllers.ScheduleController.ProcrastinateSubCalendarEvent(TilerFront.Models.ProcrastinateEventModel)">
             <summary>
             Procrastinate a given event. 
@@ -995,8 +987,6 @@
             </summary>
             <returns></returns>
         </member>
-=======
->>>>>>> fixed schedule population with a performance boost. However, I need to ensure that the new schedule can be recreated there is an error that is being thrown.
         <member name="T:TilerFront.Models.UnregisteredEvent">
             <summary>
             Represents an Event that has not being added to a users schedule. 
@@ -1110,10 +1100,13 @@
         </member>
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 <<<<<<< HEAD
 >>>>>>> finally added the ability for the core tiler data types. It can run, but there is a strong possibility that the db will migrate. I am yet to run a db upgrade. Also there are still botimplemented exception every where.
+=======
+>>>>>>> After rebasing Made changes to make code compileable
         <member name="M:TilerFront.GoogleTilerEventControl.getThirdPartyControlForIndex">
             <summary>
             Function generates google calendar control. Its populated with events retrieved within +/- 90 days of google calendar update. It returns null if access to google api is lost.
@@ -1126,6 +1119,7 @@
             </summary>
             <returns></returns>
         </member>
+<<<<<<< HEAD
 =======
 >>>>>>> fixed schedule population with a performance boost. However, I need to ensure that the new schedule can be recreated there is an error that is being thrown.
         <member name="M:TilerFront.LogControlDirect.UpdateReferenceDayInXMLLog(System.DateTimeOffset,System.String)">
@@ -1186,5 +1180,7 @@
 =======
 >>>>>>> finally added the ability for the core tiler data types. It can run, but there is a strong possibility that the db will migrate. I am yet to run a db upgrade. Also there are still botimplemented exception every where.
 >>>>>>> finally added the ability for the core tiler data types. It can run, but there is a strong possibility that the db will migrate. I am yet to run a db upgrade. Also there are still botimplemented exception every where.
+=======
+>>>>>>> After rebasing Made changes to make code compileable
     </members>
 </doc>

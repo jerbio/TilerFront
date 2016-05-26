@@ -11,6 +11,7 @@ using Google.Apis.Auth.OAuth2;
 using Google.Apis.Oauth2.v2;
 using System.Data.Entity;
 using DBTilerElement;
+using TilerElements.Connectors;
 
 namespace TilerFront.Models
 {
@@ -28,7 +29,7 @@ namespace TilerFront.Models
         public string RefreshToken { get; set; }
         [Key]
         [Column(Order = 3)]
-        public int ProviderID { get; set; }
+        public string ProviderID { get; set; }
         public DateTimeOffset Deadline { get; set; }
 
         /// <summary>
@@ -37,7 +38,9 @@ namespace TilerFront.Models
         /// <returns></returns>
         public ThirdPartyAuthenticationForView getThirdPartyOut()
         {
-            ThirdPartyAuthenticationForView RetValue = new ThirdPartyAuthenticationForView() { Email = this.Email, ProviderName =TilerElementExtension. ProviderNames[this.ProviderID],ID=this.ID };
+            ThirdPartyControl.CalendarTool Provider = (ThirdPartyControl.CalendarTool)ThirdPartyControl.CalendarTool.Parse(typeof(ThirdPartyControl.CalendarTool), this.ProviderID);
+
+            ThirdPartyAuthenticationForView RetValue = new ThirdPartyAuthenticationForView() { Email = this.Email, ProviderName = Provider.ToString(), ID=this.ID };
             return RetValue;
         }
 

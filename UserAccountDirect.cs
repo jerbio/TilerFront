@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using TilerElements;
+using TilerElements.Wpf;
+using TilerElements.DB;
 using System.Threading.Tasks;
 
 namespace TilerFront
@@ -18,7 +20,7 @@ namespace TilerFront
 
 
 
-        public UserAccountDirect(Models.ApplicationUser user, bool Passive=false)
+        public UserAccountDirect(TilerUser user, bool Passive=false)
         {
             sessionUser = user;
             UserLog = new LogControlDirect(sessionUser, "", Passive);
@@ -74,11 +76,14 @@ namespace TilerFront
         }
 
 
+<<<<<<< HEAD
         async public Task<CustomErrors> Register(Models.ApplicationUser user)
         {
             CustomErrors retValue = UserLog.genereateNewLogFile(user.Id);
             return retValue;
         }
+=======
+>>>>>>> After rebasing Made changes to make code compileable
 
         override async public Task<CustomErrors> DeleteLog()
         {

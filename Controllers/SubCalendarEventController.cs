@@ -15,6 +15,7 @@ using TilerFront.Models;
 //using TilerGoogleCalendarLib;
 using TilerElements.Wpf;
 using TilerElements.DB;
+using TilerElements.Connectors;
 using DBTilerElement;
 
 namespace TilerFront.Controllers
