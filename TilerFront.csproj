@@ -434,7 +434,6 @@
     </Compile>
     <Compile Include="GoogleCalExtension.cs" />
     <Compile Include="GoogleTilerEventControl.cs" />
-    <None Include="LogControl.cs.old" />
     <Compile Include="Migrations\201505070935055_GoogleNotificationAuthentication.cs" />
     <Compile Include="Migrations\201505070935055_GoogleNotificationAuthentication.Designer.cs">
       <DependentUpon>201505070935055_GoogleNotificationAuthentication.cs</DependentUpon>
@@ -455,14 +454,11 @@
     <Compile Include="Migrations\201605230745399_addedPausedEventForeignKeyRelationship.Designer.cs">
       <DependentUpon>201605230745399_addedPausedEventForeignKeyRelationship.cs</DependentUpon>
     </Compile>
-    <None Include="LogControlDebug.cs.old" />
-    <None Include="LogControlDirect.cs.old" />
     <Compile Include="Migrations\201603171733317_init.cs" />
     <Compile Include="Migrations\201603171733317_init.Designer.cs">
       <DependentUpon>201603171733317_init.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
-    <None Include="ScheduleControl.cs.old" />
     <Compile Include="Models\AccountBindingModels.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\AuthorizedUser.cs" />
