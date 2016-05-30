@@ -1151,5 +1151,26 @@
             <param name="RestrictionTimeLineNode"></param>
             <returns></returns>
         </member>
+        <member name="M:TilerFront.UserAccount.getCurrentPausedEvent(TilerFront.Models.ApplicationDbContext,System.String,System.Boolean)">
+            <summary>
+            This contains the functionality for retrieveing the paused event from the db.
+            THis is supposed to be part of logcontrol.cs. This should be done after the move to an rdbms like storage
+            TODO: move to logcontrol.cs after switching to an rdbms db
+            </summary>
+            <param name="db"></param>
+            <param name="userId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.UserAccount.getCurrentPausedEventAndPausedEventWithId(TilerFront.Models.ApplicationDbContext,System.String,System.String)">
+            <summary>
+            Function gets you the paused event and its the paused events with the ID EventId
+            THis is supposed to be part of logcontrol.cs. This should be done after the move to an rdbms like storage
+            TODO: move to logcontrol.cs after switching to an rdbms db
+            </summary>
+            <param name="db"></param>
+            <param name="EventId"></param>
+            <param name="userId"></param>
+            <returns></returns>
+        </member>
     </members>
 </doc>
