@@ -453,6 +453,18 @@
     <Compile Include="Migrations\201605230745399_addedPausedEventForeignKeyRelationship.Designer.cs">
       <DependentUpon>201605230745399_addedPausedEventForeignKeyRelationship.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201605300652203_addedAbilityForPauseTime.cs" />
+    <Compile Include="Migrations\201605300652203_addedAbilityForPauseTime.Designer.cs">
+      <DependentUpon>201605300652203_addedAbilityForPauseTime.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201605300724181_addedPrimaryContraintForPauseTime.cs" />
+    <Compile Include="Migrations\201605300724181_addedPrimaryContraintForPauseTime.Designer.cs">
+      <DependentUpon>201605300724181_addedPrimaryContraintForPauseTime.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201605300732307_addedPrimaryContraintForPauseTime1.cs" />
+    <Compile Include="Migrations\201605300732307_addedPrimaryContraintForPauseTime1.Designer.cs">
+      <DependentUpon>201605300732307_addedPrimaryContraintForPauseTime1.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -2685,6 +2697,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201605230745399_addedPausedEventForeignKeyRelationship.resx">
       <DependentUpon>201605230745399_addedPausedEventForeignKeyRelationship.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201605300652203_addedAbilityForPauseTime.resx">
+      <DependentUpon>201605300652203_addedAbilityForPauseTime.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201605300724181_addedPrimaryContraintForPauseTime.resx">
+      <DependentUpon>201605300724181_addedPrimaryContraintForPauseTime.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201605300732307_addedPrimaryContraintForPauseTime1.resx">
+      <DependentUpon>201605300732307_addedPrimaryContraintForPauseTime1.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
