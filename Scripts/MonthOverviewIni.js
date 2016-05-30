@@ -4491,8 +4491,51 @@ function genDivForEachWeek(RangeOfWeek, AllRanges)//generates each week containe
     }
 
 
+        function manageGlobaPauseButton() {
+            var currentTime = new Date();
+            function getPausedEventOrNextPossibleEvent(subEvents) {
+                var i = 0
+                for (; i < subEvents.length; i++)
+                {
+                    var subEvent = subEvents[i];
+                    if (subEvent.isPaused)
+                    {
 
-        {
+                        break;
+                    }
+                    if (subEvent.isPauseAble)
+                    {
+                        break;
+                    }
 
+                    if (SubEvent.SubCalEndDate > currentTime) {
+
+                        break;
+                    }
+                }
+
+                var currentSubEvent = null;
+                var nextEvent = null;
+                if (i < subEvents.length) {
+                    currentSubEvent = subEvents[i];
+                }
+                var nextIndex = i + 1;
+                if (nextIndex < subEvents.length) {
+                    nextEvent = subEvents[nextIndex];
+                }
+            }
+            function switchToResume(eventId) {
+
+            }
+            function switchToPause(eventId) {
+
+            }
+
+            function hidePauseResumeButton() {
+
+            }
+            function showPauseResumeButton() {
+
+            }
         }
 
