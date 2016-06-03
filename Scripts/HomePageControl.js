@@ -280,16 +280,6 @@ function generateHomePageDoms(Dom) {
 
     }
 
-    //(PercentWidth, LeftPosition, TopPosition, thickness, Alternate)
-
-    //var HorizontalLine = InsertHorizontalLine("70%", "15%", "0%", "6px")//creates underlying gray Line
-    //HorizontalLine.style.zIndex = 3;
-    ////HorizontalLine.style.backgroundColor = "white";
-    //HorizontalLine.style.marginTop = "-6px";
-    
-
-    //(PercentWidth, LeftPosition, TopPosition, thickness, Alternate)
-
     $(Dom).append(FooterDOM);
 
     $(FooterDOM).empty();
@@ -310,8 +300,6 @@ function populateHomePageFooter(Dom)
         AddButtonDom = document.createElement("div");
         AddButtonDom.setAttribute("id", "HomePageAddButton");
         $(AddButtonDom).addClass(CurrentTheme.AddButton);
-        //$(AddButtonDom).css({ "margin-left": "-25px",  "top": "50%", "margin-top": "-20px", "height": "40px", "width": "40px" });//top percentage was calculated manually
-        //AddButtonDom.style.left = "25%";
     }
     var ProcrastinateDom = document.getElementById("HomePageProcrastinate");
     if (ProcrastinateDom == null) {
@@ -319,9 +307,6 @@ function populateHomePageFooter(Dom)
         ProcrastinateDom.setAttribute("id", "HomePageProcrastinate");
         $(ProcrastinateDom).addClass(CurrentTheme.ProcrastinateAllIcon);
         ProcrastinateDom.addEventListener("click", onProcrastinateAll);
-
-
-        //$(ProcrastinateDom).css({ "left": "75%", "margin-left": "-20px", "top": "50%", "margin-top": "-20px", "height": "40px", "width": "40px" });//top percentage was calculated manually
     }
     var shuffleButton = getDomOrCreateNew("ShuffleButton");
     $(shuffleButton).addClass("ShuffleButton ControlPanelButton SomethingNew")
@@ -329,26 +314,10 @@ function populateHomePageFooter(Dom)
         RefreshSubEventsMainDivSubEVents();
     }
     SomethingNewButton(shuffleButton, shuffleCallback);
-    //var TopSlider = document.getElementById("TopSliderHome");
-    //if (TopSlider == null)//checks if DOM exists
-    //{
-    //    TopSlider = document.createElement("div");//populates this DOM
-    //    TopSlider.setAttribute("id", "TopSliderHome");//sets the ID of Dom
-    //    $(TopSlider).addClass("TopSlider");//Add css class
-    //}
-    //Removes all child DOMS
     $(AddButtonDom).empty();
     $(ProcrastinateDom).empty();
-    //$(TopSlider).empty();
-
-    //$(AddButtonDom).click(AddNewEventOnClick)
-    //AddButtonDom.onclick("click", AddNewEventOnClick);
     AddButtonDom.onclick = AddNewEventOnClick;
 
-    //Adds Add button, Procrastinate button, and  TOp SLider to top banner
-    
-    //$(Dom).append(TopSlider);
-    
     $(Dom).append(AddButtonDom);
     $(Dom).append(shuffleButton);
     $(Dom).append(ProcrastinateDom);
@@ -489,7 +458,6 @@ function populateSearchOptionDom(Dom)
 }
 
 
-//function populateHomePageTopBanner(Dom) {
 
 function generateModalForTIleOrModal()
 {
