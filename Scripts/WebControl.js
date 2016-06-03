@@ -2697,3 +2697,75 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
     generateMyButton.ID = 0;
 
 
+function isFunction(data) {
+    var RetValue = false;
+    if (typeof (data) === "function") {
+        RetValue = true;
+    }
+    return RetValue;
+}
+
+function isObject(data) {
+    var RetValue = false;
+    if ((typeof (data) === "object") && (data !== null)) {
+        RetValue = true;
+    }
+    return RetValue;
+}
+
+function isString(data) {
+    var RetValue = false;
+    if ((typeof (data) === "string") && (data !== null)) {
+        RetValue = true;
+    }
+    return RetValue;
+}
+
+function isNumber(data) {
+    var RetValue = false;
+    if ((typeof (data) === "number") && (data !== null)) {
+        RetValue = true;
+    }
+    return RetValue;
+}
+
+
+function isNull(data) {
+    var RetValue = false;
+    if ((typeof (data) === "object") && (data === null)) {
+        RetValue = true;
+    }
+    return RetValue;
+}
+
+function isUndefined(data) {
+    var RetValue = false;
+    if ((typeof (data) === "undefined") && (data !== null)) {
+        RetValue = true;
+    }
+    return RetValue;
+}
+
+function isUndefinedOrNull(data) {
+    var RetValue = false;
+    if (isUndefined(data) || isNull(data)) {
+        RetValue = true;
+    }
+
+    return RetValue;
+}
+
+
+
+function generateUUID() {
+    var d = new Date().getTime();
+    if (window.performance && typeof window.performance.now === "function") {
+        d += performance.now(); //use high-precision timer if available
+    }
+    var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        var r = (d + Math.random() * 16) % 16 | 0;
+        d = Math.floor(d / 16);
+        return (c == 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+    });
+    return uuid;
+}
