@@ -14,6 +14,7 @@ var global_RenderedList = new Array();
 
 function InitializeHomePage(DomContainer)
 {
+    initializeUserLocation();
     var verifiedUser = GetCookieValue();
 
     if (verifiedUser == "")
@@ -187,7 +188,7 @@ function generateHomePage(UserSchedule) {
     var AllRepeatEventDoms = generateRepeatEvents(UserSchedule.Schedule.RepeatCalendarEvent);*/
     InitializeMiddleDomUI(MiddleContentDom);
     
-    if (ClosestSubEventToNow != null)
+    if (ClosestSubEventToNow.Dom != null)
     {
         var position = $(ClosestSubEventToNow.Dom.Dom).position();
         setTimeout(function () {
@@ -281,10 +282,10 @@ function generateHomePageDoms(Dom) {
 
     //(PercentWidth, LeftPosition, TopPosition, thickness, Alternate)
 
-    var HorizontalLine = InsertHorizontalLine("70%", "15%", "0%", "6px")//creates underlying gray Line
-    HorizontalLine.style.zIndex = 3;
-    //HorizontalLine.style.backgroundColor = "white";
-    HorizontalLine.style.marginTop = "-6px";
+    //var HorizontalLine = InsertHorizontalLine("70%", "15%", "0%", "6px")//creates underlying gray Line
+    //HorizontalLine.style.zIndex = 3;
+    ////HorizontalLine.style.backgroundColor = "white";
+    //HorizontalLine.style.marginTop = "-6px";
     
 
     //(PercentWidth, LeftPosition, TopPosition, thickness, Alternate)
@@ -292,7 +293,7 @@ function generateHomePageDoms(Dom) {
     $(Dom).append(FooterDOM);
 
     $(FooterDOM).empty();
-    FooterDOM.appendChild(HorizontalLine);
+    //FooterDOM.appendChild(HorizontalLine);
     FooterDOM = populateHomePageFooter(FooterDOM);
     $(FooterDOM).addClass(CurrentTheme.ContentSection);
     return [TopBannerDom, BodyDOM, FooterDOM];
@@ -309,8 +310,8 @@ function populateHomePageFooter(Dom)
         AddButtonDom = document.createElement("div");
         AddButtonDom.setAttribute("id", "HomePageAddButton");
         $(AddButtonDom).addClass(CurrentTheme.AddButton);
-        $(AddButtonDom).css({ "margin-left": "-25px",  "top": "50%", "margin-top": "-20px", "height": "40px", "width": "40px" });//top percentage was calculated manually
-        AddButtonDom.style.left = "25%";
+        //$(AddButtonDom).css({ "margin-left": "-25px",  "top": "50%", "margin-top": "-20px", "height": "40px", "width": "40px" });//top percentage was calculated manually
+        //AddButtonDom.style.left = "25%";
     }
     var ProcrastinateDom = document.getElementById("HomePageProcrastinate");
     if (ProcrastinateDom == null) {
@@ -320,19 +321,25 @@ function populateHomePageFooter(Dom)
         ProcrastinateDom.addEventListener("click", onProcrastinateAll);
 
 
-        $(ProcrastinateDom).css({ "left": "75%", "margin-left": "-20px", "top": "50%", "margin-top": "-20px", "height": "40px", "width": "40px" });//top percentage was calculated manually
+        //$(ProcrastinateDom).css({ "left": "75%", "margin-left": "-20px", "top": "50%", "margin-top": "-20px", "height": "40px", "width": "40px" });//top percentage was calculated manually
     }
-    var TopSlider = document.getElementById("TopSliderHome");
-    if (TopSlider == null)//checks if DOM exists
-    {
-        TopSlider = document.createElement("div");//populates this DOM
-        TopSlider.setAttribute("id", "TopSliderHome");//sets the ID of Dom
-        $(TopSlider).addClass("TopSlider");//Add css class
+    var shuffleButton = getDomOrCreateNew("ShuffleButton");
+    $(shuffleButton).addClass("ShuffleButton ControlPanelButton SomethingNew")
+    var shuffleCallback = function (response) {
+        RefreshSubEventsMainDivSubEVents();
     }
+    SomethingNewButton(shuffleButton, shuffleCallback);
+    //var TopSlider = document.getElementById("TopSliderHome");
+    //if (TopSlider == null)//checks if DOM exists
+    //{
+    //    TopSlider = document.createElement("div");//populates this DOM
+    //    TopSlider.setAttribute("id", "TopSliderHome");//sets the ID of Dom
+    //    $(TopSlider).addClass("TopSlider");//Add css class
+    //}
     //Removes all child DOMS
     $(AddButtonDom).empty();
     $(ProcrastinateDom).empty();
-    $(TopSlider).empty();
+    //$(TopSlider).empty();
 
     //$(AddButtonDom).click(AddNewEventOnClick)
     //AddButtonDom.onclick("click", AddNewEventOnClick);
@@ -340,10 +347,11 @@ function populateHomePageFooter(Dom)
 
     //Adds Add button, Procrastinate button, and  TOp SLider to top banner
     
-    $(Dom).append(TopSlider);
+    //$(Dom).append(TopSlider);
     
-    $(Dom).append(ProcrastinateDom);
     $(Dom).append(AddButtonDom);
+    $(Dom).append(shuffleButton);
+    $(Dom).append(ProcrastinateDom);
     return Dom;
 }
 

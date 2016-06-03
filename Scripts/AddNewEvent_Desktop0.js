@@ -1,4 +1,4 @@
-﻿"use strict";
+"use strict";
 
 function addNewEvent(x, y, height, refStart)
 {
@@ -313,7 +313,7 @@ function generateModal(x, y, height, width,WeekStart, RenderPlane,UseCurrentTime
 {
     //return;
     //debugger;
-    getLocation();
+    initializeUserLocation();
 
     if (generateModal.isOn)
     {

@@ -1310,61 +1310,12 @@ function BindAddButton()
     }
 }
 
-/*
-*Function binds the "somethinew" button to the back end for a simple rest call
-*/
-function SomethingNewButton() {
-    var FindSomethingNewButton = document.getElementById('SomethingNew');
-
-    function reoptimizeSchedule() {
-        var TimeZone = new Date().getTimezoneOffset();
-        var ShuffleData = { UserName: UserCredentials.UserName, UserID: UserCredentials.ID, TimeZoneOffset: TimeZone, Longitude: global_PositionCoordinate.Longitude, Latitude: global_PositionCoordinate.Latitude, IsInitialized: global_PositionCoordinate.isInitialized};
-        var URL = global_refTIlerUrl + "Schedule/Shuffle";
-        var HandleNEwPage = new LoadingScreenControl("Tiler looking up the next good event  :)");
-        HandleNEwPage.Launch();
-
-        var exit = function (data) {
-            HandleNEwPage.Hide();
-            global_ExitManager.triggerLastExitAndPop();
-        }
-        $.ajax({
-            type: "POST",
-            url: URL,
-            data: ShuffleData,
-            // DO NOT SET CONTENT TYPE to json
-            // contentType: "application/json; charset=utf-8", 
-            // DataType needs to stay, otherwise the response object
-            // will be treated as a single string
-            dataType: "json",
-            success: function (response) {
-                triggerUndoPanel("Undo optimized shuffle");
-                var myContainer = (response);
-                if (myContainer.Error.code == 0) {
-                }
-                else {
-                    alert("error optimizing your schedule");
-                }
-
-            },
-            error: function () {
-                var NewMessage = "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
-                var ExitAfter = {
-                    ExitNow: true, Delay: 1000
-                };
-                HandleNEwPage.UpdateMessage(NewMessage, ExitAfter, exit);
-            }
-        }).done(function (data) {
-            HandleNEwPage.Hide();
-        });
-    }
-    FindSomethingNewButton.onclick = reoptimizeSchedule;
-}
 
 function InitializeMonthlyOverview()
 {
     BindAddButton();
-    SomethingNewButton()
-    getLocation();
+    SomethingNewButton(document.getElementById('SomethingNew'))
+    initializeUserLocation();
     var verifiedUser = GetCookieValue();
     if (verifiedUser == "")
     {
@@ -1538,8 +1489,12 @@ onSocketDataReceipt.counter = 0;
 function initializeWebSockets() {
     var chat = $.connection.scheduleChange;
     //chat.client.sendToAll = onSocketDataReceipt;
-    chat.client.refereshDataFromSockets = onSocketDataReceipt;
-    $.connection.hub.start().done();
+    if(!!chat)
+    {
+        chat.client.refereshDataFromSockets = onSocketDataReceipt;
+        $.connection.hub.start().done();
+    }
+    
 }
 
 

@@ -135,7 +135,7 @@ function GetCookieValue()//verifies that user has cookies
 
 
 
-function getLocation(onSuccessLocationRetrieval, onfailure) {
+function initializeUserLocation(onSuccessLocationRetrieval, onfailure) {
     global_PositionCoordinate.Message ="Initializing"
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(populatePosition, showError);
@@ -2689,6 +2689,139 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
         return $(InputDom).timepicker();
     }
 
+
+    /*
+    *Function binds the "somethinew" button to the back end for a simple rest call
+    */
+    function SomethingNewButton(shuffleButton,callback) {
+        var FindSomethingNewButton = shuffleButton;
+
+        function reoptimizeSchedule() {
+            var TimeZone = new Date().getTimezoneOffset();
+            var ShuffleData = { UserName: UserCredentials.UserName, UserID: UserCredentials.ID, TimeZoneOffset: TimeZone, Longitude: global_PositionCoordinate.Longitude, Latitude: global_PositionCoordinate.Latitude, IsInitialized: global_PositionCoordinate.isInitialized };
+            var URL = global_refTIlerUrl + "Schedule/Shuffle";
+            var HandleNEwPage = new LoadingScreenControl("Tiler looking up the next good event  :)");
+            HandleNEwPage.Launch();
+
+            var exit = function (data) {
+                HandleNEwPage.Hide();
+                global_ExitManager.triggerLastExitAndPop();
+            }
+            $.ajax({
+                type: "POST",
+                url: URL,
+                data: ShuffleData,
+                // DO NOT SET CONTENT TYPE to json
+                // contentType: "application/json; charset=utf-8", 
+                // DataType needs to stay, otherwise the response object
+                // will be treated as a single string
+                dataType: "json",
+                success: function (response) {
+                    triggerUndoPanel("Undo optimized shuffle");
+                    var myContainer = (response);
+                    if (myContainer.Error.code == 0) {
+                        if (isFunction(callback)) {
+                            callback(response);
+                        }
+                    }
+                    else {
+                        alert("error optimizing your schedule");
+                    }
+
+                },
+                error: function () {
+                    var NewMessage = "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
+                    var ExitAfter = {
+                        ExitNow: true, Delay: 1000
+                    };
+                    HandleNEwPage.UpdateMessage(NewMessage, ExitAfter, exit);
+                }
+            }).done(function (data) {
+                HandleNEwPage.Hide();
+            });
+        }
+        FindSomethingNewButton.onclick = reoptimizeSchedule;
+    }
+
+
+    function removeAllChildNodes(myNode) {
+        while (myNode.firstChild) {
+            myNode.removeChild(myNode.firstChild);
+        }
+    }
+
+
+    function destroyallNodes(Node) {
+        while (Node.firstChild) {
+            recursiveDeletion(Node.firstChild)
+        }
+        function recursiveDeletion(Node) {
+            while (Node.firstChild) {
+                destroyallNodes(Node)
+            }
+            if (!!Node.parentNode) {
+                removeAllChildNodes(Node.parentNode);
+            }
+        }
+    }
+
+    function isFunction(data) {
+        var RetValue = false;
+        if (typeof (data) === "function") {
+            RetValue = true;
+        }
+        return RetValue;
+    }
+
+    function isObject(data) {
+        var RetValue = false;
+        if ((typeof (data) === "object") && (data !== null)) {
+            RetValue = true;
+        }
+        return RetValue;
+    }
+
+    function isString(data) {
+        var RetValue = false;
+        if ((typeof (data) === "string") && (data !== null)) {
+            RetValue = true;
+        }
+        return RetValue;
+    }
+
+    function isNumber(data) {
+        var RetValue = false;
+        if ((typeof (data) === "number") && (data !== null)) {
+            RetValue = true;
+        }
+        return RetValue;
+    }
+
+
+    function isNull(data) {
+        var RetValue = false;
+        if ((typeof (data) === "object") && (data === null)) {
+            RetValue = true;
+        }
+        return RetValue;
+    }
+
+    function isUndefined(data) {
+        var RetValue = false;
+        if ((typeof (data) === "undefined") && (data !== null)) {
+            RetValue = true;
+        }
+        return RetValue;
+    }
+
+    function isUndefinedOrNull(data) {
+        var RetValue = false;
+        if (isUndefined(data) || isNull(data)) {
+            RetValue = true;
+        }
+
+        return RetValue;
+    }
 
     generateColorCircle.ID = 0;
 
