@@ -2738,6 +2738,11 @@ function isNull(data) {
     return RetValue;
 }
 
+function isArray(data) {
+    var RetValue = Array.isArray(data);
+    return RetValue;
+}
+
 function isUndefined(data) {
     var RetValue = false;
     if ((typeof (data) === "undefined") && (data !== null)) {

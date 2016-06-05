@@ -1,4 +1,4 @@
-﻿"use strict"
+"use strict"
 
 var global_WeekGrid;
 var global_DayHeight;
@@ -13,6 +13,7 @@ var global_refreshDataInterval = 45000;
 var global_multiSelect;
 var global_ControlPanelIconSet = new IconSet();
 var global_GoToDay;
+var global_eventIsPaused = false;
 var global_pauseManager;
 var global_CurrentWeekArrangedData = [];
 var global_UISetup = { Init: function () { }, RenderOnSubEventClick: null, RenderSubEvent: null, RenderTimeInformation: null, ConflictCalculation: null, ClearUIEffects: function () { },DisplayFullGrid:false,  ButtonID: "" }
@@ -1559,8 +1560,8 @@ function getRefreshedData(CallBackAfterRefresh)//RangeData)
     var DataHolder = { Data: "" };
     if (getRefreshedData.isEnabled)
     {
-        PopulateTotalSubEvents(DataHolder, global_WeekGrid, CallBackAfterRefresh);
-        getRefreshedData.callAllCallbacks(DataHolder);
+        getRefreshedData.instanceCallBack = CallBackAfterRefresh;
+        PopulateTotalSubEvents(DataHolder, global_WeekGrid, getRefreshedData.callAllCallbacks);
     }
     //global_ClearRefreshDataInterval = setTimeout(getRefreshedData, global_refreshDataInterval);
 
@@ -1583,10 +1584,17 @@ getRefreshedData.enableDataRefresh = function (pullLatest)
 
 }
 
+getRefreshedData.instanceCallBack = null;
+getRefreshedData.callBacks = {};
+
 getRefreshedData.callAllCallbacks = function (data) {
     for (var key in getRefreshedData.callBacks)
     {
-        getRefreshedData.callBacks[key](data);
+        getRefreshedData.callBacks[key](TotalSubEventList);
+    }
+    if(isFunction(getRefreshedData.instanceCallBack)){
+        getRefreshedData.instanceCallBack(data)
+        getRefreshedData.instanceCallBack = null;
     }
     
 }
@@ -1595,6 +1603,9 @@ getRefreshedData.enroll = function (callback) {
     var Id = null;
     if (isFunction(callback)) {
         Id = generateUUID();
+        if(!getRefreshedData.callBacks) {
+            getRefreshedData.callBacks = {};
+        }
         getRefreshedData.callBacks[Id] = callback;
     }
     else {
@@ -1705,13 +1716,13 @@ getRefreshedData.unEnroll = function (Id) {
                 var myError = err;
                 var step = "err";
             }
-        }).done(function ()
+        }).done(function (response)
         {
             //alert("done generating");
             PopulateMonthGrid(DataHolder.Data, RangeData);
             if (CallBackAfterRefresh != null)
             {
-                CallBackAfterRefresh();
+                CallBackAfterRefresh(response);
             }
             getRefreshedData.enableDataRefresh();
         });
@@ -3875,6 +3886,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
             deleteButton.onclick = deleteSubevent;
             completeButton.onclick = markAsComplete;
             if (SubEvent.isPaused) {
+                global_eventIsPaused = true;
                 global_ControlPanelIconSet.switchToResumeButton();
                 PauseResumeButton.onclick = continueEvent;
                 $(ControlPanelCloseButton).addClass("setAsDisplayNone");
@@ -3884,11 +3896,13 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                 global_ControlPanelIconSet.switchToPauseButton();
                 PauseResumeButton.onclick = pauseEvent;
                 $(ControlPanelCloseButton).addClass("setAsDisplayNone");
-                if (!SubEvent.isPauseAble) {
-                    global_ControlPanelIconSet.HidePausePauseResumeButton();
-                }
-                else {
+                if((SubEvent.isPauseAble)&&(!global_eventIsPaused)) 
+                {
                     global_ControlPanelIconSet.ShowPausePauseResumeButton();
+                }
+                else
+                {
+                    global_ControlPanelIconSet.HidePausePauseResumeButton();
                 }
             }
 
@@ -4518,245 +4532,282 @@ function genDivForEachWeek(RangeOfWeek, AllRanges)//generates each week containe
     }
 
 
-        function GlobaPauseResumeButtonManager(events) {
-            var _this = this;
-            _this.SubEvents = events;
-            var currentTime = new Date();
-            var currentIndex = -1;
-            this.timeOutData = -1;
-            var isPausedIndex = -1;
-            var isPauseAbleIndex = -1;
-            var nextEventIndex = 0;
-            function getPausedEventOrNextPossibleEvent(subEvents)
+function GlobaPauseResumeButtonManager(events) {
+    var _this = this;
+    _this.SubEvents = events;
+    var currentTime = new Date();
+    var currentIndex = -1;
+    this.timeOutData = -1;
+    var isPausedIndex = -1;
+    var isPauseAbleIndex = -1;
+    var nextEventIndex = 0;
+    var buttonId = "GlobalPauseResumeButton"
+    HidePauseResumeButton();
+    function getPausedEventOrNextPossibleEvent(subEvents)
+    {
+        var i = -1;
+        var currentSubEvent = null;
+        var nextEvent = null;
+        isPausedIndex = -1;
+        isPauseAbleIndex = -1;
+        nextEventIndex = 0;
+        if(isArray (subEvents)){
+            for (i = 0; i < subEvents.length; i++)
             {
-                var i = -1;
-                for (i = 0; i < subEvents.length; i++)
+                var subEvent = subEvents[i];
+                if (subEvent.isPaused)
                 {
-                    var subEvent = subEvents[i];
-                    if (subEvent.isPaused)
-                    {
-                        isPausedIndex = i;
-                        break;
-                    }
-                    if (subEvent.isPauseAble)
-                    {
-                        isPauseAbleIndex = i;
-                        //break;
-                    }
-
-                    if (SubEvent.SubCalEndDate > currentTime)
-                    {
-                        nextEventIndex = i;
-                        //break;
-                    }
-
-                    if (SubEvent.SubCalStartDate > currentTime) {
-                        break;
-                    }
+                    isPausedIndex = i;
+                    break;
                 }
-
-                var currentSubEvent = null;
-                var nextEvent = null;
-                if ((isPausedIndex < subEvents.length) && (isPausedIndex > -1))
+                if (subEvent.isPauseAble)
                 {
-                    currentSubEvent = subEvents[isPausedIndex];
-                    SwitchToResume(currentSubEvent.Id);
-                    _this.currentIndex = isPausedIndex;
-                    prepTimeOutForNextEvent(_this.currentIndex);
-                    return;
+                    isPauseAbleIndex = i;
+                    //break;
                 }
 
-                if ((isPauseAbleIndex < subEvents.length) && (isPauseAbleIndex > -1)) {
-                    currentSubEvent = subEvents[isPauseAbleIndex];
-                    SwitchToPause(currentSubEvent.Id);
-                    _this.currentIndex = isPauseAbleIndex;
-                    prepTimeOutForNextEvent(_this.currentIndex);
-                    return;
+                if (subEvent.SubCalEndDate > currentTime)
+                {
+                    nextEventIndex = i;
+                    //break;
                 }
 
-                if ((nextEventIndex < subEvents.length) && (nextEventIndex > -1)) {
-                    currentSubEvent = subEvents[nextEventIndex];
-                    HidePauseResumeButton();
-                    _this.currentIndex = nextEventIndex;
-                    prepTimeOutForNextEvent(_this.currentIndex);
-                    return;
-                }
-                
-            }
-
-            function prepTimeOutForNextEvent(currentIndex) {
-                currentIndex += 1;
-                if( currentIndex < this.SubEvents.length) {
-                    var subEvent = this.SubEvents[currentIndex]
-                    var TimeSpan = new Date(subEvent.SubCalCalEventEnd).getTime()  - new Date().getTime()
-                    function timeOutCallBack() {
-                        SwitchToPause(subEvent.Id);
-                        _this.currentIndex = currentIndex;
-                        prepTimeOutForNextEvent(currentIndex);
-                    }
-                    _this.timeOutData = setTimeout(timeOutCallBack, TimeSpan);
+                if (subEvent.SubCalStartDate > currentTime) {
+                    break;
                 }
             }
 
-            function SwitchToResume(eventId)
+
+            if ((isPausedIndex < subEvents.length) && (isPausedIndex > -1))
             {
-                var pauseResumeButton = getDomOrCreateNew("GobalPauseResumeButton")
-                $(pauseResumeButton).addClass("ControlPanelResumePanelButton");
-                $(pauseResumeButton).removeClass("ControlPanelPausePanelButton");
-                ShowPauseResumeButton();
-                pauseResumeButton.setAttribute("Title", "Resume Event");
-                var SubEvent = Dictionary_OfSubEvents[eventId];
-                pauseResumeButton.onclick = function () {
-                    continueEvent(SubEvent);
-                }
+                currentSubEvent = subEvents[isPausedIndex];
+                SwitchToResume(currentSubEvent.ID);
+                _this.currentIndex = isPausedIndex;
+                return;
             }
 
-            function SwitchToPause(eventId)
-            {
-                var pauseResumeButton = getDomOrCreateNew("GobalPauseResumeButton")
-                $(pauseResumeButton).addClass("ControlPanelPausePanelButton");
-                $(pauseResumeButton).removeClass("ControlPanelResumePanelButton");
-                ShowPauseResumeButton();
-                pauseResumeButton.setAttribute("Title", "Pause Event");
-                var SubEvent = Dictionary_OfSubEvents[eventId];
-                pauseResumeButton.onclick = function () {
-                    pauseEvent(SubEvent);
-                }
+            if ((isPauseAbleIndex < subEvents.length) && (isPauseAbleIndex > -1)) {
+                currentSubEvent = subEvents[isPauseAbleIndex];
+                SwitchToPause(currentSubEvent.ID);
+                _this.currentIndex = isPauseAbleIndex;
+                prepTimeOutForNextEvent(_this.currentIndex);
+                return;
             }
 
-            function HidePauseResumeButton() {
-                var pauseResumeButton = getDomOrCreateNew("GobalPauseResumeButton")
-                $(pauseResumeButton).addClass("setAsDisplayNone");
+            if ((nextEventIndex < subEvents.length) && (nextEventIndex > -1)) {
+                currentSubEvent = subEvents[nextEventIndex];
+                HidePauseResumeButton();
+                _this.currentIndex = nextEventIndex;
+                _this.currentIndex -=1;
+                prepTimeOutForNextEvent(_this.currentIndex);
+                return;
             }
-
-            function ShowPauseResumeButton() {
-                var pauseResumeButton = getDomOrCreateNew("GobalPauseResumeButton")
-                $(pauseResumeButton).removeClass("setAsDisplayNone");
-            }
-
-            function pauseEvent(SubEvent) {
-                SendMessage();
-                function SendMessage() {
-                    var TimeZone = new Date().getTimezoneOffset();
-                    debugger;
-
-                    var PauseEvent = {
-                        UserName: UserCredentials.UserName,
-                        UserID: UserCredentials.ID,
-                        EventID: SubEvent.ID,
-                        TimeZoneOffset: TimeZone,
-                        ThirdPartyEventID: SubEvent.ThirdPartyEventID,
-                        ThirdPartyUserID: SubEvent.ThirdPartyUserID,
-                        ThirdPartyType: SubEvent.ThirdPartyType
-                    };
-
-                    var URL = global_refTIlerUrl + "Schedule/Event/Pause";
-                    var HandleNEwPage = new LoadingScreenControl("Tiler is Pausing your event :)");
-                    HandleNEwPage.Launch();
-
-                    var exit = function (data) {
-                        HandleNEwPage.Hide();
-                        //triggerUIUPdate();//hack alert
-                        global_ExitManager.triggerLastExitAndPop();
-                        //getRefreshedData();
-                    }
-
-                    $.ajax({
-                        type: "POST",
-                        url: URL,
-                        data: PauseEvent,
-                        success: function (response) {
-                            exit();
-                            //triggerUndoPanel("Undo Pause?");
-                            //alert("alert 0-b");
-                        },
-                        error: function () {
-                            var NewMessage = "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
-                            var ExitAfter = {
-                                ExitNow: true, Delay: 1000
-                            };
-                            HandleNEwPage.UpdateMessage(NewMessage, ExitAfter, exit);
-                        }
-                    }).done(function (data) {
-                        HandleNEwPage.Hide();
-                        triggerUIUPdate();//hack alert
-                        //getRefreshedData();
-                    });
-                }
-                function triggerUIUPdate() {
-                    global_ExitManager.triggerLastExitAndPop();
-                }
-            }
-
-            function continueEvent(SubEvent) {
-                SendMessage();
-                function SendMessage() {
-                    var TimeZone = new Date().getTimezoneOffset();
-                    debugger;
-
-                    var ContinueEvent = {
-                        UserName: UserCredentials.UserName,
-                        UserID: UserCredentials.ID,
-                        EventID: SubEvent.ID,
-                        TimeZoneOffset: TimeZone,
-                        ThirdPartyEventID: SubEvent.ThirdPartyEventID,
-                        ThirdPartyUserID: SubEvent.ThirdPartyUserID,
-                        ThirdPartyType: SubEvent.ThirdPartyType
-                    };
-
-                    var URL = global_refTIlerUrl + "Schedule/Event/Resume";
-                    var HandleNEwPage = new LoadingScreenControl("Tiler resuming your event :)");
-                    HandleNEwPage.Launch();
-
-                    var exit = function (data) {
-                        HandleNEwPage.Hide();
-                        //triggerUIUPdate();//hack alert
-                        global_ExitManager.triggerLastExitAndPop();
-                        //getRefreshedData();
-                    }
-
-                    $.ajax({
-                        type: "POST",
-                        url: URL,
-                        data: ContinueEvent,
-                        success: function (response) {
-                            exit();
-                            //triggerUndoPanel("Undo Pause?");
-                            //alert("alert 0-b");
-                        },
-                        error: function () {
-                            var NewMessage = "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
-                            var ExitAfter = {
-                                ExitNow: true, Delay: 1000
-                            };
-                            HandleNEwPage.UpdateMessage(NewMessage, ExitAfter, exit);
-                        }
-                    }).done(function (data) {
-                        HandleNEwPage.Hide();
-                        triggerUIUPdate();//hack alert
-                        //getRefreshedData();
-                    });
-                }
-                function triggerUIUPdate() {
-                    //alert("we are deleting " + SubEvent.ID);
-                    //$('#ConfirmDeleteModal').slideToggle();
-                    //$('#ControlPanelContainer').slideUp(500);
-                    //resetButtons();
-                    global_ExitManager.triggerLastExitAndPop();
-                }
-
-            }
-
-            this.updateEventList = function (events)
-            {
-                debugger;
-                if (_this.timeOutData != -1) {
-                    clearTimeout(_this.timeOutData);
-                }
-                _this.SubEvents = events;
-                getPausedEventOrNextPossibleEvent(_this.SubEvents);
-            }
-
-            getPausedEventOrNextPossibleEvent(_this.SubEvents);
         }
+
+                
+    }
+
+    function prepTimeOutForNextEvent(currentIndex) {
+        var nextEventIndex = currentIndex + 1;
+        var nextSubEvent;
+        var currentSubEvent = _this.SubEvents[currentIndex]
+        if(nextEventIndex < _this.SubEvents.length) {
+            nextSubEvent = _this.SubEvents[nextEventIndex]
+            var TimeSpan = new Date(nextSubEvent.SubCalStartDate).getTime()  - new Date().getTime()
+            function timeOutCallBack() {
+                HidePauseResumeButton();
+                SwitchToPause(nextSubEvent.ID);
+                _this.currentIndex = nextEventIndex;
+                prepTimeOutForNextEvent(nextEventIndex);
+            }
+            if(TimeSpan > 0){
+                _this.timeOutData = setTimeout(timeOutCallBack, TimeSpan);
+            }
+            else{
+                _this.timeOutData = setTimeout(timeOutCallBack,0);
+            }
+        }
+        //hides pause button if next event begins after the end of the current event
+        if(!!currentSubEvent) {
+            var hidePauseButton = false;
+            if(!!nextSubEvent) 
+            {
+                if(new Date(currentSubEvent.SubCalEndDate).getTime() < new Date(nextSubEvent.SubCalStartDate).getTime())
+                {
+                    hidePauseButton = true;
+                }
+            }
+
+            if(hidePauseButton) 
+            {
+                var HideTimeSpan  = new Date(currentSubEvent.SubCalEndDate).getTime()  - new Date().getTime()
+                setTimeout(HidePauseResumeButton, HideTimeSpan);
+            }
+        }
+    }
+
+    function SwitchToResume(eventId)
+    {
+        var pauseResumeButton = getDomOrCreateNew(buttonId)
+        $(pauseResumeButton).addClass("ControlPanelResumePanelButton");
+        $(pauseResumeButton).removeClass("ControlPanelPausePanelButton");
+        ShowPauseResumeButton();
+        pauseResumeButton.setAttribute("Title", "Resume \""+SubEvent.Name+"\"");
+        var SubEvent = Dictionary_OfSubEvents[eventId];
+        pauseResumeButton.onclick = function () {
+            continueEvent(SubEvent);
+        }
+    }
+
+    function SwitchToPause(eventId)
+    {
+        var pauseResumeButton = getDomOrCreateNew(buttonId)
+        $(pauseResumeButton).addClass("ControlPanelPausePanelButton");
+        $(pauseResumeButton).removeClass("ControlPanelResumePanelButton");
+        ShowPauseResumeButton();
+        var SubEvent = Dictionary_OfSubEvents[eventId];
+        pauseResumeButton.setAttribute("Title", "Pause \""+SubEvent.Name+"\"");
+        var SubEvent = Dictionary_OfSubEvents[eventId];
+        pauseResumeButton.onclick = function () {
+            pauseEvent(SubEvent);
+        }
+    }
+
+    function HidePauseResumeButton() {
+        var pauseResumeButton = getDomOrCreateNew(buttonId)
+        pauseResumeButton.onclick = null;
+        $(pauseResumeButton).addClass("setAsDisplayNone");
+
+    }
+
+    function ShowPauseResumeButton() {
+        var pauseResumeButton = getDomOrCreateNew(buttonId)
+        $(pauseResumeButton).removeClass("setAsDisplayNone");
+    }
+
+    function pauseEvent(SubEvent) {
+        SendMessage();
+        function SendMessage() {
+            var TimeZone = new Date().getTimezoneOffset();
+            debugger;
+
+            var PauseEvent = {
+                UserName: UserCredentials.UserName,
+                UserID: UserCredentials.ID,
+                EventID: SubEvent.ID,
+                TimeZoneOffset: TimeZone,
+                ThirdPartyEventID: SubEvent.ThirdPartyEventID,
+                ThirdPartyUserID: SubEvent.ThirdPartyUserID,
+                ThirdPartyType: SubEvent.ThirdPartyType
+            };
+
+            var URL = global_refTIlerUrl + "Schedule/Event/Pause";
+            var HandleNEwPage = new LoadingScreenControl("Tiler is Pausing your event :)");
+            HandleNEwPage.Launch();
+
+            var exit = function (data) {
+                HandleNEwPage.Hide();
+                //triggerUIUPdate();//hack alert
+                global_ExitManager.triggerLastExitAndPop();
+                //getRefreshedData();
+            }
+
+            $.ajax({
+                type: "POST",
+                url: URL,
+                data: PauseEvent,
+                success: function (response) {
+                    exit();
+                    //triggerUndoPanel("Undo Pause?");
+                    //alert("alert 0-b");
+                },
+                error: function () {
+                    var NewMessage = "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
+                    var ExitAfter = {
+                        ExitNow: true, Delay: 1000
+                    };
+                    HandleNEwPage.UpdateMessage(NewMessage, ExitAfter, exit);
+                }
+            }).done(function (data) {
+                HandleNEwPage.Hide();
+                triggerUIUPdate();//hack alert
+                //getRefreshedData();
+            });
+        }
+        function triggerUIUPdate() {
+            global_ExitManager.triggerLastExitAndPop();
+        }
+    }
+
+    function continueEvent(SubEvent) {
+        SendMessage();
+        function SendMessage() {
+            var TimeZone = new Date().getTimezoneOffset();
+            debugger;
+
+            var ContinueEvent = {
+                UserName: UserCredentials.UserName,
+                UserID: UserCredentials.ID,
+                EventID: SubEvent.ID,
+                TimeZoneOffset: TimeZone,
+                ThirdPartyEventID: SubEvent.ThirdPartyEventID,
+                ThirdPartyUserID: SubEvent.ThirdPartyUserID,
+                ThirdPartyType: SubEvent.ThirdPartyType
+            };
+
+            var URL = global_refTIlerUrl + "Schedule/Event/Resume";
+            var HandleNEwPage = new LoadingScreenControl("Tiler resuming your event :)");
+            HandleNEwPage.Launch();
+
+            var exit = function (data) {
+                HandleNEwPage.Hide();
+                //triggerUIUPdate();//hack alert
+                global_ExitManager.triggerLastExitAndPop();
+                //getRefreshedData();
+            }
+
+            $.ajax({
+                type: "POST",
+                url: URL,
+                data: ContinueEvent,
+                success: function (response) {
+                    exit();
+                    //triggerUndoPanel("Undo Pause?");
+                    //alert("alert 0-b");
+                },
+                error: function () {
+                    var NewMessage = "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
+                    var ExitAfter = {
+                        ExitNow: true, Delay: 1000
+                    };
+                    HandleNEwPage.UpdateMessage(NewMessage, ExitAfter, exit);
+                }
+            }).done(function (data) {
+                HandleNEwPage.Hide();
+                triggerUIUPdate();//hack alert
+                //getRefreshedData();
+            });
+        }
+        function triggerUIUPdate() {
+            //alert("we are deleting " + SubEvent.ID);
+            //$('#ConfirmDeleteModal').slideToggle();
+            //$('#ControlPanelContainer').slideUp(500);
+            //resetButtons();
+            global_ExitManager.triggerLastExitAndPop();
+        }
+
+    }
+
+    this.updateEventList = function (events)
+    {
+        debugger;
+        if (_this.timeOutData != -1) {
+            clearTimeout(_this.timeOutData);
+        }
+        _this.SubEvents = events;
+        getPausedEventOrNextPossibleEvent(_this.SubEvents);
+    }
+
+    getPausedEventOrNextPossibleEvent(_this.SubEvents);
+}
 
