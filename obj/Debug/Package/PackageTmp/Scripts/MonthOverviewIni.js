@@ -4616,6 +4616,7 @@ function GlobaPauseResumeButtonManager(events) {
 
     function SwitchToPause(eventId)
     {
+<<<<<<< HEAD
         var pauseResumeButton = getDomOrCreateNew(buttonId)
         $(pauseResumeButton).addClass("ControlPanelPausePanelButton");
         $(pauseResumeButton).removeClass("ControlPanelResumePanelButton");
@@ -4625,6 +4626,19 @@ function GlobaPauseResumeButtonManager(events) {
         var SubEvent = Dictionary_OfSubEvents[eventId];
         pauseResumeButton.onclick = function () {
             pauseEvent(SubEvent);
+=======
+        var SubEvent = Dictionary_OfSubEvents[eventId];
+        if (SubEvent.isPauseAble) {
+            var pauseResumeButton = getDomOrCreateNew(buttonId)
+            $(pauseResumeButton).addClass("ControlPanelPausePanelButton");
+            $(pauseResumeButton).removeClass("ControlPanelResumePanelButton");
+            ShowPauseResumeButton();
+            pauseResumeButton.setAttribute("Title", "Pause \"" + SubEvent.Name + "\"");
+            var SubEvent = Dictionary_OfSubEvents[eventId];
+            pauseResumeButton.onclick = function () {
+                pauseEvent(SubEvent);
+            }
+>>>>>>> bug/pause/globalPauseMenu
         }
     }
 

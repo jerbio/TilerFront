@@ -4616,15 +4616,17 @@ function GlobaPauseResumeButtonManager(events) {
 
     function SwitchToPause(eventId)
     {
-        var pauseResumeButton = getDomOrCreateNew(buttonId)
-        $(pauseResumeButton).addClass("ControlPanelPausePanelButton");
-        $(pauseResumeButton).removeClass("ControlPanelResumePanelButton");
-        ShowPauseResumeButton();
         var SubEvent = Dictionary_OfSubEvents[eventId];
-        pauseResumeButton.setAttribute("Title", "Pause \""+SubEvent.Name+"\"");
-        var SubEvent = Dictionary_OfSubEvents[eventId];
-        pauseResumeButton.onclick = function () {
-            pauseEvent(SubEvent);
+        if (SubEvent.isPauseAble) {
+            var pauseResumeButton = getDomOrCreateNew(buttonId)
+            $(pauseResumeButton).addClass("ControlPanelPausePanelButton");
+            $(pauseResumeButton).removeClass("ControlPanelResumePanelButton");
+            ShowPauseResumeButton();
+            pauseResumeButton.setAttribute("Title", "Pause \"" + SubEvent.Name + "\"");
+            var SubEvent = Dictionary_OfSubEvents[eventId];
+            pauseResumeButton.onclick = function () {
+                pauseEvent(SubEvent);
+            }
         }
     }
 
