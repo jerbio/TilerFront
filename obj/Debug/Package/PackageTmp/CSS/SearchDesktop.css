@@ -1,0 +1,102 @@
+﻿
+#SearchBarAndContentContainer 
+{
+    position:absolute;
+    width:100%;
+    height:auto;
+    top:0;
+}
+
+.FullScreenSearchContainer 
+{
+    width:100% !important;
+    height:100% !important;
+    z-index:10;
+    background-color: #fff;
+}
+
+#RightHeaderElement 
+{
+    position: absolute;
+    top: 10px;
+    width: auto;
+    right: 50px;
+    height: 40px;
+}
+.ActiveSearchBar
+{
+    width:50em !important;
+}
+
+#SearchBar 
+{
+  width: 45px;
+  padding-bottom: 3px;
+  z-index: 11;
+  position: relative;
+  height: 40px;
+  /* left: 20%; */
+  display: inline-block;
+  max-width: 20em;
+  transition:width 0.5s;
+}
+
+#SearchBarInput
+{
+    font-size: 24px;
+    height:100%;
+    outline: none;
+    width:100%;
+    border: 0;
+    border-bottom: 1px solid black;
+    font-family: 'texbold', Helvetica, sans-serif;
+    position:absolute;
+}
+#TopPanelContainer {
+  margin-top: 12%;
+  margin-left: 94px;
+  margin-right: 94px;
+  }
+
+.InputBarAndContentContainer {
+  top: 15%;
+  width: 90%;
+  margin-left: 5%;
+}
+.returnedValueContainer {
+  height: 40px;
+}
+.NameOfSearchedEventContainer {
+  font-family: 'texreg', Helvetica, sans-serif;
+  font-size: 18px;
+}
+.NowIcon {
+  width: 45px;
+  height: 45px;
+  display:inline-block;
+}
+
+.NowIcon_Search
+{
+    position:relative;
+}
+
+.IconSetSearch {
+    display:inline-block;
+}
+
+.IconSetSearch div 
+{
+    transition:none;    
+    display:inline-block;
+}
+
+
+.DeleteSearchContainer {
+    position:absolute;
+    height:auto;
+    width:100%;
+}
+
+
+

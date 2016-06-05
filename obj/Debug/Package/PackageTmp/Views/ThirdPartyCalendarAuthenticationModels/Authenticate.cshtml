@@ -1,0 +1,51 @@
+﻿@model TilerFront.Models.ThirdPartyCalendarAuthenticationModel
+
+@{
+    ViewBag.Title = "Authenticate";
+}
+
+<h2>Authenticate</h2>
+<script>
+    debugger;
+    var Token = "Bearer @Model.Token";
+    var ID = "@Model.ID";
+    var Type = "web_hook";
+    var Address = "https://@Request.Url.Authority/api/GoogleNotification/Trigger";
+    var PostURL ="https://www.googleapis.com/calendar/v3/calendars/@Model.Email/events/watch";
+    var PostObject ={
+        id: ID, // Your channel ID.
+        type: "web_hook",
+        address: Address // Your receiving URL.
+        
+    }
+
+    $.ajax({
+        method: "POST",
+        url: PostURL,
+        data:JSON.stringify( PostObject),
+        contentType: "application/json; charset=utf-8",
+        //dataType: 'json',
+        headers : {
+            Authorization : Token
+        },
+        // DO NOT SET CONTENT TYPE to json
+        // contentType: "application/json; charset=utf-8", 
+        // DataType needs to stay, otherwise the response object
+        // will be treated as a single string
+        success: function (response) {
+            debugger;
+            //alert("alert 0-b");
+        },
+        error: function (data) {
+            debugger;
+        }
+    }).done(function (data) {
+        debugger;
+    });
+
+
+
+
+
+</script>
+
