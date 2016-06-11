@@ -7,13 +7,13 @@ namespace TilerFront.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.3-40302")]
-    public sealed partial class addedAbilityForPauseTime : IMigrationMetadata
+    public sealed partial class init : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(addedAbilityForPauseTime));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(init));
         
         string IMigrationMetadata.Id
         {
-            get { return "201605300652203_addedAbilityForPauseTime"; }
+            get { return "201606111536078_init"; }
         }
         
         string IMigrationMetadata.Source
