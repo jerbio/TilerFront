@@ -3,6 +3,7 @@
 =======
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.csproj.App.config
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.csprojResolveAssemblyReference.cache
+<<<<<<< HEAD
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.Migrations.GoogleNotificationAuthentication.resources
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.Migrations.GoogleNotificationAuthentication1.resources
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.Migrations.pauseEventTable.resources
@@ -11,6 +12,8 @@ C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.Migrations.init.resources
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.csproj.GenerateResource.Cache
 >>>>>>> After rebasing Made changes to make code compileable
+=======
+>>>>>>> Fixed issue where I could not create a database for tilere because of
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\ApplicationInsights.config
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\Microsoft.ApplicationInsights.Extensions.Intercept_x86.dll
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\Microsoft.ApplicationInsights.Extensions.Intercept_x64.dll
@@ -474,4 +477,9 @@ C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront
 =======
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.dll
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.pdb
+<<<<<<< HEAD
 >>>>>>> After rebasing Made changes to make code compileable
+=======
+C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.Migrations.init.resources
+C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.csproj.GenerateResource.Cache
+>>>>>>> Fixed issue where I could not create a database for tilere because of

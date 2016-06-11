@@ -7,13 +7,13 @@ namespace TilerFront.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.3-40302")]
-    public sealed partial class modifiedPuaseData : IMigrationMetadata
+    public sealed partial class init : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(modifiedPuaseData));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(init));
         
         string IMigrationMetadata.Id
         {
-            get { return "201605040341293_modifiedPuaseData"; }
+            get { return "201606111147064_init"; }
         }
         
         string IMigrationMetadata.Source
