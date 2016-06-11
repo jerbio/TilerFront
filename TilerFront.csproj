@@ -434,9 +434,9 @@
     </Compile>
     <Compile Include="GoogleCalExtension.cs" />
     <Compile Include="GoogleTilerEventControl.cs" />
-    <Compile Include="Migrations\201606111147064_init.cs" />
-    <Compile Include="Migrations\201606111147064_init.Designer.cs">
-      <DependentUpon>201606111147064_init.cs</DependentUpon>
+    <Compile Include="Migrations\201606111536078_init.cs" />
+    <Compile Include="Migrations\201606111536078_init.Designer.cs">
+      <DependentUpon>201606111536078_init.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
@@ -2653,17 +2653,8 @@
     <None Include="Project_Readme.html" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201606111147064_init.resx">
-      <DependentUpon>201606111147064_init.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201605300652203_addedAbilityForPauseTime.resx">
-      <DependentUpon>201605300652203_addedAbilityForPauseTime.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201605300724181_addedPrimaryContraintForPauseTime.resx">
-      <DependentUpon>201605300724181_addedPrimaryContraintForPauseTime.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201605300732307_addedPrimaryContraintForPauseTime1.resx">
-      <DependentUpon>201605300732307_addedPrimaryContraintForPauseTime1.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201606111536078_init.resx">
+      <DependentUpon>201606111536078_init.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

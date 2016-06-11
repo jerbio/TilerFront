@@ -308,9 +308,10 @@ namespace TilerFront.Migrations
                         PauseTime = c.DateTimeOffset(nullable: false, precision: 7),
                         isPauseDeleted = c.Boolean(nullable: false),
                     })
-                .PrimaryKey(t => t.EventId)
+                .PrimaryKey(t => t.EventId,clustered:false)
                 .ForeignKey("dbo.AspNetUsers", t => t.UserId)
-                .Index(t => t.UserId);
+                .Index(t => new { t.UserId, t.isPauseDeleted }, clustered: true, name: "UserIdAndPauseStatus")
+                .Index(t => new { t.UserId, t.EventId }, unique: true, name: "UserIdAndSubEventIdClustering");
             
             CreateTable(
                 "dbo.AspNetRoles",
@@ -359,7 +360,8 @@ namespace TilerFront.Migrations
             DropForeignKey("dbo.CalendarEvents", "Location_Id", "dbo.Location_Elements");
             DropForeignKey("dbo.CalendarEvents", "Classification_Id", "dbo.Classifications");
             DropIndex("dbo.AspNetRoles", "RoleNameIndex");
-            DropIndex("dbo.PausedEvent", new[] { "UserId" });
+            DropIndex("dbo.PausedEvent", "UserIdAndSubEventIdClustering");
+            DropIndex("dbo.PausedEvent", "UserIdAndPauseStatus");
             DropIndex("dbo.DB_RestrictionTimeLine", new[] { "RestrictionProfileId" });
             DropIndex("dbo.AspNetUserRoles", new[] { "RoleId" });
             DropIndex("dbo.AspNetUserRoles", new[] { "UserId" });
