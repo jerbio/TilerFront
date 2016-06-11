@@ -434,29 +434,9 @@
     </Compile>
     <Compile Include="GoogleCalExtension.cs" />
     <Compile Include="GoogleTilerEventControl.cs" />
-    <Compile Include="Migrations\201505070935055_GoogleNotificationAuthentication.cs" />
-    <Compile Include="Migrations\201505070935055_GoogleNotificationAuthentication.Designer.cs">
-      <DependentUpon>201505070935055_GoogleNotificationAuthentication.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201505080639133_GoogleNotificationAuthentication1.cs" />
-    <Compile Include="Migrations\201505080639133_GoogleNotificationAuthentication1.Designer.cs">
-      <DependentUpon>201505080639133_GoogleNotificationAuthentication1.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201605031337223_pauseEventTable.cs" />
-    <Compile Include="Migrations\201605031337223_pauseEventTable.Designer.cs">
-      <DependentUpon>201605031337223_pauseEventTable.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201605040341293_modifiedPuaseData.cs" />
-    <Compile Include="Migrations\201605040341293_modifiedPuaseData.Designer.cs">
-      <DependentUpon>201605040341293_modifiedPuaseData.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201605230745399_addedPausedEventForeignKeyRelationship.cs" />
-    <Compile Include="Migrations\201605230745399_addedPausedEventForeignKeyRelationship.Designer.cs">
-      <DependentUpon>201605230745399_addedPausedEventForeignKeyRelationship.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201603171733317_init.cs" />
-    <Compile Include="Migrations\201603171733317_init.Designer.cs">
-      <DependentUpon>201603171733317_init.cs</DependentUpon>
+    <Compile Include="Migrations\201606111147064_init.cs" />
+    <Compile Include="Migrations\201606111147064_init.Designer.cs">
+      <DependentUpon>201606111147064_init.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
@@ -2671,23 +2651,8 @@
     <None Include="Project_Readme.html" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201505070935055_GoogleNotificationAuthentication.resx">
-      <DependentUpon>201505070935055_GoogleNotificationAuthentication.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201505080639133_GoogleNotificationAuthentication1.resx">
-      <DependentUpon>201505080639133_GoogleNotificationAuthentication1.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201605031337223_pauseEventTable.resx">
-      <DependentUpon>201605031337223_pauseEventTable.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201605040341293_modifiedPuaseData.resx">
-      <DependentUpon>201605040341293_modifiedPuaseData.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201605230745399_addedPausedEventForeignKeyRelationship.resx">
-      <DependentUpon>201605230745399_addedPausedEventForeignKeyRelationship.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201603171733317_init.resx">
-      <DependentUpon>201603171733317_init.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201606111147064_init.resx">
+      <DependentUpon>201606111147064_init.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201605300652203_addedAbilityForPauseTime.resx">
       <DependentUpon>201605300652203_addedAbilityForPauseTime.cs</DependentUpon>

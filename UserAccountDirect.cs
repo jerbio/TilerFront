@@ -76,14 +76,6 @@ namespace TilerFront
         }
 
 
-<<<<<<< HEAD
-        async public Task<CustomErrors> Register(Models.ApplicationUser user)
-        {
-            CustomErrors retValue = UserLog.genereateNewLogFile(user.Id);
-            return retValue;
-        }
-=======
->>>>>>> After rebasing Made changes to make code compileable
 
         override async public Task<CustomErrors> DeleteLog()
         {

@@ -161,33 +161,11 @@ C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\TilerElements.pdb
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\Zlib.Portable.xml
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\Google.Maps.pdb
-C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.csproj.App.config
-C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.csprojResolveAssemblyReference.cache
-C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.Migrations.GoogleNotificationAuthentication.resources
-C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.Migrations.GoogleNotificationAuthentication1.resources
-C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.Migrations.pauseEventTable.resources
-C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.Migrations.modifiedPuaseData.resources
-C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.Migrations.addedPausedEventForeignKeyRelationship.resources
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.Migrations.addedAbilityForPauseTime.resources
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.Migrations.addedPrimaryContraintForPauseTime.resources
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.Migrations.addedPrimaryContraintForPauseTime1.resources
-C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.csproj.GenerateResource.Cache
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.dll
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.pdb
-C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\BouncyCastle.Crypto.dll
-C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\Microsoft.AI.Agent.Intercept.dll
-C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\Microsoft.AI.DependencyCollector.dll
-C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\Microsoft.AI.PerfCounterCollector.dll
-C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\Microsoft.AI.ServerTelemetryChannel.dll
-C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\Microsoft.AI.Web.dll
-C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\Microsoft.AI.WindowsServer.dll
-C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\SendGrid.dll
-C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\Microsoft.AI.DependencyCollector.xml
-C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\Microsoft.AI.ServerTelemetryChannel.xml
-C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\Microsoft.AI.Web.xml
-C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\Microsoft.AI.WindowsServer.xml
-C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\DBTilerElement.dll
-C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.Migrations.addedPausedEventForeignKeyRelationship.resources
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\ApplicationInsights.config
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Microsoft.ApplicationInsights.Extensions.Intercept_x86.dll
 C:\Users\OluJerome\Documents\WagTap\WagTapWeb\TilerFront\bin\Microsoft.ApplicationInsights.Extensions.Intercept_x64.dll
@@ -452,12 +430,7 @@ C:\Users\jerom\Documents\Visual Studio 2013\Projects\WagTap\WagTapWeb\TilerFront
 C:\Users\jerom\Documents\Visual Studio 2013\Projects\WagTap\WagTapWeb\TilerFront\bin\Google.Apis.Plus.v1.xml
 C:\Users\jerom\Documents\Visual Studio 2013\Projects\WagTap\WagTapWeb\TilerFront\bin\Google.Apis.Oauth2.v2.pdb
 C:\Users\jerom\Documents\Visual Studio 2013\Projects\WagTap\WagTapWeb\TilerFront\bin\Google.Apis.Oauth2.v2.xml
-C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.Migrations.init.resources
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\Microsoft.ApplicationInsights.Extensibility.Web.dll
-C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\TilerSearch.exe
-C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\Lucene.Net.dll
-C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\Microsoft.WindowsAzure.Storage.dll
-C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\Lucene.Net.Store.Azure.dll
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\Microsoft.ApplicationInsights.Extensibility.RuntimeTelemetry.pdb
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\Microsoft.ApplicationInsights.Extensibility.Web.pdb
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\Microsoft.ApplicationInsights.Extensibility.Web.xml
@@ -466,5 +439,3 @@ C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\Lucene.Net.pdb
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\Lucene.Net.xml
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\bin\Microsoft.WindowsAzure.Storage.xml
-C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.dll
-C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.pdb
