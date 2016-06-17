@@ -434,9 +434,29 @@
     </Compile>
     <Compile Include="GoogleCalExtension.cs" />
     <Compile Include="GoogleTilerEventControl.cs" />
-    <Compile Include="Migrations\201606111536078_init.cs" />
-    <Compile Include="Migrations\201606111536078_init.Designer.cs">
-      <DependentUpon>201606111536078_init.cs</DependentUpon>
+    <Compile Include="Migrations\201606152033590_init.cs" />
+    <Compile Include="Migrations\201606152033590_init.Designer.cs">
+      <DependentUpon>201606152033590_init.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201606161731285_init1.cs" />
+    <Compile Include="Migrations\201606161731285_init1.Designer.cs">
+      <DependentUpon>201606161731285_init1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201606162116379_init2.cs" />
+    <Compile Include="Migrations\201606162116379_init2.Designer.cs">
+      <DependentUpon>201606162116379_init2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201606162215019_init3.cs" />
+    <Compile Include="Migrations\201606162215019_init3.Designer.cs">
+      <DependentUpon>201606162215019_init3.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201606162223119_scheduleControlChange.cs" />
+    <Compile Include="Migrations\201606162223119_scheduleControlChange.Designer.cs">
+      <DependentUpon>201606162223119_scheduleControlChange.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201606170208266_requiredCreatorId.cs" />
+    <Compile Include="Migrations\201606170208266_requiredCreatorId.Designer.cs">
+      <DependentUpon>201606170208266_requiredCreatorId.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
@@ -2651,8 +2671,23 @@
     <None Include="Project_Readme.html" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201606111536078_init.resx">
-      <DependentUpon>201606111536078_init.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201606152033590_init.resx">
+      <DependentUpon>201606152033590_init.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201606161731285_init1.resx">
+      <DependentUpon>201606161731285_init1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201606162116379_init2.resx">
+      <DependentUpon>201606162116379_init2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201606162215019_init3.resx">
+      <DependentUpon>201606162215019_init3.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201606162223119_scheduleControlChange.resx">
+      <DependentUpon>201606162223119_scheduleControlChange.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201606170208266_requiredCreatorId.resx">
+      <DependentUpon>201606170208266_requiredCreatorId.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

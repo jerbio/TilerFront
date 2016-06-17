@@ -14,15 +14,55 @@ namespace TilerFront.Migrations
                         Id = c.String(nullable: false, maxLength: 128),
                         ThirdPartyID = c.String(),
                         UsedTime = c.Time(nullable: false, precision: 7),
+                        CreatorId = c.String(maxLength: 128),
+                        CalculationEnd = c.DateTimeOffset(precision: 7),
+                        CompleteCount = c.Int(),
+                        DeleteCount = c.Int(),
+                        InitializingStart = c.DateTimeOffset(precision: 7),
+                        isDeleted = c.Boolean(),
+                        isDeletedByUser = c.Boolean(),
+                        isDeviated = c.Boolean(),
+                        isRepeat = c.Boolean(),
+                        isRigid = c.Boolean(),
+                        OriginalTimeSpanPerSplit = c.Time(precision: 7),
+                        SplitCount = c.Int(),
+                        TimeSpanPerSplit = c.Time(precision: 7),
+                        Urgency = c.Int(),
+                        CompleteFlag = c.Boolean(),
+                        StartTime = c.DateTimeOffset(precision: 7),
+                        EndTime = c.DateTimeOffset(precision: 7),
                         Discriminator = c.String(nullable: false, maxLength: 128),
                         Classification_Id = c.String(maxLength: 128),
                         Location_Id = c.String(maxLength: 128),
+                        EventRepeat_Id = c.String(maxLength: 128),
+                        LastNowProfile_Id = c.String(maxLength: 128),
+                        Name_Id = c.String(maxLength: 128),
+                        Notes_Id = c.String(maxLength: 128),
+                        ProcrastinationProfile_Id = c.String(maxLength: 128),
+                        RepeatRoot_Id = c.String(maxLength: 128),
+                        UIData_Id = c.String(maxLength: 128),
                     })
                 .PrimaryKey(t => t.Id)
                 .ForeignKey("dbo.Classifications", t => t.Classification_Id)
                 .ForeignKey("dbo.Location_Elements", t => t.Location_Id)
+                .ForeignKey("dbo.AspNetUsers", t => t.CreatorId)
+                .ForeignKey("dbo.Repetition", t => t.EventRepeat_Id)
+                .ForeignKey("dbo.NowProfiles", t => t.LastNowProfile_Id)
+                .ForeignKey("dbo.EventNames", t => t.Name_Id)
+                .ForeignKey("dbo.MiscDatas", t => t.Notes_Id)
+                .ForeignKey("dbo.Procrastinations", t => t.ProcrastinationProfile_Id)
+                .ForeignKey("dbo.CalendarEvents", t => t.RepeatRoot_Id)
+                .ForeignKey("dbo.EventDisplays", t => t.UIData_Id)
+                .Index(t => t.CreatorId)
                 .Index(t => t.Classification_Id)
-                .Index(t => t.Location_Id);
+                .Index(t => t.Location_Id)
+                .Index(t => t.EventRepeat_Id)
+                .Index(t => t.LastNowProfile_Id)
+                .Index(t => t.Name_Id)
+                .Index(t => t.Notes_Id)
+                .Index(t => t.ProcrastinationProfile_Id)
+                .Index(t => t.RepeatRoot_Id)
+                .Index(t => t.UIData_Id);
             
             CreateTable(
                 "dbo.Classifications",
@@ -56,6 +96,73 @@ namespace TilerFront.Migrations
                         Discriminator = c.String(nullable: false, maxLength: 128),
                     })
                 .PrimaryKey(t => t.Id);
+            
+            CreateTable(
+                "dbo.AspNetUsers",
+                c => new
+                    {
+                        Id = c.String(nullable: false, maxLength: 128),
+                        FullName = c.String(),
+                        LastChange = c.DateTime(nullable: false),
+                        ReferenceDay = c.DateTimeOffset(nullable: false, precision: 7),
+                        Email = c.String(maxLength: 256),
+                        EmailConfirmed = c.Boolean(nullable: false),
+                        PasswordHash = c.String(),
+                        SecurityStamp = c.String(),
+                        PhoneNumber = c.String(),
+                        PhoneNumberConfirmed = c.Boolean(nullable: false),
+                        TwoFactorEnabled = c.Boolean(nullable: false),
+                        LockoutEndDateUtc = c.DateTime(),
+                        LockoutEnabled = c.Boolean(nullable: false),
+                        AccessFailedCount = c.Int(nullable: false),
+                        UserName = c.String(nullable: false, maxLength: 256),
+                        SubCalendarEventPersist_Id = c.String(maxLength: 128),
+                        DB_CalendarEvent_Id = c.String(maxLength: 128),
+                    })
+                .PrimaryKey(t => t.Id)
+                .ForeignKey("dbo.SubCalendarEvents", t => t.SubCalendarEventPersist_Id)
+                .ForeignKey("dbo.CalendarEvents", t => t.DB_CalendarEvent_Id)
+                .Index(t => t.UserName, unique: true, name: "UserNameIndex")
+                .Index(t => t.SubCalendarEventPersist_Id)
+                .Index(t => t.DB_CalendarEvent_Id);
+            
+            CreateTable(
+                "dbo.AspNetUserClaims",
+                c => new
+                    {
+                        Id = c.Int(nullable: false, identity: true),
+                        UserId = c.String(nullable: false, maxLength: 128),
+                        ClaimType = c.String(),
+                        ClaimValue = c.String(),
+                    })
+                .PrimaryKey(t => t.Id)
+                .ForeignKey("dbo.AspNetUsers", t => t.UserId, cascadeDelete: true)
+                .Index(t => t.UserId);
+            
+            CreateTable(
+                "dbo.AspNetUserLogins",
+                c => new
+                    {
+                        LoginProvider = c.String(nullable: false, maxLength: 128),
+                        ProviderKey = c.String(nullable: false, maxLength: 128),
+                        UserId = c.String(nullable: false, maxLength: 128),
+                    })
+                .PrimaryKey(t => new { t.LoginProvider, t.ProviderKey, t.UserId })
+                .ForeignKey("dbo.AspNetUsers", t => t.UserId, cascadeDelete: true)
+                .Index(t => t.UserId);
+            
+            CreateTable(
+                "dbo.AspNetUserRoles",
+                c => new
+                    {
+                        UserId = c.String(nullable: false, maxLength: 128),
+                        RoleId = c.String(nullable: false, maxLength: 128),
+                    })
+                .PrimaryKey(t => new { t.UserId, t.RoleId })
+                .ForeignKey("dbo.AspNetUsers", t => t.UserId, cascadeDelete: true)
+                .ForeignKey("dbo.AspNetRoles", t => t.RoleId, cascadeDelete: true)
+                .Index(t => t.UserId)
+                .Index(t => t.RoleId);
             
             CreateTable(
                 "dbo.Repetition",
@@ -121,42 +228,58 @@ namespace TilerFront.Migrations
                         End = c.DateTimeOffset(nullable: false, precision: 7),
                         ThirdPartyID = c.String(),
                         UsedTime = c.Time(nullable: false, precision: 7),
+                        CreatorId = c.String(),
                         CalendarEnd = c.DateTimeOffset(precision: 7),
                         CalendarStart = c.DateTimeOffset(precision: 7),
-                        ConflictLevel = c.Int(),
-                        CreatorId = c.String(),
-                        HumaneEnd = c.DateTimeOffset(precision: 7),
                         HumaneStart = c.DateTimeOffset(precision: 7),
-                        InitializingStart = c.DateTimeOffset(precision: 7),
-                        isDeleted = c.Boolean(),
-                        isDeletedByUser = c.Boolean(),
-                        isRepeat = c.Boolean(),
-                        isRigid = c.Boolean(),
-                        NonHumaneEnd = c.DateTimeOffset(precision: 7),
+                        HumaneEnd = c.DateTimeOffset(precision: 7),
                         NonHumaneStart = c.DateTimeOffset(precision: 7),
+                        NonHumaneEnd = c.DateTimeOffset(precision: 7),
+                        ConflictLevel = c.Int(),
+                        Score = c.Double(),
+                        InitializingStart = c.DateTimeOffset(precision: 7),
+                        StartTime = c.DateTimeOffset(precision: 7),
+                        EndTime = c.DateTimeOffset(precision: 7),
                         Urgency = c.Int(),
+                        isDeletedByUser = c.Boolean(),
+                        isRigid = c.Boolean(),
+                        isDeleted = c.Boolean(),
+                        CompleteFlag = c.Boolean(),
+                        isRepeat = c.Boolean(),
                         isDeviated = c.Boolean(),
                         Discriminator = c.String(nullable: false, maxLength: 128),
                         Classification_Id = c.String(maxLength: 128),
                         Location_Id = c.String(maxLength: 128),
                         conflict_Id = c.String(maxLength: 128),
+                        Creator_Id = c.String(maxLength: 128),
+                        Name_Id = c.String(maxLength: 128),
+                        Notes_Id = c.String(maxLength: 128),
                         ProcrastinationProfile_Id = c.String(maxLength: 128),
-                        Restriction_Id = c.String(maxLength: 128),
                         UIData_Id = c.String(maxLength: 128),
+                        Restriction_Id = c.String(maxLength: 128),
+                        DB_CalendarEvent_Id = c.String(maxLength: 128),
                     })
                 .PrimaryKey(t => t.Id)
                 .ForeignKey("dbo.Classifications", t => t.Classification_Id)
                 .ForeignKey("dbo.Location_Elements", t => t.Location_Id)
                 .ForeignKey("dbo.ConflictProfiles", t => t.conflict_Id)
+                .ForeignKey("dbo.AspNetUsers", t => t.Creator_Id)
+                .ForeignKey("dbo.EventNames", t => t.Name_Id)
+                .ForeignKey("dbo.MiscDatas", t => t.Notes_Id)
                 .ForeignKey("dbo.Procrastinations", t => t.ProcrastinationProfile_Id)
-                .ForeignKey("dbo.RestrictionProfiles", t => t.Restriction_Id)
                 .ForeignKey("dbo.EventDisplays", t => t.UIData_Id)
+                .ForeignKey("dbo.RestrictionProfiles", t => t.Restriction_Id)
+                .ForeignKey("dbo.CalendarEvents", t => t.DB_CalendarEvent_Id)
                 .Index(t => t.Classification_Id)
                 .Index(t => t.Location_Id)
                 .Index(t => t.conflict_Id)
+                .Index(t => t.Creator_Id)
+                .Index(t => t.Name_Id)
+                .Index(t => t.Notes_Id)
                 .Index(t => t.ProcrastinationProfile_Id)
+                .Index(t => t.UIData_Id)
                 .Index(t => t.Restriction_Id)
-                .Index(t => t.UIData_Id);
+                .Index(t => t.DB_CalendarEvent_Id);
             
             CreateTable(
                 "dbo.ConflictProfiles",
@@ -199,70 +322,6 @@ namespace TilerFront.Migrations
                 .PrimaryKey(t => t.Id);
             
             CreateTable(
-                "dbo.AspNetUsers",
-                c => new
-                    {
-                        Id = c.String(nullable: false, maxLength: 128),
-                        FullName = c.String(),
-                        LastChange = c.DateTime(nullable: false),
-                        ReferenceDay = c.DateTimeOffset(nullable: false, precision: 7),
-                        Email = c.String(maxLength: 256),
-                        EmailConfirmed = c.Boolean(nullable: false),
-                        PasswordHash = c.String(),
-                        SecurityStamp = c.String(),
-                        PhoneNumber = c.String(),
-                        PhoneNumberConfirmed = c.Boolean(nullable: false),
-                        TwoFactorEnabled = c.Boolean(nullable: false),
-                        LockoutEndDateUtc = c.DateTime(),
-                        LockoutEnabled = c.Boolean(nullable: false),
-                        AccessFailedCount = c.Int(nullable: false),
-                        UserName = c.String(nullable: false, maxLength: 256),
-                        DB_SubCalendarEventRestricted_Id = c.String(maxLength: 128),
-                    })
-                .PrimaryKey(t => t.Id)
-                .ForeignKey("dbo.SubCalendarEvents", t => t.DB_SubCalendarEventRestricted_Id)
-                .Index(t => t.UserName, unique: true, name: "UserNameIndex")
-                .Index(t => t.DB_SubCalendarEventRestricted_Id);
-            
-            CreateTable(
-                "dbo.AspNetUserClaims",
-                c => new
-                    {
-                        Id = c.Int(nullable: false, identity: true),
-                        UserId = c.String(nullable: false, maxLength: 128),
-                        ClaimType = c.String(),
-                        ClaimValue = c.String(),
-                    })
-                .PrimaryKey(t => t.Id)
-                .ForeignKey("dbo.AspNetUsers", t => t.UserId, cascadeDelete: true)
-                .Index(t => t.UserId);
-            
-            CreateTable(
-                "dbo.AspNetUserLogins",
-                c => new
-                    {
-                        LoginProvider = c.String(nullable: false, maxLength: 128),
-                        ProviderKey = c.String(nullable: false, maxLength: 128),
-                        UserId = c.String(nullable: false, maxLength: 128),
-                    })
-                .PrimaryKey(t => new { t.LoginProvider, t.ProviderKey, t.UserId })
-                .ForeignKey("dbo.AspNetUsers", t => t.UserId, cascadeDelete: true)
-                .Index(t => t.UserId);
-            
-            CreateTable(
-                "dbo.AspNetUserRoles",
-                c => new
-                    {
-                        UserId = c.String(nullable: false, maxLength: 128),
-                        RoleId = c.String(nullable: false, maxLength: 128),
-                    })
-                .PrimaryKey(t => new { t.UserId, t.RoleId })
-                .ForeignKey("dbo.AspNetUsers", t => t.UserId, cascadeDelete: true)
-                .ForeignKey("dbo.AspNetRoles", t => t.RoleId, cascadeDelete: true)
-                .Index(t => t.UserId)
-                .Index(t => t.RoleId);
-            
-            CreateTable(
                 "dbo.RestrictionProfiles",
                 c => new
                     {
@@ -303,13 +362,14 @@ namespace TilerFront.Migrations
                 "dbo.PausedEvent",
                 c => new
                     {
-                        UserId = c.String(maxLength: 128),
+                        UserId = c.String(nullable: false, maxLength: 128),
                         EventId = c.String(nullable: false, maxLength: 128),
                         PauseTime = c.DateTimeOffset(nullable: false, precision: 7),
                         isPauseDeleted = c.Boolean(nullable: false),
                     })
-                .PrimaryKey(t => t.EventId,clustered:false)
-                .ForeignKey("dbo.AspNetUsers", t => t.UserId)
+                .PrimaryKey(t => new { t.UserId, t.EventId }, clustered: false)
+                .ForeignKey("dbo.SubCalendarEvents", t => t.EventId, cascadeDelete: true)
+                .ForeignKey("dbo.AspNetUsers", t => t.UserId, cascadeDelete: true)
                 .Index(t => new { t.UserId, t.isPauseDeleted }, clustered: true, name: "UserIdAndPauseStatus")
                 .Index(t => new { t.UserId, t.EventId }, unique: true, name: "UserIdAndSubEventIdClustering");
             
@@ -345,49 +405,72 @@ namespace TilerFront.Migrations
         {
             DropForeignKey("dbo.AspNetUserRoles", "RoleId", "dbo.AspNetRoles");
             DropForeignKey("dbo.PausedEvent", "UserId", "dbo.AspNetUsers");
-            DropForeignKey("dbo.AspNetUsers", "DB_SubCalendarEventRestricted_Id", "dbo.SubCalendarEvents");
-            DropForeignKey("dbo.SubCalendarEvents", "UIData_Id", "dbo.EventDisplays");
+            DropForeignKey("dbo.PausedEvent", "EventId", "dbo.SubCalendarEvents");
+            DropForeignKey("dbo.AspNetUsers", "DB_CalendarEvent_Id", "dbo.CalendarEvents");
+            DropForeignKey("dbo.CalendarEvents", "UIData_Id", "dbo.EventDisplays");
+            DropForeignKey("dbo.SubCalendarEvents", "DB_CalendarEvent_Id", "dbo.CalendarEvents");
             DropForeignKey("dbo.SubCalendarEvents", "Restriction_Id", "dbo.RestrictionProfiles");
             DropForeignKey("dbo.DB_RestrictionTimeLine", "RestrictionProfileId", "dbo.RestrictionProfiles");
+            DropForeignKey("dbo.AspNetUsers", "SubCalendarEventPersist_Id", "dbo.SubCalendarEvents");
+            DropForeignKey("dbo.SubCalendarEvents", "UIData_Id", "dbo.EventDisplays");
+            DropForeignKey("dbo.EventDisplays", "UIColor_Id", "dbo.TilerColors");
             DropForeignKey("dbo.SubCalendarEvents", "ProcrastinationProfile_Id", "dbo.Procrastinations");
+            DropForeignKey("dbo.SubCalendarEvents", "Notes_Id", "dbo.MiscDatas");
+            DropForeignKey("dbo.SubCalendarEvents", "Name_Id", "dbo.EventNames");
+            DropForeignKey("dbo.SubCalendarEvents", "Creator_Id", "dbo.AspNetUsers");
             DropForeignKey("dbo.SubCalendarEvents", "conflict_Id", "dbo.ConflictProfiles");
+            DropForeignKey("dbo.SubCalendarEvents", "Location_Id", "dbo.Location_Elements");
+            DropForeignKey("dbo.SubCalendarEvents", "Classification_Id", "dbo.Classifications");
+            DropForeignKey("dbo.CalendarEvents", "RepeatRoot_Id", "dbo.CalendarEvents");
+            DropForeignKey("dbo.CalendarEvents", "ProcrastinationProfile_Id", "dbo.Procrastinations");
+            DropForeignKey("dbo.CalendarEvents", "Notes_Id", "dbo.MiscDatas");
+            DropForeignKey("dbo.CalendarEvents", "Name_Id", "dbo.EventNames");
+            DropForeignKey("dbo.CalendarEvents", "LastNowProfile_Id", "dbo.NowProfiles");
+            DropForeignKey("dbo.CalendarEvents", "EventRepeat_Id", "dbo.Repetition");
+            DropForeignKey("dbo.CalendarEvents", "CreatorId", "dbo.AspNetUsers");
             DropForeignKey("dbo.AspNetUserRoles", "UserId", "dbo.AspNetUsers");
             DropForeignKey("dbo.AspNetUserLogins", "UserId", "dbo.AspNetUsers");
             DropForeignKey("dbo.AspNetUserClaims", "UserId", "dbo.AspNetUsers");
-            DropForeignKey("dbo.EventDisplays", "UIColor_Id", "dbo.TilerColors");
-            DropForeignKey("dbo.SubCalendarEvents", "Location_Id", "dbo.Location_Elements");
-            DropForeignKey("dbo.SubCalendarEvents", "Classification_Id", "dbo.Classifications");
             DropForeignKey("dbo.CalendarEvents", "Location_Id", "dbo.Location_Elements");
             DropForeignKey("dbo.CalendarEvents", "Classification_Id", "dbo.Classifications");
             DropIndex("dbo.AspNetRoles", "RoleNameIndex");
             DropIndex("dbo.PausedEvent", "UserIdAndSubEventIdClustering");
             DropIndex("dbo.PausedEvent", "UserIdAndPauseStatus");
             DropIndex("dbo.DB_RestrictionTimeLine", new[] { "RestrictionProfileId" });
+            DropIndex("dbo.EventDisplays", new[] { "UIColor_Id" });
+            DropIndex("dbo.SubCalendarEvents", new[] { "DB_CalendarEvent_Id" });
+            DropIndex("dbo.SubCalendarEvents", new[] { "Restriction_Id" });
+            DropIndex("dbo.SubCalendarEvents", new[] { "UIData_Id" });
+            DropIndex("dbo.SubCalendarEvents", new[] { "ProcrastinationProfile_Id" });
+            DropIndex("dbo.SubCalendarEvents", new[] { "Notes_Id" });
+            DropIndex("dbo.SubCalendarEvents", new[] { "Name_Id" });
+            DropIndex("dbo.SubCalendarEvents", new[] { "Creator_Id" });
+            DropIndex("dbo.SubCalendarEvents", new[] { "conflict_Id" });
+            DropIndex("dbo.SubCalendarEvents", new[] { "Location_Id" });
+            DropIndex("dbo.SubCalendarEvents", new[] { "Classification_Id" });
             DropIndex("dbo.AspNetUserRoles", new[] { "RoleId" });
             DropIndex("dbo.AspNetUserRoles", new[] { "UserId" });
             DropIndex("dbo.AspNetUserLogins", new[] { "UserId" });
             DropIndex("dbo.AspNetUserClaims", new[] { "UserId" });
-            DropIndex("dbo.AspNetUsers", new[] { "DB_SubCalendarEventRestricted_Id" });
+            DropIndex("dbo.AspNetUsers", new[] { "DB_CalendarEvent_Id" });
+            DropIndex("dbo.AspNetUsers", new[] { "SubCalendarEventPersist_Id" });
             DropIndex("dbo.AspNetUsers", "UserNameIndex");
-            DropIndex("dbo.EventDisplays", new[] { "UIColor_Id" });
-            DropIndex("dbo.SubCalendarEvents", new[] { "UIData_Id" });
-            DropIndex("dbo.SubCalendarEvents", new[] { "Restriction_Id" });
-            DropIndex("dbo.SubCalendarEvents", new[] { "ProcrastinationProfile_Id" });
-            DropIndex("dbo.SubCalendarEvents", new[] { "conflict_Id" });
-            DropIndex("dbo.SubCalendarEvents", new[] { "Location_Id" });
-            DropIndex("dbo.SubCalendarEvents", new[] { "Classification_Id" });
+            DropIndex("dbo.CalendarEvents", new[] { "UIData_Id" });
+            DropIndex("dbo.CalendarEvents", new[] { "RepeatRoot_Id" });
+            DropIndex("dbo.CalendarEvents", new[] { "ProcrastinationProfile_Id" });
+            DropIndex("dbo.CalendarEvents", new[] { "Notes_Id" });
+            DropIndex("dbo.CalendarEvents", new[] { "Name_Id" });
+            DropIndex("dbo.CalendarEvents", new[] { "LastNowProfile_Id" });
+            DropIndex("dbo.CalendarEvents", new[] { "EventRepeat_Id" });
             DropIndex("dbo.CalendarEvents", new[] { "Location_Id" });
             DropIndex("dbo.CalendarEvents", new[] { "Classification_Id" });
+            DropIndex("dbo.CalendarEvents", new[] { "CreatorId" });
             DropTable("dbo.ThirdPartyCalendarAuthenticationModels");
             DropTable("dbo.AspNetRoles");
             DropTable("dbo.PausedEvent");
             DropTable("dbo.GoogleNotificationWatchResponseModels");
             DropTable("dbo.DB_RestrictionTimeLine");
             DropTable("dbo.RestrictionProfiles");
-            DropTable("dbo.AspNetUserRoles");
-            DropTable("dbo.AspNetUserLogins");
-            DropTable("dbo.AspNetUserClaims");
-            DropTable("dbo.AspNetUsers");
             DropTable("dbo.TilerColors");
             DropTable("dbo.EventDisplays");
             DropTable("dbo.ConflictProfiles");
@@ -397,6 +480,10 @@ namespace TilerFront.Migrations
             DropTable("dbo.EventNames");
             DropTable("dbo.NowProfiles");
             DropTable("dbo.Repetition");
+            DropTable("dbo.AspNetUserRoles");
+            DropTable("dbo.AspNetUserLogins");
+            DropTable("dbo.AspNetUserClaims");
+            DropTable("dbo.AspNetUsers");
             DropTable("dbo.Location_Elements");
             DropTable("dbo.Classifications");
             DropTable("dbo.CalendarEvents");

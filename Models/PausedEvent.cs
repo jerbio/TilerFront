@@ -13,7 +13,7 @@ namespace TilerFront.Models
     [Table("PausedEvent")]
     public class PausedEvent
     {
-        [Column(Order = 0), ForeignKey("User"), Index("UserIdAndSubEventIdClustering",Order =0, IsUnique = true, IsClustered = false), Index("UserIdAndPauseStatus", Order = 0, IsClustered = true)]
+        [Column(Order = 0), Key, ForeignKey("User"), Index("UserIdAndSubEventIdClustering",Order =0, IsUnique = true, IsClustered = false), Index("UserIdAndPauseStatus", Order = 0, IsClustered = true)]
         public string UserId { get; set; }
         TilerUser _User;
         /// <summary>
@@ -31,8 +31,21 @@ namespace TilerFront.Models
         /// <summary>
         /// Id of the sub evnet that is being paused
         /// </summary>
-        [Column(Order = 1), Key, Index("UserIdAndSubEventIdClustering", Order = 1, IsUnique = true, IsClustered = false)]
+        [Column(Order = 1), Key, ForeignKey("SubEvent"), Index("UserIdAndSubEventIdClustering", Order = 1, IsUnique = true, IsClustered = false)]
         public string EventId { get; set; }
+
+        public SubCalendarEvent _SubEvent;
+        public SubCalendarEvent SubEvent
+        {
+            get
+            {
+                return _SubEvent;
+            }
+            set
+            {
+                _SubEvent = value;
+            }
+        }
         /// <summary>
         /// When the event is paused. Accuracy is to the minute
         /// </summary>
