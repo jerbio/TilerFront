@@ -70,14 +70,6 @@ namespace TilerFront
             return await UserLog.DeleteLog();
         }
         
-
-        async public Task CommitEventToLog(IEnumerable<CalendarEvent> AllEvents, string LogFile = "")
-        {
-            await (UserLog).PersistCalendarEvents(AllEvents);
-            sessionUser.LastChange = DateTimeOffset.Now.DateTime;
-            Task SaveChangesToDB = new Controllers.UserController().SaveUser(sessionUser);
-            await SaveChangesToDB;
-        }
         
         override public bool DeleteAllCalendarEvents()
         {

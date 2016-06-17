@@ -92,7 +92,7 @@ namespace TilerFront.Controllers
                             Longitude = obj.Location.YCoordinate, 
                             RepeatAddress = obj.Location.Address, 
                             RepeatAddressDescription = obj.Location.Description, 
-                            RepeatCalendarName = obj.Name, 
+                            RepeatCalendarName = obj.NameString, 
                             RepeatCalendarEvents = obj.Repeat.RecurringCalendarEvents().AsParallel().
                                 Select(obj1 => obj1.ToCalEvent(TimelineForData)).ToList(),
                             RepeatEndDate = obj.End,
@@ -159,7 +159,7 @@ namespace TilerFront.Controllers
                         Longitude = obj.Location.YCoordinate,
                         RepeatAddress = obj.Location.Address,
                         RepeatAddressDescription = obj.Location.Description,
-                        RepeatCalendarName = obj.Name,
+                        RepeatCalendarName = obj.NameString,
                         RepeatCalendarEvents = obj.Repeat.RecurringCalendarEvents().AsParallel().
                             Select(obj1 => obj1.ToDeletedCalEvent(TimelineForData)).ToList(),
                         RepeatEndDate = obj.End,
