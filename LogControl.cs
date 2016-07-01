@@ -1417,7 +1417,7 @@ namespace TilerFront
                     }
                     catch(Exception e)
                     {
-                        RetrievedEvent = new CalendarEvent();
+                        throw e;
                     }
                     //*/
 
