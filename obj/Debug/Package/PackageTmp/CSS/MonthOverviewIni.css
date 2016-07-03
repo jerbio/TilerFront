@@ -911,25 +911,38 @@ body {
 
 .SubEventReferenceTime 
  {
-  position: relative;
-  left: 30px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  text-align: right;
-  font-size: 11px;
-  display: inline-block;
-  width: calc(100% - 30px);
+    position: relative;
+    left: 30px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: right;
+    font-size: 11px;
+    display: inline-block;
+    left: initial;
+    float: right;
+    width: auto;
+}
+
+.SubEventTimeTillDeadlineContainer 
+{
+    display: inline-block;
+}
+
+.SubEventTimeTillDeadlineContent 
+{
+    margin-left: 5px;
+    font-size: 11px;
+    color: rgba(40,40,40,1);
 }
 
 .SubEventReferenceBottomPanel
 {
-  position: relative;
-  /* left: 62%; */
-  width: calc(100% - 10px);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  //text-align: right;
-  font-size: 9px;
+    position: relative;
+    width: calc(100% - 10px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 9px;
+    padding-bottom: 2px;
 }
 
 .SubEventReferenceCalType
@@ -938,8 +951,8 @@ body {
     max-width:20px;
     max-height:20px;
     display:inline-block;
-    left:5px;
-    top:2px;
+    width: 15px;
+    height: 15px;
 }
 
 .SubEventReferenceCalImg
@@ -1661,7 +1674,9 @@ width: auto;
     width: 14px;
     height: 46px;/*Derived from height of ListElementDataContentContainerClassic*/
     display: inline-block;
-    //z-index: 20;
+    //
+    z-index: 20;
+    vertical-align: top;
 }
 
 #TilerCloseButton

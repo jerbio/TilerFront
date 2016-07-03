@@ -237,8 +237,9 @@ function RenderTimeInformationClassic(DayOfWeek, ID) {
     CalendarTypeContainer.appendChild(CalendarTypeCalImage);
 
     var NameDataPerListElement = getDomOrCreateNew("SubEventReferenceName" + ID);
-
-    BottomPanelListElement.appendChild(CalendarTypeContainer);
+    var EventLockContainer = getDomOrCreateNew("EventLockContainer" + ID);
+    //BottomPanelListElement.appendChild(CalendarTypeContainer);
+    EventLockContainer.appendChild(CalendarTypeContainer);
     BottomPanelListElement.appendChild(TimeDataPerListElement);
 
     
@@ -260,14 +261,14 @@ function RenderTimeInformationClassic(DayOfWeek, ID) {
 
 
     var myBool = (RefSubEvent.SubCalRigid)
+    $(EventLockContainer.Dom).addClass("EventLockContainer");
+    ListElementContainer.Dom.appendChild(EventLockContainer.Dom);
     if (myBool)
     {
-        var EventLockContainer = getDomOrCreateNew("EventLockContainer" + ID);
-        $(EventLockContainer.Dom).addClass("EventLockContainer");
         var EventLockImgContainer = getDomOrCreateNew("EventLockImgContainer" + ID);
         $(EventLockImgContainer.Dom).addClass("EventLockImgContainer");
         EventLockContainer.Dom.appendChild(EventLockImgContainer.Dom);
-        ListElementContainer.Dom.appendChild(EventLockContainer.Dom);
+        
         $(EventLockImgContainer.Dom).addClass("LockedIcon");
     }
     
@@ -360,11 +361,25 @@ function RenderListTimeInformation(DayOfWeek, ID)
     $(CalendarTypeCalImage.Dom).addClass(RefSubEvent.ThirdPartyType + "Icon");
     $(CalendarTypeContainer.Dom).addClass("SubEventReferenceCalType");
 
+    var SubEventTimeTillDeadlineContainer = getDomOrCreateNew("SubEventTimeTillDeadlineContainer" + ID);
+    $(SubEventTimeTillDeadlineContainer).addClass("SubEventTimeTillDeadlineContainer");
+    var SubEventTimeTillDeadlineContent = getDomOrCreateNew("SubEventTimeTillDeadlineContent" + ID, "span");
+    $(SubEventTimeTillDeadlineContent).addClass("SubEventTimeTillDeadlineContent");
+    SubEventTimeTillDeadlineContent.innerHTML = moment(RefSubEvent.SubCalCalEventEnd).fromNow()
+    SubEventTimeTillDeadlineContainer.appendChild(SubEventTimeTillDeadlineContent);
+    BottomPanelListElement.appendChild(SubEventTimeTillDeadlineContainer);
+
     CalendarTypeContainer.appendChild(CalendarTypeCalImage);
 
     var NameDataPerListElement = getDomOrCreateNew("SubEventReferenceName" + ID);
 
-    BottomPanelListElement.appendChild(CalendarTypeContainer);
+
+    
+    //BottomPanelListElement.appendChild(CalendarTypeContainer);
+
+    //debugger
+
+    //BottomPanelListElement.appendChild(CalendarTypeContainer);
     BottomPanelListElement.appendChild(TimeDataPerListElement);
 
     $(ListElementContainer.Dom).addClass("selectedDayElements");
@@ -395,8 +410,8 @@ function RenderListTimeInformation(DayOfWeek, ID)
     if (myBool) {
         $(EventLockImgContainer.Dom).addClass("LockedIcon");
     }
-
     EventLockContainer.Dom.appendChild(EventLockImgContainer.Dom)
+    EventLockContainer.Dom.appendChild(CalendarTypeContainer.Dom);
 
 
     ListElementContainer.Dom.appendChild(EventLockContainer.Dom);
@@ -4616,17 +4631,6 @@ function GlobaPauseResumeButtonManager(events) {
 
     function SwitchToPause(eventId)
     {
-<<<<<<< HEAD
-        var pauseResumeButton = getDomOrCreateNew(buttonId)
-        $(pauseResumeButton).addClass("ControlPanelPausePanelButton");
-        $(pauseResumeButton).removeClass("ControlPanelResumePanelButton");
-        ShowPauseResumeButton();
-        var SubEvent = Dictionary_OfSubEvents[eventId];
-        pauseResumeButton.setAttribute("Title", "Pause \""+SubEvent.Name+"\"");
-        var SubEvent = Dictionary_OfSubEvents[eventId];
-        pauseResumeButton.onclick = function () {
-            pauseEvent(SubEvent);
-=======
         var SubEvent = Dictionary_OfSubEvents[eventId];
         if (SubEvent.isPauseAble) {
             var pauseResumeButton = getDomOrCreateNew(buttonId)
@@ -4638,7 +4642,6 @@ function GlobaPauseResumeButtonManager(events) {
             pauseResumeButton.onclick = function () {
                 pauseEvent(SubEvent);
             }
->>>>>>> bug/pause/globalPauseMenu
         }
     }
 
@@ -4769,7 +4772,6 @@ function GlobaPauseResumeButtonManager(events) {
 
     this.updateEventList = function (events)
     {
-        debugger;
         if (_this.timeOutData != -1) {
             clearTimeout(_this.timeOutData);
         }
