@@ -641,7 +641,7 @@ namespace TilerFront.Controllers
             PostBackData retValue;
             if (retrievedUser.Status)
             {
-                DB_UserActivity activity = new DB_UserActivity(DateTimeOffset.UtcNow, UserActivity.ActivityType.SetAsNowSingle);
+                DB_UserActivity activity = new DB_UserActivity(DateTimeOffset.UtcNow, UserActivity.ActivityType.Undo);
                 retrievedUser.ScheduleLogControl.updateUserActivty(activity);
                 retrievedUser.ScheduleLogControl.Undo();
                 retValue = new PostBackData("\"Success\"", 0);
