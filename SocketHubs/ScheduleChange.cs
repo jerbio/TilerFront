@@ -35,6 +35,16 @@ namespace TilerFront.SocketHubs
             context.Clients.Group(who).refereshDataFromSockets(triggerRefreshRequest);
         }
 
+        public void pausedEventUpdate(Models.PausedEvent PausedEvent)
+        {
+            string who = HttpContext.Current.User.Identity.GetUserId();
+            var context = Microsoft.AspNet.SignalR.GlobalHost.ConnectionManager.GetHubContext<TilerFront.SocketHubs.ScheduleChange>();
+            dynamic pauseEventRequest = new JObject();
+            pauseEventRequest.pauseData = new JObject();
+            pauseEventRequest.pauseData.EventId = PausedEvent.EventId;
+            context.Clients.Group(who).refereshDataFromSockets(pauseEventRequest);
+        }
+
         public override Task OnConnected()
         {
             string UserId = HttpContext.Current.User.Identity.GetUserId();

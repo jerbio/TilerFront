@@ -1499,6 +1499,16 @@ function onSocketDataReceipt(data) {
             getRefreshedData();
         }
     }
+
+    if (!!data.pauseData) {
+        if (data.pauseData.EventId) {
+            refreshCounter = 1;
+            console.log("refresh is  " + getRefreshedData.isEnabled);
+            global_ExitManager.triggerLastExitAndPop();
+            //getRefreshedData.enableDataRefresh();
+            getRefreshedData();
+        }
+    }
     
     ++onSocketDataReceipt.counter
 }
@@ -4622,8 +4632,8 @@ function GlobaPauseResumeButtonManager(events) {
         $(pauseResumeButton).addClass("ControlPanelResumePanelButton");
         $(pauseResumeButton).removeClass("ControlPanelPausePanelButton");
         ShowPauseResumeButton();
-        pauseResumeButton.setAttribute("Title", "Resume \""+SubEvent.Name+"\"");
         var SubEvent = Dictionary_OfSubEvents[eventId];
+        pauseResumeButton.setAttribute("Title", "Resume \""+SubEvent.Name+"\"");
         pauseResumeButton.onclick = function () {
             continueEvent(SubEvent);
         }
