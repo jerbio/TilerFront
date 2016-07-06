@@ -114,6 +114,15 @@ namespace TilerFront.Controllers
         }
 
 
+        [HttpGet]
+        [ResponseType(typeof(PostBackStruct))]
+        [Route("api/Schedule/Amazon")]
+        public async Task<IHttpActionResult> GetAmazon([FromUri] getScheduleModel myAuthorizedUser)
+        {
+            return await GetSchedule(myAuthorizedUser);
+        }
+
+
         // GET api/schedule
         /// <summary>
         /// Retrieve Events within a time frame. Required elements are UserID and UserName. Provided starttime and Endtime for the range of the schedule allows for retrieval of schedule within a timerange
