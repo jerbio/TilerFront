@@ -458,6 +458,10 @@
     <Compile Include="Migrations\201606170208266_requiredCreatorId.Designer.cs">
       <DependentUpon>201606170208266_requiredCreatorId.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201607070005282_implementedSomeMissingProperties.cs" />
+    <Compile Include="Migrations\201607070005282_implementedSomeMissingProperties.Designer.cs">
+      <DependentUpon>201607070005282_implementedSomeMissingProperties.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -2690,6 +2694,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201606170208266_requiredCreatorId.resx">
       <DependentUpon>201606170208266_requiredCreatorId.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201607070005282_implementedSomeMissingProperties.resx">
+      <DependentUpon>201607070005282_implementedSomeMissingProperties.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

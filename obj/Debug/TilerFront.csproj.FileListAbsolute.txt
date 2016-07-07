@@ -167,3 +167,4 @@ C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.pdb
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.Migrations.scheduleControlChange.resources
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.Migrations.requiredCreatorId.resources
+C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.Migrations.implementedSomeMissingProperties.resources
