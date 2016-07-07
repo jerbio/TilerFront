@@ -474,4 +474,8 @@ C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.pdb
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.Migrations.scheduleControlChange.resources
 C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.Migrations.requiredCreatorId.resources
+<<<<<<< HEAD
 >>>>>>> Added migrations/ initialization structure for rdbs or non xml db. This enssures that we gets a relatively better performance. Current implementation can write events to db. However, duplicate have to be resolved
+=======
+C:\Users\jerom\Documents\Visual Studio 2015\Projects\WagTap\WagTapWeb\TilerFront\obj\Debug\TilerFront.Migrations.implementedSomeMissingProperties.resources
+>>>>>>> Changed UIcolor.user to uicolor.usercolorselection for a variable name

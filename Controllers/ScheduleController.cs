@@ -965,7 +965,7 @@ namespace TilerFront.Controllers
 
 
                     //RestrictionProfile myRestrictionProfile = CreateRestrictionProfile(newEvent.RestrictionStart, newEvent.RestrictionEnd, newEvent.isWorkWeek, newEvent.getTImeSpan);
-                    newCalendarEvent = new CalendarEventRestricted(Name, StartDateTime, EndDateTime,StartDateTime, myRestrictionProfile, TimeSpan.Parse(EventDuration), MyRepetition, false, true, Convert.ToInt32(Count), RigidScheduleFlag, new Location_Elements(), new TimeSpan(0, 15, 0), new TimeSpan(0, 15, 0), new EventDisplay(true, userColor, userColor.User < 1 ? 0 : 1), new MiscData());
+                    newCalendarEvent = new CalendarEventRestricted(Name, StartDateTime, EndDateTime,StartDateTime, myRestrictionProfile, TimeSpan.Parse(EventDuration), MyRepetition, false, true, Convert.ToInt32(Count), RigidScheduleFlag, new Location_Elements(), new TimeSpan(0, 15, 0), new TimeSpan(0, 15, 0), new EventDisplay(true, userColor, userColor.UserColorSelection < 1 ? 0 : 1), new MiscData());
                 }
                 else
                 {
@@ -973,7 +973,7 @@ namespace TilerFront.Controllers
                     StartData = StartData.Add(newEvent.getTImeSpan);
                     DateTimeOffset EndData = DateTimeOffset.Parse(EndTime + " " + EndDateEntry.Date.ToShortDateString()).UtcDateTime;
                     EndData = EndData.Add(newEvent.getTImeSpan);
-                    newCalendarEvent = new CalendarEvent(Name, StartData, EndData,StartData, Count, "", EventDuration, MyRepetition, true, RigidScheduleFlag, "", true, EventLocation, true, new EventDisplay(true, userColor, userColor.User < 1 ? 0 : 1), new MiscData(), false);
+                    newCalendarEvent = new CalendarEvent(Name, StartData, EndData,StartData, Count, "", EventDuration, MyRepetition, true, RigidScheduleFlag, "", true, EventLocation, true, new EventDisplay(true, userColor, userColor.UserColorSelection < 1 ? 0 : 1), new MiscData(), false);
                 }
                 Task DoInitializeClassification=newCalendarEvent.InitializeClassification();
                 
@@ -1200,7 +1200,7 @@ namespace TilerFront.Controllers
 
 
 
-                    newCalendarEvent = new CalendarEventRestricted(Name, StartDateTime, EndDateTime, StartDateTime,myRestrictionProfile, TimeSpan.Parse(EventDuration), MyRepetition, false, true, Convert.ToInt32(Count), RigidScheduleFlag, new Location_Elements(), new TimeSpan(0, 15, 0), new TimeSpan(0, 15, 0), new EventDisplay(true, userColor, userColor.User < 1 ? 0 : 1), new MiscData());
+                    newCalendarEvent = new CalendarEventRestricted(Name, StartDateTime, EndDateTime, StartDateTime,myRestrictionProfile, TimeSpan.Parse(EventDuration), MyRepetition, false, true, Convert.ToInt32(Count), RigidScheduleFlag, new Location_Elements(), new TimeSpan(0, 15, 0), new TimeSpan(0, 15, 0), new EventDisplay(true, userColor, userColor.UserColorSelection < 1 ? 0 : 1), new MiscData());
                 }
                 else
                 {
@@ -1208,7 +1208,7 @@ namespace TilerFront.Controllers
                     StartData = StartData.Add(newEvent.getTImeSpan);
                     DateTimeOffset EndData = DateTimeOffset.Parse(EndTime + " " + EndDateEntry.Date.ToShortDateString()).UtcDateTime;
                     EndData = EndData.Add(newEvent.getTImeSpan);
-                    newCalendarEvent = new CalendarEvent(Name, StartData, EndData,StartData, Count, "", EventDuration, MyRepetition, true, RigidScheduleFlag, "", true, EventLocation, true, new EventDisplay(true, userColor, userColor.User < 1 ? 0 : 1), new MiscData(), false);
+                    newCalendarEvent = new CalendarEvent(Name, StartData, EndData,StartData, Count, "", EventDuration, MyRepetition, true, RigidScheduleFlag, "", true, EventLocation, true, new EventDisplay(true, userColor, userColor.UserColorSelection < 1 ? 0 : 1), new MiscData(), false);
                 }
 
 
