@@ -28,7 +28,7 @@ $(document).ready(function () {
     $(document).tooltip({ track: true });
     $('body').hide();
     global_pauseManager = new GlobaPauseResumeButtonManager([]);
-    getRefreshedData.enroll(global_pauseManager.updateEventList);
+    getRefreshedData.pauseEnroll(global_pauseManager.processPauseData);
     initializeWebSockets();
     InitializeMonthlyOverview();
     MenuManger();
@@ -1501,7 +1501,7 @@ function onSocketDataReceipt(data) {
     }
 
     if (!!data.pauseData) {
-        if (data.pauseData.EventId) {
+        if (data.pauseData.pausedEvent) {
             refreshCounter = 1;
             console.log("refresh is  " + getRefreshedData.isEnabled);
             global_ExitManager.triggerLastExitAndPop();
@@ -1572,11 +1572,19 @@ getRefreshedData.callAllCallbacks = function (data) {
     {
         getRefreshedData.callBacks[key](TotalSubEventList);
     }
+    
+    getRefreshedData.callAllPauseCallbacks(data);
     if(isFunction(getRefreshedData.instanceCallBack)){
         getRefreshedData.instanceCallBack(data)
         getRefreshedData.instanceCallBack = null;
     }
-    
+}
+
+getRefreshedData.callAllPauseCallbacks = function (data) {
+    var pauseData = data.Content.Schedule.PauseData;
+    for (var key in getRefreshedData.pauseCallBacks) {
+        getRefreshedData.pauseCallBacks[key](pauseData);
+    }
 }
 
 getRefreshedData.enroll = function (callback) {
@@ -1597,6 +1605,27 @@ getRefreshedData.enroll = function (callback) {
 getRefreshedData.unEnroll = function (Id) {
     delete getRefreshedData.callBacks[Id]
 }
+
+getRefreshedData.pauseEnroll = function (callback) {
+    var Id = null;
+    if (isFunction(callback)) {
+        Id = generateUUID();
+        if (!getRefreshedData.pauseCallBacks) {
+            getRefreshedData.pauseCallBacks = {};
+        }
+        getRefreshedData.pauseCallBacks[Id] = callback;
+    }
+    else {
+        throw "Non function provided when function is expected in getRefreshedData.Enroll"
+    }
+    return Id;
+}
+
+getRefreshedData.pauseUnEnroll = function (Id) {
+    delete getRefreshedData.pauseCallBacks[Id]
+}
+
+
 
     function getEventsInterferringInRange(StartDate, EndDate)
     {
@@ -4787,6 +4816,72 @@ function GlobaPauseResumeButtonManager(events) {
         }
         _this.SubEvents = events;
         getPausedEventOrNextPossibleEvent(_this.SubEvents);
+    }
+
+    var startTImeOutIds = [];
+    var endTImeOutIds = [];
+
+    this.processPauseData = function (pauseData)
+    {
+        var currentTimeInMs = new Date().getTime();
+        //If an event is currently paused then just show resume button and don't handle other pauseable events
+        if (pauseData.pausedEvent != null)
+        {
+            SwitchToResume(pauseData.pausedEvent.EventId);
+        }
+        else
+        {
+            var i = 0;
+            for (; i < startTImeOutIds.length; i++)
+            {
+                clearTimeout(startTImeOutIds[i])
+            }
+
+            for (i = 0; i < endTImeOutIds.length; i++) {
+                clearTimeout(endTImeOutIds[i])
+            }
+
+            //function creates the event function that will make a call to the switch of the global pause resume button
+            function prepSpanCallback(subEvent)
+            {
+                function retValue ()
+                {
+                    function HideGlobalPausePauseButton()
+                    {
+                        if (prepSpanCallback.pauseId === subEvent.ID) {
+                            HidePauseResumeButton()
+                        }
+                    }
+
+                    SwitchToPause(subEvent.ID);
+                    prepSpanCallback.pauseId = subEvent.ID;
+                    var Span = subEvent.PauseEnd - currentTimeInMs ;
+                    var TimeOutID = setTimeout(HideGlobalPausePauseButton, Span);
+                    endTImeOutIds.push(TimeOutID);
+                }
+                return retValue 
+            }
+
+            for (i=0; i < pauseData.subEvents.length; i++) {
+                var subEvent = pauseData.subEvents[i];
+                var Span = subEvent.PauseStart - currentTimeInMs;
+                var endSpan = subEvent.PauseEnd - currentTimeInMs;
+                var eventId = subEvent.ID;
+                var TimeOutID;
+
+                if (Span < 0) {
+                    if (endSpan > 0) {
+                        TimeOutID = setTimeout(prepSpanCallback(subEvent))
+                        startTImeOutIds.push(TimeOutID);
+                    }
+                }
+                else {
+                    TimeOutID = setTimeout(prepSpanCallback(subEvent), Span)
+                    startTImeOutIds.push(TimeOutID);
+                }
+                
+            }
+        }
     }
 
     getPausedEventOrNextPossibleEvent(_this.SubEvents);

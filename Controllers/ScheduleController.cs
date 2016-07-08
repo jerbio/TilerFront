@@ -102,6 +102,10 @@ namespace TilerFront.Controllers
 
                 
                 UserSchedule currUserSchedule = new UserSchedule { NonRepeatCalendarEvent = NonRepeatingEvents.Select(obj => obj.ToCalEvent(TimelineForData)).ToArray(), RepeatCalendarEvent = RepeatingEvents };
+
+                ApplicationDbContext db = new ApplicationDbContext();
+                PausedEvent currentPausedEvent = getCurrentPausedEvent(db);
+                currUserSchedule.populatePauseData(currentPausedEvent);
                 InitScheduleProfile retValue = new InitScheduleProfile { Schedule = currUserSchedule, Name = myUserAccount.Usersname };
                 returnPostBack = new PostBackData(retValue, 0);
             }
