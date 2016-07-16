@@ -537,6 +537,7 @@ namespace TilerFront.Controllers
                             //myNOw = UserData.getRefNow();
                             My24HourTimerWPF.Schedule MySchedule = new My24HourTimerWPF.Schedule(retrievedUser, myNow );
                             await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, UserData.UserID).ConfigureAwait(false);
+                            activity.eventIds.Add(UserData.EventID);
                             retrievedUser.ScheduleLogControl.updateUserActivty(activity);
                             MySchedule.markSubEventAsCompleteCalendarEventAndReadjust(UserData.EventID);
                             retValue = new PostBackData("\"Success\"", 0);
@@ -571,6 +572,7 @@ namespace TilerFront.Controllers
             DB_UserActivity activity = new DB_UserActivity(myNow, UserActivity.ActivityType.CompleteMultiple, AllEventIDs);
             JObject json = JObject.FromObject(UserData);
             activity.updateMiscelaneousInfo(json.ToString());
+            activity.eventIds.AddRange(AllEventIDs);
             myUser.ScheduleLogControl.updateUserActivty(activity);
             await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, UserData.UserID).ConfigureAwait(false);
 
@@ -641,7 +643,7 @@ namespace TilerFront.Controllers
             PostBackData retValue;
             if (retrievedUser.Status)
             {
-                DB_UserActivity activity = new DB_UserActivity(DateTimeOffset.UtcNow, UserActivity.ActivityType.SetAsNowSingle);
+                DB_UserActivity activity = new DB_UserActivity(DateTimeOffset.UtcNow, UserActivity.ActivityType.Undo);
                 retrievedUser.ScheduleLogControl.updateUserActivty(activity);
                 retrievedUser.ScheduleLogControl.Undo();
                 retValue = new PostBackData("\"Success\"", 0);
@@ -692,6 +694,7 @@ namespace TilerFront.Controllers
                             retrievedUser.ScheduleLogControl.updateUserActivty(activity);
                             JObject json = JObject.FromObject(myUser);
                             activity.updateMiscelaneousInfo(json.ToString());
+                            activity.eventIds.Add(myUser.EventID);
                             retrievedUser.ScheduleLogControl.updateUserActivty(activity);
 
                             await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, myUser.UserID).ConfigureAwait(false);

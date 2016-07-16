@@ -1,0 +1,49 @@
+﻿@model TilerFront.Models.ApplicationUser
+
+
+@using Microsoft.AspNet.Identity
+
+
+@if (Request.IsAuthenticated)
+{
+    <!DOCTYPE html>
+    <html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>Tiler Desktop</title>
+        <link href='https://fonts.googleapis.com/css?family=Nixie+One|Poiret+One|Metrophobic|Josefin+Sans|Muli|Gafata' rel='stylesheet' type='text/css'>
+        <script>
+            function RetrieveUserCredentials()
+            {
+                var retValue = { UserName: "@Model.UserName", ID: "@Model.Id", Name: "@Model.FullName" };
+                retValue.Name=retValue.Name.split(" ")[0]
+                UserCredentials = retValue;
+                return retValue;
+            }
+            RetrieveUserCredentials();
+        </script>
+
+        @Scripts.Render("~/Content/TilerMobileJS")
+        @Styles.Render("~/Content/TilerMobileCss")
+        <script>
+            YUI_config = {
+                debug: true,
+                combine: true,
+                comboBase: '../Scripts/YuiCombo/'
+            };
+
+        </script>
+    </head>
+    <body class="yui3-skin-sam">
+        <div id="CalBodyContainer">
+            <!--<div id="ScheduleContainer"></div>-->
+        </div>
+        <div id="SearchPanelOverlay">
+
+        </div>
+        <div id="LoadingScreenPanel"></div>
+    </body>
+</html>
+}
+else
+{ }
+
