@@ -1,0 +1,186 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Tiler Desktop</title>
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    
+    <script src='Scripts/jquery-2.1.1.js'></script>
+    <script src='Scripts/jquery-ui.min.js'></script>
+    <script src='Scripts/moment.min.js'></script>
+    <script src="Scripts/fullcalendar.min.js"></script>
+    <script src="Scripts/WebControl.js"></script>
+    <script src="Scripts/MonthOverviewIni.js"></script>
+    <script src="Scripts/HomePageControl.js"></script>
+    <script src="Scripts/SelectedEvent.js"></script>
+    <script src="Scripts/AddNewEvent_Desktop0.js"></script>
+    <script src="Scripts/SearchHandler.js"></script>
+    <script src="Scripts/SeachHandlerDesktop.js"></script>
+    <script src="Scripts/highcharts.js"></script>
+    <script src="Scripts/exporting.js"></script>
+    <script type="text/javascript" src="Scripts/bootstrap-datepicker.js"></script>
+    <script type="text/javascript" src="Scripts/jquery.timepicker.min.js"></script>
+    <script src="Scripts/Chart.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true&libraries=places"></script>
+    <!--<script src="http://code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
+    <script src="http://code.jquery.com/ui/1.11.2/jquery-ui.js"></script>-->
+    <script type="text/javascript" src="Scripts/datepair.js"></script>
+    <script src="signalr/hubs"></script>
+    <script src="Scripts/heartcode-canvasloader-min-0.9.1.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="CSS/TexGyreFont.css"/>
+    <!--<link rel="stylesheet" href="http://code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css">-->
+    <link rel="stylesheet" type="text/css" href="CSS/ui-lightness/jquery-ui-1.10.4.custom.css"/>
+      <link rel="stylesheet" type="text/css" href="CSS/jquery-ui.css" />
+    <link rel=" stylesheet" type="text/css" href="CSS/WeatherIcon.css" />
+    <link href='http://fonts.googleapis.com/css?family=Nixie+One|Poiret+One|Metrophobic|Josefin+Sans|Muli|Gafata' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="CSS/jquery.timepicker.css" />
+    <link rel=" stylesheet" type="text/css" href="CSS/MainUI.css" />
+    <link rel="stylesheet" type="text/css" href="CSS/SubCalEventStyles.css" />
+    <link rel="stylesheet" type="text/css" href="CSS/SelectedSubEvent.css" />
+    <link rel="stylesheet" type="text/css" href="CSS/MonthOverviewIni.css" />
+    <link rel='stylesheet' type="text/css" href='CSS/fullcalendar.css' />
+    <!--<link rel="stylesheet" type="text/css" href="CSS/AddNewEvent.css" />-->
+    <link rel="stylesheet" type="text/css" href="CSS/AddNewEventDesktop.css" />
+    <link rel="stylesheet" type="text/css" href="CSS/LoggedHomeUser.css"/>
+    
+    <link rel="stylesheet" type="text/css" href="CSS/bootstrap-datepicker.css" />
+    <link rel="stylesheet" type="text/css" href="CSS/SearchDesktop.css" />
+  </head>
+
+  <body>
+    <div id="Header">
+        <div id="TilerManager">
+            <div id="LogoButton" class="TilerLogo"></div>
+            <div id="MenuContainer">
+                <div id="ManageMenuContainer" class="MenuElementContainer">
+                    <span id="ManageIcon"></span>
+                    <span>Manage</span>
+                </div>
+                <div id="LogoutMenuContainer" class="MenuElementContainer">
+                    <span id="LogoutIcon"></span>
+                    <span>Logout</span>
+                </div>
+            </div>
+            
+        </div>
+        <div class="RightHeaderElement" id="RightHeaderElement" >
+            
+            <div id="SearchBar" title="Search For Events">
+                <input id="SearchBarInput">
+                <div class="ControlPanelButton" id="ControlPanelSearchButton"></div>
+            </div>
+            <div id="ViewContainer">
+                <div class="ViewButton" title="Switch to Classic View" id="ClassicViewButton">
+                    <div class="ViewButtonImg" id="ClassicViewButtonImg"></div>
+                </div>
+                <div class="ViewButton" title="Switch to List View" id="ListViewButton">
+                    <div class="ViewButtonImg" id="ListViewButtonImg"></div>
+                </div>
+            </div>
+            <div class="ui-icon-shuffle" title="Get me somthing to do now" id="SomethingNew">
+                <div class="ViewButtonImg" id="ClassicViewButtonImg"></div>
+            </div>
+            <div class="ControlPanelButton" id="AddEventButton" title="Add New Tile/Event"></div>
+            <div id="ThreeCircleButton" title="Options">
+                <div class="CircleContainer">
+                    <div class="ThreeButtonCircle"></div>
+                </div>
+                <div class="CircleContainer">
+                    <div class="ThreeButtonCircle"></div>
+                </div>
+                <div class="CircleContainer">
+                    <div class="ThreeButtonCircle"></div>
+                </div>
+            </div>
+            
+        </div>
+            
+    </div>
+    <div id="SearchBarAndContentContainer"></div>
+    <div id="MonthBar">
+        <div id="MonthButton"></div>
+        <div id="MonthArrayContainer">
+            <div id="AllDayContainer"></div>
+            <div id="MonthYearContainer"></div>
+        </div>
+    </div>
+    <div id="AddEventPanel"></div>
+    <div id="FullWeekContainer"> </div>
+    <div id="TimeBar">
+      <ul>
+        <li>12 AM</li>
+        <li>1</li>
+        <li>2</li>
+        <li>3</li>
+        <li>4</li>
+        <li>5</li>
+        <li>6</li>
+        <li>7</li>
+        <li>8</li>
+        <li>9</li>
+        <li>10</li>
+        <li>11</li>
+        <li>12 PM</li>
+        <li>1</li>
+        <li>2</li>
+        <li>3</li>
+        <li>4</li>
+        <li>5</li>
+        <li>6</li>
+        <li>7</li>
+        <li>8</li>
+        <li>9</li>
+        <li>10</li>
+        <li>11</li>
+      </ul>
+    </div>
+    <div id="LeftPane">
+      <div id="MonthGrid"> </div>
+    </div>
+    
+
+    
+    
+    <div id="ControlPanelContainer" tabindex="1">
+      <div id="InfoContainer">
+          <div id="ControlPanelNameOfSubevent" class="SubEventInformationContainer">
+              <label id="SelectedSubEventLabel" class="InfoContainerLabel">Name</label>
+              <div class="InfoControlPanel" id="ControlPanelNameOfSubeventInfo"></div>
+          </div>
+          <div id="ControlPanelSubEventTime" class="SubEventInformationContainer">
+              <label id="SelectedSubEventLabel" class="InfoContainerLabel">Date &amp; Time</label>
+              <div class="InfoControlPanel" id="ControlPanelSubEventTimeInfo"></div>
+          </div>
+          <div id="ControlPanelDeadlineOfSubevent" class="SubEventInformationContainer">
+              <label class="InfoContainerLabel">Deadline</label>
+              <div class="InfoControlPanel" id="ControlPanelDeadlineOfSubeventInfo"></div>
+          </div>
+        </div>
+        <div id="ProcrastinateEventModal" tabindex="1">
+          <div id="ProcrastinateEventInputContainer">
+            <div id="ProcrastinateHeading">Procrastinate this by</div>
+            <div id="ProcrastinateInputAndSubmit">
+              <input maxlength="2" id="procrastinateHours" autofocus type="number">
+
+              <span>H</span>
+                <input maxlength="2" id="procrastinateMins" type="number">
+              <span>M</span>
+                <input maxlength="2" id="procrastinateDays" type="number">
+              <span>D</span>
+              <button id="submitProcatination" class="SubmitButton">Push It</button>
+              <button id="cancelProcatination" class="SubmitButton">Cancel</button>
+            </div>
+          </div>
+        </div>
+        <div id="ConfirmDeleteModal">
+            <div id="ConfirmContent">
+                <div id="DeleteMessage">Sure you want to delete this?</div>
+                <button class="SubmitButton" id="YeaToConfirmDelete">Yea</button>
+                <button class="SubmitButton" id="NayToConfirmDelete">Nay</button>
+            </div>
+        </div>
+        <div class='hideMultiSelectPanel' id="MultiSelectPanel"></div>
+    </div>
+    <div id="LoadingScreenPanel"></div>
+  </body>
+</html>
