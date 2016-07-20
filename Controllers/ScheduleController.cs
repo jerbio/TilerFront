@@ -39,6 +39,25 @@ namespace TilerFront.Controllers
         [ResponseType(typeof(PostBackStruct))]
         public async Task<IHttpActionResult> GetSchedule([FromUri] getScheduleModel myAuthorizedUser)
         {
+
+            PostBackData returnPostBack = await getDataFromRestEnd(myAuthorizedUser);
+            return Ok(returnPostBack.getPostBack);
+        }
+
+
+        [HttpGet]
+        [ResponseType(typeof(PostBackStruct))]
+        [Route("api/Schedule/getScheduleAlexa")]
+        public async Task<IHttpActionResult> GetScheduleAlexa(getScheduleModel myAuthorizedUser)
+        {
+
+            PostBackData returnPostBack = await getDataFromRestEnd(myAuthorizedUser);
+            return Ok(returnPostBack.getPostBack);
+        }
+
+
+        async Task<PostBackData> getDataFromRestEnd(getScheduleModel myAuthorizedUser)
+        {
             UserAccountDirect myUserAccount = await myAuthorizedUser.getUserAccountDirect();
             HttpContext myCOntext = HttpContext.Current;
             await myUserAccount.Login();
@@ -48,7 +67,7 @@ namespace TilerFront.Controllers
                 DateTimeOffset StartTime = new DateTimeOffset(myAuthorizedUser.StartRange * TimeSpan.TicksPerMillisecond, new TimeSpan()).AddYears(1969).Add(-myAuthorizedUser.getTImeSpan);
                 DateTimeOffset EndTime = new DateTimeOffset(myAuthorizedUser.EndRange * TimeSpan.TicksPerMillisecond, new TimeSpan()).AddYears(1969).Add(-myAuthorizedUser.getTImeSpan);
                 TimeLine TimelineForData = new TimeLine(StartTime.AddYears(-100), EndTime.AddYears(100));
-                
+
 
                 LogControl LogAccess = myUserAccount.ScheduleLogControl;
                 List<IndexedThirdPartyAuthentication> AllIndexedThirdParty = await getAllThirdPartyAuthentication(myUserAccount.UserID).ConfigureAwait(false);
@@ -59,9 +78,9 @@ namespace TilerFront.Controllers
                 {
                     var GoogleTilerEventControlobj = new GoogleTilerEventControl(obj);
                 }
-                
-                
-                
+
+
+
 
 
 
@@ -69,9 +88,9 @@ namespace TilerFront.Controllers
 
                 List<CalendarEvent> ScheduleData = new List<CalendarEvent>();
 
-                Task<ConcurrentBag<CalendarEvent>> GoogleCalEventsTask =  GoogleTilerEventControl.getAllCalEvents(AllGoogleTilerEvents);
+                Task<ConcurrentBag<CalendarEvent>> GoogleCalEventsTask = GoogleTilerEventControl.getAllCalEvents(AllGoogleTilerEvents);
 
-                Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, Location_Elements>> ProfileData =await LogAccess.getProfileInfo(TimelineForData);
+                Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, Location_Elements>> ProfileData = await LogAccess.getProfileInfo(TimelineForData);
 
                 IEnumerable<CalendarEvent> GoogleCalEvents = await GoogleCalEventsTask.ConfigureAwait(false);
 
@@ -80,27 +99,27 @@ namespace TilerFront.Controllers
                 ScheduleData = ScheduleData.Concat(GoogleCalEvents).ToList();
                 IEnumerable<CalendarEvent> NonRepeatingEvents = ScheduleData.Where(obj => !obj.RepetitionStatus);
 
-                
+
 
 
                 //IEnumerable<CalendarEvent> RepeatingEvents = ScheduleData.Where(obj => obj.RepetitionStatus).SelectMany(obj => obj.Repeat.RecurringCalendarEvents);
                 IList<UserSchedule.repeatedEventData> RepeatingEvents = ScheduleData.AsParallel().Where(obj => obj.RepetitionStatus).
-                    Select(obj => new UserSchedule.repeatedEventData 
-                        { 
-                            ID = obj.Calendar_EventID.ToString(), 
-                            Latitude = obj.myLocation.XCoordinate, 
-                            Longitude = obj.myLocation.YCoordinate, 
-                            RepeatAddress = obj.myLocation.Address, 
-                            RepeatAddressDescription = obj.myLocation.Description, 
-                            RepeatCalendarName = obj.Name, 
-                            RepeatCalendarEvents = obj.Repeat.RecurringCalendarEvents().AsParallel().
+                    Select(obj => new UserSchedule.repeatedEventData
+                    {
+                        ID = obj.Calendar_EventID.ToString(),
+                        Latitude = obj.myLocation.XCoordinate,
+                        Longitude = obj.myLocation.YCoordinate,
+                        RepeatAddress = obj.myLocation.Address,
+                        RepeatAddressDescription = obj.myLocation.Description,
+                        RepeatCalendarName = obj.Name,
+                        RepeatCalendarEvents = obj.Repeat.RecurringCalendarEvents().AsParallel().
                                 Select(obj1 => obj1.ToCalEvent(TimelineForData)).ToList(),
-                            RepeatEndDate = obj.End,
-                            RepeatStartDate = obj.Start,
-                            RepeatTotalDuration = obj.ActiveDuration 
-                        }).ToList();
+                        RepeatEndDate = obj.End,
+                        RepeatStartDate = obj.Start,
+                        RepeatTotalDuration = obj.ActiveDuration
+                    }).ToList();
 
-                
+
                 UserSchedule currUserSchedule = new UserSchedule { NonRepeatCalendarEvent = NonRepeatingEvents.Select(obj => obj.ToCalEvent(TimelineForData)).ToArray(), RepeatCalendarEvent = RepeatingEvents };
 
                 ApplicationDbContext db = new ApplicationDbContext();
@@ -113,10 +132,9 @@ namespace TilerFront.Controllers
             {
                 returnPostBack = new PostBackData("", 1);
             }
-            
-            return Ok(returnPostBack.getPostBack);
-        }
 
+            return returnPostBack;
+        }
 
         // GET api/schedule
         /// <summary>
