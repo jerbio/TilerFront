@@ -71,7 +71,6 @@ namespace TilerFront
 
 		public static Models.CalEvent ToCalEvent(this TilerElements.CalendarEvent CalendarEventEntry, TilerElements.TimeLine Range = null)
 		{
-
             Models.CalEvent retValue = new Models.CalEvent();
             retValue.ID = CalendarEventEntry.ID;
             retValue.CalendarName = CalendarEventEntry.Name;

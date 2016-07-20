@@ -47,8 +47,6 @@ namespace TilerFront
 
 
 
-
-
         async override protected Task<DateTimeOffset> getDayReferenceTime(string desiredDirectory = "")
         {
             DateTimeOffset retValue = sessionUser.ReferenceDay;
@@ -69,7 +67,6 @@ namespace TilerFront
         {
             return await UserLog.DeleteLog();
         }
-
 
         override public bool DeleteAllCalendarEvents()
         {

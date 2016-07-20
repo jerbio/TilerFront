@@ -703,13 +703,6 @@
             <param name="myUser"></param>
             <returns></returns>
         </member>
-        <member name="M:TilerFront.Controllers.CalendarEventController.DeleteCalEvent(TilerFront.Models.getEventModel)">
-            <summary>
-            Deletes a calendar event.
-            </summary>
-            <param name="myUser"></param>
-            <returns></returns>
-        </member>
         <member name="M:TilerFront.Controllers.CalendarEventController.CompleteCalEvent(TilerFront.Models.getEventModel)">
             <summary>
             MArks the whole calendar event as complete.

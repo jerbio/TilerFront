@@ -73,7 +73,6 @@ namespace TilerFront.Controllers
                 DateTimeOffset EndTime = new DateTimeOffset(myAuthorizedUser.EndRange * TimeSpan.TicksPerMillisecond, new TimeSpan()).AddYears(1969).Add(-myAuthorizedUser.getTImeSpan);
                 TimeLine TimelineForData = new TimeLine(StartTime.AddYears(-100), EndTime.AddYears(100));
 
-
                 //LogControl LogAccess = myUserAccount.ScheduleLogControl;
                 //Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, Location_Elements>> ProfileData = await LogAccess.getProfileInfo(TimelineForData);
                 //ScheduleData = ScheduleData.Concat(ProfileData.Item1.Values.Where(obj => obj.isActive)).ToList();
@@ -92,8 +91,6 @@ namespace TilerFront.Controllers
                 }
 
                 Task<ConcurrentBag<CalendarEvent>> GoogleCalEventsTask = GoogleTilerEventControl.getAllCalEvents(AllGoogleTilerEvents);
-
-
 
                 IEnumerable<CalendarEvent> GoogleCalEvents = await GoogleCalEventsTask.ConfigureAwait(false);
                 ScheduleData = ScheduleData.Concat(GoogleCalEvents).ToList();

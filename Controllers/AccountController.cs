@@ -437,7 +437,6 @@ namespace TilerFront.Controllers
                     // var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
                     // await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
                 }
-
                 retPost = new PostBackData(string.Join("\n", result.Errors), 3);
                 RetValue.Data = (retPost.getPostBack);
                 return RetValue;
