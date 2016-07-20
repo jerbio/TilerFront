@@ -5,7 +5,7 @@ using System.Web;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.SignalR;
 using Newtonsoft.Json.Linq;
-using TilerElements;
+using TilerElements.Wpf;
 using DBTilerElement;
 using System.Threading.Tasks;
 

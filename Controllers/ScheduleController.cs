@@ -74,7 +74,14 @@ namespace TilerFront.Controllers
                 TimeLine TimelineForData = new TimeLine(StartTime.AddYears(-100), EndTime.AddYears(100));
 
 
-                LogControl LogAccess = myUserAccount.ScheduleLogControl;
+                //LogControl LogAccess = myUserAccount.ScheduleLogControl;
+                //Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, Location_Elements>> ProfileData = await LogAccess.getProfileInfo(TimelineForData);
+                //ScheduleData = ScheduleData.Concat(ProfileData.Item1.Values.Where(obj => obj.isActive)).ToList();
+
+                ScheduleControl LogAccess = myUserAccount.ScheduleLogControl;
+                //Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, Location_Elements>> ProfileData =await LogAccess.getProfileInfo(TimelineForData);
+                IEnumerable<CalendarEvent> ScheduleData = (await LogAccess.getCalendarEvents(TimelineForData)).Values;
+
                 List<IndexedThirdPartyAuthentication> AllIndexedThirdParty = await getAllThirdPartyAuthentication(myUserAccount.UserID).ConfigureAwait(false);
 
                 List<GoogleTilerEventControl> AllGoogleTilerEvents = AllIndexedThirdParty.Select(obj => new GoogleTilerEventControl(obj)).ToList();
@@ -84,18 +91,11 @@ namespace TilerFront.Controllers
                     var GoogleTilerEventControlobj = new GoogleTilerEventControl(obj);
                 }
 
-                //List<Task<List<CalendarEvent>>> getAllCalTasks = AllGoogleTilerEvents.Select(obj => obj.getCalendarEvents()).ToList();
-
-                List<CalendarEvent> ScheduleData = new List<CalendarEvent>();
-
                 Task<ConcurrentBag<CalendarEvent>> GoogleCalEventsTask = GoogleTilerEventControl.getAllCalEvents(AllGoogleTilerEvents);
 
-                Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, Location_Elements>> ProfileData = await LogAccess.getProfileInfo(TimelineForData);
+
 
                 IEnumerable<CalendarEvent> GoogleCalEvents = await GoogleCalEventsTask.ConfigureAwait(false);
-
-                ScheduleData = ScheduleData.Concat(ProfileData.Item1.Values.Where(obj => obj.isActive)).ToList();
-
                 ScheduleData = ScheduleData.Concat(GoogleCalEvents).ToList();
                 IEnumerable<CalendarEvent> NonRepeatingEvents = ScheduleData.Where(obj => !obj.RepetitionStatus);
 
@@ -104,27 +104,23 @@ namespace TilerFront.Controllers
 
                 //IEnumerable<CalendarEvent> RepeatingEvents = ScheduleData.Where(obj => obj.RepetitionStatus).SelectMany(obj => obj.Repeat.RecurringCalendarEvents);
                 IList<UserSchedule.repeatedEventData> RepeatingEvents = ScheduleData.AsParallel().Where(obj => obj.RepetitionStatus).
-                    Select(obj => new UserSchedule.repeatedEventData 
-                        { 
-                            ID = obj.Calendar_EventID.ToString(), 
-                            Latitude = obj.Location.XCoordinate, 
-                            Longitude = obj.Location.YCoordinate, 
-                            RepeatAddress = obj.Location.Address, 
-                            RepeatAddressDescription = obj.Location.Description, 
-                            RepeatCalendarName = obj.NameString, 
-                            RepeatCalendarEvents = obj.Repeat.RecurringCalendarEvents().AsParallel().
+                    Select(obj => new UserSchedule.repeatedEventData
+                    {
+                        ID = obj.Calendar_EventID.ToString(),
+                        Latitude = obj.Location.XCoordinate,
+                        Longitude = obj.Location.YCoordinate,
+                        RepeatAddress = obj.Location.Address,
+                        RepeatAddressDescription = obj.Location.Description,
+                        RepeatCalendarName = obj.NameString,
+                        RepeatCalendarEvents = obj.Repeat.RecurringCalendarEvents().AsParallel().
                                 Select(obj1 => obj1.ToCalEvent(TimelineForData)).ToList(),
                         RepeatEndDate = obj.End,
                         RepeatStartDate = obj.Start,
-                        RepeatTotalDuration = obj.ActiveDuration
+                        RepeatTotalDuration = obj.Duration
                     }).ToList();
 
 
                 UserSchedule currUserSchedule = new UserSchedule { NonRepeatCalendarEvent = NonRepeatingEvents.Select(obj => obj.ToCalEvent(TimelineForData)).ToArray(), RepeatCalendarEvent = RepeatingEvents };
-
-                ApplicationDbContext db = new ApplicationDbContext();
-                PausedEvent currentPausedEvent = getCurrentPausedEvent(db);
-                currUserSchedule.populatePauseData(currentPausedEvent);
                 InitScheduleProfile retValue = new InitScheduleProfile { Schedule = currUserSchedule, Name = myUserAccount.Usersname };
                 returnPostBack = new PostBackData(retValue, 0);
             }
