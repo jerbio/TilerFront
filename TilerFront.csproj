@@ -462,6 +462,22 @@
     <Compile Include="Migrations\201607070005282_implementedSomeMissingProperties.Designer.cs">
       <DependentUpon>201607070005282_implementedSomeMissingProperties.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201607210445092_dedupLocationDataBlobsAndEtc.cs" />
+    <Compile Include="Migrations\201607210445092_dedupLocationDataBlobsAndEtc.Designer.cs">
+      <DependentUpon>201607210445092_dedupLocationDataBlobsAndEtc.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201607210633012_dedupLocationDataBlobsAndEtc1.cs" />
+    <Compile Include="Migrations\201607210633012_dedupLocationDataBlobsAndEtc1.Designer.cs">
+      <DependentUpon>201607210633012_dedupLocationDataBlobsAndEtc1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201607210640009_dedupLocationDataBlobsAndEtc2.cs" />
+    <Compile Include="Migrations\201607210640009_dedupLocationDataBlobsAndEtc2.Designer.cs">
+      <DependentUpon>201607210640009_dedupLocationDataBlobsAndEtc2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201607231009272_subclendarEventsAddidition.cs" />
+    <Compile Include="Migrations\201607231009272_subclendarEventsAddidition.Designer.cs">
+      <DependentUpon>201607231009272_subclendarEventsAddidition.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -2695,6 +2711,18 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201607070005282_implementedSomeMissingProperties.resx">
       <DependentUpon>201607070005282_implementedSomeMissingProperties.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201607210445092_dedupLocationDataBlobsAndEtc.resx">
+      <DependentUpon>201607210445092_dedupLocationDataBlobsAndEtc.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201607210633012_dedupLocationDataBlobsAndEtc1.resx">
+      <DependentUpon>201607210633012_dedupLocationDataBlobsAndEtc1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201607210640009_dedupLocationDataBlobsAndEtc2.resx">
+      <DependentUpon>201607210640009_dedupLocationDataBlobsAndEtc2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201607231009272_subclendarEventsAddidition.resx">
+      <DependentUpon>201607231009272_subclendarEventsAddidition.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
