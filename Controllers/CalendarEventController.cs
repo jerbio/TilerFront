@@ -70,7 +70,7 @@ namespace TilerFront.Controllers
             string phrase = myUser.Data;
 
             PostBackData retValue = new PostBackData("", 4);
-            if (retrievedUser.Status)
+            if (await retrievedUser.Status().ConfigureAwait(false))
             {
                 long myNow = (long)(DateTimeOffset.Now - TilerElementExtension.JSStartTime).TotalMilliseconds; ;
                 IEnumerable<CalendarEvent> retrievedCalendarEvents = retrievedUser.ScheduleLogControl.getCalendarEventByName(phrase).Where(obj => obj.isActive);
@@ -91,7 +91,7 @@ namespace TilerFront.Controllers
             UserAccountDirect retrievedUser = await myUser.getUserAccountDirect();// new UserAccount(myUser.UserName, myUser.UserID);
             await retrievedUser.Login();
             PostBackData retValue;
-            if (retrievedUser.Status)
+            if (await retrievedUser.Status().ConfigureAwait(false))
             {
                 My24HourTimerWPF.Schedule NewSchedule = new My24HourTimerWPF.Schedule(retrievedUser, myUser.getRefNow());
                 UserActivity activity = new UserActivity(myUser.getRefNow(), UserActivity.ActivityType.DeleteCalendarEvent, new List<String>() { myUser.EventID });
@@ -133,7 +133,7 @@ namespace TilerFront.Controllers
             UserAccountDirect retrievedUser = await myUser.getUserAccountDirect();// new UserAccount(myUser.UserName, myUser.UserID);
             await retrievedUser.Login();
             PostBackData retValue;
-            if (retrievedUser.Status)
+            if (await retrievedUser.Status().ConfigureAwait(false))
             {
                 My24HourTimerWPF.Schedule NewSchedule = new My24HourTimerWPF.Schedule(retrievedUser, myUser.getRefNow());
                 DB_UserActivity activity = new DB_UserActivity(myUser.getRefNow(), UserActivity.ActivityType.CompleteCalendarEvent, new List<String>(){myUser.EventID});
@@ -165,7 +165,7 @@ namespace TilerFront.Controllers
             await retrievedUser.Login();
             DateTime myDate;
             PostBackData retValue;
-            if (retrievedUser.Status)
+            if (await retrievedUser.Status().ConfigureAwait(false))
             {
                 My24HourTimerWPF.Schedule NewSchedule = new My24HourTimerWPF.Schedule(retrievedUser, nowEvent.getRefNow());
 
@@ -204,7 +204,7 @@ namespace TilerFront.Controllers
 
 
 
-            if (retrievedUser.Status)
+            if (await retrievedUser.Status().ConfigureAwait(false))
             {
                 string CalendarType = myUser.ThirdPartyType.ToLower();
 

@@ -151,7 +151,7 @@ namespace TilerFront.Controllers
             UserAccountDirect retrievedUser = await myUser.getUserAccountDirect(); //new UserAccountDirect(myUser.UserName, myUser.UserID);
             await retrievedUser.Login();
             PostBackData retValue = new PostBackData("", 1);
-            if (retrievedUser.Status)
+            if (await retrievedUser.Status().ConfigureAwait(false))
             {
                 string CalendarType = myUser.ThirdPartyType.ToLower();
                 switch (CalendarType)

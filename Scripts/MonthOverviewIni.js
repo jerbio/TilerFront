@@ -1676,11 +1676,11 @@ function PopulateTotalSubEvents(DataHolder, RangeData, CallBackAfterRefresh) {
             var myError = err;
             var step = "err";
         }
-    }).done(function () {
+    }).done(function (response) {
         //alert("done generating");
         PopulateMonthGrid(DataHolder.Data, RangeData);
         if (CallBackAfterRefresh != null) {
-            CallBackAfterRefresh();
+            CallBackAfterRefresh(response);
         }
         getRefreshedData.enableDataRefresh();
     });
@@ -4699,26 +4699,29 @@ function GlobaPauseResumeButtonManager(events) {
                 }
                 return retValue 
             }
+            if(!!pauseData.subEvents)
+            {
+                for (i=0; i < pauseData.subEvents.length; i++) {
+                    var subEvent = pauseData.subEvents[i];
+                    var Span = subEvent.PauseStart - currentTimeInMs;
+                    var endSpan = subEvent.PauseEnd - currentTimeInMs;
+                    var eventId = subEvent.ID;
+                    var TimeOutID;
 
-            for (i=0; i < pauseData.subEvents.length; i++) {
-                var subEvent = pauseData.subEvents[i];
-                var Span = subEvent.PauseStart - currentTimeInMs;
-                var endSpan = subEvent.PauseEnd - currentTimeInMs;
-                var eventId = subEvent.ID;
-                var TimeOutID;
-
-                if (Span < 0) {
-                    if (endSpan > 0) {
-                        TimeOutID = setTimeout(prepSpanCallback(subEvent))
+                    if (Span < 0) {
+                        if (endSpan > 0) {
+                            TimeOutID = setTimeout(prepSpanCallback(subEvent))
+                            startTImeOutIds.push(TimeOutID);
+                        }
+                    }
+                    else {
+                        TimeOutID = setTimeout(prepSpanCallback(subEvent), Span)
                         startTImeOutIds.push(TimeOutID);
                     }
+
                 }
-                else {
-                    TimeOutID = setTimeout(prepSpanCallback(subEvent), Span)
-                    startTImeOutIds.push(TimeOutID);
-                }
-                
             }
+            
         }
     }
 

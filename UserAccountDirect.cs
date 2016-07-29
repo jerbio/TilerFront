@@ -6,11 +6,13 @@ using TilerElements;
 using TilerElements.Wpf;
 using TilerElements.DB;
 using System.Threading.Tasks;
+using Microsoft.AspNet.Identity;
 
 namespace TilerFront
 {
     public class UserAccountDirect : UserAccount
     {
+        TilerDbContext context = new TilerDbContext();
         //LogControl UserLog;
         protected UserAccountDirect()
         {
@@ -23,7 +25,8 @@ namespace TilerFront
         {
             sessionUser = user;
             ID = sessionUser.Id;
-            throw new NotImplementedException();
+            Username = sessionUser.UserName;
+            //throw new NotImplementedException();
         }
 
         /*
@@ -42,7 +45,11 @@ namespace TilerFront
         public override async System.Threading.Tasks.Task<bool> Login()
         {
             HttpContext ctx = HttpContext.Current;
-            return UserLog.Status;
+            UserLog = new ScheduleControl(context,sessionUser);
+
+            bool retValue = await UserLog.VerifyUser();
+            sessionUser = UserLog.VerifiedUser;
+            return retValue;
         }
 
 
@@ -90,15 +97,14 @@ namespace TilerFront
 
 
 
-        public bool Status
+        public async override Task<bool> Status()
         {
-            get
             {
-                return UserLog.Status;
+                return await UserLog.hasAccess(this.sessionUser);
             }
         }
 
-        public string UserID
+        public override string UserID
         {
             get
             {
@@ -106,7 +112,7 @@ namespace TilerFront
             }
         }
 
-        public string UserName
+        public override string UserName
         {
             get
             {
@@ -114,7 +120,7 @@ namespace TilerFront
             }
         }
 
-        public string Usersname
+        public override string Usersname
         {
             get
             {

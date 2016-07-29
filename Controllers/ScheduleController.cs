@@ -67,7 +67,7 @@ namespace TilerFront.Controllers
             HttpContext myCOntext = HttpContext.Current;
             await myUserAccount.Login();
             PostBackData returnPostBack;
-            if (myUserAccount.Status)
+            if (await myUserAccount.Status().ConfigureAwait(false))
             {
                 DateTimeOffset StartTime = new DateTimeOffset(myAuthorizedUser.StartRange * TimeSpan.TicksPerMillisecond, new TimeSpan()).AddYears(1969).Add(-myAuthorizedUser.getTImeSpan);
                 DateTimeOffset EndTime = new DateTimeOffset(myAuthorizedUser.EndRange * TimeSpan.TicksPerMillisecond, new TimeSpan()).AddYears(1969).Add(-myAuthorizedUser.getTImeSpan);
@@ -146,7 +146,7 @@ namespace TilerFront.Controllers
             HttpContext myCOntext = HttpContext.Current;
             await myUserAccount.Login();
             PostBackData returnPostBack;
-            if (myUserAccount.Status)
+            if (await myUserAccount.Status().ConfigureAwait(false))
             {
                 DateTimeOffset StartTime = new DateTimeOffset(myAuthorizedUser.StartRange * TimeSpan.TicksPerMillisecond, new TimeSpan()).AddYears(1969).Add(-myAuthorizedUser.getTImeSpan);
                 DateTimeOffset EndTime = new DateTimeOffset(myAuthorizedUser.EndRange * TimeSpan.TicksPerMillisecond, new TimeSpan()).AddYears(1969).Add(-myAuthorizedUser.getTImeSpan);
@@ -532,7 +532,7 @@ namespace TilerFront.Controllers
             DB_UserActivity activity = new DB_UserActivity(UserData.getRefNow(), UserActivity.ActivityType.CompleteSingle);
             JObject json = JObject.FromObject(UserData);
             activity.updateMiscelaneousInfo(json.ToString());
-            if (retrievedUser.Status)
+            if (await retrievedUser.Status().ConfigureAwait(false))
             {
                 string CalendarType = UserData.ThirdPartyType.ToLower();
 
@@ -614,7 +614,7 @@ namespace TilerFront.Controllers
             UserAccountDirect retrievedUser = await myUser.getUserAccountDirect();// new UserAccountDirect(myUser.UserName, myUser.UserID);
             await retrievedUser.Login();
             PostBackData retValue;
-            if (retrievedUser.Status)
+            if (await retrievedUser.Status().ConfigureAwait(false))
             {
                 DateTimeOffset myNow = DateTimeOffset.UtcNow;
                 //myNow = UserData.getRefNow();
@@ -656,7 +656,7 @@ namespace TilerFront.Controllers
             UserAccountDirect retrievedUser = await myUser.getUserAccountDirect();// new UserAccountDirect(myUser.UserName, myUser.UserID);
             await retrievedUser.Login();
             PostBackData retValue;
-            if (retrievedUser.Status)
+            if (await retrievedUser.Status().ConfigureAwait(false))
             {
                 DB_UserActivity activity = new DB_UserActivity(DateTimeOffset.UtcNow, UserActivity.ActivityType.Undo);
                 retrievedUser.ScheduleLogControl.updateUserActivty(activity);
@@ -688,7 +688,7 @@ namespace TilerFront.Controllers
             UserAccountDirect retrievedUser = await myUser.getUserAccountDirect();
             await retrievedUser.Login();
             PostBackData retValue= new PostBackData("", 1);
-            if (retrievedUser.Status)
+            if (await retrievedUser.Status().ConfigureAwait(false))
             {
                 string CalendarType = myUser.ThirdPartyType.ToLower();
 
@@ -758,7 +758,7 @@ namespace TilerFront.Controllers
             UserAccountDirect retrievedUser = await myUser.getUserAccountDirect();
             await retrievedUser.Login();
             PostBackData retValue;
-            if (retrievedUser.Status)
+            if (await retrievedUser.Status().ConfigureAwait(false))
             {
                 My24HourTimerWPF.Schedule MySchedule = new My24HourTimerWPF.Schedule(retrievedUser, myUser.getRefNow());
                 await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, myUser.UserID).ConfigureAwait(false);
@@ -939,7 +939,7 @@ namespace TilerFront.Controllers
 
             Task HoldUpForWriteNewEvent;
             Task CommitChangesToSchedule;
-            if (myUser.Status)
+            if (await myUser.Status().ConfigureAwait(false))
             {
                 DateTimeOffset myNow = newEvent.getRefNow();
                 myNow = DateTimeOffset.UtcNow;
@@ -1173,7 +1173,7 @@ namespace TilerFront.Controllers
 
             Task HoldUpForWriteNewEvent;
             Task CommitChangesToSchedule;
-            if (myUser.Status)
+            if (await myUser.Status().ConfigureAwait(false))
             {
                 DateTimeOffset myNow = newEvent.getRefNow();
                 myNow = DateTimeOffset.UtcNow;
