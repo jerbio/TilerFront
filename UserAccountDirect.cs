@@ -46,6 +46,7 @@ namespace TilerFront
         {
             HttpContext ctx = HttpContext.Current;
             UserLog = new ScheduleControl(context,sessionUser);
+            UserLocation = new LocationControl(context, sessionUser);
 
             bool retValue = await UserLog.VerifyUser();
             sessionUser = UserLog.VerifiedUser;

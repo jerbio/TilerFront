@@ -152,7 +152,6 @@ namespace TilerFront.Controllers
                 DateTimeOffset EndTime = new DateTimeOffset(myAuthorizedUser.EndRange * TimeSpan.TicksPerMillisecond, new TimeSpan()).AddYears(1969).Add(-myAuthorizedUser.getTImeSpan);
                 TimeLine TimelineForData = new TimeLine(StartTime, EndTime);
 
-
                 ScheduleControl LogAccess = myUserAccount.ScheduleLogControl;
                 List<CalendarEvent> ScheduleData = new List<CalendarEvent>();
 

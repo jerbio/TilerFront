@@ -478,6 +478,10 @@
     <Compile Include="Migrations\201607231009272_subclendarEventsAddidition.Designer.cs">
       <DependentUpon>201607231009272_subclendarEventsAddidition.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201607290728556_addedLocationDB_Set.cs" />
+    <Compile Include="Migrations\201607290728556_addedLocationDB_Set.Designer.cs">
+      <DependentUpon>201607290728556_addedLocationDB_Set.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -2723,6 +2727,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201607231009272_subclendarEventsAddidition.resx">
       <DependentUpon>201607231009272_subclendarEventsAddidition.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201607290728556_addedLocationDB_Set.resx">
+      <DependentUpon>201607290728556_addedLocationDB_Set.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
