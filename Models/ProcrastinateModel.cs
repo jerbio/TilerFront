@@ -12,6 +12,7 @@ namespace TilerFront.Models
         public long DurationDays { get; set; }
         public long DurationHours { get; set; }
         public long DurationMins { get; set; }
+        public string FormattedAsISO8601 { get; set; }
 
         public AuthorizedUser User 
         {
