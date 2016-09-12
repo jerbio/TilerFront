@@ -406,7 +406,12 @@ namespace TilerFront.Controllers
 
             Tuple<List<GoogleTilerEventControl>, GoogleThirdPartyControl> GoogleEvents = await GoogleTilerEventControl.getThirdPartyControlForIndex(AllGoogleTilerEvents).ConfigureAwait(false);
             Task DeleteInvalidAuthentication = ManageController.delelteGoogleAuthentication(GoogleEvents.Item1.Select(obj => obj.getDBAuthenticationData()));
-            mySchedule.updateDataSetWithThirdPartyData(new Tuple<ThirdPartyControl.CalendarTool, IEnumerable<CalendarEvent>>(ThirdPartyControl.CalendarTool.Google,new List<CalendarEvent> {GoogleEvents.Item2.getThirdpartyCalendarEvent()}));
+            CalendarEvent googleMotherEvent = GoogleEvents.Item2.getThirdpartyCalendarEvent();
+            if(googleMotherEvent.RepetitionStatus)
+            {
+                mySchedule.updateDataSetWithThirdPartyData(new Tuple<ThirdPartyControl.CalendarTool, IEnumerable<CalendarEvent>>(ThirdPartyControl.CalendarTool.Google, new List<CalendarEvent> { googleMotherEvent }));
+            }
+            
             //mySchedule.updateDataSetWithThirdPartyData(new Tuple<ThirdPartyControl.CalendarTool.Google, GoogleEvents.Item2.);
             await DeleteInvalidAuthentication.ConfigureAwait(false);
         }
@@ -853,8 +858,6 @@ namespace TilerFront.Controllers
             string EventDuration = TimeSpan.FromSeconds(fullTimeSpan.TotalSeconds * Convert.ToInt32(Count)).ToString();
 
             bool RigidScheduleFlag = Convert.ToBoolean(Rigid);
-            Location_Elements EventLocation = new Location_Elements(LocationAddress, LocationTag);
-            EventLocation.Validate();
 
             Repetition MyRepetition = new Repetition();
             DateTimeOffset RepeatStart = new DateTimeOffset();
@@ -936,13 +939,18 @@ namespace TilerFront.Controllers
             PostBackData retValue;
             await myUser.Login();
 
+            DB_LocationElements EventLocation = new DB_LocationElements(LocationAddress, LocationTag);
+            EventLocation.Validate();
+            
+
+
             Task HoldUpForWriteNewEvent;
             Task CommitChangesToSchedule;
             if (await myUser.Status().ConfigureAwait(false))
             {
                 DateTimeOffset myNow = newEvent.getRefNow();
                 myNow = DateTimeOffset.UtcNow;
-                
+                EventLocation.CreatorId = myUser.UserID;
 
                 CalendarEvent newCalendarEvent;
                 RestrictionProfile myRestrictionProfile = newEvent.getRestrictionProfile();
@@ -968,7 +976,7 @@ namespace TilerFront.Controllers
                     newCalendarEvent = new CalendarEvent(Name, StartData, EndData,StartData, Count, "", EventDuration, MyRepetition, true, RigidScheduleFlag, "", true, EventLocation, true, new EventDisplay(true, userColor, userColor.UserColorSelection < 1 ? 0 : 1), new MiscData(), false);
                 }
                 Task DoInitializeClassification=newCalendarEvent.InitializeClassification();
-                
+                await myUser.ScheduleLogControl.updateNewLocation(EventLocation);
                 My24HourTimerWPF.Schedule MySchedule = new My24HourTimerWPF.Schedule(myUser, myNow);
 
                 await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, myUser.UserID).ConfigureAwait(false);
@@ -978,11 +986,11 @@ namespace TilerFront.Controllers
                 string BeforemyName = newCalendarEvent.ToString(); //BColor + " -- " + Count + " -- " + DurationDays + " -- " + DurationHours + " -- " + DurationMins + " -- " + EndDay + " -- " + EndHour + " -- " + EndMins + " -- " + EndMonth + " -- " + EndYear + " -- " + GColor + " -- " + LocationAddress + " -- " + LocationTag + " -- " + Name + " -- " + RColor + " -- " + RepeatData + " -- " + RepeatEndDay + " -- " + RepeatEndMonth + " -- " + RepeatEndYear + " -- " + RepeatStartDay + " -- " + RepeatStartMonth + " -- " + RepeatStartYear + " -- " + RepeatType + " -- " + RepeatWeeklyData + " -- " + Rigid + " -- " + StartDay + " -- " + StartHour + " -- " + StartMins + " -- " + StartMonth + " -- " + StartYear;
                 string AftermyName = newCalendarEvent.ToString();
                 {
-                    myUser.ScheduleLogControl.updateNewLocation(EventLocation);
                     DB_UserActivity activity = new DB_UserActivity(myNow, UserActivity.ActivityType.NewEventCreation);
                     JObject json = JObject.FromObject(newEvent);
                     activity.updateMiscelaneousInfo(json.ToString());
                     myUser.ScheduleLogControl.updateUserActivty(activity);
+                    newCalendarEvent.updateCreator(await myUser.getVerifiedUser());
                     await MySchedule.AddToScheduleAndCommit(newCalendarEvent);
                 }
                 

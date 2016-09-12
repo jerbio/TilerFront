@@ -2165,11 +2165,11 @@ var global_ListOfDayCounter = 0;
 
 function DoSideBarsInterSect(MeEnd, Index, AllElements) {
     var retValue = false;
-    MeEnd = MeEnd.toFixed(2);
+    MeEnd = Number( MeEnd.toFixed(2));
     var Me = AllElements[Index];
     for (var i = Index + 1; i < AllElements.length; i++) {
         var PossibleInterferringElement = AllElements[i];
-        var PossibleInterferringTop = PossibleInterferringElement.top.toFixed(2);
+        var PossibleInterferringTop = Number( PossibleInterferringElement.top.toFixed(2));
         if (PossibleInterferringTop < MeEnd) {
             //++Me.Count;
             PossibleInterferringElement.CalCCount = Me.CalCCount + 1;

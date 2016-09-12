@@ -78,7 +78,7 @@ namespace TilerFront.Controllers
             PostBackData retValue = new PostBackData("", 4);
             if (await retrievedUser.Status().ConfigureAwait(false))
             {
-                IEnumerable<Location_Elements> retrievedCalendarEvents = await retrievedUser.Location.getCachedLocationByName(SearchData.Data);
+                IEnumerable<Location_Elements> retrievedCalendarEvents = await retrievedUser.Location.searchLocationByName(SearchData.Data, retrievedUser.UserID);
                 retValue = new PostBackData(retrievedCalendarEvents.Select(obj => obj.ToLocationModel()).ToList(), 0);
             }
 

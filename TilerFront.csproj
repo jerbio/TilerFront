@@ -482,6 +482,14 @@
     <Compile Include="Migrations\201607290728556_addedLocationDB_Set.Designer.cs">
       <DependentUpon>201607290728556_addedLocationDB_Set.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201609090757238_uniqueLocationNamePerUser.cs" />
+    <Compile Include="Migrations\201609090757238_uniqueLocationNamePerUser.Designer.cs">
+      <DependentUpon>201609090757238_uniqueLocationNamePerUser.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201609090825325_uniqueLocationNamePerUserUpdate.cs" />
+    <Compile Include="Migrations\201609090825325_uniqueLocationNamePerUserUpdate.Designer.cs">
+      <DependentUpon>201609090825325_uniqueLocationNamePerUserUpdate.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -2730,6 +2738,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201607290728556_addedLocationDB_Set.resx">
       <DependentUpon>201607290728556_addedLocationDB_Set.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201609090757238_uniqueLocationNamePerUser.resx">
+      <DependentUpon>201609090757238_uniqueLocationNamePerUser.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201609090825325_uniqueLocationNamePerUserUpdate.resx">
+      <DependentUpon>201609090825325_uniqueLocationNamePerUserUpdate.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
