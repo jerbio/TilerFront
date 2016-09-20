@@ -1262,7 +1262,7 @@ namespace TilerFront
             return retValue;
         }
 
-        private XmlDocument getLogDataStore(string NameOfFile = "")
+        protected XmlDocument getLogDataStore(string NameOfFile = "")
         {
 
             XmlDocument doc = new XmlDocument();
@@ -1342,26 +1342,16 @@ namespace TilerFront
 
 
 
-        public Dictionary<string, CalendarEvent> getAllCalendarFromXml(TimeLine RangeOfLookUP)
+        public Dictionary<string, CalendarEvent> getAllCalendarFromXml(TimeLine RangeOfLookUP, XmlNode IdNode, XmlNode EventSchedulesNodes)
         {
-#if ForceReadFromXml
-#else
-            if (useCassandra)
-            {
-                return myCassandraAccess.getAllCalendarEvent();
-            }
-#endif
-
-            XmlDocument doc = getLogDataStore();
             Dictionary<string, CalendarEvent> MyCalendarEventDictionary = new Dictionary<string, CalendarEvent>();
-
-
-            XmlNode node = doc.DocumentElement.SelectSingleNode("/ScheduleLog/LastIDCounter");
-            string LastUsedIndex = node.InnerText;
-            LastIDNumber =Convert.ToInt64( LastUsedIndex);
+            if (IdNode != null)
+            {
+                string LastUsedIndex = IdNode.InnerText;
+                LastIDNumber = Convert.ToInt64(LastUsedIndex);
+            }
+            
             DateTimeOffset userReferenceDay;
-            XmlNode EventSchedulesNodes = doc.DocumentElement.SelectSingleNode("/ScheduleLog/EventSchedules");
-
             string ID;
             string Deadline;
             string Split;
@@ -1381,7 +1371,7 @@ namespace TilerFront
             string PrepTimeFlag;
             string PrepTime;
 
-            if (EventSchedulesNodes.ChildNodes!=null)
+            if (EventSchedulesNodes.ChildNodes != null)
             {
                 foreach (XmlNode EventScheduleNode in EventSchedulesNodes.ChildNodes)
                 {
@@ -1404,9 +1394,30 @@ namespace TilerFront
                 }
 
             }
-            
+
 
             return MyCalendarEventDictionary;
+        }
+
+        public Dictionary<string, CalendarEvent> getAllCalendarFromXml(TimeLine RangeOfLookUP)
+        {
+#if ForceReadFromXml
+#else
+            if (useCassandra)
+            {
+                return myCassandraAccess.getAllCalendarEvent();
+            }
+#endif
+
+            XmlDocument doc = getLogDataStore();
+            XmlNode IdNode = doc.DocumentElement.SelectSingleNode("/ScheduleLog/LastIDCounter");
+            
+            XmlNode EventSchedulesNodes = doc.DocumentElement.SelectSingleNode("/ScheduleLog/EventSchedules");
+
+            return getAllCalendarFromXml(RangeOfLookUP, IdNode, EventSchedulesNodes);
+
+
+
         }
         public CalendarEvent getCalendarEventObjFromNode(XmlNode EventScheduleNode, TimeLine RangeOfLookUP)
         {
