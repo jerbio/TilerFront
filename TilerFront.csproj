@@ -2586,7 +2586,6 @@
     <Content Include="Scripts\heartcode-canvasloader-min-0.9.1.js" />
     <Content Include="Scripts\HomePageControl.js" />
     <Content Include="Scripts\IndexIni.js" />
-    <None Include="Properties\PublishProfiles\mytilerkid.pubxml" />
     <Content Include="Scripts\jquery-2.1.0.min.js" />
     <Content Include="Scripts\jquery-ui-1.10.4.custom.js" />
     <Content Include="Scripts\jquery.datepair.js" />
@@ -2673,6 +2672,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="BigDataLogs\" />
+    <Folder Include="Properties\PublishProfiles\" />
     <Folder Include="Views\GoogleNotifications\" />
     <Folder Include="Views\GoogleNotification\" />
     <Folder Include="WagTapCalLogs\" />

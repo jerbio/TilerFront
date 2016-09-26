@@ -201,7 +201,7 @@ namespace TilerFront
             }
 
             xmldoc.InnerXml = xmldocCopy.InnerXml;
-
+            int loopCounter = 0;
             while (true)
             {
                 try
@@ -214,6 +214,11 @@ namespace TilerFront
                 catch (Exception e)
                 {
                     Thread.Sleep(160);
+
+                    if (++loopCounter > 3)
+                    {
+                        throw new TimeoutException("Failed to open files for undo");
+                    }
                 }
             }
 
@@ -513,10 +518,10 @@ namespace TilerFront
                 catch (Exception e)
                 {
                     Thread.Sleep(160);
-                    
-                    if(++loopCounter > 3)
+
+                    if (++loopCounter > 3)
                     {
-                        break;
+                        throw new TimeoutException("Failed to update schedule log");
                     }
                 }
             }
@@ -1146,6 +1151,7 @@ namespace TilerFront
             }
 
             XmlDocument doc = new XmlDocument();
+            int loopCounter = 0;
             while (true)
             {
                 if (!File.Exists(dirString))
@@ -1160,11 +1166,18 @@ namespace TilerFront
                 catch (Exception e)
                 {
                     Thread.Sleep(160);
+
+                    if (++loopCounter > 3)
+                    {
+                        throw new TimeoutException("Failed to create empty log for deletion");
+                    }
                 }
             }
 
             XmlNode EventSchedulesNodes = doc.DocumentElement.SelectSingleNode("/ScheduleLog/EventSchedules");
             EventSchedulesNodes.InnerText = "";
+
+            loopCounter = 0;
             while (true)
             {
                 try
@@ -1175,6 +1188,11 @@ namespace TilerFront
                 catch (Exception e)
                 {
                     Thread.Sleep(160);
+
+                    if (++loopCounter > 3)
+                    {
+                        throw new TimeoutException("Failed to save empty log in deletion of log");
+                    }
                 }
             }
 
@@ -1275,6 +1293,7 @@ namespace TilerFront
                 NameOfFile = WagTapLogLocation + "BeforeInsertionFixingStiticRestricted.xml.lnk";
                 NameOfFile = GetShortcutTarget(NameOfFile);
 #endif
+            int loopCounter = 0;
             while (true)
             {
                 if (!File.Exists(NameOfFile))
@@ -1289,8 +1308,11 @@ namespace TilerFront
                 catch (Exception e)
                 {
                     Thread.Sleep(160);
-                    ;
 
+                    if (++loopCounter > 3)
+                    {
+                        throw new TimeoutException("Failed to load day reference");
+                    }
                 }
             }
 
@@ -1342,7 +1364,7 @@ namespace TilerFront
 
 
 
-        public Dictionary<string, CalendarEvent> getAllCalendarFromXml(TimeLine RangeOfLookUP, XmlNode IdNode, XmlNode EventSchedulesNodes)
+        protected virtual Dictionary<string, CalendarEvent> getAllCalendarFromXml(TimeLine RangeOfLookUP, XmlNode IdNode, XmlNode EventSchedulesNodes)
         {
             Dictionary<string, CalendarEvent> MyCalendarEventDictionary = new Dictionary<string, CalendarEvent>();
             if (IdNode != null)
@@ -1379,14 +1401,8 @@ namespace TilerFront
 
                     //RetrievedEvent = getCalendarEventObjFromNode(EventScheduleNode, RangeOfLookUP);
                     ///*
-                    try
-                    {
-                        RetrievedEvent = getCalendarEventObjFromNode(EventScheduleNode, RangeOfLookUP);
-                    }
-                    catch
-                    {
-                        RetrievedEvent = new CalendarEvent();
-                    }
+                    RetrievedEvent = getCalendarEventObjFromNode(EventScheduleNode, RangeOfLookUP);
+                   
                     //*/
 
                     if (RetrievedEvent != null)
@@ -1399,7 +1415,7 @@ namespace TilerFront
             return MyCalendarEventDictionary;
         }
 
-        public Dictionary<string, CalendarEvent> getAllCalendarFromXml(TimeLine RangeOfLookUP)
+        public virtual Dictionary<string, CalendarEvent> getAllCalendarFromXml(TimeLine RangeOfLookUP)
         {
 #if ForceReadFromXml
 #else
@@ -1419,7 +1435,7 @@ namespace TilerFront
 
 
         }
-        public CalendarEvent getCalendarEventObjFromNode(XmlNode EventScheduleNode, TimeLine RangeOfLookUP)
+        public virtual CalendarEvent getCalendarEventObjFromNode(XmlNode EventScheduleNode, TimeLine RangeOfLookUP)
         {
             string ID;
             string Deadline;
@@ -1586,7 +1602,7 @@ namespace TilerFront
             return retValue;
         }
         
-        List<SubCalendarEvent> ReadSubSchedulesFromXMLNode(XmlNode MyXmlNode, CalendarEvent MyParent, TimeLine RangeOfLookUP)
+        protected virtual List<SubCalendarEvent> ReadSubSchedulesFromXMLNode(XmlNode MyXmlNode, CalendarEvent MyParent, TimeLine RangeOfLookUP)
         {
             List<SubCalendarEvent> MyArrayOfNodes = new List<SubCalendarEvent>();
             string ID = "";
