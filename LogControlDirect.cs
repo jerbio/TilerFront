@@ -431,7 +431,7 @@ namespace TilerFront
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Name"));
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.Name.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("ID"));
-            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.ID.ToString();
+            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.Id;
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Enabled"));
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.isEnabled.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Location"));

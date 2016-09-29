@@ -489,7 +489,7 @@ namespace TilerFront
                 
                         XmlNode MyImportedNode = xmldoc.ImportNode(EventScheduleNode as XmlNode, true);
                         //(EventScheduleNode, true);
-                        if (!UpdateInnerXml(ref EventScheduleNodes, "ID", MyEvent.ID.ToString(), EventScheduleNode))
+                        if (!UpdateInnerXml(ref EventScheduleNodes, "ID", MyEvent.Id, EventScheduleNode))
                         {
                             xmldoc.DocumentElement.SelectSingleNode("/ScheduleLog/EventSchedules").AppendChild(MyImportedNode);
                         }
@@ -730,7 +730,7 @@ namespace TilerFront
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Name"));
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.Name.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("ID"));
-            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.ID.ToString();
+            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.Id;
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Enabled"));
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.isEnabled.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Location"));
@@ -942,7 +942,7 @@ namespace TilerFront
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("Rigid"));
             MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.Rigid.ToString();
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("ID"));
-            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.ID.ToString();
+            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.Id;
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("Enabled"));
             MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.isEnabled.ToString();
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("Complete"));
@@ -1693,7 +1693,7 @@ namespace TilerFront
                 EventDisplay UiData = getDisplayUINode(MyXmlNode.ChildNodes[i]);
                 ConflictProfile conflictProfile = getConflctProfile(MyXmlNode.ChildNodes[i]);
 
-                SubCalendarEvent retrievedSubEvent = new SubCalendarEvent(ID, BusySlot, Start, End, PrepTime, MyParent.ID, rigidFlag, Enabled, UiData, noteData, CompleteFlag, var1, MyParent.RangeTimeLine, conflictProfile);
+                SubCalendarEvent retrievedSubEvent = new SubCalendarEvent(ID, BusySlot, Start, End, PrepTime, MyParent.Id, rigidFlag, Enabled, UiData, noteData, CompleteFlag, var1, MyParent.RangeTimeLine, conflictProfile);
                 retrievedSubEvent.ThirdPartyID = MyXmlNode.ChildNodes[i].SelectSingleNode("ThirdPartyID").InnerText;//this is a hack to just update the Third partyID
                 XmlNode restrictedNode = MyXmlNode.ChildNodes[i].SelectSingleNode("Restricted");
                 retrievedSubEvent = new DB_SubCalendarEvent(retrievedSubEvent, MyParent.NowInfo, MyParent.ProcrastinationInfo);

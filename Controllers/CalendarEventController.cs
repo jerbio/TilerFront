@@ -268,7 +268,7 @@ namespace TilerFront.Controllers
                             Models.ThirdPartyCalendarAuthenticationModel AllIndexedThirdParty = await ScheduleController.getThirdPartyAuthentication(retrievedUser.UserID, myUser.ThirdPartyUserID, 2);
                             GoogleTilerEventControl googleControl = new GoogleTilerEventControl(AllIndexedThirdParty);
                             await googleControl.updateSubEvent(myUser).ConfigureAwait(false);
-                            Dictionary<string, CalendarEvent>AllCalendarEvents =  (await googleControl.getCalendarEvents().ConfigureAwait(false)).ToDictionary(obj=>obj.ID, obj=>obj);
+                            Dictionary<string, CalendarEvent>AllCalendarEvents =  (await googleControl.getCalendarEvents().ConfigureAwait(false)).ToDictionary(obj=>obj.Id, obj=>obj);
 
                             GoogleThirdPartyControl googleEvents = new GoogleThirdPartyControl(AllCalendarEvents);
 

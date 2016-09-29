@@ -207,7 +207,7 @@ namespace TilerFront.Controllers
             DateTimeOffset myNow = DateTimeOffset.UtcNow;
             My24HourTimerWPF.Schedule MySchedule = new My24HourTimerWPF.Schedule(myUser, myNow);
             SubCalendarEvent SubEvent = MySchedule.getSubCalendarEvent(myAuthorizedUser.EventID);
-            if ((!SubEvent.Rigid) && (SubEvent.ID != currentPausedEvent.EventId))
+            if ((!SubEvent.Rigid) && (SubEvent.Id != currentPausedEvent.EventId))
             {
                 DB_UserActivity activity = new DB_UserActivity(myAuthorizedUser.getRefNow(), UserActivity.ActivityType.Pause);
 
