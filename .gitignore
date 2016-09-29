@@ -1,8 +1,6 @@
 App_Data/aspnet-TilerFront-ground.mdf
 App_Data/aspnet-TilerFront-ground_log.ldf
-<<<<<<< 94847fdd79766218e9798c8b961a88f23ab133b3
 obj/*
 BigDataLogs/*
-=======
 obj
->>>>>>> No changes just new dll files because of changes to file from the mytwentyfourhourtimer.exe
+
