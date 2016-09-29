@@ -210,7 +210,7 @@ namespace TilerFront
             }
 
             xmldoc.InnerXml = xmldocCopy.InnerXml;
-
+            int loopCounter = 0;
             while (true)
             {
                 try
@@ -223,6 +223,11 @@ namespace TilerFront
                 catch (Exception e)
                 {
                     Thread.Sleep(160);
+
+                    if (++loopCounter > 3)
+                    {
+                        throw new TimeoutException("Failed to open files for undo");
+                    }
                 }
             }
 
@@ -522,10 +527,10 @@ namespace TilerFront
                 catch (Exception e)
                 {
                     Thread.Sleep(160);
-                    
-                    if(++loopCounter > 3)
+
+                    if (++loopCounter > 3)
                     {
-                        break;
+                        throw new TimeoutException("Failed to update schedule log");
                     }
                 }
             }
@@ -1168,6 +1173,7 @@ namespace TilerFront
             }
 
             XmlDocument doc = new XmlDocument();
+            int loopCounter = 0;
             while (true)
             {
                 if (!File.Exists(dirString))
@@ -1182,11 +1188,18 @@ namespace TilerFront
                 catch (Exception e)
                 {
                     Thread.Sleep(160);
+
+                    if (++loopCounter > 3)
+                    {
+                        throw new TimeoutException("Failed to create empty log for deletion");
+                    }
                 }
             }
 
             XmlNode EventSchedulesNodes = doc.DocumentElement.SelectSingleNode("/ScheduleLog/EventSchedules");
             EventSchedulesNodes.InnerText = "";
+
+            loopCounter = 0;
             while (true)
             {
                 try
@@ -1197,6 +1210,11 @@ namespace TilerFront
                 catch (Exception e)
                 {
                     Thread.Sleep(160);
+
+                    if (++loopCounter > 3)
+                    {
+                        throw new TimeoutException("Failed to save empty log in deletion of log");
+                    }
                 }
             }
 
@@ -1284,7 +1302,7 @@ namespace TilerFront
             return retValue;
         }
 
-        private XmlDocument getLogDataStore(string NameOfFile = "")
+        protected XmlDocument getLogDataStore(string NameOfFile = "")
         {
 
             XmlDocument doc = new XmlDocument();
@@ -1297,6 +1315,7 @@ namespace TilerFront
                 NameOfFile = WagTapLogLocation + "BeforeInsertionFixingStiticRestricted.xml.lnk";
                 NameOfFile = GetShortcutTarget(NameOfFile);
 #endif
+            int loopCounter = 0;
             while (true)
             {
                 if (!File.Exists(NameOfFile))
@@ -1311,8 +1330,11 @@ namespace TilerFront
                 catch (Exception e)
                 {
                     Thread.Sleep(160);
-                    ;
 
+                    if (++loopCounter > 3)
+                    {
+                        throw new TimeoutException("Failed to load day reference");
+                    }
                 }
             }
 
@@ -1364,26 +1386,16 @@ namespace TilerFront
 
 
 
-        public Dictionary<string, CalendarEvent> getAllCalendarFromXml(TimeLine RangeOfLookUP)
+        protected virtual Dictionary<string, CalendarEvent> getAllCalendarFromXml(TimeLine RangeOfLookUP, XmlNode IdNode, XmlNode EventSchedulesNodes)
         {
-#if ForceReadFromXml
-#else
-            if (useCassandra)
-            {
-                return myCassandraAccess.getAllCalendarEvent();
-            }
-#endif
-
-            XmlDocument doc = getLogDataStore();
             Dictionary<string, CalendarEvent> MyCalendarEventDictionary = new Dictionary<string, CalendarEvent>();
-
-
-            XmlNode node = doc.DocumentElement.SelectSingleNode("/ScheduleLog/LastIDCounter");
-            string LastUsedIndex = node.InnerText;
-            LastIDNumber =Convert.ToInt64( LastUsedIndex);
+            if (IdNode != null)
+            {
+                string LastUsedIndex = IdNode.InnerText;
+                LastIDNumber = Convert.ToInt64(LastUsedIndex);
+            }
+            
             DateTimeOffset userReferenceDay;
-            XmlNode EventSchedulesNodes = doc.DocumentElement.SelectSingleNode("/ScheduleLog/EventSchedules");
-
             string ID;
             string Deadline;
             string Split;
@@ -1403,7 +1415,7 @@ namespace TilerFront
             string PrepTimeFlag;
             string PrepTime;
 
-            if (EventSchedulesNodes.ChildNodes!=null)
+            if (EventSchedulesNodes.ChildNodes != null)
             {
                 foreach (XmlNode EventScheduleNode in EventSchedulesNodes.ChildNodes)
                 {
@@ -1411,14 +1423,7 @@ namespace TilerFront
 
                     //RetrievedEvent = getCalendarEventObjFromNode(EventScheduleNode, RangeOfLookUP);
                     ///*
-                    try
-                    {
-                        RetrievedEvent = getCalendarEventObjFromNode(EventScheduleNode, RangeOfLookUP);
-                    }
-                    catch(Exception e)
-                    {
-                        throw e;
-                    }
+                    RetrievedEvent = getCalendarEventObjFromNode(EventScheduleNode, RangeOfLookUP);
                     //*/
 
                     if (RetrievedEvent != null)
@@ -1426,11 +1431,32 @@ namespace TilerFront
                 }
 
             }
-            
+
 
             return MyCalendarEventDictionary;
         }
-        public CalendarEvent getCalendarEventObjFromNode(XmlNode EventScheduleNode, TimeLine RangeOfLookUP)
+
+        public virtual Dictionary<string, CalendarEvent> getAllCalendarFromXml(TimeLine RangeOfLookUP)
+        {
+#if ForceReadFromXml
+#else
+            if (useCassandra)
+            {
+                return myCassandraAccess.getAllCalendarEvent();
+            }
+#endif
+
+            XmlDocument doc = getLogDataStore();
+            XmlNode IdNode = doc.DocumentElement.SelectSingleNode("/ScheduleLog/LastIDCounter");
+            
+            XmlNode EventSchedulesNodes = doc.DocumentElement.SelectSingleNode("/ScheduleLog/EventSchedules");
+
+            return getAllCalendarFromXml(RangeOfLookUP, IdNode, EventSchedulesNodes);
+
+
+
+        }
+        public virtual CalendarEvent getCalendarEventObjFromNode(XmlNode EventScheduleNode, TimeLine RangeOfLookUP)
         {
             string ID;
             string Deadline;
@@ -1650,7 +1676,7 @@ namespace TilerFront
             return retValue;
         }
         
-        List<SubCalendarEvent> ReadSubSchedulesFromXMLNode(XmlNode MyXmlNode, CalendarEvent MyParent, TimeLine RangeOfLookUP)
+        protected virtual List<SubCalendarEvent> ReadSubSchedulesFromXMLNode(XmlNode MyXmlNode, CalendarEvent MyParent, TimeLine RangeOfLookUP)
         {
             List<SubCalendarEvent> MyArrayOfNodes = new List<SubCalendarEvent>();
             string ID = "";

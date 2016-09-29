@@ -2602,7 +2602,6 @@ function AddTiledEvent()
 
     function peekData()
     {
-        debugger;
         var Splits = RepetionSlider.getAllElements()[0].TileInput;
         var RepetionChoice = RepetionSlider.getAllElements()[1].TileInput;
         var myColor = ColorPicker.Selector.getColor();

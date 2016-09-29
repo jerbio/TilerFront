@@ -34,6 +34,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>App_Data\XmlDocument.xml</DocumentationFile>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -2575,7 +2576,6 @@
     <Content Include="Content\bootstrap.css.map" />
     <Content Include="Content\bootstrap-theme.min.css.map" />
     <Content Include="Content\bootstrap-theme.css.map" />
-    <None Include="Properties\PublishProfiles\mytiler.pubxml" />
     <Content Include="Scripts\Chart.min.js" />
     <Content Include="Scripts\Datepair.js" />
     <Content Include="Scripts\detectmobilebrowser.js" />
@@ -2586,8 +2586,6 @@
     <Content Include="Scripts\heartcode-canvasloader-min-0.9.1.js" />
     <Content Include="Scripts\HomePageControl.js" />
     <Content Include="Scripts\IndexIni.js" />
-    <None Include="Properties\PublishProfiles\mytilerkid.pubxml" />
-    <None Include="Properties\PublishProfiles\mytilerkidOld.pubxml" />
     <Content Include="Scripts\jquery-2.1.0.min.js" />
     <Content Include="Scripts\jquery-ui-1.10.4.custom.js" />
     <Content Include="Scripts\jquery.datepair.js" />
@@ -2674,6 +2672,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="BigDataLogs\" />
+    <Folder Include="Properties\PublishProfiles\" />
     <Folder Include="Views\GoogleNotifications\" />
     <Folder Include="Views\GoogleNotification\" />
     <Folder Include="WagTapCalLogs\" />
