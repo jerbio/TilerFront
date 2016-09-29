@@ -74,7 +74,12 @@ namespace TilerFront
             {
                 {Reason.Options.BestFit.ToString(),(XmlNode node)=> { return  getBestFitReason(node); } },
                 {Reason.Options.PreservedOrder.ToString(),(XmlNode node)=> { return  getPreservedOrderReason(node); } },
-                {Reason.Options.Weather.ToString(), (XmlNode node)=> { return  getWeatherReason(node); } }
+                {Reason.Options.Weather.ToString(), (XmlNode node)=> { return  getWeatherReason(node); } },
+                {Reason.Options.CloseToCluster.ToString(), (XmlNode node)=> { return  getLocationReason(node); } },
+                {Reason.Options.Occupancy.ToString(), (XmlNode node)=> { return  getOccupancyReason(node); } },
+                {Reason.Options.RestrictedEvent.ToString(), (XmlNode node)=> { return  getRestrictedEventReason(node); } }
+                
+
             };
         }
 
@@ -1659,6 +1664,31 @@ namespace TilerFront
 
             return result;
         }
+
+
+        public Reason getLocationReason(XmlNode ReasonNode)
+        {
+            MemoryStream stm = new MemoryStream();
+            StreamWriter stw = new StreamWriter(stm);
+            stw.Write(ReasonNode.OuterXml);
+            stw.Flush();
+            LocationReason result = new LocationReason();
+            return result;
+        }
+
+        public Reason getOccupancyReason(XmlNode ReasonNode)
+        {
+            DurationReason result = new DurationReason();
+            return result;
+        }
+
+
+        public Reason getRestrictedEventReason(XmlNode ReasonNode)
+        {
+            RestrictedEventReason result = new RestrictedEventReason();
+            return result;
+        }
+        
 
         Procrastination generateProcrastinationObject(XmlNode ReferenceNode)
         {

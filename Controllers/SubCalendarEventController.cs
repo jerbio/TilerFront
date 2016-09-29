@@ -179,7 +179,7 @@ namespace TilerFront.Controllers
                             myNow = DateTimeOffset.UtcNow;
                             My24HourTimerWPF.Schedule NewSchedule = new My24HourTimerWPF.Schedule(retrievedUser, myNow);
 
-                            await ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(NewSchedule, retrievedUser.UserID).ConfigureAwait(false);
+                            //await ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(NewSchedule, retrievedUser.UserID).ConfigureAwait(false);
 
                             long StartLong = Convert.ToInt64(myUser.Start);
                             long EndLong = Convert.ToInt64(myUser.End);
