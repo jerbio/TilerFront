@@ -15,6 +15,9 @@ using SendGrid;
 using System.Net;
 using System.Configuration;
 using System.Diagnostics;
+//using SendGrid.Helpers.Mail;
+using System.Net.Mime;
+using SendGrid.Helpers.Mail;
 
 namespace TilerFront
 {
@@ -32,34 +35,59 @@ namespace TilerFront
         }
         */
 
+        //private async Task configSendGridasyncOldApi(IdentityMessage message)
+        //{
+        //    var myMessage = new SendGridMessage();
+        //    myMessage.AddTo(message.Destination);
+        //    myMessage.From = new System.Net.Mail.MailAddress(
+        //                        "noreply@mytiler.com", "Tiler S.");
+        //    myMessage.Subject = message.Subject;
+        //    myMessage.Text = message.Body;
+        //    myMessage.Html = message.Body;
+
+        //    var credentials = new NetworkCredential(
+        //               ConfigurationManager.AppSettings["sendGridMailAccount"],
+        //               ConfigurationManager.AppSettings["sendGridMailPassword"]
+        //               );
+
+        //    // Create a Web transport for sending email.
+        //    var transportWeb = new Web(credentials);
+
+        //    // Send the email.
+        //    if (transportWeb != null)
+        //    {
+        //        await transportWeb.DeliverAsync(myMessage);
+        //    }
+        //    else
+        //    {
+        //        Trace.TraceError("Failed to create Web transport.");
+        //        await Task.FromResult(0);
+        //    }
+        //}
+
+
         private async Task configSendGridasync(IdentityMessage message)
         {
-            var myMessage = new SendGridMessage();
-            myMessage.AddTo(message.Destination);
-            myMessage.From = new System.Net.Mail.MailAddress(
-                                "noreply@mytiler.com", "Tiler S.");
-            myMessage.Subject = message.Subject;
-            myMessage.Text = message.Body;
-            myMessage.Html = message.Body;
+            String apiKey = ConfigurationManager.AppSettings["tilerSendGridKey"];//, Environment.GetEnvironmentVariable("007HealthLineSendGridKey", EnvironmentVariableTarget.User);
+            dynamic sg = new SendGridAPIClient(apiKey);
 
-            var credentials = new NetworkCredential(
-                       ConfigurationManager.AppSettings["mailAccount"],
-                       ConfigurationManager.AppSettings["mailPassword"]
-                       );
 
-            // Create a Web transport for sending email.
-            var transportWeb = new Web(credentials);
+            Email from = new Email("noreply@mytiler.com");
+            String subject = message.Subject;
+            Email to = new Email(message.Destination);
+            Content content = new Content(MediaTypeNames.Text.Html, message.Body);
+            Mail mail = new Mail(from, subject, to, content);
 
-            // Send the email.
-            if (transportWeb != null)
-            {
-                await transportWeb.DeliverAsync(myMessage);
-            }
-            else
-            {
-                Trace.TraceError("Failed to create Web transport.");
-                await Task.FromResult(0);
-            }
+            String ret = mail.Get();
+
+            string requestBody = ret;
+
+
+            dynamic response = sg.client.mail.send.post(requestBody: requestBody);
+
+            System.Diagnostics.Debug.WriteLine((response.StatusCode.ToString() as string) + "!!!!!~~~~~good for my soul");
+            System.Diagnostics.Debug.WriteLine((response.Body.ReadAsStringAsync().Result.ToString() as string) + "****$$$$$good for my soul");
+            System.Diagnostics.Debug.WriteLine((response.Headers.ToString().ToString() as string) + "******boots for you for my soul");
         }
 
     }

@@ -1,0 +1,1155 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>TilerFront</name>
+    </assembly>
+    <members>
+        <member name="M:TilerFront.AppFlowMetadata.#ctor(System.String)">
+            *
+        </member>
+        <member name="M:TilerFront.Areas.HelpPage.ApiDescriptionExtensions.GetFriendlyId(System.Web.Http.Description.ApiDescription)">
+            <summary>
+            Generates an URI-friendly ID for the <see cref="T:System.Web.Http.Description.ApiDescription"/>. E.g. "Get-Values-id_name" instead of "GetValues/{id}?name={name}"
+            </summary>
+            <param name="description">The <see cref="T:System.Web.Http.Description.ApiDescription"/>.</param>
+            <returns>The ID as a string.</returns>
+        </member>
+        <member name="T:TilerFront.Areas.HelpPage.HelpPageConfig">
+            <summary>
+            Use this class to customize the Help Page.
+            For example you can set a custom <see cref="T:System.Web.Http.Description.IDocumentationProvider"/> to supply the documentation
+            or you can provide the samples for the requests/responses.
+            </summary>
+        </member>
+        <member name="T:TilerFront.Areas.HelpPage.Controllers.HelpController">
+            <summary>
+            The controller that will handle requests for the help page.
+            </summary>
+        </member>
+        <member name="M:TilerFront.Areas.HelpPage.HelpPageConfigurationExtensions.SetDocumentationProvider(System.Web.Http.HttpConfiguration,System.Web.Http.Description.IDocumentationProvider)">
+            <summary>
+            Sets the documentation provider for help page.
+            </summary>
+            <param name="config">The <see cref="T:System.Web.Http.HttpConfiguration"/>.</param>
+            <param name="documentationProvider">The documentation provider.</param>
+        </member>
+        <member name="M:TilerFront.Areas.HelpPage.HelpPageConfigurationExtensions.SetSampleObjects(System.Web.Http.HttpConfiguration,System.Collections.Generic.IDictionary{System.Type,System.Object})">
+            <summary>
+            Sets the objects that will be used by the formatters to produce sample requests/responses.
+            </summary>
+            <param name="config">The <see cref="T:System.Web.Http.HttpConfiguration"/>.</param>
+            <param name="sampleObjects">The sample objects.</param>
+        </member>
+        <member name="M:TilerFront.Areas.HelpPage.HelpPageConfigurationExtensions.SetSampleRequest(System.Web.Http.HttpConfiguration,System.Object,System.Net.Http.Headers.MediaTypeHeaderValue,System.String,System.String)">
+            <summary>
+            Sets the sample request directly for the specified media type and action.
+            </summary>
+            <param name="config">The <see cref="T:System.Web.Http.HttpConfiguration"/>.</param>
+            <param name="sample">The sample request.</param>
+            <param name="mediaType">The media type.</param>
+            <param name="controllerName">Name of the controller.</param>
+            <param name="actionName">Name of the action.</param>
+        </member>
+        <member name="M:TilerFront.Areas.HelpPage.HelpPageConfigurationExtensions.SetSampleRequest(System.Web.Http.HttpConfiguration,System.Object,System.Net.Http.Headers.MediaTypeHeaderValue,System.String,System.String,System.String[])">
+            <summary>
+            Sets the sample request directly for the specified media type and action with parameters.
+            </summary>
+            <param name="config">The <see cref="T:System.Web.Http.HttpConfiguration"/>.</param>
+            <param name="sample">The sample request.</param>
+            <param name="mediaType">The media type.</param>
+            <param name="controllerName">Name of the controller.</param>
+            <param name="actionName">Name of the action.</param>
+            <param name="parameterNames">The parameter names.</param>
+        </member>
+        <member name="M:TilerFront.Areas.HelpPage.HelpPageConfigurationExtensions.SetSampleResponse(System.Web.Http.HttpConfiguration,System.Object,System.Net.Http.Headers.MediaTypeHeaderValue,System.String,System.String)">
+            <summary>
+            Sets the sample request directly for the specified media type of the action.
+            </summary>
+            <param name="config">The <see cref="T:System.Web.Http.HttpConfiguration"/>.</param>
+            <param name="sample">The sample response.</param>
+            <param name="mediaType">The media type.</param>
+            <param name="controllerName">Name of the controller.</param>
+            <param name="actionName">Name of the action.</param>
+        </member>
+        <member name="M:TilerFront.Areas.HelpPage.HelpPageConfigurationExtensions.SetSampleResponse(System.Web.Http.HttpConfiguration,System.Object,System.Net.Http.Headers.MediaTypeHeaderValue,System.String,System.String,System.String[])">
+            <summary>
+            Sets the sample response directly for the specified media type of the action with specific parameters.
+            </summary>
+            <param name="config">The <see cref="T:System.Web.Http.HttpConfiguration"/>.</param>
+            <param name="sample">The sample response.</param>
+            <param name="mediaType">The media type.</param>
+            <param name="controllerName">Name of the controller.</param>
+            <param name="actionName">Name of the action.</param>
+            <param name="parameterNames">The parameter names.</param>
+        </member>
+        <member name="M:TilerFront.Areas.HelpPage.HelpPageConfigurationExtensions.SetSampleForMediaType(System.Web.Http.HttpConfiguration,System.Object,System.Net.Http.Headers.MediaTypeHeaderValue)">
+            <summary>
+            Sets the sample directly for all actions with the specified media type.
+            </summary>
+            <param name="config">The <see cref="T:System.Web.Http.HttpConfiguration"/>.</param>
+            <param name="sample">The sample.</param>
+            <param name="mediaType">The media type.</param>
+        </member>
+        <member name="M:TilerFront.Areas.HelpPage.HelpPageConfigurationExtensions.SetSampleForType(System.Web.Http.HttpConfiguration,System.Object,System.Net.Http.Headers.MediaTypeHeaderValue,System.Type)">
+            <summary>
+            Sets the sample directly for all actions with the specified type and media type.
+            </summary>
+            <param name="config">The <see cref="T:System.Web.Http.HttpConfiguration"/>.</param>
+            <param name="sample">The sample.</param>
+            <param name="mediaType">The media type.</param>
+            <param name="type">The parameter type or return type of an action.</param>
+        </member>
+        <member name="M:TilerFront.Areas.HelpPage.HelpPageConfigurationExtensions.SetActualRequestType(System.Web.Http.HttpConfiguration,System.Type,System.String,System.String)">
+            <summary>
+            Specifies the actual type of <see cref="T:System.Net.Http.ObjectContent`1"/> passed to the <see cref="T:System.Net.Http.HttpRequestMessage"/> in an action.
+            The help page will use this information to produce more accurate request samples.
+            </summary>
+            <param name="config">The <see cref="T:System.Web.Http.HttpConfiguration"/>.</param>
+            <param name="type">The type.</param>
+            <param name="controllerName">Name of the controller.</param>
+            <param name="actionName">Name of the action.</param>
+        </member>
+        <member name="M:TilerFront.Areas.HelpPage.HelpPageConfigurationExtensions.SetActualRequestType(System.Web.Http.HttpConfiguration,System.Type,System.String,System.String,System.String[])">
+            <summary>
+            Specifies the actual type of <see cref="T:System.Net.Http.ObjectContent`1"/> passed to the <see cref="T:System.Net.Http.HttpRequestMessage"/> in an action.
+            The help page will use this information to produce more accurate request samples.
+            </summary>
+            <param name="config">The <see cref="T:System.Web.Http.HttpConfiguration"/>.</param>
+            <param name="type">The type.</param>
+            <param name="controllerName">Name of the controller.</param>
+            <param name="actionName">Name of the action.</param>
+            <param name="parameterNames">The parameter names.</param>
+        </member>
+        <member name="M:TilerFront.Areas.HelpPage.HelpPageConfigurationExtensions.SetActualResponseType(System.Web.Http.HttpConfiguration,System.Type,System.String,System.String)">
+            <summary>
+            Specifies the actual type of <see cref="T:System.Net.Http.ObjectContent`1"/> returned as part of the <see cref="T:System.Net.Http.HttpRequestMessage"/> in an action.
+            The help page will use this information to produce more accurate response samples.
+            </summary>
+            <param name="config">The <see cref="T:System.Web.Http.HttpConfiguration"/>.</param>
+            <param name="type">The type.</param>
+            <param name="controllerName">Name of the controller.</param>
+            <param name="actionName">Name of the action.</param>
+        </member>
+        <member name="M:TilerFront.Areas.HelpPage.HelpPageConfigurationExtensions.SetActualResponseType(System.Web.Http.HttpConfiguration,System.Type,System.String,System.String,System.String[])">
+            <summary>
+            Specifies the actual type of <see cref="T:System.Net.Http.ObjectContent`1"/> returned as part of the <see cref="T:System.Net.Http.HttpRequestMessage"/> in an action.
+            The help page will use this information to produce more accurate response samples.
+            </summary>
+            <param name="config">The <see cref="T:System.Web.Http.HttpConfiguration"/>.</param>
+            <param name="type">The type.</param>
+            <param name="controllerName">Name of the controller.</param>
+            <param name="actionName">Name of the action.</param>
+            <param name="parameterNames">The parameter names.</param>
+        </member>
+        <member name="M:TilerFront.Areas.HelpPage.HelpPageConfigurationExtensions.GetHelpPageSampleGenerator(System.Web.Http.HttpConfiguration)">
+            <summary>
+            Gets the help page sample generator.
+            </summary>
+            <param name="config">The <see cref="T:System.Web.Http.HttpConfiguration"/>.</param>
+            <returns>The help page sample generator.</returns>
+        </member>
+        <member name="M:TilerFront.Areas.HelpPage.HelpPageConfigurationExtensions.SetHelpPageSampleGenerator(System.Web.Http.HttpConfiguration,TilerFront.Areas.HelpPage.HelpPageSampleGenerator)">
+            <summary>
+            Sets the help page sample generator.
+            </summary>
+            <param name="config">The <see cref="T:System.Web.Http.HttpConfiguration"/>.</param>
+            <param name="sampleGenerator">The help page sample generator.</param>
+        </member>
+        <member name="M:TilerFront.Areas.HelpPage.HelpPageConfigurationExtensions.GetModelDescriptionGenerator(System.Web.Http.HttpConfiguration)">
+            <summary>
+            Gets the model description generator.
+            </summary>
+            <param name="config">The configuration.</param>
+            <returns>The <see cref="T:TilerFront.Areas.HelpPage.ModelDescriptions.ModelDescriptionGenerator"/></returns>
+        </member>
+        <member name="M:TilerFront.Areas.HelpPage.HelpPageConfigurationExtensions.GetHelpPageApiModel(System.Web.Http.HttpConfiguration,System.String)">
+            <summary>
+            Gets the model that represents an API displayed on the help page. The model is initialized on the first call and cached for subsequent calls.
+            </summary>
+            <param name="config">The <see cref="T:System.Web.Http.HttpConfiguration"/>.</param>
+            <param name="apiDescriptionId">The <see cref="T:System.Web.Http.Description.ApiDescription"/> ID.</param>
+            <returns>
+            An <see cref="T:TilerFront.Areas.HelpPage.Models.HelpPageApiModel"/>
+            </returns>
+        </member>
+        <member name="T:TilerFront.Areas.HelpPage.ModelDescriptions.ModelDescription">
+            <summary>
+            Describes a type model.
+            </summary>
+        </member>
+        <member name="T:TilerFront.Areas.HelpPage.ModelDescriptions.ModelDescriptionGenerator">
+            <summary>
+            Generates model descriptions for given types.
+            </summary>
+        </member>
+        <member name="T:TilerFront.Areas.HelpPage.ModelDescriptions.ModelNameAttribute">
+            <summary>
+            Use this attribute to change the name of the <see cref="T:TilerFront.Areas.HelpPage.ModelDescriptions.ModelDescription"/> generated for a type.
+            </summary>
+        </member>
+        <member name="T:TilerFront.Areas.HelpPage.Models.HelpPageApiModel">
+            <summary>
+            The model that represents an API displayed on the help page.
+            </summary>
+        </member>
+        <member name="M:TilerFront.Areas.HelpPage.Models.HelpPageApiModel.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:TilerFront.Areas.HelpPage.Models.HelpPageApiModel"/> class.
+            </summary>
+        </member>
+        <member name="P:TilerFront.Areas.HelpPage.Models.HelpPageApiModel.ApiDescription">
+            <summary>
+            Gets or sets the <see cref="P:TilerFront.Areas.HelpPage.Models.HelpPageApiModel.ApiDescription"/> that describes the API.
+            </summary>
+        </member>
+        <member name="P:TilerFront.Areas.HelpPage.Models.HelpPageApiModel.UriParameters">
+            <summary>
+            Gets or sets the <see cref="T:TilerFront.Areas.HelpPage.ModelDescriptions.ParameterDescription"/> collection that describes the URI parameters for the API.
+            </summary>
+        </member>
+        <member name="P:TilerFront.Areas.HelpPage.Models.HelpPageApiModel.RequestDocumentation">
+            <summary>
+            Gets or sets the documentation for the request.
+            </summary>
+        </member>
+        <member name="P:TilerFront.Areas.HelpPage.Models.HelpPageApiModel.RequestModelDescription">
+            <summary>
+            Gets or sets the <see cref="T:TilerFront.Areas.HelpPage.ModelDescriptions.ModelDescription"/> that describes the request body.
+            </summary>
+        </member>
+        <member name="P:TilerFront.Areas.HelpPage.Models.HelpPageApiModel.RequestBodyParameters">
+            <summary>
+            Gets the request body parameter descriptions.
+            </summary>
+        </member>
+        <member name="P:TilerFront.Areas.HelpPage.Models.HelpPageApiModel.ResourceDescription">
+            <summary>
+            Gets or sets the <see cref="T:TilerFront.Areas.HelpPage.ModelDescriptions.ModelDescription"/> that describes the resource.
+            </summary>
+        </member>
+        <member name="P:TilerFront.Areas.HelpPage.Models.HelpPageApiModel.ResourceProperties">
+            <summary>
+            Gets the resource property descriptions.
+            </summary>
+        </member>
+        <member name="P:TilerFront.Areas.HelpPage.Models.HelpPageApiModel.SampleRequests">
+            <summary>
+            Gets the sample requests associated with the API.
+            </summary>
+        </member>
+        <member name="P:TilerFront.Areas.HelpPage.Models.HelpPageApiModel.SampleResponses">
+            <summary>
+            Gets the sample responses associated with the API.
+            </summary>
+        </member>
+        <member name="P:TilerFront.Areas.HelpPage.Models.HelpPageApiModel.ErrorMessages">
+            <summary>
+            Gets the error messages associated with this model.
+            </summary>
+        </member>
+        <member name="T:TilerFront.Areas.HelpPage.HelpPageSampleGenerator">
+            <summary>
+            This class will generate the samples for the help page.
+            </summary>
+        </member>
+        <member name="M:TilerFront.Areas.HelpPage.HelpPageSampleGenerator.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:TilerFront.Areas.HelpPage.HelpPageSampleGenerator"/> class.
+            </summary>
+        </member>
+        <member name="P:TilerFront.Areas.HelpPage.HelpPageSampleGenerator.ActualHttpMessageTypes">
+            <summary>
+            Gets CLR types that are used as the content of <see cref="T:System.Net.Http.HttpRequestMessage"/> or <see cref="T:System.Net.Http.HttpResponseMessage"/>.
+            </summary>
+        </member>
+        <member name="P:TilerFront.Areas.HelpPage.HelpPageSampleGenerator.ActionSamples">
+            <summary>
+            Gets the objects that are used directly as samples for certain actions.
+            </summary>
+        </member>
+        <member name="P:TilerFront.Areas.HelpPage.HelpPageSampleGenerator.SampleObjects">
+            <summary>
+            Gets the objects that are serialized as samples by the supported formatters.
+            </summary>
+        </member>
+        <member name="P:TilerFront.Areas.HelpPage.HelpPageSampleGenerator.SampleObjectFactories">
+            <summary>
+            Gets factories for the objects that the supported formatters will serialize as samples. Processed in order,
+            stopping when the factory successfully returns a non-<see langref="null"/> object.
+            </summary>
+            <remarks>
+            Collection includes just <see cref="M:TilerFront.Areas.HelpPage.ObjectGenerator.GenerateObject(System.Type)"/> initially. Use
+            <code>SampleObjectFactories.Insert(0, func)</code> to provide an override and
+            <code>SampleObjectFactories.Add(func)</code> to provide a fallback.</remarks>
+        </member>
+        <member name="M:TilerFront.Areas.HelpPage.HelpPageSampleGenerator.GetSampleRequests(System.Web.Http.Description.ApiDescription)">
+            <summary>
+            Gets the request body samples for a given <see cref="T:System.Web.Http.Description.ApiDescription"/>.
+            </summary>
+            <param name="api">The <see cref="T:System.Web.Http.Description.ApiDescription"/>.</param>
+            <returns>The samples keyed by media type.</returns>
+        </member>
+        <member name="M:TilerFront.Areas.HelpPage.HelpPageSampleGenerator.GetSampleResponses(System.Web.Http.Description.ApiDescription)">
+            <summary>
+            Gets the response body samples for a given <see cref="T:System.Web.Http.Description.ApiDescription"/>.
+            </summary>
+            <param name="api">The <see cref="T:System.Web.Http.Description.ApiDescription"/>.</param>
+            <returns>The samples keyed by media type.</returns>
+        </member>
+        <member name="M:TilerFront.Areas.HelpPage.HelpPageSampleGenerator.GetSample(System.Web.Http.Description.ApiDescription,TilerFront.Areas.HelpPage.SampleDirection)">
+            <summary>
+            Gets the request or response body samples.
+            </summary>
+            <param name="api">The <see cref="T:System.Web.Http.Description.ApiDescription"/>.</param>
+            <param name="sampleDirection">The value indicating whether the sample is for a request or for a response.</param>
+            <returns>The samples keyed by media type.</returns>
+        </member>
+        <member name="M:TilerFront.Areas.HelpPage.HelpPageSampleGenerator.GetActionSample(System.String,System.String,System.Collections.Generic.IEnumerable{System.String},System.Type,System.Net.Http.Formatting.MediaTypeFormatter,System.Net.Http.Headers.MediaTypeHeaderValue,TilerFront.Areas.HelpPage.SampleDirection)">
+            <summary>
+            Search for samples that are provided directly through <see cref="P:TilerFront.Areas.HelpPage.HelpPageSampleGenerator.ActionSamples"/>.
+            </summary>
+            <param name="controllerName">Name of the controller.</param>
+            <param name="actionName">Name of the action.</param>
+            <param name="parameterNames">The parameter names.</param>
+            <param name="type">The CLR type.</param>
+            <param name="formatter">The formatter.</param>
+            <param name="mediaType">The media type.</param>
+            <param name="sampleDirection">The value indicating whether the sample is for a request or for a response.</param>
+            <returns>The sample that matches the parameters.</returns>
+        </member>
+        <member name="M:TilerFront.Areas.HelpPage.HelpPageSampleGenerator.GetSampleObject(System.Type)">
+            <summary>
+            Gets the sample object that will be serialized by the formatters. 
+            First, it will look at the <see cref="P:TilerFront.Areas.HelpPage.HelpPageSampleGenerator.SampleObjects"/>. If no sample object is found, it will try to create
+            one using <see cref="M:TilerFront.Areas.HelpPage.HelpPageSampleGenerator.DefaultSampleObjectFactory(TilerFront.Areas.HelpPage.HelpPageSampleGenerator,System.Type)"/> (which wraps an <see cref="T:TilerFront.Areas.HelpPage.ObjectGenerator"/>) and other
+            factories in <see cref="P:TilerFront.Areas.HelpPage.HelpPageSampleGenerator.SampleObjectFactories"/>.
+            </summary>
+            <param name="type">The type.</param>
+            <returns>The sample object.</returns>
+        </member>
+        <member name="M:TilerFront.Areas.HelpPage.HelpPageSampleGenerator.ResolveHttpRequestMessageType(System.Web.Http.Description.ApiDescription)">
+            <summary>
+            Resolves the actual type of <see cref="T:System.Net.Http.ObjectContent`1"/> passed to the <see cref="T:System.Net.Http.HttpRequestMessage"/> in an action.
+            </summary>
+            <param name="api">The <see cref="T:System.Web.Http.Description.ApiDescription"/>.</param>
+            <returns>The type.</returns>
+        </member>
+        <member name="M:TilerFront.Areas.HelpPage.HelpPageSampleGenerator.ResolveType(System.Web.Http.Description.ApiDescription,System.String,System.String,System.Collections.Generic.IEnumerable{System.String},TilerFront.Areas.HelpPage.SampleDirection,System.Collections.ObjectModel.Collection{System.Net.Http.Formatting.MediaTypeFormatter}@)">
+            <summary>
+            Resolves the type of the action parameter or return value when <see cref="T:System.Net.Http.HttpRequestMessage"/> or <see cref="T:System.Net.Http.HttpResponseMessage"/> is used.
+            </summary>
+            <param name="api">The <see cref="T:System.Web.Http.Description.ApiDescription"/>.</param>
+            <param name="controllerName">Name of the controller.</param>
+            <param name="actionName">Name of the action.</param>
+            <param name="parameterNames">The parameter names.</param>
+            <param name="sampleDirection">The value indicating whether the sample is for a request or a response.</param>
+            <param name="formatters">The formatters.</param>
+        </member>
+        <member name="M:TilerFront.Areas.HelpPage.HelpPageSampleGenerator.WriteSampleObjectUsingFormatter(System.Net.Http.Formatting.MediaTypeFormatter,System.Object,System.Type,System.Net.Http.Headers.MediaTypeHeaderValue)">
+            <summary>
+            Writes the sample object using formatter.
+            </summary>
+            <param name="formatter">The formatter.</param>
+            <param name="value">The value.</param>
+            <param name="type">The type.</param>
+            <param name="mediaType">Type of the media.</param>
+            <returns></returns>
+        </member>
+        <member name="T:TilerFront.Areas.HelpPage.HelpPageSampleKey">
+            <summary>
+            This is used to identify the place where the sample should be applied.
+            </summary>
+        </member>
+        <member name="M:TilerFront.Areas.HelpPage.HelpPageSampleKey.#ctor(System.Net.Http.Headers.MediaTypeHeaderValue)">
+            <summary>
+            Creates a new <see cref="T:TilerFront.Areas.HelpPage.HelpPageSampleKey"/> based on media type.
+            </summary>
+            <param name="mediaType">The media type.</param>
+        </member>
+        <member name="M:TilerFront.Areas.HelpPage.HelpPageSampleKey.#ctor(System.Net.Http.Headers.MediaTypeHeaderValue,System.Type)">
+            <summary>
+            Creates a new <see cref="T:TilerFront.Areas.HelpPage.HelpPageSampleKey"/> based on media type and CLR type.
+            </summary>
+            <param name="mediaType">The media type.</param>
+            <param name="type">The CLR type.</param>
+        </member>
+        <member name="M:TilerFront.Areas.HelpPage.HelpPageSampleKey.#ctor(TilerFront.Areas.HelpPage.SampleDirection,System.String,System.String,System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+            Creates a new <see cref="T:TilerFront.Areas.HelpPage.HelpPageSampleKey"/> based on <see cref="P:TilerFront.Areas.HelpPage.HelpPageSampleKey.SampleDirection"/>, controller name, action name and parameter names.
+            </summary>
+            <param name="sampleDirection">The <see cref="P:TilerFront.Areas.HelpPage.HelpPageSampleKey.SampleDirection"/>.</param>
+            <param name="controllerName">Name of the controller.</param>
+            <param name="actionName">Name of the action.</param>
+            <param name="parameterNames">The parameter names.</param>
+        </member>
+        <member name="M:TilerFront.Areas.HelpPage.HelpPageSampleKey.#ctor(System.Net.Http.Headers.MediaTypeHeaderValue,TilerFront.Areas.HelpPage.SampleDirection,System.String,System.String,System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+            Creates a new <see cref="T:TilerFront.Areas.HelpPage.HelpPageSampleKey"/> based on media type, <see cref="P:TilerFront.Areas.HelpPage.HelpPageSampleKey.SampleDirection"/>, controller name, action name and parameter names.
+            </summary>
+            <param name="mediaType">The media type.</param>
+            <param name="sampleDirection">The <see cref="P:TilerFront.Areas.HelpPage.HelpPageSampleKey.SampleDirection"/>.</param>
+            <param name="controllerName">Name of the controller.</param>
+            <param name="actionName">Name of the action.</param>
+            <param name="parameterNames">The parameter names.</param>
+        </member>
+        <member name="P:TilerFront.Areas.HelpPage.HelpPageSampleKey.ControllerName">
+            <summary>
+            Gets the name of the controller.
+            </summary>
+            <value>
+            The name of the controller.
+            </value>
+        </member>
+        <member name="P:TilerFront.Areas.HelpPage.HelpPageSampleKey.ActionName">
+            <summary>
+            Gets the name of the action.
+            </summary>
+            <value>
+            The name of the action.
+            </value>
+        </member>
+        <member name="P:TilerFront.Areas.HelpPage.HelpPageSampleKey.MediaType">
+            <summary>
+            Gets the media type.
+            </summary>
+            <value>
+            The media type.
+            </value>
+        </member>
+        <member name="P:TilerFront.Areas.HelpPage.HelpPageSampleKey.ParameterNames">
+            <summary>
+            Gets the parameter names.
+            </summary>
+        </member>
+        <member name="P:TilerFront.Areas.HelpPage.HelpPageSampleKey.SampleDirection">
+            <summary>
+            Gets the <see cref="P:TilerFront.Areas.HelpPage.HelpPageSampleKey.SampleDirection"/>.
+            </summary>
+        </member>
+        <member name="T:TilerFront.Areas.HelpPage.ImageSample">
+            <summary>
+            This represents an image sample on the help page. There's a display template named ImageSample associated with this class.
+            </summary>
+        </member>
+        <member name="M:TilerFront.Areas.HelpPage.ImageSample.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:TilerFront.Areas.HelpPage.ImageSample"/> class.
+            </summary>
+            <param name="src">The URL of an image.</param>
+        </member>
+        <member name="T:TilerFront.Areas.HelpPage.InvalidSample">
+            <summary>
+            This represents an invalid sample on the help page. There's a display template named InvalidSample associated with this class.
+            </summary>
+        </member>
+        <member name="T:TilerFront.Areas.HelpPage.ObjectGenerator">
+            <summary>
+            This class will create an object of a given type and populate it with sample data.
+            </summary>
+        </member>
+        <member name="M:TilerFront.Areas.HelpPage.ObjectGenerator.GenerateObject(System.Type)">
+            <summary>
+            Generates an object for a given type. The type needs to be public, have a public default constructor and settable public properties/fields. Currently it supports the following types:
+            Simple types: <see cref="T:System.Int32"/>, <see cref="T:System.String"/>, <see cref="T:System.Enum"/>, <see cref="T:System.DateTime"/>, <see cref="T:System.Uri"/>, etc.
+            Complex types: POCO types.
+            Nullables: <see cref="T:System.Nullable`1"/>.
+            Arrays: arrays of simple types or complex types.
+            Key value pairs: <see cref="T:System.Collections.Generic.KeyValuePair`2"/>
+            Tuples: <see cref="T:System.Tuple`1"/>, <see cref="T:System.Tuple`2"/>, etc
+            Dictionaries: <see cref="T:System.Collections.Generic.IDictionary`2"/> or anything deriving from <see cref="T:System.Collections.Generic.IDictionary`2"/>.
+            Collections: <see cref="T:System.Collections.Generic.IList`1"/>, <see cref="T:System.Collections.Generic.IEnumerable`1"/>, <see cref="T:System.Collections.Generic.ICollection`1"/>, <see cref="T:System.Collections.IList"/>, <see cref="T:System.Collections.IEnumerable"/>, <see cref="T:System.Collections.ICollection"/> or anything deriving from <see cref="T:System.Collections.Generic.ICollection`1"/> or <see cref="T:System.Collections.IList"/>.
+            Queryables: <see cref="T:System.Linq.IQueryable"/>, <see cref="T:System.Linq.IQueryable`1"/>.
+            </summary>
+            <param name="type">The type.</param>
+            <returns>An object of the given type.</returns>
+        </member>
+        <member name="T:TilerFront.Areas.HelpPage.SampleDirection">
+            <summary>
+            Indicates whether the sample is used for request or response
+            </summary>
+        </member>
+        <member name="T:TilerFront.Areas.HelpPage.TextSample">
+            <summary>
+            This represents a preformatted text sample on the help page. There's a display template named TextSample associated with this class.
+            </summary>
+        </member>
+        <member name="T:TilerFront.Areas.HelpPage.XmlDocumentationProvider">
+            <summary>
+            A custom <see cref="T:System.Web.Http.Description.IDocumentationProvider"/> that reads the API documentation from an XML documentation file.
+            </summary>
+        </member>
+        <member name="M:TilerFront.Areas.HelpPage.XmlDocumentationProvider.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:TilerFront.Areas.HelpPage.XmlDocumentationProvider"/> class.
+            </summary>
+            <param name="documentPath">The physical path to XML document.</param>
+        </member>
+        <member name="T:TilerFront.Areas.RouteDebugger.Components.ActionSelectSimulator">
+            <summary>
+            Simulate the action selection and record the decision making process.
+            
+            This class is basically a copy of default IHttpActionSelector implementation (DefaultActionSelector) private members,
+            and methods where we have included logging.
+            The private members of the DefaultActionSelector are copied here, so we can access them.
+            
+            Some help internal help classes are also copied to assist the process,
+            </summary>
+        </member>
+        <member name="M:TilerFront.Areas.RouteDebugger.Components.ActionSelectSimulator.Simulate(System.Web.Http.Controllers.HttpControllerContext)">
+            <summary>
+            Simulating the action selecting process. It mimics the ASP.NET Web API internal logic
+            </summary>
+            <param name="controllerContext">The controller context.</param>
+            <returns>A structure contains the log of selecting process</returns>
+        </member>
+        <member name="M:TilerFront.Areas.RouteDebugger.Components.ActionSelectSimulator.FindActionsForVerb(System.Net.Http.HttpMethod)">
+            <summary>
+            This is a copy of the private ApiControllerActionSelector.FindActionsForVerb. It doesn't use the cache
+            but copies the contents of the FindActionsForVerbWorker method.
+            </summary>
+        </member>
+        <member name="M:TilerFront.Areas.RouteDebugger.Components.ActionSelectSimulator.FindActionUsingRouteAndQueryParameters(System.Web.Http.Controllers.HttpControllerContext,System.Collections.Generic.IEnumerable{System.Web.Http.Controllers.ReflectedHttpActionDescriptor},System.Boolean)">
+            <summary>
+            This is an exact copy from ApiControllerActionSelector.
+            </summary>
+        </member>
+        <member name="M:TilerFront.Areas.RouteDebugger.Components.ActionSelectSimulator.IsValidActionMethod(System.Reflection.MethodInfo)">
+            <summary>
+            This is an exact copy from ApiControllerActionSelector.
+            </summary>
+        </member>
+        <member name="M:TilerFront.Areas.RouteDebugger.Components.ActionSelectSimulator.IsSubset(System.String[],System.Collections.Generic.HashSet{System.String})">
+            <summary>
+            This is an exact copy from ApiControllerActionSelector.
+            </summary>
+        </member>
+        <member name="M:TilerFront.Areas.RouteDebugger.Components.ActionSelectSimulator.RunSelectionFilters(System.Web.Http.Controllers.HttpControllerContext,System.Collections.Generic.IEnumerable{System.Web.Http.Controllers.HttpActionDescriptor})">
+            <summary>
+            Replace the private method from ApiControllerActionSelector.
+            
+            The IActionMethodSelector interface used in the method is internal so we must make a copy. 
+            CacheAttrsIActionMethodSelector is also internal.
+            The default implementation of IActionMethodSelector finds methods marked with the NonActionAttribute, so the
+            code below is converted to directly filter out methods with that attribute.
+            </summary>
+        </member>
+        <member name="T:TilerFront.Areas.RouteDebugger.Components.DictionaryExtensions">
+            <summary>
+            An exact copy of the TryGetValue method from  DictionaryExtensions.cs.
+            </summary>
+        </member>
+        <member name="M:TilerFront.Areas.RouteDebugger.Components.DictionaryExtensions.TryGetValue``1(System.Collections.Generic.IDictionary{System.String,System.Object},System.String,``0@)">
+            <summary>
+            Gets the value of <typeparamref name="T"/> associated with the specified key or <c>default</c> value if
+            either the key is not present or the value is not of type <typeparamref name="T"/>. 
+            </summary>
+            <typeparam name="T">The type of the value associated with the specified key.</typeparam>
+            <param name="dictionary">The <see cref="T:System.Collections.Generic.IDictionary`2"/> instance where <c>TValue</c> is <c>object</c>.</param>
+            <param name="key">The key whose value to get.</param>
+            <param name="value">When this method returns, the value associated with the specified key, if the key is found; otherwise, the default value for the type of the value parameter.</param>
+            <returns><c>true</c> if key was found, value is non-null, and value is of type <typeparamref name="T"/>; otherwise false.</returns>
+        </member>
+        <member name="T:TilerFront.Areas.RouteDebugger.Components.HttpParameterBindingExtensions">
+            <summary>
+            A copy of HttpParameterBindingExtensions.cs with one change. HttpParameterBindingExtensions.WillReadUri calls the internal
+            interface IUriValueProvderFactory, so that code is also in this method.
+            </summary>
+        </member>
+        <member name="T:TilerFront.Areas.RouteDebugger.Components.TypeHelper">
+            <summary>
+            A static class that provides various <see cref="T:System.Type"/> related helpers.
+            </summary>
+        </member>
+        <member name="M:TilerFront.Areas.RouteDebugger.Components.TypeHelper.OfType``1(System.Object[])">
+            <summary>
+            Fast implementation to get the subset of a given type.
+            </summary>
+            <typeparam name="T">type to search for</typeparam>
+            <returns>subset of objects that can be assigned to T</returns>
+        </member>
+        <member name="T:TilerFront.Areas.RouteDebugger.InspectActionInvoker">
+            <summary>
+            Hijacks the original invoker. It examines the header before 
+            executing the action. If the inspect header exists, returns the inspection data in a 200 response.
+            If the inspection header does not exist, the delegate calls the default InvokeActionAsync method.
+            
+            The inspection data saved in the request property are collected when the request is passed
+            along the stack.
+            </summary>
+        </member>
+        <member name="T:TilerFront.Areas.RouteDebugger.InspectActionSelector">
+             <summary>
+             This class replaces ApiControllerActionSelector (it's hooked up in RouteDebuggerConfig.cs). 
+             It uses  _innerSelector to call into ApiControllerActionSelector methods and it calls ActionSelectSimulator methods.
+             Private members of ApiControllerActionSelector cannot be called with a delegate, so a copy of the private members of
+             ApiControllerActionSelector are contained in the class ActionSelectSimulator.
+            
+             See http://www.asp.net/web-api/overview/web-api-routing-and-actions/routing-and-action-selection for more info.   
+             
+              The SelectAction method examines the request header. If an inspection header is found, it runs the 
+              action selection simulator, saves the inspection data in the request property, then uses the delegate
+              to run the ApiControllerActionSelector.SelectAction method.
+             </summary>
+        </member>
+        <member name="T:TilerFront.Areas.RouteDebugger.InspectControllerSelector">
+            <summary>
+            This class replaces the DefaultHttpControllerSelector (see RouteDebuggerConfig.cs).  
+            It uses _innerSelector to call into DefaultHttpControllerSelector methods.
+            See http://www.asp.net/web-api/overview/web-api-routing-and-actions/routing-and-action-selection for more info.
+            
+            The SelectController method examines the request header. If an inspection header is found:
+                1. Saves all candidate controllers in inspection data.
+                2. Marks the selected controller.
+            </summary>
+        </member>
+        <member name="T:TilerFront.Areas.RouteDebugger.InspectHandler">
+            <summary>
+            Inspect handler saves route inspect data and handler error.
+            
+            If a request has inspect header, the handler will save all routes and route data to inspect data.
+            
+            If the return response is not 200. That may cause by 500 or 404, handler extract Inspect data from
+            request property and set back the the response. The original response status is saved to the inspect 
+            data and actual return response is always 200.
+            </summary>
+        </member>
+        <member name="T:TilerFront.Areas.RouteDebugger.Models.ActionSelectionInfo">
+            <summary>
+            Representing one action selection
+            </summary>
+        </member>
+        <member name="P:TilerFront.Areas.RouteDebugger.Models.ActionSelectionInfo.FoundByActionName">
+            <summary>
+            Is this action selected based on its action name?
+            </summary>
+        </member>
+        <member name="P:TilerFront.Areas.RouteDebugger.Models.ActionSelectionInfo.FoundByActionNameWithRightVerb">
+            <summary>
+            Is this action selected based on its action name and its supported http verb?
+            </summary>
+        </member>
+        <member name="P:TilerFront.Areas.RouteDebugger.Models.ActionSelectionInfo.FoundByVerb">
+            <summary>
+            Is this action selected based on its supported http verb?
+            </summary>
+        </member>
+        <member name="P:TilerFront.Areas.RouteDebugger.Models.ActionSelectionInfo.FoundWithRightParam">
+            <summary>
+            Do this action's parameters match the ones in query string?
+            </summary>
+        </member>
+        <member name="P:TilerFront.Areas.RouteDebugger.Models.ActionSelectionInfo.FoundWithSelectorsRun">
+            <summary>
+            Is this action finally selected by selection attribute?
+            </summary>
+        </member>
+        <member name="T:TilerFront.Areas.RouteDebugger.Models.ActionSelectionLog">
+            <summary>
+            Logs information collected when ActionSelectSimulator.Simulate is called. 
+            ActionSelectSimulator.Simulate replaces DefaultActionSelector.
+            </summary>
+        </member>
+        <member name="M:TilerFront.Areas.RouteDebugger.Models.ActionSelectionLog.MarkSelected(System.Collections.Generic.IEnumerable{System.Web.Http.Controllers.HttpActionDescriptor},System.Action{TilerFront.Areas.RouteDebugger.Models.ActionSelectionInfo})">
+            <summary>
+            Looks for related ActionSelectionInfo instances based on given action
+            descriptors. Invoke given marking functor on each of them.
+            
+            This method is used in action simulator when a selection decision is 
+            made in every stage, the selected action will be passed in along with
+            a marking functor. The marking functor usually set a particular boolean
+            property on related ActionSelectionInfo instance to mark that this action
+            is selected in particular stage.
+            </summary>
+            <param name="actions">The actions to be marked.</param>
+            <param name="marking">The functor picking the bool property of an action to be set to true.</param>
+        </member>
+        <member name="M:TilerFront.Areas.RouteDebugger.Models.ActionSelectionLog.MarkOthersSelected(System.Collections.Generic.IEnumerable{System.Web.Http.Controllers.HttpActionDescriptor},System.Action{TilerFront.Areas.RouteDebugger.Models.ActionSelectionInfo})">
+            <summary>
+            Counterpart of function MarkSelected, instead of marking selected action
+            this method mark unselected action.
+            </summary>
+            <param name="actions">the actions NOT to be marked</param>
+            <param name="marking">the functor picking the bool property of an action to be set to true.</param>
+        </member>
+        <member name="T:TilerFront.Areas.RouteDebugger.Models.HttpParameterDescriptorInfo">
+            <summary>
+            Represents the parameters.
+            </summary>
+        </member>
+        <member name="M:TilerFront.Areas.RouteDebugger.RequestHelper.IsInspectRequest(System.Net.Http.HttpRequestMessage)">
+            <summary>
+            Returns true if this request is a inspect request. 
+            
+            For sake of security only inspect request from local will be accepted.
+            </summary>
+        </member>
+        <member name="M:TilerFront.Areas.RouteDebugger.RequestHelper.IsFromLocal(System.Net.Http.HttpRequestMessage)">
+            <summary>
+            Returns true if this request is from local
+            </summary>
+        </member>
+        <member name="M:TilerFront.Controllers.CalendarEventController.GetCalEvent(System.String,TilerFront.Models.AuthorizedUser)">
+            <summary>
+            Retrieve a calendar event by the ID, and registered user account
+            </summary>
+            <param name="id"></param>
+            <param name="myUser"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.Controllers.CalendarEventController.CalEventName(TilerFront.Models.NameSearchModel)">
+            <summary>
+            Look up a calendar event by name
+            </summary>
+            <param name="myUser"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.Controllers.CalendarEventController.DeleteCalEvent(TilerFront.Models.getEventModel)">
+            <summary>
+            Deletes a calendar event.
+            </summary>
+            <param name="myUser"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.Controllers.CalendarEventController.CompleteCalEvent(TilerFront.Models.getEventModel)">
+            <summary>
+            MArks the whole calendar event as complete.
+            </summary>
+            <param name="myUser"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.Controllers.CalendarEventController.Now(TilerFront.Models.NowEventModel)">
+            <summary>
+            Sets the earleiest valid sub event to current time. Essentially, makes the event have a start time of now.
+            </summary>
+            <param name="nowEvent"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.Controllers.CalendarEventController.UpdateCalEvent(TilerFront.Models.EditCalEventModel)">
+            <summary>
+            Updates the calendar event properties in the information  sent.
+            </summary>
+            <param name="myUser"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.Controllers.GoogleNotificationController.GoogNextNotif(TilerFront.Models.GoogleNotificationRequestModel)">
+            *
+        </member>
+        <member name="T:TilerFront.Controllers.ScheduleController">
+            <summary>
+            Represents a users schedule. Provides access to schedule creation, modification and deletion
+            </summary>
+        </member>
+        <member name="M:TilerFront.Controllers.ScheduleController.GetSchedule(TilerFront.Models.getScheduleModel)">
+            <summary>
+            Retrieve Events within a time frame. Required elements are UserID and UserName. Provided starttime and Endtime for the range of the schedule allows for retrieval of schedule within a timerange
+            </summary>
+            <param name="myAuthorizedUser"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.Controllers.ScheduleController.GetDeletedSchedule(TilerFront.Models.getScheduleModel)">
+            <summary>
+            Retrieve Events within a time frame. Required elements are UserID and UserName. Provided starttime and Endtime for the range of the schedule allows for retrieval of schedule within a timerange
+            </summary>
+            <param name="myAuthorizedUser"></param>
+            <returns></returns>
+            
+        </member>
+        <member name="M:TilerFront.Controllers.ScheduleController.getCurrentPausedEvent(TilerFront.Models.ApplicationDbContext,System.String)">
+            <summary>
+            This contains the functionality for retrieveing the paused event from the db.
+            THis is supposed to be part of logcontrol.cs. This should be done after the move to an rdbms like storage
+            TODO: move to logcontrol.cs after switching to an rdbms db
+            </summary>
+            <param name="db"></param>
+            <param name="userId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.Controllers.ScheduleController.getCurrentPausedEventAndPausedEventWithId(TilerFront.Models.ApplicationDbContext,System.String,System.String)">
+            <summary>
+            Function gets you the paused event and its the paused events with the ID EventId
+            THis is supposed to be part of logcontrol.cs. This should be done after the move to an rdbms like storage
+            TODO: move to logcontrol.cs after switching to an rdbms db
+            </summary>
+            <param name="db"></param>
+            <param name="EventId"></param>
+            <param name="userId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.Controllers.ScheduleController.getAllThirdPartyAuthentication(System.String)">
+            <summary>
+            Retrieves the third party authentication credentials needed to retrieve third party calendar. Attaches an index for multiple calendar retrieval. Based on a specific userID
+            </summary>
+            <param name="ID"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.Controllers.ScheduleController.getThirdPartyAuthentication(System.String,System.String,System.Int32)">
+            <summary>
+            Retrieves the third party authentication credentials needed to retrieve third party calendar. Gets a specific calendar authentication. You need full credentials to get specific oauth credentials
+            </summary>
+            <param name="TilerUserID"></param>
+            <param name="ThirdpaartyUserID"></param>
+            <param name="ThirdPartyType"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.Controllers.ScheduleController.googleNotificationTrigger(System.String)">
+            <summary>
+            Handles the trigger when new google notification comes through.
+            </summary>
+            <param name="GoogleNotificationID"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.Controllers.ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(My24HourTimerWPF.Schedule,System.String)">
+            <summary>
+            Function retrives the third party credential. Credential are used to retrieve calendar event. The retrieved events are used to populate mySchedule
+            </summary>
+            <param name="mySchedule"></param>
+            <param name="TilerUserID"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.Controllers.ScheduleController.ProcrastinateAll(TilerFront.Models.ProcrastinateModel)">
+            <summary>
+            Modify user schedule. It clears out time frame. Procrastinates all Subcalendar events, essentially freeing up sometime.
+            </summary>
+            <param name="UserData"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.Controllers.ScheduleController.ProcrastinateSubCalendarEvent(TilerFront.Models.ProcrastinateEventModel)">
+            <summary>
+            Procrastinate a given event. 
+            </summary>
+            <param name="UserData"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.Controllers.ScheduleController.Shuffle(TilerFront.Models.ShuffleModel)">
+            <summary>
+            Have Tiler get you something to do. 
+            </summary>
+            <param name="UserData"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.Controllers.ScheduleController.CompleteSubCalendarEvent(TilerFront.Models.getEventModel)">
+            <summary>
+            Marks an Event as complete.  Note this also triggers a readjust to the schedule
+            </summary>
+            <param name="UserData"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.Controllers.ScheduleController.CompleteSubCalendarEvents(TilerFront.Models.getEventModel)">
+            <summary>
+            Marks a series of Event as complete. It takes a collection of IDs and then marks them as complete
+            </summary>
+            <param name="UserData"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.Controllers.ScheduleController.Now(TilerFront.Models.getEventModel)">
+            <summary>
+            Sets the provided event as now. The ID has to be a Sub event ID
+            </summary>
+            <param name="myUser"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.Controllers.ScheduleController.Undo(TilerFront.Models.AuthorizedUser)">
+            <summary>
+            Undoes the last schedule changing effect triggered on tiler.
+            </summary>
+            <param name="myUser"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.Controllers.ScheduleController.DeleteEvent(TilerFront.Models.getEventModel)">
+            <summary>
+            Deletes a Sub event from Tiler. The deletion does not trigger a schedule readjustment.
+            </summary>
+            <param name="myUser"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.Controllers.ScheduleController.HandleOptionsEvent(TilerFront.Models.getEventModel)">
+            <summary>
+            Option needed to satisfy a delete request for deletion of a subevent.
+            </summary>
+            <param name="myUser"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.Controllers.ScheduleController.DeleteEvents(TilerFront.Models.getEventModel)">
+            <summary>
+            Deletes multiple subevents.
+            </summary>
+            <param name="myUser"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.Controllers.ScheduleController.HandleOptionsEvents(TilerFront.Models.getEventModel)">
+            <summary>
+            Option needed to satisfy a delete request for multiple subevents.
+            </summary>
+            <param name="myUser"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.Controllers.ScheduleController.NewCalEvent(TilerFront.Models.UnregisteredEvent)">
+            <summary>
+            Adds an Event to Tiler. Returns data formatted as tiler endpoint together. Returns the earliest sub calendarevent generated. 
+            </summary>
+            <param name="newEvent"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.Controllers.ScheduleController.Notification(TilerFront.Models.AuthorizedUser)">
+            <summary>
+            Triggers a schedule update when a notification is received pertaining third party event modification
+            </summary>
+            <param name="newEvent"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.Controllers.ScheduleController.PeekCalEvent(TilerFront.Models.UnregisteredEvent)">
+            <summary>
+            Peeks into user schedule. Generates an update to a schedule for any changes.
+            </summary>
+            <param name="newEvent"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.Controllers.ScheduleController.Dispose(System.Boolean)">
+            <summary>
+            Creates a restriction profile to be used when generating a new event.
+            </summary>
+            <param name="Start"></param>
+            <param name="End"></param>
+            <param name="workWeek"></param>
+            <param name="TimeZoneOffSet"></param>
+            <param name="DaySelection"></param>
+            <returns></returns>
+        </member>
+        <member name="P:TilerFront.Models.getEventModel.EventID">
+            <summary>
+            ID of the Event in tiler format. It should be in the format a_b_c
+            </summary>
+        </member>
+        <member name="P:TilerFront.Models.getEventModel.ThirdPartyEventID">
+            <summary>
+            ID of the third party service. The ID is provided from the 3rd party
+            </summary>
+        </member>
+        <member name="P:TilerFront.Models.getEventModel.ThirdPartyUserID">
+            <summary>
+            User ID to the third party service for which this event was created from
+            </summary>
+        </member>
+        <member name="P:TilerFront.Models.getEventModel.ThirdPartyType">
+            <summary>
+            The type or provider of this scheduling service(e.g: google, outlook).
+            </summary>
+        </member>
+        <member name="T:TilerFront.Models.getScheduleModel">
+            <summary>
+            Represents schedule for user. The StartRange is the start time in JS in milliseconds. The EndRange is the start time in JS in milliseconds. Default is 2 weeks before today to 90 days from today.
+            </summary>
+        </member>
+        <member name="P:TilerFront.Models.getScheduleModel.AuthoriZationId">
+            <summary>
+            Id which authorizes the request to make a request for requesting a schedule
+            </summary>
+        </member>
+        <member name="P:TilerFront.Models.PausedEvent.User">
+            <summary>
+            User for which the event is associated
+            </summary>
+        </member>
+        <member name="P:TilerFront.Models.PausedEvent.EventId">
+            <summary>
+            Id of the sub evnet that is being paused
+            </summary>
+        </member>
+        <member name="P:TilerFront.Models.PausedEvent.PauseTime">
+            <summary>
+            When the event is paused. Accuracy is to the minute
+            </summary>
+        </member>
+        <member name="P:TilerFront.Models.PausedEvent.isPauseDeleted">
+            <summary>
+            Is the current event paused
+            </summary>
+        </member>
+        <member name="T:TilerFront.Models.ProcrastinateEventModel">
+            <summary>
+            Represents a request for procrastination of an event. EventID is required.
+            </summary>
+        </member>
+        <member name="M:TilerFront.Models.ThirdPartyCalendarAuthenticationModel.getThirdPartyOut">
+            <summary>
+            Converts "this" object to "ThirdPartyAuthenticationForView" object. This is to be used to generate the more secure information on the user for the management of third party accounts on the front end
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.Models.ThirdPartyCalendarAuthenticationModel.getGoogleOauthCredentials">
+            <summary>
+            function generates the google oauth credentials
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.Models.ThirdPartyCalendarAuthenticationModel.refreshAuthenticationToken">
+            <summary>
+            Function refreshes the token and update "this" object. Note it does not try to persist the authentication to permanent storage on azure. If you want it to persist call function refreshAndCommitToken;
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.Models.ThirdPartyCalendarAuthenticationModel.unCommitAuthentication">
+            <summary>
+            This deletes this authentication tokens from persistent storage. Note this uses the data members from "this" object. It revokes the credentials then commits them.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:TilerFront.Models.UnregisteredEvent">
+            <summary>
+            Represents an Event that has not being added to a users schedule. 
+            </summary>
+        </member>
+        <member name="P:TilerFront.Models.UnregisteredEvent.BColor">
+            <summary>
+            Blue Value for RGBO color format  for calendar event
+            </summary>
+        </member>
+        <member name="P:TilerFront.Models.UnregisteredEvent.RColor">
+            <summary>
+            Red Value for RGBO color format  for calendar event
+            </summary>
+        </member>
+        <member name="P:TilerFront.Models.UnregisteredEvent.GColor">
+            <summary>
+            Green Value for RGBO color format for calendar event
+            </summary>
+        </member>
+        <member name="P:TilerFront.Models.UnregisteredEvent.Opacity">
+            <summary>
+            Sets the opacity RGBO color format for calendar event
+            </summary>
+        </member>
+        <member name="P:TilerFront.Models.UnregisteredEvent.ColorSelection">
+            <summary>
+            One of the preset color selections for tiler. The preset options are from [0-8].
+            </summary>
+        </member>
+        <member name="P:TilerFront.Models.UnregisteredEvent.Count">
+            <summary>
+            The number of splits for a specific calendar event. Default is 1.
+            </summary>
+        </member>
+        <member name="P:TilerFront.Models.UnregisteredEvent.DurationDays">
+            <summary>
+            Sets the number of days for duration component of the given calendar event. Default is 0
+            </summary>
+        </member>
+        <member name="P:TilerFront.Models.UnregisteredEvent.DurationHours">
+            <summary>
+            Sets the number of hours component for the duration of event. for the given calendar event. Default is 0
+            </summary>
+        </member>
+        <member name="P:TilerFront.Models.UnregisteredEvent.DurationMins">
+            <summary>
+            Sets the number of Minutes component for the duration of event. for the given calendar event. Default is 0
+            </summary>
+        </member>
+        <member name="P:TilerFront.Models.UnregisteredEvent.EndDay">
+            <summary>
+            Day-date component of End date.
+            </summary>
+        </member>
+        <member name="P:TilerFront.Models.UnregisteredEvent.EndHour">
+            <summary>
+            Hour component of End date.
+            </summary>
+        </member>
+        <member name="P:TilerFront.Models.UnregisteredEvent.EndMins">
+            <summary>
+            Minute component of End date.
+            </summary>
+        </member>
+        <member name="P:TilerFront.Models.UnregisteredEvent.EndMonth">
+            <summary>
+            Month component of End date.
+            </summary>
+        </member>
+        <member name="P:TilerFront.Models.UnregisteredEvent.EndYear">
+            <summary>
+            Year component of End date.
+            </summary>
+        </member>
+        <member name="P:TilerFront.Models.UnregisteredEvent.LocationAddress">
+            <summary>
+            Full Address for new event. Fully described in default format. e.g 1234 stret apt 56 Kingston, CO 78901
+            </summary>
+        </member>
+        <!-- Badly formed XML comment ignored for member "P:TilerFront.Models.UnregisteredEvent.LocationTag" -->
+        <member name="P:TilerFront.Models.UnregisteredEvent.Name">
+            <summary>
+            Name of Newly added Tile/Event
+            </summary>
+        </member>
+        <member name="P:TilerFront.Models.UnregisteredEvent.RepeatData">
+            <summary>
+            ***No current use***
+            </summary>
+        </member>
+        <member name="P:TilerFront.Models.UnregisteredEvent.isRestricted">
+            <summary>
+            is time restriction set on this event
+            </summary>
+        </member>
+        <member name="P:TilerFront.Models.UnregisteredEvent.RestrictionStart">
+            <summary>
+            Start time for restriction
+            </summary>
+        </member>
+        <member name="P:TilerFront.Models.UnregisteredEvent.RestrictionEnd">
+            <summary>
+            End time for restriction
+            </summary>
+        </member>
+        <member name="P:TilerFront.Models.UnregisteredEvent.isWorkWeek">
+            <summary>
+            is the restrcition to be for only work week.
+            </summary>
+        </member>
+        <member name="M:TilerFront.GoogleTilerEventControl.getThirdPartyControlForIndex">
+            <summary>
+            Function generates google calendar control. Its populated with events retrieved within +/- 90 days of google calendar update. It returns null if access to google api is lost.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.GoogleTilerEventControl.getThirdPartyControlForIndex(System.Collections.Generic.IEnumerable{TilerFront.GoogleTilerEventControl})">
+            <summary>
+            Function generates google calendar control. Its populated with events retrieved within +/- 90 days of google calendar update. It returns null if access to google api is lost.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.LogControlDirect.UpdateReferenceDayInXMLLog(System.DateTimeOffset,System.String)">
+            <summary>
+            Function does nothing because updating start of day gets triggered in the manage controller
+            </summary>
+            <param name="referenceDay"></param>
+            <param name="LogFile"></param>
+        </member>
+        <member name="M:TilerFront.LogControl.updateBigData(System.Xml.XmlDocument,System.Xml.XmlDocument)">
+            <summary>
+            Function is to be called for the generation of auto logs for a user interaction with the schedule
+            </summary>
+            <param name="oldData"></param>
+            <param name="newData"></param>
+        </member>
+        <member name="M:TilerFront.LogControl.updateNewLocation(TilerElements.Location_Elements)">
+            <summary>
+            updates the logcontrol with a possible new location
+            </summary>
+            <param name="NewLocation"></param>
+        </member>
+        <member name="M:TilerFront.LogControl.CreatePauseUsedUpNode(TilerElements.SubCalendarEvent,System.Xml.XmlDocument)">
+            <summary>
+            Class generates the pause xml mode for a given schedule
+            </summary>
+            <param name="SubEvent"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.LogControl.getRestrictionTimeLine(System.Xml.XmlNode)">
+            <summary>
+            Funciton returns aall the possible active restriction timelines for the restriciton profile
+            </summary>
+            <param name="RestrictionTimeLineNode"></param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

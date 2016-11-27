@@ -865,14 +865,14 @@ namespace TilerFront
         {
             XmlDocument xmldoc = new XmlDocument();
             XmlElement RestrictionProfileNode = xmldoc.CreateElement("RestrictionProfile");
-            List<Tuple<DayOfWeek, RestrictionTimeLine>> ActiveRestrictions = RestrictionProfileData.getActiveDays();
-            foreach (Tuple<DayOfWeek, RestrictionTimeLine> eachTuple in ActiveRestrictions)
+            List<RestrictionDay> ActiveRestrictions = RestrictionProfileData.getActiveDays();
+            foreach (RestrictionDay eachTuple in ActiveRestrictions)
             {
                 XmlElement RestrictionNode = xmldoc.CreateElement("RestrictionNode");
                 XmlElement RestrictionDayOfWeekNode = xmldoc.CreateElement("RestrictionDayOfWeek");
-                RestrictionDayOfWeekNode.InnerText = ((int)eachTuple.Item1).ToString();
+                RestrictionDayOfWeekNode.InnerText = ((int)eachTuple.DayOfWeek).ToString();
                 XmlElement RestrictionTimeLineNode = xmldoc.CreateElement("RestrictionTimeLineData");
-                RestrictionTimeLineNode.InnerXml=generateRestrictionTimeLineNode(eachTuple.Item2).InnerXml;
+                RestrictionTimeLineNode.InnerXml=generateRestrictionTimeLineNode(eachTuple.RestrictionTimeLine).InnerXml;
                 RestrictionNode.AppendChild(RestrictionTimeLineNode);
                 RestrictionNode.AppendChild(RestrictionDayOfWeekNode);
                 RestrictionProfileNode.AppendChild(RestrictionNode);
@@ -1823,7 +1823,7 @@ namespace TilerFront
 
         RestrictionProfile getRestrictionProfile(XmlNode RestrictionNode)
         {
-            List<Tuple<DayOfWeek, RestrictionTimeLine>> RestrictionTimeLines = new List<Tuple<DayOfWeek, RestrictionTimeLine>>();
+            List<RestrictionDay> RestrictionTimeLines = new List<RestrictionDay>();
             foreach (XmlNode eachXmlNode in RestrictionNode.SelectNodes("RestrictionNode"))
             {
                 RestrictionTimeLines.Add(getgetRestrictionTuples(eachXmlNode));
@@ -1833,11 +1833,11 @@ namespace TilerFront
             return retValue;
         }
 
-        Tuple<DayOfWeek, RestrictionTimeLine> getgetRestrictionTuples(XmlNode RestrictionTupleNode)
+        RestrictionDay getgetRestrictionTuples(XmlNode RestrictionTupleNode)
         {
             DayOfWeek myDayOfWeek = getRestrictionDayOfWeek(RestrictionTupleNode);
             RestrictionTimeLine myRestrictionTimeLine = getRestrictionTimeLine(RestrictionTupleNode);
-            Tuple<DayOfWeek, RestrictionTimeLine> retValue = new Tuple<DayOfWeek, RestrictionTimeLine>(myDayOfWeek, myRestrictionTimeLine);
+            RestrictionDay retValue = new RestrictionDay(myDayOfWeek, myRestrictionTimeLine);
             return retValue;
         }
 

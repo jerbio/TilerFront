@@ -17,9 +17,9 @@ namespace TilerFront
             TilerFront.LogControl.UpdateLogLocation(LogLocation);
             TilerFront.LogControl.UpdateBigDataLogLocation(BigDataocation);
             bundles.Add(new ScriptBundle("~/Scripts/signalR").Include(
-                        "~/Scripts/jquery.signalR-2.2.0.min.js"));
+                        "~/Scripts/jquery.signalR-{version}.js"));
 
-
+            
             bundles.Add(new ScriptBundle("~/bundles/jquery").Include(
                         "~/Scripts/jquery-{version}.js"));
 
@@ -95,7 +95,7 @@ namespace TilerFront
                     "~/Scripts/jquery-ui.min.js",
                     "~/Scripts/SeachHandlerDesktop.js",
                     "~/Scripts/bootstrap-datepicker.js",
-                    "~/Scripts/jquery.signalR-2.2.0.min.js"
+                    "~/Scripts/jquery.signalR-{version}.js"
 
                       ));
 
