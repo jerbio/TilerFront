@@ -482,7 +482,7 @@ namespace TilerFront.Controllers
                 JObject json = JObject.FromObject(UserData);
                 activity.updateMiscelaneousInfo(json.ToString());
                 myUserAccount.ScheduleLogControl.updateUserActivty(activity);
-                await MySchedule.UpdateWithProcrastinateSchedule(ScheduleUpdateMessage.Item2);
+                await MySchedule.UpdateWithDifferentSchedule(ScheduleUpdateMessage.Item2);
                 PostBackData myPostData;
                 BusyTimeLine nextBusySchedule = MySchedule.NextActivity;
                 if (nextBusySchedule != null)
@@ -530,7 +530,7 @@ namespace TilerFront.Controllers
             await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, UserData.UserID).ConfigureAwait(false);
 
             Tuple<CustomErrors, Dictionary<string, CalendarEvent>> ScheduleUpdateMessage = MySchedule.ProcrastinateJustAnEvent(UserData.EventID, ProcrastinateDuration.TotalTimeSpan);
-            await MySchedule.UpdateWithProcrastinateSchedule(ScheduleUpdateMessage.Item2);
+            await MySchedule.UpdateWithDifferentSchedule(ScheduleUpdateMessage.Item2);
             PostBackData myPostData = new PostBackData("\"Success\"", 0);
             TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
             scheduleChangeSocket.triggerRefreshData();
@@ -708,7 +708,7 @@ namespace TilerFront.Controllers
                 await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, myUser.UserID).ConfigureAwait(false);
 
                 Tuple<CustomErrors, Dictionary<string, CalendarEvent>> retValue0 = MySchedule.SetEventAsNow(myUser.EventID, true);
-                await MySchedule.UpdateWithProcrastinateSchedule(retValue0.Item2);
+                await MySchedule.UpdateWithDifferentSchedule(retValue0.Item2);
                 retValue = new PostBackData("\"Success\"", 0);
             }
             else
