@@ -229,7 +229,7 @@ namespace TilerFront.Controllers
                 JObject json = JObject.FromObject(nowEvent);
                 activity.updateMiscelaneousInfo(json.ToString());
                 retrievedUser.ScheduleLogControl.updateUserActivty(activity);
-                await NewSchedule.UpdateWithProcrastinateSchedule(ScheduleUpdateMessage.Item2).ConfigureAwait(false);
+                await NewSchedule.UpdateWithDifferentSchedule(ScheduleUpdateMessage.Item2).ConfigureAwait(false);
                 retValue = new PostBackData(ScheduleUpdateMessage.Item1);
             }
             else
@@ -295,7 +295,7 @@ namespace TilerFront.Controllers
 
                             retrievedUser.ScheduleLogControl.updateUserActivty(activity);
 
-                            await NewSchedule.UpdateWithProcrastinateSchedule(ScheduleUpdateMessage.Item2).ConfigureAwait(false);
+                            await NewSchedule.UpdateWithDifferentSchedule(ScheduleUpdateMessage.Item2).ConfigureAwait(false);
                             retValue = new PostBackData(ScheduleUpdateMessage.Item1);
                         }
                         break;
@@ -317,7 +317,7 @@ namespace TilerFront.Controllers
                 int SplitCount = (int)myUser.Split;
                 TimeSpan SpanPerSplit = TimeSpan.FromMilliseconds(myUser.Duration);
                 Tuple<CustomErrors, Dictionary<string, CalendarEvent>> ScheduleUpdateMessage = NewSchedule.BundleChangeUpdate(myUser.EventID, myUser.EventName, newStart, newEnd, SplitCount);//, SpanPerSplit);
-                await NewSchedule.UpdateWithProcrastinateSchedule(ScheduleUpdateMessage.Item2).ConfigureAwait(false);
+                await NewSchedule.UpdateWithDifferentSchedule(ScheduleUpdateMessage.Item2).ConfigureAwait(false);
                 retValue = new PostBackData(ScheduleUpdateMessage.Item1);
             }
             else

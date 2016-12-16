@@ -116,12 +116,20 @@ namespace TilerFront.Models
         public string isWorkWeek {get;set;}
         public string isEveryDay { get; set; }
         public RestrictionWeekConfig RestrictiveWeek { get; set; }
+        /// <summary>
+        /// TimeZone desired by the user. This defaults to UTC
+        /// </summary>
+        public string TimeZone { get; set; }
+        /// <summary>
+        /// The timezone of the location where the request is received. This defaults to UTC
+        /// </summary>
+        public string TimeZoneOrigin { get; set; } = "UTC";
 
         public RestrictionProfile getRestrictionProfile()
         {
             bool EveryDayFlag = Boolean.Parse(isEveryDay);
             bool WorkWeek = Boolean.Parse(isWorkWeek);
-            DateTimeOffset myNow = DateTimeOffset.UtcNow;;
+            DateTimeOffset myNow = DateTimeOffset.UtcNow;
             DateTimeOffset RestrictStart = new DateTimeOffset(myNow.Year, myNow.Month, myNow.Day, 0,0, 0,new TimeSpan());
             RestrictStart = RestrictStart.Add(-getTImeSpan);
             DateTimeOffset RestrictEnd = RestrictStart.AddSeconds(-1);
@@ -140,7 +148,6 @@ namespace TilerFront.Models
                     }
                     else
                     {
-
                         RestrictionTimeLine RestrictionTimeLine = new TilerElements.RestrictionTimeLine(RestrictStart, RestrictEnd);
                         retValue = new RestrictionProfile(selectedDaysOftheweek, RestrictionTimeLine);
                     }

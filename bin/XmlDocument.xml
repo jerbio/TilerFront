@@ -1105,6 +1105,16 @@
             is the restrcition to be for only work week.
             </summary>
         </member>
+        <member name="P:TilerFront.Models.UnregisteredEvent.TimeZone">
+            <summary>
+            TimeZone desired by the user. This defaults to UTC
+            </summary>
+        </member>
+        <member name="P:TilerFront.Models.UnregisteredEvent.TimeZoneOrigin">
+            <summary>
+            The timezone of the location where the request is received. This defaults to UTC
+            </summary>
+        </member>
         <member name="M:TilerFront.GoogleTilerEventControl.getThirdPartyControlForIndex">
             <summary>
             Function generates google calendar control. Its populated with events retrieved within +/- 90 days of google calendar update. It returns null if access to google api is lost.
