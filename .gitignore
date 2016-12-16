@@ -3,4 +3,5 @@ App_Data/aspnet-TilerFront-ground_log.ldf
 obj/*
 BigDataLogs/*
 obj
-
+WagTapCalLogs/*
+WagTapCalLogs
