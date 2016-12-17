@@ -111,7 +111,7 @@ namespace TilerFront.Controllers
                         Longitude = obj.myLocation.YCoordinate,
                         RepeatAddress = obj.myLocation.Address,
                         RepeatAddressDescription = obj.myLocation.Description,
-                        RepeatCalendarName = obj.Name,
+                        RepeatCalendarName = obj.Name.NameValue,
                         RepeatCalendarEvents = obj.Repeat.RecurringCalendarEvents().AsParallel().
                                 Select(obj1 => obj1.ToCalEvent(TimelineForData)).ToList(),
                         RepeatEndDate = obj.End,
@@ -181,7 +181,7 @@ namespace TilerFront.Controllers
                         Longitude = obj.myLocation.YCoordinate,
                         RepeatAddress = obj.myLocation.Address,
                         RepeatAddressDescription = obj.myLocation.Description,
-                        RepeatCalendarName = obj.Name,
+                        RepeatCalendarName = obj.Name.NameValue,
                         RepeatCalendarEvents = obj.Repeat.RecurringCalendarEvents().AsParallel().
                             Select(obj1 => obj1.ToDeletedCalEvent(TimelineForData)).ToList(),
                         RepeatEndDate = obj.End,
@@ -400,12 +400,12 @@ namespace TilerFront.Controllers
             ApplicationDbContext db = new ApplicationDbContext();
             ThirdPartyCalendarAuthenticationModel ThirdPartAuthData= db.ThirdPartyAuthentication.Where(obj => obj.ID == GoogleNotificationID).Single();
             object[] LookUpParams = {ThirdPartAuthData.TilerID};
-            ApplicationUser myUser = db.Users.Find(LookUpParams);
+            TilerUser myUser = db.Users.Find(LookUpParams);
             await notificationTrigger(myUser).ConfigureAwait(false);
         }
 
 
-        static async Task notificationTrigger(ApplicationUser TilerUser)
+        static async Task notificationTrigger(TilerUser TilerUser)
         {
             UserAccountDirect RetrievedUSer = new UserAccountDirect(TilerUser, true);
             ApplicationDbContext db = new ApplicationDbContext();
@@ -898,7 +898,7 @@ namespace TilerFront.Controllers
 
             string LocationAddress = newEvent.LocationAddress; ;
             string LocationTag = newEvent.LocationTag; ;
-            string Name = newEvent.Name; ;
+            EventName Name = new EventName(newEvent.Name);
 
             string RepeatData = newEvent.RepeatData; ;
             string RepeatEndDay = newEvent.RepeatEndDay; ;
@@ -1036,7 +1036,7 @@ namespace TilerFront.Controllers
 
 
                     //RestrictionProfile myRestrictionProfile = CreateRestrictionProfile(newEvent.RestrictionStart, newEvent.RestrictionEnd, newEvent.isWorkWeek, newEvent.getTImeSpan);
-                    newCalendarEvent = new CalendarEventRestricted(Name, StartDateTime, EndDateTime, myRestrictionProfile, TimeSpan.Parse(EventDuration), MyRepetition, false, true, Convert.ToInt32(Count), RigidScheduleFlag, EventLocation, new TimeSpan(0, 15, 0), new TimeSpan(0, 15, 0), new EventDisplay(true, userColor, userColor.User < 1 ? 0 : 1), new MiscData());
+                    newCalendarEvent = new CalendarEventRestricted( Name, StartDateTime, EndDateTime, myRestrictionProfile, TimeSpan.Parse(EventDuration), MyRepetition, false, true, Convert.ToInt32(Count), RigidScheduleFlag, EventLocation, new TimeSpan(0, 15, 0), new TimeSpan(0, 15, 0), new EventDisplay(true, userColor, userColor.User < 1 ? 0 : 1), new MiscData());
                 }
                 else
                 {
@@ -1138,7 +1138,7 @@ namespace TilerFront.Controllers
 
             string LocationAddress = string.IsNullOrEmpty( newEvent.LocationAddress)?"": newEvent.LocationAddress;
             string LocationTag = LocationAddress = string.IsNullOrEmpty(newEvent.LocationTag) ? "" : newEvent.LocationTag;
-            string Name = newEvent.Name; ;
+            EventName Name = new EventName(newEvent.Name);
 
             string RepeatData = newEvent.RepeatData; ;
             string RepeatEndDay = newEvent.RepeatEndDay; ;

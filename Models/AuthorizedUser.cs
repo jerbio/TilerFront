@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Threading.Tasks;
-
+using TilerElements;
 
 namespace TilerFront.Models
 {
@@ -30,11 +30,11 @@ namespace TilerFront.Models
         async public Task<UserAccountDirect> getUserAccountDirect(bool Passive=true)
         {
             Controllers.UserController myUserController = new Controllers.UserController();
-            ApplicationUser User ;
+            TilerUser User ;
 
             if (Passive)
             {
-                User = new ApplicationUser() { UserName = UserName, Id = UserID,FullName="" };
+                User = new TilerUser() { UserName = UserName, Id = UserID,FullName="" };
             }
             else
             {
@@ -46,11 +46,11 @@ namespace TilerFront.Models
         async public Task<UserAccountDebug> getUserAccountDebug(bool Passive = true)
         {
             Controllers.UserController myUserController = new Controllers.UserController();
-            ApplicationUser User;
+            TilerUser User;
 
             if (Passive)
             {
-                User = new ApplicationUser() { UserName = UserName, Id = UserID, FullName = "" };
+                User = new TilerUser() { UserName = UserName, Id = UserID, FullName = "" };
             }
             else
             {

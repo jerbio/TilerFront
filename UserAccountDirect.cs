@@ -9,7 +9,7 @@ namespace TilerFront
 {
     public class UserAccountDirect:UserAccount
     {
-        protected Models.ApplicationUser sessionUser;
+        protected TilerUser sessionUser;
         //LogControl UserLog;
         protected UserAccountDirect()
         {
@@ -18,7 +18,7 @@ namespace TilerFront
 
 
 
-        public UserAccountDirect(Models.ApplicationUser user, bool Passive=false)
+        public UserAccountDirect(TilerUser user, bool Passive=false)
         {
             sessionUser = user;
             UserLog = new LogControlDirect(sessionUser, "", Passive);
@@ -30,7 +30,7 @@ namespace TilerFront
         {
             if (!Passive)
             {
-                sessionUser = new Models.ApplicationUser();
+                sessionUser = new Models.TilerUser();
                 sessionUser.UserName = UserName;
                 sessionUser.Id = USerID;
             }
@@ -74,7 +74,7 @@ namespace TilerFront
         }
 
 
-        async public Task<CustomErrors> Register(Models.ApplicationUser user)
+        async public Task<CustomErrors> Register(TilerUser user)
         {
             CustomErrors retValue = UserLog.genereateNewLogFile(user.Id);
             return retValue;

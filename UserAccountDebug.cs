@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using TilerElements;
 
 namespace TilerFront
 {
     public class UserAccountDebug:UserAccountDirect
     {
-        public UserAccountDebug(Models.ApplicationUser user, bool Passive = false)
+        public UserAccountDebug(TilerUser user, bool Passive = false)
         {
             sessionUser = user;
             UserLog = new LogControlDebug(user, "", Passive);

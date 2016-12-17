@@ -738,7 +738,9 @@ namespace TilerFront
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("StartTime"));
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.Start.UtcDateTime.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Name"));
-            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.Name.ToString();
+            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.Name.NameValue.ToString();
+            MyEventScheduleNode.PrependChild(xmldoc.CreateElement("NameId"));
+            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.Name.NameId.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("ID"));
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.Id;
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Enabled"));
@@ -957,7 +959,11 @@ namespace TilerFront
             MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.isEnabled.ToString();
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("Complete"));
             MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.isComplete.ToString();
-            
+            MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("Name"));
+            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.Name.NameValue.ToString();
+            MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("NameId"));
+            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.Name.NameId.ToString();
+
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("Location"));
             MyEventSubScheduleNode.ChildNodes[0].InnerXml = CreateLocationNode(MySubEvent.myLocation, "EventSubScheduleLocation").InnerXml;
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("UIParams"));
@@ -1468,7 +1474,7 @@ namespace TilerFront
             string Split;
             string Completed;
             string Rigid;
-            string Name;
+            EventName Name;
             string[] StartDateTime;
             string StartDate;
             string StartTime;
@@ -1487,10 +1493,9 @@ namespace TilerFront
             string LocationData;
             string EnableFlag;
 
-            
-            
-            
-            Name = EventScheduleNode.SelectSingleNode("Name").InnerText;
+
+            string NameId = EventScheduleNode.SelectSingleNode("NameId")?.InnerText ?? Guid.NewGuid().ToString();
+            Name = new DB_EventName( EventScheduleNode.SelectSingleNode("Name").InnerText, NameId);
             ID = EventScheduleNode.SelectSingleNode("ID").InnerText;
             //EventScheduleNode.SelectSingleNode("ID").InnerXml = "<wetin></wetin>";
             Deadline = EventScheduleNode.SelectSingleNode("Deadline").InnerText;
@@ -1748,8 +1753,10 @@ namespace TilerFront
                 MiscData noteData = getMiscData(MyXmlNode.ChildNodes[i]);
                 EventDisplay UiData = getDisplayUINode(MyXmlNode.ChildNodes[i]);
                 ConflictProfile conflictProfile = getConflctProfile(MyXmlNode.ChildNodes[i]);
-
-                SubCalendarEvent retrievedSubEvent = new SubCalendarEvent(ID, BusySlot, Start, End, PrepTime, MyParent.Id, rigidFlag, Enabled, UiData, noteData, CompleteFlag, var1, MyParent.RangeTimeLine, conflictProfile);
+                string nameString = MyXmlNode.ChildNodes[i].SelectSingleNode("Name")?.InnerText??MyParent.Name.NameValue;
+                string id = MyXmlNode.ChildNodes[i].SelectSingleNode("NameId")?.InnerText ?? MyParent.Name.NameId;
+                EventName name = new DB_EventName(nameString, id);
+                SubCalendarEvent retrievedSubEvent = new SubCalendarEvent(ID, name, BusySlot, Start, End, PrepTime, MyParent.Id, rigidFlag, Enabled, UiData, noteData, CompleteFlag, var1, MyParent.RangeTimeLine, conflictProfile);
                 retrievedSubEvent.ThirdPartyID = MyXmlNode.ChildNodes[i].SelectSingleNode("ThirdPartyID").InnerText;//this is a hack to just update the Third partyID
                 XmlNode restrictedNode = MyXmlNode.ChildNodes[i].SelectSingleNode("Restricted");
                 retrievedSubEvent = new DB_SubCalendarEvent(retrievedSubEvent, MyParent.NowInfo, MyParent.ProcrastinationInfo);
@@ -2100,7 +2107,7 @@ namespace TilerFront
             Name = Name.ToLower();
             if (AllScheduleData.Count > 0)
             {
-                retValue = AllScheduleData.Values.Where(obj => obj.Name.ToLower().Contains(Name)).ToList();
+                retValue = AllScheduleData.Values.Where(obj => obj.Name.NameValue.ToLower().Contains(Name)).ToList();
             }
 
             return retValue;

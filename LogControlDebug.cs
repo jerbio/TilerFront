@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.IO;
+using TilerElements;
+
 namespace TilerFront
 {
     public class LogControlDebug:LogControlDirect
@@ -14,7 +16,7 @@ namespace TilerFront
             UserID = userid;
         }
         */
-        public LogControlDebug(Models.ApplicationUser User, string logLocation="", bool Passive=false):base(User,logLocation,Passive)
+        public LogControlDebug(TilerUser User, string logLocation="", bool Passive=false):base(User,logLocation,Passive)
         {
             
         }

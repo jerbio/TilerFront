@@ -18,6 +18,7 @@ using Google.Apis.Calendar.v3;
 using Google.Apis.Plus.v1;
 using Google.Apis.Calendar.v3.Data;
 using Google.Apis.Util.Store;
+using TilerElements;
 
 namespace TilerFront
 {
@@ -42,7 +43,7 @@ namespace TilerFront
                 {
                     // Enables the application to validate the security stamp when the user logs in.
                     // This is a security feature which is used when you change a password or add an external login to your account.  
-                    OnValidateIdentity = SecurityStampValidator.OnValidateIdentity<ApplicationUserManager, ApplicationUser>(
+                    OnValidateIdentity = SecurityStampValidator.OnValidateIdentity<ApplicationUserManager, TilerUser>(
                         validateInterval: TimeSpan.FromMinutes(30),
                         regenerateIdentity: (manager, user) => user.GenerateUserIdentityAsync(manager))
                 }

@@ -12,7 +12,7 @@ using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using Microsoft.AspNet.Identity.EntityFramework;
 using TilerFront.Models;
-
+using TilerElements;
 
 namespace TilerFront.Controllers
 {
@@ -223,7 +223,7 @@ namespace TilerFront.Controllers
                 case SignInStatus.Success:
                     {
                         UserController myUserCtrl = new UserController();
-                        ApplicationUser SessionUser = await myUserCtrl.GetUser(User.Identity.GetUserId(), User.Identity.GetUserName());
+                        TilerUser SessionUser = await myUserCtrl.GetUser(User.Identity.GetUserId(), User.Identity.GetUserName());
                         RetValue = new UserAccountDirect(SessionUser);
                         return RetValue;   
                     }
@@ -312,7 +312,7 @@ namespace TilerFront.Controllers
                 int Min=Convert.ToInt32(model.TimeZoneOffSet);
                 TimeSpan OffSet = TimeSpan.FromMinutes(Min);
                 DateTimeOffset EndOfDay = new DateTimeOffset(2014, 1, 1, 22, 0, 0, OffSet);
-                var user = new ApplicationUser { UserName = model.Username, Email = model.Email, FullName = model.FullName, LastChange = EndOfDay.UtcDateTime};
+                var user = new TilerUser { UserName = model.Username, Email = model.Email, FullName = model.FullName, LastChange = EndOfDay.UtcDateTime};
                 var logGenerationresult = await generateLog(user);
                 //var result = logGenerationresult.Item1;
                 //if (result.Succeeded)
@@ -385,7 +385,7 @@ namespace TilerFront.Controllers
                 int Min = Convert.ToInt32(model.TimeZoneOffSet);
                 TimeSpan OffSet = TimeSpan.FromMinutes(Min);
                 DateTimeOffset EndOfDay = new DateTimeOffset(2014, 1, 1, 22, 0, 0, OffSet);
-                var user = new ApplicationUser { UserName = model.Username, Email = model.Email, FullName = model.FullName, LastChange = EndOfDay.UtcDateTime };
+                var user = new TilerUser { UserName = model.Username, Email = model.Email, FullName = model.FullName, LastChange = EndOfDay.UtcDateTime };
                 var logGenerationresult = await generateLog(user);
                 var result = logGenerationresult.Item1;
                 if (result.Succeeded)
@@ -461,7 +461,7 @@ namespace TilerFront.Controllers
 
 
 
-        async Task<Tuple<IdentityResult,int>> generateLog(ApplicationUser model)
+        async Task<Tuple<IdentityResult,int>> generateLog(TilerUser model)
         {
             Tuple<bool, int> ExistInOldDB = DBControl.doesUserExistInOldDB(model.UserName);
             string CurrentLogLocation = LogControl.getLogLocation();
@@ -549,7 +549,7 @@ namespace TilerFront.Controllers
         public ActionResult Mobile()
         {
             ViewBag.Message = "Welcome To Tiler";
-            ApplicationUser myUser = UserManager.FindById(User.Identity.GetUserId());
+            TilerUser myUser = UserManager.FindById(User.Identity.GetUserId());
 
             return View(myUser);
         }
@@ -725,7 +725,7 @@ namespace TilerFront.Controllers
                             string RefreshToken = loginInfo.ExternalIdentity.FindFirst("RefreshToken").Value;
                             if(!string.IsNullOrEmpty(RefreshToken ))
                             {
-                                ApplicationUser AppUser = await UserManager.FindAsync(loginInfo.Login).ConfigureAwait(false);
+                                TilerUser AppUser = await UserManager.FindAsync(loginInfo.Login).ConfigureAwait(false);
                                 string Email = loginInfo.Email;
                                 string AccessToken = loginInfo.ExternalIdentity.FindFirst("AccessToken").Value;
                                 TimeSpan fiveMin = new TimeSpan(0,-5,0);
@@ -756,7 +756,7 @@ namespace TilerFront.Controllers
                         string RefreshToken = loginInfo.ExternalIdentity.FindFirst("RefreshToken").Value;
                         if (!string.IsNullOrEmpty(RefreshToken))
                         {
-                            ApplicationUser AppUser = await UserManager.FindAsync(loginInfo.Login).ConfigureAwait(false);
+                            TilerUser AppUser = await UserManager.FindAsync(loginInfo.Login).ConfigureAwait(false);
                             string Email = loginInfo.Email;
                             string AccessToken = loginInfo.ExternalIdentity.FindFirst("AccessToken").Value;
                             TimeSpan fiveMin = new TimeSpan(0, -5, 0);
@@ -806,7 +806,7 @@ namespace TilerFront.Controllers
                 {
                     return View("ExternalLoginFailure");
                 }
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email, FullName = info.ExternalIdentity.Name, LastChange = DateTime.Now };
+                var user = new TilerUser { UserName = model.Email, Email = model.Email, FullName = info.ExternalIdentity.Name, LastChange = DateTime.Now };
 
 
                 var result = await UserManager.CreateAsync(user);
@@ -833,7 +833,7 @@ namespace TilerFront.Controllers
                         {
                             ApplicationDbContext db = new ApplicationDbContext();
                             string Email = loginInfo.Email;
-                            ApplicationUser AppUser = db.Users.Where(obj => obj.Email == Email).Single();
+                            TilerUser AppUser = db.Users.Where(obj => obj.Email == Email).Single();
                             string AccessToken = loginInfo.ExternalIdentity.FindFirst("AccessToken").Value;
                             TimeSpan fiveMin = new TimeSpan(0, -5, 0);
                             TimeSpan Duration = TimeSpan.Parse(loginInfo.ExternalIdentity.FindFirst("ExpiryDuration").Value);
@@ -893,7 +893,7 @@ namespace TilerFront.Controllers
         async Task<bool> PopulateGoogleAuthentication(string TilerUserID,string AccessToken,string RefreshToken, string GoogleEmail,DateTimeOffset ExpirationDate )
         {
             ApplicationDbContext db = new ApplicationDbContext();
-            ApplicationUser AppUser = UserManager.FindById(TilerUserID);
+            TilerUser AppUser = UserManager.FindById(TilerUserID);
             bool RetValue = false;
             try
             { 

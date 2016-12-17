@@ -5,29 +5,31 @@ using Microsoft.AspNet.Identity;
 using System;
 using System.Collections.Generic;
 using Microsoft.AspNet.Identity.EntityFramework;
+using TilerElements;
 
 namespace TilerFront.Models
 {
-    // You can add profile data for the user by adding more properties to your ApplicationUser class, please visit http://go.microsoft.com/fwlink/?LinkID=317594 to learn more.
-    public class ApplicationUser : IdentityUser
-    {
-        public string FullName { get; set; }
-        public  DateTime LastChange { get; set; }
-        //public string UserName { get; set; }
-        public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager)
-        {
-            // Note the authenticationType must match the one defined in CookieAuthenticationOptions.AuthenticationType
-            
-            
-            var userIdentity = await manager.CreateIdentityAsync(this, DefaultAuthenticationTypes.ApplicationCookie);
-            // Add custom user claims here
-            
+    // You can add profile data for the user by adding more properties to your TilerUser class, please visit http://go.microsoft.com/fwlink/?LinkID=317594 to learn more.
+    //public class TilerUser : IdentityUser
+    //{
+    //    public string FullName { get; set; }
+    //    public DateTime LastChange { get; set; }
+    //    public string UserName { get; set; }
+    //    public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<TilerUser> manager)
+    //    {
+    //        Note the authenticationType must match the one defined in CookieAuthenticationOptions.AuthenticationType
 
-            return userIdentity;
-        }
-    }
 
-    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
+    //       var userIdentity = await manager.CreateIdentityAsync(this, DefaultAuthenticationTypes.ApplicationCookie);
+    //        Add custom user claims here
+
+
+
+    //        return userIdentity;
+    //    }
+    //}
+
+    public class ApplicationDbContext : IdentityDbContext<TilerUser>
     {
         public ApplicationDbContext()
             : base("DefaultConnection", throwIfV1Schema: false)

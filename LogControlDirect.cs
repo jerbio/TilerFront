@@ -12,7 +12,8 @@ using TilerElements;
 using System.Web;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity.Owin;
-using Microsoft.AspNet.Identity; 
+using Microsoft.AspNet.Identity;
+using TilerElements;
 #if ForceReadFromXml
 #else
 using CassandraUserLog;
@@ -26,16 +27,16 @@ namespace TilerFront
     {
         Tuple<bool, string, DateTimeOffset, long> ScheduleMetadata;
         //public static bool useCassandra=false;
-        Models.ApplicationUser SessionUser;
+        TilerUser SessionUser;
         bool PassiveInitialization = false;
         bool forcedLogin = false;
         public LogControlDirect()
         {
             ScheduleMetadata = new Tuple<bool, string, DateTimeOffset, long>(false, "", new DateTimeOffset(), 0);
             //useCassandra=false;
-            SessionUser= new Models.ApplicationUser();
+            SessionUser= new TilerUser();
         }
-        public LogControlDirect(Models.ApplicationUser User, string logLocation="", bool Passive=false)
+        public LogControlDirect(TilerUser User, string logLocation="", bool Passive=false)
         {
             if (!string.IsNullOrEmpty(logLocation))
             {
@@ -63,9 +64,9 @@ namespace TilerFront
             }
         }
 
-        public async Task<Models.ApplicationUser> forceLogin()
+        public async Task<TilerUser> forceLogin()
         {
-            Models.ApplicationUser retValue = null;
+            TilerUser retValue = null;
             
             
             if (SessionUser != null)
@@ -1014,7 +1015,7 @@ namespace TilerFront
             Name = Name.ToLower();
             if (AllScheduleData.Count > 0)
             {
-                retValue = AllScheduleData.Values.Where(obj => obj.Name.ToLower().Contains(Name)).ToList();
+                retValue = AllScheduleData.Values.Where(obj => obj.Name.NameValue.ToLower().Contains(Name)).ToList();
             }
 
             return retValue;
