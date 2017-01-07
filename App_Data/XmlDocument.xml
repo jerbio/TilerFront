@@ -775,14 +775,14 @@
             <param name="userId"></param>
             <returns></returns>
         </member>
-        <member name="M:TilerFront.Controllers.ScheduleController.getAllThirdPartyAuthentication(System.String)">
+        <member name="M:TilerFront.Controllers.ScheduleController.getAllThirdPartyAuthentication(System.String,TilerFront.Models.ApplicationDbContext)">
             <summary>
             Retrieves the third party authentication credentials needed to retrieve third party calendar. Attaches an index for multiple calendar retrieval. Based on a specific userID
             </summary>
             <param name="ID"></param>
             <returns></returns>
         </member>
-        <member name="M:TilerFront.Controllers.ScheduleController.getThirdPartyAuthentication(System.String,System.String,System.Int32)">
+        <member name="M:TilerFront.Controllers.ScheduleController.getThirdPartyAuthentication(System.String,System.String,System.String,TilerFront.Models.ApplicationDbContext)">
             <summary>
             Retrieves the third party authentication credentials needed to retrieve third party calendar. Gets a specific calendar authentication. You need full credentials to get specific oauth credentials
             </summary>
@@ -791,14 +791,14 @@
             <param name="ThirdPartyType"></param>
             <returns></returns>
         </member>
-        <member name="M:TilerFront.Controllers.ScheduleController.googleNotificationTrigger(System.String)">
+        <member name="M:TilerFront.Controllers.ScheduleController.googleNotificationTrigger(System.String,TilerFront.Models.ApplicationDbContext)">
             <summary>
             Handles the trigger when new google notification comes through.
             </summary>
             <param name="GoogleNotificationID"></param>
             <returns></returns>
         </member>
-        <member name="M:TilerFront.Controllers.ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(My24HourTimerWPF.Schedule,System.String)">
+        <member name="M:TilerFront.Controllers.ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(My24HourTimerWPF.Schedule,System.String,TilerFront.Models.ApplicationDbContext)">
             <summary>
             Function retrives the third party credential. Credential are used to retrieve calendar event. The retrieved events are used to populate mySchedule
             </summary>
@@ -914,6 +914,24 @@
             <param name="TimeZoneOffSet"></param>
             <param name="DaySelection"></param>
             <returns></returns>
+        </member>
+        <member name="T:TilerFront.TilerController">
+            <summary>
+            Tiler controller that provides custom tiler functionality
+            </summary>
+        </member>
+        <member name="M:TilerFront.TilerController.saveLatestChange(TilerFront.Models.ApplicationDbContext,TilerElements.TilerUser)">
+            <summary>
+            This is to be called when you need save the last change to the database
+            </summary>
+            <param name="db">The database context for accessing db</param>
+            <param name="user">The referemce tiler user</param>
+            <returns></returns>
+        </member>
+        <member name="P:TilerFront.Models.AuthorizedUser.TimeZone">
+            <summary>
+            TimeZone desired by the user. This defaults to UTC
+            </summary>
         </member>
         <member name="P:TilerFront.Models.getEventModel.EventID">
             <summary>
@@ -1105,11 +1123,6 @@
             is the restrcition to be for only work week.
             </summary>
         </member>
-        <member name="P:TilerFront.Models.UnregisteredEvent.TimeZone">
-            <summary>
-            TimeZone desired by the user. This defaults to UTC
-            </summary>
-        </member>
         <member name="P:TilerFront.Models.UnregisteredEvent.TimeZoneOrigin">
             <summary>
             The timezone of the location where the request is received. This defaults to UTC
@@ -1134,6 +1147,12 @@
             <param name="referenceDay"></param>
             <param name="LogFile"></param>
         </member>
+        <member name="M:TilerFront.LogControl.getTilerRetrievedUser">
+            <summary>
+            Function returns the tiler User retrieved from the db
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:TilerFront.LogControl.updateBigData(System.Xml.XmlDocument,System.Xml.XmlDocument)">
             <summary>
             Function is to be called for the generation of auto logs for a user interaction with the schedule
@@ -1147,6 +1166,13 @@
             </summary>
             <param name="NewLocation"></param>
         </member>
+        <member name="M:TilerFront.LogControl.generateTilerUserNode(TilerElements.TilerUser)">
+            <summary>
+            This function generates a tiler user node that simply stores the id and user name for a given tiler user
+            </summary>
+            <param name="user">tiler user</param>
+            <returns></returns>
+        </member>
         <member name="M:TilerFront.LogControl.CreatePauseUsedUpNode(TilerElements.SubCalendarEvent,System.Xml.XmlDocument)">
             <summary>
             Class generates the pause xml mode for a given schedule
@@ -1154,11 +1180,42 @@
             <param name="SubEvent"></param>
             <returns></returns>
         </member>
+        <member name="M:TilerFront.LogControl.getTilerLoggedUser(System.Xml.XmlNode)">
+            <summary>
+            Function retrieves a db_tiler user from an xmlnode.  Note if there is no user node it returns an object in which the isNull property is set to true
+            </summary>
+            <param name="userNode">The xml node with the tiler user information</param>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.LogControl.getTilerUserGroup(System.Xml.XmlNode)">
+            <summary>
+            Function retrieves a tiler user group form an xmlnode. Npte if there isn't a node a new object will be created with the isNull flag set
+            </summary>
+            <param name="userGroupNode">xml node with formated user group</param>
+            <returns></returns>
+        </member>
         <member name="M:TilerFront.LogControl.getRestrictionTimeLine(System.Xml.XmlNode)">
             <summary>
             Funciton returns aall the possible active restriction timelines for the restriciton profile
             </summary>
             <param name="RestrictionTimeLineNode"></param>
+            <returns></returns>
+        </member>
+        <member name="T:TilerFront.TilerApiController">
+            <summary>
+            Tiler controller that provides custom tiler functionality
+            </summary>
+        </member>
+        <member name="M:TilerFront.UserAccount.getTilerUser">
+            <summary>
+            Gets the tilerUser account associated with the userAccount
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.UserAccountDirect.Login">
+            <summary>
+            Essentially initializes the user log and pulls a user's account
+            </summary>
             <returns></returns>
         </member>
     </members>

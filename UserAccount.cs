@@ -7,90 +7,45 @@ using System.Xml;
 using System.IO;
 using System.Threading.Tasks;
 using TilerElements;
+using TilerFront.Models;
 
 
 
 
 namespace TilerFront
 {
-    public class UserAccount
+    public abstract class UserAccount
     {
-        
         protected LogControl UserLog;
         protected string ID="";
         protected string Name;
         protected string Username;
         string Password;
-        protected TilerFront.DBControl UserAccountDBAccess;
+
         public UserAccount()
         {
             Username = "";
             Password = "";
         }
-        /*
-        public UserAccount(string UserName, string PassWord)
+
+        public abstract Task<bool> Login();
+
+        /// <summary>
+        /// Gets the tilerUser account associated with the userAccount
+        /// </summary>
+        /// <returns></returns>
+        public virtual TilerUser getTilerUser()
         {
-            this.Username = UserName;
-            this.Password = TilerFront.DBControl.encryptString(PassWord);
-        }
-        */
-        public UserAccount(string UserName, string UserID)
-        {
-            this.Username = UserName;
-            this.ID = UserID;
-            this.Password = "";
+            return SessionUser;
         }
 
-        virtual public async Task<bool> Login()
+        protected TilerUser SessionUser
         {
-            if(string.IsNullOrEmpty(ID))
+            get
             {
-                UserAccountDBAccess = new DBControl(Username, Password);
-                UserLog = new LogControl(UserAccountDBAccess);
+                return UserLog.getTilerRetrievedUser();
             }
-            else
-            {
-                UserAccountDBAccess = new DBControl(Username, ID);
-                UserLog = new LogControl(UserAccountDBAccess);
-            }
-            await UserLog.Initialize();
-            ID = UserLog.LoggedUserID;
-            Name = UserLog.Usersname;
-            
-            return UserLog.Status;
         }
-
-
-
-
-        async virtual public Task<Tuple<string, CustomErrors>> RegisterOld(string FirstName, string LastName, string Email, string UserName, string PassWord)
-        {
-            CustomErrors retValue = new CustomErrors(false,"success");
-            { 
-                PassWord=(DBControl.encryptString(PassWord));
-            }
-            UserAccountDBAccess = new DBControl(UserName, PassWord);
-            Tuple<string, CustomErrors> registrationStatus = await UserAccountDBAccess.RegisterUser(FirstName, LastName, Email);//, UserName, PassWord);
-            retValue = registrationStatus.Item2;
-            UserLog = new LogControl(UserAccountDBAccess);
-            await UserLog.Initialize();
-            if (!registrationStatus.Item2.Status)
-            {
-                Username = UserName;
-                Password = PassWord;
-                retValue =UserLog.genereateNewLogFile(registrationStatus.Item1.ToString());
-
-                if (retValue.Status && retValue.Code >= 20000000)//error 20000000 denotes log creation issue
-                {
-                    UserAccountDBAccess.deleteUser();
-                }
-            }
-
-            Tuple<string, CustomErrors> RetValue = new Tuple<string, CustomErrors>(registrationStatus.Item1, retValue);
-
-            return RetValue;
-        }
-
 
 
         virtual protected Dictionary<string, CalendarEvent>  getAllCalendarElements(TimeLine RangeOfLookup, string desiredDirectory="")

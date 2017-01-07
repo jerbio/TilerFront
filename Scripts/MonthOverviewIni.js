@@ -4059,7 +4059,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
             function extraOptionsData()
             {
                 var splitInputBox = getDomOrCreateNew("InputSplitCount", "input");
-                splitInputBox.readOnly = true;
+                //splitInputBox.readOnly = true;
                 splitInputBox.oninput= EditContainerData.RevealContainer;
                 splitInputBox.setAttribute("type", "Number");
                 splitInputBox.onkeydown = stopPropagationOfKeyDown;

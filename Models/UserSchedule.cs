@@ -29,7 +29,8 @@ namespace TilerFront.Models
 
         public void populatePauseData(PausedEvent PausedEvent)
         {
-            long RangeStart = (long)(TilerElementExtension.CurrentTime - TilerElementExtension.JSStartTime).TotalMilliseconds;
+            DateTimeOffset CurrentTime = DateTimeOffset.UtcNow;
+            long RangeStart = (long)(CurrentTime - TilerElementExtension.JSStartTime).TotalMilliseconds;
             long RangeEnd = RangeStart + (long)TimeSpan.FromDays(1).TotalMilliseconds;
             Func<SubCalEvent, bool> predicate = (subEvent => 
             {

@@ -17,7 +17,7 @@ using TilerElements;
 namespace TilerFront.Controllers
 {
     [Authorize]
-    public class AccountController : Controller
+    public class AccountController : TilerController
     {
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
@@ -224,7 +224,7 @@ namespace TilerFront.Controllers
                     {
                         UserController myUserCtrl = new UserController();
                         TilerUser SessionUser = await myUserCtrl.GetUser(User.Identity.GetUserId(), User.Identity.GetUserName());
-                        RetValue = new UserAccountDirect(SessionUser);
+                        RetValue = new UserAccountDirect(SessionUser.Id, db);
                         return RetValue;   
                     }
                 default:
@@ -358,7 +358,7 @@ namespace TilerFront.Controllers
                     }
                     else
                     {
-                        LogControlDirect LogToBedeleted = new LogControlDirect(user, "", true);
+                    LogControlDirect LogToBedeleted = new LogControlDirect(user, this.db, "");
                         await LogToBedeleted.DeleteLog();
                     }
                 //}
@@ -444,7 +444,7 @@ namespace TilerFront.Controllers
                     }
                     else
                     {
-                        LogControlDirect LogToBedeleted = new LogControlDirect(user,"",true);
+                        LogControlDirect LogToBedeleted = new LogControlDirect(user, db, "");
                         await LogToBedeleted.DeleteLog();
                     }
                 }
@@ -497,12 +497,11 @@ namespace TilerFront.Controllers
             }
             else
             {
-
-                LogControlDirect newLog = new LogControlDirect(model, CurrentLogLocation);
-                UserAccountDirect newUser = new UserAccountDirect(model);
+                UserAccountDirect newUser = new UserAccountDirect(model.Id, db);
+                LogControlDirect newLog = new LogControlDirect(model, db, CurrentLogLocation);
                 List<string> NameDist = model.FullName.Split().ToList();
                 Task< TilerElements.CustomErrors> registerStatus =  newUser.Register(model);
-                NewLogCreationSuccess =! (await registerStatus).Status;
+                NewLogCreationSuccess = (await registerStatus) != null;
             }
 
             if (NewLogCreationSuccess)
@@ -705,22 +704,21 @@ namespace TilerFront.Controllers
         [AllowAnonymous]
         public async Task<ActionResult> ExternalLoginCallback(string returnUrl)
         {
-            ApplicationDbContext db = new ApplicationDbContext();
             var loginInfo = await AuthenticationManager.GetExternalLoginInfoAsync();
             if (loginInfo == null)
             {
                 return RedirectToAction("Login");
             }
             Controllers.ThirdPartyCalendarAuthenticationModelsController.initializeCurrentURI(System.Web.HttpContext.Current.Request.Url.Authority);
-            int ThirdPartyType = -1;
+            string ThirdPartyType;
             var result = await SignInManager.ExternalSignInAsync(loginInfo, isPersistent: false).ConfigureAwait(false);
             switch (result)
             {
                 case SignInStatus.Success:
                     {
-                        ThirdPartyType = Convert.ToInt32(loginInfo.ExternalIdentity.FindFirst("ThirdPartyType").Value);
+                        ThirdPartyType = loginInfo.ExternalIdentity.FindFirst("ThirdPartyType").Value;
                         DateTimeOffset Now = DateTimeOffset.UtcNow;
-                        if (ThirdPartyType==(int)TilerElements.ThirdPartyControl.CalendarTool.Google)
+                        if (ThirdPartyType==TilerElements.ThirdPartyControl.CalendarTool.google.ToString())
                         {
                             string RefreshToken = loginInfo.ExternalIdentity.FindFirst("RefreshToken").Value;
                             if(!string.IsNullOrEmpty(RefreshToken ))
@@ -748,10 +746,10 @@ namespace TilerFront.Controllers
                 default:
                     // If the user does not have an account, then prompt the user to create an account
                     
-                    ThirdPartyType = Convert.ToInt32(loginInfo.ExternalIdentity.FindFirst("ThirdPartyType").Value);
+                    ThirdPartyType = loginInfo.ExternalIdentity.FindFirst("ThirdPartyType").Value;
                     ThirdPartyCalendarAuthenticationModel thirdPartyModel = null;
                     DateTimeOffset Deadline = DateTimeOffset.UtcNow;
-                    if (ThirdPartyType == (int)TilerElements.ThirdPartyControl.CalendarTool.Google)
+                    if (ThirdPartyType == TilerElements.ThirdPartyControl.CalendarTool.google.ToString())
                     {
                         string RefreshToken = loginInfo.ExternalIdentity.FindFirst("RefreshToken").Value;
                         if (!string.IsNullOrEmpty(RefreshToken))
@@ -860,7 +858,7 @@ namespace TilerFront.Controllers
                     }
                     else
                     {
-                        LogControlDirect LogToBedeleted = new LogControlDirect(user);
+                        LogControlDirect LogToBedeleted = new LogControlDirect(user, db);
                         await LogToBedeleted.DeleteLog();
                     }
                 }
@@ -892,7 +890,7 @@ namespace TilerFront.Controllers
 
         async Task<bool> PopulateGoogleAuthentication(string TilerUserID,string AccessToken,string RefreshToken, string GoogleEmail,DateTimeOffset ExpirationDate )
         {
-            ApplicationDbContext db = new ApplicationDbContext();
+            //ApplicationDbContext db = new ApplicationDbContext();
             TilerUser AppUser = UserManager.FindById(TilerUserID);
             bool RetValue = false;
             try

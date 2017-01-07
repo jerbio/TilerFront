@@ -54,7 +54,8 @@
       <HintPath>..\packages\BouncyCastle.1.8.1\lib\BouncyCastle.Crypto.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="DBTilerElement">
+    <Reference Include="DBTilerElement, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\DBTilerElement\bin\Debug\DBTilerElement.dll</HintPath>
     </Reference>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
@@ -417,6 +418,7 @@
     <Compile Include="Controllers\ScheduleController.cs" />
     <Compile Include="Controllers\SubCalendarEventController.cs" />
     <Compile Include="Controllers\ThirdPartyCalendarAuthenticationModelsController.cs" />
+    <Compile Include="Controllers\TilerController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Content Include="App_Data\XmlDocument.xml" />
     <Content Include="Areas\HelpPage\HelpPage.css" />
@@ -459,9 +461,21 @@
     <Compile Include="Migrations\201605300724181_addedPrimaryContraintForPauseTime.Designer.cs">
       <DependentUpon>201605300724181_addedPrimaryContraintForPauseTime.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201605300732307_addedPrimaryContraintForPauseTime1.cs" />
-    <Compile Include="Migrations\201605300732307_addedPrimaryContraintForPauseTime1.Designer.cs">
-      <DependentUpon>201605300732307_addedPrimaryContraintForPauseTime1.cs</DependentUpon>
+    <Compile Include="Migrations\201612250817177_ApplicationUserToTilerUser.cs" />
+    <Compile Include="Migrations\201612250817177_ApplicationUserToTilerUser.Designer.cs">
+      <DependentUpon>201612250817177_ApplicationUserToTilerUser.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201612270435357_tilerUserLastUpdateChange.cs" />
+    <Compile Include="Migrations\201612270435357_tilerUserLastUpdateChange.Designer.cs">
+      <DependentUpon>201612270435357_tilerUserLastUpdateChange.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201612270701357_tilerUserLastUpdateChange_SwitchBack.cs" />
+    <Compile Include="Migrations\201612270701357_tilerUserLastUpdateChange_SwitchBack.Designer.cs">
+      <DependentUpon>201612270701357_tilerUserLastUpdateChange_SwitchBack.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201612270726466_tilerUserLastUpdateChange_SwitchBack1.cs" />
+    <Compile Include="Migrations\201612270726466_tilerUserLastUpdateChange_SwitchBack1.Designer.cs">
+      <DependentUpon>201612270726466_tilerUserLastUpdateChange_SwitchBack1.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
@@ -498,6 +512,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SocketHubs\ScheduleChange.cs" />
     <Compile Include="Startup.cs" />
+    <Compile Include="Controllers\TilerApiController.cs" />
     <Compile Include="UserAccount.cs" />
     <Compile Include="UserAccountDebug.cs" />
     <Compile Include="UserAccountDirect.cs" />
@@ -2705,8 +2720,17 @@
     <EmbeddedResource Include="Migrations\201605300724181_addedPrimaryContraintForPauseTime.resx">
       <DependentUpon>201605300724181_addedPrimaryContraintForPauseTime.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201605300732307_addedPrimaryContraintForPauseTime1.resx">
-      <DependentUpon>201605300732307_addedPrimaryContraintForPauseTime1.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201612250817177_ApplicationUserToTilerUser.resx">
+      <DependentUpon>201612250817177_ApplicationUserToTilerUser.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201612270435357_tilerUserLastUpdateChange.resx">
+      <DependentUpon>201612270435357_tilerUserLastUpdateChange.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201612270701357_tilerUserLastUpdateChange_SwitchBack.resx">
+      <DependentUpon>201612270701357_tilerUserLastUpdateChange_SwitchBack.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201612270726466_tilerUserLastUpdateChange_SwitchBack1.resx">
+      <DependentUpon>201612270726466_tilerUserLastUpdateChange_SwitchBack1.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

@@ -36,11 +36,10 @@ using TilerElements;
 namespace TilerFront.Controllers
 {
     [Authorize]
-    public class ManageController : Controller
+    public class ManageController : TilerController
     {
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
-        private ApplicationDbContext db = new ApplicationDbContext();
         public ManageController()
         {
         }
@@ -273,7 +272,7 @@ namespace TilerFront.Controllers
         public ActionResult ChangeStartOfDay()
         {
             TilerUser myUser = UserManager.FindById(User.Identity.GetUserId());
-            long Milliseconds = (long)(new DateTimeOffset(myUser.LastChange.AddDays(10)) - TilerElementExtension.JSStartTime).TotalMilliseconds;
+            long Milliseconds = (long)(myUser.LastChange.AddDays(10) - TilerElementExtension.JSStartTime).TotalMilliseconds;
             var model = new ChangeStartOfDayModel
             {
                 TimeOfDay = Milliseconds.ToString()
@@ -338,7 +337,7 @@ namespace TilerFront.Controllers
 
         async Task<ThirdPartyCalendarAuthenticationModel> getGoogleAuthenticationData(string TilerUSerID,string EmailID )
         {
-            Object[] Param = { TilerUSerID, EmailID, (int)TilerElements.ThirdPartyControl.CalendarTool.Google};
+            Object[] Param = { TilerUSerID, EmailID, TilerElements.ThirdPartyControl.CalendarTool.google};
             ThirdPartyCalendarAuthenticationModel checkingThirdPartyCalendarAuthentication = await db.ThirdPartyAuthentication.FindAsync(Param);
             return checkingThirdPartyCalendarAuthentication;
         }
@@ -542,7 +541,7 @@ namespace TilerFront.Controllers
                         double totalSeconds = myCredential.Token.ExpiresInSeconds == null ? 0 : (double)myCredential.Token.ExpiresInSeconds;
                         DateTime myDate = myCredential.Token.Issued.AddSeconds(totalSeconds);
                         thirdpartydata.Deadline = new DateTimeOffset(myDate);
-                        thirdpartydata.ProviderID = (int)TilerElements.ThirdPartyControl.CalendarTool.Google;
+                        thirdpartydata.ProviderID = TilerElements.ThirdPartyControl.CalendarTool.google.ToString();
                         thirdpartydata.Token = myCredential.Token.AccessToken;
                         thirdpartydata.RefreshToken = myCredential.Token.RefreshToken;
 
@@ -553,7 +552,7 @@ namespace TilerFront.Controllers
                         ThirdPartyCalendarAuthenticationModel retrievedAuthentication = await getGoogleAuthenticationData(UserID, Email).ConfigureAwait(false);
                         try 
                         {
-                            await retrievedAuthentication.refreshAndCommitToken().ConfigureAwait(false);
+                            await retrievedAuthentication.refreshAndCommitToken(db).ConfigureAwait(false);
                         }
                         catch
                         {

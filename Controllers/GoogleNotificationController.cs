@@ -12,9 +12,8 @@ using System.Web.Http.Description;
 namespace TilerFront.Controllers
 {
     [ApiExplorerSettings(IgnoreApi = true)]
-    public class GoogleNotificationController : ApiController
+    public class GoogleNotificationController : TilerApiController
     {
-        ApplicationDbContext db = new ApplicationDbContext();
         [HttpPost]
         [Route("api/GoogleNotification/Trigger")]
         async public Task<System.Web.Http.IHttpActionResult> Trigger()
@@ -30,7 +29,7 @@ namespace TilerFront.Controllers
             if (continueIntoTrigger)
             {
                 string ChannelID = myContext.Request.Headers["X-Goog-Channel-ID"];
-                ScheduleController.googleNotificationTrigger(ChannelID);
+                ScheduleController.googleNotificationTrigger(ChannelID, db);
             }
 
             return retValue;
@@ -44,7 +43,7 @@ namespace TilerFront.Controllers
             if (continueIntoTrigger)
             {
                 string ChannelID = "2090f290-682a-47a7-9bfc-dcdc9f685993";
-                ScheduleController.googleNotificationTrigger(ChannelID);
+                ScheduleController.googleNotificationTrigger(ChannelID, db);
             }
             OkNegotiatedContentResult<string> retValue = new OkNegotiatedContentResult<string>("thumbs up", this);
             return retValue;

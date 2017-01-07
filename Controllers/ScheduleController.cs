@@ -25,7 +25,7 @@ namespace TilerFront.Controllers
     /// <summary>
     /// Represents a users schedule. Provides access to schedule creation, modification and deletion
     /// </summary>
-    public class ScheduleController : ApiController
+    public class ScheduleController : TilerApiController
     {
 
         // GET api/schedule
@@ -58,7 +58,7 @@ namespace TilerFront.Controllers
 
         async Task<PostBackData> getDataFromRestEnd(getScheduleModel myAuthorizedUser)
         {
-            UserAccountDirect myUserAccount = await myAuthorizedUser.getUserAccountDirect();
+            UserAccountDirect myUserAccount = await myAuthorizedUser.getUserAccountDirect(db);
             HttpContext myCOntext = HttpContext.Current;
             await myUserAccount.Login();
             PostBackData returnPostBack;
@@ -70,13 +70,13 @@ namespace TilerFront.Controllers
 
 
                 LogControl LogAccess = myUserAccount.ScheduleLogControl;
-                List<IndexedThirdPartyAuthentication> AllIndexedThirdParty = await getAllThirdPartyAuthentication(myUserAccount.UserID).ConfigureAwait(false);
+                List<IndexedThirdPartyAuthentication> AllIndexedThirdParty = await getAllThirdPartyAuthentication(myUserAccount.UserID, db).ConfigureAwait(false);
 
-                List<GoogleTilerEventControl> AllGoogleTilerEvents = AllIndexedThirdParty.Select(obj => new GoogleTilerEventControl(obj)).ToList();
+                List<GoogleTilerEventControl> AllGoogleTilerEvents = AllIndexedThirdParty.Select(obj => new GoogleTilerEventControl(obj, db)).ToList();
                 //AllIndexedThirdParty.Select(obj => new GoogleTilerEventControl(obj)).ToList();
                 foreach (IndexedThirdPartyAuthentication obj in AllIndexedThirdParty)
                 {
-                    var GoogleTilerEventControlobj = new GoogleTilerEventControl(obj);
+                    var GoogleTilerEventControlobj = new GoogleTilerEventControl(obj, db);
                 }
 
 
@@ -122,7 +122,7 @@ namespace TilerFront.Controllers
 
                 UserSchedule currUserSchedule = new UserSchedule { NonRepeatCalendarEvent = NonRepeatingEvents.Select(obj => obj.ToCalEvent(TimelineForData)).ToArray(), RepeatCalendarEvent = RepeatingEvents };
 
-                ApplicationDbContext db = new ApplicationDbContext();
+                //ApplicationDbContext db = new ApplicationDbContext();
                 PausedEvent currentPausedEvent = getCurrentPausedEvent(db);
                 currUserSchedule.populatePauseData(currentPausedEvent);
                 InitScheduleProfile retValue = new InitScheduleProfile { Schedule = currUserSchedule, Name = myUserAccount.Usersname };
@@ -149,7 +149,7 @@ namespace TilerFront.Controllers
         [Route("api/Schedule/DeletedSchedule")]
         public async Task<IHttpActionResult> GetDeletedSchedule([FromUri] getScheduleModel myAuthorizedUser)
         {
-            UserAccountDirect myUserAccount = await myAuthorizedUser.getUserAccountDirect();
+            UserAccountDirect myUserAccount = await myAuthorizedUser.getUserAccountDirect(db);
             HttpContext myCOntext = HttpContext.Current;
             await myUserAccount.Login();
             PostBackData returnPostBack;
@@ -207,8 +207,8 @@ namespace TilerFront.Controllers
         [Route("api/Schedule/Event/Pause")]
         public async Task<IHttpActionResult> PauseSchedule([FromBody]getEventModel myAuthorizedUser)
         {
-            ApplicationDbContext db = new ApplicationDbContext();
-            UserAccountDirect myUser = await myAuthorizedUser.getUserAccountDirect();
+            //ApplicationDbContext db = new ApplicationDbContext();
+            UserAccountDirect myUser = await myAuthorizedUser.getUserAccountDirect(db);
             await myUser.Login();
 
             if (myUser.Status)
@@ -232,7 +232,7 @@ namespace TilerFront.Controllers
                 DateTimeOffset myNow = DateTimeOffset.UtcNow;
                 My24HourTimerWPF.Schedule MySchedule = new My24HourTimerWPF.Schedule(myUser, myNow);
                 SubCalendarEvent SubEvent = MySchedule.getSubCalendarEvent(myAuthorizedUser.EventID);
-                if ((!SubEvent.Rigid) && (SubEvent.Id != currentPausedEvent.EventId))
+                if ((!SubEvent.Rigid) && (SubEvent.getId != currentPausedEvent.EventId))
                 {
                     DB_UserActivity activity = new DB_UserActivity(myAuthorizedUser.getRefNow(), UserActivity.ActivityType.Pause);
 
@@ -263,7 +263,7 @@ namespace TilerFront.Controllers
                 }
                 PostBackData myPostData = new PostBackData("\"Success\"", 0);
                 TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
-                scheduleChangeSocket.triggerRefreshData(myAuthorizedUser);
+                scheduleChangeSocket.triggerRefreshData(myUser.getTilerUser());
                 return Ok(myPostData.getPostBack);
             }
             throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.Unauthorized)
@@ -279,8 +279,8 @@ namespace TilerFront.Controllers
         public async Task<IHttpActionResult> ResumeSchedule([FromBody]getEventModel myAuthorizedUser)
         {
 
-            ApplicationDbContext db = new ApplicationDbContext();
-            UserAccountDirect myUser = await myAuthorizedUser.getUserAccountDirect();
+            //ApplicationDbContext db = new ApplicationDbContext();
+            UserAccountDirect myUser = await myAuthorizedUser.getUserAccountDirect(db);
             await myUser.Login();
             if (myUser.Status)
             {
@@ -304,7 +304,7 @@ namespace TilerFront.Controllers
                     await db.SaveChangesAsync();
 
                     TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
-                    scheduleChangeSocket.triggerRefreshData(myAuthorizedUser);
+                    scheduleChangeSocket.triggerRefreshData(myUser.getTilerUser());
                 }
 
                 PostBackData myPostData;
@@ -366,9 +366,9 @@ namespace TilerFront.Controllers
         /// </summary>
         /// <param name="ID"></param>
         /// <returns></returns>
-        static async Task<List<IndexedThirdPartyAuthentication>> getAllThirdPartyAuthentication(string ID)
+        static async Task<List<IndexedThirdPartyAuthentication>> getAllThirdPartyAuthentication(string ID, ApplicationDbContext db)
         {
-            ApplicationDbContext db = new ApplicationDbContext();
+            //ApplicationDbContext db = new ApplicationDbContext();
             List<ThirdPartyCalendarAuthenticationModel> AllAuthentications = ( db.ThirdPartyAuthentication.Where(obj => ID == obj.TilerID).ToList());
             List<IndexedThirdPartyAuthentication> RetValue = AllAuthentications.Select((obj, i) => new IndexedThirdPartyAuthentication(obj,(uint) i)).ToList();
             return RetValue;
@@ -382,10 +382,9 @@ namespace TilerFront.Controllers
         /// <param name="ThirdpaartyUserID"></param>
         /// <param name="ThirdPartyType"></param>
         /// <returns></returns>
-        async static public Task<ThirdPartyCalendarAuthenticationModel> getThirdPartyAuthentication(string TilerUserID, string ThirdpaartyUserID, int ThirdPartyType)
+        async static public Task<ThirdPartyCalendarAuthenticationModel> getThirdPartyAuthentication(string TilerUserID, string ThirdpaartyUserID, string ThirdPartyType, ApplicationDbContext db)
         {
             Object[] Param = { TilerUserID, ThirdpaartyUserID, ThirdPartyType };
-            ApplicationDbContext db = new ApplicationDbContext();
             ThirdPartyCalendarAuthenticationModel RetValue = await db.ThirdPartyAuthentication.FindAsync(Param);
             return RetValue;
         }
@@ -395,24 +394,23 @@ namespace TilerFront.Controllers
         /// </summary>
         /// <param name="GoogleNotificationID"></param>
         /// <returns></returns>
-        static async public Task googleNotificationTrigger(string GoogleNotificationID)
+        static async public Task googleNotificationTrigger(string GoogleNotificationID, ApplicationDbContext db)
         {
-            ApplicationDbContext db = new ApplicationDbContext();
             ThirdPartyCalendarAuthenticationModel ThirdPartAuthData= db.ThirdPartyAuthentication.Where(obj => obj.ID == GoogleNotificationID).Single();
             object[] LookUpParams = {ThirdPartAuthData.TilerID};
             TilerUser myUser = db.Users.Find(LookUpParams);
-            await notificationTrigger(myUser).ConfigureAwait(false);
+            await notificationTrigger(myUser, db).ConfigureAwait(false);
         }
 
 
-        static async Task notificationTrigger(TilerUser TilerUser)
+        static async Task notificationTrigger(TilerUser TilerUser, ApplicationDbContext db)
         {
-            UserAccountDirect RetrievedUSer = new UserAccountDirect(TilerUser, true);
-            ApplicationDbContext db = new ApplicationDbContext();
+            UserAccountDirect RetrievedUSer = new UserAccountDirect(TilerUser.Id, db);
+            
             //DateTimeOffset CurrentTime = DateTimeOffset.Parse("5/8/2015 5:35:00 AM +00:00");//.AddDays(-1);// DateTimeOffset.UtcNow.AddDays(-1);
             DateTimeOffset CurrentTime = DateTimeOffset.UtcNow;//.AddDays(-1);
             My24HourTimerWPF.Schedule TilerSchedule = new My24HourTimerWPF.Schedule(RetrievedUSer, CurrentTime);
-            await updatemyScheduleWithGoogleThirdpartyCalendar(TilerSchedule, RetrievedUSer.UserID).ConfigureAwait(false);
+            await updatemyScheduleWithGoogleThirdpartyCalendar(TilerSchedule, RetrievedUSer.UserID, db).ConfigureAwait(false);
             await TilerSchedule.UpdateScheduleDueToExternalChanges().ConfigureAwait(false);
         }
 
@@ -431,14 +429,14 @@ namespace TilerFront.Controllers
         /// <param name="mySchedule"></param>
         /// <param name="TilerUserID"></param>
         /// <returns></returns>
-        static internal async Task updatemyScheduleWithGoogleThirdpartyCalendar(My24HourTimerWPF.Schedule mySchedule, string TilerUserID)
+        static internal async Task updatemyScheduleWithGoogleThirdpartyCalendar(My24HourTimerWPF.Schedule mySchedule, string TilerUserID, ApplicationDbContext db)
         {
-            List<IndexedThirdPartyAuthentication> AllIndexedThirdParty = await getAllThirdPartyAuthentication(TilerUserID).ConfigureAwait(false);
-            List<GoogleTilerEventControl> AllGoogleTilerEvents = AllIndexedThirdParty.Select(obj => new GoogleTilerEventControl (obj)).ToList();
+            List<IndexedThirdPartyAuthentication> AllIndexedThirdParty = await getAllThirdPartyAuthentication(TilerUserID, db).ConfigureAwait(false);
+            List<GoogleTilerEventControl> AllGoogleTilerEvents = AllIndexedThirdParty.Select(obj => new GoogleTilerEventControl (obj, db)).ToList();
 
             Tuple<List<GoogleTilerEventControl>, GoogleThirdPartyControl> GoogleEvents = await GoogleTilerEventControl.getThirdPartyControlForIndex(AllGoogleTilerEvents).ConfigureAwait(false);
             Task DeleteInvalidAuthentication = ManageController.delelteGoogleAuthentication(GoogleEvents.Item1.Select(obj => obj.getDBAuthenticationData()));
-            mySchedule.updateDataSetWithThirdPartyData(new Tuple<ThirdPartyControl.CalendarTool, IEnumerable<CalendarEvent>>(ThirdPartyControl.CalendarTool.Google,new List<CalendarEvent> {GoogleEvents.Item2.getThirdpartyCalendarEvent()}));
+            mySchedule.updateDataSetWithThirdPartyData(new Tuple<ThirdPartyControl.CalendarTool, IEnumerable<CalendarEvent>>(ThirdPartyControl.CalendarTool.google,new List<CalendarEvent> {GoogleEvents.Item2.getThirdpartyCalendarEvent()}));
             //mySchedule.updateDataSetWithThirdPartyData(new Tuple<ThirdPartyControl.CalendarTool.Google, GoogleEvents.Item2.);
             await DeleteInvalidAuthentication.ConfigureAwait(false);
         }
@@ -456,7 +454,7 @@ namespace TilerFront.Controllers
         {
 
             AuthorizedUser myAuthorizedUser = UserData.User;
-            UserAccountDirect myUserAccount = await UserData.getUserAccountDirect();
+            UserAccountDirect myUserAccount = await UserData.getUserAccountDirect(db);
             await myUserAccount.Login();
             if (myUserAccount.Status)
             {
@@ -468,16 +466,16 @@ namespace TilerFront.Controllers
                 }
                 else
                 {
-                    fullTimeSpan = myAuthorizedUser.getTImeSpan;
+                    fullTimeSpan = ProcrastinateDuration.TotalTimeSpan; ;
                 }
                 My24HourTimerWPF.Schedule MySchedule = new My24HourTimerWPF.Schedule(myUserAccount, DateTimeOffset.UtcNow);
 
-                await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, UserData.UserID).ConfigureAwait(false);
+                await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, UserData.UserID, db).ConfigureAwait(false);
 
 
 
 
-                Tuple<CustomErrors, Dictionary<string, CalendarEvent>> ScheduleUpdateMessage = MySchedule.ProcrastinateAll(ProcrastinateDuration.TotalTimeSpan);
+                Tuple<CustomErrors, Dictionary<string, CalendarEvent>> ScheduleUpdateMessage = MySchedule.ProcrastinateAll(fullTimeSpan);
                 DB_UserActivity activity = new DB_UserActivity(myAuthorizedUser.getRefNow(), UserActivity.ActivityType.ProcrastinateAll);
                 JObject json = JObject.FromObject(UserData);
                 activity.updateMiscelaneousInfo(json.ToString());
@@ -496,7 +494,7 @@ namespace TilerFront.Controllers
                     myPostData = new PostBackData("\"There aren't events for the next three months is coming up in the next three months\"", 0);
                 }
                 TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
-                scheduleChangeSocket.triggerRefreshData(myAuthorizedUser);
+                scheduleChangeSocket.triggerRefreshData(myUserAccount.getTilerUser());
                 return Ok(myPostData.getPostBack);
             }
             throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.Unauthorized)
@@ -518,7 +516,7 @@ namespace TilerFront.Controllers
             AuthorizedUser myAuthorizedUser = UserData.User;
             TimeDuration ProcrastinateDuration = UserData.ProcrastinateDuration;
             TimeSpan fullTimeSpan = myAuthorizedUser.getTImeSpan;
-            UserAccountDirect myUser = await UserData.getUserAccountDirect();
+            UserAccountDirect myUser = await UserData.getUserAccountDirect(db);
             await myUser.Login();
 
             DateTimeOffset myNow = DateTimeOffset.UtcNow;// myAuthorizedUser.getRefNow();
@@ -527,13 +525,13 @@ namespace TilerFront.Controllers
             JObject json = JObject.FromObject(UserData);
             activity.updateMiscelaneousInfo(json.ToString());
             myUser.ScheduleLogControl.updateUserActivty(activity);
-            await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, UserData.UserID).ConfigureAwait(false);
+            await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, UserData.UserID, db).ConfigureAwait(false);
 
             Tuple<CustomErrors, Dictionary<string, CalendarEvent>> ScheduleUpdateMessage = MySchedule.ProcrastinateJustAnEvent(UserData.EventID, ProcrastinateDuration.TotalTimeSpan);
             await MySchedule.UpdateWithDifferentSchedule(ScheduleUpdateMessage.Item2);
             PostBackData myPostData = new PostBackData("\"Success\"", 0);
             TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
-            scheduleChangeSocket.triggerRefreshData();
+            scheduleChangeSocket.triggerRefreshData(myUser.getTilerUser());
             return Ok(myPostData.getPostBack);
         }
 
@@ -548,7 +546,7 @@ namespace TilerFront.Controllers
         public async Task<IHttpActionResult> Shuffle([FromBody]ShuffleModel UserData)
         {
             AuthorizedUser myAuthorizedUser = UserData.User;
-            UserAccountDirect myUser = await UserData.getUserAccountDirect();
+            UserAccountDirect myUser = await UserData.getUserAccountDirect(db);
             await myUser.Login();
             if (myUser.Status)
             {
@@ -556,7 +554,7 @@ namespace TilerFront.Controllers
                 My24HourTimerWPF.Schedule MySchedule = new My24HourTimerWPF.Schedule(myUser, myNow);
                 DB_UserActivity activity = new DB_UserActivity(myNow, UserActivity.ActivityType.Shuffle);
                 myUser.ScheduleLogControl.updateUserActivty(activity);
-                await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, UserData.UserID).ConfigureAwait(false);
+                await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, UserData.UserID, db).ConfigureAwait(false);
 
                 Location_Elements location;
                 if (UserData.IsInitialized)
@@ -584,7 +582,7 @@ namespace TilerFront.Controllers
 
                 
                 TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
-                scheduleChangeSocket.triggerRefreshData(myAuthorizedUser);
+                scheduleChangeSocket.triggerRefreshData(myUser.getTilerUser());
                 return Ok(myPostData.getPostBack);
             }
             throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.Unauthorized)
@@ -604,7 +602,7 @@ namespace TilerFront.Controllers
         [Route("api/Schedule/Event/Complete")]
         public async Task<IHttpActionResult> CompleteSubCalendarEvent([FromBody]getEventModel UserData)
         {
-            UserAccountDirect retrievedUser = await UserData.getUserAccountDirect();
+            UserAccountDirect retrievedUser = await UserData.getUserAccountDirect(db);
             await retrievedUser.Login();
             PostBackData retValue = new PostBackData("", 1);
             DB_UserActivity activity = new DB_UserActivity(UserData.getRefNow(), UserActivity.ActivityType.CompleteSingle);
@@ -618,8 +616,8 @@ namespace TilerFront.Controllers
                 {
                     case "google":
                         {
-                            Models.ThirdPartyCalendarAuthenticationModel AllIndexedThirdParty = await getThirdPartyAuthentication(retrievedUser.UserID, UserData.ThirdPartyUserID, 2);
-                            GoogleTilerEventControl googleControl = new GoogleTilerEventControl(AllIndexedThirdParty);
+                            Models.ThirdPartyCalendarAuthenticationModel AllIndexedThirdParty = await getThirdPartyAuthentication(retrievedUser.UserID, UserData.ThirdPartyUserID, "Google", db);
+                            GoogleTilerEventControl googleControl = new GoogleTilerEventControl(AllIndexedThirdParty, db);
                             await googleControl.deleteSubEvent(UserData).ConfigureAwait(false);
                             retValue = new PostBackData("\"Success\"", 0);
                         }
@@ -629,7 +627,7 @@ namespace TilerFront.Controllers
                             DateTimeOffset myNow = DateTimeOffset.UtcNow;
                             //myNOw = UserData.getRefNow();
                             My24HourTimerWPF.Schedule MySchedule = new My24HourTimerWPF.Schedule(retrievedUser, myNow );
-                            await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, UserData.UserID).ConfigureAwait(false);
+                            await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, UserData.UserID, db).ConfigureAwait(false);
                             activity.eventIds.Add(UserData.EventID);
                             retrievedUser.ScheduleLogControl.updateUserActivty(activity);
                             MySchedule.markSubEventAsCompleteCalendarEventAndReadjust(UserData.EventID);
@@ -642,7 +640,7 @@ namespace TilerFront.Controllers
             }
 
             TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
-            scheduleChangeSocket.triggerRefreshData();
+            scheduleChangeSocket.triggerRefreshData(retrievedUser.getTilerUser());
             return Ok(retValue.getPostBack);
         }
 
@@ -656,7 +654,7 @@ namespace TilerFront.Controllers
         [Route("api/Schedule/Events/Complete")]
         public async Task<IHttpActionResult> CompleteSubCalendarEvents([FromBody]getEventModel UserData)
         {
-            UserAccountDirect myUser = await UserData.getUserAccountDirect();
+            UserAccountDirect myUser = await UserData.getUserAccountDirect(db);
             await myUser.Login();
             DateTimeOffset myNow = DateTimeOffset.UtcNow;
             //myNow = UserData.getRefNow();
@@ -667,14 +665,14 @@ namespace TilerFront.Controllers
             activity.updateMiscelaneousInfo(json.ToString());
             activity.eventIds.AddRange(AllEventIDs);
             myUser.ScheduleLogControl.updateUserActivty(activity);
-            await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, UserData.UserID).ConfigureAwait(false);
+            await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, UserData.UserID, db).ConfigureAwait(false);
 
             
             MySchedule.markSubEventsAsComplete(AllEventIDs);
             PostBackData myPostData = new PostBackData("\"Success\"", 0);
 
             TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
-            scheduleChangeSocket.triggerRefreshData();
+            scheduleChangeSocket.triggerRefreshData(myUser.getTilerUser());
             return Ok(myPostData.getPostBack);
         }
 
@@ -689,7 +687,7 @@ namespace TilerFront.Controllers
         [Route("api/Schedule/Event/Now")]
         public async Task<IHttpActionResult> Now([FromBody]getEventModel myUser)
         {
-            UserAccountDirect retrievedUser = await myUser.getUserAccountDirect();// new UserAccountDirect(myUser.UserName, myUser.UserID);
+            UserAccountDirect retrievedUser = await myUser.getUserAccountDirect(db);// new UserAccountDirect(myUser.UserName, myUser.UserID);
             await retrievedUser.Login();
             PostBackData retValue;
             if (retrievedUser.Status)
@@ -705,7 +703,7 @@ namespace TilerFront.Controllers
 
 
 
-                await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, myUser.UserID).ConfigureAwait(false);
+                await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, myUser.UserID, db).ConfigureAwait(false);
 
                 Tuple<CustomErrors, Dictionary<string, CalendarEvent>> retValue0 = MySchedule.SetEventAsNow(myUser.EventID, true);
                 await MySchedule.UpdateWithDifferentSchedule(retValue0.Item2);
@@ -717,7 +715,7 @@ namespace TilerFront.Controllers
             }
 
             TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
-            scheduleChangeSocket.triggerRefreshData();
+            scheduleChangeSocket.triggerRefreshData(retrievedUser.getTilerUser());
             return Ok(retValue.getPostBack);
         }
 
@@ -731,14 +729,14 @@ namespace TilerFront.Controllers
         [Route("api/Schedule/Undo")]
         public async Task<IHttpActionResult> Undo([FromBody]AuthorizedUser myUser)
         {
-            UserAccountDirect retrievedUser = await myUser.getUserAccountDirect();// new UserAccountDirect(myUser.UserName, myUser.UserID);
+            UserAccountDirect retrievedUser = await myUser.getUserAccountDirect(db);// new UserAccountDirect(myUser.UserName, myUser.UserID);
             await retrievedUser.Login();
             PostBackData retValue;
             if (retrievedUser.Status)
             {
                 DB_UserActivity activity = new DB_UserActivity(DateTimeOffset.UtcNow, UserActivity.ActivityType.Undo);
                 retrievedUser.ScheduleLogControl.updateUserActivty(activity);
-                retrievedUser.ScheduleLogControl.Undo();
+                await retrievedUser.ScheduleLogControl.Undo().ConfigureAwait(false);
                 retValue = new PostBackData("\"Success\"", 0);
             }
             else
@@ -747,7 +745,7 @@ namespace TilerFront.Controllers
             }
 
             TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
-            scheduleChangeSocket.triggerRefreshData();
+            scheduleChangeSocket.triggerRefreshData(retrievedUser.getTilerUser());
             return Ok(retValue.getPostBack);
         }
 
@@ -763,7 +761,7 @@ namespace TilerFront.Controllers
         [Route("api/Schedule/Event")]
         public async Task<IHttpActionResult> DeleteEvent([FromBody]getEventModel myUser)
         {
-            UserAccountDirect retrievedUser = await myUser.getUserAccountDirect();
+            UserAccountDirect retrievedUser = await myUser.getUserAccountDirect(db);
             await retrievedUser.Login();
             PostBackData retValue= new PostBackData("", 1);
             if (retrievedUser.Status)
@@ -774,8 +772,8 @@ namespace TilerFront.Controllers
                 {
                     case "google":
                         {
-                            Models.ThirdPartyCalendarAuthenticationModel AllIndexedThirdParty = await getThirdPartyAuthentication(retrievedUser.UserID, myUser.ThirdPartyUserID, 2);
-                            GoogleTilerEventControl googleControl = new GoogleTilerEventControl(AllIndexedThirdParty);
+                            Models.ThirdPartyCalendarAuthenticationModel AllIndexedThirdParty = await getThirdPartyAuthentication(retrievedUser.UserID, myUser.ThirdPartyUserID, "Google", db);
+                            GoogleTilerEventControl googleControl = new GoogleTilerEventControl(AllIndexedThirdParty, db);
                             await googleControl.deleteSubEvent(myUser).ConfigureAwait(false);
                             retValue = new PostBackData("\"Success\"", 0);   
                         }
@@ -790,7 +788,7 @@ namespace TilerFront.Controllers
                             activity.eventIds.Add(myUser.EventID);
                             retrievedUser.ScheduleLogControl.updateUserActivty(activity);
 
-                            await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, myUser.UserID).ConfigureAwait(false);
+                            await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, myUser.UserID, db).ConfigureAwait(false);
 
                             MySchedule.deleteSubCalendarEvent(myUser.EventID);
                             retValue = new PostBackData("\"Success\"", 0);   
@@ -804,7 +802,7 @@ namespace TilerFront.Controllers
                 
             }
             TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
-            scheduleChangeSocket.triggerRefreshData();
+            scheduleChangeSocket.triggerRefreshData(retrievedUser.getTilerUser());
             return Ok(retValue.getPostBack);
         }
 
@@ -833,17 +831,17 @@ namespace TilerFront.Controllers
         [Route("api/Schedule/Events")]
         public async Task<IHttpActionResult> DeleteEvents([FromBody]getEventModel myUser)
         {
-            UserAccountDirect retrievedUser = await myUser.getUserAccountDirect();
+            UserAccountDirect retrievedUser = await myUser.getUserAccountDirect(db);
             await retrievedUser.Login();
             PostBackData retValue;
             if (retrievedUser.Status)
             {
                 My24HourTimerWPF.Schedule MySchedule = new My24HourTimerWPF.Schedule(retrievedUser, myUser.getRefNow());
-                await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, myUser.UserID).ConfigureAwait(false);
+                await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, myUser.UserID, db).ConfigureAwait(false);
                 IEnumerable<string> AllEventIDs = myUser.EventID.Split(',');
                 DB_UserActivity activity = new DB_UserActivity(myUser.getRefNow(), UserActivity.ActivityType.DeleteMultiple, AllEventIDs);
                 retrievedUser.ScheduleLogControl.updateUserActivty(activity);
-                MySchedule.deleteSubCalendarEvents(AllEventIDs);
+                await MySchedule.deleteSubCalendarEvents(AllEventIDs);
                 retValue = new PostBackData("\"Success\"", 0);
             }
             else
@@ -851,7 +849,7 @@ namespace TilerFront.Controllers
                 retValue = new PostBackData("", 1);
             }
             TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
-            scheduleChangeSocket.triggerRefreshData();
+            scheduleChangeSocket.triggerRefreshData(retrievedUser.getTilerUser());
             return Ok(retValue.getPostBack);
         }
 
@@ -886,7 +884,7 @@ namespace TilerFront.Controllers
             string GColor = newEvent.GColor;
             string Opacity = newEvent.Opacity;
             string ColorSelection = newEvent.ColorSelection;
-            string Count = newEvent.Count; ;
+            int Count = Convert.ToInt32(newEvent.Count??1.ToString()) ;
             string DurationDays = newEvent.DurationDays; ;
             string DurationHours = newEvent.DurationHours; ;
             string DurationMins = newEvent.DurationMins; ;
@@ -929,7 +927,7 @@ namespace TilerFront.Controllers
             DateTimeOffset EndDateEntry = new DateTimeOffset(Convert.ToInt32(EndYear), Convert.ToInt32(EndMonth), Convert.ToInt32(EndDay), 0, 0, 0, new TimeSpan());
 
             TimeSpan fullTimeSpan = new TimeSpan(Convert.ToInt32(DurationDays), Convert.ToInt32(DurationHours), Convert.ToInt32(DurationMins), 0);
-            string EventDuration = TimeSpan.FromSeconds(fullTimeSpan.TotalSeconds * Convert.ToInt32(Count)).ToString();
+            TimeSpan EventDuration = TimeSpan.FromSeconds(fullTimeSpan.TotalSeconds * Convert.ToInt32(Count));
 
             bool RigidScheduleFlag = Convert.ToBoolean(Rigid);
             Location_Elements EventLocation = new Location_Elements(LocationAddress, LocationTag);
@@ -947,12 +945,11 @@ namespace TilerFront.Controllers
                 DateTimeOffset FullEndTime = new DateTimeOffset(EndDateEntry.Year, EndDateEntry.Month, EndDateEntry.Day, Convert.ToInt32(EndTime.Split(':')[0]), Convert.ToInt32(EndTime.Split(':')[1]), 0, new TimeSpan());// DateTimeOffset.Parse(EndDateEntry + " " + EndTime);
                 FullStartTime = FullStartTime.Add(newEvent.getTImeSpan);
                 FullEndTime = FullEndTime.Add(newEvent.getTImeSpan);
-                EventDuration = (FullEndTime - FullStartTime).ToString();
+                EventDuration = (FullEndTime - FullStartTime);
                 restrictionFlag = false;
             }
 
             
-
             if (!string.IsNullOrEmpty(RepeatType))
             {
                 
@@ -1011,10 +1008,10 @@ namespace TilerFront.Controllers
 
             
 
-            UserAccountDirect myUser = await newEvent.getUserAccountDirect();
+            UserAccountDirect myUser = await newEvent.getUserAccountDirect(db);
             PostBackData retValue;
             await myUser.Login();
-
+            TilerUser tilerUser = myUser.getTilerUser();
             Task HoldUpForWriteNewEvent;
             Task CommitChangesToSchedule;
             if (myUser.Status)
@@ -1036,7 +1033,7 @@ namespace TilerFront.Controllers
 
 
                     //RestrictionProfile myRestrictionProfile = CreateRestrictionProfile(newEvent.RestrictionStart, newEvent.RestrictionEnd, newEvent.isWorkWeek, newEvent.getTImeSpan);
-                    newCalendarEvent = new CalendarEventRestricted( Name, StartDateTime, EndDateTime, myRestrictionProfile, TimeSpan.Parse(EventDuration), MyRepetition, false, true, Convert.ToInt32(Count), RigidScheduleFlag, EventLocation, new TimeSpan(0, 15, 0), new TimeSpan(0, 15, 0), new EventDisplay(true, userColor, userColor.User < 1 ? 0 : 1), new MiscData());
+                    newCalendarEvent = new CalendarEventRestricted( Name, StartDateTime, EndDateTime, myRestrictionProfile, EventDuration, MyRepetition, false, true, Count, RigidScheduleFlag, EventLocation, new TimeSpan(0, 15, 0), new TimeSpan(0, 15, 0),null, new EventDisplay(true, userColor, userColor.User < 1 ? 0 : 1), new MiscData());
                 }
                 else
                 {
@@ -1044,13 +1041,23 @@ namespace TilerFront.Controllers
                     StartData = StartData.Add(newEvent.getTImeSpan);
                     DateTimeOffset EndData = DateTimeOffset.Parse(EndTime + " " + EndDateEntry.Date.ToShortDateString()).UtcDateTime;
                     EndData = EndData.Add(newEvent.getTImeSpan);
-                    newCalendarEvent = new CalendarEvent(Name, StartData, EndData, Count, "", EventDuration, MyRepetition, true, RigidScheduleFlag, "", true, EventLocation, true, new EventDisplay(true, userColor, userColor.User < 1 ? 0 : 1), new MiscData(), false);
+                    if (RigidScheduleFlag) {
+                        newCalendarEvent = new RigidCalendarEvent(//EventID.GenerateCalendarEvent(), 
+                            Name, StartData, EndData, EventDuration,new TimeSpan(), new TimeSpan(), MyRepetition, EventLocation,  new EventDisplay(true, userColor, userColor.User < 1 ? 0 : 1), new MiscData(), true,false, tilerUser, new TilerUserGroup(), TimeZone, null);
+                    }
+                    else
+                    {
+                        newCalendarEvent = new CalendarEvent(//EventID.GenerateCalendarEvent(), 
+                            Name, StartData, EndData, EventDuration, new TimeSpan(), new TimeSpan(), Count, MyRepetition, EventLocation, new EventDisplay(true, userColor, userColor.User < 1 ? 0 : 1), new MiscData(), null, new NowProfile(), true, false, tilerUser, new TilerUserGroup(), TimeZone, null);
+                    }
+                    
+                    //newCalendarEvent = new CalendarEvent(Name, StartData, EndData, Count, "", EventDuration, MyRepetition, true, RigidScheduleFlag, "", true, EventLocation, true, new EventDisplay(true, userColor, userColor.User < 1 ? 0 : 1), new MiscData(), false);
                 }
                 Task DoInitializeClassification=newCalendarEvent.InitializeClassification();
                 
                 My24HourTimerWPF.Schedule MySchedule = new My24HourTimerWPF.Schedule(myUser, myNow);
 
-                await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, myUser.UserID).ConfigureAwait(false);
+                await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, myUser.UserID, db).ConfigureAwait(false);
 
                 await DoInitializeClassification;
                 newCalendarEvent.Repeat.PopulateRepetitionParameters(newCalendarEvent);
@@ -1067,7 +1074,8 @@ namespace TilerFront.Controllers
                 
 
                 CustomErrors userError = newCalendarEvent.Error;
-                retValue = new PostBackData(newCalendarEvent.ActiveSubEvents.First().ToSubCalEvent(newCalendarEvent), userError.Code);
+                int errorCode = userError?.Code ?? 0;
+                retValue = new PostBackData(newCalendarEvent.ActiveSubEvents.First().ToSubCalEvent(newCalendarEvent), errorCode);
                 
             }
             else
@@ -1075,7 +1083,7 @@ namespace TilerFront.Controllers
                 retValue = new PostBackData("", 1);
             }
             TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
-            scheduleChangeSocket.triggerRefreshData();
+            scheduleChangeSocket.triggerRefreshData(myUser.getTilerUser());
             return Ok(retValue.getPostBack);
         }
 
@@ -1096,9 +1104,9 @@ namespace TilerFront.Controllers
             {
                 DateTimeOffset myNow = newEvent.getRefNow();
                 myNow = DateTimeOffset.UtcNow;
-                UserAccount RetrievedUser = await newEvent.getUserAccountDirect().ConfigureAwait(false);
+                UserAccount RetrievedUser = await newEvent.getUserAccountDirect(db).ConfigureAwait(false);
                 My24HourTimerWPF.Schedule MySchedule = new My24HourTimerWPF.Schedule(RetrievedUser, myNow);
-                await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, RetrievedUser.UserID).ConfigureAwait(false);
+                await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, RetrievedUser.UserID, db).ConfigureAwait(false);
                 await MySchedule.UpdateScheduleDueToExternalChanges().ConfigureAwait(false);
                 retValue = new PostBackData("\"Success\"", 0);
             }
@@ -1126,7 +1134,7 @@ namespace TilerFront.Controllers
             string GColor = newEvent.GColor;
             string Opacity = newEvent.Opacity;
             string ColorSelection = newEvent.ColorSelection;
-            string Count = newEvent.Count; ;
+            int Count = Convert.ToInt32(newEvent.Count ?? 1.ToString());
             string DurationDays = newEvent.DurationDays; ;
             string DurationHours = newEvent.DurationHours; ;
             string DurationMins = newEvent.DurationMins; ;
@@ -1156,6 +1164,7 @@ namespace TilerFront.Controllers
             string StartMonth = newEvent.StartMonth; ;
             string StartYear = newEvent.StartYear; ;
             string RepeatFrequency = newEvent.RepeatFrequency; ;
+            string TimeZone = newEvent.TimeZone;
 
 
             string restrictionPreference = newEvent.isRestricted;
@@ -1169,7 +1178,7 @@ namespace TilerFront.Controllers
             DateTimeOffset EndDateEntry = new DateTimeOffset(Convert.ToInt32(EndYear), Convert.ToInt32(EndMonth), Convert.ToInt32(EndDay), 0, 0, 0, new TimeSpan());
 
             TimeSpan fullTimeSpan = new TimeSpan(Convert.ToInt32(DurationDays), Convert.ToInt32(DurationHours), Convert.ToInt32(DurationMins), 0);
-            string EventDuration = TimeSpan.FromSeconds(fullTimeSpan.TotalSeconds * Convert.ToInt32(Count)).ToString();
+            TimeSpan EventDuration = TimeSpan.FromSeconds(fullTimeSpan.TotalSeconds * Convert.ToInt32(Count));
 
             bool RigidScheduleFlag = Convert.ToBoolean(Rigid);
             TilerElements.Location_Elements EventLocation = new TilerElements.Location_Elements(LocationAddress, LocationTag);
@@ -1187,7 +1196,7 @@ namespace TilerFront.Controllers
                 DateTimeOffset FullEndTime = new DateTimeOffset(EndDateEntry.Year, EndDateEntry.Month, EndDateEntry.Day, Convert.ToInt32(EndTime.Split(':')[0]), Convert.ToInt32(EndTime.Split(':')[1]), 0, new TimeSpan());// DateTimeOffset.Parse(EndDateEntry + " " + EndTime);
                 FullStartTime = FullStartTime.Add(newEvent.getTImeSpan);
                 FullEndTime = FullEndTime.Add(newEvent.getTImeSpan);
-                EventDuration = (FullEndTime - FullStartTime).ToString();
+                EventDuration = (FullEndTime - FullStartTime);
             }
 
             if (!string.IsNullOrEmpty(RepeatType))
@@ -1245,9 +1254,11 @@ namespace TilerFront.Controllers
                 EndDateEntry = RepeatEnd;
             }
 
-            UserAccountDirect myUser = await newEvent.getUserAccountDirect();
+            UserAccountDirect myUser = await newEvent.getUserAccountDirect(db);
             PostBackData retValue;
             await myUser.Login();
+
+            TilerUser tilerUser = myUser.getTilerUser();
 
             Task HoldUpForWriteNewEvent;
             Task CommitChangesToSchedule;
@@ -1256,7 +1267,7 @@ namespace TilerFront.Controllers
                 DateTimeOffset myNow = newEvent.getRefNow();
                 myNow = DateTimeOffset.UtcNow;
                 My24HourTimerWPF.Schedule MySchedule = new My24HourTimerWPF.Schedule(myUser, myNow);
-                await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, myUser.UserID).ConfigureAwait(false);
+                await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, myUser.UserID, db).ConfigureAwait(false);
 
                 CalendarEvent newCalendarEvent;
                 RestrictionProfile myRestrictionProfile = newEvent.getRestrictionProfile();
@@ -1268,10 +1279,7 @@ namespace TilerFront.Controllers
                     TimeString = EndDateEntry.Date.ToShortDateString() + " " + EndTime;
                     DateTimeOffset EndDateTime = DateTimeOffset.Parse(TimeString).UtcDateTime;
                     EndDateTime = EndDateTime.Add(newEvent.getTImeSpan);
-
-
-                    // CreateRestrictionProfile(newEvent.RestrictionStart, newEvent.RestrictionEnd, newEvent.isWorkWeek, newEvent.getTImeSpan);
-                    newCalendarEvent = new CalendarEventRestricted(Name, StartDateTime, EndDateTime, myRestrictionProfile, TimeSpan.Parse(EventDuration), MyRepetition, false, true, Convert.ToInt32(Count), RigidScheduleFlag, new Location_Elements(), new TimeSpan(0, 15, 0), new TimeSpan(0, 15, 0), new EventDisplay(true, userColor, userColor.User < 1 ? 0 : 1), new MiscData());
+                    newCalendarEvent = new CalendarEventRestricted(Name, StartDateTime, EndDateTime, myRestrictionProfile, EventDuration, MyRepetition, false, true, Count, RigidScheduleFlag, new Location_Elements(), new TimeSpan(0, 15, 0), new TimeSpan(0, 15, 0), null, new EventDisplay(true, userColor, userColor.User < 1 ? 0 : 1), new MiscData());
                 }
                 else
                 {
@@ -1279,7 +1287,16 @@ namespace TilerFront.Controllers
                     StartData = StartData.Add(newEvent.getTImeSpan);
                     DateTimeOffset EndData = DateTimeOffset.Parse(EndTime + " " + EndDateEntry.Date.ToShortDateString()).UtcDateTime;
                     EndData = EndData.Add(newEvent.getTImeSpan);
-                    newCalendarEvent = new CalendarEvent(Name, StartData, EndData, Count, "", EventDuration, MyRepetition, true, RigidScheduleFlag, "", true, EventLocation, true, new EventDisplay(true, userColor, userColor.User < 1 ? 0 : 1), new MiscData(), false);
+                    if (RigidScheduleFlag)
+                    {
+                        newCalendarEvent = new RigidCalendarEvent(//EventID.GenerateCalendarEvent(), 
+                            Name, StartData, EndData, EventDuration, new TimeSpan(), new TimeSpan(), MyRepetition, EventLocation, new EventDisplay(true, userColor, userColor.User < 1 ? 0 : 1), new MiscData(), true, false, tilerUser, new TilerUserGroup(), TimeZone, null);
+                    }
+                    else
+                    {
+                        newCalendarEvent = new CalendarEvent(//EventID.GenerateCalendarEvent(), 
+                            Name, StartData, EndData, EventDuration, new TimeSpan(), new TimeSpan(), Count, MyRepetition, EventLocation, new EventDisplay(true, userColor, userColor.User < 1 ? 0 : 1), new MiscData(), null, new NowProfile(), true, false, tilerUser, new TilerUserGroup(), TimeZone, null);
+                    }
                 }
 
 
@@ -1307,7 +1324,8 @@ namespace TilerFront.Controllers
                 PeekResult peekData = new PeekResult(peekingEvents.Item1, peekingEvents.Item2, peekingEvents.Item3);
                 
                 CustomErrors userError = newCalendarEvent.Error;
-                retValue = new PostBackData(peekData, userError.Code);
+                int errorCode = userError?.Code ?? 0;
+                retValue = new PostBackData(peekData, errorCode);
 
             }
             else

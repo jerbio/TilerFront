@@ -117,10 +117,6 @@ namespace TilerFront.Models
         public string isEveryDay { get; set; }
         public RestrictionWeekConfig RestrictiveWeek { get; set; }
         /// <summary>
-        /// TimeZone desired by the user. This defaults to UTC
-        /// </summary>
-        public string TimeZone { get; set; }
-        /// <summary>
         /// The timezone of the location where the request is received. This defaults to UTC
         /// </summary>
         public string TimeZoneOrigin { get; set; } = "UTC";

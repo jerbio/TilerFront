@@ -21,10 +21,10 @@ using DBTilerElement;
 namespace TilerFront.Controllers
 {
     //[EnableCors(origins: "*", headers: "accept, authorization, origin", methods: "DELETE,PUT,POST,GET")]
-    public class UserController : ApiController
+    public class UserController : TilerApiController
     {
         //private TilerFrontContext db = new TilerFrontContext();
-        private ApplicationDbContext db = new ApplicationDbContext();
+        //private ApplicationDbContext db = new ApplicationDbContext();
         
         // GET api/User
         [NonAction]
@@ -162,7 +162,7 @@ namespace TilerFront.Controllers
         [Route("api/User/Location")]
         public async Task<IHttpActionResult> Location([FromUri]NameSearchModel SearchData)
         {
-            UserAccountDirect retrievedUser = await SearchData.getUserAccountDirect();
+            UserAccountDirect retrievedUser = await SearchData.getUserAccountDirect(db);
             await retrievedUser.Login();
 
             PostBackData retValue = new PostBackData("", 4);

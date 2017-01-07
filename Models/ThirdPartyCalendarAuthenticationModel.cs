@@ -11,6 +11,7 @@ using Google.Apis.Auth.OAuth2;
 using Google.Apis.Oauth2.v2;
 using System.Data.Entity;
 using DBTilerElement;
+using TilerElements;
 
 namespace TilerFront.Models
 {
@@ -26,9 +27,18 @@ namespace TilerFront.Models
         public string Email { get; set; }
         public string Token { get; set; }
         public string RefreshToken { get; set; }
+        protected string _ProviderID { get; set; }
         [Key]
         [Column(Order = 3)]
-        public int ProviderID { get; set; }
+        public string ProviderID {
+            get {
+                return _ProviderID;
+            }
+            set {
+                ThirdPartyControl.CalendarTool calendarType = Utility.ParseEnum<ThirdPartyControl.CalendarTool>(value.ToLower());
+                _ProviderID = calendarType.ToString();
+            }
+        }
         public DateTimeOffset Deadline { get; set; }
 
         /// <summary>
@@ -37,10 +47,22 @@ namespace TilerFront.Models
         /// <returns></returns>
         public ThirdPartyAuthenticationForView getThirdPartyOut()
         {
-            ThirdPartyAuthenticationForView RetValue = new ThirdPartyAuthenticationForView() { Email = this.Email, ProviderName =TilerElementExtension. ProviderNames[this.ProviderID],ID=this.ID };
+            ThirdPartyAuthenticationForView RetValue = new ThirdPartyAuthenticationForView() { Email = this.Email, ProviderName =this.ProviderID, ID=this.ID };
             return RetValue;
         }
 
+
+        public DB_TilerUser getTilerUser()
+        {
+            DB_TilerUser retValue = new DB_TilerUser()
+            {
+                CalendarType = this.ProviderID,
+                Id = TilerID,
+                isNull = false,
+                ThirdPartyId = Email
+            };
+            return retValue;
+        }
         /// <summary>
         /// function generates the google oauth credentials
         /// </summary>
@@ -84,13 +106,12 @@ namespace TilerFront.Models
 
 
         //refreshes the token credentials and updates tiler DB with the data
-        async public Task<bool> refreshAndCommitToken()
+        async public Task<bool> refreshAndCommitToken(ApplicationDbContext db)
         {
             bool RetValue =await refreshAuthenticationToken().ConfigureAwait(false);
             if (RetValue)
             {
                 Object[] Param = { this.TilerID, this.Email, this.ProviderID };
-                ApplicationDbContext db = new ApplicationDbContext();
                 ThirdPartyCalendarAuthenticationModel checkingThirdPartyCalendarAuthentication = await db.ThirdPartyAuthentication.FindAsync(Param);
                 if (checkingThirdPartyCalendarAuthentication != null)
                 {

@@ -11,6 +11,10 @@ namespace TilerFront.Models
     {
         public bool MobileFlag { get; set; }
         public int TimeZoneOffset { get; set; }
+        /// <summary>
+        /// TimeZone desired by the user. This defaults to UTC
+        /// </summary>
+        public string TimeZone { get; set; } = "UTC";
         protected DateTimeOffset refNow = DateTimeOffset.UtcNow;
         public TimeSpan getTImeSpan
         {
@@ -27,20 +31,9 @@ namespace TilerFront.Models
             return refNow;
         }
 
-        async public Task<UserAccountDirect> getUserAccountDirect(bool Passive=true)
+        async public Task<UserAccountDirect> getUserAccountDirect(ApplicationDbContext db)
         {
-            Controllers.UserController myUserController = new Controllers.UserController();
-            TilerUser User ;
-
-            if (Passive)
-            {
-                User = new TilerUser() { UserName = UserName, Id = UserID,FullName="" };
-            }
-            else
-            {
-                User = await myUserController.GetUser(UserID, UserName);
-            }
-            return new UserAccountDirect(User, Passive);
+            return new UserAccountDirect(UserID, db);
         }
 
         async public Task<UserAccountDebug> getUserAccountDebug(bool Passive = true)
@@ -56,7 +49,7 @@ namespace TilerFront.Models
             {
                 User = await myUserController.GetUser(UserID, UserName);
             }
-            return new UserAccountDebug(User, Passive);
+            return new UserAccountDebug(User);
         }
     }
 }

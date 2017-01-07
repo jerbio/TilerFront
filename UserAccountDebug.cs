@@ -8,16 +8,28 @@ namespace TilerFront
 {
     public class UserAccountDebug:UserAccountDirect
     {
-        public UserAccountDebug(TilerUser user, bool Passive = false)
+        public UserAccountDebug(TilerUser user)
         {
-            sessionUser = user;
-            UserLog = new LogControlDebug(user, "", Passive);
-            ID = sessionUser.Id;
+            UserLog = new LogControlDebug(user, "");
+            ID = SessionUser.Id;
         }
         protected override async System.Threading.Tasks.Task<DateTimeOffset> getDayReferenceTime(string desiredDirectory = "")
         {
 
             return await base.getDayReferenceTimeFromXml(desiredDirectory);
+        }
+
+        public override async System.Threading.Tasks.Task<bool> Login()
+        {
+            HttpContext ctx = HttpContext.Current;
+            if (ctx != null)
+            {
+                await UserLog.Initialize();
+            }
+
+
+            bool retValue = UserLog.Status && (SessionUser != null);
+            return retValue;
         }
 
         /*

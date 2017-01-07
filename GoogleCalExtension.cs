@@ -24,7 +24,7 @@ namespace TilerFront
         {
             SubCalEvent retValue = new SubCalEvent();
             retValue.ThirdPartyEventID = myEvent.Id;
-            retValue.ThirdPartyType = TilerElementExtension.ProviderNames[(int)ThirdPartyControl.CalendarTool.Google];
+            retValue.ThirdPartyType = ThirdPartyControl.CalendarTool.google.ToString();
             retValue.ThirdPartyUserID = myEvent.Organizer.Email;
             EventID SubEVentID = EventID.generateRepeatGoogleSubCalendarEventID(CalendarID, CurrentCount);
             retValue.ID = SubEVentID.ToString();
@@ -62,7 +62,7 @@ namespace TilerFront
         {
             SubCalEvent retValue = new SubCalEvent();
             retValue.ThirdPartyEventID = myEvent.Id;
-            retValue.ThirdPartyType = TilerElementExtension.ProviderNames[(int)ThirdPartyControl.CalendarTool.Google];
+            retValue.ThirdPartyType = ThirdPartyControl.CalendarTool.google.ToString();
             retValue.ThirdPartyUserID = myEvent.Organizer.Email;
 
 

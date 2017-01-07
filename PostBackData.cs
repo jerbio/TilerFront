@@ -55,8 +55,14 @@ namespace TilerFront
 
         public PostBackData(CustomErrors Error)
         {
-            Data = Error.Message;
-            Status = Error.Code;
+            Status = 0;
+            Data = "Success";
+            if (Error != null)
+            {
+                Data = Error.Message;
+                Status = Error.Code;
+            }
+            
         }
 
         public PostBackData(dynamic DataEntry, int StatusEntry)

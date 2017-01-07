@@ -13,17 +13,18 @@ using Google.Apis.Calendar.v3.Data;
 using Google.Apis.Services;
 using Google.Apis.Plus.v1;
 using Google.Apis.Plus.v1.Data;
+using TilerFront.Models;
 
 namespace TilerFront
 {
     public class GoogleTilerEventControl
     {
-
+        ApplicationDbContext db;
         CalendarService CalendarServiceInfo;
         TilerFront.Models.ThirdPartyCalendarAuthenticationModel AuthenticationInfo;
         string EmailID;
 
-        public GoogleTilerEventControl(TilerFront.Models.ThirdPartyCalendarAuthenticationModel AuthenticationCredential)
+        public GoogleTilerEventControl(TilerFront.Models.ThirdPartyCalendarAuthenticationModel AuthenticationCredential, ApplicationDbContext db)
         {
             CalendarServiceInfo = new Google.Apis.Calendar.v3.CalendarService(new BaseClientService.Initializer
             {
@@ -33,6 +34,7 @@ namespace TilerFront
             AuthenticationInfo = AuthenticationCredential;
 
             EmailID = AuthenticationCredential.Email;
+            this.db = db;
         }
 
 
@@ -121,7 +123,7 @@ namespace TilerFront
             {
                 try
                 {
-                    if(await AuthenticationInfo.refreshAndCommitToken().ConfigureAwait(false))
+                    if(await AuthenticationInfo.refreshAndCommitToken(db).ConfigureAwait(false))
                     {
                         RetValue =await getGoogleEvents().ConfigureAwait(false);
                     }

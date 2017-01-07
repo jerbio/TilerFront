@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.AspNet.Identity;
 using TilerElements;
+using TilerFront.Models;
 #if ForceReadFromXml
 #else
 using CassandraUserLog;
@@ -26,42 +27,29 @@ namespace TilerFront
     public class LogControlDirect:LogControl
     {
         Tuple<bool, string, DateTimeOffset, long> ScheduleMetadata;
-        //public static bool useCassandra=false;
-        TilerUser SessionUser;
-        bool PassiveInitialization = false;
         bool forcedLogin = false;
         public LogControlDirect()
         {
             ScheduleMetadata = new Tuple<bool, string, DateTimeOffset, long>(false, "", new DateTimeOffset(), 0);
             //useCassandra=false;
-            SessionUser= new TilerUser();
+//            SessionUser= new TilerUser();
         }
-        public LogControlDirect(TilerUser User, string logLocation="", bool Passive=false)
+        public LogControlDirect(TilerUser User, ApplicationDbContext database, string logLocation="")
         {
             if (!string.IsNullOrEmpty(logLocation))
             {
                 WagTapLogLocation = logLocation;
             }
-            PassiveInitialization = Passive;
-            SessionUser = User;
+            _TilerUser = User;
             LogStatus = false;
             CachedLocation = new Dictionary<string, Location_Elements>();
+            Database = database;
+            CurrentLog = _TilerUser.Id.ToString() + ".xml";
+            LogStatus = true;
+            ID = _TilerUser.Id;
+            UserName = _TilerUser.UserName;
+                
             
-            if ((PassiveInitialization)&&(SessionUser!=null))
-            {
-#if ForceReadFromXml
-#else
-                if (useCassandra)
-                {
-                    myCassandraAccess = new CassandraUserLog.CassandraLog(SessionUser.Id);
-                }
-#endif      
-                CurrentLog = SessionUser.Id.ToString() + ".xml";
-                LogStatus = true;
-                ID = SessionUser.Id;
-                UserName = SessionUser.UserName;
-                LogDBDataAccess = new DBControlDirect(User.Id,User.UserName);
-            }
         }
 
         public async Task<TilerUser> forceLogin()
@@ -69,13 +57,13 @@ namespace TilerFront
             TilerUser retValue = null;
             
             
-            if (SessionUser != null)
+            if (_TilerUser != null)
             {
                 HttpContext myContext = HttpContext.Current;
                 ApplicationUserManager UserManager = myContext.GetOwinContext().GetUserManager<ApplicationUserManager>();
                 try
                 {
-                    retValue = await UserManager.FindByIdAsync(SessionUser.Id).ConfigureAwait(false);
+                    retValue = await UserManager.FindByIdAsync(_TilerUser.Id).ConfigureAwait(false);
                     forcedLogin = true;
                 }
                 catch (Exception e)
@@ -92,53 +80,9 @@ namespace TilerFront
         #region Functions
         override async public Task Initialize()
         {
-#if ForceReadFromXml
-#else
-            myCassandraAccess = new CassandraUserLog.CassandraLog(ID);
-#endif      
-            if (PassiveInitialization)
             {
-                return;
-            }
-            CurrentLog = "";
 
-            if (SessionUser == null)
-            {
-                return;
-            }
-            if (true)
-            {
-                Tuple<bool, string, string> VerifiedUser = LogDBDataAccess.LogIn();
-                CurrentLog = SessionUser.Id.ToString() + ".xml";
-                string LogDir = (WagTapLogLocation + CurrentLog);
-                string myCurrDir = Directory.GetCurrentDirectory();
-                Console.WriteLine("Log DIR is:" + LogDir);
-                LogStatus = File.Exists(LogDir);
-#if ForceReadFromXml
-
-#else
-                Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, Location_Elements>> tempProfileData = await getProfileInfo();
-                LogDBDataAccess.CreateLatestChange(this.ID, new DateTimeOffset(), Convert.ToInt64(LastIDNumber));
-                Tuple<bool, string, DateTimeOffset, long> resultofLatestChange = await LogDBDataAccess.getLatestChanges(VerifiedUser.Item2);
-                myCassandraAccess.BatchMigrateXMLToCassandra(this);
-#endif
-            }
-            else
-            {
-                    
-#if ForceReadFromXml
-                CurrentLog = SessionUser.Id.ToString() + ".xml";
-                string LogDir = (WagTapLogLocation + CurrentLog);
-                string myCurrDir = Directory.GetCurrentDirectory();
-                Console.WriteLine("Log DIR is:" + LogDir);
-                LogStatus = File.Exists(LogDir);
-#else
-                LogStatus = true;
-                //LastIDNumber = resultofLatestChange.Item4.ToString();
-                useCassandra = true;
-#endif
-
-                //ScheduleMetadata = resultofLatestChange;
+                await base.Initialize().ConfigureAwait(false);
             }
         }
 
@@ -174,8 +118,8 @@ namespace TilerFront
 
         public CustomErrors genereateNewLogFile(string UserID)//creates a new xml log file. Uses the passed UserID
         {
-            
-            CustomErrors retValue = new CustomErrors(false, "success");
+
+            CustomErrors retValue = null;
 #if ForceReadFromXml
 #else
             if (useCassandra)
@@ -201,7 +145,7 @@ namespace TilerFront
             }
             catch (Exception e)
             {
-                retValue = new CustomErrors(true, "Error generating log\n" + e.ToString(), 20000000);
+                retValue = new CustomErrors("Error generating log\n" + e.ToString(), 20000000);
             }
 
             return retValue;
@@ -210,7 +154,7 @@ namespace TilerFront
 
         public async Task<CustomErrors> DeleteLog()
         {
-            CustomErrors retValue = new CustomErrors(false, "Success");
+            CustomErrors retValue = null;
             await Initialize().ConfigureAwait(false);
             try
             {
@@ -219,7 +163,7 @@ namespace TilerFront
             }
             catch (Exception e)
             {
-                retValue = new CustomErrors(true, e.ToString(), 20002000);
+                retValue = new CustomErrors(e.ToString(), 20002000);
             }
 
             return retValue;
@@ -229,9 +173,9 @@ namespace TilerFront
         {
             if(!forcedLogin)
             {
-                SessionUser = await forceLogin().ConfigureAwait(false);
+                _TilerUser = await forceLogin().ConfigureAwait(false);
             }
-            DateTimeOffset retValue = new DateTimeOffset(SessionUser.LastChange);
+            DateTimeOffset retValue = _TilerUser.LastChange;
             //retValue = new DateTimeOffset(2015, 4, 5, 22, 0, 0, new TimeSpan());
             return retValue;
         }
@@ -432,7 +376,7 @@ namespace TilerFront
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Name"));
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.Name.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("ID"));
-            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.Id;
+            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.getId;
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Enabled"));
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.isEnabled.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Location"));
@@ -1157,24 +1101,24 @@ namespace TilerFront
             }
         }
 
-        public bool Status
+        public override bool Status
         {
             get
             {
-                return LogStatus;
+                return LogStatus && _TilerUser != null;
             }
         }
 
-        public string  LoggedUserID
+        public override string  LoggedUserID
         {
             get
             {
-                return SessionUser.Id;
+                return _TilerUser.Id;
             }
         }
 
 
-        public string getFullLogDir
+        override public string getFullLogDir
         {
             get
             {
@@ -1183,7 +1127,7 @@ namespace TilerFront
 
         }
 
-        public Location_Elements defaultLocation
+        override public Location_Elements defaultLocation
         {
             get
             {
@@ -1191,11 +1135,11 @@ namespace TilerFront
             }
         }
 
-        public string Usersname
+        override public string Usersname
         {
             get
             {
-                return SessionUser.FullName;
+                return _TilerUser.FullName;
             }
         }
 

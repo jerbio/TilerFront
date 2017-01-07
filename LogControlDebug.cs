@@ -16,9 +16,8 @@ namespace TilerFront
             UserID = userid;
         }
         */
-        public LogControlDebug(TilerUser User, string logLocation="", bool Passive=false):base(User,logLocation,Passive)
+        public LogControlDebug(TilerUser User, string logLocation=""):base(User, null,logLocation)
         {
-            
         }
 
 
@@ -27,5 +26,13 @@ namespace TilerFront
             return await base.getDayReferenceTimeFromXml(NameOfFile);
         }
 
+
+        public override bool Status
+        {
+            get
+            {
+                return LogStatus;
+            }
+        }
     }
 }

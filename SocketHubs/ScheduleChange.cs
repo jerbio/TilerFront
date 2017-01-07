@@ -27,17 +27,9 @@ namespace TilerFront.SocketHubs
 
         }
 
-        public void triggerRefreshData(Models.AuthorizedUser tilerUser = null) {
-            
-            string who = "";
-            if (tilerUser != null)
-            {
-                who = tilerUser.UserID;
-            }
-            else
-            {
-                who = HttpContext.Current.User.Identity.GetUserId();
-            }
+        public void triggerRefreshData(TilerUser tilerUser ) {
+
+            string who = tilerUser.Id;
             
             var context = Microsoft.AspNet.SignalR.GlobalHost.ConnectionManager.GetHubContext<TilerFront.SocketHubs.ScheduleChange>();
             dynamic triggerRefreshRequest = new JObject();
