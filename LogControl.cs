@@ -1796,14 +1796,14 @@ namespace TilerFront
 
         public Reason getOccupancyReason(XmlNode ReasonNode)
         {
-            DurationReason result = new DurationReason();
+            DurationReason result = new DurationReason(new TimeSpan());
             return result;
         }
 
 
         public Reason getRestrictedEventReason(XmlNode ReasonNode)
         {
-            RestrictedEventReason result = new RestrictedEventReason();
+            RestrictedEventReason result = new RestrictedEventReason(new RestrictionProfile(new DateTimeOffset(), new TimeSpan()));
             return result;
         }
         
@@ -2218,7 +2218,7 @@ namespace TilerFront
 
         public CalendarEvent getCalendarEventWithID(string ID)
         {
-            TimeLine RangeOfLookup = new TimeLine(DateTimeOffset.Now.AddYears(-1000), DateTimeOffset.Now.AddYears(1000));
+            TimeLine RangeOfLookup = new TimeLine(DateTimeOffset.UtcNow.AddYears(-1000), DateTimeOffset.UtcNow.AddYears(1000));
             Dictionary<string, CalendarEvent> AllScheduleData = getAllCalendarFromXml(RangeOfLookup);
             CalendarEvent retValue = null;
             if (AllScheduleData.ContainsKey(ID))
@@ -2240,7 +2240,7 @@ namespace TilerFront
             }
 #endif
 
-            TimeLine RangeOfLookup = new TimeLine(DateTimeOffset.Now.AddYears(-1000), DateTimeOffset.Now.AddYears(1000));
+            TimeLine RangeOfLookup = new TimeLine(DateTimeOffset.UtcNow.AddYears(-1000), DateTimeOffset.UtcNow.AddYears(1000));
             Dictionary<string, CalendarEvent> AllScheduleData = getAllCalendarFromXml(RangeOfLookup);
             
             Name = Name.ToLower();
@@ -2265,7 +2265,7 @@ namespace TilerFront
                 return retValue;
             }
 #endif
-            TimeLine RangeOfLookup = new TimeLine(DateTimeOffset.Now.AddYears(-1000), DateTimeOffset.Now.AddYears(1000));
+            TimeLine RangeOfLookup = new TimeLine(DateTimeOffset.UtcNow.AddYears(-1000), DateTimeOffset.UtcNow.AddYears(1000));
             CachedLocation = await getLocationCache().ConfigureAwait(false); ;
             
 
@@ -2339,7 +2339,7 @@ namespace TilerFront
             //getLocationCache
             if (RangeOfLookup == null)
             {
-                RangeOfLookup = new TimeLine(DateTimeOffset.Now.AddYears(-10), DateTimeOffset.Now.AddYears(10));
+                RangeOfLookup = new TimeLine(DateTimeOffset.UtcNow.AddYears(-10), DateTimeOffset.UtcNow.AddYears(10));
             }
 
             Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, Location_Elements>> retValue;

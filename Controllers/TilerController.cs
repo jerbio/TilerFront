@@ -64,8 +64,7 @@ namespace TilerFront
             {
                 retrievedUser.ClearAllId = user.ClearAllId;
             }
-            retrievedUser.LastChange = DateTime.UtcNow;
-            retrievedUser.LastChange = retrievedUser.LastChange;
+            retrievedUser.LastScheduleModification = DateTime.UtcNow;
             Task waitForDbSave = null;
             if (!string.IsNullOrEmpty(retrievedUser.PasswordHash))
             {

@@ -312,7 +312,7 @@ namespace TilerFront.Controllers
                 int Min=Convert.ToInt32(model.TimeZoneOffSet);
                 TimeSpan OffSet = TimeSpan.FromMinutes(Min);
                 DateTimeOffset EndOfDay = new DateTimeOffset(2014, 1, 1, 22, 0, 0, OffSet);
-                var user = new TilerUser { UserName = model.Username, Email = model.Email, FullName = model.FullName, LastChange = EndOfDay.UtcDateTime};
+                var user = new TilerUser { UserName = model.Username, Email = model.Email, FullName = model.FullName, EndfOfDay = EndOfDay.UtcDateTime};
                 var logGenerationresult = await generateLog(user);
                 //var result = logGenerationresult.Item1;
                 //if (result.Succeeded)
@@ -322,28 +322,6 @@ namespace TilerFront.Controllers
                     if (result.Succeeded)
                     {
                         await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
-                        /*
-                        if (logGenerationresult.Item2 > 0)
-                        {
-                            string CurrentLogLocation = LogControl.getLogLocation();
-                            DBControl newDB = new DBControl(model.Username, logGenerationresult.Item2);
-                            LogControl OldLog = new LogControl(newDB);
-                            string OldLogLocation = BundleConfig.OldLog;
-                            LogControl.UpdateLogLocation(OldLogLocation);
-                            UserAccount OldUserAccount = new UserAccount(model.Username, logGenerationresult.Item2);
-                            await OldUserAccount.Login();
-                            newDB.deleteUser();
-                            await OldUserAccount.DeleteLog();
-                            LogControl.UpdateLogLocation(CurrentLogLocation);
-                        }
-                        
-                        string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
-                        var callbackUrl = Url.Action("ConfirmEmail", "Account",
-                           new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-                        await UserManager.SendEmailAsync(user.Id,
-                           "Confirm your account", "Please confirm your account by clicking <a href=\""
-                           + callbackUrl + "\">here </a>");
-                        */
                         Task SendEmail = SendEmailConfirmationAsync(user.Id, "Please Confirm Your Tiler Account!");
                         await SendEmail.ConfigureAwait(false);
 
@@ -385,7 +363,7 @@ namespace TilerFront.Controllers
                 int Min = Convert.ToInt32(model.TimeZoneOffSet);
                 TimeSpan OffSet = TimeSpan.FromMinutes(Min);
                 DateTimeOffset EndOfDay = new DateTimeOffset(2014, 1, 1, 22, 0, 0, OffSet);
-                var user = new TilerUser { UserName = model.Username, Email = model.Email, FullName = model.FullName, LastChange = EndOfDay.UtcDateTime };
+                var user = new TilerUser { UserName = model.Username, Email = model.Email, FullName = model.FullName, EndfOfDay = EndOfDay.UtcDateTime };
                 var logGenerationresult = await generateLog(user);
                 var result = logGenerationresult.Item1;
                 if (result.Succeeded)
@@ -395,29 +373,6 @@ namespace TilerFront.Controllers
                     if (result.Succeeded)
                     {
                         await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
-                        /*
-                        if (logGenerationresult.Item2 > 0)
-                        {
-                            string CurrentLogLocation = LogControl.getLogLocation();
-                            DBControl newDB = new DBControl(model.Username, logGenerationresult.Item2);
-                            LogControl OldLog = new LogControl(newDB);
-                            string OldLogLocation = BundleConfig.OldLog;
-                            LogControl.UpdateLogLocation(OldLogLocation);
-                            UserAccount OldUserAccount = new UserAccount(model.Username, logGenerationresult.Item2);
-                            await OldUserAccount.Login();
-                            newDB.deleteUser();
-                            await OldUserAccount.DeleteLog();
-                            LogControl.UpdateLogLocation(CurrentLogLocation);
-                        }
-                        */
-                        /*
-                        string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
-                        var callbackUrl = Url.Action("ConfirmEmail", "Account",
-                           new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-                        await UserManager.SendEmailAsync(user.Id,
-                           "Confirm your account", "Please confirm your account by clicking <a href=\""
-                           + callbackUrl + "\">here </a>");*/
-
                         Task SendEmail = SendEmailConfirmationAsync(user.Id, "Please Confirm Your Tiler Account!");
                         await SendEmail.ConfigureAwait(false);
 
@@ -463,39 +418,10 @@ namespace TilerFront.Controllers
 
         async Task<Tuple<IdentityResult,int>> generateLog(TilerUser model)
         {
-            Tuple<bool, int> ExistInOldDB = DBControl.doesUserExistInOldDB(model.UserName);
             string CurrentLogLocation = LogControl.getLogLocation();
             bool NewLogCreationSuccess=false;
             Tuple<IdentityResult, int> retValue;
             int OldID = -1;
-            if (ExistInOldDB.Item1)
-            {
-                /*
-                OldID = ExistInOldDB.Item2;
-                DBControl newDB = new DBControl(model.UserName, model.PasswordHash);
-                LogControl OldLog = new LogControl(newDB);
-
-                
-                string OldLogLocation = BundleConfig.OldLog;
-                LogControl.UpdateLogLocation(OldLogLocation);
-                UserAccount OldUserAccount = new UserAccount(model.UserName, ExistInOldDB.Item2);
-                await OldUserAccount.Login();
-                ///*
-                if (OldUserAccount.Status)
-                {
-                    Task<Tuple<Dictionary<string, TilerElements.CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location_Elements>>> Task_profileData = OldUserAccount.ScheduleData.getProfileInfo();
-                    Tuple<Dictionary<string, TilerElements.CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location_Elements>> profileData = await Task_profileData;
-                    //OldUserAccount.DeleteLog();
-
-                    LogControlDirect newLog = new LogControlDirect(model, CurrentLogLocation);
-                    newLog.genereateNewLogFile(model.Id);
-                    newLog.UpdateReferenceDay(profileData.Item2);
-                    NewLogCreationSuccess = await newLog.WriteToLog(profileData.Item1.Values, OldUserAccount.LastEventTopNodeID.ToString());
-                }
-                
-                //*/
-            }
-            else
             {
                 UserAccountDirect newUser = new UserAccountDirect(model.Id, db);
                 LogControlDirect newLog = new LogControlDirect(model, db, CurrentLogLocation);
@@ -804,7 +730,7 @@ namespace TilerFront.Controllers
                 {
                     return View("ExternalLoginFailure");
                 }
-                var user = new TilerUser { UserName = model.Email, Email = model.Email, FullName = info.ExternalIdentity.Name, LastChange = DateTime.Now };
+                var user = new TilerUser { UserName = model.Email, Email = model.Email, FullName = info.ExternalIdentity.Name, EndfOfDay = DateTime.Now };
 
 
                 var result = await UserManager.CreateAsync(user);

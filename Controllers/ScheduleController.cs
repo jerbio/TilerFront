@@ -1000,7 +1000,7 @@ namespace TilerFront.Controllers
                 }
 
                 
-                //RepeatEnd = (DateTimeOffset.Now).AddDays(7);
+                //RepeatEnd = (DateTimeOffset.UtcNow).AddDays(7);
                 RepetitionFlag = true;
                 MyRepetition = new Repetition(RepetitionFlag, new TimeLine(RepeatStart, RepeatEnd), RepeatFrequency, new TimeLine(FullStartTime, FullEndTime), selectedDaysOftheweek);
                 EndDateEntry = MyRepetition.Range.End > EndDateEntry ? MyRepetition.Range.End : EndDateEntry;
@@ -1248,7 +1248,7 @@ namespace TilerFront.Controllers
                 }
 
 
-                //RepeatEnd = (DateTimeOffset.Now).AddDays(7);
+                //RepeatEnd = (DateTimeOffset.UtcNow).AddDays(7);
                 RepetitionFlag = true;
                 MyRepetition = new Repetition(RepetitionFlag, new TimeLine(RepeatStart, RepeatEnd), RepeatFrequency, new TimeLine(FullStartTime, FullEndTime), selectedDaysOftheweek);
                 EndDateEntry = RepeatEnd;

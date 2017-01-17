@@ -272,7 +272,7 @@ namespace TilerFront.Controllers
         public ActionResult ChangeStartOfDay()
         {
             TilerUser myUser = UserManager.FindById(User.Identity.GetUserId());
-            long Milliseconds = (long)(myUser.LastChange.AddDays(10) - TilerElementExtension.JSStartTime).TotalMilliseconds;
+            long Milliseconds = (long)(myUser.EndfOfDay.AddDays(10) - TilerElementExtension.JSStartTime).TotalMilliseconds;
             var model = new ChangeStartOfDayModel
             {
                 TimeOfDay = Milliseconds.ToString()
@@ -305,7 +305,7 @@ namespace TilerFront.Controllers
                 TilerUser myUser = await UserManager.FindByIdAsync(User.Identity.GetUserId());
                 TimeSpan OffSetSpan= TimeSpan.FromMinutes(Convert.ToInt32( model.TimeZoneOffSet));
                 TimeOfDay = TimeOfDay.ToOffset(OffSetSpan);
-                myUser.LastChange=TimeOfDay.DateTime;
+                myUser.EndfOfDay=TimeOfDay.DateTime;
                 result= await UserManager.UpdateAsync(myUser);
             }
 
@@ -388,41 +388,6 @@ namespace TilerFront.Controllers
                         ;
                     }
                     return RedirectToAction("ImportCalendar");
-                    /*
-                    try
-                    {
-                        Object[] Param = { thirdPartyCalendarAuthentication.TilerID, thirdPartyCalendarAuthentication.Email, thirdPartyCalendarAuthentication.ProviderID };
-                        ThirdPartyCalendarAuthenticationModel checkingThirdPartyCalendarAuthentication = await db.ThirdPartyAuthentication.FindAsync(Param);
-                        if (checkingThirdPartyCalendarAuthentication != null)
-                        {
-                            checkingThirdPartyCalendarAuthentication.ID = thirdPartyCalendarAuthentication.ID;
-                            checkingThirdPartyCalendarAuthentication.Token = thirdPartyCalendarAuthentication.Token;
-                            checkingThirdPartyCalendarAuthentication.RefreshToken = thirdPartyCalendarAuthentication.RefreshToken;
-                            checkingThirdPartyCalendarAuthentication.Deadline = thirdPartyCalendarAuthentication.Deadline;
-                            db.Entry(checkingThirdPartyCalendarAuthentication).State = EntityState.Modified;
-                            await db.SaveChangesAsync().ConfigureAwait(false);
-                        }
-                        else
-                        {
-                            db.ThirdPartyAuthentication.Add(thirdPartyCalendarAuthentication);
-                            await db.SaveChangesAsync();
-                            //RedirectToAction()
-
-                            //Object ParamS = new {TilerID= thirdPartyCalendarAuthentication.TilerID,Email= thirdPartyCalendarAuthentication.Email,Provider = thirdPartyCalendarAuthentication.ProviderID };
-
-                            //return RedirectToAction("Authenticate", "ThirdPartyCalendarAuthenticationModels", ParamS);
-
-                            if(!(await SendRequestForGoogleNotification(thirdPartyCalendarAuthentication).ConfigureAwait(false)))
-                            {
-                                await deleteGoogleAccount(thirdPartyCalendarAuthentication.getThirdPartyOut()).ConfigureAwait(false);
-                            }
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        ;
-                    }
-                    */
                 }
                 else 
                 {
@@ -439,62 +404,6 @@ namespace TilerFront.Controllers
             return View("ImportCalendar");
         }
 
-        /*
-        public async Task<bool> SendRequestForGoogleNotification(ThirdPartyCalendarAuthenticationModel AuthenticationData)
-        {
-            bool RetValue = false;
-            HttpContext Ctx = System.Web.HttpContext.Current;
-            try
-            {
-
-                var url = string.Format
-                (
-                    "https://www.googleapis.com/calendar/v3/calendars/{0}/events/watch",
-                    AuthenticationData.Email 
-                );
-                //url = "https://mytilerkid.azurewebsites.net/api/GoogleNotification/Trigger";
-                var httpWebRequest = HttpWebRequest.Create(url) as HttpWebRequest;
-                httpWebRequest.Headers["Authorization"] =
-                    string.Format("Bearer {0}", AuthenticationData.Token);
-                httpWebRequest.Method = "POST";
-                // added the character set to the content-type as per David's suggestion
-                httpWebRequest.ContentType = "application/json; charset=UTF-8";
-                httpWebRequest.CookieContainer = new CookieContainer();
-
-                // replaced Environment.Newline by CRLF as per David's suggestion
-                GoogleNotificationRequestModel NotificationRequest = AuthenticationData.getGoogleNotificationCredentials(Ctx.Request.Url.Authority);
-
-                var requestText = JsonConvert.SerializeObject(NotificationRequest);
-
-                using (var stream = httpWebRequest.GetRequestStream())
-                // replaced Encoding.UTF8 by new UTF8Encoding(false) to avoid the byte order mark
-                using (var streamWriter = new System.IO.StreamWriter(stream, new UTF8Encoding(false)))
-                {
-                    streamWriter.Write(requestText);
-                    streamWriter.Flush();
-                    streamWriter.Close();
-                }
-
-                var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
-                using (var streamReader = new System.IO.StreamReader(httpResponse.GetResponseStream()))
-                {
-                    string result = streamReader.ReadToEnd();
-                    GoogleNotificationWatchResponseModel NotificationResponse = JsonConvert.DeserializeObject<GoogleNotificationWatchResponseModel>(result);
-                    db.GoogleNotificationCredentials.Add(NotificationResponse);
-                    await db.SaveChangesAsync().ConfigureAwait(false);
-                }
-                RetValue = true;
-
-
-            }
-            catch (Exception E)
-            {
-                Console.WriteLine(E.Message);
-            }
-
-            return RetValue;
-        }
-        //*/
         async public Task<ActionResult> ImportGoogle(CancellationToken cancellationToken)
         {
             string UserID = User.Identity.GetUserId();
@@ -571,49 +480,6 @@ namespace TilerFront.Controllers
                 return new RedirectResult(result.RedirectUri);
             }
         }
-
-        /*
-
-        private async Task<BaseClientService.Initializer> GetCredentials()
-        {
-            ClientSecrets secrets = new ClientSecrets
-            {
-                ClientId = "518133740160-i5ie6s4h802048gujtmui1do8h2lqlfj.apps.googleusercontent.com",
-                ClientSecret = "NKRal5rA8NM5qHnmiigU6kWh"
-            };
-
-            String[] SCOPES = new[] { CalendarService.Scope.Calendar, CalendarService.Scope.CalendarReadonly };
-
-            IDataStore credentialPersistanceStore = getPersistentCredentialStore();
-
-            UserCredential credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(secrets,
-                    SCOPES, getUserId(), CancellationToken.None, credentialPersistanceStore);
-
-            BaseClientService.Initializer initializer = new BaseClientService.Initializer
-            {
-                HttpClientInitializer = credential,
-                ApplicationName = "TilerWebZy"
-            };
-
-            return initializer;
-        }
-
-        private String getUserId()
-        {
-            // TODO: Generate a unique user ID within your system for this user. The credential
-            // data store will use this as a key to look up saved credentials.
-            return User.Identity.GetUserId();
-        }
-
-        /// <summary> Returns a persistent data store for user's credentials. </summary>
-        private  IDataStore getPersistentCredentialStore()
-        {
-            // TODO: This uses a local file store to cache credentials. You should replace this with
-            // the appropriate IDataStore for your application.
-            return new FileDataStore("Drive.Sample.Credentals");
-        }
-        */
-
 #endregion
 
         //
