@@ -1194,6 +1194,13 @@
             <param name="userGroupNode">xml node with formated user group</param>
             <returns></returns>
         </member>
+        <member name="M:TilerFront.LogControl.getDayReferenceTime(System.String)">
+            <summary>
+            Function gets the end of the day of the specified user.
+            </summary>
+            <param name="NameOfFile"></param>
+            <returns></returns>
+        </member>
         <member name="M:TilerFront.LogControl.getRestrictionTimeLine(System.Xml.XmlNode)">
             <summary>
             Funciton returns aall the possible active restriction timelines for the restriciton profile

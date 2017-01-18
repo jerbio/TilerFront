@@ -176,7 +176,6 @@ namespace TilerFront
                 _TilerUser = await forceLogin().ConfigureAwait(false);
             }
             DateTimeOffset retValue = _TilerUser.EndfOfDay;
-            //retValue = new DateTimeOffset(2015, 4, 5, 22, 0, 0, new TimeSpan());
             return retValue;
         }
 

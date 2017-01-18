@@ -1371,22 +1371,16 @@ namespace TilerFront
             }
         }
 
+        /// <summary>
+        /// Function gets the end of the day of the specified user.
+        /// </summary>
+        /// <param name="NameOfFile"></param>
+        /// <returns></returns>
         virtual public async Task<DateTimeOffset> getDayReferenceTime(string NameOfFile = "")
         {
-#if ForceReadFromXml
-#else
-            if (useCassandra)
-            {
-#if LocalDebug
-                return new DateTimeOffset(1970, 1, 1, 16, 0, 0, new TimeSpan());
-#else
-                return SessionUser.LastChange;
-#endif
-            }
-#endif       
             XmlDocument doc = getLogDataStore(NameOfFile);
             XmlNode node = doc.DocumentElement.SelectSingleNode("/ScheduleLog/referenceDay");
-            DateTimeOffset retValue = DateTimeOffset.Parse(node.InnerText).UtcDateTime;
+            DateTimeOffset retValue = _TilerUser.EndfOfDay;
 
             return retValue;
         }

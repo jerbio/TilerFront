@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.IO;
 using TilerElements;
+using System.Threading.Tasks;
 
 namespace TilerFront
 {
@@ -21,11 +22,11 @@ namespace TilerFront
         }
 
 
-        public override async System.Threading.Tasks.Task<DateTimeOffset> getDayReferenceTime(string NameOfFile = "")
+        async public override Task<DateTimeOffset> getDayReferenceTime(string NameOfFile = "")
         {
-            return await base.getDayReferenceTimeFromXml(NameOfFile);
+            DateTimeOffset retValue = _TilerUser.EndfOfDay;
+            return retValue;
         }
-
 
         public override bool Status
         {

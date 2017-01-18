@@ -63,14 +63,6 @@ namespace TilerFront
         }
 
 
-        async protected Task<DateTimeOffset> getDayReferenceTimeFromXml(string desiredDirectory = "")
-        {
-
-            DateTimeOffset retValue = await ((LogControlDirect)UserLog).getDayReferenceTimeFromXml(desiredDirectory);
-            return retValue;
-        }
-
-
         async public Task<CustomErrors> Register(TilerUser user)
         {
             CustomErrors retValue = UserLog.genereateNewLogFile(user.Id);

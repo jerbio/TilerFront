@@ -13,11 +13,6 @@ namespace TilerFront
             UserLog = new LogControlDebug(user, "");
             ID = SessionUser.Id;
         }
-        protected override async System.Threading.Tasks.Task<DateTimeOffset> getDayReferenceTime(string desiredDirectory = "")
-        {
-
-            return await base.getDayReferenceTimeFromXml(desiredDirectory);
-        }
 
         public override async System.Threading.Tasks.Task<bool> Login()
         {
