@@ -201,6 +201,33 @@ body {
     background-repeat:no-repeat;
 }
 
+.EventDeadlineColorImage
+{
+    position: relative;
+    width: 10px;
+    height: 10px;
+    margin-right: 0;
+    padding-right: 0;
+    left: 3px;
+    border-radius: 5px;
+}
+
+.PastDeadline.EventDeadlineColorImage {
+    background-color: rgb(40,40,40);
+}
+
+.OneDay.EventDeadlineColorImage {
+    background-color: rgb(200, 10, 10);
+}
+
+.ThreeDay.EventDeadlineColorImage {
+    background-color: darkorange;
+}
+
+.MoreThanThreeDay.EventDeadlineColorImage {
+    background-color: rgb(10, 200, 10);
+}
+
 .ActiveEventProcrastination /*media*/
 {
     position: absolute;

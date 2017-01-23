@@ -271,7 +271,27 @@ function RenderTimeInformationClassic(DayOfWeek, ID) {
         
         $(EventLockImgContainer.Dom).addClass("LockedIcon");
     }
-    
+
+    let EventDeadlineColorContainer = getDomOrCreateNew("EventDeadlineColorContainer" + ID);
+    $(EventDeadlineColorContainer.Dom).addClass("EventDeadlineColorContainer");
+    let EventDeadlineColorImage = getDomOrCreateNew("EventDeadlineColorImage" + ID);
+    EventDeadlineColorContainer.Dom.appendChild(EventDeadlineColorImage.Dom);
+    let refTime = (RefSubEvent.SubCalCalEventEnd).getTime()
+    var pastDeadlineColor = Date.now() > refTime
+    $(EventDeadlineColorImage.Dom).removeClass("PastDeadline OneDay ThreeDay MoreThanThreeDay");
+    let span = refTime - Date.now()
+    if (span < 0) {
+        $(EventDeadlineColorImage.Dom).addClass("PastDeadline EventDeadlineColorImage");
+    } else if (span < OneDayInMs) {
+        $(EventDeadlineColorImage.Dom).addClass("OneDay EventDeadlineColorImage");
+    } else if (span < (OneDayInMs * 3)) {
+        $(EventDeadlineColorImage.Dom).addClass("ThreeDay EventDeadlineColorImage");
+    } else {
+        $(EventDeadlineColorImage.Dom).addClass("MoreThanThreeDay EventDeadlineColorImage");
+    }
+    EventLockContainer.Dom.appendChild(EventDeadlineColorContainer.Dom);
+
+
     ListElementContainer.Dom.appendChild(ListElementDataContentContainer.Dom);
     
 
@@ -331,11 +351,6 @@ function ResetClassicUIEffects()
 function RenderListTimeInformation(DayOfWeek, ID)
 {
     var RefSubEvent = global_DictionaryOfSubEvents[ID];
-    /*
-    if (DayOfWeek.Start.getTime() == new Date(2015, 4, 23, 0, 0, 0, 0).getTime()) {
-        debugger;
-    }
-    */
 
     var TopPixels = ((DayOfWeek.UISpecs[ID].css.top / 100) * global_DayHeight) + global_DayTop;
     var ListElementContainer = getDomOrCreateNew("SubEventReference" + ID);
@@ -410,8 +425,28 @@ function RenderListTimeInformation(DayOfWeek, ID)
     if (myBool) {
         $(EventLockImgContainer.Dom).addClass("LockedIcon");
     }
+    
+    let EventDeadlineColorContainer = getDomOrCreateNew("EventDeadlineColorContainer" + ID);
+    $(EventDeadlineColorContainer.Dom).addClass("EventDeadlineColorContainer");
+    let EventDeadlineColorImage = getDomOrCreateNew("EventDeadlineColorImage" + ID);
+    $(EventDeadlineColorImage.Dom).removeClass("PastDeadline OneDay ThreeDay MoreThanThreeDay");
+    EventDeadlineColorContainer.Dom.appendChild(EventDeadlineColorImage.Dom);
+    let refTime = (RefSubEvent.SubCalCalEventEnd).getTime()
+    var pastDeadlineColor = Date.now() > refTime
+    let span = refTime - Date.now() 
+    if (span < 0) {
+        $(EventDeadlineColorImage.Dom).addClass("PastDeadline EventDeadlineColorImage");
+    } else if (span < OneDayInMs) {
+        $(EventDeadlineColorImage.Dom).addClass("OneDay EventDeadlineColorImage");
+    } else if (span < (OneDayInMs * 3)) {
+        $(EventDeadlineColorImage.Dom).addClass("ThreeDay EventDeadlineColorImage");
+    } else {
+        $(EventDeadlineColorImage.Dom).addClass("MoreThanThreeDay EventDeadlineColorImage");
+    }
+
     EventLockContainer.Dom.appendChild(EventLockImgContainer.Dom)
     EventLockContainer.Dom.appendChild(CalendarTypeContainer.Dom);
+    EventLockContainer.Dom.appendChild(EventDeadlineColorContainer.Dom);
 
 
     ListElementContainer.Dom.appendChild(EventLockContainer.Dom);
