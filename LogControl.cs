@@ -38,9 +38,9 @@ namespace TilerFront
         protected string CurrentLog;
         protected bool LogStatus;
         protected bool UpdateLocaitionCache = false;
-        protected Dictionary<string, Location_Elements> CachedLocation;
-        protected Location_Elements DefaultLocation= new Location_Elements();
-        protected Location_Elements NewLocation;
+        protected Dictionary<string, TilerElements.Location> CachedLocation;
+        protected TilerElements.Location DefaultLocation= new TilerElements.Location();
+        protected TilerElements.Location NewLocation;
         protected DB_UserActivity activity;
         Dictionary<string, Func<XmlNode, Reason>> createDictionaryOfOPtionToFunction;
         protected TilerUser _TilerUser;
@@ -71,7 +71,7 @@ namespace TilerFront
             NameSearcher = new EventNameSearchHandler();
             LocationSearcher = new LocationSearchHandler();
 #endif
-            Dictionary<string, Location_Elements> CachedLocation = new Dictionary<string, Location_Elements>();
+            Dictionary<string, TilerElements.Location> CachedLocation = new Dictionary<string, TilerElements.Location>();
 
             createDictionaryOfOPtionToFunction = new Dictionary<string, Func<XmlNode, Reason>>
             {
@@ -81,8 +81,6 @@ namespace TilerFront
                 {Reason.Options.CloseToCluster.ToString(), (XmlNode node)=> { return  getLocationReason(node); } },
                 {Reason.Options.Occupancy.ToString(), (XmlNode node)=> { return  getOccupancyReason(node); } },
                 {Reason.Options.RestrictedEvent.ToString(), (XmlNode node)=> { return  getRestrictedEventReason(node); } }
-                
-
             };
         }
 
@@ -108,7 +106,7 @@ namespace TilerFront
             }
             //LogDBDataAccess = DBAccess;
             LogStatus = false;
-            CachedLocation = new Dictionary<string, Location_Elements>();
+            CachedLocation = new Dictionary<string, TilerElements.Location>();
             _TilerUser = user;
             Database = database;
         }
@@ -460,7 +458,7 @@ namespace TilerFront
 
             xmldocCopy.InnerXml = xmldoc.InnerXml;
             CachedLocation = await getLocationCache().ConfigureAwait(false); ;//populates with current location info
-            Dictionary<string, Location_Elements> OldLocationCache = new Dictionary<string, Location_Elements>(CachedLocation);
+            Dictionary<string, TilerElements.Location> OldLocationCache = new Dictionary<string, TilerElements.Location>(CachedLocation);
             xmldoc.DocumentElement.SelectSingleNode("/ScheduleLog/LastIDCounter").InnerText = LatestID;
             XmlNodeList EventSchedulesNodes = xmldoc.DocumentElement.SelectNodes("/ScheduleLog/EventSchedules");
             
@@ -536,7 +534,7 @@ namespace TilerFront
 
             if(errorWritingFile)
             {
-                throw new Exception("Error wrtiting file" + ErrorEvent.Name);
+                throw new Exception("Error wrtiting file" + ErrorEvent.getName);
             }
 
             return await retValue.ConfigureAwait(false); ;
@@ -545,12 +543,12 @@ namespace TilerFront
         /// updates the logcontrol with a possible new location
         /// </summary>
         /// <param name="NewLocation"></param>
-        public void updateNewLocation(Location_Elements NewLocation)
+        public void updateNewLocation(TilerElements.Location NewLocation)
         {
             this.NewLocation = NewLocation;
         }
 
-        public void UpdateCacheLocation(XmlDocument xmldoc, Dictionary<string, Location_Elements> currentCache, Location_Elements NewLocation )
+        public void UpdateCacheLocation(XmlDocument xmldoc, Dictionary<string, TilerElements.Location> currentCache, TilerElements.Location NewLocation )
         {
             XmlNode LocationCacheNode = xmldoc.DocumentElement.SelectSingleNode("/ScheduleLog/LocationCache");
             if (LocationCacheNode == null)
@@ -567,7 +565,7 @@ namespace TilerFront
 
 
            
-            foreach (KeyValuePair<string, Location_Elements> eachKeyValuePair in CachedLocation)
+            foreach (KeyValuePair<string, TilerElements.Location> eachKeyValuePair in CachedLocation)
             {
                 if (!currentCache.ContainsKey(eachKeyValuePair.Key))
                 {
@@ -607,9 +605,9 @@ namespace TilerFront
             }
         }
 
-        public bool isLocationIsDifferent(Location_Elements OldLocation, Location_Elements NewLocation)
+        public bool isLocationIsDifferent(TilerElements.Location OldLocation, TilerElements.Location NewLocation)
         {
-            double newDistance = Location_Elements.calculateDistance(OldLocation, NewLocation);
+            double newDistance = TilerElements.Location.calculateDistance(OldLocation, NewLocation);
             bool retValue = newDistance >= 0.5;
             return retValue;
         }
@@ -642,17 +640,17 @@ namespace TilerFront
             return retValue;
         }
 
-        virtual public XmlNode updateLocationNode(Location_Elements Location, XmlDocument DocNode = null)
+        virtual public XmlNode updateLocationNode(TilerElements.Location Location, XmlDocument DocNode = null)
         {
             XmlNode OldNode = getLocationNodeByTagName(Location.Description, DocNode);
-            Location_Elements OldLocation;
+            TilerElements.Location OldLocation;
             if(OldNode != null)
             {
                 OldLocation = getLocation(OldNode);
             }
             else
             {
-                OldLocation = new Location_Elements();
+                OldLocation = new TilerElements.Location();
             }
             
 
@@ -745,22 +743,22 @@ namespace TilerFront
 
             XmlElement MyEventScheduleNode = xmldoc.CreateElement("EventSchedule");
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Completed"));
-            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.isComplete.ToString();
+            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.getIsComplete.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("RepetitionFlag"));
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.RepetitionStatus.ToString();
 
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("EventSubSchedules"));
             //MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.Repetition.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("RigidFlag"));
-            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.Rigid.ToString();
+            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.getRigid.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Duration"));
-            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.ActiveDuration.ToString();
+            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.getActiveDuration.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Split"));
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.NumberOfSplit.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Deadline"));
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.End.UtcDateTime.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("PrepTime"));
-            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.Preparation.ToString();
+            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.getPreparation.ToString();
             //MyEventScheduleNode.PrependChild(xmldoc.CreateElement("PreDeadlineFlag"));
             //MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.Pre.ToString();
             
@@ -770,13 +768,13 @@ namespace TilerFront
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.DeletionCount.ToString();
 
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("PreDeadline"));
-            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.PreDeadline.ToString();
+            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.getPreDeadline.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("StartTime"));
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.Start.UtcDateTime.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Name"));
-            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.Name.NameValue.ToString();
+            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.getName.NameValue.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("NameId"));
-            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.Name.NameId.ToString();
+            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.getName.NameId.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("ID"));
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.getId;
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Enabled"));
@@ -784,19 +782,19 @@ namespace TilerFront
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Location"));
             MyEventScheduleNode.ChildNodes[0].InnerXml = CreateLocationNode(MyEvent.myLocation, "EventScheduleLocation").InnerXml;
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("UIParams"));
-            MyEventScheduleNode.ChildNodes[0].InnerXml = createDisplayUINode(MyEvent.UIParam, "UIParams").InnerXml;
+            MyEventScheduleNode.ChildNodes[0].InnerXml = createDisplayUINode(MyEvent.getUIParam, "UIParams").InnerXml;
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("MiscData"));
             MyEventScheduleNode.ChildNodes[0].InnerXml = createMiscDataNode(MyEvent.Notes, "MiscData").InnerXml;
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Restricted"));
-            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.isEventRestricted.ToString();
+            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.getIsEventRestricted.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("NowProfile"));
-            MyEventScheduleNode.ChildNodes[0].InnerXml = (generateNowProfileNode(MyEvent.NowInfo).InnerXml);
+            MyEventScheduleNode.ChildNodes[0].InnerXml = (generateNowProfileNode(MyEvent.getNowInfo).InnerXml);
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("ProcrastinationProfile"));
-            MyEventScheduleNode.ChildNodes[0].InnerXml = (generateProcrastinationNode(MyEvent.ProcrastinationInfo).InnerXml);
+            MyEventScheduleNode.ChildNodes[0].InnerXml = (generateProcrastinationNode(MyEvent.getProcrastinationInfo).InnerXml);
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("isProcrastinateEvent"));
-            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.isProcrastinateCalendarEvent.ToString();
+            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.getIsProcrastinateCalendarEvent.ToString();
 
-            if (MyEvent.isEventRestricted)
+            if (MyEvent.getIsEventRestricted)
             {
                 CalendarEventRestricted restrictedMyEvent = (CalendarEventRestricted)MyEvent;
                 XmlElement restrictionProfileData = generateXMLRestrictionProfile(restrictedMyEvent.RetrictionInfo);
@@ -943,15 +941,15 @@ namespace TilerFront
             StartTime = StartTime.removeSecondsAndMilliseconds();
             DateTimeOffset EndTime = MySubEvent.End;
             EndTime = EndTime.removeSecondsAndMilliseconds();
-            TimeSpan EventTimeSpan = MySubEvent.ActiveDuration;
+            TimeSpan EventTimeSpan = MySubEvent.getActiveDuration;
 
-            if ((!string.IsNullOrEmpty(MySubEvent.myLocation.Description)) || (!MySubEvent.myLocation.isNull))
+            if ((!string.IsNullOrEmpty(MySubEvent.Location.Description)) || (!MySubEvent.Location.isNull))
             {
-                string TaggedLocation = MySubEvent.myLocation.Description;
+                string TaggedLocation = MySubEvent.Location.Description;
                 TaggedLocation = TaggedLocation.ToLower();
                 if (!CachedLocation.ContainsKey(TaggedLocation))
                 {
-                    CachedLocation.Add(TaggedLocation, MySubEvent.myLocation);
+                    CachedLocation.Add(TaggedLocation, MySubEvent.Location);
                 }
 
             }
@@ -971,26 +969,26 @@ namespace TilerFront
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("ActiveStartTime"));
             MyEventSubScheduleNode.ChildNodes[0].InnerText = StartTime.UtcDateTime.ToString();
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("PrepTime"));
-            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.Preparation.ToString();
+            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.getPreparation.ToString();
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("ThirdPartyID"));
             MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.ThirdPartyID;
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("Rigid"));
-            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.Rigid.ToString();
+            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.getRigid.ToString();
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("ID"));
             MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.getId;
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("Enabled"));
             MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.isEnabled.ToString();
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("Complete"));
-            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.isComplete.ToString();
+            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.getIsComplete.ToString();
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("Name"));
-            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.Name.NameValue.ToString();
+            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.getName.NameValue.ToString();
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("NameId"));
-            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.Name.NameId.ToString();
+            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.getName.NameId.ToString();
 
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("Location"));
-            MyEventSubScheduleNode.ChildNodes[0].InnerXml = CreateLocationNode(MySubEvent.myLocation, "EventSubScheduleLocation").InnerXml;
+            MyEventSubScheduleNode.ChildNodes[0].InnerXml = CreateLocationNode(MySubEvent.Location, "EventSubScheduleLocation").InnerXml;
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("UIParams"));
-            MyEventSubScheduleNode.ChildNodes[0].InnerXml = createDisplayUINode(MySubEvent.UIParam, "UIParams").InnerXml;
+            MyEventSubScheduleNode.ChildNodes[0].InnerXml = createDisplayUINode(MySubEvent.getUIParam, "UIParams").InnerXml;
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("MiscData"));
             MyEventSubScheduleNode.ChildNodes[0].InnerXml = createMiscDataNode(MySubEvent.Notes, "MiscData").InnerXml;
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("ConflictProfile"));
@@ -998,12 +996,12 @@ namespace TilerFront
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("TimePositionReasons"));
             MyEventSubScheduleNode.ChildNodes[0].InnerXml = ReasonForPosition(MySubEvent.ReasonsForPosiition.SelectMany(obj => obj.Value).ToList(), "TimePositionReasons").InnerXml;
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("Restricted"));
-            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.isEventRestricted.ToString();
+            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.getIsEventRestricted.ToString();
             MyEventSubScheduleNode.PrependChild(CreatePauseUsedUpNode(MySubEvent, xmldoc));
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("isProcrastinateEvent"));
-            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.isProcrastinateCalendarEvent.ToString();
+            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.getIsProcrastinateCalendarEvent.ToString();
 
-            if (MySubEvent.isEventRestricted)
+            if (MySubEvent.getIsEventRestricted)
             {
                 restrictedMySub = (SubCalendarEventRestricted)MySubEvent;
                 XmlElement restrictionProfileData =  generateXMLRestrictionProfile(restrictedMySub.RetrictionInfo);
@@ -1045,7 +1043,7 @@ namespace TilerFront
             return retValue;
         }
 
-        public XmlElement CreateLocationNode(Location_Elements Arg1, string Identifier = "Location")
+        public XmlElement CreateLocationNode(TilerElements.Location Arg1, string Identifier = "Location")
         {
             XmlDocument xmldoc = new XmlDocument();
             XmlElement var1 = xmldoc.CreateElement(Identifier);
@@ -1424,9 +1422,9 @@ namespace TilerFront
             return doc;
         }
 
-        async protected Task<Dictionary<string, Location_Elements>> getLocationCache(string NameOfFile = "")
+        async protected Task<Dictionary<string, TilerElements.Location>> getLocationCache(string NameOfFile = "")
         {
-            Dictionary<string, Location_Elements> retValue = new Dictionary<string, Location_Elements>();
+            Dictionary<string, TilerElements.Location> retValue = new Dictionary<string, TilerElements.Location>();
 #if ForceReadFromXml
 #else
             if (useCassandra)
@@ -1450,7 +1448,7 @@ namespace TilerFront
             XmlNodeList AllLocationNodes = node.SelectNodes("Locations/Location");
             foreach (XmlNode eachXmlNode in AllLocationNodes)
             {
-                Location_Elements myLocation = generateLocationObjectFromNode(eachXmlNode);
+                TilerElements.Location myLocation = generateLocationObjectFromNode(eachXmlNode);
 
                 if (myLocation != null)
                 {
@@ -1620,7 +1618,7 @@ namespace TilerFront
 
             //MainWindow.CreateSchedule("","",new DateTimeOffset(),"",new DateTimeOffset(),"","","",true,true,true,"",false);
 
-            Location_Elements var3 = getLocation(EventScheduleNode);
+            TilerElements.Location var3 = getLocation(EventScheduleNode);
             MiscData noteData = getMiscData(EventScheduleNode);
             EventDisplay UiData = getDisplayUINode(EventScheduleNode);
             Procrastination procrastinationData = generateProcrastinationObject(EventScheduleNode);
@@ -1707,7 +1705,7 @@ namespace TilerFront
             }
             else
             {
-                CompleteCount = RetrievedEvent.AllSubEvents.Where(obj => obj.isComplete).Count();
+                CompleteCount = RetrievedEvent.AllSubEvents.Where(obj => obj.getIsComplete).Count();
             }
 
 
@@ -1838,7 +1836,7 @@ namespace TilerFront
                 Start = DateTimeOffset.Parse(MyXmlNode.ChildNodes[i].SelectSingleNode("ActiveStartTime").InnerText).UtcDateTime;
                 End = DateTimeOffset.Parse(MyXmlNode.ChildNodes[i].SelectSingleNode("ActiveEndTime").InnerText).UtcDateTime;
 
-                bool rigidFlag =MyParent.Rigid;
+                bool rigidFlag =MyParent.getRigid;
                 XmlNode rigidNode = MyXmlNode.ChildNodes[i].SelectSingleNode("Rigid");
                 if (rigidNode!=null)
                 {
@@ -1857,17 +1855,17 @@ namespace TilerFront
                 End = DateTimeOffset.Parse(MyXmlNode.ChildNodes[i].SelectSingleNode("EndTime").InnerText).UtcDateTime;
                 Enabled = Convert.ToBoolean(MyXmlNode.ChildNodes[i].SelectSingleNode("Enabled").InnerText);
                 bool CompleteFlag = Convert.ToBoolean(MyXmlNode.ChildNodes[i].SelectSingleNode("Complete").InnerText);
-                Location_Elements var1 = getLocation(MyXmlNode.ChildNodes[i]);
+                TilerElements.Location var1 = getLocation(MyXmlNode.ChildNodes[i]);
                 MiscData noteData = getMiscData(MyXmlNode.ChildNodes[i]);
                 EventDisplay UiData = getDisplayUINode(MyXmlNode.ChildNodes[i]);
                 ConflictProfile conflictProfile = getConflctProfile(MyXmlNode.ChildNodes[i]);
-                string nameString = MyXmlNode.ChildNodes[i].SelectSingleNode("Name")?.InnerText??MyParent.Name.NameValue;
-                string id = MyXmlNode.ChildNodes[i].SelectSingleNode("NameId")?.InnerText ?? MyParent.Name.NameId;
+                string nameString = MyXmlNode.ChildNodes[i].SelectSingleNode("Name")?.InnerText??MyParent.getName.NameValue;
+                string id = MyXmlNode.ChildNodes[i].SelectSingleNode("NameId")?.InnerText ?? MyParent.getName.NameId;
                 EventName name = new DB_EventName(nameString, id);
                 TilerUser creator = getTilerLoggedUser(MyXmlNode.ChildNodes[i].SelectSingleNode("UserNode"));
                 if ((creator as DB_TilerUser).isNull)
                 {
-                    creator = MyParent.Creator;
+                    creator = MyParent.getCreator;
                 }
                 string timeZone = MyXmlNode.ChildNodes[i].SelectSingleNode("TimeZone")?.InnerText ?? "UTC";
                 DB_TilerUserGroup userGroup = getTilerUserGroup(MyXmlNode.ChildNodes[i].SelectSingleNode("UserGroup"));
@@ -1878,7 +1876,7 @@ namespace TilerFront
                 if (!procrastinationEventFlag)
                 {
                     retrievedSubEvent = new SubCalendarEvent(creator, userGroup, timeZone, ID, name, BusySlot, Start, End, PrepTime, ID, rigidFlag, Enabled, UiData, noteData, CompleteFlag, var1, MyParent.RangeTimeLine, conflictProfile);
-                    retrievedSubEvent = new DB_SubCalendarEvent(retrievedSubEvent, MyParent.NowInfo, MyParent.ProcrastinationInfo);
+                    retrievedSubEvent = new DB_SubCalendarEvent(retrievedSubEvent, MyParent.getNowInfo, MyParent.getProcrastinationInfo);
                     (retrievedSubEvent as DB_SubCalendarEvent).UseTime = PauseData.Item1;
                     (retrievedSubEvent as DB_SubCalendarEvent).PauseTime = PauseData.Item2;
                 }
@@ -2055,14 +2053,14 @@ namespace TilerFront
             }
             return ListOfRepeatCalendarNodes.ToArray();
         }
-        Location_Elements getLocation(XmlNode Arg1)
+        TilerElements.Location getLocation(XmlNode Arg1)
         {
             XmlNode var1 = Arg1.SelectSingleNode("Location");
             bool UninitializedLocation = false;
             return generateLocationObjectFromNode(var1);
         }
 
-        Location_Elements generateLocationObjectFromNode(XmlNode var1)
+        TilerElements.Location generateLocationObjectFromNode(XmlNode var1)
         {
             bool UninitializedLocation = false;
             if (var1 == null)
@@ -2070,7 +2068,7 @@ namespace TilerFront
 #if UseDefaultLocation
                 return DefaultLocation;
 #else
-                return new Location_Elements();
+                return new TilerElements.Location();
 #endif
             }
             else
@@ -2090,7 +2088,7 @@ namespace TilerFront
 
                 if (string.IsNullOrEmpty(XCoordinate_Str) || string.IsNullOrEmpty(YCoordinate_Str))
                 {
-                    return new Location_Elements(Address);
+                    return new TilerElements.Location(Address);
                 }
                 else
                 {
@@ -2110,7 +2108,7 @@ namespace TilerFront
 
                     if (!(double.TryParse(XCoordinate_Str, out xCoOrdinate)))
                     {
-                        xCoOrdinate = Location_Elements.MaxLatitude;
+                        xCoOrdinate = TilerElements.Location.MaxLatitude;
                         UninitializedLocation = true;
 #if UseDefaultLocation
                         return DefaultLocation;
@@ -2126,7 +2124,7 @@ namespace TilerFront
 #endif
                     }
 
-                    return new Location_Elements(xCoOrdinate, yCoOrdinate, Address, Descripion, UninitializedLocation, isDefault);
+                    return new TilerElements.Location(xCoOrdinate, yCoOrdinate, Address, Descripion, UninitializedLocation, isDefault);
                 }
             }
         }
@@ -2240,17 +2238,17 @@ namespace TilerFront
             Name = Name.ToLower();
             if (AllScheduleData.Count > 0)
             {
-                retValue = AllScheduleData.Values.Where(obj => obj.Name.NameValue.ToLower().Contains(Name)).ToList();
+                retValue = AllScheduleData.Values.Where(obj => obj.getName.NameValue.ToLower().Contains(Name)).ToList();
             }
 
             return retValue;
         }
 
 
-        async public Task<IList<Location_Elements>> getCachedLocationByName(string Name)
+        async public Task<IList<TilerElements.Location>> getCachedLocationByName(string Name)
         {
-            
-            IList<Location_Elements> retValue = new List<Location_Elements>();
+
+            IList<TilerElements.Location> retValue = new List<TilerElements.Location>();
 #if ForceReadFromXml
 #else
             if (useCassandra)
@@ -2328,7 +2326,7 @@ namespace TilerFront
 
 
 
-        async public Task<Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, Location_Elements>>> getProfileInfo(TimeLine RangeOfLookup = null)
+        async public Task<Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location>>> getProfileInfo(TimeLine RangeOfLookup = null)
         {
             //getLocationCache
             if (RangeOfLookup == null)
@@ -2336,20 +2334,20 @@ namespace TilerFront
                 RangeOfLookup = new TimeLine(DateTimeOffset.UtcNow.AddYears(-10), DateTimeOffset.UtcNow.AddYears(10));
             }
 
-            Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, Location_Elements>> retValue;
+            Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location>> retValue;
             if (this.Status)
             {
-                Task<Dictionary<string, Location_Elements>> TaskLocationCache = getLocationCache();
+                Task<Dictionary<string, TilerElements.Location>> TaskLocationCache = getLocationCache();
                 
                 Dictionary<string, CalendarEvent> AllScheduleData = this.getAllCalendarFromXml(RangeOfLookup);
                 Task<DateTimeOffset> getReferenceTime = getDayReferenceTime();
 
 
-                Dictionary<string, Location_Elements> LocationCache = await TaskLocationCache.ConfigureAwait(false);
+                Dictionary<string, TilerElements.Location> LocationCache = await TaskLocationCache.ConfigureAwait(false);
                 await populateDefaultLocation(LocationCache).ConfigureAwait(false);
                 DateTimeOffset ReferenceTime = await getReferenceTime.ConfigureAwait(false);
                 
-                retValue = new Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, Location_Elements>>(AllScheduleData, ReferenceTime, LocationCache);
+                retValue = new Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location>>(AllScheduleData, ReferenceTime, LocationCache);
             }
             else
             {
@@ -2361,15 +2359,15 @@ namespace TilerFront
 
         
 
-        async protected Task populateDefaultLocation(Dictionary<string, Location_Elements> locations = null)
+        async protected Task populateDefaultLocation(Dictionary<string, TilerElements.Location> locations = null)
         {
             double xLocation = 40.083319;
             double yLocation = -105.3505482;
-            Location_Elements retValue;
+            TilerElements.Location retValue;
             if ((locations == null))
             {
 
-                retValue = Location_Elements.getDefaultLocation();
+                retValue = TilerElements.Location.getDefaultLocation();
                 DefaultLocation = retValue;
                 locations = await getLocationCache().ConfigureAwait(false);
                 return;
@@ -2377,17 +2375,17 @@ namespace TilerFront
 
             if ((locations.Count < 1))
             {
-                retValue = Location_Elements.getDefaultLocation();
+                retValue = TilerElements.Location.getDefaultLocation();
                 DefaultLocation = retValue;
                 locations = await getLocationCache().ConfigureAwait(false);
                 return;
             }
 
-            Location_Elements AverageLocations = Location_Elements.AverageGPSLocation(locations.Values);
+            TilerElements.Location AverageLocations = TilerElements.Location.AverageGPSLocation(locations.Values);
 
             xLocation = AverageLocations.XCoordinate;
             yLocation = AverageLocations.YCoordinate;
-            Location_Elements.InitializeDefaultLongLat(xLocation, yLocation);
+            TilerElements.Location.InitializeDefaultLongLat(xLocation, yLocation);
             DefaultLocation = AverageLocations;
             
         }
@@ -2429,7 +2427,7 @@ namespace TilerFront
 
         }
 
-        virtual public Location_Elements defaultLocation
+        virtual public TilerElements.Location defaultLocation
         {
             get
             {

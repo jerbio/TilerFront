@@ -42,7 +42,7 @@ namespace TilerFront
             }
             _TilerUser = User;
             LogStatus = false;
-            CachedLocation = new Dictionary<string, Location_Elements>();
+            CachedLocation = new Dictionary<string, TilerElements.Location>();
             Database = database;
             CurrentLog = _TilerUser.Id.ToString() + ".xml";
             LogStatus = true;
@@ -350,30 +350,30 @@ namespace TilerFront
 
             XmlElement MyEventScheduleNode = xmldoc.CreateElement("EventSchedule");
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Completed"));
-            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.isComplete.ToString();
+            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.getIsComplete.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("RepetitionFlag"));
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.RepetitionStatus.ToString();
 
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("EventSubSchedules"));
             //MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.Repetition.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("RigidFlag"));
-            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.Rigid.ToString();
+            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.getRigid.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Duration"));
-            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.ActiveDuration.ToString();
+            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.getActiveDuration.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Split"));
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.NumberOfSplit.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Deadline"));
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.End.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("PrepTime"));
-            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.Preparation.ToString();
+            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.getPreparation.ToString();
             //MyEventScheduleNode.PrependChild(xmldoc.CreateElement("PreDeadlineFlag"));
             //MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.Pre.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("PreDeadline"));
-            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.PreDeadline.ToString();
+            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.getPreDeadline.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("StartTime"));
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.Start.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Name"));
-            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.Name.ToString();
+            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.getName.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("ID"));
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.getId;
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Enabled"));
@@ -381,7 +381,7 @@ namespace TilerFront
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Location"));
             MyEventScheduleNode.ChildNodes[0].InnerXml = CreateLocationNode(MyEvent.myLocation, "EventScheduleLocation").InnerXml;
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("UIParams"));
-            MyEventScheduleNode.ChildNodes[0].InnerXml = createDisplayUINode(MyEvent.UIParam, "UIParams").InnerXml;
+            MyEventScheduleNode.ChildNodes[0].InnerXml = createDisplayUINode(MyEvent.getUIParam, "UIParams").InnerXml;
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("MiscData"));
             MyEventScheduleNode.ChildNodes[0].InnerXml = createMiscDataNode(MyEvent.Notes, "MiscData").InnerXml;
 
@@ -958,17 +958,17 @@ namespace TilerFront
             Name = Name.ToLower();
             if (AllScheduleData.Count > 0)
             {
-                retValue = AllScheduleData.Values.Where(obj => obj.Name.NameValue.ToLower().Contains(Name)).ToList();
+                retValue = AllScheduleData.Values.Where(obj => obj.getName.NameValue.ToLower().Contains(Name)).ToList();
             }
 
             return retValue;
         }
 
 
-        async public Task<IList<Location_Elements>> getCachedLocationByName(string Name)
+        async public Task<IList<TilerElements.Location>> getCachedLocationByName(string Name)
         {
-            
-            IList<Location_Elements> retValue = new List<Location_Elements>();
+
+            IList<TilerElements.Location> retValue = new List<TilerElements.Location>();
 #if ForceReadFromXml
 #else
             if (useCassandra)
@@ -1126,7 +1126,7 @@ namespace TilerFront
 
         }
 
-        override public Location_Elements defaultLocation
+        override public TilerElements.Location defaultLocation
         {
             get
             {
