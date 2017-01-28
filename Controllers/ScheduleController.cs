@@ -231,7 +231,7 @@ namespace TilerFront.Controllers
 
 
                 DateTimeOffset myNow = DateTimeOffset.UtcNow;
-                Schedule MySchedule = new DB_Schedule(myUser, myNow);
+                DB_Schedule MySchedule = new DB_Schedule(myUser, myNow);
                 SubCalendarEvent SubEvent = MySchedule.getSubCalendarEvent(myAuthorizedUser.EventID);
                 if ((!SubEvent.getRigid) && (SubEvent.getId != currentPausedEvent.EventId))
                 {
@@ -242,6 +242,7 @@ namespace TilerFront.Controllers
 
                     myUser.ScheduleLogControl.updateUserActivty(activity);
                     await MySchedule.PauseEvent(myAuthorizedUser.EventID, currentPausedEventId);
+                    await MySchedule.WriteFullScheduleToLogAndOutlook().ConfigureAwait(false);
                     PausedEvent paused;
                     PausedEvent InstanceOfPausedEventAlreadyInDb = pausedEvents.FirstOrDefault(obj => obj.EventId == myAuthorizedUser.EventID);
 
@@ -291,13 +292,14 @@ namespace TilerFront.Controllers
                 if (PausedEvent != null)
                 {
                     DateTimeOffset myNow = DateTimeOffset.UtcNow;
-                    Schedule MySchedule = new DB_Schedule(myUser, myNow);
+                    DB_Schedule MySchedule = new DB_Schedule(myUser, myNow);
                     DB_UserActivity activity = new DB_UserActivity(myAuthorizedUser.getRefNow(), UserActivity.ActivityType.Resume);
 
                     JObject json = JObject.FromObject(myAuthorizedUser);
                     activity.updateMiscelaneousInfo(json.ToString());
                     myUser.ScheduleLogControl.updateUserActivty(activity);
                     await MySchedule.ContinueEvent(PausedEvent.EventId);
+                    await MySchedule.WriteFullScheduleToLogAndOutlook().ConfigureAwait(false);
                     pausedSubEvent = MySchedule.getSubCalendarEvent(PausedEvent.EventId);
                     pausedCalEvent = MySchedule.getCalendarEvent(PausedEvent.EventId);
                     PausedEvent.isPauseDeleted = true;
@@ -469,7 +471,7 @@ namespace TilerFront.Controllers
                 {
                     fullTimeSpan = ProcrastinateDuration.TotalTimeSpan; ;
                 }
-                Schedule MySchedule = new DB_Schedule(myUserAccount, DateTimeOffset.UtcNow);
+                DB_Schedule MySchedule = new DB_Schedule(myUserAccount, DateTimeOffset.UtcNow);
 
                 await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, UserData.UserID, db).ConfigureAwait(false);
 
@@ -521,7 +523,7 @@ namespace TilerFront.Controllers
             await myUser.Login();
 
             DateTimeOffset myNow = DateTimeOffset.UtcNow;// myAuthorizedUser.getRefNow();
-            Schedule MySchedule = new DB_Schedule(myUser,myNow);
+            DB_Schedule MySchedule = new DB_Schedule(myUser,myNow);
             DB_UserActivity activity = new DB_UserActivity(myNow, UserActivity.ActivityType.ProcrastinateSingle);
             JObject json = JObject.FromObject(UserData);
             activity.updateMiscelaneousInfo(json.ToString());
@@ -552,7 +554,7 @@ namespace TilerFront.Controllers
             if (myUser.Status)
             {
                 DateTimeOffset myNow = myNow = DateTimeOffset.UtcNow;
-                Schedule MySchedule = new DB_Schedule(myUser, myNow);
+                DB_Schedule MySchedule = new DB_Schedule(myUser, myNow);
                 DB_UserActivity activity = new DB_UserActivity(myNow, UserActivity.ActivityType.Shuffle);
                 myUser.ScheduleLogControl.updateUserActivty(activity);
                 await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, UserData.UserID, db).ConfigureAwait(false);
@@ -567,6 +569,7 @@ namespace TilerFront.Controllers
                     location = TilerElements.Location.getDefaultLocation();
                 }
                 await MySchedule.FindMeSomethingToDo(location);
+                MySchedule.WriteFullScheduleToLogAndOutlook().Wait();
                 BusyTimeLine nextBusySchedule = MySchedule.NextActivity;
                 PostBackData myPostData;
                 if (nextBusySchedule != null)
@@ -627,11 +630,12 @@ namespace TilerFront.Controllers
                         {
                             DateTimeOffset myNow = DateTimeOffset.UtcNow;
                             //myNOw = UserData.getRefNow();
-                            Schedule MySchedule = new DB_Schedule(retrievedUser, myNow );
+                            DB_Schedule MySchedule = new DB_Schedule(retrievedUser, myNow );
                             await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, UserData.UserID, db).ConfigureAwait(false);
                             activity.eventIds.Add(UserData.EventID);
                             retrievedUser.ScheduleLogControl.updateUserActivty(activity);
                             MySchedule.markSubEventAsCompleteCalendarEventAndReadjust(UserData.EventID);
+                            await MySchedule.WriteFullScheduleToLogAndOutlook().ConfigureAwait(false);
                             retValue = new PostBackData("\"Success\"", 0);
                         }
                         break;
@@ -658,7 +662,7 @@ namespace TilerFront.Controllers
             UserAccountDirect myUser = await UserData.getUserAccountDirect(db);
             await myUser.Login();
             DateTimeOffset myNow = DateTimeOffset.UtcNow;
-            Schedule MySchedule = new DB_Schedule(myUser, myNow);
+            DB_Schedule MySchedule = new DB_Schedule(myUser, myNow);
             IEnumerable<string> AllEventIDs = UserData.EventID.Split(',');
             DB_UserActivity activity = new DB_UserActivity(myNow, UserActivity.ActivityType.CompleteMultiple, AllEventIDs);
             JObject json = JObject.FromObject(UserData);
@@ -669,6 +673,7 @@ namespace TilerFront.Controllers
 
             
             await MySchedule.markSubEventsAsComplete(AllEventIDs).ConfigureAwait(false);
+            MySchedule.WriteFullScheduleToLogAndOutlook().Wait();
             PostBackData myPostData = new PostBackData("\"Success\"", 0);
 
             TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
@@ -695,7 +700,7 @@ namespace TilerFront.Controllers
                 DateTimeOffset myNow = DateTimeOffset.UtcNow;
                 //myNow = UserData.getRefNow();
 
-                Schedule MySchedule = new DB_Schedule(retrievedUser, myNow);
+                DB_Schedule MySchedule = new DB_Schedule(retrievedUser, myNow);
                 DB_UserActivity activity = new DB_UserActivity(myNow, UserActivity.ActivityType.SetAsNowSingle);
                 JObject json = JObject.FromObject(myUser);
                 activity.updateMiscelaneousInfo(json.ToString());
@@ -780,7 +785,7 @@ namespace TilerFront.Controllers
                         break;
                     case "tiler":
                         {
-                            Schedule MySchedule = new DB_Schedule(retrievedUser, myUser.getRefNow());
+                            DB_Schedule MySchedule = new DB_Schedule(retrievedUser, myUser.getRefNow());
                             DB_UserActivity activity = new DB_UserActivity(myUser.getRefNow(), UserActivity.ActivityType.DeleteSingle);
                             retrievedUser.ScheduleLogControl.updateUserActivty(activity);
                             JObject json = JObject.FromObject(myUser);
@@ -790,7 +795,8 @@ namespace TilerFront.Controllers
 
                             await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, myUser.UserID, db).ConfigureAwait(false);
 
-                            MySchedule.deleteSubCalendarEvent(myUser.EventID);
+                            await MySchedule.deleteSubCalendarEvent(myUser.EventID).ConfigureAwait(false);
+                            await MySchedule.WriteFullScheduleToLogAndOutlook().ConfigureAwait(false);
                             retValue = new PostBackData("\"Success\"", 0);   
                         }
                         break;
@@ -836,12 +842,13 @@ namespace TilerFront.Controllers
             PostBackData retValue;
             if (retrievedUser.Status)
             {
-                Schedule MySchedule = new DB_Schedule(retrievedUser, myUser.getRefNow());
+                DB_Schedule MySchedule = new DB_Schedule(retrievedUser, myUser.getRefNow());
                 await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, myUser.UserID, db).ConfigureAwait(false);
                 IEnumerable<string> AllEventIDs = myUser.EventID.Split(',');
                 DB_UserActivity activity = new DB_UserActivity(myUser.getRefNow(), UserActivity.ActivityType.DeleteMultiple, AllEventIDs);
                 retrievedUser.ScheduleLogControl.updateUserActivty(activity);
                 await MySchedule.deleteSubCalendarEvents(AllEventIDs);
+                await MySchedule.WriteFullScheduleToLogAndOutlook().ConfigureAwait(false);
                 retValue = new PostBackData("\"Success\"", 0);
             }
             else
@@ -1054,8 +1061,8 @@ namespace TilerFront.Controllers
                     //newCalendarEvent = new CalendarEvent(Name, StartData, EndData, Count, "", EventDuration, MyRepetition, true, RigidScheduleFlag, "", true, EventLocation, true, new EventDisplay(true, userColor, userColor.User < 1 ? 0 : 1), new MiscData(), false);
                 }
                 Task DoInitializeClassification=newCalendarEvent.InitializeClassification();
-                
-                Schedule MySchedule = new DB_Schedule(myUser, myNow);
+
+                DB_Schedule MySchedule = new DB_Schedule(myUser, myNow);
 
                 await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, myUser.UserID, db).ConfigureAwait(false);
 
@@ -1069,7 +1076,8 @@ namespace TilerFront.Controllers
                     JObject json = JObject.FromObject(newEvent);
                     activity.updateMiscelaneousInfo(json.ToString());
                     myUser.ScheduleLogControl.updateUserActivty(activity);
-                    await MySchedule.AddToScheduleAndCommit(newCalendarEvent);
+                    MySchedule.AddToSchedule(newCalendarEvent);
+                    await MySchedule.WriteFullScheduleToLogAndOutlook().ConfigureAwait(false);
                 }
                 
 
@@ -1105,7 +1113,7 @@ namespace TilerFront.Controllers
                 DateTimeOffset myNow = newEvent.getRefNow();
                 myNow = DateTimeOffset.UtcNow;
                 UserAccount RetrievedUser = await newEvent.getUserAccountDirect(db).ConfigureAwait(false);
-                Schedule MySchedule = new DB_Schedule(RetrievedUser, myNow);
+                DB_Schedule MySchedule = new DB_Schedule(RetrievedUser, myNow);
                 await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, RetrievedUser.UserID, db).ConfigureAwait(false);
                 await MySchedule.UpdateScheduleDueToExternalChanges().ConfigureAwait(false);
                 retValue = new PostBackData("\"Success\"", 0);

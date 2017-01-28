@@ -18,13 +18,14 @@ namespace TilerFront
         protected UserAccount myAccount;
         public DB_Schedule(UserAccount AccountEntry, DateTimeOffset referenceNow, DateTimeOffset startOfDay):base()
         {
-            Initialize(referenceNow, startOfDay).Wait();
             myAccount = AccountEntry;
+            Initialize(referenceNow, startOfDay).Wait();
+            
         }
         public DB_Schedule(UserAccount AccountEntry, DateTimeOffset referenceNow)
         {
-            Initialize(referenceNow).Wait();
             myAccount = AccountEntry;
+            Initialize(referenceNow).Wait();
         }
         async virtual protected Task Initialize(DateTimeOffset referenceNow)
         {
@@ -48,6 +49,7 @@ namespace TilerFront
                 }
                 Locations = profileData.Item3;
             }
+            TilerUser = myAccount.getTilerUser();
         }
 
         async virtual protected Task Initialize(DateTimeOffset referenceNow, DateTimeOffset StartOfDay)
@@ -73,6 +75,200 @@ namespace TilerFront
                 }
                 Locations = profileData.Item3;
             }
+        }
+
+        public virtual void RemoveAllCalendarEventFromLogAndCalendar()//MyTemp Function for deleting all calendar events
+        {
+            myAccount.DeleteAllCalendarEvents();
+            removeAllFromOutlook();
+        }
+
+        async Task CleanUpForUI()
+        {
+            foreach (CalendarEvent eachCalendarEvent in AllEventDictionary.Values)
+            {
+                List<DateTimeOffset> AllStratTImes = eachCalendarEvent.ActiveSubEvents.AsParallel().Select(obj => obj.Start).ToList();
+                AllStratTImes.Sort();
+
+                List<SubCalendarEvent> OrderedSubEvent = eachCalendarEvent.ActiveSubEvents.OrderBy(obj => obj.SubEvent_ID.getSubCalendarEventID()).ToList();
+
+
+                Parallel.For(0, OrderedSubEvent.Count, i =>
+                {
+                    SubCalendarEvent SubEvent = OrderedSubEvent[i];
+                    DateTimeOffset TIme = AllStratTImes[i];
+                    SubEvent.shiftEvent(TIme - SubEvent.Start);
+                });
+
+                //IEnumerable<SubCalendarEvent> AllShifted = AllStratTImes.AsParallel().Zip(OrderedSubEvent.AsParallel(), (TIme, SubEvent) => { SubEvent.shiftEvent(TIme - SubEvent.Start); return SubEvent; });
+            }
+            return;
+        }
+
+        async virtual public Task WriteFullScheduleToLogAndOutlook()
+        {
+            await CleanUpForUI().ConfigureAwait(false);
+            myAccount.UpdateReferenceDayTime(ReferenceDayTIime);
+
+
+            foreach (List<CalendarEvent> eachTuple in ThirdPartyCalendars.Values)
+            {
+                foreach (CalendarEvent THirpartyCalendarEvents in eachTuple)
+                {//= eachThirdPartyCalendarControl.getThirdpartyCalendarEvent();
+                    AllEventDictionary.Remove(THirpartyCalendarEvents.Calendar_EventID.getCalendarEventComponent());
+                }
+            }
+
+            TilerFront.OutLookConnector myOutlook = new OutLookConnector();
+            foreach (CalendarEvent MyCalEvent in AllEventDictionary.Values)
+            {
+                (myOutlook).WriteToOutlook(MyCalEvent);
+            }
+
+
+
+            await myAccount.CommitEventToLogOld(AllEventDictionary.Values, EventID.LatestID.ToString());
+        }
+
+        virtual public bool isScheduleLoadSuccessful
+        {
+            get
+            {
+                return myAccount.Status;
+            }
+        }
+
+        virtual public void removeAllFromOutlook()
+        {
+
+            TilerFront.OutLookConnector myOutlook = new OutLookConnector();
+            myOutlook.removeAllEventsFromOutLook(AllEventDictionary.Values);
+        }
+        virtual public void WriteFullScheduleToOutlook()
+        {
+            TilerFront.OutLookConnector myOutlook = new OutLookConnector();
+            foreach (CalendarEvent MyCalEvent in AllEventDictionary.Values)
+            {
+                myOutlook.WriteToOutlook(MyCalEvent);
+            }
+        }
+
+        async virtual public Task UpdateWithDifferentSchedule(Dictionary<string, CalendarEvent> UpdatedSchedule)
+        {
+            //RemoveAllCalendarEventFromLogAndCalendar();
+            removeAllFromOutlook();
+            AllEventDictionary = UpdatedSchedule;
+            await WriteFullScheduleToLogAndOutlook();
+            CompleteSchedule = getTimeLine();
+        }
+
+        async public Task<CustomErrors> AddToScheduleAndCommit(CalendarEvent NewEvent)
+        {
+#if enableTimer
+            myWatch.Start();
+#endif
+            HashSet<SubCalendarEvent> NotdoneYet = new HashSet<SubCalendarEvent>();// getNoneDoneYetBetweenNowAndReerenceStartTIme();
+            if (!NewEvent.getRigid)
+            {
+                NewEvent = EvaluateTotalTimeLineAndAssignValidTimeSpots(NewEvent, NotdoneYet);
+            }
+            else
+            {
+                NewEvent = EvaluateTotalTimeLineAndAssignValidTimeSpots(NewEvent, NotdoneYet, null, 1);
+            }
+
+
+            ///
+
+            if (NewEvent == null)//checks if event was assigned and ID ehich means it was successfully able to find a spot
+            {
+
+                return NewEvent.Error;
+            }
+
+            if (NewEvent.getId == "" || NewEvent == null)//checks if event was assigned and ID ehich means it was successfully able to find a spot
+            {
+                return NewEvent.Error;
+            }
+
+
+            if (NewEvent.Error != null)
+            {
+                LogStatus(NewEvent, "Adding New Event");
+            }
+            removeAllFromOutlook();
+            //RemoveAllCalendarEventFromLogAndCalendar();
+            try
+            {
+                AllEventDictionary.Add(NewEvent.Calendar_EventID.getCalendarEventComponent(), NewEvent);
+            }
+            catch
+            {
+                AllEventDictionary[NewEvent.getId] = NewEvent;
+            }
+
+
+            await WriteFullScheduleToLogAndOutlook().ConfigureAwait(false);
+
+            CompleteSchedule = getTimeLine();
+
+
+
+
+            return NewEvent.Error;
+        }
+
+        public virtual async Task UpdateScheduleDueToExternalChanges()
+        {
+            TimeLine newSubeEvent = new TimeLine(Now.constNow, Now.constNow.AddMinutes(5));
+            TimeSpan fiveMinSpan = new TimeSpan(1);
+            EventName tempEventName = new EventName("TempEvent");
+            TilerUser user = this.TilerUser;
+            CalendarEvent TempEvent = new CalendarEvent(
+                //EventID.GenerateCalendarEvent(), 
+                tempEventName, newSubeEvent.Start, newSubeEvent.End, fiveMinSpan, new TimeSpan(), new TimeSpan(), 1, new Repetition(), new Location(), new EventDisplay(), new MiscData(), null, new NowProfile(), true, false, user, new TilerUserGroup(), user.TimeZone, null);
+            AddToSchedule(TempEvent);
+            AllEventDictionary.Remove(TempEvent.Calendar_EventID.getCalendarEventComponent());
+            AllEventDictionary.Remove(TempEvent.Calendar_EventID.ToString());
+            await WriteFullScheduleToLogAndOutlook().ConfigureAwait(false);
+            return;
+        }
+
+        async virtual public Task updateDataSetWithThirdPartyDataAndTriggerNewAddition(Tuple<ThirdPartyControl.CalendarTool, IEnumerable<CalendarEvent>> ThirdPartyData)
+        {
+
+            if (ThirdPartyData != null)
+            {
+                updateDataSetWithThirdPartyData(ThirdPartyData);
+                await triggerNewlyAddedThirdparty().ConfigureAwait(false);
+                foreach (CalendarEvent ThirdPartyCalData in ThirdPartyData.Item2)
+                {
+                    AllEventDictionary.Remove(ThirdPartyCalData.Calendar_EventID.getCalendarEventComponent());
+                }
+            }
+            retrievedThirdParty = true;
+            await WriteFullScheduleToLogAndOutlook().ConfigureAwait(false);
+        }
+
+
+        virtual protected async Task triggerNewlyAddedThirdparty()
+        {
+            if (retrievedThirdParty)
+            {
+                TimeLine newSubeEvent = new TimeLine(Now.constNow, Now.constNow.AddMinutes(5));
+                TimeSpan fiveMinSpan = new TimeSpan(1);
+                EventName tempEventName = new EventName("TempEvent");
+                TilerUser user = TilerUser;
+                CalendarEvent TempEvent = new CalendarEvent(
+                    //EventID.GenerateCalendarEvent(), 
+                    tempEventName, newSubeEvent.Start, newSubeEvent.End, fiveMinSpan, new TimeSpan(), new TimeSpan(), 1, new Repetition(), new Location(), new EventDisplay(), new MiscData(), null, new NowProfile(), true, false, user, new TilerUserGroup(), user.TimeZone, null);
+                AddToSchedule(TempEvent);
+                AllEventDictionary.Remove(TempEvent.Calendar_EventID.getCalendarEventComponent());
+                AllEventDictionary.Remove(TempEvent.Calendar_EventID.ToString());
+                return;
+            }
+
+            throw new Exception("Hey you are yet to retrieve the latest third party schedule");
         }
 
     }

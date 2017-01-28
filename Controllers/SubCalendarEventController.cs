@@ -36,8 +36,8 @@ namespace TilerFront.Controllers
                         {
                             DateTimeOffset myNow = myUser.getRefNow();
                             myNow = DateTimeOffset.UtcNow;
-                            
-                            Schedule NewSchedule = new DB_Schedule(retrievedUser, myNow);
+
+                            DB_Schedule NewSchedule = new DB_Schedule(retrievedUser, myNow);
 
                             Models.ThirdPartyCalendarAuthenticationModel AllIndexedThirdParty = await ScheduleController.getThirdPartyAuthentication(retrievedUser.UserID, myUser.ThirdPartyUserID, "Google", db);
                             GoogleTilerEventControl googleControl = new GoogleTilerEventControl(AllIndexedThirdParty, db);
@@ -56,7 +56,7 @@ namespace TilerFront.Controllers
                         {
                             DateTimeOffset myNow = myUser.getRefNow();
                             myNow = DateTimeOffset.UtcNow;
-                            Schedule NewSchedule = new DB_Schedule(retrievedUser, myNow);
+                            DB_Schedule NewSchedule = new DB_Schedule(retrievedUser, myNow);
 
                             //await ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(NewSchedule, retrievedUser.UserID).ConfigureAwait(false);
 
