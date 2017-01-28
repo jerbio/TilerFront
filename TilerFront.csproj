@@ -340,6 +340,9 @@
       <HintPath>..\packages\Microsoft.AspNet.Web.Optimization.1.1.3\lib\net40\System.Web.Optimization.dll</HintPath>
     </Reference>
     <Reference Include="System.Xml.Linq" />
+    <Reference Include="TilerCore">
+      <HintPath>..\..\My24HourTimerWPF\TilerCore\bin\Debug\TilerCore.dll</HintPath>
+    </Reference>
     <Reference Include="TilerElements, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\My24HourTimerWPF\TilerElements\bin\Debug\TilerElements.dll</HintPath>
@@ -426,6 +429,7 @@
     <Compile Include="Controllers\UserController.cs" />
     <Content Include="App_Data\XmlDocument.xml" />
     <Content Include="Areas\HelpPage\HelpPage.css" />
+    <Compile Include="DB_Schedule.cs" />
     <Compile Include="DTOs\PostBackStruct.cs" />
     <Compile Include="DTOs\PostError.cs" />
     <Compile Include="DTOs\VerifiedUser.cs" />

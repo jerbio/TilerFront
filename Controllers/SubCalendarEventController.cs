@@ -12,7 +12,7 @@ using System.Web.Http.Description;
 using TilerElements;
 using DBTilerElement;
 using TilerFront.Models;
-//using TilerGoogleCalendarLib;
+using TilerCore;
 
 
 namespace TilerFront.Controllers
@@ -37,7 +37,7 @@ namespace TilerFront.Controllers
                             DateTimeOffset myNow = myUser.getRefNow();
                             myNow = DateTimeOffset.UtcNow;
                             
-                            My24HourTimerWPF.Schedule NewSchedule = new My24HourTimerWPF.Schedule(retrievedUser, myNow);
+                            Schedule NewSchedule = new DB_Schedule(retrievedUser, myNow);
 
                             Models.ThirdPartyCalendarAuthenticationModel AllIndexedThirdParty = await ScheduleController.getThirdPartyAuthentication(retrievedUser.UserID, myUser.ThirdPartyUserID, "Google", db);
                             GoogleTilerEventControl googleControl = new GoogleTilerEventControl(AllIndexedThirdParty, db);
@@ -56,7 +56,7 @@ namespace TilerFront.Controllers
                         {
                             DateTimeOffset myNow = myUser.getRefNow();
                             myNow = DateTimeOffset.UtcNow;
-                            My24HourTimerWPF.Schedule NewSchedule = new My24HourTimerWPF.Schedule(retrievedUser, myNow);
+                            Schedule NewSchedule = new DB_Schedule(retrievedUser, myNow);
 
                             //await ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(NewSchedule, retrievedUser.UserID).ConfigureAwait(false);
 
