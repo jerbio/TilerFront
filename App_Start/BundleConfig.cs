@@ -62,7 +62,7 @@ namespace TilerFront
 
             bundles.Add(new ScriptBundle("~/Content/TilerJS").Include(
                     "~/Scripts/jquery-2.1.1.js",
-                    //"~/Scripts/jquery-2.1.0.min.js",
+                    "~/Scripts/Utility.js",
                     "~/Scripts/Chart.min.js",
                     "~/Scripts/moment.min.js",
                     "~/Scripts/fullcalendar.min.js",
@@ -90,6 +90,7 @@ namespace TilerFront
                     ));
 
             bundles.Add(new ScriptBundle("~/Content/TilerDesktopJS").Include(
+                    "~/Scripts/Utility.js",
                     "~/Scripts/MonthOverviewIni.js",
                     "~/Scripts/AddNewEvent_Desktop0.js",
                     "~/Scripts/jquery-ui.min.js",
@@ -100,6 +101,7 @@ namespace TilerFront
                       ));
 
             bundles.Add(new ScriptBundle("~/Content/TilerMobileJS").Include(
+                    "~/Scripts/Utility.js",
                     "~/Scripts/yui-min.js",
                     "~/Scripts/MapData.js",
                     "~/Scripts/jquery.knob.js",

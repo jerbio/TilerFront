@@ -35,19 +35,72 @@ function exitSelectedEventScreen()
     myContainer.outerHTML = "";
 }
 
+function generateEditField(options) {
+    let id = generateUUID()
+    let container = getDomOrCreateNew("editable-field-" + id)
+    $(container).addClass("editable-field-container")
+    if (options.label) {
+        let label = getDomOrCreateNew("editable-field-label-" + id, 'label')
+        $(label).addClass("editable-field-label")
+        container.label = label
+        container.appendChild(label)
+    }
+
+    let input = getDomOrCreateNew("editable-field-input-" + id, 'input')
+    $(input).addClass("editable-field-input")
+    container.appendChild(input)
+    if (options.placeHolder) {
+        input.setAttribute('placeholder', options.placeHolder)
+        container.input = input
+    }
+
+    return container
+}
+
+function generateSubEventEditPage(subEventId) {
+    let page = getDomOrCreateNew("Edit-SubEvent-Page-" + subEventId)
+    let nameEdit = generateEditField({id:"Edit-SubEvent-Name-" + subEventId})
+    let addressEdit = generateEditField({id:"Edit-SubEvent-Address-" + subEventId})
+    let durationEdit = generateEditField({id:"Edit-SubEvent-Deadline-" + subEventId})
+    let deadlineEdit = generateEditField({ id: "Edit-SubEvent-Deadline-" + subEventId })
+    let startTimeEdit = generateEditField({id:"Edit-SubEvent-Start-" + subEventId})
+    let endTimeEdit = generateEditField({ id: "Edit-SubEvent-End-" + subEventId })
+    let cancelButton = getDomOrCreateNew("Cancel-Edit-SubEvent-" + subEventId, "button")
+    let saveButton = getDomOrCreateNew( "Save-Edit-SubEvent-" + subEventId , "button")
+
+    page.appendChild(nameEdit)
+    page.appendChild(addressEdit)
+    page.appendChild(startTimeEdit)
+    page.appendChild(endTimeEdit)
+    page.appendChild(deadlineEdit)
+    $(page).addClass('edit-subevent-page')
+    let body = getCalBodyContainer()
+    body.appendChild(page)
+
+
+
+}
+
 function generateSelectedEventLabelDom(SelectedEvent)
 {
     var LabelSectionDom = getDomOrCreateNew("LabelSectionDom"+SelectedEvent.ID)
-
-        //document.createElement("div");
     $(LabelSectionDom.Dom).addClass("LabelSectionDom");
     $(LabelSectionDom.Dom).addClass(CurrentTheme.ContentSection);
     $(LabelSectionDom.Dom).addClass(CurrentTheme.FontColor);
 
+    debugger
+    let onClick = () => {
+        
+        generateSubEventEditPage(SelectedEvent.ID)
+    }
+
+    LabelSectionDom.onClick = onClick
+    LabelSectionDom.onclick = onClick
+
     var HorizontalLine = InsertHorizontalLine("95%", "2.5%", "98%");
     LabelSectionDom.Dom.appendChild(HorizontalLine);
     var LabelBackButton = getDomOrCreateNew("BackIconSelectedEvent").Dom;
-    //$(LabelBackButton).css({ "position": "absolute", "left":"25px","top": "50%", "margin-top": "-50px", "width": "100px", "height": "100px" })
+
     $(LabelBackButton).addClass("BackIcon");
     LabelSectionDom.Dom.appendChild(LabelBackButton);
 
@@ -75,11 +128,9 @@ function generateSelectedEventLabelDom(SelectedEvent)
     LabelDescriptionTop.appendChild(LabelDescriptionTopName);
     
     var LabelDescriptionBottom = getDomOrCreateNew("LabelDescriptionBottom" + SelectedEvent.ID)
-        //document.createElement("div");
     $(LabelDescriptionBottom.Dom).addClass("LabelDescriptionBottom");
     LabelDescription.Dom.appendChild(LabelDescriptionBottom.Dom);
     var VerticalLine = InsertVerticalLine("95%", "50%", "0%");
-    //LabelDescriptionBottom.Dom.appendChild(VerticalLine);
 
     var LabelDescriptionBottomLocation = document.createElement("div");
     $(LabelDescriptionBottomLocation).addClass("LabelDescriptionBottomLocation");
@@ -90,6 +141,7 @@ function generateSelectedEventLabelDom(SelectedEvent)
     $(LabelDescriptionBottomTime).addClass("LabelDescriptionBottomTime");
     LabelDescriptionBottom.Dom.appendChild(LabelDescriptionBottomTime);
     LabelDescriptionBottomTime.innerHTML = "" + getTimeStringFromDate(SelectedEvent.SubCalStartDate) + "-" + getTimeStringFromDate(SelectedEvent.SubCalEndDate) + "";
+
     return LabelSectionDom.Dom;
 }
 
@@ -313,10 +365,6 @@ function generateRangeUpdate(SelectedEvent) {
     $(LabelRangeModify.Dom).addClass("SubEventLabelSection");
 
 
-
-    //var LabelWeatherSubEventID = "LabelWeatherSubEvent"
-    //var LabelWeatherSubEvent = getDomOrCreateNew(LabelWeatherSubEventID);
-    //$(LabelWeatherSubEvent.Dom).addClass("SubEventLabelSection");
     LabelRangeModify.Dom.innerHTML = "<p>Change Deadline</p>"
     $(LabelRangeModify.Dom).addClass(CurrentTheme.AlternateFontColor);
 
@@ -352,36 +400,8 @@ function generateRangeUpdate(SelectedEvent) {
     SubEventEnd.value = new Date(SelectedEvent.SubCalCalEventEnd).toDateString();
     SubEventEndDate.Dom.appendChild(SubEventEnd);
     BindImputToDatePicketMobile(SubEventEnd);
-    function UpdateDateDisplay() {
-        /*var myDate = $(SliderContainer.Dom).slider("value");
-        SubEventEndDateNameContent.Dom.innerHTML = DateTimeToDayMDYTimeString(new Date(myDate));*/
-    }
-
-    
-    
-
     ContentRangeModify.Dom.appendChild(SliderContainer.Dom);
     ContentRangeModify.Dom.appendChild(SubEventEndDate.Dom);
-    
-    $(
-        function ()
-        {
-            /*
-            $(SliderContainer.Dom).slider({
-                    range: true,
-                    min: StartCalEvent,
-                    max: EndCalEvent,
-                    values: CurrentDate,
-                    slide: UpdateDateDisplay,
-                    change: UpdateDateDisplay
-                });
-            $(SliderContainer.Dom).slider("value", new Date(CurrentDate));*/
-        }
-    );
-    
-
-
-
     return RangeModify.Dom;
 }
 
@@ -396,23 +416,6 @@ function generateEventOptions(SelectedEvent) {
     $(EventOptionsSubEvent.Dom).append(TopDividerDom);
     CurrentTheme.getCurrentContainer().appendChild(EventOptionsSubEvent.Dom);
 
-
-    /*
-    //Populates Label of Next event section
-    var LabelEventOptionsSubEventID = "LabelEventOptionsSubEvent"
-    var LabelEventOptionsSubEvent = getDomOrCreateNew(LabelEventOptionsSubEventID);
-    $(LabelEventOptionsSubEvent.Dom).addClass("SubEventLabelSection");
-    //Populates splitter of Next event section
-    var SectionSplitterID = "LabelSectionSplitterEventOptionsSubEvent"
-    var LabelSectionSplitter = getDomOrCreateNew(SectionSplitterID);
-    $(LabelSectionSplitter.Dom).addClass("SectionSplitter");
-    //Populates  of Next event COntent
-    var ContentEventOptionsSubEventID = "ContentEventOptionsSubEvent"
-    var ContentEventOptionsSubEvent = getDomOrCreateNew(ContentEventOptionsSubEventID);
-    $(ContentEventOptionsSubEvent.Dom).addClass("SubEventContentSection");
-
-
-    */
     /*Populate Options*/
     var ProcrastinateOptionID = "ProcrastinateOption";
     var ProcrastinateOption = getDomOrCreateNew(ProcrastinateOptionID);

@@ -464,3 +464,9 @@
     left:25px;
 }
 
+
+/*Edit sub event*/
+.edit-subevent-page {
+    height:100%;
+    background-color: red;
+}
