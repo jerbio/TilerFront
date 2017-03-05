@@ -114,7 +114,7 @@ namespace TilerFront
             foreach (List<CalendarEvent> eachTuple in ThirdPartyCalendars.Values)
             {
                 foreach (CalendarEvent THirpartyCalendarEvents in eachTuple)
-                {//= eachThirdPartyCalendarControl.getThirdpartyCalendarEvent();
+                {
                     AllEventDictionary.Remove(THirpartyCalendarEvents.Calendar_EventID.getCalendarEventComponent());
                 }
             }
