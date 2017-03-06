@@ -851,7 +851,7 @@ namespace TilerFront
             RepeatCalendarEventsNode.PrependChild(xmldoc.CreateElement("RepeatEndDate"));
             RepeatCalendarEventsNode.ChildNodes[0].InnerText = RepetitionObjEntry.Range.End.UtcDateTime.ToString();
             RepeatCalendarEventsNode.PrependChild(xmldoc.CreateElement("RepeatFrequency"));
-            RepeatCalendarEventsNode.ChildNodes[0].InnerText = RepetitionObjEntry.Frequency;
+            RepeatCalendarEventsNode.ChildNodes[0].InnerText = RepetitionObjEntry.getFrequency.ToString();
             RepeatCalendarEventsNode.PrependChild(xmldoc.CreateElement("RepeatDay"));
             RepeatCalendarEventsNode.ChildNodes[0].InnerText = RepetitionObjEntry.weekDay.ToString();
             RepeatCalendarEventsNode.PrependChild(xmldoc.CreateElement("RepeatDays"));
