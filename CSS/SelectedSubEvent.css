@@ -474,19 +474,20 @@
 
 .editable-field-container {
     white-space: nowrap;
-    height: 50px;
+    height: 45px;
     line-height: 50px;
-    font-size: 24px;
+    font-size: 20px;
 }
 
 .editable-field-label {
     height: auto;
-    width: 170px;
+    width: 140px;
 }
 
 .editable-field-input {
     height: auto;
     border: solid 1px gray;
+    width: 215px;
 }
 
 .editable-field-container .ui-icon-clock {
@@ -498,7 +499,7 @@
     display: block;
 }
 .edit-subEvent-page-content {
-    width: 60%;
+    width: 90%;
     left: 50%;
     transform: translateX(-50%);
     position: relative;
@@ -509,9 +510,9 @@
 
 .edit-subEvent-page-title {
     text-align: center;
-    height: 90px;
+    height: 80px;
     line-height: 90px;
-    font-size: 30px;
+    font-size: 24px;
 }
 
 .edit-subEvent-page-footer {
