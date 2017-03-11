@@ -65,6 +65,7 @@ namespace TilerFront
                     "~/Scripts/Utility.js",
                     "~/Scripts/Chart.min.js",
                     "~/Scripts/moment.min.js",
+                    "~/Scripts/moment-timezone-with-data.min.js",
                     "~/Scripts/fullcalendar.min.js",
                     "~/Scripts/highcharts.js",
                     "~/Scripts/exporting.js",

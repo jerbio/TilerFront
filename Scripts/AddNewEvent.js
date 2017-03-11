@@ -117,12 +117,6 @@ function LaunchAddnewEvent(LoopBackCaller, CurrentUser,isTIle)
             // will be treated as a single string
             //dataType: "json",
             success: function (response) {
-                //alert(response);
-                //debugger;
-                //var myContainer = (CurrentTheme.getCurrentContainer());
-                //CurrentTheme.TransitionOldContainer();
-                //$(myContainer).empty();
-                //myContainer.outerHTML = "";                
             },
             error: function (err) {
                 //debugger;
@@ -136,11 +130,6 @@ function LaunchAddnewEvent(LoopBackCaller, CurrentUser,isTIle)
 
         }).done(function (data) {
             debugger;
-            /*var myContainer = (CurrentTheme.getCurrentContainer());
-            CurrentTheme.TransitionOldContainer();
-            $(myContainer).empty();
-            myContainer.outerHTML = "";*/
-            //InitializeHomePage();//hack alert
             RefreshSubEventsMainDivSubEVents(CloseAddNewEvent);
 
             var SubEventDate = new Date(data.Content.SubCalStartDate)
@@ -630,9 +619,6 @@ function createCalEventNameTab(isTIle)
 
     var AutoScheduleRangeConstraintContainerID = "AutoScheduleRangeConstraintContainer";
     var AutoScheduleRangeConstraintContainer = getDomOrCreateNew(AutoScheduleRangeConstraintContainerID);
-    //AutoScheduleContainerDataContainerSlider.Dom.appendChild(AutoScheduleRangeConstraintContainer.Dom);
-    
-    
 
     var AutoScheduleRangeConstraintContainerStartID = "AutoScheduleRangeConstraintContainerStart";
     
@@ -651,18 +637,6 @@ function createCalEventNameTab(isTIle)
 
     BindImputToDatePicketMobile(AutoScheduleRangeConstraintContainerStartDatePicker);
 
-    /*
-    $(AutoScheduleRangeConstraintContainerStartDatePicker.Dom).click(
-        function ()
-        {
-            var Container = getDomOrCreateNew("ContainerDateElement");
-            LaunchDatePicker(false, Container.Dom, AutoScheduleRangeConstraintContainerStartDatePicker.Dom);
-            Container.Dom.style.display = "block";
-            CurrentTheme.getCurrentContainer().appendChild((Container.Dom));
-        }
-    );
-    */
-    
     var AutoScheduleRangeConstraintContainerStartTimePickerID = "AutoScheduleRangeConstraintContainerStartTimePicker";
     var AutoScheduleRangeConstraintContainerStartTimePicker = getDomOrCreateNew(AutoScheduleRangeConstraintContainerStartTimePickerID, "input");
     
@@ -1486,21 +1460,18 @@ function createCalEventRecurrenceTab(IsTile)
     return retValue;
 }
 
-/*
-function binds the date selector to the click event of the passed "LaunchDOm"
-*/
-function BindImputToDatePicketMobile(LaunchDOm)
-{
+function BindImputToTimePicketMobile (element) {
+    $(element).datebox({
+        mode: "timeflipbox",
+        minuteStep: 5,
+        overrideTimeFormat: 12,
+        overrideTimeOutput: "%I:%M%p"
+    });
 
-    LaunchDOm.onclick=function()
-    {
-        var Container = getDomOrCreateNew("ContainerDateElement");
-        LaunchDatePicker(false, Container.Dom, LaunchDOm);
-        Container.Dom.style.display = "block";
-        CurrentTheme.getCurrentContainer().appendChild((Container.Dom));
+    element.onclick = function () {
+        var aElement2 = $(element.parentElement).children("a");
+        aElement2[0].click()
     }
-
-    
 }
 
 function createCalEventDoneTab()

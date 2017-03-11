@@ -834,9 +834,8 @@ function Theme(color)
         //document.getElementById("CalBodyContainer").appendChild(NewContainer);
     }
 
-    function transitionOldContainer(NewContainer)
+    function transitionOldContainer()
     {
-        //var oldContainer = GetCurrentContainer();
         HideCurrentContainer(true);
         ContainerStack.pop();
         LoadNewContainer();
@@ -2536,9 +2535,9 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
 
         $(pieChartContainer.Dom).addClass("PieChart");
 
-        var TotalNumberOfTask = parseInt(Dictionary_OfCalendarData[myEvent.CalendarID].TotalNumberOfEvents)
-        var DelededEvents=parseInt(Dictionary_OfCalendarData[myEvent.CalendarID].DeletedEvents);
-        var NumberOfCompleteTask =parseInt(Dictionary_OfCalendarData[myEvent.CalendarID].CompletedEvents);
+        var TotalNumberOfTask = parseInt(myEvent.Split)
+        var DelededEvents = parseInt(myEvent.DeletionCount);
+        var NumberOfCompleteTask = parseInt(myEvent.CompletionCount);
 
 
         var CompletedTask={

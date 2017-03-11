@@ -13,7 +13,9 @@ namespace TilerFront.Models
         public long End { get; set; }
         public long Duration { get; set; }
         public long Split { get; set; }
-
+        public string CalAddress { get; set; }
+        public string CalAddressDescription { get; set; }
+        public int AllEvents = 0;
 
         public DateTimeOffset getStart()
         {

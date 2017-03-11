@@ -20,16 +20,6 @@ namespace TilerFront.Controllers
 
     public class CalendarEventController : TilerApiController
     {
-        /*
-        private TilerContext db = new TilerContext();
-
-        // GET api/CalendarEvent
-        [NonAction]
-        public IQueryable<CalEvent> GetCalEvents()
-        {
-            return db.CalEvents;
-        }*/
-
         // GET api/CalendarEvent/5
         /// <summary>
         /// Retrieve a calendar event by the ID, and registered user account

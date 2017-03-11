@@ -468,5 +468,68 @@
 /*Edit sub event*/
 .edit-subevent-page {
     height:100%;
-    background-color: red;
+    background-color: #ffffff;
+    position: relative;
 }
+
+.editable-field-container {
+    white-space: nowrap;
+    height: 50px;
+    line-height: 50px;
+    font-size: 24px;
+}
+
+.editable-field-label {
+    height: auto;
+    width: 170px;
+}
+
+.editable-field-input {
+    height: auto;
+    border: solid 1px gray;
+}
+
+.editable-field-container .ui-icon-clock {
+    display: none;
+}
+
+.Save-Edit-SubEvent,
+.Cancel-Edit-SubEvent {
+    display: block;
+}
+.edit-subEvent-page-content {
+    width: 60%;
+    left: 50%;
+    transform: translateX(-50%);
+    position: relative;
+}
+.edit-subEvent-page-content-container{
+    width: 100%;
+}
+
+.edit-subEvent-page-title {
+    text-align: center;
+    height: 90px;
+    line-height: 90px;
+    font-size: 30px;
+}
+
+.edit-subEvent-page-footer {
+
+}
+
+.edit-subEvent-page-footer button {
+    outline: 0;
+    border: solid 1px gray;
+    width: 90%;
+    left: 5%;
+    height: 60px;
+    background: transparent;
+    margin-top: 10px;
+    position: relative;
+    text-align: center;
+    box-sizing: border-box;
+    line-height: 60px;
+    border-radius: 4px;
+}
+

@@ -622,6 +622,16 @@
     <Content Include="Scripts\jquery_mobile_datebox.js" />
     <Content Include="Scripts\knockout-3.4.0.debug.js" />
     <Content Include="Scripts\knockout-3.4.0.js" />
+    <Content Include="Scripts\moment-timezone-utils.js" />
+    <Content Include="Scripts\moment-timezone-with-data-2010-2020.js" />
+    <Content Include="Scripts\moment-timezone-with-data-2010-2020.min.js" />
+    <Content Include="Scripts\moment-timezone-with-data.js" />
+    <Content Include="Scripts\moment-timezone-with-data.min.js" />
+    <Content Include="Scripts\moment-timezone.js" />
+    <Content Include="Scripts\moment-timezone.min.js" />
+    <Content Include="Scripts\moment-with-langs.js" />
+    <Content Include="Scripts\moment-with-langs.min.js" />
+    <Content Include="Scripts\moment.js" />
     <Content Include="Scripts\Utility.js" />
     <Content Include="Scripts\YuiCombo\3.18.1\align-plugin\align-plugin-coverage.js" />
     <Content Include="Scripts\YuiCombo\3.18.1\align-plugin\align-plugin-debug.js" />

@@ -1240,23 +1240,7 @@ function generateModalForTIleOrModal()
             //$(ParentDom).children().show();
 
         }
-        //$(EventBackButton).click(closeProcrastinateContainer)
-        EventBackButton.onclick =closeProcrastinateContainer;
-          /*
-            (function () {
-            var myEventProcrastinateButtonContainer = EventProcrastinateContainer.Dom;
-            //alert("empty....");
-                //myEventProcrastinateButtonContainer.innerHTML = "";
-            $(myEventProcrastinateButtonContainer).empty();
-            myEventProcrastinateButtonContainer.outerHTML = "";
-            CurrentTheme.TransitionOldContainer();
-
-                //$(ParentDom).children().show();
-
-            });
-        */
-
-        
+        EventBackButton.onclick =closeProcrastinateContainer;        
 
         //$(EventUpdateButton).click
             EventUpdateButton.onclick=(function () {

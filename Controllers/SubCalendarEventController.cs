@@ -13,7 +13,7 @@ using TilerElements;
 using DBTilerElement;
 using TilerFront.Models;
 using TilerCore;
-
+using Newtonsoft.Json.Linq;
 
 namespace TilerFront.Controllers
 {
@@ -78,7 +78,12 @@ namespace TilerFront.Controllers
                             DB_UserActivity activity = new DB_UserActivity(myNow, UserActivity.ActivityType.InternalUpdate, new List<String>() { myUser.EventID });
                             retrievedUser.ScheduleLogControl.updateUserActivty(activity);
                             await NewSchedule.UpdateWithDifferentSchedule(ScheduleUpdateMessage.Item2).ConfigureAwait(false);
-                            retValue = new PostBackData(ScheduleUpdateMessage.Item1);
+                            SubCalendarEvent subEvent = NewSchedule.getSubCalendarEvent(myUser.EventID);
+                            CalendarEvent calendarEvent = NewSchedule.getCalendarEvent(myUser.EventID);
+                            SubCalEvent subCalEvent =  subEvent.ToSubCalEvent(calendarEvent);
+                            JObject retSubEvent = new JObject();
+                            retSubEvent.Add("subEvent", JObject.FromObject(subCalEvent));
+                            retValue = new PostBackData(retSubEvent, 0);
                         }
                         break;
                     default:

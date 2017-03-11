@@ -1019,3 +1019,8 @@ width: 20px;
     cursor: pointer;
     border-radius: 5px;
 }
+
+
+.inline-block {
+    display: inline-block;
+}

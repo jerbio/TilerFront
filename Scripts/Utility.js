@@ -49,3 +49,15 @@ function getCalBodyContainer() {
     let retValue = getDomOrCreateNew('CalBodyContainer')
     return retValue
 }
+
+/*
+function binds the date selector to the click event of the passed "LaunchDOm"
+*/
+function BindImputToDatePicketMobile(LaunchDOm) {
+    LaunchDOm.onclick = function () {
+        var Container = getDomOrCreateNew("ContainerDateElement");
+        LaunchDatePicker(false, Container.Dom, LaunchDOm);
+        Container.Dom.style.display = "block";
+        CurrentTheme.getCurrentContainer().appendChild((Container.Dom));
+    }
+}
