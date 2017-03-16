@@ -10,6 +10,11 @@ namespace TilerFront
 {
     public class DB_Schedule:Schedule
     {
+        protected DB_Schedule(Dictionary<string, CalendarEvent> allEventDictionary, DateTimeOffset starOfDay, Dictionary<string, Location> locations, DateTimeOffset referenceNow, UserAccount userAccount) : base(allEventDictionary, starOfDay, locations, referenceNow, userAccount.getTilerUser())
+        {
+            myAccount = userAccount;
+        }
+
 
         protected DB_Schedule(Dictionary<string, CalendarEvent> allEventDictionary, DateTimeOffset starOfDay, Dictionary<string, Location> locations, DateTimeOffset referenceNow, TilerUser user):base(allEventDictionary, starOfDay, locations, referenceNow, user)
         {
@@ -162,7 +167,7 @@ namespace TilerFront
             CompleteSchedule = getTimeLine();
         }
 
-        async public Task<CustomErrors> AddToScheduleAndCommit(CalendarEvent NewEvent)
+        async virtual public Task<CustomErrors> AddToScheduleAndCommit(CalendarEvent NewEvent, bool optimizeSchedule = true)
         {
 #if enableTimer
             myWatch.Start();
@@ -170,11 +175,11 @@ namespace TilerFront
             HashSet<SubCalendarEvent> NotdoneYet = new HashSet<SubCalendarEvent>();// getNoneDoneYetBetweenNowAndReerenceStartTIme();
             if (!NewEvent.getRigid)
             {
-                NewEvent = EvaluateTotalTimeLineAndAssignValidTimeSpots(NewEvent, NotdoneYet);
+                NewEvent = EvaluateTotalTimeLineAndAssignValidTimeSpots(NewEvent, NotdoneYet, optimizeFirstTwentyFourHours: optimizeSchedule);
             }
             else
             {
-                NewEvent = EvaluateTotalTimeLineAndAssignValidTimeSpots(NewEvent, NotdoneYet, null, 1);
+                NewEvent = EvaluateTotalTimeLineAndAssignValidTimeSpots(NewEvent, NotdoneYet, null, 1, optimizeSchedule);
             }
 
 
