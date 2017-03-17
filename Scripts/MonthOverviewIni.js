@@ -3161,8 +3161,8 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
 
             var totalDuration = referenceEnd -referenceStart;
             var percentHeight = (totalDuration / OneDayInMs) * 100;
-
-            var percentTop = ((referenceStart - new Date(Range.Start)) / OneDayInMs) * 100;
+            let startOfDay = new Date(referenceStart.getFullYear(), referenceStart.getMonth(), referenceStart.getDate())
+            var percentTop = ((referenceStart - startOfDay) / OneDayInMs) * 100;
             function call_renderSubEventsClickEvents(e)
             {
                 e.stopPropagation();
@@ -3275,496 +3275,563 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
             global_previousSelectedSubCalEvent = new Array();
         }
         function prepOnClickOfCalendarElement(SubEvent, Dom) {
-        return function () {
-            //event.stopPropagation();
-            if (!global_UISetup.RenderOnSubEventClick.isRefListSubEventClicked)
-            {
-                global_ExitManager.triggerLastExitAndPop();
-            }
-            DeselectAllSideBarElements();
-            
-            
-            var AllDomsOfTheSameSubevent = $(".SameSubEvent" + SubEvent.ID);
-            for (var i = 0; i < AllDomsOfTheSameSubevent.length; i++) {
-                var myDom = AllDomsOfTheSameSubevent[i]
-                $(myDom).addClass("SelectedWeekGridSubcalEvent");
-                global_previousSelectedSubCalEvent.push(myDom);
-                myDom.focus();
-        }
-
-              var ControlPanelNameOfSubeventInfo = document.getElementById("ControlPanelNameOfSubeventInfo");
-              var ControlPanelDeadlineOfSubeventInfo = document.getElementById("ControlPanelDeadlineOfSubeventInfo");
-              var ControlPanelSubEventTimeInfo = document.getElementById("ControlPanelSubEventTimeInfo");
-
-
-
-              var FormatTime = function (date) {
-              var d = date;
-              var TimeHours = d.getHours();
-              var TimeMinutes = d.getMinutes();
-              var TimeMM = TimeMinutes;
-              var TimeHH = TimeHours;
-              var AMPM = 'am';
-              var day = '';
-              var month = '';
-              var date_number = d.getDate();
-              var year = d.getYear();
-
-              if (TimeMinutes <= 9) {
-                TimeMM = '0' +TimeMinutes
-              }
-              if (TimeHours >= 12 && TimeMinutes >= 0) {
-                if (TimeHours >= 13) {
-                  TimeHH = TimeHours -12;
-              }
-                AMPM = 'pm';
-              } else if (TimeHours === 12 && TimeMinutes === 0) {
-                TimeHH = 'Noon';
-                AMPM = '';
-                TimeMM = '';
-              } else if (TimeHours === 24 && TimeMinutes === 0) {
-                TimeHH = 'Midnight';
-                AMPM = '';
-                TimeMM = '';
-              }
-              switch (d.getMonth()) {
-                case 0:
-                  month = "Jan";
-                  break;
-                case 1:
-                  month = "Feb";
-                  break;
-                case 2:
-                  month = "Mar";
-                  break;
-                case 3:
-                  month = "Apr";
-                  break;
-                case 4:
-                  month = "May";
-                  break;
-                case 5:
-                  month = "Jun";
-                  break;
-                case 6:
-                  month = "Jul";
-                  break;
-                case 7:
-                  month = "Aug";
-                  break;
-                case 8:
-                  month = "Sep";
-                  break;
-                case 9:
-                  month = "Oct";
-                  break;
-                case 10:
-                  month = "Nov";
-                  break;
-                case 11:
-                  month = "Dec";
-                  break;
-              }
-              switch (d.getDay()) {
-                case 0:
-                  day = "Sunday";
-                  break;
-                case 1:
-                  day = "Monday";
-                  break;
-                case 2:
-                  day = "Tuesday";
-                  break;
-                case 3:
-                  day = "Wednesday";
-                  break;
-                case 4:
-                  day = "Thursday";
-                  break;
-                case 5:
-                  day = "Friday";
-                  break;
-                case 6:
-                  day = "Saturday";
-                  break;
-              }
-              var a = { hour: TimeHH, minute: TimeMM, merid: AMPM, day: day, mon: month, date: date_number, year: year
-              }
-              return a;
-              };
-              getRefreshedData.disableDataRefresh();
-            var StartDate = FormatTime(SubEvent.SubCalStartDate);
-            var EndDate = FormatTime(SubEvent.SubCalEndDate);
-            var Deadline = FormatTime(SubEvent.SubCalCalEventEnd);
-
-            var yeaButton = getDomOrCreateNew("YeaToConfirmDelete");
-            var nayButton = getDomOrCreateNew("NayToConfirmDelete");
-            var completeButton = global_ControlPanelIconSet.getCompleteButton();
-            var PauseResumeButton = global_ControlPanelIconSet.getPauseResumeButton()
-            var deleteButton = global_ControlPanelIconSet.getDeleteButton();
-            var DeleteMessage = getDomOrCreateNew("DeleteMessage")
-            var ProcatinationButton = getDomOrCreateNew("submitProcatination");
-            var ProcatinationCancelButton = getDomOrCreateNew("cancelProcatination");
-            var ControlPanelCloseButton = global_ControlPanelIconSet.getCloseButton();
-            var ProcrastinateEventModalContainer = getDomOrCreateNew("ProcrastinateEventModal");
-            var ControlPanelProcrastinateButton = global_ControlPanelIconSet.getProcrastinateButton();
-            var ControlPanelLocationButton = global_ControlPanelIconSet.getLocationButton();
-            var ModalDelete = getDomOrCreateNew("ConfirmDeleteModal")
-            var ControlPanelContainer = getDomOrCreateNew("ControlPanelContainer");
-            var MultiSelectPanel = getDomOrCreateNew("MultiSelectPanel");
-            $(ControlPanelContainer).addClass("ControlPanelContainerModal");
-            /*if (renderSubEventsClickEvents.BottomPanelIsOpen) {
-                closeControlPanel();
-            }*/
-
-            var InfoPanelOverLay = getDomOrCreateNew("InfoPanelOverLay")
-            removeLowerBarIconSetCOntainer();
-            revealControlInfoContainer()
-            var BasePanel = generateBasePanel();
-            
-
-            var IconSetContainer = global_ControlPanelIconSet.getIconSetContainer();
-            $(ControlPanelContainer).addClass("setAsVisibilityHidden");
-            setTimeout(function ()
-            {
-                $(ControlPanelContainer).removeClass("setAsVisibilityHidden");
-                $(ControlPanelContainer).slideDown(500);
-            }, 300)
-
-            
-            BasePanel.appendChild(InfoPanelOverLay);
-            BasePanel.appendChild(IconSetContainer);
-            
-
-            ControlPanelContainer.appendChild(BasePanel);
-            var EditContainerData = generateEditDoneCOntainer();
-            ControlPanelContainer.appendChild(EditContainerData.Container);
-
-            var LauchLocation = function () {
-                debugger;
-                var googleMapsURL = "https://www.google.com/maps/place/";
-                var fullURL = googleMapsURL + SubEvent.SubCalAddress
-                if (SubEvent.SubCalAddress) {
-                    var win = window.open(fullURL, '_blank');
-                    win.focus();
-                }
-                else {
-                    $(MultiSelectPanel).removeClass("hideMultiSelectPanel");
-                    MultiSelectPanel.innerHTML = "Oops tiler could not find an address :X &#x1f603;";
-                    setTimeout(function () { $(MultiSelectPanel).addClass("hideMultiSelectPanel"); }, 3000);
-
-
-                }
-
-            }
-
-            ControlPanelLocationButton.onclick = LauchLocation;
-
-            ProcatinationButton.onclick = function () {
-                debugger;
-                procrastinateEvent();
-                closeProcrastinatePanel();
-            }
-
-
-            ProcatinationCancelButton.onclick = closeProcrastinatePanel;
-
-            function resetButtons() {
-                yeaButton.onclick = null;
-                nayButton.onclick = null;
-                ControlPanelProcrastinateButton.onclick = null;
-                ControlPanelCloseButton.onclick = null;
-                ControlPanelLocationButton.onclick = null;
-        }
-
-            function generateBasePanel()
-            {
-                var BasePanelID = "InfoBasePanel";
-                var BasePanel = getDomOrCreateNew(BasePanelID);
-                return BasePanel;
-            }
-
-            function slideOpenProcrastinateEventModal() {
-                ProcrastinateEventModalContainer.focus();
-                $(ProcrastinateEventModalContainer).slideDown(500);
-                ProcrastinateEventModalContainer.onkeydown = ProcrastinateEventModalContainer;
-                function procrastinateContainerKeyPress(e) {
-                    e.stopPropagation();
-                    if (e.which == 27)//escape key press
-                    {
-                        closeProcrastinatePanel();
-                    }
-                }
-
-                
-
-            }
-
-            function generateEditDoneCOntainer()
-            {
-                var SaveButton = getDomOrCreateNew("SaveButton", "button");
-                SaveButton.innerHTML = "Save"
-                var EditContainer = getDomOrCreateNew("EditCalEventContainer");
-                $(EditContainer).addClass("setAsDisplayNone");
-                EditContainer.appendChild(SaveButton);
-                var EditContainerStatus = { isRevealed: false };
-                function RevealEditContainer()
+            return function () {
+                //event.stopPropagation();
+                if (!global_UISetup.RenderOnSubEventClick.isRefListSubEventClicked)
                 {
-                    if (!EditContainerStatus.isRevealed)
-                    {
-                        $(EditContainer).removeClass("setAsDisplayNone");
-                        EditContainerStatus.isRevealed = true;
-                    }
+                    global_ExitManager.triggerLastExitAndPop();
                 }
-
-                    
-                function HideEditContainer()
-                {
-                    if (EditContainerStatus.isRevealed)
-                    {
-                        $(EditContainer).addClass("setAsDisplayNone");
-                        EditContainerStatus.isRevealed = false;
-                    }
-                }
-
-
-                HideEditContainer();
-                SaveButton.onclick = null;
-
-                var retValue = { SaveButton: SaveButton, Container: EditContainer, RevealContainer: RevealEditContainer, HideEditContainer: HideEditContainer };
-                return retValue;
-            }
-
-            
-
-            ControlPanelProcrastinateButton.onclick = slideOpenProcrastinateEventModal;
-            
-
-            function closeControlPanel() {
-                global_ExitManager.triggerLastExitAndPop();
-            }
-
-
-            //function combines the close of selected reference list elements
-            function CombinedCLoser()
-            {
-                BindClickOfSideBarToCLick.reset();
-                TriggerClose();
-            }
-
-
-            function TriggerClose() {
-                getRefreshedData.enableDataRefresh();
-                resetButtons();
                 DeselectAllSideBarElements();
-                closeModalDelete();
-                closeProcrastinatePanel();
-                deleteButton.onclick = null;
-                completeButton.onclick = null;
-                PauseResumeButton.onclick = null;
-                $(ControlPanelContainer).slideUp(500);
-                document.removeEventListener("keydown", containerKeyPress);
-                global_UISetup.RenderOnSubEventClick.isRefListSubEventClicked = false;
-                global_UISetup.RenderOnSubEventClick.BottomPanelIsOpen = false;
+            
+            
+                var AllDomsOfTheSameSubevent = $(".SameSubEvent" + SubEvent.ID);
+                for (var i = 0; i < AllDomsOfTheSameSubevent.length; i++) {
+                    var myDom = AllDomsOfTheSameSubevent[i]
+                    $(myDom).addClass("SelectedWeekGridSubcalEvent");
+                    global_previousSelectedSubCalEvent.push(myDom);
+                    myDom.focus();
+            }
+
+                  var ControlPanelNameOfSubeventInfo = document.getElementById("ControlPanelNameOfSubeventInfo");
+                  var ControlPanelDeadlineOfSubeventInfo = document.getElementById("ControlPanelDeadlineOfSubeventInfo");
+                  var ControlPanelSubEventTimeInfo = document.getElementById("ControlPanelSubEventTimeInfo");
+
+
+
+                  var FormatTime = function (date) {
+                  var d = date;
+                  var TimeHours = d.getHours();
+                  var TimeMinutes = d.getMinutes();
+                  var TimeMM = TimeMinutes;
+                  var TimeHH = TimeHours;
+                  var AMPM = 'am';
+                  var day = '';
+                  var month = '';
+                  var date_number = d.getDate();
+                  var year = d.getYear();
+
+                  if (TimeMinutes <= 9) {
+                    TimeMM = '0' +TimeMinutes
+                  }
+                  if (TimeHours >= 12 && TimeMinutes >= 0) {
+                    if (TimeHours >= 13) {
+                      TimeHH = TimeHours -12;
+                  }
+                    AMPM = 'pm';
+                  } else if (TimeHours === 12 && TimeMinutes === 0) {
+                    TimeHH = 'Noon';
+                    AMPM = '';
+                    TimeMM = '';
+                  } else if (TimeHours === 24 && TimeMinutes === 0) {
+                    TimeHH = 'Midnight';
+                    AMPM = '';
+                    TimeMM = '';
+                  }
+                  switch (d.getMonth()) {
+                    case 0:
+                      month = "Jan";
+                      break;
+                    case 1:
+                      month = "Feb";
+                      break;
+                    case 2:
+                      month = "Mar";
+                      break;
+                    case 3:
+                      month = "Apr";
+                      break;
+                    case 4:
+                      month = "May";
+                      break;
+                    case 5:
+                      month = "Jun";
+                      break;
+                    case 6:
+                      month = "Jul";
+                      break;
+                    case 7:
+                      month = "Aug";
+                      break;
+                    case 8:
+                      month = "Sep";
+                      break;
+                    case 9:
+                      month = "Oct";
+                      break;
+                    case 10:
+                      month = "Nov";
+                      break;
+                    case 11:
+                      month = "Dec";
+                      break;
+                  }
+                  switch (d.getDay()) {
+                    case 0:
+                      day = "Sunday";
+                      break;
+                    case 1:
+                      day = "Monday";
+                      break;
+                    case 2:
+                      day = "Tuesday";
+                      break;
+                    case 3:
+                      day = "Wednesday";
+                      break;
+                    case 4:
+                      day = "Thursday";
+                      break;
+                    case 5:
+                      day = "Friday";
+                      break;
+                    case 6:
+                      day = "Saturday";
+                      break;
+                  }
+                  var a = { hour: TimeHH, minute: TimeMM, merid: AMPM, day: day, mon: month, date: date_number, year: year
+                  }
+                  return a;
+                  };
+                  getRefreshedData.disableDataRefresh();
+                var StartDate = FormatTime(SubEvent.SubCalStartDate);
+                var EndDate = FormatTime(SubEvent.SubCalEndDate);
+                var Deadline = FormatTime(SubEvent.SubCalCalEventEnd);
+
+                var yeaButton = getDomOrCreateNew("YeaToConfirmDelete");
+                var nayButton = getDomOrCreateNew("NayToConfirmDelete");
+                var completeButton = global_ControlPanelIconSet.getCompleteButton();
+                var PauseResumeButton = global_ControlPanelIconSet.getPauseResumeButton()
+                var deleteButton = global_ControlPanelIconSet.getDeleteButton();
+                var DeleteMessage = getDomOrCreateNew("DeleteMessage")
+                var ProcatinationButton = getDomOrCreateNew("submitProcatination");
+                var ProcatinationCancelButton = getDomOrCreateNew("cancelProcatination");
+                var ControlPanelCloseButton = global_ControlPanelIconSet.getCloseButton();
+                var ProcrastinateEventModalContainer = getDomOrCreateNew("ProcrastinateEventModal");
+                var ControlPanelProcrastinateButton = global_ControlPanelIconSet.getProcrastinateButton();
+                var ControlPanelLocationButton = global_ControlPanelIconSet.getLocationButton();
+                var ModalDelete = getDomOrCreateNew("ConfirmDeleteModal")
+                var ControlPanelContainer = getDomOrCreateNew("ControlPanelContainer");
+                var MultiSelectPanel = getDomOrCreateNew("MultiSelectPanel");
+                $(ControlPanelContainer).addClass("ControlPanelContainerModal");
+                /*if (renderSubEventsClickEvents.BottomPanelIsOpen) {
+                    closeControlPanel();
+                }*/
+
+                var InfoPanelOverLay = getDomOrCreateNew("InfoPanelOverLay")
+                removeLowerBarIconSetCOntainer();
+                revealControlInfoContainer()
+                var BasePanel = generateBasePanel();
+            
+
+                var IconSetContainer = global_ControlPanelIconSet.getIconSetContainer();
+                $(ControlPanelContainer).addClass("setAsVisibilityHidden");
+                setTimeout(function ()
+                {
+                    $(ControlPanelContainer).removeClass("setAsVisibilityHidden");
+                    $(ControlPanelContainer).slideDown(500);
+                }, 300)
+
+            
+                BasePanel.appendChild(InfoPanelOverLay);
+                BasePanel.appendChild(IconSetContainer);
+            
+
+                ControlPanelContainer.appendChild(BasePanel);
+                var EditContainerData = generateEditDoneCOntainer();
+                ControlPanelContainer.appendChild(EditContainerData.Container);
+
+                var LauchLocation = function () {
+                    debugger;
+                    var googleMapsURL = "https://www.google.com/maps/place/";
+                    var fullURL = googleMapsURL + SubEvent.SubCalAddress
+                    if (SubEvent.SubCalAddress) {
+                        var win = window.open(fullURL, '_blank');
+                        win.focus();
+                    }
+                    else {
+                        $(MultiSelectPanel).removeClass("hideMultiSelectPanel");
+                        MultiSelectPanel.innerHTML = "Oops tiler could not find an address :X &#x1f603;";
+                        setTimeout(function () { $(MultiSelectPanel).addClass("hideMultiSelectPanel"); }, 3000);
+
+
+                    }
+
+                }
+
+                ControlPanelLocationButton.onclick = LauchLocation;
+
+                ProcatinationButton.onclick = function () {
+                    debugger;
+                    procrastinateEvent();
+                    closeProcrastinatePanel();
+                }
+
+
+                ProcatinationCancelButton.onclick = closeProcrastinatePanel;
+
+                function resetButtons() {
+                    yeaButton.onclick = null;
+                    nayButton.onclick = null;
+                    ControlPanelProcrastinateButton.onclick = null;
+                    ControlPanelCloseButton.onclick = null;
+                    ControlPanelLocationButton.onclick = null;
+            }
+
+                function generateBasePanel()
+                {
+                    var BasePanelID = "InfoBasePanel";
+                    var BasePanel = getDomOrCreateNew(BasePanelID);
+                    return BasePanel;
+                }
+
+                function slideOpenProcrastinateEventModal() {
+                    ProcrastinateEventModalContainer.focus();
+                    $(ProcrastinateEventModalContainer).slideDown(500);
+                    ProcrastinateEventModalContainer.onkeydown = ProcrastinateEventModalContainer;
+                    function procrastinateContainerKeyPress(e) {
+                        e.stopPropagation();
+                        if (e.which == 27)//escape key press
+                        {
+                            closeProcrastinatePanel();
+                        }
+                    }
+
                 
-                if (IconSetContainer.parentNode != null) {
-                    IconSetContainer.parentNode.removeChild(IconSetContainer);
+
                 }
-                $(ControlPanelContainer).removeClass("ControlPanelContainerLowerBar");
-                setTimeout(function(){ $(ControlPanelContainer).removeClass("ControlPanelContainerModal")},500);
-            }
 
+                function generateEditDoneCOntainer()
+                {
+                    var SaveButton = getDomOrCreateNew("SaveButton", "button");
+                    SaveButton.innerHTML = "Save"
+                    var EditContainer = getDomOrCreateNew("EditCalEventContainer");
+                    $(EditContainer).addClass("setAsDisplayNone");
+                    EditContainer.appendChild(SaveButton);
+                    var EditContainerStatus = { isRevealed: false };
+                    function RevealEditContainer()
+                    {
+                        if (!EditContainerStatus.isRevealed)
+                        {
+                            $(EditContainer).removeClass("setAsDisplayNone");
+                            EditContainerStatus.isRevealed = true;
+                        }
+                    }
 
-            //checks if bottompannel is open. If panel is open then just reset the subevent reflist element as opposed to 
-            if (!global_UISetup.RenderOnSubEventClick.isRefListSubEventClicked) {
-                global_ExitManager.addNewExit(CombinedCLoser);
-            }
-            
-            
-            
-            
-            
-
-            function closeProcrastinatePanel() {
-                $(ProcrastinateEventModalContainer).slideUp(500);
-            }
-
-            ControlPanelCloseButton.onclick = global_ExitManager.triggerLastExitAndPop;
-
-            function pauseEvent()
-            {
-                SendMessage();
-                function SendMessage() {
-                    var TimeZone = new Date().getTimezoneOffset();
-                    debugger;
-
-                    var PauseEvent = {
-                        UserName: UserCredentials.UserName,
-                        UserID: UserCredentials.ID,
-                        EventID: SubEvent.ID,
-                        TimeZoneOffset: TimeZone,
-                        ThirdPartyEventID: SubEvent.ThirdPartyEventID,
-                        ThirdPartyUserID: SubEvent.ThirdPartyUserID,
-                        ThirdPartyType: SubEvent.ThirdPartyType
-                    };
                     
-                    var URL = global_refTIlerUrl + "Schedule/Event/Pause";
-                    var HandleNEwPage = new LoadingScreenControl("Tiler is Pausing your event :)");
-                    HandleNEwPage.Launch();
-
-                    var exit = function (data) {
-                        HandleNEwPage.Hide();
-                        //triggerUIUPdate();//hack alert
-                        global_ExitManager.triggerLastExitAndPop();
-                        //getRefreshedData();
+                    function HideEditContainer()
+                    {
+                        if (EditContainerStatus.isRevealed)
+                        {
+                            $(EditContainer).addClass("setAsDisplayNone");
+                            EditContainerStatus.isRevealed = false;
+                        }
                     }
 
-                    $.ajax({
-                        type: "POST",
-                        url: URL,
-                        data: PauseEvent,
-                        success: function (response) {
-                            exit();
-                            //triggerUndoPanel("Undo Pause?");
-                            //alert("alert 0-b");
-                        },
-                        error: function () {
-                            var NewMessage = "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
-                            var ExitAfter = {
-                                ExitNow: true, Delay: 1000
-                            };
-                            HandleNEwPage.UpdateMessage(NewMessage, ExitAfter, exit);
-                        }
-                    }).done(function (data) {
-                        HandleNEwPage.Hide();
-                        triggerUIUPdate();//hack alert
-                        //getRefreshedData();
-                    });
+
+                    HideEditContainer();
+                    SaveButton.onclick = null;
+
+                    var retValue = { SaveButton: SaveButton, Container: EditContainer, RevealContainer: RevealEditContainer, HideEditContainer: HideEditContainer };
+                    return retValue;
                 }
-                function triggerUIUPdate() {
-                    //alert("we are deleting " + SubEvent.ID);
-                    //$('#ConfirmDeleteModal').slideToggle();
-                    //$('#ControlPanelContainer').slideUp(500);
-                    //resetButtons();
+
+            
+
+                ControlPanelProcrastinateButton.onclick = slideOpenProcrastinateEventModal;
+            
+
+                function closeControlPanel() {
                     global_ExitManager.triggerLastExitAndPop();
                 }
 
-            }
 
-            function continueEvent() {
-                SendMessage();
-                function SendMessage() {
-                    var TimeZone = new Date().getTimezoneOffset();
-                    debugger;
+                //function combines the close of selected reference list elements
+                function CombinedCLoser()
+                {
+                    BindClickOfSideBarToCLick.reset();
+                    TriggerClose();
+                }
 
-                    var ContinueEvent = {
-                        UserName: UserCredentials.UserName,
-                        UserID: UserCredentials.ID,
-                        EventID: SubEvent.ID,
-                        TimeZoneOffset: TimeZone,
-                        ThirdPartyEventID: SubEvent.ThirdPartyEventID,
-                        ThirdPartyUserID: SubEvent.ThirdPartyUserID,
-                        ThirdPartyType: SubEvent.ThirdPartyType
-                    };
 
-                    var URL = global_refTIlerUrl + "Schedule/Event/Resume";
-                    var HandleNEwPage = new LoadingScreenControl("Tiler resuming your event :)");
-                    HandleNEwPage.Launch();
-
-                    var exit = function (data) {
-                        HandleNEwPage.Hide();
-                        //triggerUIUPdate();//hack alert
-                        global_ExitManager.triggerLastExitAndPop();
-                        //getRefreshedData();
+                function TriggerClose() {
+                    getRefreshedData.enableDataRefresh();
+                    resetButtons();
+                    DeselectAllSideBarElements();
+                    closeModalDelete();
+                    closeProcrastinatePanel();
+                    deleteButton.onclick = null;
+                    completeButton.onclick = null;
+                    PauseResumeButton.onclick = null;
+                    $(ControlPanelContainer).slideUp(500);
+                    document.removeEventListener("keydown", containerKeyPress);
+                    global_UISetup.RenderOnSubEventClick.isRefListSubEventClicked = false;
+                    global_UISetup.RenderOnSubEventClick.BottomPanelIsOpen = false;
+                
+                    if (IconSetContainer.parentNode != null) {
+                        IconSetContainer.parentNode.removeChild(IconSetContainer);
                     }
+                    $(ControlPanelContainer).removeClass("ControlPanelContainerLowerBar");
+                    setTimeout(function(){ $(ControlPanelContainer).removeClass("ControlPanelContainerModal")},500);
+                }
 
-                    $.ajax({
-                        type: "POST",
-                        url: URL,
-                        data: ContinueEvent,
-                        success: function (response) {
-                            exit();
-                            //triggerUndoPanel("Undo Pause?");
-                            //alert("alert 0-b");
-                        },
-                        error: function () {
-                            var NewMessage = "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
-                            var ExitAfter = {
-                                ExitNow: true, Delay: 1000
-                            };
-                            HandleNEwPage.UpdateMessage(NewMessage, ExitAfter, exit);
+
+                //checks if bottompannel is open. If panel is open then just reset the subevent reflist element as opposed to 
+                if (!global_UISetup.RenderOnSubEventClick.isRefListSubEventClicked) {
+                    global_ExitManager.addNewExit(CombinedCLoser);
+                }
+            
+            
+            
+            
+            
+
+                function closeProcrastinatePanel() {
+                    $(ProcrastinateEventModalContainer).slideUp(500);
+                }
+
+                ControlPanelCloseButton.onclick = global_ExitManager.triggerLastExitAndPop;
+
+                function pauseEvent()
+                {
+                    SendMessage();
+                    function SendMessage() {
+                        var TimeZone = new Date().getTimezoneOffset();
+                        debugger;
+
+                        var PauseEvent = {
+                            UserName: UserCredentials.UserName,
+                            UserID: UserCredentials.ID,
+                            EventID: SubEvent.ID,
+                            TimeZoneOffset: TimeZone,
+                            ThirdPartyEventID: SubEvent.ThirdPartyEventID,
+                            ThirdPartyUserID: SubEvent.ThirdPartyUserID,
+                            ThirdPartyType: SubEvent.ThirdPartyType
+                        };
+                    
+                        var URL = global_refTIlerUrl + "Schedule/Event/Pause";
+                        var HandleNEwPage = new LoadingScreenControl("Tiler is Pausing your event :)");
+                        HandleNEwPage.Launch();
+
+                        var exit = function (data) {
+                            HandleNEwPage.Hide();
+                            //triggerUIUPdate();//hack alert
+                            global_ExitManager.triggerLastExitAndPop();
+                            //getRefreshedData();
                         }
-                    }).done(function (data) {
-                        HandleNEwPage.Hide();
-                        triggerUIUPdate();//hack alert
-                        //getRefreshedData();
-                    });
-                }
-                function triggerUIUPdate() {
-                    //alert("we are deleting " + SubEvent.ID);
-                    //$('#ConfirmDeleteModal').slideToggle();
-                    //$('#ControlPanelContainer').slideUp(500);
-                    //resetButtons();
-                    global_ExitManager.triggerLastExitAndPop();
-                }
 
-            }
-
-            function deleteSubevent()//triggers the yea / nay deletion of events
-            {
-                DeleteMessage.innerHTML = "Sure you want to delete \"" + SubEvent.Name + "\"?"
-
-                yeaButton.onclick = yeaDeleteSubEvent;
-                nayButton.onclick = nayDeleteSubEvent;
-                yeaButton.focus();
-                $('#ConfirmDeleteModal').slideDown(500);
-                ModalDelete.isRevealed = true;
-            }
-
-            if (ModalDelete.isRevealed) {
-                deleteSubevent();
-            }
-
-            function yeaDeleteSubEvent()//triggers the deletion of subevent
-            {
-                SendMessage();
-                function SendMessage() {
-                    var TimeZone = new Date().getTimezoneOffset();
-                    debugger;
-                    var DeletionEvent = {
-                        UserName: UserCredentials.UserName,
-                        UserID: UserCredentials.ID,
-                        EventID: SubEvent.ID,
-                        TimeZoneOffset: TimeZone,
-                        ThirdPartyEventID: SubEvent.ThirdPartyEventID,
-                        ThirdPartyUserID: SubEvent.ThirdPartyUserID,
-                        ThirdPartyType: SubEvent.ThirdPartyType
-                };
-                    //var URL = "RootWagTap/time.top?WagCommand=6"
-                    var URL = global_refTIlerUrl + "Schedule/Event";
-                    var HandleNEwPage = new LoadingScreenControl("Tiler is Deleting your event :)");
-                    HandleNEwPage.Launch();
-
-                    var exit = function (data) {
-                        HandleNEwPage.Hide();
-                        //triggerUIUPdate();//hack alert
-                        global_ExitManager.triggerLastExitAndPop();
-                        //getRefreshedData();
-                    }
-
-                    $.ajax({
-                            type: "DELETE",
+                        $.ajax({
+                            type: "POST",
                             url: URL,
-                            data: DeletionEvent,
+                            data: PauseEvent,
+                            success: function (response) {
+                                exit();
+                                //triggerUndoPanel("Undo Pause?");
+                                //alert("alert 0-b");
+                            },
+                            error: function () {
+                                var NewMessage = "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
+                                var ExitAfter = {
+                                    ExitNow: true, Delay: 1000
+                                };
+                                HandleNEwPage.UpdateMessage(NewMessage, ExitAfter, exit);
+                            }
+                        }).done(function (data) {
+                            HandleNEwPage.Hide();
+                            triggerUIUPdate();//hack alert
+                            //getRefreshedData();
+                        });
+                    }
+                    function triggerUIUPdate() {
+                        //alert("we are deleting " + SubEvent.ID);
+                        //$('#ConfirmDeleteModal').slideToggle();
+                        //$('#ControlPanelContainer').slideUp(500);
+                        //resetButtons();
+                        global_ExitManager.triggerLastExitAndPop();
+                    }
+
+                }
+
+                function continueEvent() {
+                    SendMessage();
+                    function SendMessage() {
+                        var TimeZone = new Date().getTimezoneOffset();
+                        debugger;
+
+                        var ContinueEvent = {
+                            UserName: UserCredentials.UserName,
+                            UserID: UserCredentials.ID,
+                            EventID: SubEvent.ID,
+                            TimeZoneOffset: TimeZone,
+                            ThirdPartyEventID: SubEvent.ThirdPartyEventID,
+                            ThirdPartyUserID: SubEvent.ThirdPartyUserID,
+                            ThirdPartyType: SubEvent.ThirdPartyType
+                        };
+
+                        var URL = global_refTIlerUrl + "Schedule/Event/Resume";
+                        var HandleNEwPage = new LoadingScreenControl("Tiler resuming your event :)");
+                        HandleNEwPage.Launch();
+
+                        var exit = function (data) {
+                            HandleNEwPage.Hide();
+                            //triggerUIUPdate();//hack alert
+                            global_ExitManager.triggerLastExitAndPop();
+                            //getRefreshedData();
+                        }
+
+                        $.ajax({
+                            type: "POST",
+                            url: URL,
+                            data: ContinueEvent,
+                            success: function (response) {
+                                exit();
+                                //triggerUndoPanel("Undo Pause?");
+                                //alert("alert 0-b");
+                            },
+                            error: function () {
+                                var NewMessage = "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
+                                var ExitAfter = {
+                                    ExitNow: true, Delay: 1000
+                                };
+                                HandleNEwPage.UpdateMessage(NewMessage, ExitAfter, exit);
+                            }
+                        }).done(function (data) {
+                            HandleNEwPage.Hide();
+                            triggerUIUPdate();//hack alert
+                            //getRefreshedData();
+                        });
+                    }
+                    function triggerUIUPdate() {
+                        //alert("we are deleting " + SubEvent.ID);
+                        //$('#ConfirmDeleteModal').slideToggle();
+                        //$('#ControlPanelContainer').slideUp(500);
+                        //resetButtons();
+                        global_ExitManager.triggerLastExitAndPop();
+                    }
+
+                }
+
+                function deleteSubevent()//triggers the yea / nay deletion of events
+                {
+                    DeleteMessage.innerHTML = "Sure you want to delete \"" + SubEvent.Name + "\"?"
+
+                    yeaButton.onclick = yeaDeleteSubEvent;
+                    nayButton.onclick = nayDeleteSubEvent;
+                    yeaButton.focus();
+                    $('#ConfirmDeleteModal').slideDown(500);
+                    ModalDelete.isRevealed = true;
+                }
+
+                if (ModalDelete.isRevealed) {
+                    deleteSubevent();
+                }
+
+                function yeaDeleteSubEvent()//triggers the deletion of subevent
+                {
+                    SendMessage();
+                    function SendMessage() {
+                        var TimeZone = new Date().getTimezoneOffset();
+                        debugger;
+                        var DeletionEvent = {
+                            UserName: UserCredentials.UserName,
+                            UserID: UserCredentials.ID,
+                            EventID: SubEvent.ID,
+                            TimeZoneOffset: TimeZone,
+                            ThirdPartyEventID: SubEvent.ThirdPartyEventID,
+                            ThirdPartyUserID: SubEvent.ThirdPartyUserID,
+                            ThirdPartyType: SubEvent.ThirdPartyType
+                    };
+                        //var URL = "RootWagTap/time.top?WagCommand=6"
+                        var URL = global_refTIlerUrl + "Schedule/Event";
+                        var HandleNEwPage = new LoadingScreenControl("Tiler is Deleting your event :)");
+                        HandleNEwPage.Launch();
+
+                        var exit = function (data) {
+                            HandleNEwPage.Hide();
+                            //triggerUIUPdate();//hack alert
+                            global_ExitManager.triggerLastExitAndPop();
+                            //getRefreshedData();
+                        }
+
+                        $.ajax({
+                                type: "DELETE",
+                                url: URL,
+                                data: DeletionEvent,
+                            // DO NOT SET CONTENT TYPE to json
+                            // contentType: "application/json; charset=utf-8", 
+                            // DataType needs to stay, otherwise the response object
+                            // will be treated as a single string
+                                success: function (response) {
+                                    exit();
+                                    triggerUndoPanel("Undo deletion?");
+                                    //alert("alert 0-b");
+                        },
+                                error: function () {
+                                var NewMessage = "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
+                                var ExitAfter = { ExitNow: true, Delay: 1000
+                                };
+                                HandleNEwPage.UpdateMessage(NewMessage, ExitAfter, exit);
+                        }
+                        }).done(function (data) {
+                            HandleNEwPage.Hide();
+                            triggerUIUPdate();//hack alert
+                            //getRefreshedData();
+                        });
+                }
+                    function triggerUIUPdate() {
+                        //alert("we are deleting " + SubEvent.ID);
+                        //$('#ConfirmDeleteModal').slideToggle();
+                        //$('#ControlPanelContainer').slideUp(500);
+                        //resetButtons();
+                        global_ExitManager.triggerLastExitAndPop();
+                }
+
+            }
+
+
+                function nayDeleteSubEvent()//ignores deletion of events
+                {
+                    closeModalDelete();
+                    //resetButtons();
+                }
+
+                function procrastinateEvent() {
+                    var HourInput = getDomOrCreateNew("procrastinateHours").value == "" ? 0 : getDomOrCreateNew("procrastinateHours").value;
+                    var MinInput = getDomOrCreateNew("procrastinateMins").value == "" ? 0 : getDomOrCreateNew("procrastinateMins").value;
+                    var DayInput = getDomOrCreateNew("procrastinateDays").value == "" ? 0 : getDomOrCreateNew("procrastinateDays").value;
+                    debugger;
+                    var TimeZone = new Date().getTimezoneOffset();
+                    var NowData = { UserName: UserCredentials.UserName, UserID: UserCredentials.ID, EventID: SubEvent.ID, DurationDays: DayInput, DurationHours: HourInput, DurationMins: MinInput, TimeZoneOffset: TimeZone};
+                    //var URL= "RootWagTap/time.top?WagCommand=2";
+                    var URL = global_refTIlerUrl + "Schedule/Event/Procrastinate";
+                    var HandleNEwPage = new LoadingScreenControl("Tiler is Postponing  :)");
+                    HandleNEwPage.Launch();
+
+                    var exit = function (data) {
+                        HandleNEwPage.Hide();
+                        //triggerUIUPdate();//hack alert
+                        global_ExitManager.triggerLastExitAndPop();
+                        //getRefreshedData();
+                    }
+                    $.ajax({
+                            type: "POST",
+                            url: URL,
+                            data: NowData,
                         // DO NOT SET CONTENT TYPE to json
                         // contentType: "application/json; charset=utf-8", 
                         // DataType needs to stay, otherwise the response object
                         // will be treated as a single string
+                            dataType: "json",
                             success: function (response) {
-                                exit();
-                                triggerUndoPanel("Undo deletion?");
-                                //alert("alert 0-b");
-                    },
+                                triggerUndoPanel("Undo Procrastination");
+                                var myContainer = (response);
+                                if (myContainer.Error.code == 0) {
+                                    //exitSelectedEventScreen();
+                                }
+                                else {
+                                    alert("error detected with marking as complete");
+                                }
+
+                            },
                             error: function () {
                             var NewMessage = "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
                             var ExitAfter = { ExitNow: true, Delay: 1000
@@ -3775,54 +3842,375 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                         HandleNEwPage.Hide();
                         triggerUIUPdate();//hack alert
                         //getRefreshedData();
+
                     });
-            }
-                function triggerUIUPdate() {
-                    //alert("we are deleting " + SubEvent.ID);
-                    //$('#ConfirmDeleteModal').slideToggle();
-                    //$('#ControlPanelContainer').slideUp(500);
-                    //resetButtons();
-                    global_ExitManager.triggerLastExitAndPop();
+
+                    function triggerUIUPdate() {
+                        //resetButtons();
+                        global_ExitManager.triggerLastExitAndPop();
+                    }
             }
 
-        }
+                function markAsComplete() {
+                    SendMessage();
+                    function SendMessage() {
+                        var TimeZone = new Date().getTimezoneOffset();
+                        var Url;
+                        //Url="RootWagTap/time.top?WagCommand=7";
+                        Url = global_refTIlerUrl + "Schedule/Event/Complete";
+                        var HandleNEwPage = new LoadingScreenControl("Tiler is updating your schedule ...");
+                        HandleNEwPage.Launch();
+
+                        var MarkAsCompleteData = {
+                            UserName: UserCredentials.UserName,
+                            UserID: UserCredentials.ID,
+                            EventID: SubEvent.ID,
+                            TimeZoneOffset: TimeZone,
+                            ThirdPartyEventID: SubEvent.ThirdPartyEventID,
+                            ThirdPartyUserID: SubEvent.ThirdPartyUserID,
+                            ThirdPartyType: SubEvent.ThirdPartyType
+                        };
+                        var exit = function (data) {
+                            HandleNEwPage.Hide();
+                            //triggerUIUPdate();//hack alert
+                            global_ExitManager.triggerLastExitAndPop();
+                            //getRefreshedData();
+                        }
+                        $.ajax({
+                                type: "POST",
+                                url: Url,
+                                data: MarkAsCompleteData,
+                            // DO NOT SET CONTENT TYPE to json
+                            // contentType: "application/json; charset=utf-8", 
+                            // DataType needs to stay, otherwise the response object
+                            // will be treated as a single string
+                            //dataType: "json",
+                                success: function (response) {
+                                    triggerUndoPanel("Undo Completion");
+                                var myContainer = (response);
+                                if (myContainer.Error.code == 0) {
+                                    //exitSelectedEventScreen();
+                                }
+                                else {
+                                    alert("error detected with marking as complete");
+                                }
+
+                        },
+                                error: function (err) {
+                                var myError = err;
+                                var step = "err";
+                                var NewMessage = "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
+                                var ExitAfter = { ExitNow: true, Delay: 1000
+                                };
+                                HandleNEwPage.UpdateMessage(NewMessage, ExitAfter, exit);
+                                    //InitializeHomePage();
 
 
-            function nayDeleteSubEvent()//ignores deletion of events
-            {
-                closeModalDelete();
-                //resetButtons();
-            }
+                        }
 
-            function procrastinateEvent() {
-                var HourInput = getDomOrCreateNew("procrastinateHours").value == "" ? 0 : getDomOrCreateNew("procrastinateHours").value;
-                var MinInput = getDomOrCreateNew("procrastinateMins").value == "" ? 0 : getDomOrCreateNew("procrastinateMins").value;
-                var DayInput = getDomOrCreateNew("procrastinateDays").value == "" ? 0 : getDomOrCreateNew("procrastinateDays").value;
-                debugger;
-                var TimeZone = new Date().getTimezoneOffset();
-                var NowData = { UserName: UserCredentials.UserName, UserID: UserCredentials.ID, EventID: SubEvent.ID, DurationDays: DayInput, DurationHours: HourInput, DurationMins: MinInput, TimeZoneOffset: TimeZone};
-                //var URL= "RootWagTap/time.top?WagCommand=2";
-                var URL = global_refTIlerUrl + "Schedule/Event/Procrastinate";
-                var HandleNEwPage = new LoadingScreenControl("Tiler is Postponing  :)");
-                HandleNEwPage.Launch();
-
-                var exit = function (data) {
-                    HandleNEwPage.Hide();
-                    //triggerUIUPdate();//hack alert
-                    global_ExitManager.triggerLastExitAndPop();
-                    //getRefreshedData();
+                        }).done(function (data) {
+                            debugger;
+                            HandleNEwPage.Hide();
+                            triggerUIUPdate();//hack alert
+                            //getRefreshedData();
+                        });
                 }
-                $.ajax({
+                    function triggerUIUPdate() {
+                        //resetButtons();
+                        global_ExitManager.triggerLastExitAndPop();
+                }
+
+            }
+
+                function closeModalDelete() {
+                    DeleteMessage.innerHTML = "Sure you want to delete ?"
+                    $('#ConfirmDeleteModal').slideUp(500);
+                    ModalDelete.isRevealed = false;
+            }
+                deleteButton.onclick = deleteSubevent;
+                completeButton.onclick = markAsComplete;
+                if (SubEvent.isPaused) {
+                    global_eventIsPaused = true;
+                    global_ControlPanelIconSet.switchToResumeButton();
+                    PauseResumeButton.onclick = continueEvent;
+                    $(ControlPanelCloseButton).addClass("setAsDisplayNone");
+                    global_ControlPanelIconSet.ShowPausePauseResumeButton();
+                }
+                else {
+                    global_ControlPanelIconSet.switchToPauseButton();
+                    PauseResumeButton.onclick = pauseEvent;
+                    $(ControlPanelCloseButton).addClass("setAsDisplayNone");
+                    if((SubEvent.isPauseAble)&&(!global_eventIsPaused)) 
+                    {
+                        global_ControlPanelIconSet.ShowPausePauseResumeButton();
+                    }
+                    else
+                    {
+                        global_ControlPanelIconSet.HidePausePauseResumeButton();
+                    }
+                }
+
+                //continueButton.onclick = continueEvent;
+
+                var ControlPanelContainer = getDomOrCreateNew("ControlPanelContainer");
+                ControlPanelContainer.focus();
+
+                function containerKeyPress(e) {
+                    //e.stopPropagation();
+                
+                    if (e.which == 27)//escape key press
+                    {
+
+                        return;//closeControlPanel();
+                    }
+
+                    if ((e.which == 8) || (e.which == 46))//bkspc/delete key pressed
+                    {
+                        deleteSubevent();
+                    }
+            }
+                //debugger;
+                document.removeEventListener("keydown", containerKeyPress);//this is here just to avooid duplicate addition of the same keypress event
+                document.addEventListener("keydown", containerKeyPress);
+
+                global_UISetup.RenderOnSubEventClick.isRefListSubEventClicked = true;
+                global_UISetup.RenderOnSubEventClick.BottomPanelIsOpen = true;
+
+                /*
+                ControlPanelNameOfSubeventInfo.innerHTML = SubEvent.Name;
+                ControlPanelDeadlineOfSubeventInfo.innerHTML = Deadline.hour + ' ' + Deadline.minute + ' ' + Deadline.merid + ' // ' + Deadline.day + ', ' + Deadline.mon + ' ' + Deadline.date;
+                ControlPanelSubEventTimeInfo.innerHTML = StartDate.hour + ' ' + StartDate.minute + ' ' + StartDate.merid + ' &mdash; ' + EndDate.hour + ' ' + EndDate.minute + ' ' + EndDate.merid;
+                */
+                function stopPropagationOfKeyDown(e) {
+                    if (e.which == 27)
+                    {
+                        return;
+                    }
+                    e.stopPropagation();
+                }
+                var NameContanierInput = getDomOrCreateNew("NameInputBox", "input");
+                $(NameContanierInput).off();
+                NameContanierInput.value = SubEvent.Name;
+                NameContanierInput.onkeydown = stopPropagationOfKeyDown;
+
+                $(NameContanierInput).on("input", EditContainerData.RevealContainer)
+
+                var SubEventStartTime = getDomOrCreateNew("StartTimeInput", "input");
+                $(SubEventStartTime).off();
+                var SubEventStartBinder = BindTimePicker(SubEventStartTime)
+                SubEventStartBinder.on('input', EditContainerData.RevealContainer);
+                SubEventStartBinder.on('changeTime', EditContainerData.RevealContainer);
+            
+                SubEventStartTime.value = SubEvent.SubCalStartDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                var AmDash0 = getDomOrCreateNew("AmDash0", "span");
+                AmDash0.innerHTML = ' &mdash; '
+                var SubEventEndTime = getDomOrCreateNew("EndTimeInput", "input");
+                $(SubEventEndTime).off();
+                var SubEventEndBinder = BindTimePicker(SubEventEndTime)
+                SubEventEndBinder.on('input', EditContainerData.RevealContainer);
+                SubEventEndBinder.on('changeTime', EditContainerData.RevealContainer);
+            
+                SubEventEndTime.value= SubEvent.SubCalEndDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+
+                SubEventStartTime.onkeydown = stopPropagationOfKeyDown;
+                SubEventEndTime.onkeydown = stopPropagationOfKeyDown;
+
+
+                var SubEventStartDate = getDomOrCreateNew("SubEventStartDateInput", "input");
+                $(SubEventStartDate).off("input");
+                $(SubEventStartDate).off("changeDate");
+                SubEventStartDate.value = SubEvent.SubCalStartDate.toLocaleDateString();//position of this insertion matters. It has to be before the call to "BindDatePicker" or else the input value will get reset at each entry
+                var SubEventStartDateBinder = BindDatePicker(SubEventStartDate, "D M d, yyyy");
+                SubEventStartDateBinder.datepicker("setDate", new Date(SubEventStartDate.value));
+                SubEventStartDateBinder.on('input', EditContainerData.RevealContainer);
+                SubEventStartDateBinder.on('changeDate', EditContainerData.RevealContainer);
+            
+
+            
+                var AmDash1 = getDomOrCreateNew("AmDash1", "span");
+                AmDash1.innerHTML = ' &mdash; '
+                var SubEventEndDate = getDomOrCreateNew("SubEventEndDateInput", "input");
+                $(SubEventEndDate).off("input");
+                $(SubEventEndDate).off("changeDate");
+                SubEventEndDate.value = SubEvent.SubCalEndDate.toLocaleDateString();//position of this insertion matters. It has to be before the call to "BindDatePicker"
+                var SubEventEndDateBinder = BindDatePicker(SubEventEndDate, "D M d, yyyy");
+                SubEventEndDateBinder.datepicker("setDate", new Date(SubEventEndDate.value));
+                SubEventEndDateBinder.on('input', EditContainerData.RevealContainer)
+                SubEventEndDateBinder.on('changeDate', EditContainerData.RevealContainer);
+            
+            
+            
+
+
+
+                SubEventStartDate.onkeydown = stopPropagationOfKeyDown;
+                SubEventEndDate.onkeydown = stopPropagationOfKeyDown;
+
+                var SubCalStartInfo = getDomOrCreateNew("SubCalStartInfo");
+                var SubCalEndInfo = getDomOrCreateNew("SubCalEndInfo");
+                $(SubCalEndInfo).addClass( "TimeDateContainer")
+                $(SubCalStartInfo).addClass("TimeDateContainer");
+            
+
+
+                var CalEndTime = getDomOrCreateNew("CalEndTime", "input");
+                CalEndTime.onkeydown = stopPropagationOfKeyDown;
+                CalEndTime.onkeydown = stopPropagationOfKeyDown;
+
+                $(CalEndTime).off("input");
+                $(CalEndTime).off("changeTime");
+                CalEndTime.value = SubEvent.SubCalCalEventEnd.toLocaleTimeString();//position of this insertion matters. It has to be before the call to "BindTimePicker"
+                var CalEventEndTimeBinder = BindTimePicker(CalEndTime);
+                CalEventEndTimeBinder.on('input', EditContainerData.RevealContainer)
+                CalEventEndTimeBinder.on('changeTime', EditContainerData.RevealContainer);
+
+
+                //var CalStartDate = getDomOrCreateNew("CalStartDate", "input");
+                var CalEndDate = getDomOrCreateNew("CalEndDate", "input");
+                //CalStartDate.onkeydown = stopPropagationOfKeyDown;
+                CalEndDate.onkeydown = stopPropagationOfKeyDown;
+            
+                $(CalEndDate).off("input");
+                $(CalEndDate).off("changeDate");
+                CalEndDate.value = SubEvent.SubCalCalEventEnd.toLocaleDateString();//position of this insertion matters. It has to be before the call to "BindDatePicker"
+                var CalEventEndDateBinder = BindDatePicker(CalEndDate, "D M d, yyyy");
+                CalEventEndDateBinder.datepicker("setDate", new Date(CalEndDate.value));
+                CalEventEndDateBinder.on('input', EditContainerData.RevealContainer)
+                CalEventEndDateBinder.on('changeDate', EditContainerData.RevealContainer);
+
+
+                var calendarEventData = getDomOrCreateNew("CalEndDate", "input");
+
+
+                //ControlPanelNameOfSubeventInfo.value = SubEvent.Name;
+                ControlPanelNameOfSubeventInfo.appendChild(NameContanierInput);
+
+
+                function removeInputBindings()
+                {
+                
+                }
+            
+                function extraOptionsData()
+                {
+                    var splitInputBox = getDomOrCreateNew("InputSplitCount", "input");
+                    //splitInputBox.readOnly = true;
+                    splitInputBox.oninput= EditContainerData.RevealContainer;
+                    splitInputBox.setAttribute("type", "Number");
+                    splitInputBox.onkeydown = stopPropagationOfKeyDown;
+                    splitInputBox.value = Dictionary_OfCalendarData[SubEvent.CalendarID].TotalNumberOfEvents;
+                    var splitInputBoxLabel = getDomOrCreateNew("splitInputBoxLabel","label");
+                    splitInputBoxLabel.innerHTML="Splits"
+                    var splitInputBoxContainer = getDomOrCreateNew("InputSplitCountContainer");
+                    splitInputBoxContainer.appendChild(splitInputBoxLabel);
+                    splitInputBoxContainer.appendChild(splitInputBox);
+                    $(splitInputBoxContainer).addClass("SubEventInformationContainer");
+
+                    var CompletionMap = getDomOrCreateNew("CompletionContainer");
+                    var CompletionMapDom= generateCompletionMap(SubEvent)
+                    CompletionMap .appendChild(CompletionMapDom);
+                    var ContainerForExtraOptions = getDomOrCreateNew("ExtraOptionsContainer")
+                    ContainerForExtraOptions.appendChild(splitInputBoxContainer)
+                    ContainerForExtraOptions.appendChild(CompletionMap)
+                
+                    return ContainerForExtraOptions;
+                }
+
+            
+                SubCalStartInfo.appendChild(SubEventStartTime);
+                //SubCalTimeInfo.appendChild(AmDash0);
+                //SubCalTimeInfo.appendChild(SubEventEndTime);
+                SubCalStartInfo.appendChild(SubEventStartDate);
+
+                SubCalEndInfo.appendChild(SubEventEndTime);
+                //SubCalDateInfo.appendChild(AmDash1);
+                SubCalEndInfo.appendChild(SubEventEndDate);
+
+
+                ControlPanelSubEventTimeInfo.appendChild(SubCalStartInfo);
+                ControlPanelSubEventTimeInfo.appendChild(SubCalEndInfo);
+            
+
+                var ControlPanelDeadlineOfSubevent=getDomOrCreateNew("ControlPanelDeadlineOfSubevent")
+                //ControlPanelDeadlineOfSubeventInfo.appendChild(CalStartDate);
+                ControlPanelDeadlineOfSubeventInfo.appendChild(CalEndTime)
+                ControlPanelDeadlineOfSubeventInfo.appendChild(CalEndDate);
+                var optionData = extraOptionsData();
+
+                var InfoCOntainer = getDomOrCreateNew("InfoContainer")
+
+                InfoCOntainer.appendChild(optionData);
+                if (Dictionary_OfCalendarData[SubEvent.CalendarID].Rigid)
+                {
+                    $(ControlPanelDeadlineOfSubevent).addClass("setAsDisplayNone");
+                    $(optionData).addClass("setAsDisplayNone");
+                
+                }
+                else
+                {
+                    $(ControlPanelDeadlineOfSubevent).removeClass("setAsDisplayNone");
+                    $(optionData).removeClass("setAsDisplayNone");
+                }
+            
+
+
+
+                function SaveButtonClick()
+                {
+                    debugger;
+                    var TimeZone = new Date().getTimezoneOffset();
+                    var Url;
+                    //Url="RootWagTap/time.top?WagCommand=7";
+                    SubEventStartTime.value =formatTimePortionOfStringToRightFormat(SubEventStartTime.value )
+                    var SubCalStartDateTimeString = SubEventStartTime.value + " " + $(SubEventStartDate).datepicker("getDate").toLocaleDateString();
+                    var SubCaStartDateInMS = Date.parse(SubCalStartDateTimeString) - (TimeZone * OneMinInMs)
+
+
+                    SubEventEndTime.value = formatTimePortionOfStringToRightFormat(SubEventEndTime.value)
+                    var SubCalEndDateTimeString = SubEventEndTime.value + " " + $(SubEventEndDate).datepicker("getDate").toLocaleDateString();
+                    var SubCaEndDateInMS = Date.parse(SubCalEndDateTimeString) - (TimeZone*OneMinInMs);//.getFullTime();
+
+                    CalEndTime.value = formatTimePortionOfStringToRightFormat(CalEndTime.value)
+
+                    var CalDateEndTimeString = CalEndTime.value + " " + $(CalEndDate).datepicker("getDate").toLocaleDateString();
+                    var CalEndDateInMS = Date.parse(CalDateEndTimeString) - (TimeZone * OneMinInMs);
+                    var splitValue =  getDomOrCreateNew("InputSplitCount", "input").value;
+                    Url = global_refTIlerUrl + "SubCalendarEvent/Update";
+                    var HandleNEwPage = new LoadingScreenControl("Tiler is updating your schedule ...");
+                    HandleNEwPage.Launch();
+
+                    var SaveData = {
+                        UserName: UserCredentials.UserName,
+                        UserID: UserCredentials.ID,
+                        EventID: SubEvent.ID,
+                        EventName: NameContanierInput.value, TimeZoneOffset: TimeZone,
+                        Start: SubCaStartDateInMS,
+                        End: SubCaEndDateInMS,
+                        CalStart: 0,
+                        CalEnd: CalEndDateInMS,
+                        Split: splitValue,
+                        ThirdPartyEventID: SubEvent.ThirdPartyEventID,
+                        ThirdPartyUserID: SubEvent.ThirdPartyUserID,
+                        ThirdPartyType: SubEvent.ThirdPartyType
+
+                    };
+                    var exit= function (data) {
+                        HandleNEwPage.Hide();
+                        //triggerUIUPdate();//hack alert
+                        global_ExitManager.triggerLastExitAndPop();
+                        //getRefreshedData();
+                    }
+                    $.ajax({
                         type: "POST",
-                        url: URL,
-                        data: NowData,
-                    // DO NOT SET CONTENT TYPE to json
-                    // contentType: "application/json; charset=utf-8", 
-                    // DataType needs to stay, otherwise the response object
-                    // will be treated as a single string
-                        dataType: "json",
+                        url: Url,
+                        data: SaveData,
+                        // DO NOT SET CONTENT TYPE to json
+                        // contentType: "application/json; charset=utf-8", 
+                        // DataType needs to stay, otherwise the response object
+                        // will be treated as a single string
+                        //dataType: "json",
                         success: function (response) {
-                            triggerUndoPanel("Undo Procrastination");
+                            triggerUndoPanel("Undo Change to event on Tiler");
                             var myContainer = (response);
                             if (myContainer.Error.code == 0) {
                                 //exitSelectedEventScreen();
@@ -3832,423 +4220,35 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                             }
 
                         },
-                        error: function () {
-                        var NewMessage = "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
-                        var ExitAfter = { ExitNow: true, Delay: 1000
-                        };
-                        HandleNEwPage.UpdateMessage(NewMessage, ExitAfter, exit);
-                }
-                }).done(function (data) {
-                    HandleNEwPage.Hide();
-                    triggerUIUPdate();//hack alert
-                    //getRefreshedData();
-
-                });
-
-                function triggerUIUPdate() {
-                    //resetButtons();
-                    global_ExitManager.triggerLastExitAndPop();
-                }
-        }
-
-            function markAsComplete() {
-                SendMessage();
-                function SendMessage() {
-                    var TimeZone = new Date().getTimezoneOffset();
-                    var Url;
-                    //Url="RootWagTap/time.top?WagCommand=7";
-                    Url = global_refTIlerUrl + "Schedule/Event/Complete";
-                    var HandleNEwPage = new LoadingScreenControl("Tiler is updating your schedule ...");
-                    HandleNEwPage.Launch();
-
-                    var MarkAsCompleteData = {
-                        UserName: UserCredentials.UserName,
-                        UserID: UserCredentials.ID,
-                        EventID: SubEvent.ID,
-                        TimeZoneOffset: TimeZone,
-                        ThirdPartyEventID: SubEvent.ThirdPartyEventID,
-                        ThirdPartyUserID: SubEvent.ThirdPartyUserID,
-                        ThirdPartyType: SubEvent.ThirdPartyType
-                    };
-                    var exit = function (data) {
-                        HandleNEwPage.Hide();
-                        //triggerUIUPdate();//hack alert
-                        global_ExitManager.triggerLastExitAndPop();
-                        //getRefreshedData();
-                    }
-                    $.ajax({
-                            type: "POST",
-                            url: Url,
-                            data: MarkAsCompleteData,
-                        // DO NOT SET CONTENT TYPE to json
-                        // contentType: "application/json; charset=utf-8", 
-                        // DataType needs to stay, otherwise the response object
-                        // will be treated as a single string
-                        //dataType: "json",
-                            success: function (response) {
-                                triggerUndoPanel("Undo Completion");
-                            var myContainer = (response);
-                            if (myContainer.Error.code == 0) {
-                                //exitSelectedEventScreen();
-                            }
-                            else {
-                                alert("error detected with marking as complete");
-                            }
-
-                    },
-                            error: function (err) {
+                        error: function (err) {
                             var myError = err;
                             var step = "err";
                             var NewMessage = "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
-                            var ExitAfter = { ExitNow: true, Delay: 1000
+                            var ExitAfter = {
+                                ExitNow: true, Delay: 1000
                             };
                             HandleNEwPage.UpdateMessage(NewMessage, ExitAfter, exit);
-                                //InitializeHomePage();
+                        }
 
+                    }).done(exit);
 
-                    }
-
-                    }).done(function (data) {
-                        debugger;
-                        HandleNEwPage.Hide();
-                        triggerUIUPdate();//hack alert
-                        //getRefreshedData();
-                    });
-            }
-                function triggerUIUPdate() {
-                    //resetButtons();
-                    global_ExitManager.triggerLastExitAndPop();
-            }
-
-        }
-
-            function closeModalDelete() {
-                DeleteMessage.innerHTML = "Sure you want to delete ?"
-                $('#ConfirmDeleteModal').slideUp(500);
-                ModalDelete.isRevealed = false;
-        }
-            deleteButton.onclick = deleteSubevent;
-            completeButton.onclick = markAsComplete;
-            if (SubEvent.isPaused) {
-                global_eventIsPaused = true;
-                global_ControlPanelIconSet.switchToResumeButton();
-                PauseResumeButton.onclick = continueEvent;
-                $(ControlPanelCloseButton).addClass("setAsDisplayNone");
-                global_ControlPanelIconSet.ShowPausePauseResumeButton();
-            }
-            else {
-                global_ControlPanelIconSet.switchToPauseButton();
-                PauseResumeButton.onclick = pauseEvent;
-                $(ControlPanelCloseButton).addClass("setAsDisplayNone");
-                if((SubEvent.isPauseAble)&&(!global_eventIsPaused)) 
-                {
-                    global_ControlPanelIconSet.ShowPausePauseResumeButton();
-                }
-                else
-                {
-                    global_ControlPanelIconSet.HidePausePauseResumeButton();
-                }
-            }
-
-            //continueButton.onclick = continueEvent;
-
-            var ControlPanelContainer = getDomOrCreateNew("ControlPanelContainer");
-            ControlPanelContainer.focus();
-
-            function containerKeyPress(e) {
-                //e.stopPropagation();
-                
-                if (e.which == 27)//escape key press
-                {
-
-                    return;//closeControlPanel();
                 }
 
-                if ((e.which == 8) || (e.which == 46))//bkspc/delete key pressed
-                {
-                    deleteSubevent();
-                }
-        }
-            //debugger;
-            document.removeEventListener("keydown", containerKeyPress);//this is here just to avooid duplicate addition of the same keypress event
-            document.addEventListener("keydown", containerKeyPress);
-
-            global_UISetup.RenderOnSubEventClick.isRefListSubEventClicked = true;
-            global_UISetup.RenderOnSubEventClick.BottomPanelIsOpen = true;
-
-            /*
-            ControlPanelNameOfSubeventInfo.innerHTML = SubEvent.Name;
-            ControlPanelDeadlineOfSubeventInfo.innerHTML = Deadline.hour + ' ' + Deadline.minute + ' ' + Deadline.merid + ' // ' + Deadline.day + ', ' + Deadline.mon + ' ' + Deadline.date;
-            ControlPanelSubEventTimeInfo.innerHTML = StartDate.hour + ' ' + StartDate.minute + ' ' + StartDate.merid + ' &mdash; ' + EndDate.hour + ' ' + EndDate.minute + ' ' + EndDate.merid;
-            */
-            function stopPropagationOfKeyDown(e) {
-                if (e.which == 27)
-                {
-                    return;
-                }
-                e.stopPropagation();
-            }
-            var NameContanierInput = getDomOrCreateNew("NameInputBox", "input");
-            $(NameContanierInput).off();
-            NameContanierInput.value = SubEvent.Name;
-            NameContanierInput.onkeydown = stopPropagationOfKeyDown;
-
-            $(NameContanierInput).on("input", EditContainerData.RevealContainer)
-
-            var SubEventStartTime = getDomOrCreateNew("StartTimeInput", "input");
-            $(SubEventStartTime).off();
-            var SubEventStartBinder = BindTimePicker(SubEventStartTime)
-            SubEventStartBinder.on('input', EditContainerData.RevealContainer);
-            SubEventStartBinder.on('changeTime', EditContainerData.RevealContainer);
-            
-            SubEventStartTime.value = SubEvent.SubCalStartDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-            var AmDash0 = getDomOrCreateNew("AmDash0", "span");
-            AmDash0.innerHTML = ' &mdash; '
-            var SubEventEndTime = getDomOrCreateNew("EndTimeInput", "input");
-            $(SubEventEndTime).off();
-            var SubEventEndBinder = BindTimePicker(SubEventEndTime)
-            SubEventEndBinder.on('input', EditContainerData.RevealContainer);
-            SubEventEndBinder.on('changeTime', EditContainerData.RevealContainer);
-            
-            SubEventEndTime.value= SubEvent.SubCalEndDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-
-            SubEventStartTime.onkeydown = stopPropagationOfKeyDown;
-            SubEventEndTime.onkeydown = stopPropagationOfKeyDown;
-
-
-            var SubEventStartDate = getDomOrCreateNew("SubEventStartDateInput", "input");
-            $(SubEventStartDate).off("input");
-            $(SubEventStartDate).off("changeDate");
-            SubEventStartDate.value = SubEvent.SubCalStartDate.toLocaleDateString();//position of this insertion matters. It has to be before the call to "BindDatePicker" or else the input value will get reset at each entry
-            var SubEventStartDateBinder = BindDatePicker(SubEventStartDate, "D M d, yyyy");
-            SubEventStartDateBinder.datepicker("setDate", new Date(SubEventStartDate.value));
-            SubEventStartDateBinder.on('input', EditContainerData.RevealContainer);
-            SubEventStartDateBinder.on('changeDate', EditContainerData.RevealContainer);
-            
+                EditContainerData.SaveButton.onclick = SaveButtonClick;
 
             
-            var AmDash1 = getDomOrCreateNew("AmDash1", "span");
-            AmDash1.innerHTML = ' &mdash; '
-            var SubEventEndDate = getDomOrCreateNew("SubEventEndDateInput", "input");
-            $(SubEventEndDate).off("input");
-            $(SubEventEndDate).off("changeDate");
-            SubEventEndDate.value = SubEvent.SubCalEndDate.toLocaleDateString();//position of this insertion matters. It has to be before the call to "BindDatePicker"
-            var SubEventEndDateBinder = BindDatePicker(SubEventEndDate, "D M d, yyyy");
-            SubEventEndDateBinder.datepicker("setDate", new Date(SubEventEndDate.value));
-            SubEventEndDateBinder.on('input', EditContainerData.RevealContainer)
-            SubEventEndDateBinder.on('changeDate', EditContainerData.RevealContainer);
-            
-            
-            
 
-
-
-            SubEventStartDate.onkeydown = stopPropagationOfKeyDown;
-            SubEventEndDate.onkeydown = stopPropagationOfKeyDown;
-
-            var SubCalStartInfo = getDomOrCreateNew("SubCalStartInfo");
-            var SubCalEndInfo = getDomOrCreateNew("SubCalEndInfo");
-            $(SubCalEndInfo).addClass( "TimeDateContainer")
-            $(SubCalStartInfo).addClass("TimeDateContainer");
-            
-
-
-            var CalEndTime = getDomOrCreateNew("CalEndTime", "input");
-            CalEndTime.onkeydown = stopPropagationOfKeyDown;
-            CalEndTime.onkeydown = stopPropagationOfKeyDown;
-
-            $(CalEndTime).off("input");
-            $(CalEndTime).off("changeTime");
-            CalEndTime.value = SubEvent.SubCalCalEventEnd.toLocaleTimeString();//position of this insertion matters. It has to be before the call to "BindTimePicker"
-            var CalEventEndTimeBinder = BindTimePicker(CalEndTime);
-            CalEventEndTimeBinder.on('input', EditContainerData.RevealContainer)
-            CalEventEndTimeBinder.on('changeTime', EditContainerData.RevealContainer);
-
-
-            //var CalStartDate = getDomOrCreateNew("CalStartDate", "input");
-            var CalEndDate = getDomOrCreateNew("CalEndDate", "input");
-            //CalStartDate.onkeydown = stopPropagationOfKeyDown;
-            CalEndDate.onkeydown = stopPropagationOfKeyDown;
-            
-            $(CalEndDate).off("input");
-            $(CalEndDate).off("changeDate");
-            CalEndDate.value = SubEvent.SubCalCalEventEnd.toLocaleDateString();//position of this insertion matters. It has to be before the call to "BindDatePicker"
-            var CalEventEndDateBinder = BindDatePicker(CalEndDate, "D M d, yyyy");
-            CalEventEndDateBinder.datepicker("setDate", new Date(CalEndDate.value));
-            CalEventEndDateBinder.on('input', EditContainerData.RevealContainer)
-            CalEventEndDateBinder.on('changeDate', EditContainerData.RevealContainer);
-
-
-            var calendarEventData = getDomOrCreateNew("CalEndDate", "input");
-
-
-            //ControlPanelNameOfSubeventInfo.value = SubEvent.Name;
-            ControlPanelNameOfSubeventInfo.appendChild(NameContanierInput);
-
-
-            function removeInputBindings()
-            {
-                
-            }
-            
-            function extraOptionsData()
-            {
-                var splitInputBox = getDomOrCreateNew("InputSplitCount", "input");
-                //splitInputBox.readOnly = true;
-                splitInputBox.oninput= EditContainerData.RevealContainer;
-                splitInputBox.setAttribute("type", "Number");
-                splitInputBox.onkeydown = stopPropagationOfKeyDown;
-                splitInputBox.value = Dictionary_OfCalendarData[SubEvent.CalendarID].TotalNumberOfEvents;
-                var splitInputBoxLabel = getDomOrCreateNew("splitInputBoxLabel","label");
-                splitInputBoxLabel.innerHTML="Splits"
-                var splitInputBoxContainer = getDomOrCreateNew("InputSplitCountContainer");
-                splitInputBoxContainer.appendChild(splitInputBoxLabel);
-                splitInputBoxContainer.appendChild(splitInputBox);
-                $(splitInputBoxContainer).addClass("SubEventInformationContainer");
-
-                var CompletionMap = getDomOrCreateNew("CompletionContainer");
-                var CompletionMapDom= generateCompletionMap(SubEvent)
-                CompletionMap .appendChild(CompletionMapDom);
-                var ContainerForExtraOptions = getDomOrCreateNew("ExtraOptionsContainer")
-                ContainerForExtraOptions.appendChild(splitInputBoxContainer)
-                ContainerForExtraOptions.appendChild(CompletionMap)
-                
-                return ContainerForExtraOptions;
-            }
-
-            
-            SubCalStartInfo.appendChild(SubEventStartTime);
-            //SubCalTimeInfo.appendChild(AmDash0);
-            //SubCalTimeInfo.appendChild(SubEventEndTime);
-            SubCalStartInfo.appendChild(SubEventStartDate);
-
-            SubCalEndInfo.appendChild(SubEventEndTime);
-            //SubCalDateInfo.appendChild(AmDash1);
-            SubCalEndInfo.appendChild(SubEventEndDate);
-
-
-            ControlPanelSubEventTimeInfo.appendChild(SubCalStartInfo);
-            ControlPanelSubEventTimeInfo.appendChild(SubCalEndInfo);
-            
-
-            var ControlPanelDeadlineOfSubevent=getDomOrCreateNew("ControlPanelDeadlineOfSubevent")
-            //ControlPanelDeadlineOfSubeventInfo.appendChild(CalStartDate);
-            ControlPanelDeadlineOfSubeventInfo.appendChild(CalEndTime)
-            ControlPanelDeadlineOfSubeventInfo.appendChild(CalEndDate);
-            var optionData = extraOptionsData();
-
-            var InfoCOntainer = getDomOrCreateNew("InfoContainer")
-
-            InfoCOntainer.appendChild(optionData);
-            if (Dictionary_OfCalendarData[SubEvent.CalendarID].Rigid)
-            {
-                $(ControlPanelDeadlineOfSubevent).addClass("setAsDisplayNone");
-                $(optionData).addClass("setAsDisplayNone");
-                
-            }
-            else
-            {
-                $(ControlPanelDeadlineOfSubevent).removeClass("setAsDisplayNone");
-                $(optionData).removeClass("setAsDisplayNone");
-            }
-            
-
-
-
-            function SaveButtonClick()
-            {
-                debugger;
-                var TimeZone = new Date().getTimezoneOffset();
-                var Url;
-                //Url="RootWagTap/time.top?WagCommand=7";
-                SubEventStartTime.value =formatTimePortionOfStringToRightFormat(SubEventStartTime.value )
-                var SubCalStartDateTimeString = SubEventStartTime.value + " " + $(SubEventStartDate).datepicker("getDate").toLocaleDateString();
-                var SubCaStartDateInMS = Date.parse(SubCalStartDateTimeString) - (TimeZone * OneMinInMs)
-
-
-                SubEventEndTime.value = formatTimePortionOfStringToRightFormat(SubEventEndTime.value)
-                var SubCalEndDateTimeString = SubEventEndTime.value + " " + $(SubEventEndDate).datepicker("getDate").toLocaleDateString();
-                var SubCaEndDateInMS = Date.parse(SubCalEndDateTimeString) - (TimeZone*OneMinInMs);//.getFullTime();
-
-                CalEndTime.value = formatTimePortionOfStringToRightFormat(CalEndTime.value)
-
-                var CalDateEndTimeString = CalEndTime.value + " " + $(CalEndDate).datepicker("getDate").toLocaleDateString();
-                var CalEndDateInMS = Date.parse(CalDateEndTimeString) - (TimeZone * OneMinInMs);
-                var splitValue =  getDomOrCreateNew("InputSplitCount", "input").value;
-                Url = global_refTIlerUrl + "SubCalendarEvent/Update";
-                var HandleNEwPage = new LoadingScreenControl("Tiler is updating your schedule ...");
-                HandleNEwPage.Launch();
-
-                var SaveData = {
-                    UserName: UserCredentials.UserName,
-                    UserID: UserCredentials.ID,
-                    EventID: SubEvent.ID,
-                    EventName: NameContanierInput.value, TimeZoneOffset: TimeZone,
-                    Start: SubCaStartDateInMS,
-                    End: SubCaEndDateInMS,
-                    CalStart: 0,
-                    CalEnd: CalEndDateInMS,
-                    Split: splitValue,
-                    ThirdPartyEventID: SubEvent.ThirdPartyEventID,
-                    ThirdPartyUserID: SubEvent.ThirdPartyUserID,
-                    ThirdPartyType: SubEvent.ThirdPartyType
-
+                //ControlPanelDeadlineOfSubeventInfo.value = Deadline.hour + ' ' + Deadline.minute + ' ' + Deadline.merid + ' // ' + Deadline.day + ', ' + Deadline.mon + ' ' + Deadline.date;
+                //ControlPanelSubEventTimeInfo.value = EndDate.hour + ' ' + StartDate.minute + ' ' + StartDate.merid + ' &mdash; ' + EndDate.hour + ' ' + EndDate.minute + ' ' + EndDate.merid;
+                var SubEventName = SubEvent.Name;
+                $(document).keyup(function (e) {
+                  if (e == 46) {
+                    deleteEvent();
                 };
-                var exit= function (data) {
-                    HandleNEwPage.Hide();
-                    //triggerUIUPdate();//hack alert
-                    global_ExitManager.triggerLastExitAndPop();
-                    //getRefreshedData();
-                }
-                $.ajax({
-                    type: "POST",
-                    url: Url,
-                    data: SaveData,
-                    // DO NOT SET CONTENT TYPE to json
-                    // contentType: "application/json; charset=utf-8", 
-                    // DataType needs to stay, otherwise the response object
-                    // will be treated as a single string
-                    //dataType: "json",
-                    success: function (response) {
-                        triggerUndoPanel("Undo Change to event on Tiler");
-                        var myContainer = (response);
-                        if (myContainer.Error.code == 0) {
-                            //exitSelectedEventScreen();
-                        }
-                        else {
-                            alert("error detected with marking as complete");
-                        }
-
-                    },
-                    error: function (err) {
-                        var myError = err;
-                        var step = "err";
-                        var NewMessage = "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
-                        var ExitAfter = {
-                            ExitNow: true, Delay: 1000
-                        };
-                        HandleNEwPage.UpdateMessage(NewMessage, ExitAfter, exit);
-                    }
-
-                }).done(exit);
+                });
 
             }
-
-            EditContainerData.SaveButton.onclick = SaveButtonClick;
-
-            
-
-            //ControlPanelDeadlineOfSubeventInfo.value = Deadline.hour + ' ' + Deadline.minute + ' ' + Deadline.merid + ' // ' + Deadline.day + ', ' + Deadline.mon + ' ' + Deadline.date;
-            //ControlPanelSubEventTimeInfo.value = EndDate.hour + ' ' + StartDate.minute + ' ' + StartDate.merid + ' &mdash; ' + EndDate.hour + ' ' + EndDate.minute + ' ' + EndDate.merid;
-            var SubEventName = SubEvent.Name;
-            $(document).keyup(function (e) {
-              if (e == 46) {
-                deleteEvent();
-            };
-            });
-
         }
-    }
 
 
         function StopPullingData() {
