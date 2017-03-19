@@ -121,9 +121,12 @@ function generateSubEventEditPage(subEvent) {
         let postData = {
         }
         let userData = GetCookieValue()
-        postData.CalEnd = moment(deadlineTimeEdit.input.value + " " + deadlineDateEdit.input.value).valueOf()
-        postData.Start = moment(startTimeEdit.input.value + " " + startDateEdit.input.value).valueOf()
-        postData.End = moment(endTimeEdit.input.value + " " + endDateEdit.input.value).valueOf()
+        let startTime = startTimeEdit.input.value.split(' ').length === 1 ? spliceSlice(startTimeEdit.input.value, 5, 0, ' ') : startTimeEdit.input.value
+        let endTime = endTimeEdit.input.value.split(' ').length === 1 ? spliceSlice(endTimeEdit.input.value, 5, 0, ' ') : endTimeEdit.input.value
+        let deadlineTime = deadlineTimeEdit.input.value.split(' ').length === 1 ? spliceSlice(deadlineTimeEdit.input.value, 5, 0, ' ') : deadlineTimeEdit.input.value
+        postData.CalEnd = moment(deadlineTime + " " + deadlineDateEdit.input.value).valueOf()
+        postData.Start = moment(startTime + " " + startDateEdit.input.value).valueOf()
+        postData.End = moment(endTime + " " + endDateEdit.input.value).valueOf()
         postData.EventName = nameEdit.input.value
         postData.address = addressEdit.input.value
         postData.AddressDescription = addressNickNameEdit.input.value
