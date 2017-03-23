@@ -73,7 +73,8 @@ function retrieveUserSchedule(myurl, UserEntry,SuccessCallBack)
     UserCredentials.TimeZoneOffset = TimeZone;
     UserEntry.TimeZoneOffset = UserCredentials.TimeZoneOffset;
     UserEntry.StartRange = (new Date()).getTime() - TwelveHourMilliseconds;
-    UserEntry.EndRange = (new Date()).getTime()+TwelveHourMilliseconds;
+    UserEntry.EndRange = (new Date()).getTime() + TwelveHourMilliseconds;
+    UserEntry.TimeZone = moment.tz.guess()
     var HandleNewPage = new LoadingScreenControl("Tiler is retrieving your schedule :)");
     if(!!HandleNewPage.Launch){
         HandleNewPage.Launch();
@@ -334,6 +335,7 @@ function generateProcrastinateAllFunction(TimeData,CallBack)
     var TimeZone = new Date().getTimezoneOffset();
     TimeData = TimeData.ToTimeSpan();
     var NowData = { DurationDays: TimeData.Days, DurationHours: TimeData.Hours, DurationMins: TimeData.Mins, UserName: UserCredentials.UserName, UserID: UserCredentials.ID, TimeZoneOffset: TimeZone };
+    NowData.TimeZone = moment.tz.guess()
     var HandleNEwPage = new LoadingScreenControl("Tiler is Freeing up Some time :)");
     TimeData.Hours
     HandleNEwPage.Launch();
@@ -398,6 +400,7 @@ function prepFunctionForCompletionOfEvent(EventID, CallBack) {
             ThirdPartyUserID: SubEvent.ThirdPartyUserID,
             ThirdPartyType: SubEvent.ThirdPartyType
         };
+        MarkAsCompleteData.TimeZone = moment.tz.guess()
         $.ajax({
             type: "POST",
             url: Url,
@@ -1249,7 +1252,7 @@ function generateModalForTIleOrModal()
 
             var TimeZone = new Date().getTimezoneOffset();
             var NowData = { UserName: UserCredentials.UserName, UserID: UserCredentials.ID, EventID: EventID, DurationDays: TimeData.Days, DurationHours: TimeData.Hours, DurationMins: TimeData.Mins ,TimeZoneOffset: TimeZone };
-            //var URL= "RootWagTap/time.top?WagCommand=2";
+            NowData.TimeZone = moment.tz.guess()
             var URL = global_refTIlerUrl + "Schedule/Event/Procrastinate";
             var HandleNEwPage = new LoadingScreenControl("Tiler is Postponing  :)");
             HandleNEwPage.Launch();
@@ -1478,7 +1481,7 @@ function generateModalForTIleOrModal()
             var NowData = { UserName: UserCredentials.UserName, UserID: UserCredentials.ID, EventID: EventID, TimeZoneOffset: TimeZone };
             //var URL = "RootWagTap/time.top?WagCommand=8"
             var URL = myurl = global_refTIlerUrl + "Schedule/Event/Now";
-
+            NowData.TimeZone = moment.tz.guess()
             var HandleNEwPage = new LoadingScreenControl("Tiler is moving up your Event ...  :)");
             HandleNEwPage.Launch();
             

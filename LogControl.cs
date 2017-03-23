@@ -463,7 +463,7 @@ namespace TilerFront
             XmlNodeList EventSchedulesNodes = xmldoc.DocumentElement.SelectNodes("/ScheduleLog/EventSchedules");
             
             XmlNode EventSchedulesNodesNode = xmldoc.DocumentElement.SelectSingleNode("/ScheduleLog/EventSchedules");
-            XmlNode EventSchedulesNodesNodeCpy = xmldoc.CreateElement("NodeCopy");// .DocumentElement.SelectSingleNode("/ScheduleLog/EventSchedules");
+            XmlNode EventSchedulesNodesNodeCpy = xmldoc.CreateElement("NodeCopy");
             EventSchedulesNodesNodeCpy.InnerXml = EventSchedulesNodesNode.InnerXml;
             EventSchedulesNodesNode.RemoveAll();
             XmlNodeList EventScheduleNodes = xmldoc.DocumentElement.SelectNodes("/ScheduleLog/EventSchedules/EventSchedule");
@@ -759,8 +759,6 @@ namespace TilerFront
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.End.UtcDateTime.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("PrepTime"));
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.getPreparation.ToString();
-            //MyEventScheduleNode.PrependChild(xmldoc.CreateElement("PreDeadlineFlag"));
-            //MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.Pre.ToString();
             
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("CompletionCount"));
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.CompletionCount.ToString();
@@ -793,6 +791,8 @@ namespace TilerFront
             MyEventScheduleNode.ChildNodes[0].InnerXml = (generateProcrastinationNode(MyEvent.getProcrastinationInfo).InnerXml);
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("isProcrastinateEvent"));
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.getIsProcrastinateCalendarEvent.ToString();
+            MyEventScheduleNode.PrependChild(xmldoc.CreateElement("TimeZone"));
+            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.getTimeZone;
 
             if (MyEvent.getIsEventRestricted)
             {
@@ -820,7 +820,6 @@ namespace TilerFront
                 SubScheduleNodes.PrependChild(xmldoc.CreateElement("EventSubSchedule"));
                 SubScheduleNodes.ChildNodes[0].InnerXml = CreateSubScheduleNode(MySubEvent).InnerXml;
             }
-            //MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.ID;
 
 
             return MyEventScheduleNode;
@@ -1000,6 +999,8 @@ namespace TilerFront
             MyEventSubScheduleNode.PrependChild(CreatePauseUsedUpNode(MySubEvent, xmldoc));
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("isProcrastinateEvent"));
             MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.getIsProcrastinateCalendarEvent.ToString();
+            MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("TimeZone"));
+            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.getTimeZone;
 
             if (MySubEvent.getIsEventRestricted)
             {
@@ -1656,9 +1657,7 @@ namespace TilerFront
 
             } else
             {
-                RetrievedEvent = new CalendarEvent(//new EventID(ID), 
-                    Name, start, end, CalendarEventDuration, PreDeadline, PrepTime, Split, Recurrence, var3, UiData, noteData, procrastinationData, NowProfileData, EVentEnableFlag, completedFlag, creator, userGroup, timeZone, new EventID(ID));
-                //RetrievedEvent.setEventId(new EventID(ID));
+                RetrievedEvent = new CalendarEvent(Name, start, end, CalendarEventDuration, PreDeadline, PrepTime, Split, Recurrence, var3, UiData, noteData, procrastinationData, NowProfileData, EVentEnableFlag, completedFlag, creator, userGroup, timeZone, new EventID(ID));
             }
 
             if (rigidFlag && procrastinationEventFlag)

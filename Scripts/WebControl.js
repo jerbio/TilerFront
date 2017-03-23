@@ -457,7 +457,7 @@ function sendUndoRequest(CallBack)
     var UndoData = {
         UserName: UserCredentials.UserName, UserID: UserCredentials.ID, TimeZoneOffset: TimeZone
     };
-
+    UndoData.TimeZone = moment.tz.guess()
     var HandleNEwPage = new LoadingScreenControl("Tiler is undoing your last request :)");
     HandleNEwPage.Launch();
 
@@ -978,6 +978,7 @@ function procrastinateSubEvent(ID, Day, Hour, Minute,CallBackSuccess,CallBackFai
     //var URL= "RootWagTap/time.top?WagCommand=2";
     var URL = global_refTIlerUrl + "Schedule/Event/Procrastinate";
     var HandleNEwPage = new LoadingScreenControl("Tiler is Postponing  :)");
+    NowData.TimeZone = moment.tz.guess()
     HandleNEwPage.Launch();
     var ProcrastinateRequest = $.ajax({
         type: "POST",
@@ -1047,6 +1048,7 @@ function deleteSubEvent(SubEventID, CallBackSuccess, CallBackFailure, CallBackDo
     //var URL = "RootWagTap/time.top?WagCommand=6"
     var URL = global_refTIlerUrl + "Schedule/Event";
     var HandleNEwPage = new LoadingScreenControl("Tiler is Deleting your event :)");
+    DeletionEvent.TimeZone = moment.tz.guess()
     HandleNEwPage.Launch();
 
     var AjaxRequest = $.ajax({
@@ -1077,7 +1079,7 @@ function deleteCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure, 
     var URL = global_refTIlerUrl + "CalendarEvent";
     var HandleNEwPage = new LoadingScreenControl("Tiler is Deleting your event :)");
     HandleNEwPage.Launch();
-
+    DeletionEvent.TimeZone = moment.tz.guess()
     var AjaxRequest = $.ajax({
         type: "DELETE",
         url: URL,
@@ -1106,6 +1108,7 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
     HandleNEwPage.Launch();
 
     var MarkAsCompleteData = { UserName: UserCredentials.UserName, UserID: UserCredentials.ID, EventID: CalendarEventID, TimeZoneOffset: TimeZone };
+    MarkAsCompleteData.TimeZone = moment.tz.guess()
     var AjaxRequest = $.ajax({
         type: "POST",
         url: Url,
@@ -2663,7 +2666,7 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
             var URL = global_refTIlerUrl + "Schedule/Shuffle";
             var HandleNEwPage = new LoadingScreenControl("Tiler looking up the next good event  :)");
             HandleNEwPage.Launch();
-
+            ShuffleData.TimeZone = moment.tz.guess()
             var exit = function (data) {
                 HandleNEwPage.Hide();
                 global_ExitManager.triggerLastExitAndPop();

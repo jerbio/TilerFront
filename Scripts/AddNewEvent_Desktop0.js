@@ -255,57 +255,6 @@ function SubmitTile(Name, Address,AddressNick, Splits, Hour, Minutes, Deadline, 
     }
 
     return NewEvent;
-
-    /*
-    NewEvent.UserName = UserCredentials.UserName
-    NewEvent.UserID = UserCredentials.ID;
-
-    var TimeZone = new Date().getTimezoneOffset();
-    NewEvent.TimeZoneOffset = TimeZone;
-    //var url = "RootWagTap/time.top?WagCommand=1"
-    var url = global_refTIlerUrl + "Schedule/Event";
-
-    var HandleNEwPage = new LoadingScreenControl("Tiler is Adding \"" + NewEvent.Name + " \" to your schedule ...");
-    //alert("about to send out");
-    //debugger;
-    //return;
-    HandleNEwPage.Launch();
-    
-    
-    
-
-    $.ajax({
-        type: "POST",
-        url: url,
-        data: NewEvent,
-        // DO NOT SET CONTENT TYPE to json
-        // contentType: "application/json; charset=utf-8", 
-        // DataType needs to stay, otherwise the response object
-        // will be treated as a single string
-        //dataType: "json",
-        success: function (response) {
-            //alert(response);
-            //var myContainer = (CurrentTheme.getCurrentContainer());
-            //CurrentTheme.TransitionOldContainer();
-            //$(myContainer).empty();
-            //myContainer.outerHTML = "";
-        },
-        error: function (err) {
-            //var myError = err;
-            //var step = "err";
-            var NewMessage = "Oh No!!! Tiler is having issues modifying your schedule. Please try again Later :(";
-            var ExitAfter = { ExitNow: true, Delay: 1000 };
-            HandleNEwPage.UpdateMessage(NewMessage, ExitAfter, function () { });
-        }
-
-    }).done(function (data) {
-        HandleNEwPage.Hide();
-        global_ExitManager.triggerLastExitAndPop();
-        getRefreshedData();
-        affirmNewEvent(data);
-    });
-    */
-
 }
 
 /*generates modal "Add New Event & Add New Tile" for creating new item. Note: width is distance in pixels between left click and End of window */
@@ -3414,7 +3363,7 @@ function SendScheduleInformation(NewEvent, CallBack)
     NewEvent.UserID = UserCredentials.ID;
     var TimeZone = new Date().getTimezoneOffset();
     NewEvent.TimeZoneOffset = TimeZone;
-
+    NewEvent.TimeZone = moment.tz.guess()
     var url = global_refTIlerUrl + "Schedule/Event";
     var HandleNEwPage = new LoadingScreenControl("Tiler is Adding \"" + NewEvent.Name + " \" to your schedule ...");
     HandleNEwPage.Launch();

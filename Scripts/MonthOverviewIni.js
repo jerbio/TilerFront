@@ -709,6 +709,7 @@ function RevealControlPanelSection(SelectedEvents)
             };
             //var URL = "RootWagTap/time.top?WagCommand=6"
             var URL = global_refTIlerUrl + "Schedule/Events";
+            DeletionEvent.TimeZone = moment.tz.guess()
             var HandleNEwPage = new LoadingScreenControl("Tiler is Deleting your event :)");
             HandleNEwPage.Launch();
 
@@ -772,7 +773,7 @@ function RevealControlPanelSection(SelectedEvents)
             var MarkAsCompleteData = {
                 UserName: UserCredentials.UserName, UserID: UserCredentials.ID, EventID: AllIds, TimeZoneOffset: TimeZone
             };
-
+            MarkAsCompleteData.TimeZone = moment.tz.guess()
             var exit = function (data) {
                 HandleNEwPage.Hide();
                 //triggerUIUPdate();//hack alert
@@ -3609,6 +3610,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                         };
                     
                         var URL = global_refTIlerUrl + "Schedule/Event/Pause";
+                        PauseEvent.TimeZone = moment.tz.guess()
                         var HandleNEwPage = new LoadingScreenControl("Tiler is Pausing your event :)");
                         HandleNEwPage.Launch();
 
@@ -3668,6 +3670,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                         };
 
                         var URL = global_refTIlerUrl + "Schedule/Event/Resume";
+                        ContinueEvent.TimeZone = moment.tz.guess()
                         var HandleNEwPage = new LoadingScreenControl("Tiler resuming your event :)");
                         HandleNEwPage.Launch();
 
@@ -3742,6 +3745,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                     };
                         //var URL = "RootWagTap/time.top?WagCommand=6"
                         var URL = global_refTIlerUrl + "Schedule/Event";
+                        DeletionEvent.TimeZone = moment.tz.guess()
                         var HandleNEwPage = new LoadingScreenControl("Tiler is Deleting your event :)");
                         HandleNEwPage.Launch();
 
@@ -3803,6 +3807,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                     var NowData = { UserName: UserCredentials.UserName, UserID: UserCredentials.ID, EventID: SubEvent.ID, DurationDays: DayInput, DurationHours: HourInput, DurationMins: MinInput, TimeZoneOffset: TimeZone};
                     //var URL= "RootWagTap/time.top?WagCommand=2";
                     var URL = global_refTIlerUrl + "Schedule/Event/Procrastinate";
+                    NowData.TimeZone = moment.tz.guess()
                     var HandleNEwPage = new LoadingScreenControl("Tiler is Postponing  :)");
                     HandleNEwPage.Launch();
 
@@ -3870,6 +3875,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                             ThirdPartyUserID: SubEvent.ThirdPartyUserID,
                             ThirdPartyType: SubEvent.ThirdPartyType
                         };
+                        MarkAsCompleteData.TimeZone = moment.tz.guess()
                         var exit = function (data) {
                             HandleNEwPage.Hide();
                             //triggerUIUPdate();//hack alert
@@ -4194,6 +4200,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                         ThirdPartyType: SubEvent.ThirdPartyType
 
                     };
+                    SaveData.TimeZone = moment.tz.guess()
                     var exit= function (data) {
                         HandleNEwPage.Hide();
                         //triggerUIUPdate();//hack alert
@@ -4746,7 +4753,7 @@ function GlobaPauseResumeButtonManager(events) {
                 ThirdPartyUserID: SubEvent.ThirdPartyUserID,
                 ThirdPartyType: SubEvent.ThirdPartyType
             };
-
+            PauseEvent.TimeZone = moment.tz.guess()
             var URL = global_refTIlerUrl + "Schedule/Event/Pause";
             var HandleNEwPage = new LoadingScreenControl("Tiler is Pausing your event :)");
             HandleNEwPage.Launch();
@@ -4800,7 +4807,7 @@ function GlobaPauseResumeButtonManager(events) {
                 ThirdPartyUserID: SubEvent.ThirdPartyUserID,
                 ThirdPartyType: SubEvent.ThirdPartyType
             };
-
+            ContinueEvent.TimeZone = moment.tz.guess()
             var URL = global_refTIlerUrl + "Schedule/Event/Resume";
             var HandleNEwPage = new LoadingScreenControl("Tiler resuming your event :)");
             HandleNEwPage.Launch();

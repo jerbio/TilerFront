@@ -132,13 +132,16 @@ function generateSubEventEditPage(subEvent) {
         postData.AddressDescription = addressNickNameEdit.input.value
         postData.EventID = subEventId
         postData.mobileFlag = true
-        postData.TimeZoneOffset = moment.tz.guess()
+        var TimeZone = new Date().getTimezoneOffset();
+        postData.TimeZoneOffset = TimeZone;
+        postData.TimeZone = moment.tz.guess()
         postData.offset = new Date().getTimezoneOffset()
         postData.Split = numberOfEvents.input.value
         postData.UserName = userData.UserName
         postData.UserID = userData.UserID
         postData.ThirdPartyType = subEvent.ThirdPartyType
         let url = global_refTIlerUrl + "SubCalendarEvent/Update"
+        postData.TimeZone = moment.tz.guess()
         var HandleNEwPage = new LoadingScreenControl("Tiler is Updating the event ...");
         HandleNEwPage.Launch();
         $.ajax({

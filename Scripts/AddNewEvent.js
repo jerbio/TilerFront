@@ -73,24 +73,14 @@ function LaunchAddnewEvent(LoopBackCaller, CurrentUser,isTIle)
         $(myContainer).empty();
         myContainer.outerHTML = "";
     }
-    //$(CancelTab.Button.Dom).click(CloseAddNewEvent)
-    //(CancelTab.Button.Dom).onclick = (CloseAddNewEvent)
-
-
     AllTabs.push(RecurrenceTab);
 
     var DoneTab = createCalEventDoneTab();
-    //$(RangeTab.Content.Dom).addClass(CurrentTheme.InActiveTabContent);
-    //TabContentContainer.Dom.appendChild(RangeTab.Content.Dom);
-    //TabTitleContainer.Dom.appendChild(DoneTab.Button.Dom);
     var NewCalendarEvent;//
     //$(DoneTab.Button.Dom).click(function ()
-        (DoneTab.Button.Dom).onclick=(function ()
-        {
-
-
+    (DoneTab.Button.Dom).onclick=(function ()
+    {
         var NewEvent = prepCalDataForPost();
-
         if (NewEvent == null)
         {
             return;
@@ -100,7 +90,7 @@ function LaunchAddnewEvent(LoopBackCaller, CurrentUser,isTIle)
 
         var TimeZone = new Date().getTimezoneOffset();
         NewEvent.TimeZoneOffset = TimeZone;
-        //var url = "RootWagTap/time.top?WagCommand=1"
+        NewEvent.TimeZone = moment.tz.guess()
         var url = global_refTIlerUrl + "Schedule/Event";
 
         var HandleNEwPage = new LoadingScreenControl("Tiler is Adding \"" + NewEvent.Name+ " \" to your schedule ...");
@@ -136,19 +126,6 @@ function LaunchAddnewEvent(LoopBackCaller, CurrentUser,isTIle)
             var myDropDown = new DropDownNotification();
             myDropDown.ShowMessage("Earliest time for \"" + NewEvent.Name + "\" is " + SubEventDate.toLocaleString());
         });
-
-        //alert(NewEvent);
-        /*
-        var repeteOpitonSelect = "none"
-        if(EventrepeatStatus.status)
-        {
-            EventRepetitionSelection.forEach(function (Selection) { if (Selection.status) { repeteOpitonSelect = Selection } });
-        }
-        
-
-        var ret = repeteOpitonSelect.Type.Name;
-
-        alert(ret);*/
         }
     );
     
@@ -508,45 +485,9 @@ function createCalEventNameTab(isTIle)
     var EnableAutoSchedulerButtonID = "EnableAutoSchedulerButton"
     var EnableAutoSchedulerButton = generateMyButton(AutoScheduleContainerLoopBack, EnableAutoSchedulerButtonID);
     $(EnableAutoSchedulerButton).addClass("setAsDisplayNone");
-    
-    
-    //EnableAutoSchedulerButton.status = 0;
-
-    
-
     EventRigid = EnableAutoSchedulerButton;
 
     EnableAAutoScheduleContainer.Dom.appendChild(EnableAAutoScheduleContainerLabel.Dom)
-    
-
-    //Split Input box
-    
-    /*
-    var AutoScheduleCountContainerID = "AutoScheduleCountContainer";
-    var AutoSchedulerDataInputData = { Name: "", ID: AutoScheduleCountContainerID, Default: "Splits?" };
-    var AutoSchedulerDataInputDataCounterDom = generateuserInput(AutoSchedulerDataInputData, null);
-    $(AutoSchedulerDataInputDataCounterDom.FullContainer.Dom).addClass(CurrentTheme.FontColor);
-    AutoSchedulerDataInputDataCounterDom.FullContainer.Dom.style.borderBottom = "none";
-    $(AutoSchedulerDataInputDataCounterDom.Input.Dom).addClass("InputBox");
-    $(AutoSchedulerDataInputDataCounterDom.Label.Dom).addClass("InputLabel");
-    $(AutoSchedulerDataInputDataCounterDom.Input.Dom).addClass(CurrentTheme.FontColor);
-    AutoSchedulerDataInputDataCounterDom.Input.Dom.value = 1;
-    AutoSchedulerDataInputDataCounterDom.Input.Dom.style.width = "3em";
-    AutoSchedulerDataInputDataCounterDom.Input.Dom.style.height = "30px";
-    AutoSchedulerDataInputDataCounterDom.Input.Dom.style.left = "10%";
-    AutoSchedulerDataInputDataCounterDom.Input.Dom.style.top = 0;
-    AutoSchedulerDataInputDataCounterDom.Input.Dom.style.marginTop = 0;
-
-
-
-    EventSplits = AutoSchedulerDataInputDataCounterDom.Input;
-    */
-    
-
-
-
-
-    
     var AutoScheduleTimeConstraintContainerID = "AutoScheduleTimeCOnstraintContainer";
     var AutoScheduleTimeConstraintContainer = getDomOrCreateNew(AutoScheduleTimeConstraintContainerID);
 
@@ -584,15 +525,9 @@ function createCalEventNameTab(isTIle)
     AutoSchedulerDataInputDataDom.Input = getDomOrCreateNew("AutoScheduleDurationContainer_Text","span");
     AutoSchedulerDataInputDataDom.Input.Dom.innerHTML = (isTIle ? "Tile" : "Event") + " Duration";
     AutoSchedulerDataInputDataDom.FullContainer.Dom.appendChild(AutoSchedulerDataInputDataDom.Input.Dom);
-    //$(AutoSchedulerDataInputDataDom.Input.Dom).click(function () { dialAutoScheduleCallBack(AutoScheduleDurationContainerDialContainer.Dom, dialAutoScheduleCallBack) });
     AutoSchedulerDataInputDataDom.FullContainer.onclick = (function () { dialAutoScheduleCallBack(AutoScheduleDurationContainerDialContainer.Dom, dialAutoScheduleCallBack) });
     $(AutoSchedulerDataInputDataDom.FullContainer.Dom).addClass(CurrentTheme.FontColor);
-    //AutoSchedulerDataInputDataDom.FullContainer.Dom.style.borderBottom = "none";
-    //$(AutoSchedulerDataInputDataDom.Input.Dom).addClass("InputBox");
-    //AutoSchedulerDataInputDataDom.Input.Dom.style.height = "30%";
     $(AutoSchedulerDataInputDataDom.Input.Dom).addClass(CurrentTheme.FontColor);
-    //AutoSchedulerDataInputDataDom.Input.Dom.style.border = "yellow 2px solid";
-    //AutoSchedulerDataInputDataDom.Label.Dom.style.border = "black 2px solid";
     AutoSchedulerDataInputDataDom.Label.Dom.style.textAlign = "center";
     $(AutoSchedulerDataInputDataDom.Label.Dom).addClass("InputLabel");
     //AutoSchedulerDataInputDataDom.Input.Dom.style.width = "40%";
@@ -605,17 +540,8 @@ function createCalEventNameTab(isTIle)
     AutoScheduleTimeConstraintContainer.Dom.appendChild(AutoSchedulerDataInputDataDom.FullContainer.Dom);
     EnableAutoSchedulerButton.SetAsOff();//this initializs the button. This initialization has to be placed after the creation of the reference objects specified in the loop back function. In this case after the creation of "AutoScheduleContainerDataContainerSlider" in AutoScheduleContainerLoopBack
 
-    
-
-    
-    
-
     var AutoScheduleCountContainerDialContainerID = "AutoScheduleCountContainerDialContainer";
     var AutoScheduleCountContainerDialContainer = getDomOrCreateNew(AutoScheduleCountContainerDialContainerID);
-
-
-    
-    
 
     var AutoScheduleRangeConstraintContainerID = "AutoScheduleRangeConstraintContainer";
     var AutoScheduleRangeConstraintContainer = getDomOrCreateNew(AutoScheduleRangeConstraintContainerID);
