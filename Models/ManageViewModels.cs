@@ -77,10 +77,8 @@ namespace TilerFront.Models
         public string TimeOfDay { get; set; }
         [Display(Name = "TimeZoneOffSet")]
         public string TimeZoneOffSet { get; set; }
-
-        /*
-        [Display(Name = "DST")]
-        public string Dst { get; set; }*/
+        [Display(Name = "TimeZone")]
+        public string TimeZone { get; set; } = "UTC";
     }
 
     public class AddPhoneNumberViewModel

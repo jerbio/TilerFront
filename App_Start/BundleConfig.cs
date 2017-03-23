@@ -97,8 +97,9 @@ namespace TilerFront
                     "~/Scripts/jquery-ui.min.js",
                     "~/Scripts/SeachHandlerDesktop.js",
                     "~/Scripts/bootstrap-datepicker.js",
-                    "~/Scripts/jquery.signalR-{version}.js"
-
+                    "~/Scripts/jquery.signalR-{version}.js",
+                    "~/Scripts/moment.min.js",
+                    "~/Scripts/moment-timezone-with-data.min.js"
                       ));
 
             bundles.Add(new ScriptBundle("~/Content/TilerMobileJS").Include(
@@ -118,6 +119,8 @@ namespace TilerFront
                     "~/Scripts/jqm-datebox-1.4.4.core.min.js",
                     "~/Scripts/jqm-datebox-1.4.4.mode.slidebox.min.js",
                     "~/Scripts/jqm-datebox-1.4.4.mode.flipbox.min.js",
+                    "~/Scripts/moment.min.js",
+                    "~/Scripts/moment-timezone-with-data.min.js",
                     //"~/Scripts/YuiCombo/3.18.1/oop/oop-min.js&3.18.1/event…min.js&3.18.1/node-core/node-core-min.js",
                     "~/Scripts/YuiCombo/3.18.1/oop/oop-min.js",
                     "~/Scripts/YuiCombo/3.18.1/event-focus/event-focus-min.js",
