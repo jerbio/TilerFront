@@ -62,26 +62,11 @@ namespace TilerFront
             return retValue;
         }
 
-
-        async public Task<CustomErrors> Register(TilerUser user)
-        {
-            CustomErrors retValue = UserLog.genereateNewLogFile(user.Id);
-            return retValue;
-        }
-
         override async public Task<CustomErrors> DeleteLog()
         {
             return await UserLog.DeleteLog();
         }
-        
-        //async public Task CommitEventToLog(IEnumerable<CalendarEvent> AllEvents, string LatestID, string LogFile = "")
-        //{
-        //    await ((LogControlDirect)UserLog).WriteToLog(AllEvents, LatestID, LogFile);
-        //    sessionUser.LastChange = DateTimeOffset.UtcNow.DateTime;
-        //    Task SaveChangesToDB = new Controllers.UserController().SaveUser(sessionUser);
-        //    await SaveChangesToDB;
-        //}
-        
+
         override public bool DeleteAllCalendarEvents()
         {
             bool retValue = false;
