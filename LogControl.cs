@@ -85,19 +85,6 @@ namespace TilerFront
         }
 
 
-        //public LogControl(ApplicationDbContext database, string logLocation = "")
-        //{
-        //    if (!string.IsNullOrEmpty(logLocation))
-        //    {
-        //        WagTapLogLocation = logLocation;
-        //    }
-        //    //LogDBDataAccess = DBAccess;
-        //    LogStatus = false;
-        //    CachedLocation = new Dictionary<string, Location_Elements>();
-        //    Database = database;
-        //}
-
-
         public LogControl(TilerUser user, ApplicationDbContext database, string logLocation = "", DB_UserActivity useractivity = null)
         {
             if (!string.IsNullOrEmpty(logLocation))
@@ -156,20 +143,6 @@ namespace TilerFront
         public async Task Undo(string LogFile = "")
         {
             Task<bool> retValue;
-
-#if ForceReadFromXml
-#else
-            if (useCassandra)
-            {
-                retValue =  myCassandraAccess.Commit(AllEvents);
-                LogDBDataAccess.WriteLatestData(DateTime.Now,Convert.ToInt64( LatestID), ID);
-                bool boolRetValue = await retValue;
-                return boolRetValue;
-            }
-#endif
-
-
-
             retValue = new Task<bool>(() => { return true; });
             retValue.Start();
             string LogFileCopy = "";
@@ -232,58 +205,6 @@ namespace TilerFront
                 }
             }
 
-        }
-
-        public CustomErrors genereateNewLogFile(string UserID)//creates a new xml log file. Uses the passed UserID
-        {
-
-            CustomErrors retValue = null;
-#if ForceReadFromXml
-#else
-            if (useCassandra)
-            {
-                return retValue;
-            }
-#endif
-            try
-            {
-
-                string NameOfFile = WagTapLogLocation + UserID + ".xml";
-                if (File.Exists(NameOfFile))
-                {
-                    File.Delete(NameOfFile);
-                }
-
-                FileStream myFileStream = File.Create(NameOfFile);
-                myFileStream.Close();
-
-                CurrentLog = UserID + ".xml";
-                EmptyCalendarXMLFile(NameOfFile);
-                //EmptyCalendarXMLFile();
-            }
-            catch (Exception e)
-            {
-                retValue = new CustomErrors("Error generating log\n" + e.ToString(), 20000000);
-            }
-
-            return retValue;
-
-        }
-
-        public async Task<CustomErrors> DeleteLog()
-        {
-            CustomErrors retValue = null;
-            try
-            {
-                string NameOfFile = WagTapLogLocation + CurrentLog;
-                File.Delete(NameOfFile);
-            }
-            catch (Exception e)
-            {
-                retValue = new CustomErrors(e.ToString(), 20002000);
-            }
-
-            return retValue;
         }
 
         public void updateUserActivty(UserActivity activity)

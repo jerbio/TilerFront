@@ -62,10 +62,6 @@ namespace TilerFront
             return retValue;
         }
 
-        override async public Task<CustomErrors> DeleteLog()
-        {
-            return await UserLog.DeleteLog();
-        }
 
         override public bool DeleteAllCalendarEvents()
         {

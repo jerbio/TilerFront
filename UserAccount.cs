@@ -77,11 +77,6 @@ namespace TilerFront
             return retValue;
         }
 
-        virtual async public Task<CustomErrors> DeleteLog()
-        {
-            return await UserLog.DeleteLog();
-        }
-
         virtual public void UpdateReferenceDayTime(DateTimeOffset referenceTime)
         {
             UserLog.UpdateReferenceDayInXMLLog(referenceTime);
