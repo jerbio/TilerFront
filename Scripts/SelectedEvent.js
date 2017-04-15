@@ -8,7 +8,6 @@
     $(DomInformation.Dom).addClass("ScreenContainer");
     var DomTopSection = generateSelectedEventLabelDom(SelectedEvent);
     var CompletionMapDom = generateCompletionMap(SelectedEvent);
-    //$(CompletionMapDom).addClass("SubEventLabelSection TextColorLight")
     $(CompletionMapDom).addClass("SubEventNonLabelSection ContentSectionLight")
     var NextEventDom = generateNextEventSelection(SelectedEvent);
     var WeatherSelectionDom = generateWeatherSelection(SelectedEvent);
@@ -51,11 +50,9 @@ function generateEditField(options) {
         $(label).addClass("inline-block")
         label.innerText = options.label
         container.label = label
-        //label.appendChild(input)
         container.appendChild(label)
         retValue.label = label
     }
-
     let input = getDomOrCreateNew("editable-field-input-" + id, 'input')
     $(input).addClass("editable-field-input")
     container.appendChild(input)
@@ -90,7 +87,7 @@ function generateSubEventEditPage(subEvent) {
     let pageFooter = getDomOrCreateNew("Edit-SubEvent-page-footer-" + subEventId)
     $(pageFooter).addClass('edit-subEvent-page-footer')
     $(page).show();
-    let nameEdit = generateEditField({ id: "Edit-SubEvent-Name-" + subEventId, label:'Name', placeHolder: 'Name', value: subEvent.Name })
+    let nameEdit = generateEditField({ id: "Edit-SubEvent-Name-" + subEventId, label: 'Name', placeHolder: 'Name', value: subEvent.Name || subEvent.SubCalCalendarName })
     let addressEdit = generateEditField({ id: "Edit-SubEvent-Address-" + subEventId, label: 'Address', placeHolder: 'Address', value: subEvent.SubCalAddress })
     let addressNickNameEdit = generateEditField({ id: "Edit-SubEvent-Address-nick-Name" + subEventId, label: 'Address Description', placeHolder: 'Another name for the address', value: subEvent.SubCalAddressDescription })
     let durationEdit = generateEditField({ id: "Edit-SubEvent-Duration-" + subEventId, label: 'Duration', placeHolder: 'Duration', value: subEvent.Name })
@@ -135,6 +132,11 @@ function generateSubEventEditPage(subEvent) {
         var TimeZone = new Date().getTimezoneOffset();
         postData.TimeZoneOffset = TimeZone;
         postData.TimeZone = moment.tz.guess()
+
+        postData.Start = postData.Start - (TimeZone * OneMinInMs);
+        postData.End = postData.End - (TimeZone * OneMinInMs);
+        postData.CalEnd = postData.CalEnd - (TimeZone * OneMinInMs);
+
         postData.offset = new Date().getTimezoneOffset()
         postData.Split = numberOfEvents.input.value
         postData.UserName = userData.UserName

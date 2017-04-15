@@ -3932,7 +3932,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                     DeleteMessage.innerHTML = "Sure you want to delete ?"
                     $('#ConfirmDeleteModal').slideUp(500);
                     ModalDelete.isRevealed = false;
-            }
+                }
                 deleteButton.onclick = deleteSubevent;
                 completeButton.onclick = markAsComplete;
                 if (SubEvent.isPaused) {
@@ -3974,7 +3974,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                     {
                         deleteSubevent();
                     }
-            }
+                }
                 //debugger;
                 document.removeEventListener("keydown", containerKeyPress);//this is here just to avooid duplicate addition of the same keypress event
                 document.addEventListener("keydown", containerKeyPress);
