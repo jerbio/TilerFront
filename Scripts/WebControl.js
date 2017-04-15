@@ -82,7 +82,7 @@ Date.prototype.dst = function () {
     return this.getTimezoneOffset() < this.stdTimezoneOffset();
 }
 
-var googleAPiKey = "AIzaSyAOnexWFxnoQ6nQI7p64lyR8YgXwB4qRvU";//Debug ? "AIzaSyAeFh3yjsRCmTEL1ujbaA_CBk_r_LUNPY8" : "AIzaSyAd2zKjpB7lw4FS41oLzC2SPwtCP6HXHoc";
+var googleAPiKey ="AIzaSyAOnexWFxnoQ6nQI7p64lyR8YgXwB4qRvU";//Debug ? "AIzaSyAeFh3yjsRCmTEL1ujbaA_CBk_r_LUNPY8" : "AIzaSyAd2zKjpB7lw4FS41oLzC2SPwtCP6HXHoc";
 
 
 
@@ -340,7 +340,6 @@ function StructuralizeNewData(NewData)
                     }
 
                 }
-                //debugger;
                 var RangeStart = new Date(NowDate.getTime() - (OneHourInMs * 12));
                 var RangeEned = new Date(CurrentTheme.Now + TwelveHourMilliseconds);
 
@@ -354,32 +353,11 @@ function StructuralizeNewData(NewData)
 
 
     function PopulateDomForScheduleEvent(myEvent, Tiers) {
-        
-
-        //debugger;
-        /*
-        myEvent.SubCalStartDate = new Date(myEvent.SubCalStartDate + global_TimeZone_ms );
-        myEvent.SubCalEndDate = new Date(myEvent.SubCalEndDate + global_TimeZone_ms );
-        myEvent.SubCalCalEventStart = new Date(myEvent.SubCalCalEventStart + global_TimeZone_ms );
-        myEvent.SubCalCalEventEnd = new Date(myEvent.SubCalCalEventEnd + global_TimeZone_ms );
-        //*/
-
-        ///*
         myEvent.SubCalStartDate = new Date(myEvent.SubCalStartDate);// + global_TimeZone_ms);
         myEvent.SubCalEndDate = new Date(myEvent.SubCalEndDate);// + global_TimeZone_ms);
         myEvent.SubCalCalEventStart = new Date(myEvent.SubCalCalEventStart);//+ global_TimeZone_ms);
         myEvent.SubCalCalEventEnd = new Date(myEvent.SubCalCalEventEnd);// + global_TimeZone_ms);
         myEvent.Tiers = Tiers;
-        //*/
-        /*myEvent.SubCalStartDate = !myEvent.SubCalStartDate.dst() ? new Date(Number(myEvent.SubCalStartDate.getTime()) + OneHourInMs) : myEvent.SubCalStartDate;
-        myEvent.SubCalEndDate =! myEvent.SubCalEndDate.dst() ? new Date(Number(myEvent.SubCalEndDate.getTime()) + OneHourInMs) : myEvent.SubCalEndDate;
-        myEvent.SubCalCalEventStart = !myEvent.SubCalCalEventStart.dst() ? new Date(Number(myEvent.SubCalCalEventStart.getTime()) + OneHourInMs) : myEvent.SubCalCalEventStart;
-        myEvent.SubCalCalEventEnd = !myEvent.SubCalCalEventEnd.dst() ? new Date(Number(myEvent.SubCalCalEventEnd.getTime()) + OneHourInMs) : myEvent.SubCalCalEventEnd;*/
-
-
-
-        //var MobileDom = genereateMobileDoms(myEvent);
-        //myEvent.Dom = MobileDom;
         return myEvent
     }
     return { TotalSubEventList: TotalSubEventList,ActiveSubEvents: ActiveSubEvents,Dictionary_OfCalendarData: Dictionary_OfCalendarData,Dictionary_OfSubEvents:Dictionary_OfSubEvents};
@@ -2052,10 +2030,7 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
             var returnedValueContainerID = "returnedValueContainer" + AutoSuggestControl.Counter;
             var returnedValueContainer = getDomOrCreateNew(returnedValueContainerID);
             $(returnedValueContainer.Dom).addClass("returnedValueContainer");
-            //$(returnedValueContainer.Dom).addClass(CurrentTheme.ContentSection);
-            //(InputBar.Dom).oninput = prepCall(InputBar.Dom, Url, Method, returnedValueContainer, IsNotTilerEndPoint);
             $(InputBar.Dom).on("input", prepCall(InputBar.Dom, Url, Method, returnedValueContainer, IsNotTilerEndPoint, DataStructure));
-            //InputBar.onchange= clear;
 
             var retValue = { InputBar: InputBar, returnedValue: returnedValueContainer };
             return retValue;
@@ -2095,6 +2070,7 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
 
         function prepCall(InputDom, url, Method, SuggestedValuesContainer, IsNotTilerEndPoint, DataStructure)//[reps timer
         {
+            debugger
             return function(e)
             {
                 if (e.which == 27)
@@ -2120,15 +2096,12 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
         function prepCalToBackEnd(InputDom, url, Method, SuggestedValuesContainer, e, IsNotTilerEndPoint,DataStructure) {
             return function ()
             {
-                //debugger;
-                
                 cancelRequest();//cancels any preceeding requests
                 var FullLetter = InputDom.value;
                 FullLetter = FullLetter.trim();
                 myRequest = null;
                 if (!(url))//checks if data set is already provided. If it is provided then it should just call the call back.
                 {
-                    //debugger;
                     var Data = url;
                     var AllDom = GenerateEachDomCallBack(Data, SuggestedValuesContainer, InputDom);
                     TimerResetID = ini_TimerResetID;
@@ -2143,7 +2116,6 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
                 var postData ={}
                 if (IsNotTilerEndPoint)
                 {
-                    debugger;
                     postData = DataStructure;
                     postData["query"] = FullLetter;
                 }

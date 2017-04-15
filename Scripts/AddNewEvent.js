@@ -314,24 +314,22 @@ function createCalEventNameTab(isTIle)
     var CalEventNameInputDom = generateuserInput(CalEventNameParam, null);
     var CalEventNameInput = CalEventNameInputDom.FullContainer;
     CalEventNameInput.Dom.style.position = "relative";
-    //CalEventNameInput.Dom.style.top = "0%";
     CalEventNameInput.Dom.style.width = "70%";
-    //CalEventNameInput.Dom.style.height = "8%";
-    //CalEventNameInputDom.Input.Dom.style.height = "16px";
-    
     
     CalEventNameInput.Dom.style.left = "15%";
     $(CalEventNameInput.Dom).addClass(CurrentTheme.FontColor);
     $(CalEventNameInput.Dom).addClass("InputTextFont");
-    //CalEventNameInputDom.Input.Dom.style.backgroundColor = "Transparent";
     CalEventNameInputDom.Input.Dom.style.border = "None"
     $(CalEventNameInputDom.Input.Dom).addClass(CurrentTheme.FontColor);
-    //CalEventNameInputDom.Input.Dom.style.border = "solid 2px rgb(50,50,50)";
 
     EventNameDom = CalEventNameInputDom.Input;//public access of Name Dom
     var LabelContainerNameDom = CalEventNameInputDom.Label;
     EventNameDom.Dom.style.width = "100%";
     EventNameDom.Dom.style.fontFamily = "'Muli', sans-serif";
+
+    var MyDataContainer = { AllData: [], Index: -1 };
+    var GoogleDataContainer = { AllData: [], Index: -1 };
+    var CombinedData = { AllData: [], Index: -1 };
 
     
     EventNameDom.Dom.style.left = 0;
@@ -339,7 +337,82 @@ function createCalEventNameTab(isTIle)
 
     var url = global_refTIlerUrl + "User/Location";
     var myAutoSuggestControl = new AutoSuggestControl(url, "GET", HandleLocationResult);
-    
+
+
+    //Combined callback
+    function combinedCallBack(typeOfData, MyData) {
+        //if (combinedCallBack.currentIndex == 0)
+        if (typeOfData == 0) {
+            combinedCallBack.cleanUI();
+            LaunchPopulation(typeOfData)
+        }
+        else {
+            combinedCallBack.indexContainer[typeOfData] = MyData;
+            return;
+        }
+
+
+        function LaunchPopulation(Index) {
+            if (combinedCallBack.indexContainer[Index] != null) {
+                combinedCallBack.indexContainer[Index].forEach
+                (
+                    function (myData) {
+                        CombinedData.AllData.push(myData);
+                        myData.Index = LaunchPopulation.Index;
+                        ++LaunchPopulation.Index;
+                        myData.Hover = HoverMe;
+                        function HoverMe() {
+                            if (combinedCallBack.CurrentHover != null) {
+                                combinedCallBack.CurrentHover.UnHover();
+                            }
+                            combinedCallBack.CurrentHover = myData;
+                            //MyDataContainer.Index = Index;
+                            $(myData.Container).addClass("HoveLocationCacheContainer");
+                        }
+                    }
+                )
+                combinedCallBack.indexContainer[Index] = null;
+                ++Index;
+                combinedCallBack.currentIndex = Index;
+                LaunchPopulation(combinedCallBack.currentIndex);
+            }
+            else {
+                if (combinedCallBack.currentIndex >= combinedCallBack.indexContainer.length) {
+                    combinedCallBack.currentIndex = 0;
+                    combinedCallBack.clearData();
+                    PopulateteContainerDom();
+                    return;
+                }
+                else {
+                    setTimeout(function () { LaunchPopulation(combinedCallBack.currentIndex) }, 200);
+                }
+            }
+        }
+
+        function PopulateteContainerDom() {
+            for (var i = 0; i < CombinedData.AllData.length; i++) {
+                var Data = CombinedData.AllData[i];
+                justPushIntoContainer(Data);
+            }
+
+            function justPushIntoContainer(myData) {
+                combinedCallBack.DomContainer.Dom.appendChild(myData.Container);
+            }
+
+        }
+        LaunchPopulation.Index = 0;
+
+    }
+
+    combinedCallBack.CurrentHover = null;
+    combinedCallBack.indexContainer = [null, null];
+    combinedCallBack.currentIndex = 0;
+
+    combinedCallBack.DomContainer = myAutoSuggestControl.getSuggestedValueContainer();
+
+    combinedCallBack.rePopulate = function () {
+
+    }
 
     function HandleLocationResult(data, DomContainer,InputContainer)
     {
@@ -399,6 +472,149 @@ function createCalEventNameTab(isTIle)
         }
     }
 
+    function googleAddressCallBack(data, DomContainer, InputCOntainer) {
+
+        function initialize() {
+            debugger
+            ReseAutoSuggest();
+            var dataInput = InputCOntainer.value
+            dataInput = dataInput.trim();
+            var defaultLocation = new google.maps.LatLng(global_PositionCoordinate.Latitude, global_PositionCoordinate.Longitude);
+            var request = {
+                location: defaultLocation,
+                radius: 50,
+                query: dataInput
+            };
+
+            var service = new google.maps.places.PlacesService(DomContainer);
+            service.textSearch(request, callback);
+        }
+
+        function callback(results, status) {
+
+            if (status == google.maps.places.PlacesServiceStatus.OK) {
+                for (var i = 0; ((i < results.length) && (i < 5)) ; i++) {
+                    //debugger
+                    resolveEachRetrievedEvent(results[i], i);
+                }
+            }
+
+            var CombinedDataIndex = 1;
+            combinedCallBack.indexContainer[CombinedDataIndex] = GoogleDataContainer.AllData;
+            combinedCallBack(CombinedDataIndex, GoogleDataContainer.AllData);
+        }
+
+        initialize();
+
+        function ReseAutoSuggest() {
+            GoogleDataContainer.AllData.splice(0, GoogleDataContainer.AllData.length)
+            GoogleDataContainer.Index = -1;
+            //LocationAutoSuggestControl.HideContainer();
+        }
+
+        function resolveEachRetrievedEvent(LocationData)//, Index)
+        {
+            var CalendarEventDom = generateDomForEach(LocationData)//, Index);
+            $(CalendarEventDom.Container).addClass("LocationCacheContainer");
+            //DomContainer.Dom.appendChild(CalendarEventDom.Container);
+            GoogleDataContainer.AllData.push(CalendarEventDom);
+            ++resolveEachRetrievedEvent.ID;
+        }
+        resolveEachRetrievedEvent.ID = 0;
+        //GoogleDataContainer.AllData[0].Hover();
+
+        function generateDomForEach(LocationData)//, Index)
+        {
+            //var RestrictiveWeekSlider = TimeRestrictionSlider;
+            var TagSpan = getDomOrCreateNew(("GoogleTagSpan" + resolveEachRetrievedEvent.ID), "span");
+            TagSpan.innerHTML = LocationData.name + " &mdash; ";
+
+            $(TagSpan).addClass("LocationTag");
+            var AddressSpan = getDomOrCreateNew(("GoogleAddressSpan " + resolveEachRetrievedEvent.ID), "span");
+            AddressSpan.innerHTML = LocationData.formatted_address;
+            $(AddressSpan).addClass("LocationAddress");
+            var CacheAddressContainer = getDomOrCreateNew(("GoogleCacheAddressContainer" + resolveEachRetrievedEvent.ID));
+            var GoogleSymbolContainer = getDomOrCreateNew(("GoogleSymbolContainer" + resolveEachRetrievedEvent.ID));
+            $(GoogleSymbolContainer).addClass("GoogleSearchSymbolContainer");
+            var GoogleSymbol = getDomOrCreateNew(("GoogleSymbol" + resolveEachRetrievedEvent.ID));
+            $(GoogleSymbol).addClass("GoogleSearchSymbol");
+            $(GoogleSymbol).addClass("GoogleSearchIcon");
+            GoogleSymbolContainer.appendChild(GoogleSymbol);
+
+            CacheAddressContainer.appendChild(TagSpan);
+            CacheAddressContainer.appendChild(AddressSpan);
+            CacheAddressContainer.appendChild(GoogleSymbolContainer);
+            CacheAddressContainer.onclick = function () { SelectMe() };
+
+            var RetValue = { Container: CacheAddressContainer, Hover: HoverMe, UnHover: UnHoverMe, Select: SelectMe, /*Index: Index,*/ Insert: InsertIntoInput };
+
+            function HoverMe() {
+                if (generateDomForEach.CurrentHover != null) {
+                    generateDomForEach.CurrentHover.UnHover();
+                }
+                generateDomForEach.CurrentHover = RetValue;
+                //GoogleDataContainer.Index = Index;
+                $(CacheAddressContainer).addClass("HoveLocationCacheContainer");
+            }
+
+            function UnHoverMe() {
+                $(CacheAddressContainer).removeClass("HoveLocationCacheContainer");
+            }
+
+            function SelectMe() {
+                //InputCOntainer.value = LocationData.Address;
+                InsertIntoInput();
+                LocationAutoSuggestControl.HideContainer();
+                NickNameSlider.turnOnSlide();
+                //debugger
+                var NickElements = NickNameSlider.getAllElements();
+                //getBusinessHourData(LocationData);
+                NickElements[0].TileInput.getInputDom().value = LocationData.name;
+                setTimeout(function () { InputBox.focus(), 200 });
+            }
+
+            function getBusinessHourData(LocationData) {
+                debugger;
+                var request = {
+                    placeId: LocationData.place_id
+                };
+                var service = new google.maps.places.PlacesService(DomContainer);
+                service.getDetails(request, LocationUpdateCallBack);
+                function LocationUpdateCallBack(place, status) {
+                    if (status == google.maps.places.PlacesServiceStatus.OK) {
+                        var RestrictedTimeData = generateOfficeHours(place);
+                        if ((!RestrictedTimeData.IsTwentyFourHours) && (!RestrictedTimeData.NoWeekData)) {
+                            RestrictiveWeekSlider.turnOnSlide();
+                            RestrictiveWeekSlider.EnableWeekDayCheckBox();
+                            var RestrictiveWeek = RestrictiveWeekSlider.getRestrictiveWeek();
+                            for (var i = 0; i < RestrictedTimeData.WeekDayData.length; i++) {
+                                var myDay = RestrictedTimeData.WeekDayData[i];
+                                if (!myDay.IsClosed) {
+                                    var myButton = RestrictiveWeek.getWeekDayButton(myDay.DayIndex);
+                                    var Start = myDay.Start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                                    var End = myDay.End.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                                    myButton.UIElement.TurnOnButton();
+                                    myButton.WeekDayButton.getStartDom().value = Start;
+                                    myButton.WeekDayButton.setStart(Start);
+                                    myButton.WeekDayButton.getEndDom().value = End;
+                                    myButton.WeekDayButton.setEnd(End);
+                                }
+                            }
+                            setTimeout(function () { InputCOntainer.focus(); });//need to return focus to auto suggest input box. After selecting element system seems to shift focus to checkbox. 
+                        }
+                    }
+                }
+            }
+
+            function InsertIntoInput() {
+                InputCOntainer.value = LocationData.formatted_address;
+            }
+
+            return RetValue;
+        }
+        generateDomForEach.CurrentHover = null;
+    }
+
     var CalEventAddressInputDom = generateuserInput(CalEventAddressParam, null);
     var CalEventAddressInput = CalEventAddressInputDom.FullContainer;
     //CalEventAddressInput.Dom.style.height = "8%";
@@ -408,20 +624,14 @@ function createCalEventNameTab(isTIle)
 
     var CalEventAddressTagInputDom = generateuserInput(CalEventAddressTagParam, null);
     var CalEventAddressTagInput = CalEventAddressTagInputDom.FullContainer;
-    //CalEventAddressTagInput.Dom.style.position = "absolute";
     CalEventAddressTagInput.Dom.style.position = "relative";
-    //CalEventAddressTagInput.Dom.style.top = "16%";
-    //CalEventAddressTagInput.Dom.style.marginTop = "6px";
-    //CalEventAddressTagInput.Dom.style.height = "8%";
 
     CalEventAddressTagInput.Dom.style.width = "70%";
     CalEventAddressTagInput.Dom.style.left = "15%";
     $(CalEventAddressTagInput.Dom).addClass(CurrentTheme.FontColor);
     $(CalEventAddressTagInput.Dom).addClass("InputTextFont");
-    //CalEventAddressTagInputDom.Input.Dom.style.backgroundColor = "Transparent";
     CalEventAddressTagInputDom.Input.Dom.style.border = 0
     $(CalEventAddressTagInputDom.Input.Dom).addClass(CurrentTheme.FontColor);
-    //CalEventAddressTagInputDom.Input.Dom.style.border = "solid 2px rgb(50,50,50)";
 
     $(CalEventAddressInputDom.Input.Dom).remove();//deletes input Dom generated by generateuserInput()
     CalEventAddressInputDom.Input.Dom = myAutoSuggestControl.getAutoSuggestControlContainer();
@@ -429,6 +639,15 @@ function createCalEventNameTab(isTIle)
     CalEventAddressInputDom.Input.Dom.border = "none";
     var returnedCacheValuesContainer = myAutoSuggestControl.getSuggestedValueContainer();//gets autoSuggest container
     var AutoSuggestInputBar = myAutoSuggestControl.getInputBox();
+
+
+    var GoogleAutoSuggestEndPoint = "";
+
+    var googleSendData = {};
+    googleSendData.key = googleAPiKey
+    googleSendData.query = "";
+    var GoogleAutoSuggestControl = new AutoSuggestControl(GoogleAutoSuggestEndPoint, "GET", googleAddressCallBack, AutoSuggestInputBar, true, googleSendData);
+
     $(AutoSuggestInputBar).addClass(CurrentTheme.FontColor);
     $(returnedCacheValuesContainer).addClass(CurrentTheme.AlternateContentSection);
     $(returnedCacheValuesContainer).addClass(CurrentTheme.AlternateFontColor);

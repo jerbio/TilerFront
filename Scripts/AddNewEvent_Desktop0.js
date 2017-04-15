@@ -2,7 +2,6 @@
 
 function addNewEvent(x, y, height, refStart)
 {
-    //debugger;
     var AddEventPanel = getDomOrCreateNew("AddEventPanel");
     generateAddEventContainer(x, y, height, AddEventPanel.Dom, refStart);
     
@@ -10,7 +9,6 @@ function addNewEvent(x, y, height, refStart)
 
 function generatePostBackDataForTimeRestriction(RestrictionSlider)
 {
-    //debugger;
     var RestrictionStatusButtonStatus = RestrictionSlider.getStatus();
     var RestrictionStart = RestrictionSlider.getStart();
     var RestrictionEnd = RestrictionSlider.getEnd();
@@ -875,12 +873,10 @@ function InactiveSlider(InActiveDom, ActiveDom, ButtonElements, AutoSentence)
     while (LastElement.NextElement != undefined)
     {
         AddToTileContainer(LastElement, AllInputDataContainer);
-        //AllInputDataContainer.Dom.appendChild(LastElement.FullContainer.Dom);
         LastElement = LastElement.NextElement;
     }
 
     AddToTileContainer(LastElement, AllInputDataContainer);
-    //AllInputDataContainer.Dom.appendChild(LastElement.FullContainer.Dom);
 
     this.getAllElements =function()
     {
@@ -1869,7 +1865,6 @@ function AddTiledEvent()
         var CombinedData= { AllData: [], Index: -1 };
         var FullContainer = LocationAutoSuggestControl.getAutoSuggestControlContainer();
 
-
         //Combined callback
         function combinedCallBack(typeOfData,MyData)
         {
@@ -1962,7 +1957,6 @@ function AddTiledEvent()
 
         combinedCallBack.clear = function ()
         {
-            debugger;
             MyDataContainer.AllData.splice(0, MyDataContainer.AllData.length)
             MyDataContainer.Index = -1;
             //LocationAutoSuggestControl.clear();
@@ -2113,6 +2107,7 @@ function AddTiledEvent()
 
             function initialize()
             {
+                debugger
                 ReseAutoSuggest();
                 var dataInput = InputCOntainer.value
                 dataInput = dataInput.trim();
@@ -2121,7 +2116,6 @@ function AddTiledEvent()
                     location: defaultLocation,
                     radius: 50,
                     query: dataInput
-                    //query: "vectra bank"
                 };
 
                 var service = new google.maps.places.PlacesService(DomContainer);
@@ -2132,7 +2126,6 @@ function AddTiledEvent()
                 
                 if (status == google.maps.places.PlacesServiceStatus.OK) {
                     for (var i = 0; ((i < results.length)&&(i<5)); i++) {
-                        //debugger
                         resolveEachRetrievedEvent(results[i],i);
                     }
                 }
@@ -2512,11 +2505,9 @@ function AddTiledEvent()
     while (LastElement.NextElement!=undefined)
     {
         AddToTileContainer(LastElement, ModalContentContainer);
-        //ModalContentContainer.Dom.appendChild(LastElement.FullContainer.Dom);
         LastElement = LastElement.NextElement;
     }
     AddToTileContainer(LastElement, ModalContentContainer);
-    //ModalContentContainer.Dom.appendChild(LastElement.FullContainer.Dom);
     
     
 
@@ -2703,11 +2694,7 @@ function TileInputBox(TabElement, ModalContainer, SendTile, Exit, HideInput, get
     
     var invisibleSpan = getDomOrCreateNew("measureSpan" + myTIleInputID, "span");
     $(invisibleSpan.Dom).addClass("invisibleSpan");
-    //labelAndInputContainer.Dom.appendChild(invisibleSpan.Dom);
     $(InputBox.Dom).addClass("TileInput");
-
-    //$(labelAndInputContainer.Dom).addClass("NonReveal");
-    //$(labelAndInputContainer.Dom).addClass("labelAndInputContainer");
     
     var OtherElements = [];
     
@@ -2721,152 +2708,19 @@ function TileInputBox(TabElement, ModalContainer, SendTile, Exit, HideInput, get
         var JSONProperty;
         if (TabElement.DropDown != undefined)
         {
-            ///debugger;
             AutoSuggestFunction = TabElement.DropDown(Exit, InputBox.Dom);
         }
-        /*
-        function LoopBack(Data,Container)
-        {
-            $(Container).removeClass("NonReveal");
-            CleanUp();
-            if (!TabElement.isInFocus)
-            {
-                return;
-            }
-            TabElement.DropDown.AllDoms = [];
-            SetContainerToBottomOfInput();
-            function generateEachDom(eachData)
-            {
-                var DropDownElement = getDomOrCreateNew(generateEachDom.ID++);
-                DropDownElement.Dom.innerHTML = eachData[JSONProperty];
-                Container.Dom.appendChild(DropDownElement.Dom);
-                TabElement.DropDown.AllDoms.push(DropDownElement.Dom);
-                SelectDropOption(DropDownElement.Dom)
-                TabElement.DropDown.status = true;
-            }
-
-            function SetContainerToBottomOfInput()
-            {
-                var Position = $(InputBox.Dom).position();
-                var Left = 50;// Position.left;
-                var Top = Position.top;
-                var height = $(InputBox.Dom).height();
-                Top += height;
-                $(TabElement.DropDown.AutoSuggestContainer).css({ left: Left + "px", top: Top + "px", position: "absolute", width: "calc(100% - 100px)" });
-            }
-
-            function SelectDropOption(Dom)
-            {
-                function SetAsActive()
-                {
-                    
-                    var mInputBox = dropDown.getInputBox();
-                    mInputBox.value = Dom.innerHTML;
-                    var FullWidth = resizeInput();
-                    CleanUp();
-                }
-
-                function Onfocus()
-                {
-                    $(Dom).addClass("OnFocusDropDownElement");
-                }
-
-                function Outfocus()
-                {
-                    $(Dom).removeClass("OnFocusDropDownElement");
-                }
-                $(Dom).click(SetAsActive);
-                Dom.Onfocus = Onfocus;
-                Dom.SetAsActive = SetAsActive
-                Dom.Outfocus = Outfocus;
-            }
-
-            function CleanUp()
-            {
-                TabElement.DropDown.CleanUp();
-            }
-            
-            //function MonitorNavigation()
-            $(Container).removeClass("setAsDisplayNone");
-            var myInput = dropDown.getInputBox();
-            TabElement.DropDown.Index = 0;
-            TabElement.DropDown.CurrentOnFocus = null;
-            TabElement.DropDown.OnUpKey = function ()
-            {
-                if (TabElement.DropDown.CurrentOnFocus != null)
-                {
-                    TabElement.DropDown.CurrentOnFocus.Outfocus();
-                }
-                TabElement.DropDown.AllDoms[TabElement.DropDown.Index].Onfocus();
-                TabElement.DropDown.CurrentOnFocus = TabElement.DropDown.AllDoms[TabElement.DropDown.Index];
-                --TabElement.DropDown.Index;
-                TabElement.DropDown.Index = (TabElement.DropDown.AllDoms.length + TabElement.DropDown.Index) % TabElement.DropDown.AllDoms.length;
-                $(myInput).focus();
-            }
-
-            TabElement.DropDown.OnDownKey = function ()
-            {
-                if (TabElement.DropDown.CurrentOnFocus != null) {
-                    TabElement.DropDown.CurrentOnFocus.Outfocus();
-                }
-                if (TabElement.DropDown.AllDoms.length < 0)
-                {
-                    return;
-                }
-                TabElement.DropDown.AllDoms[TabElement.DropDown.Index].Onfocus();
-                TabElement.DropDown.CurrentOnFocus = TabElement.DropDown.AllDoms[TabElement.DropDown.Index];
-                ++TabElement.DropDown.Index;
-                TabElement.DropDown.Index = (TabElement.DropDown.AllDoms.length + TabElement.DropDown.Index) % TabElement.DropDown.AllDoms.length;
-                $(myInput).focus();
-            }
-            
-            
-            generateEachDom.ID = 0;
-            setTimeout(function () { Data.forEach(generateEachDom); },100);//Just waits for the creation of generateEachDom
-            
-        }
-
-        if (TabElement.DropDown != undefined)
-        {
-            dropDown = new AutoSuggestControl(TabElement.DropDown.url, "GET", LoopBack, InputDataDomain.Dom);
-            
-            InputDataDomain = {};
-            JSONProperty = TabElement.DropDown.LookOut; //   var Element3 = { Label: "Element3", DropDown: { url: global_refTIlerUrl + "CalendarEvent/Name", LookOut:  } };
-            TabElement.DropDown.AutoSuggestContainer = dropDown.getAutoSuggestControlContainer();
-            InputDataDomain.Dom = TabElement.DropDown.AutoSuggestContainer;
-            $(TabElement.DropDown.AutoSuggestContainer).css({ position : "absolute" });
-            TabElement.DropDown.status = false;
-            TabElement.DropDown.CleanUp = function () {
-                var SuggestedValueContainer = dropDown.getSuggestedValueContainer();
-                $(SuggestedValueContainer).empty();
-                $(SuggestedValueContainer).addClass("setAsDisplayNone");
-                TabElement.DropDown.status = false;
-            }
-
-
-            InputDataDomain.CleanUp = function ()
-            {
-                TabElement.DropDown.CleanUp();
-            }
-            InputBox.Dom = dropDown.getInputBox();
-            $(dropDown.getInputBox()).focus(onFocus)
-            $(dropDown.getInputBox()).focusout(outFocus);
-        }
-        */
     }
 
     function GenerateAlreadyCreatedBoxes()
     {
-        //
         if (TabElement.SubTileInputBox != undefined)
         {
-            //debugger;
             TabElement.SubTileInputBox.forEach(revealEachElement);
         }
 
         function revealEachElement(eachSubTileInputBox)
         {
-            //debugger;
             OtherElements= OtherElements.concat(eachSubTileInputBox.getAllElements());
             eachSubTileInputBox.ReplaceNextElement(NextElement.Data);
             eachSubTileInputBox.reveal();
@@ -3138,26 +2992,6 @@ function TileInputBox(TabElement, ModalContainer, SendTile, Exit, HideInput, get
     {
         $(AllElements[i]).addClass("tileInputBoxElement");
     }
-
-
-    //labelAndInputContainer.Dom.appendChild(InputBoxLabelBefore.Dom);
-    //labelAndInputContainer.Dom.appendChild(InputBox.Dom);
-    //labelAndInputContainer.Dom.appendChild(InputBoxLabelAfter.Dom);
-
-    
-    //labelAndInputContainer.Dom.appendChild(InputDataDomain.Dom);
-    /*
-    function InsertEachElement(EachSubTile)
-    {
-        labelAndInputContainer.Dom.appendChild(EachSubTile.FullContainer.Dom);
-    }
-    if (TabElement.SubTileInputBox != undefined)
-    {
-        (labelAndInputContainer.Dom.removeChild(InputBox.Dom));
-        
-        TabElement.SubTileInputBox.forEach(InsertEachElement);
-    }
-    */
 
     if (TabElement.InputType != undefined)
     {
