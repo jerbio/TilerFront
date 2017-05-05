@@ -1311,23 +1311,7 @@ namespace TilerFront.Controllers
                 newCalendarEvent.Repeat.PopulateRepetitionParameters(newCalendarEvent);
                 string BeforemyName = newCalendarEvent.ToString(); //BColor + " -- " + Count + " -- " + DurationDays + " -- " + DurationHours + " -- " + DurationMins + " -- " + EndDay + " -- " + EndHour + " -- " + EndMins + " -- " + EndMonth + " -- " + EndYear + " -- " + GColor + " -- " + LocationAddress + " -- " + LocationTag + " -- " + Name + " -- " + RColor + " -- " + RepeatData + " -- " + RepeatEndDay + " -- " + RepeatEndMonth + " -- " + RepeatEndYear + " -- " + RepeatStartDay + " -- " + RepeatStartMonth + " -- " + RepeatStartYear + " -- " + RepeatType + " -- " + RepeatWeeklyData + " -- " + Rigid + " -- " + StartDay + " -- " + StartHour + " -- " + StartMins + " -- " + StartMonth + " -- " + StartYear;
                 string AftermyName = newCalendarEvent.ToString();
-#if ForceReadFromXml
-#else
-                if (LogControl.useCassandra)
-                {
-                    CassandraUserLog.CassandraLog quickInsert = new CassandraUserLog.CassandraLog(myUser.UserID);
-                    Dictionary<string, CalendarEvent> myDict = new Dictionary<string, CalendarEvent>();
-                    MySchedule.AddToSchedule(newCalendarEvent);
-                    HoldUpForWriteNewEvent = myUser.AddNewEventToLog(newCalendarEvent);
-                    CommitChangesToSchedule = myUser.CommitEventToLog(MySchedule.getAllCalendarEvents(), MySchedule.LastScheduleIDNumber.ToString());
-                    await HoldUpForWriteNewEvent;
-                    await CommitChangesToSchedule;
-                }
-                else
-#endif
-                {
-                    
-                }
+
                 Tuple<List<SubCalendarEvent>[], DayTimeLine[], List<SubCalendarEvent>> peekingEvents = MySchedule.peekIntoSchedule(newCalendarEvent);
                 PeekResult peekData = new PeekResult(peekingEvents.Item1, peekingEvents.Item2, peekingEvents.Item3);
                 

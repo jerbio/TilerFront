@@ -63,9 +63,10 @@ namespace TilerFront
         }
 
 
-        async public Task<CustomErrors> Register(TilerUser user)
+        async public Task<CustomErrors> Register(TilerUser user, LogControl newLog)
         {
-            CustomErrors retValue = UserLog.genereateNewLogFile(user.Id);
+            UserLog = newLog;
+            CustomErrors retValue = newLog.genereateNewLogFile(user.Id);
             return retValue;
         }
 

@@ -374,7 +374,14 @@ namespace TilerFront.Controllers
                     {
                         await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
                         Task SendEmail = SendEmailConfirmationAsync(user.Id, "Please Confirm Your Tiler Account!");
-                        await SendEmail.ConfigureAwait(false);
+                        try
+                        {
+                            await SendEmail.ConfigureAwait(false);
+                        } catch (Exception err)
+                        {
+                            Console.WriteLine("there was a problem sending the confirmation email");
+                        }
+                        
 
                         string LoopBackUrl = "";
                         if (Request.Browser.IsMobileDevice)
@@ -426,8 +433,8 @@ namespace TilerFront.Controllers
                 UserAccountDirect newUser = new UserAccountDirect(model.Id, db);
                 LogControlDirect newLog = new LogControlDirect(model, db, CurrentLogLocation);
                 List<string> NameDist = model.FullName.Split().ToList();
-                Task< TilerElements.CustomErrors> registerStatus =  newUser.Register(model);
-                NewLogCreationSuccess = (await registerStatus) != null;
+                Task< TilerElements.CustomErrors> registerStatus =  newUser.Register(model, newLog);
+                NewLogCreationSuccess = (await registerStatus) == null;
             }
 
             if (NewLogCreationSuccess)
