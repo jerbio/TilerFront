@@ -165,7 +165,6 @@ namespace TilerFront
             {
                 try
                 {
-                    genereateNewLogFile("Copy_" + ID);
                     xmldocCopy.Load(LogFileCopy);
                 }
                 catch (Exception e)
@@ -367,7 +366,6 @@ namespace TilerFront
             {
                 try
                 {
-                    genereateNewLogFile("Copy_" + ID);
                     xmldocCopy.Load(LogFileCopy);
                 }
                 catch(Exception e)
