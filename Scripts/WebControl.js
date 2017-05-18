@@ -2579,35 +2579,35 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
 
         var option= {
         //Boolean - Whether we should show a stroke on each segment
-        segmentShowStroke : true,
+            segmentShowStroke : true,
 	
-        //String - The colour of each segment stroke
-        segmentStrokeColor : "rgba(50,50,50,.8)",
+            //String - The colour of each segment stroke
+            segmentStrokeColor : "rgba(50,50,50,.8)",
 	
-        //Number - The width of each segment stroke
-        segmentStrokeWidth : 1,
+            //Number - The width of each segment stroke
+            segmentStrokeWidth : 1,
 	
-        //The percentage of the chart that we cut out of the middle.
-        percentageInnerCutout : 45,
+            //The percentage of the chart that we cut out of the middle.
+            percentageInnerCutout : 45,
 	
-        //Boolean - Whether we should animate the chart	
-        animation : true,
+            //Boolean - Whether we should animate the chart	
+            animation : true,
 	
-        //Number - Amount of animation steps
-        animationSteps : 100,
+            //Number - Amount of animation steps
+            animationSteps : 100,
 	
-        //String - Animation easing effect
-        animationEasing : "easeOutBounce",
+            //String - Animation easing effect
+            animationEasing : "easeOutBounce",
 	
-        //Boolean - Whether we animate the rotation of the Doughnut
-        animateRotate : true,
+            //Boolean - Whether we animate the rotation of the Doughnut
+            animateRotate : true,
 
-        //Boolean - Whether we animate scaling the Doughnut from the centre
-        animateScale : false,
+            //Boolean - Whether we animate scaling the Doughnut from the centre
+            animateScale : false,
 	
-        //Function - Will fire on animation completion.
-        onAnimationComplete : null
-    }
+            //Function - Will fire on animation completion.
+            onAnimationComplete : null
+        }
 
         myNewChart.Doughnut(data, option);
         //pieChartContainer.Dom.style.height = "70px";

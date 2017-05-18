@@ -69,26 +69,26 @@ namespace TilerFront
 
         private async Task configSendGridasync(IdentityMessage message)
         {
-            String apiKey = ConfigurationManager.AppSettings["tilerSendGridKey"];//, Environment.GetEnvironmentVariable("007HealthLineSendGridKey", EnvironmentVariableTarget.User);
-            dynamic sg = new SendGridAPIClient(apiKey);
+            //String apiKey = ConfigurationManager.AppSettings["tilerSendGridKey"];//, Environment.GetEnvironmentVariable("007HealthLineSendGridKey", EnvironmentVariableTarget.User);
+            //dynamic sg = new SendGridAPIClient(apiKey);
 
 
-            Email from = new Email("noreply@mytiler.com");
-            String subject = message.Subject;
-            Email to = new Email(message.Destination);
-            Content content = new Content(MediaTypeNames.Text.Html, message.Body);
-            Mail mail = new Mail(from, subject, to, content);
+            //Email from = new Email("noreply@mytiler.com");
+            //String subject = message.Subject;
+            //Email to = new Email(message.Destination);
+            //Content content = new Content(MediaTypeNames.Text.Html, message.Body);
+            //Mail mail = new Mail(from, subject, to, content);
 
-            String ret = mail.Get();
+            //String ret = mail.Get();
 
-            string requestBody = ret;
+            //string requestBody = ret;
 
 
-            dynamic response = sg.client.mail.send.post(requestBody: requestBody);
+            //dynamic response = sg.client.mail.send.post(requestBody: requestBody);
 
-            System.Diagnostics.Debug.WriteLine((response.StatusCode.ToString() as string) + "!!!!!~~~~~good for my soul");
-            System.Diagnostics.Debug.WriteLine((response.Body.ReadAsStringAsync().Result.ToString() as string) + "****$$$$$good for my soul");
-            System.Diagnostics.Debug.WriteLine((response.Headers.ToString().ToString() as string) + "******boots for you for my soul");
+            //System.Diagnostics.Debug.WriteLine((response.StatusCode.ToString() as string) + "!!!!!~~~~~good for my soul");
+            //System.Diagnostics.Debug.WriteLine((response.Body.ReadAsStringAsync().Result.ToString() as string) + "****$$$$$good for my soul");
+            //System.Diagnostics.Debug.WriteLine((response.Headers.ToString().ToString() as string) + "******boots for you for my soul");
         }
 
     }
