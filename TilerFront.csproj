@@ -586,6 +586,7 @@
     <Content Include="MonthOverView.html" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
+    <Content Include="Scripts\Chart.js" />
     <Content Include="Scripts\exporting.js" />
     <Content Include="Scripts\extensionBackground.js" />
     <Content Include="Scripts\highcharts.js" />
