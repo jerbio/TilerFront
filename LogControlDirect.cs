@@ -485,8 +485,6 @@ namespace TilerFront
         {
             XmlDocument xmldoc = new XmlDocument();
             XmlElement var1 = xmldoc.CreateElement(ElementIdentifier);
-            var1.PrependChild(xmldoc.CreateElement("Visible"));
-            var1.ChildNodes[0].InnerText = Arg1.isVisible.ToString();
             var1.PrependChild(xmldoc.CreateElement("Color"));
             var1.ChildNodes[0].InnerXml = createColorNode(Arg1.UIColor, "Color").InnerXml;
             var1.PrependChild(xmldoc.CreateElement("Type"));

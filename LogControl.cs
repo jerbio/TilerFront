@@ -490,7 +490,7 @@ namespace TilerFront
                 {
                     //if (!eachKeyValuePair.Value.isNull)
                     {
-                        string LocationID = eachKeyValuePair.Value.ID;
+                        string LocationID = eachKeyValuePair.Value.Id;
                         XmlElement myCacheLocationNode = CreateLocationNode(eachKeyValuePair.Value, "Location");
 
                         XmlNode MyImportedNode = xmldoc.ImportNode(myCacheLocationNode as XmlNode, true);
@@ -580,7 +580,7 @@ namespace TilerFront
                 XmlNode LocationIDNode = DocNode.CreateElement("LocationID");
                 XmlNode CacheNameNode = DocNode.CreateElement("CachedName");
                 CacheNameNode.InnerText = Location.Description.ToLower();
-                LocationIDNode.InnerText = Location.ID;
+                LocationIDNode.InnerText = Location.Id;
                 OldNode.PrependChild(LocationIDNode);
                 OldNode.PrependChild(CacheNameNode);
             }
@@ -1065,8 +1065,6 @@ namespace TilerFront
         {
             XmlDocument xmldoc = new XmlDocument();
             XmlElement var1 = xmldoc.CreateElement(ElementIdentifier);
-            var1.PrependChild(xmldoc.CreateElement("Visible"));
-            var1.ChildNodes[0].InnerText = Arg1.isVisible.ToString();
             var1.PrependChild(xmldoc.CreateElement("Color"));
             var1.ChildNodes[0].InnerXml = createColorNode(Arg1.UIColor, "Color").InnerXml;
             var1.PrependChild(xmldoc.CreateElement("Type"));
