@@ -635,7 +635,7 @@ namespace TilerFront
             XmlElement userGroupNode = xmlDoc.CreateElement("UserGroup");
             XmlElement idNode = xmlDoc.CreateElement("Id");
             XmlElement usersNode = xmlDoc.CreateElement("Users");
-            foreach(TilerUser user in usergroup.getUsers)
+            foreach(TilerUser user in usergroup.users)
             {
                 XmlElement userNode = generateTilerUserNode(user);
                 usersNode.AppendChild(userNode);
