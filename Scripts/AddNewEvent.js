@@ -414,6 +414,42 @@ function createCalEventNameTab(isTIle)
 
     }
 
+    
+    combinedCallBack.clear = function ()
+    {
+        MyDataContainer.AllData.splice(0, MyDataContainer.AllData.length)
+        MyDataContainer.Index = -1;
+        //LocationAutoSuggestControl.clear();
+        LocationAutoSuggestControl.HideContainer();
+
+        GoogleDataContainer.AllData.splice(0, GoogleDataContainer.AllData.length)
+        GoogleDataContainer.Index = -1;
+        //LocationAutoSuggestControl.clear();
+        GoogleAutoSuggestControl.HideContainer();
+
+        CombinedData.AllData.splice(0, CombinedData.AllData.length);
+        CombinedData.Index = -1;
+        $(combinedCallBack.DomContainer).empty();
+        //LocationAutoSuggestControl.clear();
+        LocationAutoSuggestControl.HideContainer();
+    }
+
+    combinedCallBack.clearData=function()
+    {
+        MyDataContainer.AllData.splice(0, MyDataContainer.AllData.length)
+        MyDataContainer.Index = -1;
+        GoogleDataContainer.AllData.splice(0, GoogleDataContainer.AllData.length)
+        GoogleDataContainer.Index = -1;
+    }
+
+    combinedCallBack.cleanUI = function ()
+    {
+        //console.log("Called Clear " + combinedCallBack.currentIndex);
+        CombinedData.AllData.splice(0, CombinedData.AllData.length);
+        CombinedData.Index = -1;
+        $(combinedCallBack.DomContainer).empty();
+    }
+
     function HandleLocationResult(data, DomContainer,InputContainer)
     {
         var EventIndex = 0;
@@ -470,12 +506,16 @@ function createCalEventNameTab(isTIle)
                 $(DomContainer.Dom).empty();
             }
         }
+
+        var CombinedDataIndex = 0;
+        combinedCallBack.indexContainer[CombinedDataIndex] = data
+        combinedCallBack(CombinedDataIndex, data);
+
     }
 
     function googleAddressCallBack(data, DomContainer, InputCOntainer) {
 
         function initialize() {
-            debugger
             ReseAutoSuggest();
             var dataInput = InputCOntainer.value
             dataInput = dataInput.trim();
