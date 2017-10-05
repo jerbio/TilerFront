@@ -820,7 +820,7 @@ namespace TilerFront
             {
                 XmlElement RestrictionNode = xmldoc.CreateElement("RestrictionNode");
                 XmlElement RestrictionDayOfWeekNode = xmldoc.CreateElement("RestrictionDayOfWeek");
-                RestrictionDayOfWeekNode.InnerText = ((int)eachTuple.DayOfWeek).ToString();
+                RestrictionDayOfWeekNode.InnerText = eachTuple.DayOfWeek;
                 XmlElement RestrictionTimeLineNode = xmldoc.CreateElement("RestrictionTimeLineData");
                 RestrictionTimeLineNode.InnerXml=generateRestrictionTimeLineNode(eachTuple.RestrictionTimeLine).InnerXml;
                 RestrictionNode.AppendChild(RestrictionTimeLineNode);
