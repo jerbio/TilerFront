@@ -62,11 +62,11 @@ namespace TilerFront.Controllers
                                 db.ThirdPartyAuthentication.Add(thirdPartyCalendarAuthentication);
                                 await db.SaveChangesAsync();
                                 RetValue = true;
-                                if (!(await SendRequestForGoogleNotification(thirdPartyCalendarAuthentication).ConfigureAwait(false)))
-                                {
-                                    await deleteGoogleAccount(thirdPartyCalendarAuthentication.getThirdPartyOut()).ConfigureAwait(false);
-                                    RetValue=false;
-                                }
+                                //if (!(await SendRequestForGoogleNotification(thirdPartyCalendarAuthentication).ConfigureAwait(false)))
+                                //{
+                                //    await deleteGoogleAccount(thirdPartyCalendarAuthentication.getThirdPartyOut()).ConfigureAwait(false);
+                                //    RetValue=false;
+                                //}
                             }
                         }
 
@@ -117,8 +117,7 @@ namespace TilerFront.Controllers
                 );
                 //url = "https://mytilerkid.azurewebsites.net/api/GoogleNotification/Trigger";
                 var httpWebRequest = HttpWebRequest.Create(url) as HttpWebRequest;
-                httpWebRequest.Headers["Authorization"] =
-                    string.Format("Bearer {0}", AuthenticationData.Token);
+                httpWebRequest.Headers["Authorization"] = string.Format("Bearer {0}", AuthenticationData.Token);
                 httpWebRequest.Method = "POST";
                 // added the character set to the content-type as per David's suggestion
                 httpWebRequest.ContentType = "application/json; charset=UTF-8";
@@ -128,14 +127,6 @@ namespace TilerFront.Controllers
                 GoogleNotificationRequestModel NotificationRequest = AuthenticationData.getGoogleNotificationCredentials(CurrentURI);
 
                 var requestText = JsonConvert.SerializeObject(NotificationRequest);
-
-                /*
-                GoogleNotificationWatchResponseModel testGoogleResponse = new GoogleNotificationWatchResponseModel();
-                testGoogleResponse.expiration = "98989";
-                testGoogleResponse.id = "jkhj2hkjhkjh";
-                testGoogleResponse.kind = "99898989";
-                testGoogleResponse.resourceUri= "hjhj98878";
-                requestText = JsonConvert.SerializeObject(testGoogleResponse);*/
 
                 using (var stream = httpWebRequest.GetRequestStream())
                 // replaced Encoding.UTF8 by new UTF8Encoding(false) to avoid the byte order mark

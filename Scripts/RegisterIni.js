@@ -256,11 +256,7 @@ function addEventgotoScreenButton(ClickDom, ShowThisDOm,TitleText)
 
 function SignInUser(UserName,Password)
 {
-    debugger
     var TimeZone = new Date().getTimezoneOffset();
-    
-    //var url = global_refTIlerUrl+ "User/SignIn";
-    //url="RootWagTap/time.top?WagCommand=4";
 
 
     var __RequestVerificationToken = $('input[name=__RequestVerificationToken]').val();
@@ -345,7 +341,6 @@ function RegisterUser(FullName, UserName, Password,PassWordConfirmation, Email)
         url: url,
         data: RegistrationCredentials,
         success: function (response) {
-            debugger;
             var myContainer = response
             //myContainer= JSON.parse(myContainer);
             if (myContainer.Error.code == 0) {
@@ -370,7 +365,6 @@ function RegisterUser(FullName, UserName, Password,PassWordConfirmation, Email)
 
 function LaunchLoggedUser(urlString)
 {
-    debugger;    
     window.location.href = urlString;
 }
 
