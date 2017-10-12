@@ -25,6 +25,7 @@
     <ApplicationInsightsResourceId>/subscriptions/d6d53995-468d-414f-bf34-d7c3381b2429/resourcegroups/Default-ApplicationInsights-CentralUS/providers/microsoft.insights/components/TilerFront</ApplicationInsightsResourceId>
     <UseGlobalApplicationHostFile />
     <TargetFrameworkProfile />
+    <Use64BitIISExpress />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -611,6 +612,9 @@
     <Content Include="Content\bootstrap.css.map" />
     <Content Include="Content\bootstrap-theme.min.css.map" />
     <Content Include="Content\bootstrap-theme.css.map" />
+    <Content Include="Credentials\client_secret.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <None Include="Properties\PublishProfiles\mytilerkid - FTP.pubxml" />
     <None Include="Properties\PublishProfiles\mytilerkid - Web Deploy.pubxml" />
     <None Include="Scripts\jquery-3.2.1.intellisense.js" />

@@ -42,8 +42,6 @@ function InitializeSignInReg()
     var SignInButton = document.getElementById("SignInButton");
     var RegisterButton = document.getElementById("gotToRegisterScreenButton");
     
-
-    var RegPageFormContainer = document.getElementById("RegPageFormContainer");
     $(RegPageFormContainer).hide();
 
     var callBackprepSignInFunc=prepSignInFunc(UserNameSignInDom, PasswordSigninDom);
@@ -72,7 +70,7 @@ function CheckFocuseChange()
     var SignInButton = document.getElementById("SignInButton");
     var registerButton = document.getElementById("gotToRegisterScreenButton");
 
-    if ((UserNameReginDom.value != null && UserNameReginDom.value != "")) {
+    if ((UserNameReginDom.value !== null && UserNameReginDom.value !== "")) {
         $(registerButton).addClass("enabledButton");
     }
     else
@@ -84,7 +82,7 @@ function CheckFocuseChange()
         return;
     }
 
-    if ((PasswordReginDom.value != null && PasswordReginDom.value != "") && (UserNameReginDom.value != null && UserNameReginDom.value != "")) {
+    if ((PasswordReginDom.value !== null && PasswordReginDom.value !== "") && (UserNameReginDom.value !== null && UserNameReginDom.value !== "")) {
         $(SignInButton).removeClass("disabledButton");
         $(SignInButton).addClass("enabledButton");
         $(registerButton).addClass("enabledButton");
@@ -103,7 +101,7 @@ function checkIfEmailIsValid()
     var EmailReginDom = document.getElementById("EmailRegin");
     var EmailErrorDom = document.getElementById("EmailError");
     var res = EmailReginDom.value.match(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9_%+-]+\.[A-Za-z0-9._%+-]+\b/g);
-    if ((res == "")||(res==null)) {
+    if ((res === "")||(res === null)) {
         EmailReginDom.style.borderBottom = "solid red 2px";
         EmailErrorDom.innerHTML = "Invalid Email";
         return false;
@@ -126,7 +124,7 @@ function checkIfPasswordIsValid()
     var ConfirmPasswordReginDom = document.getElementById("ConfirmPasswordRegin");
     var PassWordErrorDom = document.getElementById("PassWordConfirmErrorContainer");
 
-    if ((ConfirmPasswordReginDom.value != PasswordReginDom.value) && (ConfirmPasswordReginDom.value != "") && (PasswordReginDom.value != ""))
+    if ((ConfirmPasswordReginDom.value !== PasswordReginDom.value) && (ConfirmPasswordReginDom.value !== "") && (PasswordReginDom.value !== ""))
     {
         ConfirmPasswordReginDom.style.borderBottom = "solid red 2px";
         PassWordErrorDom.innerHTML = "These Passwords don't match. Try again?";
@@ -142,8 +140,7 @@ function checkIfPasswordIsValid()
 }
 function checkIfBothPasswordsAreSame(PasswordDom1,PasswordDom2)
 {
-    return PasswordDom1.value == PasswordDom2.value
-    true;
+    return PasswordDom1.value === PasswordDom2.value
 }
 
 function prepSignInFunc(UserNameDom, PasswordDom)
@@ -186,7 +183,7 @@ function prepFunctionOnRegisterRequest(SignInButton, RegisterButton, ShowSignInF
         BigBackGroundText.style.marginTop = "-150px";
 
         
-        if (ShowSignInFormCallBack == null)
+        if (ShowSignInFormCallBack === null)
         {
             postRegistrationDataCallBack = prepRegisterFunc(FullNameReginDom, UserNameReginDom, PasswordReginDom, EmailReginDom, ConfirmPasswordReginDom);
             ShowSignInFormCallBack = prepFunctionOnSignInRequest(SignInButton, RegisterButton, retValue, postRegistrationDataCallBack, postSignInCallBack);
@@ -275,7 +272,7 @@ function SignInUser(UserName,Password)
             debugger;
             var myContainer = response
             //myContainer= JSON.parse(myContainer);
-            if (myContainer.Error.code == 0) {
+            if (myContainer.Error.code === 0) {
                 LaunchLoggedUser(myContainer.Error.Message);
             }
             else {
@@ -317,7 +314,7 @@ function hideRegistrationError()
 
 function RegisterUser(FullName, UserName, Password,PassWordConfirmation, Email)
 {
-    var FullName = FullName.split(" ");
+    FullName = FullName.split(" ");
 
     if (!checkIfPasswordIsValid() || !checkIfEmailIsValid())
     {
@@ -343,7 +340,7 @@ function RegisterUser(FullName, UserName, Password,PassWordConfirmation, Email)
         success: function (response) {
             var myContainer = response
             //myContainer= JSON.parse(myContainer);
-            if (myContainer.Error.code == 0) {
+            if (myContainer.Error.code === 0) {
                 LaunchLoggedUser(myContainer.Error.Message);
             }
             else {
