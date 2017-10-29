@@ -379,7 +379,7 @@ namespace TilerFront
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Enabled"));
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.isEnabled.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Location"));
-            MyEventScheduleNode.ChildNodes[0].InnerXml = CreateLocationNode(MyEvent.myLocation, "EventScheduleLocation").InnerXml;
+            MyEventScheduleNode.ChildNodes[0].InnerXml = CreateLocationNode(MyEvent.Location, "EventScheduleLocation").InnerXml;
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("UIParams"));
             MyEventScheduleNode.ChildNodes[0].InnerXml = createDisplayUINode(MyEvent.getUIParam, "UIParams").InnerXml;
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("MiscData"));
@@ -721,16 +721,16 @@ namespace TilerFront
             XmlNodeList AllLocationNodes = node.SelectNodes("Locations/Location");
             foreach (XmlNode eachXmlNode in AllLocationNodes)
             {
-                Location_Elements myLocation = generateLocationObjectFromNode(eachXmlNode);
+                Location_Elements Location = generateLocationObjectFromNode(eachXmlNode);
 
-                if (myLocation != null)
+                if (Location != null)
                 {
-                    if (!string.IsNullOrEmpty(myLocation.Description))
+                    if (!string.IsNullOrEmpty(Location.Description))
                     {
-                        string Description = myLocation.Description.ToLower();
+                        string Description = Location.Description.ToLower();
                         if (!retValue.ContainsKey(Description))
                         {
-                            retValue.Add(Description, myLocation);
+                            retValue.Add(Description, Location);
                         }
                     }
                 }

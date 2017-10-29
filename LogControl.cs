@@ -697,7 +697,7 @@ namespace TilerFront
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Enabled"));
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.isEnabled.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Location"));
-            MyEventScheduleNode.ChildNodes[0].InnerXml = CreateLocationNode(MyEvent.myLocation, "EventScheduleLocation").InnerXml;
+            MyEventScheduleNode.ChildNodes[0].InnerXml = CreateLocationNode(MyEvent.Location, "EventScheduleLocation").InnerXml;
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("UIParams"));
             MyEventScheduleNode.ChildNodes[0].InnerXml = createDisplayUINode(MyEvent.getUIParam, "UIParams").InnerXml;
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("MiscData"));
@@ -1366,16 +1366,16 @@ namespace TilerFront
             XmlNodeList AllLocationNodes = node.SelectNodes("Locations/Location");
             foreach (XmlNode eachXmlNode in AllLocationNodes)
             {
-                TilerElements.Location myLocation = generateLocationObjectFromNode(eachXmlNode);
+                TilerElements.Location Location = generateLocationObjectFromNode(eachXmlNode);
 
-                if (myLocation != null)
+                if (Location != null)
                 {
-                    if (!string.IsNullOrEmpty(myLocation.Description))
+                    if (!string.IsNullOrEmpty(Location.Description))
                     {
-                        string Description = myLocation.Description.ToLower();
+                        string Description = Location.Description.ToLower();
                         if (!retValue.ContainsKey(Description))
                         {
-                            retValue.Add(Description, myLocation);
+                            retValue.Add(Description, Location);
                         }
                     }
                 }
@@ -1791,14 +1791,14 @@ namespace TilerFront
                 bool procrastinationEventFlag = Convert.ToBoolean(MyXmlNode.ChildNodes[i].SelectSingleNode("isProcrastinateEvent")?.InnerText??"False");
                 if (!procrastinationEventFlag)
                 {
-                    retrievedSubEvent = new SubCalendarEvent(creator, userGroup, timeZone, ID, name, BusySlot, Start, End, PrepTime, ID, rigidFlag, Enabled, UiData, noteData, CompleteFlag, var1, MyParent.RangeTimeLine, conflictProfile);
-                    retrievedSubEvent = new DB_SubCalendarEvent(retrievedSubEvent, MyParent.getNowInfo, MyParent.getProcrastinationInfo);
+                    retrievedSubEvent = new DB_SubCalendarEvent(MyParent, creator, userGroup, timeZone, ID, name, BusySlot, Start, End, PrepTime, ID, rigidFlag, Enabled, UiData, noteData, CompleteFlag, var1, MyParent.RangeTimeLine, conflictProfile);
+                    retrievedSubEvent = new DB_SubCalendarEvent(retrievedSubEvent, MyParent.getNowInfo, MyParent.getProcrastinationInfo, MyParent);
                     (retrievedSubEvent as DB_SubCalendarEvent).UseTime = PauseData.Item1;
                     (retrievedSubEvent as DB_SubCalendarEvent).PauseTime = PauseData.Item2;
                 }
                 else
                 {
-                    DB_ProcrastinateAllSubCalendarEvent procrastinateSubEvent = new DB_ProcrastinateAllSubCalendarEvent(creator, userGroup, timeZone, new TimeLine(Start, End), new EventID(ID), MyParent.myLocation, MyParent as ProcrastinateCalendarEvent, Enabled, CompleteFlag);
+                    DB_ProcrastinateAllSubCalendarEvent procrastinateSubEvent = new DB_ProcrastinateAllSubCalendarEvent(creator, userGroup, timeZone, new TimeLine(Start, End), new EventID(ID), MyParent.Location, MyParent as ProcrastinateCalendarEvent, Enabled, CompleteFlag);
                     procrastinateSubEvent.UseTime = PauseData.Item1;
                     procrastinateSubEvent.PauseTime = PauseData.Item2;
                     retrievedSubEvent = procrastinateSubEvent;
