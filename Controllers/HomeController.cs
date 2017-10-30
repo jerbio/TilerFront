@@ -17,7 +17,15 @@ namespace TilerFront.Controllers
             ///*
             if (User.Identity.IsAuthenticated)
             {
-                return RedirectToAction("Desktop", "Account");
+                if (Request.Browser.IsMobileDevice)
+                {
+                    return RedirectToAction("Mobile", "Account");
+                }
+                else
+                {
+                    return RedirectToAction("Desktop", "Account");
+                }
+
             }
             else
             {

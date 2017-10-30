@@ -272,7 +272,7 @@ function SignInUser(UserName,Password)
             debugger;
             var myContainer = response
             //myContainer= JSON.parse(myContainer);
-            if (myContainer.Error.code === 0) {
+            if (myContainer.Error.code === "0") {
                 LaunchLoggedUser(myContainer.Error.Message);
             }
             else {
@@ -340,7 +340,7 @@ function RegisterUser(FullName, UserName, Password,PassWordConfirmation, Email)
         success: function (response) {
             var myContainer = response
             //myContainer= JSON.parse(myContainer);
-            if (myContainer.Error.code === 0) {
+            if (myContainer.Error.code === "0") {
                 LaunchLoggedUser(myContainer.Error.Message);
             }
             else {
