@@ -74,7 +74,8 @@ namespace TilerFront.Controllers
                             Deadline = Deadline.Add(myUser.getTImeSpan);
                             int SplitCount = (int)myUser.Split;
                             //TimeSpan SpanPerSplit = TimeSpan.FromMilliseconds(myUser.Duration);
-                            Tuple<CustomErrors, Dictionary<string, CalendarEvent>> ScheduleUpdateMessage = NewSchedule.BundleChangeUpdate(myUser.EventID,  new EventName(myUser.EventName), newStart, newEnd, Begin, Deadline, SplitCount);//, SpanPerSplit);
+
+                            Tuple<CustomErrors, Dictionary<string, CalendarEvent>> ScheduleUpdateMessage = NewSchedule.BundleChangeUpdate(myUser.EventID, myUser.EventName, newStart, newEnd, Begin, Deadline, SplitCount);//, SpanPerSplit);
                             DB_UserActivity activity = new DB_UserActivity(myNow, UserActivity.ActivityType.InternalUpdate, new List<String>() { myUser.EventID });
                             retrievedUser.ScheduleLogControl.updateUserActivty(activity);
                             await NewSchedule.UpdateWithDifferentSchedule(ScheduleUpdateMessage.Item2).ConfigureAwait(false);

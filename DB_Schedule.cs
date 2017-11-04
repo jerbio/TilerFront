@@ -227,11 +227,13 @@ namespace TilerFront
         {
             TimeLine newSubeEvent = new TimeLine(Now.constNow, Now.constNow.AddMinutes(5));
             TimeSpan fiveMinSpan = new TimeSpan(1);
-            EventName tempEventName = new EventName("TempEvent");
+            EventName tempEventName = new EventName(null, null, "TempEvent");
             TilerUser user = this.TilerUser;
             CalendarEvent TempEvent = new CalendarEvent(
                 //EventID.GenerateCalendarEvent(), 
                 tempEventName, newSubeEvent.Start, newSubeEvent.End, fiveMinSpan, new TimeSpan(), new TimeSpan(), 1, new Repetition(), new Location(), new EventDisplay(), new MiscData(), null, new NowProfile(), true, false, user, new TilerUserGroup(), user.TimeZone, null);
+            tempEventName.Creator_EventDB = TempEvent.getCreator;
+            tempEventName.Tiler_EventDB = TempEvent;
             AddToSchedule(TempEvent);
             AllEventDictionary.Remove(TempEvent.Calendar_EventID.getCalendarEventComponent());
             AllEventDictionary.Remove(TempEvent.Calendar_EventID.ToString());
@@ -262,11 +264,12 @@ namespace TilerFront
             {
                 TimeLine newSubeEvent = new TimeLine(Now.constNow, Now.constNow.AddMinutes(5));
                 TimeSpan fiveMinSpan = new TimeSpan(1);
-                EventName tempEventName = new EventName("TempEvent");
+                EventName tempEventName = new EventName(null, null, "TempEvent");
                 TilerUser user = TilerUser;
                 CalendarEvent TempEvent = new CalendarEvent(
-                    //EventID.GenerateCalendarEvent(), 
                     tempEventName, newSubeEvent.Start, newSubeEvent.End, fiveMinSpan, new TimeSpan(), new TimeSpan(), 1, new Repetition(), new Location(), new EventDisplay(), new MiscData(), null, new NowProfile(), true, false, user, new TilerUserGroup(), user.TimeZone, null);
+                tempEventName.Creator_EventDB = TempEvent.getCreator;
+                tempEventName.Tiler_EventDB = TempEvent;
                 AddToSchedule(TempEvent);
                 AllEventDictionary.Remove(TempEvent.Calendar_EventID.getCalendarEventComponent());
                 AllEventDictionary.Remove(TempEvent.Calendar_EventID.ToString());

@@ -3,7 +3,7 @@ namespace TilerFront.Migrations
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class Initial : DbMigration
+    public partial class init : DbMigration
     {
         public override void Up()
         {
@@ -29,8 +29,9 @@ namespace TilerFront.Migrations
                         PauseTime = c.DateTimeOffset(nullable: false, precision: 7),
                         isPauseDeleted = c.Boolean(nullable: false),
                     })
+                .PrimaryKey(t => t.EventId)
                 .ForeignKey("dbo.AspNetUsers", t => t.UserId)
-                .PrimaryKey(t => new { t.UserId, t.isPauseDeleted }, clustered: true, name: "UserIdAndPauseStatus")
+                .Index(t => new { t.UserId, t.isPauseDeleted }, clustered: true, name: "UserIdAndPauseStatus")
                 .Index(t => new { t.UserId, t.EventId }, unique: true, name: "UserIdAndSubEventIdClustering");
             
             CreateTable(

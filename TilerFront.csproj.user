@@ -14,6 +14,11 @@
     <WebStackScaffolding_IsAsyncSelected>True</WebStackScaffolding_IsAsyncSelected>
     <UseIISExpress>true</UseIISExpress>
     <IISExpressSSLPort>44305</IISExpressSSLPort>
+    <Use64BitIISExpress />
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
+    <UseGlobalApplicationHostFile />
   </PropertyGroup>
   <ProjectExtensions>
     <VisualStudio>

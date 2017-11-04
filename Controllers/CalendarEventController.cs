@@ -282,7 +282,7 @@ namespace TilerFront.Controllers
                             newEnd = newEnd.Add(myUser.getTImeSpan);
                             int SplitCount = (int)myUser.Split;
                             TimeSpan SpanPerSplit = TimeSpan.FromMilliseconds(myUser.Duration);
-                            Tuple<CustomErrors, Dictionary<string, CalendarEvent>> ScheduleUpdateMessage = NewSchedule.BundleChangeUpdate(myUser.EventID, new EventName(myUser.EventName), newStart, newEnd, SplitCount);//, SpanPerSplit);
+                            Tuple<CustomErrors, Dictionary<string, CalendarEvent>> ScheduleUpdateMessage = NewSchedule.BundleChangeUpdate(myUser.EventID, myUser.EventName, newStart, newEnd, SplitCount);//, SpanPerSplit);
                             DB_UserActivity activity = new DB_UserActivity(myUser.getRefNow(), UserActivity.ActivityType.InternalUpdateCalendarEvent, new List<String>() { myUser.EventID });
                             JObject json = JObject.FromObject(myUser);
                             activity.updateMiscelaneousInfo(json.ToString());

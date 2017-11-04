@@ -1483,7 +1483,7 @@ namespace TilerFront
 
 
             string NameId = EventScheduleNode.SelectSingleNode("NameId")?.InnerText ?? Guid.NewGuid().ToString();
-            Name = new DB_EventName( EventScheduleNode.SelectSingleNode("Name").InnerText, NameId);
+            Name = new DB_EventName(null, null, EventScheduleNode.SelectSingleNode("Name").InnerText, NameId);
             ID = EventScheduleNode.SelectSingleNode("ID").InnerText;
             //EventScheduleNode.SelectSingleNode("ID").InnerXml = "<wetin></wetin>";
             Deadline = EventScheduleNode.SelectSingleNode("Deadline").InnerText;
@@ -1584,7 +1584,8 @@ namespace TilerFront
             else {
                 RetrievedEvent = new DB_CalendarEventExtra(RetrievedEvent, procrastinationData, NowProfileData);
             }
-
+            Name.Creator_EventDB = RetrievedEvent.getCreator;
+            Name.Tiler_EventDB = RetrievedEvent;
             SubCalendarEvent[] AllSubCalEvents = ReadSubSchedulesFromXMLNode(EventScheduleNode.SelectSingleNode("EventSubSchedules"), RetrievedEvent, RangeOfLookUP).ToArray();
             XmlNode restrictedNode = EventScheduleNode.SelectSingleNode("Restricted");
 
@@ -1777,7 +1778,7 @@ namespace TilerFront
                 ConflictProfile conflictProfile = getConflctProfile(MyXmlNode.ChildNodes[i]);
                 string nameString = MyXmlNode.ChildNodes[i].SelectSingleNode("Name")?.InnerText??MyParent.getName.NameValue;
                 string id = MyXmlNode.ChildNodes[i].SelectSingleNode("NameId")?.InnerText ?? MyParent.getName.NameId;
-                EventName name = new DB_EventName(nameString, id);
+                EventName name = new DB_EventName(null, null, nameString, id);
                 TilerUser creator = getTilerLoggedUser(MyXmlNode.ChildNodes[i].SelectSingleNode("UserNode"));
                 if ((creator as DB_TilerUser).isNull)
                 {
@@ -1803,7 +1804,8 @@ namespace TilerFront
                     procrastinateSubEvent.PauseTime = PauseData.Item2;
                     retrievedSubEvent = procrastinateSubEvent;
                 }
-
+                name.Creator_EventDB = retrievedSubEvent.getCreator;
+                name.Tiler_EventDB = retrievedSubEvent;
                 retrievedSubEvent.ThirdPartyID = MyXmlNode.ChildNodes[i].SelectSingleNode("ThirdPartyID").InnerText;//this is a hack to just update the Third partyID
                 XmlNode restrictedNode = MyXmlNode.ChildNodes[i].SelectSingleNode("Restricted");
                 

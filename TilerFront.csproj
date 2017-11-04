@@ -25,6 +25,7 @@
     <ApplicationInsightsResourceId>/subscriptions/d6d53995-468d-414f-bf34-d7c3381b2429/resourcegroups/Default-ApplicationInsights-CentralUS/providers/microsoft.insights/components/TilerFront</ApplicationInsightsResourceId>
     <UseGlobalApplicationHostFile />
     <TargetFrameworkProfile />
+    <Use64BitIISExpress />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -441,9 +442,9 @@
     <Compile Include="LogControlDebug.cs" />
     <Compile Include="LogControlDirect.cs" />
     <Compile Include="LogControl.cs" />
-    <Compile Include="Migrations\201704040454510_Initial.cs" />
-    <Compile Include="Migrations\201704040454510_Initial.Designer.cs">
-      <DependentUpon>201704040454510_Initial.cs</DependentUpon>
+    <Compile Include="Migrations\201710290436412_init.cs" />
+    <Compile Include="Migrations\201710290436412_init.Designer.cs">
+      <DependentUpon>201710290436412_init.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
@@ -2679,8 +2680,8 @@
     <Content Include="Scripts\jquery-3.1.1.min.map" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201704040454510_Initial.resx">
-      <DependentUpon>201704040454510_Initial.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201710290436412_init.resx">
+      <DependentUpon>201710290436412_init.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

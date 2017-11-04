@@ -903,7 +903,7 @@ namespace TilerFront.Controllers
 
             string LocationAddress = newEvent.LocationAddress; ;
             string LocationTag = newEvent.LocationTag; ;
-            EventName Name = new EventName(newEvent.Name);
+            EventName Name = new EventName(null, null, newEvent.Name);
 
             string RepeatData = newEvent.RepeatData; ;
             string RepeatEndDay = newEvent.RepeatEndDay; ;
@@ -1060,6 +1060,8 @@ namespace TilerFront.Controllers
                     
                     //newCalendarEvent = new CalendarEvent(Name, StartData, EndData, Count, "", EventDuration, MyRepetition, true, RigidScheduleFlag, "", true, EventLocation, true, new EventDisplay(true, userColor, userColor.User < 1 ? 0 : 1), new MiscData(), false);
                 }
+                Name.Creator_EventDB = newCalendarEvent.getCreator;
+                Name.Tiler_EventDB = newCalendarEvent;
                 Task DoInitializeClassification=newCalendarEvent.InitializeClassification();
 
                 DB_Schedule MySchedule = new DB_Schedule(myUser, myNow);
@@ -1154,7 +1156,7 @@ namespace TilerFront.Controllers
 
             string LocationAddress = string.IsNullOrEmpty( newEvent.LocationAddress)?"": newEvent.LocationAddress;
             string LocationTag = LocationAddress = string.IsNullOrEmpty(newEvent.LocationTag) ? "" : newEvent.LocationTag;
-            EventName Name = new EventName(newEvent.Name);
+            EventName Name = new EventName(null, null, newEvent.Name);
 
             string RepeatData = newEvent.RepeatData; ;
             string RepeatEndDay = newEvent.RepeatEndDay; ;
@@ -1306,7 +1308,8 @@ namespace TilerFront.Controllers
                             Name, StartData, EndData, EventDuration, new TimeSpan(), new TimeSpan(), Count, MyRepetition, EventLocation, new EventDisplay(true, userColor, userColor.User < 1 ? 0 : 1), new MiscData(), null, new NowProfile(), true, false, tilerUser, new TilerUserGroup(), TimeZone, null);
                     }
                 }
-
+                Name.Creator_EventDB = newCalendarEvent.getCreator;
+                Name.Tiler_EventDB = newCalendarEvent;
 
                 newCalendarEvent.Repeat.PopulateRepetitionParameters(newCalendarEvent);
                 string BeforemyName = newCalendarEvent.ToString(); //BColor + " -- " + Count + " -- " + DurationDays + " -- " + DurationHours + " -- " + DurationMins + " -- " + EndDay + " -- " + EndHour + " -- " + EndMins + " -- " + EndMonth + " -- " + EndYear + " -- " + GColor + " -- " + LocationAddress + " -- " + LocationTag + " -- " + Name + " -- " + RColor + " -- " + RepeatData + " -- " + RepeatEndDay + " -- " + RepeatEndMonth + " -- " + RepeatEndYear + " -- " + RepeatStartDay + " -- " + RepeatStartMonth + " -- " + RepeatStartYear + " -- " + RepeatType + " -- " + RepeatWeeklyData + " -- " + Rigid + " -- " + StartDay + " -- " + StartHour + " -- " + StartMins + " -- " + StartMonth + " -- " + StartYear;

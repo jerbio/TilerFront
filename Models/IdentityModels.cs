@@ -39,6 +39,21 @@ namespace TilerFront.Models
         public System.Data.Entity.DbSet<ThirdPartyCalendarAuthenticationModel> ThirdPartyAuthentication { get; set; }
         public System.Data.Entity.DbSet<GoogleNotificationWatchResponseModel> GoogleNotificationCredentials { get; set; }
         public System.Data.Entity.DbSet<PausedEvent> PausedEvents { get; set; }
+        public System.Data.Entity.DbSet<TilerEvent> events { get; set; }
+        public System.Data.Entity.DbSet<SubCalendarEvent> SubEvents { get; set; }
+        public System.Data.Entity.DbSet<CalendarEvent> CalEvents { get; set; }
+        public System.Data.Entity.DbSet<Repetition> Repetitions { get; set; }
+        public System.Data.Entity.DbSet<RestrictionProfile> Restrictions { get; set; }
+        public System.Data.Entity.DbSet<Location> Locations { get; set; }
+        public System.Data.Entity.DbSet<EventDisplay> UiParams { get; set; }
+        public System.Data.Entity.DbSet<EventName> Names { get; set; }
+        public System.Data.Entity.DbSet<MiscData> MiscData { get; set; }
+        public System.Data.Entity.DbSet<Reason> Reason{ get; set; }
+        public System.Data.Entity.DbSet<Procrastination> Procrastination { get; set; }
+        public System.Data.Entity.DbSet<RestrictionDay> RestrictionDays { get; set; }
+        public System.Data.Entity.DbSet<TilerColor> UserColors { get; set; }
+        public System.Data.Entity.DbSet<Undo> undos { get; set; }
+
 
         public static ApplicationDbContext Create()
         {
