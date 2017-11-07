@@ -998,7 +998,7 @@ namespace TilerFront.Controllers
 
                 
 
-                RepeatStart = StartDateEntry;
+                RepeatStart = StartDateEntry.Add(newEvent.getTImeSpan);
                 int[] selectedDaysOftheweek={};
                 RepeatWeeklyData = string.IsNullOrEmpty( RepeatWeeklyData )?"":RepeatWeeklyData.Trim();
                 if (!string.IsNullOrEmpty(RepeatWeeklyData))
