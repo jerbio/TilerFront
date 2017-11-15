@@ -1439,26 +1439,6 @@ function populateMonth(refDate,CallBack)
     }
     refDate = new Date(refDate);
     global_WeekGrid = InitiateGrid(refDate);
-    /*$('#MonthGrid').fullCalendar({
-        dayClick: function (obj)
-        {
-            var myVar = obj;
-            var Y_M_D = myVar._i.split("-");
-            Y_M_D[0] = parseInt(Y_M_D[0]);
-            Y_M_D[1] = parseInt(Y_M_D[1])-1;
-            Y_M_D[2] = parseInt(Y_M_D[2]);
-            var SelectedDate = new Date(Y_M_D[0], Y_M_D[1], Y_M_D[2]);
-            if ((SelectedDate >= global_CurrentRange.Start) && (SelectedDate < global_CurrentRange.End))
-            {
-                scrollToDay(SelectedDate);
-                return;
-            }
-
-
-            global_WeekGrid = InitiateGrid(SelectedDate);
-            getRefreshedData(global_WeekGrid);
-        }
-    })*/
 
     LaunchMonthTicker(refDate);
     function MyCallBack()
@@ -1468,7 +1448,7 @@ function populateMonth(refDate,CallBack)
             CallBack();
         }
     }
-
+    refreshCounter = 1
     getRefreshedData(MyCallBack);
     return global_WeekGrid;
 }

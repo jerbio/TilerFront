@@ -58,7 +58,7 @@ namespace TilerFront.Controllers
                             myNow = DateTimeOffset.UtcNow;
                             DB_Schedule NewSchedule = new DB_Schedule(retrievedUser, myNow);
 
-                            //await ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(NewSchedule, retrievedUser.UserID).ConfigureAwait(false);
+                            await ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(NewSchedule, retrievedUser.UserID, db).ConfigureAwait(false);
 
                             long StartLong = Convert.ToInt64(myUser.Start);
                             long EndLong = Convert.ToInt64(myUser.End);

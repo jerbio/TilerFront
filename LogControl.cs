@@ -389,13 +389,10 @@ namespace TilerFront
             bool errorWritingFile = false;
             CalendarEvent ErrorEvent = new CalendarEvent();
             EventScheduleNodes = xmldoc.DocumentElement.SelectNodes("/ScheduleLog/EventSchedules/EventSchedule");
-            DateTimeOffset purgeLimit = DateTimeOffset.UtcNow.AddMonths(-3);
             try
             {
                 foreach (CalendarEvent MyEvent in AllEvents)
                 {
-                    //break;
-                    if (MyEvent.End > purgeLimit)
                     {
                         XmlElement EventScheduleNode;
                         ErrorEvent = MyEvent;

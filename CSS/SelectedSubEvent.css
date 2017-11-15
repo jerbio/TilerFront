@@ -409,13 +409,13 @@
     position:absolute;
 }
 
-#pieChartContainer /*media*/
+.pieChartContainer /*media*/
 {
     height:50%;
     margin-top:-38px;
-    margin-left:-50px;
-    height:76px !important;
-    width:152px !important;
+    margin-left:0px;
+    height:80px !important;
+    width:80px !important;
 
 }
 .LegendEncasingDom /*media*/

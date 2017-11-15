@@ -137,6 +137,7 @@ namespace TilerFront.Controllers
             if (retrievedUser.Status)
             {
                 DB_Schedule NewSchedule = new DB_Schedule(retrievedUser, myUser.getRefNow());
+                await ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(NewSchedule, retrievedUser.UserID, db).ConfigureAwait(false);
                 DB_UserActivity activity = new DB_UserActivity(myUser.getRefNow(), UserActivity.ActivityType.DeleteCalendarEvent, new List<String>() { myUser.EventID });
                 JObject json = JObject.FromObject(myUser);
                 activity.updateMiscelaneousInfo(json.ToString());

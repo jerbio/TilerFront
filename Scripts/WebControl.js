@@ -315,7 +315,7 @@ function StructuralizeNewData(NewData)
         var i = 0;
         for (; i < CalendarEvent.AllSubCalEvents.length; i++) {
             CalendarEvent.AllSubCalEvents[i].Name = CalendarEvent.CalendarName;
-            TotalSubEventList.push(PopulateDomForScheduleEvent(CalendarEvent.AllSubCalEvents[i], CalendarEvent.Tiers));
+            TotalSubEventList.push(PopulateDomForScheduleEvent(CalendarEvent.AllSubCalEvents[i], CalendarEvent.Tiers, CalendarData));
         }
     }
 
@@ -353,7 +353,7 @@ function StructuralizeNewData(NewData)
 
 
 
-    function PopulateDomForScheduleEvent(myEvent, Tiers) {
+    function PopulateDomForScheduleEvent(myEvent, Tiers, CalendarData) {
         
 
         //debugger;
@@ -370,6 +370,9 @@ function StructuralizeNewData(NewData)
         myEvent.SubCalCalEventStart = new Date(myEvent.SubCalCalEventStart);//+ global_TimeZone_ms);
         myEvent.SubCalCalEventEnd = new Date(myEvent.SubCalCalEventEnd);// + global_TimeZone_ms);
         myEvent.Tiers = Tiers;
+        myEvent.Split = CalendarData.TotalNumberOfEvents
+        myEvent.DeletionCount = CalendarData.DeletedEvents
+        myEvent.CompletionCount = CalendarData.CompletedEvents
         //*/
         /*myEvent.SubCalStartDate = !myEvent.SubCalStartDate.dst() ? new Date(Number(myEvent.SubCalStartDate.getTime()) + OneHourInMs) : myEvent.SubCalStartDate;
         myEvent.SubCalEndDate =! myEvent.SubCalEndDate.dst() ? new Date(Number(myEvent.SubCalEndDate.getTime()) + OneHourInMs) : myEvent.SubCalEndDate;
@@ -2507,10 +2510,6 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
 {
     var CompletionMapID = "CompletionMap";
     var CompletionMap = getDomOrCreateNew(CompletionMapID);
-    //$(CompletionMap.Dom).addClass("SubEventNonLabelSection");
-    //$(CompletionMap.Dom).addClass(CurrentTheme.ContentSection)
-    //$(CompletionMap.Dom).addClass(CurrentTheme.FontColor);
-
     generatePieChart(CompletionMap, SelectedEvent);
 
     
@@ -2520,98 +2519,101 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
 
     function generatePieChart(getDomObj, myEvent)
     {
-        var pieChartContainerID = "pieChartContainer";
+        $(getDomObj).empty();
+        var pieChartContainerID = "pieChartContainer"+generateUUID();
         var pieChartContainer = getDomOrCreateNew(pieChartContainerID,"canvas");
         var LegendContainerID = "LegendContainer";
         var LegendContainer = getDomOrCreateNew(LegendContainerID);
         $(LegendContainer.Dom).addClass("LegendContainer");
+        $(pieChartContainer.Dom).addClass("pieChartContainer");
 
         
 
 
         var ctx = pieChartContainer.Dom;
         ctx = ctx.getContext("2d");
-        var myNewChart = new Chart(ctx);
-        
-        getDomObj.Dom.appendChild(pieChartContainer.Dom);
-        getDomObj.Dom.appendChild(LegendContainer.Dom);
-
-        $(pieChartContainer.Dom).addClass("PieChart");
 
         var TotalNumberOfTask = parseInt(myEvent.Split)
         var DelededEvents = parseInt(myEvent.DeletionCount);
         var NumberOfCompleteTask = parseInt(myEvent.CompletionCount);
 
-
         var CompletedTask={
             value: NumberOfCompleteTask,
-            color: "green"
+            color: "#28cc6a",
+            hoverColor: "#2FEF7C",
+            label: 'Completed Tasks'
         };
         var CompletedTaskLegend = makeMyLegend("CompletedTask");
         CompletedTaskLegend[1].Dom.innerHTML = "Completed";
         LegendContainer.Dom.appendChild(CompletedTaskLegend[2].Dom);
         CompletedTaskLegend[2].Dom.style.top = "0";
-        CompletedTaskLegend[0].Dom.style.backgroundColor = "green";
+        CompletedTaskLegend[0].Dom.style.backgroundColor = CompletedTask.color;
 
         var DisabledTask={
             value: DelededEvents,
-            color: "red"
+            color: "#BA003E",
+            hoverColor: "#d60047",
+            label: 'Deleted Tasks'
         };
         var DisabledTaskLegend = makeMyLegend("DisabledTask");
         DisabledTaskLegend[1].Dom.innerHTML = "Disabled";
         LegendContainer.Dom.appendChild(DisabledTaskLegend[2].Dom);
         DisabledTaskLegend[2].Dom.style.top = "33%";
-        DisabledTaskLegend[0].Dom.style.backgroundColor = "red";
+        DisabledTaskLegend[0].Dom.style.backgroundColor = DisabledTask.color;
 
         var NotCompleted =
             {
                 value: TotalNumberOfTask - (DelededEvents + NumberOfCompleteTask),
-            color: "gray"
+                color: "#6B6D70",
+                hoverColor: "#b5b8bc",
+                label: 'Available Tasks'
             };
         var NotCompletedLegend = makeMyLegend("NotCompleted");
         NotCompletedLegend[1].Dom.innerHTML = "Not Completed";
         LegendContainer.Dom.appendChild(NotCompletedLegend[2].Dom);
         NotCompletedLegend[2].Dom.style.top = "66%";
-        NotCompletedLegend[0].Dom.style.backgroundColor = "gray";
+        NotCompletedLegend[0].Dom.style.backgroundColor = NotCompleted.color;
 
 
-        var data = [CompletedTask, DisabledTask, NotCompleted];
+        let data = {
+            labels: [
+                CompletedTask.label,
+                DisabledTask.label,
+                NotCompleted.label
+            ],
+            datasets: [
+                {
+                    data: [CompletedTask.value, DisabledTask.value, NotCompleted.value],
+                    backgroundColor: [
+                        CompletedTask.color,
+                        DisabledTask.color,
+                        NotCompleted.color
+                    ],
+                    hoverBackgroundColor: [
+                        CompletedTask.hoverColor,
+                        DisabledTask.hoverColor,
+                        NotCompleted.hoverColor
+                    ]
+                }]
+        };
 
-        var option= {
-        //Boolean - Whether we should show a stroke on each segment
-        segmentShowStroke : true,
-	
-        //String - The colour of each segment stroke
-        segmentStrokeColor : "rgba(50,50,50,.8)",
-	
-        //Number - The width of each segment stroke
-        segmentStrokeWidth : 1,
-	
-        //The percentage of the chart that we cut out of the middle.
-        percentageInnerCutout : 45,
-	
-        //Boolean - Whether we should animate the chart	
-        animation : true,
-	
-        //Number - Amount of animation steps
-        animationSteps : 100,
-	
-        //String - Animation easing effect
-        animationEasing : "easeOutBounce",
-	
-        //Boolean - Whether we animate the rotation of the Doughnut
-        animateRotate : true,
+        var myDoughnutChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: data,
+            options: {
+                responsive: false,
+                legend: { 
+                    display: false,
+                    position: 'right'
+                }
+            }
+        });
 
-        //Boolean - Whether we animate scaling the Doughnut from the centre
-        animateScale : false,
-	
-        //Function - Will fire on animation completion.
-        onAnimationComplete : null
-    }
 
-        myNewChart.Doughnut(data, option);
-        //pieChartContainer.Dom.style.height = "70px";
-        //pieChartContainer.Dom.style.width = "140px";
+        getDomObj.Dom.appendChild(pieChartContainer.Dom);
+        getDomObj.Dom.appendChild(LegendContainer.Dom);
+
+        $(pieChartContainer.Dom).addClass("PieChart");
     }
 
     function makeMyLegend(ID)
