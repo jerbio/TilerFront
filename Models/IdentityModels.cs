@@ -46,14 +46,25 @@ namespace TilerFront.Models
         public System.Data.Entity.DbSet<RestrictionProfile> Restrictions { get; set; }
         public System.Data.Entity.DbSet<Location> Locations { get; set; }
         public System.Data.Entity.DbSet<EventDisplay> UiParams { get; set; }
-        public System.Data.Entity.DbSet<EventName> Names { get; set; }
         public System.Data.Entity.DbSet<MiscData> MiscData { get; set; }
-        public System.Data.Entity.DbSet<Reason> Reason{ get; set; }
-        public System.Data.Entity.DbSet<Procrastination> Procrastination { get; set; }
         public System.Data.Entity.DbSet<RestrictionDay> RestrictionDays { get; set; }
         public System.Data.Entity.DbSet<TilerColor> UserColors { get; set; }
         public System.Data.Entity.DbSet<Undo> undos { get; set; }
-
+        public System.Data.Entity.DbSet<CalendarEventRestricted> RestrictedCalEvents { get; set; }
+        public System.Data.Entity.DbSet<SubCalendarEventRestricted> RestrictedSubCalEvents { get; set; }
+        public System.Data.Entity.DbSet<RigidCalendarEvent> RigidCalEvents { get; set; }
+        public System.Data.Entity.DbSet<BusyTimeLine> BusyTimelines { get; set; }
+        public System.Data.Entity.DbSet<EventName> EventNames { get; set; }
+        public System.Data.Entity.DbSet<EventTimeLine> EventTimeLines { get; set; }
+        public System.Data.Entity.DbSet<Classification> EventType { get; set; }
+        public System.Data.Entity.DbSet<GoogleTilerUser> Googleusers { get; set; }
+        public System.Data.Entity.DbSet<NowProfile> NowProfiles { get; set; }
+        public System.Data.Entity.DbSet<ProcrastinateCalendarEvent> ProcrastinteAlls { get; set; }
+        public System.Data.Entity.DbSet<Procrastination> Procrastinations { get; set; }
+        public System.Data.Entity.DbSet<Reason> Reasons { get; set; }
+        public System.Data.Entity.DbSet<RestrictionTimeLine> RestrictionTimeLines { get; set; }
+        public System.Data.Entity.DbSet<ThirdPartyTilerUser> ThirdPartyTilerUsers { get; set; }
+        public System.Data.Entity.DbSet<TilerUserGroup> TilerUserGroups { get; set; }
 
         public static ApplicationDbContext Create()
         {
