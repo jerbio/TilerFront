@@ -11,7 +11,7 @@ namespace TilerFront.Models
     [Table("PausedEvent")]
     public class PausedEvent
     {
-        [Column(Order = 0), ForeignKey("User"), Index("UserIdAndSubEventIdClustering",Order =0, IsUnique = true, IsClustered = false), Index("UserIdAndPauseStatus", Order = 0, IsClustered = true)]
+        [Column(Order = 0), ForeignKey("User"), Index("UserIdAndSubEventIdClustering",Order =0, IsUnique = true, IsClustered = false), Index("UserIdAndPauseStatus", Order = 0)]
         public string UserId { get; set; }
         TilerUser _User;
         /// <summary>
@@ -38,7 +38,7 @@ namespace TilerFront.Models
         /// <summary>
         /// Is the current event paused
         /// </summary>
-        [Index("UserIdAndPauseStatus", Order = 1, IsClustered = true)]
+        [Index("UserIdAndPauseStatus", Order = 1)]
         public bool isPauseDeleted { get; set; } = false;
     }
 }

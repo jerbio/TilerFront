@@ -972,8 +972,8 @@ namespace TilerFront
             string CheckCalendarEvent = 0.ToString();
             if ((Arg1 != null) )//&& (!Arg1.isNull))
             {
-                XCoordinate = Arg1.XCoordinate.ToString();
-                YCoordinate = Arg1.YCoordinate.ToString();
+                XCoordinate = Arg1.Latitude.ToString();
+                YCoordinate = Arg1.Longitude.ToString();
                 Descripion = Arg1.Description;
                 MappedAddress = Arg1.Address;
                 IsNull = Arg1.isNull.ToString();
@@ -1579,10 +1579,10 @@ namespace TilerFront
                 RetrievedEvent = new DB_ProcrastinateCalendarEvent(new EventID(creator.getClearAllEventsId()), Name, start, end, CalendarEventDuration, PreDeadline, PrepTime, Recurrence, var3, UiData, noteData, EVentEnableFlag, completedFlag, creator, userGroup, timeZone, Split);
             }
             else {
-                RetrievedEvent = new DB_CalendarEventExtra(RetrievedEvent, procrastinationData, NowProfileData);
+                RetrievedEvent = new DB_CalendarEvent(RetrievedEvent, procrastinationData, NowProfileData);
             }
             Name.Creator_EventDB = RetrievedEvent.getCreator;
-            Name.Tiler_EventDB = RetrievedEvent;
+            Name.AssociatedEvent = RetrievedEvent;
             SubCalendarEvent[] AllSubCalEvents = ReadSubSchedulesFromXMLNode(EventScheduleNode.SelectSingleNode("EventSubSchedules"), RetrievedEvent, RangeOfLookUP).ToArray();
             XmlNode restrictedNode = EventScheduleNode.SelectSingleNode("Restricted");
 
@@ -1802,7 +1802,7 @@ namespace TilerFront
                     retrievedSubEvent = procrastinateSubEvent;
                 }
                 name.Creator_EventDB = retrievedSubEvent.getCreator;
-                name.Tiler_EventDB = retrievedSubEvent;
+                name.AssociatedEvent = retrievedSubEvent;
                 retrievedSubEvent.ThirdPartyID = MyXmlNode.ChildNodes[i].SelectSingleNode("ThirdPartyID").InnerText;//this is a hack to just update the Third partyID
                 XmlNode restrictedNode = MyXmlNode.ChildNodes[i].SelectSingleNode("Restricted");
                 
@@ -2298,8 +2298,8 @@ namespace TilerFront
 
             TilerElements.Location AverageLocations = TilerElements.Location.AverageGPSLocation(locations.Values);
 
-            xLocation = AverageLocations.XCoordinate;
-            yLocation = AverageLocations.YCoordinate;
+            xLocation = AverageLocations.Latitude;
+            yLocation = AverageLocations.Longitude;
             TilerElements.Location.InitializeDefaultLongLat(xLocation, yLocation);
             DefaultLocation = AverageLocations;
             

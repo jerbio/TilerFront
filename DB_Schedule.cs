@@ -233,7 +233,7 @@ namespace TilerFront
                 //EventID.GenerateCalendarEvent(), 
                 tempEventName, newSubeEvent.Start, newSubeEvent.End, fiveMinSpan, new TimeSpan(), new TimeSpan(), 1, new Repetition(), new Location(), new EventDisplay(), new MiscData(), null, new NowProfile(), true, false, user, new TilerUserGroup(), user.TimeZone, null);
             tempEventName.Creator_EventDB = TempEvent.getCreator;
-            tempEventName.Tiler_EventDB = TempEvent;
+            tempEventName.AssociatedEvent = TempEvent;
             AddToSchedule(TempEvent);
             AllEventDictionary.Remove(TempEvent.Calendar_EventID.getCalendarEventComponent());
             AllEventDictionary.Remove(TempEvent.Calendar_EventID.ToString());
@@ -269,7 +269,7 @@ namespace TilerFront
                 CalendarEvent TempEvent = new CalendarEvent(
                     tempEventName, newSubeEvent.Start, newSubeEvent.End, fiveMinSpan, new TimeSpan(), new TimeSpan(), 1, new Repetition(), new Location(), new EventDisplay(), new MiscData(), null, new NowProfile(), true, false, user, new TilerUserGroup(), user.TimeZone, null);
                 tempEventName.Creator_EventDB = TempEvent.getCreator;
-                tempEventName.Tiler_EventDB = TempEvent;
+                tempEventName.AssociatedEvent = TempEvent;
                 AddToSchedule(TempEvent);
                 AllEventDictionary.Remove(TempEvent.Calendar_EventID.getCalendarEventComponent());
                 AllEventDictionary.Remove(TempEvent.Calendar_EventID.ToString());
