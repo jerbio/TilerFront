@@ -110,10 +110,11 @@ namespace TilerFront
             return;
         }
 
-        async virtual public Task WriteFullScheduleToLogAndOutlook()
+        async virtual public Task WriteFullScheduleToLogAndOutlook(CalendarEvent newCalendarEvent=null)
         {
             await CleanUpForUI().ConfigureAwait(false);
             myAccount.UpdateReferenceDayTime(ReferenceDayTIime);
+            
 
 
             foreach (List<CalendarEvent> eachTuple in ThirdPartyCalendars.Values)
@@ -129,10 +130,7 @@ namespace TilerFront
             {
                 (myOutlook).WriteToOutlook(MyCalEvent);
             }
-
-
-
-            await myAccount.CommitEventToLogOld(AllEventDictionary.Values, EventID.LatestID.ToString());
+            await myAccount.Commit(AllEventDictionary.Values, newCalendarEvent, EventID.LatestID.ToString());
         }
 
         virtual public bool isScheduleLoadSuccessful
@@ -218,8 +216,7 @@ namespace TilerFront
             CompleteSchedule = getTimeLine();
 
 
-
-
+            
             return NewEvent.Error;
         }
 

@@ -338,123 +338,6 @@ namespace TilerFront
             return;
         }
 
-        async public Task<bool> WriteToLogOld(IEnumerable<CalendarEvent> AllEvents, string LatestID, string LogFile = "")
-        {
-            Task<bool>  retValue;
-
-
-
-            retValue = new Task<bool>(() => { return true; });
-            retValue.Start();
-            string LogFileCopy = "";
-            if (LogFile == "")
-            { 
-                LogFile = WagTapLogLocation + CurrentLog;
-                LogFileCopy = WagTapLogLocation + "Copy_" + CurrentLog;
-            }
-
-            
-
-            XmlDocument xmldoc = new XmlDocument();
-            XmlDocument xmldocCopy = new XmlDocument();
-            xmldoc.Load(LogFile);
-            try
-            {
-                xmldocCopy.Load(LogFileCopy);
-            }
-            catch
-            {
-                try
-                {
-                    xmldocCopy.Load(LogFileCopy);
-                }
-                catch(Exception e)
-                {
-                    Console.Write(e.Message);
-                }
-            }
-
-
-            xmldocCopy.InnerXml = xmldoc.InnerXml;
-            CachedLocation = await getLocationCache().ConfigureAwait(false); ;//populates with current location info
-            Dictionary<string, TilerElements.Location> OldLocationCache = new Dictionary<string, TilerElements.Location>(CachedLocation);
-            xmldoc.DocumentElement.SelectSingleNode("/ScheduleLog/LastIDCounter").InnerText = LatestID;
-            XmlNodeList EventSchedulesNodes = xmldoc.DocumentElement.SelectNodes("/ScheduleLog/EventSchedules");
-            
-            XmlNode EventSchedulesNodesNode = xmldoc.DocumentElement.SelectSingleNode("/ScheduleLog/EventSchedules");
-            XmlNode EventSchedulesNodesNodeCpy = xmldoc.CreateElement("NodeCopy");
-            EventSchedulesNodesNodeCpy.InnerXml = EventSchedulesNodesNode.InnerXml;
-            EventSchedulesNodesNode.RemoveAll();
-            XmlNodeList EventScheduleNodes = xmldoc.DocumentElement.SelectNodes("/ScheduleLog/EventSchedules/EventSchedule");
-            bool errorWritingFile = false;
-            CalendarEvent ErrorEvent = new CalendarEvent();
-            EventScheduleNodes = xmldoc.DocumentElement.SelectNodes("/ScheduleLog/EventSchedules/EventSchedule");
-            try
-            {
-                foreach (CalendarEvent MyEvent in AllEvents)
-                {
-                    {
-                        XmlElement EventScheduleNode;
-                        ErrorEvent = MyEvent;
-                        EventScheduleNode = CreateEventScheduleNode(MyEvent);
-                
-                        XmlNode MyImportedNode = xmldoc.ImportNode(EventScheduleNode as XmlNode, true);
-                        //(EventScheduleNode, true);
-                        if (!UpdateInnerXml(ref EventScheduleNodes, "ID", MyEvent.getId, EventScheduleNode))
-                        {
-                            xmldoc.DocumentElement.SelectSingleNode("/ScheduleLog/EventSchedules").AppendChild(MyImportedNode);
-                        }
-                        else
-                        {
-                            ;
-                        }
-                    }
-                }
-            }
-            catch(Exception e)
-            {
-                EventSchedulesNodesNode.InnerXml = EventSchedulesNodesNodeCpy.InnerXml;
-                errorWritingFile = true;
-            }
-
-            UpdateCacheLocation(xmldoc, OldLocationCache,NewLocation);
-            int loopCounter = 0;
-            while (true)
-            {
-                try
-                {
-                    Task dbLatestChange = null;
-                    if (!string.IsNullOrEmpty(_TilerUser.PasswordHash))
-                    {
-                        dbLatestChange = TilerController.saveLatestChange(Database, _TilerUser);
-                    }
-                    xmldoc.Save(LogFile);
-                    xmldocCopy.Save(LogFileCopy);
-                    updateBigData(xmldocCopy, xmldoc);
-                    if (dbLatestChange != null)
-                    {
-                        await dbLatestChange;
-                    }
-                    break;
-                }
-                catch (Exception e)
-                {
-                    Thread.Sleep(160);
-
-                    if (++loopCounter > 3)
-                    {
-                        throw new TimeoutException("Failed to update schedule log");
-                    }
-                }
-            }
-
-            if(errorWritingFile)
-            {
-                throw new Exception("Error wrtiting file" + ErrorEvent.getName);
-            }
-
-            return await retValue.ConfigureAwait(false); ;
-        }
         /// <summary>
         /// updates the logcontrol with a possible new location
         /// </summary>
@@ -462,6 +345,21 @@ namespace TilerFront
         public void updateNewLocation(TilerElements.Location NewLocation)
         {
             this.NewLocation = NewLocation;
+        }
+
+        async Task Commit(IEnumerable<CalendarEvent> calendarEvents, TilerUser tilerUser)
+        {
+            await Database.SaveChangesAsync();
+        }
+
+        public async Task Commit(IEnumerable<CalendarEvent> calendarEvents, CalendarEvent calendarEvent, String LatestId)
+        {
+            _TilerUser.LatestId = LatestId;
+            if (calendarEvent!=null)
+            {
+                Database.CalEvents.Add(calendarEvent);
+            }
+            await Commit(calendarEvents, _TilerUser);
         }
 
         public void UpdateCacheLocation(XmlDocument xmldoc, Dictionary<string, TilerElements.Location> currentCache, TilerElements.Location NewLocation )
@@ -1448,9 +1346,6 @@ namespace TilerFront
             XmlNode EventSchedulesNodes = doc.DocumentElement.SelectSingleNode("/ScheduleLog/EventSchedules");
 
             return getAllCalendarFromXml(RangeOfLookUP, IdNode, EventSchedulesNodes);
-
-
-
         }
         public virtual CalendarEvent getCalendarEventObjFromNode(XmlNode EventScheduleNode, TimeLine RangeOfLookUP)
         {
@@ -1528,10 +1423,6 @@ namespace TilerFront
             XmlNode deleteNode = EventScheduleNode.SelectSingleNode("DeletionCount");
             int CompleteCount = 0;
             int DeleteCount = 0;
-
-            //string Name, string StartTime, DateTimeOffset StartDate, string EndTime, DateTimeOffset EventEndDate, string eventSplit, string PreDeadlineTime, string EventDuration, bool EventRepetitionflag, bool DefaultPrepTimeflag, bool RigidScheduleFlag, string eventPrepTime, bool PreDeadlineFlag
-
-            //MainWindow.CreateSchedule("","",new DateTimeOffset(),"",new DateTimeOffset(),"","","",true,true,true,"",false);
 
             TilerElements.Location var3 = getLocation(EventScheduleNode);
             MiscData noteData = getMiscData(EventScheduleNode);

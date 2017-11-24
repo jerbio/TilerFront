@@ -450,9 +450,9 @@
     <Compile Include="LogControlDebug.cs" />
     <Compile Include="LogControlDirect.cs" />
     <Compile Include="LogControl.cs" />
-    <Compile Include="Migrations\201711231750048_init.cs" />
-    <Compile Include="Migrations\201711231750048_init.Designer.cs">
-      <DependentUpon>201711231750048_init.cs</DependentUpon>
+    <Compile Include="Migrations\201711240630420_init.cs" />
+    <Compile Include="Migrations\201711240630420_init.Designer.cs">
+      <DependentUpon>201711240630420_init.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
@@ -2689,8 +2689,8 @@
     <None Include="Project_Readme.html" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201711231750048_init.resx">
-      <DependentUpon>201711231750048_init.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201711240630420_init.resx">
+      <DependentUpon>201711240630420_init.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

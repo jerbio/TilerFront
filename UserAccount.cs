@@ -81,15 +81,10 @@ namespace TilerFront
         {
             UserLog.UpdateReferenceDayInXMLLog(referenceTime);
         }
-        /*
-        public void CommitEventToLog(CalendarEvent MyCalEvent)
+
+        virtual async public Task Commit(IEnumerable<CalendarEvent> AllEvents, CalendarEvent calendarEvent, String LatestID)
         {
-            UserLog.WriteToLog(MyCalEvent);
-        }
-        */
-        virtual async public Task  CommitEventToLogOld(IEnumerable<CalendarEvent> AllEvents,string LatestID,string LogFile="")
-        {
-            await UserLog.WriteToLogOld(AllEvents, LatestID, LogFile).ConfigureAwait(false);
+            await UserLog.Commit(AllEvents, calendarEvent, LatestID).ConfigureAwait(false);
         }
 
         
