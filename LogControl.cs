@@ -1237,100 +1237,19 @@ namespace TilerFront
 
         async protected Task<Dictionary<string, TilerElements.Location>> getLocationCache(string NameOfFile = "")
         {
-            Dictionary<string, TilerElements.Location> retValue = new Dictionary<string, TilerElements.Location>();
-#if ForceReadFromXml
-#else
-            if (useCassandra)
-            {
-                Task<Tuple<bool, string, DateTimeOffset, long>> gettingLatesData = LogDBDataAccess.getLatestChanges(ID);
-                Task<Dictionary<string, Location_Elements>> gettingLocationCache = myCassandraAccess.getAllCachedLocations();
-                Tuple<bool, string, DateTimeOffset, long> LatesData =await gettingLatesData;
-                LastIDNumber = LatesData.Item4;
-                retValue = await gettingLocationCache;
-                return retValue;
-            }
-#endif
-
-
-            XmlDocument doc = getLogDataStore(NameOfFile);
-            XmlNode node = doc.DocumentElement.SelectSingleNode("/ScheduleLog/LocationCache");
-            if (node == null)
-            {
-                return retValue;
-            }
-            XmlNodeList AllLocationNodes = node.SelectNodes("Locations/Location");
-            foreach (XmlNode eachXmlNode in AllLocationNodes)
-            {
-                TilerElements.Location Location = generateLocationObjectFromNode(eachXmlNode);
-
-                if (Location != null)
-                {
-                    if (!string.IsNullOrEmpty(Location.Description))
-                    {
-                        string Description = Location.Description.ToLower();
-                        if (!retValue.ContainsKey(Description))
-                        {
-                            retValue.Add(Description, Location);
-                        }
-                    }
-                }
-            }
+            Dictionary<string, TilerElements.Location> retValue = await Database.Locations.ToDictionaryAsync(obj => obj.Description, obj => obj);
             return retValue;
         }
 
 
 
-        protected virtual Dictionary<string, CalendarEvent> getAllCalendarFromXml(TimeLine RangeOfLookUP, XmlNode IdNode, XmlNode EventSchedulesNodes)
+        async protected virtual Task<Dictionary<string, CalendarEvent>> getAllCalendarFromXml(TimeLine RangeOfLookUP, XmlNode IdNode, XmlNode EventSchedulesNodes)
         {
-            Dictionary<string, CalendarEvent> MyCalendarEventDictionary = new Dictionary<string, CalendarEvent>();
-            if (IdNode != null)
-            {
-                string LastUsedIndex = IdNode.InnerText;
-                LastIDNumber = Convert.ToInt64(LastUsedIndex);
-            }
-            
-            DateTimeOffset userReferenceDay;
-            string ID;
-            string Deadline;
-            string Split;
-            string Completed;
-            string Rigid;
-            string Name;
-            string[] StartDateTime;
-            string StartDate;
-            string StartTime;
-            string[] EndDateTime;
-            string EndDate;
-            string EndTime;
-            string PreDeadline;
-            string CalendarEventDuration;
-            string PreDeadlineFlag;
-            string EventRepetitionflag;
-            string PrepTimeFlag;
-            string PrepTime;
-
-            if (EventSchedulesNodes.ChildNodes != null)
-            {
-                foreach (XmlNode EventScheduleNode in EventSchedulesNodes.ChildNodes)
-                {
-                    CalendarEvent RetrievedEvent;
-
-                    //RetrievedEvent = getCalendarEventObjFromNode(EventScheduleNode, RangeOfLookUP);
-                    ///*
-                    RetrievedEvent = getCalendarEventObjFromNode(EventScheduleNode, RangeOfLookUP);
-                    //*/
-
-                    if (RetrievedEvent != null)
-                    { MyCalendarEventDictionary.Add(RetrievedEvent.Calendar_EventID.getCalendarEventComponent(), RetrievedEvent); }
-                }
-
-            }
-
-
+            Dictionary<string, CalendarEvent> MyCalendarEventDictionary = await Database.CalEvents.Where(calEvent => calEvent.Start < RangeOfLookUP.End && calEvent.End > RangeOfLookUP.Start).ToDictionaryAsync(calEvent => calEvent.getId, calEvent => calEvent);
             return MyCalendarEventDictionary;
         }
 
-        public virtual Dictionary<string, CalendarEvent> getAllCalendarFromXml(TimeLine RangeOfLookUP)
+        async public virtual Task<Dictionary<string, CalendarEvent>> getAllCalendarFromXml(TimeLine RangeOfLookUP)
         {
 #if ForceReadFromXml
 #else
@@ -1345,7 +1264,7 @@ namespace TilerFront
             
             XmlNode EventSchedulesNodes = doc.DocumentElement.SelectSingleNode("/ScheduleLog/EventSchedules");
 
-            return getAllCalendarFromXml(RangeOfLookUP, IdNode, EventSchedulesNodes);
+            return await getAllCalendarFromXml(RangeOfLookUP, IdNode, EventSchedulesNodes);
         }
         public virtual CalendarEvent getCalendarEventObjFromNode(XmlNode EventScheduleNode, TimeLine RangeOfLookUP)
         {
@@ -2014,10 +1933,10 @@ namespace TilerFront
             return retValue;
         }
 
-        public CalendarEvent getCalendarEventWithID(string ID)
+        public async Task<CalendarEvent> getCalendarEventWithID(string ID)
         {
             TimeLine RangeOfLookup = new TimeLine(DateTimeOffset.UtcNow.AddYears(-1000), DateTimeOffset.UtcNow.AddYears(1000));
-            Dictionary<string, CalendarEvent> AllScheduleData = getAllCalendarFromXml(RangeOfLookup);
+            Dictionary<string, CalendarEvent> AllScheduleData = await getAllCalendarFromXml(RangeOfLookup);
             CalendarEvent retValue = null;
             if (AllScheduleData.ContainsKey(ID))
             {
@@ -2026,7 +1945,7 @@ namespace TilerFront
             return retValue;
         }
 
-        public IList<CalendarEvent> getCalendarEventWithName(string Name)
+        public async Task<IList<CalendarEvent>> getCalendarEventWithName(string Name)
         {
             IList<CalendarEvent> retValue = new CalendarEvent[0];
 #if ForceReadFromXml
@@ -2039,7 +1958,7 @@ namespace TilerFront
 #endif
 
             TimeLine RangeOfLookup = new TimeLine(DateTimeOffset.UtcNow.AddYears(-1000), DateTimeOffset.UtcNow.AddYears(1000));
-            Dictionary<string, CalendarEvent> AllScheduleData = getAllCalendarFromXml(RangeOfLookup);
+            Dictionary<string, CalendarEvent> AllScheduleData =await getAllCalendarFromXml(RangeOfLookup);
             
             Name = Name.ToLower();
             if (AllScheduleData.Count > 0)
@@ -2145,7 +2064,7 @@ namespace TilerFront
             {
                 Task<Dictionary<string, TilerElements.Location>> TaskLocationCache = getLocationCache();
                 
-                Dictionary<string, CalendarEvent> AllScheduleData = this.getAllCalendarFromXml(RangeOfLookup);
+                Dictionary<string, CalendarEvent> AllScheduleData =await this.getAllCalendarFromXml(RangeOfLookup);
                 Task<DateTimeOffset> getReferenceTime = getDayReferenceTime();
 
 

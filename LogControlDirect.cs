@@ -926,10 +926,10 @@ namespace TilerFront
             return retValue;
         }
 
-        public CalendarEvent getCalendarEventWithID(string ID)
+        public async Task<CalendarEvent> getCalendarEventWithID(string ID)
         {
             TimeLine RangeOfLookup = new TimeLine(DateTimeOffset.UtcNow.AddYears(-1000), DateTimeOffset.UtcNow.AddYears(1000));
-            Dictionary<string, CalendarEvent> AllScheduleData = getAllCalendarFromXml(RangeOfLookup);
+            Dictionary<string, CalendarEvent> AllScheduleData = await getAllCalendarFromXml(RangeOfLookup);
             CalendarEvent retValue = null;
             if (AllScheduleData.ContainsKey(ID))
             {
@@ -938,7 +938,7 @@ namespace TilerFront
             return retValue;
         }
 
-        public IList<CalendarEvent> getCalendarEventWithName(string Name)
+        public async Task<IList<CalendarEvent>> getCalendarEventWithName(string Name)
         {
             IList<CalendarEvent> retValue = new CalendarEvent[0];
 #if ForceReadFromXml
@@ -951,7 +951,7 @@ namespace TilerFront
 #endif
 
             TimeLine RangeOfLookup = new TimeLine(DateTimeOffset.UtcNow.AddYears(-1000), DateTimeOffset.UtcNow.AddYears(1000));
-            Dictionary<string, CalendarEvent> AllScheduleData = getAllCalendarFromXml(RangeOfLookup);
+            Dictionary<string, CalendarEvent> AllScheduleData = await getAllCalendarFromXml(RangeOfLookup);
             
             Name = Name.ToLower();
             if (AllScheduleData.Count > 0)

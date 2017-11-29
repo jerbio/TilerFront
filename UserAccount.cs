@@ -48,10 +48,10 @@ namespace TilerFront
         }
 
 
-        virtual protected Dictionary<string, CalendarEvent>  getAllCalendarElements(TimeLine RangeOfLookup, string desiredDirectory="")
+        virtual protected async Task<Dictionary<string, CalendarEvent>>  getAllCalendarElements(TimeLine RangeOfLookup, string desiredDirectory="")
         {
             Dictionary<string, CalendarEvent> retValue=new Dictionary<string,CalendarEvent>();
-            retValue = UserLog.getAllCalendarFromXml(RangeOfLookup);
+            retValue = await UserLog.getAllCalendarFromXml(RangeOfLookup);
             return retValue;
         }
 

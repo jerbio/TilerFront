@@ -32,7 +32,7 @@ namespace TilerFront.Controllers
         {
             UserAccountDirect retrievedUser = await myUser.getUserAccountDirect(db);
             await retrievedUser.Login();
-            TilerElements.CalendarEvent retrievedCalendarEvent = retrievedUser.ScheduleLogControl.getCalendarEventWithID(id);
+            TilerElements.CalendarEvent retrievedCalendarEvent = await retrievedUser.ScheduleLogControl.getCalendarEventWithID(id);
             PostBackData retValue = new PostBackData(retrievedCalendarEvent.ToCalEvent(), 0);
 
 
@@ -59,7 +59,7 @@ namespace TilerFront.Controllers
             if (retrievedUser.Status)
             {
                 long myNow = (long)(DateTimeOffset.UtcNow - TilerElementExtension.JSStartTime).TotalMilliseconds; ;
-                IEnumerable<CalendarEvent> retrievedCalendarEvents = retrievedUser.ScheduleLogControl.getCalendarEventWithName(phrase).Where(obj => obj.isActive);
+                IEnumerable<CalendarEvent> retrievedCalendarEvents = (await retrievedUser.ScheduleLogControl.getCalendarEventWithName(phrase)).Where(obj => obj.isActive);
                 retValue = new PostBackData(retrievedCalendarEvents.Select(obj => obj.ToCalEvent()).OrderBy(obj => Math.Abs(myNow - obj.EndDate)).ToList(), 0);
             }
             
@@ -68,59 +68,6 @@ namespace TilerFront.Controllers
             return Ok(retValue.getPostBack);
         }
 
-
-        /*
-        // POST api/CalendarEvent
-        [ResponseType(typeof(CalEvent))]
-        public async Task<IHttpActionResult> PostCalEvent([FromBody]CalEvent calevent)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            db.CalEvents.Add(calevent);
-
-            try
-            {
-                await db.SaveChangesAsync();
-            }
-            catch (DbUpdateException)
-            {
-                if (CalEventExists(calevent.ID))
-                {
-                    return Conflict();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return CreatedAtRoute("DefaultApi", new { id = calevent.ID }, calevent);
-        }
-        
-        // DELETE api/CalendarEvent/5
-        [ResponseType(typeof(PostBackStruct))]
-        public async Task<IHttpActionResult> DeleteCalEvent(string id, bool readjust, [FromBody]AuthorizedUser myUser )
-        {
-            UserAccountDirect retrievedUser = await myUser.getUserAccount();// new UserAccount(myUser.UserName, myUser.UserID);
-            await retrievedUser.Login();
-            PostBackData retValue ;
-            if(retrievedUser.Status)
-            {
-                My24HourTimerWPF.Schedule NewSchedule = new My24HourTimerWPF.Schedule(retrievedUser, new DateTime(myUser.getRefNow().Ticks));
-                CustomErrors messageReturned= NewSchedule.deleteCalendarEventAndReadjust(id);
-                retValue = new PostBackData(messageReturned, messageReturned.Code);
-            }
-            else
-            {
-                retValue = new PostBackData("",1);
-            }
-
-            return Ok(retValue.getPostBack);
-        }
-        */
         /// <summary>
         /// Deletes a calendar event.
         /// </summary>
