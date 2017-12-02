@@ -175,11 +175,11 @@ namespace TilerFront
             HashSet<SubCalendarEvent> NotdoneYet = new HashSet<SubCalendarEvent>();// getNoneDoneYetBetweenNowAndReerenceStartTIme();
             if (!NewEvent.getRigid)
             {
-                NewEvent = EvaluateTotalTimeLineAndAssignValidTimeSpots(NewEvent, NotdoneYet, optimizeFirstTwentyFourHours: optimizeSchedule);
+                NewEvent = EvaluateTotalTimeLineAndAssignValidTimeSpots(NewEvent, NotdoneYet, null, optimizeFirstTwentyFourHours: optimizeSchedule);
             }
             else
             {
-                NewEvent = EvaluateTotalTimeLineAndAssignValidTimeSpots(NewEvent, NotdoneYet, null, 1, optimizeSchedule);
+                NewEvent = EvaluateTotalTimeLineAndAssignValidTimeSpots(NewEvent, NotdoneYet, null, null, 1, optimizeSchedule);
             }
 
 
