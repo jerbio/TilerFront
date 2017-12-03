@@ -84,20 +84,6 @@ namespace TilerFront
             };
         }
 
-
-        //public LogControl(ApplicationDbContext database, string logLocation = "")
-        //{
-        //    if (!string.IsNullOrEmpty(logLocation))
-        //    {
-        //        WagTapLogLocation = logLocation;
-        //    }
-        //    //LogDBDataAccess = DBAccess;
-        //    LogStatus = false;
-        //    CachedLocation = new Dictionary<string, Location_Elements>();
-        //    Database = database;
-        //}
-
-
         public LogControl(TilerUser user, ApplicationDbContext database, string logLocation = "", DB_UserActivity useractivity = null)
         {
             if (!string.IsNullOrEmpty(logLocation))
@@ -790,6 +776,8 @@ namespace TilerFront
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.getIsProcrastinateCalendarEvent.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("TimeZone"));
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.getTimeZone;
+            MyEventScheduleNode.PrependChild(xmldoc.CreateElement("TimeCreaated"));
+            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.TimeCreated.ToString();
 
             if (MyEvent.getIsEventRestricted)
             {
@@ -998,6 +986,8 @@ namespace TilerFront
             MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.getIsProcrastinateCalendarEvent.ToString();
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("TimeZone"));
             MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.getTimeZone;
+            MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("TimeCreaated"));
+            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.TimeCreated.ToString();
 
             if (MySubEvent.getIsEventRestricted)
             {
@@ -1713,6 +1703,16 @@ namespace TilerFront
             {
                 DeleteCount = RetrievedEvent.AllSubEvents.Where(obj => !obj.isEnabled).Count();
             }
+
+            DateTimeOffset timeCreated;
+            XmlNode timeCreatednode = EventScheduleNode.SelectSingleNode("TimeCreated");
+            if (timeCreatednode != null)
+            {
+                timeCreated = DateTimeOffset.Parse(timeCreatednode.ToString());
+                RetrievedEvent.TimeCreated = timeCreated;
+            }
+
+
             RetrievedEvent.InitializeCounts(DeleteCount, CompleteCount);
 
             return RetrievedEvent;
@@ -1902,6 +1902,15 @@ namespace TilerFront
                         (retrievedSubEvent as DB_SubCalendarEventRestricted).PauseTime = PauseData.Item2;
                     }
                 }
+
+                DateTimeOffset timeCreated;
+                XmlNode timeCreatednode = MyXmlNode.ChildNodes[i].SelectSingleNode("TimeCreated");
+                if (timeCreatednode != null)
+                {
+                    timeCreated = DateTimeOffset.Parse(timeCreatednode.ToString());
+                    retrievedSubEvent.TimeCreated = timeCreated;
+                }
+
                 MyArrayOfNodes.Add(retrievedSubEvent);
                 createReasonObjects(retrievedSubEvent, MyXmlNode.ChildNodes[i]);
             }
