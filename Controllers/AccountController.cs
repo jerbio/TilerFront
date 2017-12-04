@@ -837,6 +837,7 @@ namespace TilerFront.Controllers
                 NewAccountCalendarImportation.isLongLived = false;
                 NewAccountCalendarImportation.Email = GoogleEmail;
                 NewAccountCalendarImportation.Deadline = ExpirationDate;
+                NewAccountCalendarImportation.ProviderID = ThirdPartyControl.CalendarTool.google.ToString();
 
 
                 //await NewAccountCalendarImportation.refreshAuthenticationToken().ConfigureAwait(false);

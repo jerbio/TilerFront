@@ -89,7 +89,7 @@ namespace TilerFront.Controllers
 
                 List<CalendarEvent> ScheduleData = new List<CalendarEvent>();
 
-                Task<ConcurrentBag<CalendarEvent>> GoogleCalEventsTask = GoogleTilerEventControl.getAllCalEvents(AllGoogleTilerEvents);
+                Task<ConcurrentBag<CalendarEvent>> GoogleCalEventsTask = GoogleTilerEventControl.getAllCalEvents(AllGoogleTilerEvents, TimelineForData);
 
                 Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location>> ProfileData = await LogAccess.getProfileInfo(TimelineForData);
 
@@ -432,12 +432,12 @@ namespace TilerFront.Controllers
         /// <param name="mySchedule"></param>
         /// <param name="TilerUserID"></param>
         /// <returns></returns>
-        static internal async Task updatemyScheduleWithGoogleThirdpartyCalendar(Schedule mySchedule, string TilerUserID, ApplicationDbContext db)
+        static internal async Task updatemyScheduleWithGoogleThirdpartyCalendar(Schedule mySchedule, string TilerUserID, ApplicationDbContext db, TimeLine calucaltionTimeLine = null)
         {
             List<IndexedThirdPartyAuthentication> AllIndexedThirdParty = await getAllThirdPartyAuthentication(TilerUserID, db).ConfigureAwait(false);
             List<GoogleTilerEventControl> AllGoogleTilerEvents = AllIndexedThirdParty.Select(obj => new GoogleTilerEventControl (obj, db)).ToList();
 
-            Tuple<List<GoogleTilerEventControl>, GoogleThirdPartyControl> GoogleEvents = await GoogleTilerEventControl.getThirdPartyControlForIndex(AllGoogleTilerEvents).ConfigureAwait(false);
+            Tuple<List<GoogleTilerEventControl>, GoogleThirdPartyControl> GoogleEvents = await GoogleTilerEventControl.getThirdPartyControlForIndex(AllGoogleTilerEvents, calucaltionTimeLine).ConfigureAwait(false);
             Task DeleteInvalidAuthentication = ManageController.delelteGoogleAuthentication(GoogleEvents.Item1.Select(obj => obj.getDBAuthenticationData()));
             mySchedule.updateDataSetWithThirdPartyData(new Tuple<ThirdPartyControl.CalendarTool, IEnumerable<CalendarEvent>>(ThirdPartyControl.CalendarTool.google,new List<CalendarEvent> {GoogleEvents.Item2.getThirdpartyCalendarEvent()}));
             //mySchedule.updateDataSetWithThirdPartyData(new Tuple<ThirdPartyControl.CalendarTool.Google, GoogleEvents.Item2.);
@@ -1040,7 +1040,7 @@ namespace TilerFront.Controllers
 
 
                     //RestrictionProfile myRestrictionProfile = CreateRestrictionProfile(newEvent.RestrictionStart, newEvent.RestrictionEnd, newEvent.isWorkWeek, newEvent.getTImeSpan);
-                    newCalendarEvent = new CalendarEventRestricted( Name, StartDateTime, EndDateTime, myRestrictionProfile, EventDuration, MyRepetition, false, true, Count, RigidScheduleFlag, EventLocation, new TimeSpan(0, 15, 0), new TimeSpan(0, 15, 0),null, new EventDisplay(true, userColor, userColor.User < 1 ? 0 : 1), new MiscData(), TimeZone);
+                    newCalendarEvent = new CalendarEventRestricted(tilerUser, new TilerUserGroup(), Name, StartDateTime, EndDateTime, myRestrictionProfile, EventDuration, MyRepetition, false, true, Count, RigidScheduleFlag, EventLocation, new TimeSpan(0, 15, 0), new TimeSpan(0, 15, 0),null, new EventDisplay(true, userColor, userColor.User < 1 ? 0 : 1), new MiscData(), TimeZone);
                 }
                 else
                 {
@@ -1181,7 +1181,7 @@ namespace TilerFront.Controllers
 
             string StartTime = StartHour + ":" + StartMins;
             string EndTime = EndHour + ":" + EndMins;
-
+            return Ok();
             DateTimeOffset StartDateEntry = new DateTimeOffset(Convert.ToInt32(StartYear), Convert.ToInt32(StartMonth), Convert.ToInt32(StartDay), 0, 0, 0, new TimeSpan());
             DateTimeOffset EndDateEntry = new DateTimeOffset(Convert.ToInt32(EndYear), Convert.ToInt32(EndMonth), Convert.ToInt32(EndDay), 0, 0, 0, new TimeSpan());
 
@@ -1287,7 +1287,7 @@ namespace TilerFront.Controllers
                     TimeString = EndDateEntry.Date.ToShortDateString() + " " + EndTime;
                     DateTimeOffset EndDateTime = DateTimeOffset.Parse(TimeString).UtcDateTime;
                     EndDateTime = EndDateTime.Add(newEvent.getTImeSpan);
-                    newCalendarEvent = new CalendarEventRestricted(Name, StartDateTime, EndDateTime, myRestrictionProfile, EventDuration, MyRepetition, false, true, Count, RigidScheduleFlag, new TilerElements.Location(), new TimeSpan(0, 15, 0), new TimeSpan(0, 15, 0), null, new EventDisplay(true, userColor, userColor.User < 1 ? 0 : 1), new MiscData());
+                    newCalendarEvent = new CalendarEventRestricted(tilerUser, new TilerUserGroup(), Name, StartDateTime, EndDateTime, myRestrictionProfile, EventDuration, MyRepetition, false, true, Count, RigidScheduleFlag, new TilerElements.Location(), new TimeSpan(0, 15, 0), new TimeSpan(0, 15, 0), null, new EventDisplay(true, userColor, userColor.User < 1 ? 0 : 1), new MiscData());
                 }
                 else
                 {

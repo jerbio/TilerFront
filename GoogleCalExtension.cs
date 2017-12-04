@@ -192,7 +192,7 @@ namespace TilerFront
             return RetValue;
         }
 
-        public async static Task<IEnumerable<CalendarEvent>> getAllCalEvents(IList<Google.Apis.Calendar.v3.Data.Event> AllSubCals, Google.Apis.Calendar.v3.CalendarService CalendarServiceData, string UserID,EventID AuthenticationID)
+        public async static Task<IEnumerable<CalendarEvent>> getAllCalEvents(IList<Google.Apis.Calendar.v3.Data.Event> AllSubCals, Google.Apis.Calendar.v3.CalendarService CalendarServiceData, string UserID,EventID AuthenticationID, TimeLine CalculationTimeLine)
         {
             //ThirdPartyControl.CalendarTool calendarInUser = ThirdPartyControl.CalendarTool.Google;
 
@@ -201,8 +201,10 @@ namespace TilerFront
             Dictionary<string, Google.Apis.Calendar.v3.Data.Event> RepeatingIDs = new Dictionary<string, Google.Apis.Calendar.v3.Data.Event>();
 
             ConcurrentBag<CalendarEvent> RetValue = new ConcurrentBag<CalendarEvent>();
-
-            TimeLine CalculationTimeLine = new TimeLine(DateTimeOffset.UtcNow.AddDays(-90), DateTimeOffset.UtcNow.AddDays(90));
+            if (CalculationTimeLine == null) {
+                CalculationTimeLine = new TimeLine(DateTimeOffset.UtcNow.AddDays(-90), DateTimeOffset.UtcNow.AddDays(90));
+            }
+            
 
             uint i = 0;
             for (; i < AllSubCalNoCancels.Count; i++)
@@ -214,7 +216,7 @@ namespace TilerFront
                 if (GoogleEvent.Start.DateTime != null)
                 {
                     TimeLine EventRange = new TimeLine(GoogleEvent.Start.DateTime.Value.ToUniversalTime(), GoogleEvent.End.DateTime.Value.ToUniversalTime());
-                    if (EventRange.InterferringTimeLine(CalculationTimeLine) != null)
+                    if (EventRange.InterferringTimeLine(CalculationTimeLine) != null || GoogleEvent.Recurrence != null)
                     {
 
                         if (GoogleEvent.Recurrence == null)
@@ -224,7 +226,6 @@ namespace TilerFront
                         }
                         else
                         {
-                            
                             RepeatingIDs.Add(GoogleEvent.Id, GoogleEvent);
                         }
                     }
@@ -249,9 +250,9 @@ namespace TilerFront
                 RepetitionData.TimeMax = DateTime.Now.AddDays(90);
                 var generatedRsults = await RepetitionData.ExecuteAsync().ConfigureAwait(false);
                 EventID CalendarEventID = EventID.generateGoogleCalendarEventID(myIndex);
-                List<SubCalendarEvent> AllRepeatSubCals = generateRepeatSubCalendarEvent(CalendarEventID, generatedRsults.Items);
+                List<Event> googleEventsWithinRange = generatedRsults.Items.Where(googleEvent => googleEvent.End.DateTime.Value.ToUniversalTime() > CalculationTimeLine.Start && CalculationTimeLine.End > googleEvent.Start.DateTime.Value.ToUniversalTime()).ToList();
+                List<SubCalendarEvent> AllRepeatSubCals = generateRepeatSubCalendarEvent(CalendarEventID, googleEventsWithinRange);
                 
-                //List<SubCalEvent> AllRepeatSubCals = generatedRsults.Items.Select((obj, k) => obj.ToSubCal(AuthenticationID,(myIndex + k), CalendarServiceData)).ToList();
                 if (AllRepeatSubCals.Count>0)
                 {
                     CalendarEvent newlyCreatedCalEVent = CalEvent.FromGoogleToRepatCalendarEvent(AllRepeatSubCals);
