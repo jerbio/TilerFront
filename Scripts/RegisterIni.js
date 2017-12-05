@@ -180,6 +180,7 @@ function prepFunctionOnRegisterRequest(SignInButton, RegisterButton, ShowSignInF
         SignButtonContainer.style.top = "90%";
         SignInButton.innerHTML = "Back";
         BigBackGroundText.style.top = "50%";
+        BigBackGroundText.style.color = "rgba(200,200,200,.5)";
         BigBackGroundText.style.marginTop = "-150px";
 
         
@@ -218,6 +219,7 @@ function prepFunctionOnSignInRequest(SignInButton, RegistrationButton, displayRe
         SignInButton.innerHTML = "Sign In";
         BigBackGroundText.style.top = "0%";
         BigBackGroundText.style.marginTop = "0";
+        BigBackGroundText.style.color = "rgba(0,0,0,1)";
 
         RegistrationButton.removeEventListener("click", postRegisterCallBack);
         RegistrationButton.addEventListener("click", displayRegisterCallBack);

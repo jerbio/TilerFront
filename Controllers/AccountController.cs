@@ -407,14 +407,14 @@ namespace TilerFront.Controllers
                     else
                     {
                         LogControlDirect LogToBedeleted = new LogControlDirect(user, db, "");
-                        await LogToBedeleted.DeleteLog();
+                        await LogToBedeleted.DeleteLogOfUnregistedUser();
                     }
                 }
-                retPost = new PostBackData(string.Join("\n", result.Errors), 3);
+                retPost = new PostBackData(string.Join("<br>", result.Errors.Select(obj => obj.Split('.')).SelectMany(obj => obj)), 3);
                 RetValue.Data= (retPost.getPostBack);
                 return RetValue;
             }
-            string AllErrors = string.Join("\n", ModelState.Values.SelectMany(obj=>obj.Errors.Select(obj1=>obj1.ErrorMessage)));
+            string AllErrors = string.Join("<br>", ModelState.Values.SelectMany(obj=>obj.Errors.Select(obj1=>obj1.ErrorMessage)));
             retPost = new PostBackData(AllErrors, 3);
             RetValue.Data = (retPost.getPostBack);
 

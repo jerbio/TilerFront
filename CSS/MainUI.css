@@ -64,17 +64,16 @@ body {
 .ControlPanelButton:first-child { margin-left: 0; }
 
 
-#BigBackGroundText 
-{
-    position:absolute;
-    height:80%;
-    width:100%;
-    text-align:center;
-    font-size:55px;
-    font-weight:900;
-    font-stretch:ultra-condensed;
-    color:black;
-    text-decoration:underline;
+#BigBackGroundText {
+    position: absolute;
+    height: 80%;
+    width: 100%;
+    text-align: center;
+    font-size: 55px;
+    font-weight: 400;
+    font-stretch: normal;
+    color: black;
+    text-decoration: underline;
 }
 
 .radiantBgrnd 
