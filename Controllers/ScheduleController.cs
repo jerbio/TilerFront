@@ -108,10 +108,10 @@ namespace TilerFront.Controllers
                     Select(obj => new UserSchedule.repeatedEventData
                     {
                         ID = obj.Calendar_EventID.ToString(),
-                        Latitude = obj.myLocation.XCoordinate,
-                        Longitude = obj.myLocation.YCoordinate,
-                        RepeatAddress = obj.myLocation.Address,
-                        RepeatAddressDescription = obj.myLocation.Description,
+                        Latitude = obj.Location.XCoordinate,
+                        Longitude = obj.Location.YCoordinate,
+                        RepeatAddress = obj.Location.Address,
+                        RepeatAddressDescription = obj.Location.Description,
                         RepeatCalendarName = obj.getName.NameValue,
                         RepeatCalendarEvents = obj.Repeat.RecurringCalendarEvents().AsParallel().
                                 Select(obj1 => obj1.ToCalEvent(TimelineForData)).ToList(),
@@ -178,10 +178,10 @@ namespace TilerFront.Controllers
                     Select(obj => new UserSchedule.repeatedEventData
                     {
                         ID = obj.Calendar_EventID.ToString(),
-                        Latitude = obj.myLocation.XCoordinate,
-                        Longitude = obj.myLocation.YCoordinate,
-                        RepeatAddress = obj.myLocation.Address,
-                        RepeatAddressDescription = obj.myLocation.Description,
+                        Latitude = obj.Location.XCoordinate,
+                        Longitude = obj.Location.YCoordinate,
+                        RepeatAddress = obj.Location.Address,
+                        RepeatAddressDescription = obj.Location.Description,
                         RepeatCalendarName = obj.getName.NameValue,
                         RepeatCalendarEvents = obj.Repeat.RecurringCalendarEvents().AsParallel().
                             Select(obj1 => obj1.ToDeletedCalEvent(TimelineForData)).ToList(),
