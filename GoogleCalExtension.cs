@@ -214,10 +214,6 @@ namespace TilerFront
                 }
             }
             KeyValuePair<string, Google.Apis.Calendar.v3.Data.Event>[] DictAsArray = RepeatingIDs.ToArray();
-
-
-            //foreach (KeyValuePair<string, Google.Apis.Calendar.v3.Data.Event> eachKeyValuePair in RepeatingIDs)
-
             for (uint j = 0; j < DictAsArray.Length; j++)
             {
                 uint myIndex = i + j;
@@ -249,8 +245,9 @@ namespace TilerFront
             iterlocations.AsParallel().ForAll((location) => {
                 ConcurrentBag<TilerElements.Location> locations;
                 string address = location.Address;
-                address = address.Replace(",", "");
-                address = Regex.Replace(address, @"\s+", "");
+                address = address.Replace(",", "_");
+                address = Regex.Replace(address, @"\s+", "_");
+                address = Regex.Replace(address, @"_+", "_");
                 if (addressesToLocations.ContainsKey(address))
                 {
                     locations = addressesToLocations[address];
@@ -261,7 +258,12 @@ namespace TilerFront
                     bool addSuccess = false;
                     while (!addSuccess)
                     {
+
                         addSuccess = addressesToLocations.TryAdd(address, locations);
+                        if(!addSuccess)
+                        {
+                            addSuccess = addressesToLocations.ContainsKey(address);
+                        }
                     }
                 }
                 if (!String.IsNullOrEmpty(address))
