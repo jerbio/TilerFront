@@ -12,18 +12,6 @@
     if (e.which == 27)
     {
         return;
-
-        /*
-        if (ActivateUserSearch.isActive)
-        {
-            ActivateUserSearch.ClearSearch();
-            return;
-        }
-        else
-        {
-            return;
-        }
-        */
     }
 
 

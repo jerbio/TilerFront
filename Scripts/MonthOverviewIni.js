@@ -1001,7 +1001,6 @@ function multiSelect()
                 alert("oops Jay there is some discrepancy with your multiselect");
             }
             DeselectEleemnt(EventID);
-            debugger;
             delete SelecedIDs[EventID];
             if (Object.keys(SelecedIDs).length < 1) {
                 isMultiSelectActive = false;
@@ -1250,7 +1249,6 @@ function generateDayContainer()
         var FullBarShadeContainer = getDomOrCreateNew("FullGridShadeContainer" + myID + "" + NumberOfShaders);
         $(FullBarShadeContainer).addClass("FullGridShadeContainer");//shade for full grid
         var TimeOfDayTextContainer = getDomOrCreateNew("TimeOfDayTextContainer" + myID + "" + NumberOfShaders,"span");
-        //debugger;
         var Military = 24 - NumberOfShaders;
         var floorValue= Math.floor( Military / 12);
         var DayTime = TimeArray[Military % 12];
@@ -1302,7 +1300,6 @@ function generateDayContainer()
 
     function onMouseIn()
     {
-        //debugger;
         setTimeout(function ()
         {
             if (FullGridContainer.isEnabled) {
@@ -1466,7 +1463,6 @@ function scrollToDay(refDate)
 
     if (j)
     {
-        //debugger;
         var bar = (i * parseInt(WidthInPixels)) - (WidthInPixels*3.5);
         WidthInPixels = bar;
         $("#NameOfWeekContainerPlane").animate({ scrollLeft: WidthInPixels }, 1000);
@@ -2033,18 +2029,6 @@ getRefreshedData.pauseUnEnroll = function (Id) {
                 //DayOfWeek.UISpecs[ID].Dom.Enabled = false;
                 
                 var HeightPx=(DayOfWeek.UISpecs[ID].css.height/100)*global_DayHeight;
-                if (DayOfWeek.UISpecs[ID].css.height < MinPercent)
-                {
-                    //HeightPx=40;
-                }
-                /*
-                if ((ID == "111414_7_0_111415") || (ID == "111426_7_0_111427"))
-                {
-                    //debugger;
-                }
-                */
-                //var TopPixels=IntersectingArrayData[i].top;
-                //var EndPixelTop = TopPixels + HeightPx;
                 var EndPixelTop =IntersectingArrayData[i].end;
                 //IntersectingArrayData[i].BestBottom.End = EndPixelTop
 
@@ -2117,7 +2101,6 @@ getRefreshedData.pauseUnEnroll = function (Id) {
 
     function PositionIconSet(DayContainer, SubEventDom)
     {
-        //debugger;
         DayContainer = DayContainer.Parent;
         //var IconSetContainer = global_ControlPanelIconSet.getIconSetContainer();
         var ControlPanelContainer = getDomOrCreateNew("ControlPanelContainer");
@@ -2364,13 +2347,6 @@ getRefreshedData.pauseUnEnroll = function (Id) {
             else {
                 break;
             }
-
-
-            /*
-            if (AllElements[Index].BestBottom.End <= myTop) {
-                AllElements[i].Count = AllElements[Index].BestBottom.Count;
-                AllElements[Index].BestBottom.End = End
-            }*/
         }
 
         return retValue;
@@ -2411,7 +2387,6 @@ function renderClassicSubEventLook(DayOfWeek, ID, MyArray, Index, TabCount)
     return function () {
         //debugger;
         var GridSubEventWidth = renderClassicSubEventLook.PercentWidthOfDay;// / TabCount;
-        //DayOfWeek.UISpecs[ID].Dom.style.left = "100%";
         var RefEvent = DayOfWeek.UISpecs[ID]
 
         var ArrayElement = MyArray[Index];
@@ -2421,19 +2396,6 @@ function renderClassicSubEventLook(DayOfWeek, ID, MyArray, Index, TabCount)
         var LeftShift = NumberOfLeftShifts;
         var DomWidth = (GridSubEventWidth - NumberOfLeftShifts)
         DomWidth -= ArrayElement.OverlappingAfterMe;
-        /*
-        DomWidth /= (ArrayElement.OverlappingCount + 1);
-
-        var MaxCounts =(( GridSubEventWidth / DomWidth)-1);
-
-        LeftShift = (MaxCounts - LeftShift);
-        if (LeftShift < 0)
-        {
-            LeftShift = Math.abs(LeftShift) / 2;
-        }
-        */
-
-        //LeftShift *= DomWidth;
 
         LeftPercent = LeftPercent + LeftShift;
         $(RefEvent.Dom).addClass("ClassicGridEvents");
@@ -2493,12 +2455,10 @@ function renderSideBarEvents(DayOfWeek, ID, MyArray, Index, TabCount)
         var BindToThis = BindClickOfSideBarToCLick(MyArray, RefEvent, Index, RefEvent.Dom,ID);
         var Range = global_DictionaryOfSubEvents[ID].Day;
         RefEvent.refrenceListElement.Dom.onmouseover = function () {
-            //debugger;
             Range.Parent.onmouseover();
         }
 
         RefEvent.refrenceListElement.Dom.onmouseout = function () {
-            //debugger;
             Range.Parent.onmouseout();
         }
 
@@ -3442,7 +3402,6 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                 ControlPanelLocationButton.onclick = LauchLocation;
 
                 ProcatinationButton.onclick = function () {
-                    debugger;
                     procrastinateEvent();
                     closeProcrastinatePanel();
                 }
@@ -3530,29 +3489,34 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                 function CombinedCLoser()
                 {
                     BindClickOfSideBarToCLick.reset();
-                    TriggerClose();
+                    TriggerClose(false);
                 }
 
 
-                function TriggerClose() {
+                function TriggerClose(slideClose = true) {
                     getRefreshedData.enableDataRefresh();
                     resetButtons();
                     DeselectAllSideBarElements();
                     closeModalDelete();
-                    closeProcrastinatePanel();
+                    closeProcrastinatePanel(true);
                     deleteButton.onclick = null;
                     completeButton.onclick = null;
                     PauseResumeButton.onclick = null;
-                    $(ControlPanelContainer).slideUp(500);
+                    if (slideClose) {
+                        $(ControlPanelContainer).slideUp(500);
+                    } else {
+                        $(ControlPanelContainer).slideUp(0);
+                    }
+                    
                     document.removeEventListener("keydown", containerKeyPress);
                     global_UISetup.RenderOnSubEventClick.isRefListSubEventClicked = false;
                     global_UISetup.RenderOnSubEventClick.BottomPanelIsOpen = false;
-                
+                    ActivateUserSearch.setSearchAsOn();
                     if (IconSetContainer.parentNode != null) {
                         IconSetContainer.parentNode.removeChild(IconSetContainer);
                     }
                     $(ControlPanelContainer).removeClass("ControlPanelContainerLowerBar");
-                    setTimeout(function(){ $(ControlPanelContainer).removeClass("ControlPanelContainerModal")},500);
+                    setTimeout(function(){ $(ControlPanelContainer).removeClass("ControlPanelContainerModal")},0);
                 }
 
 
@@ -3566,10 +3530,20 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
             
             
 
-                function closeProcrastinatePanel() {
-                    $(ProcrastinateEventModalContainer).slideUp(500);
+                function closeProcrastinatePanel(slidePanel) {
+                    getDomOrCreateNew("procrastinateHours").value = ""
+                    getDomOrCreateNew("procrastinateMins").value = ""
+                    getDomOrCreateNew("procrastinateDays").value = ""
+                    if (slidePanel) {
+                        $(ProcrastinateEventModalContainer).slideUp(500);
+                    } else {
+                        $(ProcrastinateEventModalContainer).slideUp(0);
+                    }
+                    
                 }
-
+                closeProcrastinatePanel(false)
+                closeModalDelete(false)
+                ActivateUserSearch.setSearchAsOff();
                 ControlPanelCloseButton.onclick = global_ExitManager.triggerLastExitAndPop;
 
                 function pauseEvent()
@@ -3762,10 +3736,6 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                         });
                 }
                     function triggerUIUPdate() {
-                        //alert("we are deleting " + SubEvent.ID);
-                        //$('#ConfirmDeleteModal').slideToggle();
-                        //$('#ControlPanelContainer').slideUp(500);
-                        //resetButtons();
                         global_ExitManager.triggerLastExitAndPop();
                 }
 
@@ -3908,9 +3878,13 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
 
             }
 
-                function closeModalDelete() {
+                function closeModalDelete(slidePanel = true) {
                     DeleteMessage.innerHTML = "Sure you want to delete ?"
-                    $('#ConfirmDeleteModal').slideUp(500);
+                    if (slidePanel) {
+                        $('#ConfirmDeleteModal').slideUp(500);
+                    } else {
+                        $('#ConfirmDeleteModal').slideUp(0);
+                    }
                     ModalDelete.isRevealed = false;
                 }
                 deleteButton.onclick = deleteSubevent;
