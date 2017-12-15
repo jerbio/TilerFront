@@ -178,7 +178,7 @@ namespace TilerFront
             return RetValue;
         }
 
-        public async static Task<IEnumerable<CalendarEvent>> getAllCalEvents(IList<Google.Apis.Calendar.v3.Data.Event> AllSubCals, Google.Apis.Calendar.v3.CalendarService CalendarServiceData, string UserID,EventID AuthenticationID, TimeLine CalculationTimeLine)
+        public async static Task<IEnumerable<CalendarEvent>> getAllCalEvents(IList<Google.Apis.Calendar.v3.Data.Event> AllSubCals, Google.Apis.Calendar.v3.CalendarService CalendarServiceData, string UserID,EventID AuthenticationID, TimeLine CalculationTimeLine, bool retrieveLocationFromGoogle)
         {
             List<Google.Apis.Calendar.v3.Data.Event> AllSubCalNoCancels = AllSubCals.Where(obj => obj.Status != "cancelled").ToList();
 
@@ -234,8 +234,11 @@ namespace TilerFront
                 }
             }
 
-            HashSet<TilerElements.Location> hashLocation = new HashSet<TilerElements.Location>(locations);
-            batchValidateLocations(hashLocation);
+            if(retrieveLocationFromGoogle)
+            {
+                HashSet<TilerElements.Location> hashLocation = new HashSet<TilerElements.Location>(locations);
+                batchValidateLocations(hashLocation);
+            }
             return RetValue;
         }
 

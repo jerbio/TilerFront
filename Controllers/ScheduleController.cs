@@ -80,13 +80,6 @@ namespace TilerFront.Controllers
                     var GoogleTilerEventControlobj = new GoogleTilerEventControl(obj, db);
                 }
 
-
-
-
-
-
-                //List<Task<List<CalendarEvent>>> getAllCalTasks = AllGoogleTilerEvents.Select(obj => obj.getCalendarEvents()).ToList();
-
                 List<CalendarEvent> ScheduleData = new List<CalendarEvent>();
 
                 Task<ConcurrentBag<CalendarEvent>> GoogleCalEventsTask = GoogleTilerEventControl.getAllCalEvents(AllGoogleTilerEvents, TimelineForData);
@@ -100,10 +93,6 @@ namespace TilerFront.Controllers
                 ScheduleData = ScheduleData.Concat(GoogleCalEvents).ToList();
                 IEnumerable<CalendarEvent> NonRepeatingEvents = ScheduleData.Where(obj => !obj.RepetitionStatus);
 
-
-
-
-                //IEnumerable<CalendarEvent> RepeatingEvents = ScheduleData.Where(obj => obj.RepetitionStatus).SelectMany(obj => obj.Repeat.RecurringCalendarEvents);
                 IList<UserSchedule.repeatedEventData> RepeatingEvents = ScheduleData.AsParallel().Where(obj => obj.RepetitionStatus).
                     Select(obj => new UserSchedule.repeatedEventData
                     {
@@ -432,12 +421,12 @@ namespace TilerFront.Controllers
         /// <param name="mySchedule"></param>
         /// <param name="TilerUserID"></param>
         /// <returns></returns>
-        static internal async Task updatemyScheduleWithGoogleThirdpartyCalendar(Schedule mySchedule, string TilerUserID, ApplicationDbContext db, TimeLine calucaltionTimeLine = null)
+        static internal async Task updatemyScheduleWithGoogleThirdpartyCalendar(Schedule mySchedule, string TilerUserID, ApplicationDbContext db, TimeLine calcultionTimeLine = null, bool getGoogleLocation = true)
         {
             List<IndexedThirdPartyAuthentication> AllIndexedThirdParty = await getAllThirdPartyAuthentication(TilerUserID, db).ConfigureAwait(false);
             List<GoogleTilerEventControl> AllGoogleTilerEvents = AllIndexedThirdParty.Select(obj => new GoogleTilerEventControl (obj, db)).ToList();
 
-            Tuple<List<GoogleTilerEventControl>, GoogleThirdPartyControl> GoogleEvents = await GoogleTilerEventControl.getThirdPartyControlForIndex(AllGoogleTilerEvents, calucaltionTimeLine).ConfigureAwait(false);
+            Tuple<List<GoogleTilerEventControl>, GoogleThirdPartyControl> GoogleEvents = await GoogleTilerEventControl.getThirdPartyControlForIndex(AllGoogleTilerEvents, calcultionTimeLine, getGoogleLocation).ConfigureAwait(false);
             Task DeleteInvalidAuthentication = ManageController.delelteGoogleAuthentication(GoogleEvents.Item1.Select(obj => obj.getDBAuthenticationData()));
             mySchedule.updateDataSetWithThirdPartyData(new Tuple<ThirdPartyControl.CalendarTool, IEnumerable<CalendarEvent>>(ThirdPartyControl.CalendarTool.google,new List<CalendarEvent> {GoogleEvents.Item2.getThirdpartyCalendarEvent()}));
             //mySchedule.updateDataSetWithThirdPartyData(new Tuple<ThirdPartyControl.CalendarTool.Google, GoogleEvents.Item2.);
