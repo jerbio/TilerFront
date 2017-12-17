@@ -121,11 +121,11 @@ namespace TilerFront.Models
         /// </summary>
         public string TimeZoneOrigin { get; set; } = "UTC";
 
-        public RestrictionProfile getRestrictionProfile()
+        public RestrictionProfile getRestrictionProfile(DateTimeOffset currentTime)
         {
             bool EveryDayFlag = Boolean.Parse(isEveryDay);
             bool WorkWeek = Boolean.Parse(isWorkWeek);
-            DateTimeOffset myNow = DateTimeOffset.UtcNow;
+            DateTimeOffset myNow = currentTime;
             DateTimeOffset RestrictStart = new DateTimeOffset(myNow.Year, myNow.Month, myNow.Day, 0,0, 0,new TimeSpan());
             RestrictStart = RestrictStart.Add(-getTImeSpan);
             DateTimeOffset RestrictEnd = RestrictStart.AddSeconds(-1);

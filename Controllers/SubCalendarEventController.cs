@@ -35,7 +35,6 @@ namespace TilerFront.Controllers
                     case "google":
                         {
                             DateTimeOffset myNow = myUser.getRefNow();
-                            myNow = DateTimeOffset.UtcNow;
 
                             DB_Schedule NewSchedule = new DB_Schedule(retrievedUser, myNow);
 
@@ -55,7 +54,7 @@ namespace TilerFront.Controllers
                     case "tiler":
                         {
                             DateTimeOffset myNow = myUser.getRefNow();
-                            myNow = DateTimeOffset.UtcNow;
+                            myNow = myUser.getRefNow();
                             DB_Schedule NewSchedule = new DB_Schedule(retrievedUser, myNow);
 
                             await ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(NewSchedule, retrievedUser.UserID, db).ConfigureAwait(false);
@@ -73,7 +72,6 @@ namespace TilerFront.Controllers
                             DateTimeOffset Deadline = TilerElementExtension.JSStartTime.AddMilliseconds(LongDeadline);
                             Deadline = Deadline.Add(myUser.getTImeSpan);
                             int SplitCount = (int)myUser.Split;
-                            //TimeSpan SpanPerSplit = TimeSpan.FromMilliseconds(myUser.Duration);
                             Tuple<CustomErrors, Dictionary<string, CalendarEvent>> ScheduleUpdateMessage = NewSchedule.BundleChangeUpdate(myUser.EventID,  new EventName(myUser.EventName), newStart, newEnd, Begin, Deadline, SplitCount);//, SpanPerSplit);
                             DB_UserActivity activity = new DB_UserActivity(myNow, UserActivity.ActivityType.InternalUpdate, new List<String>() { myUser.EventID });
                             retrievedUser.ScheduleLogControl.updateUserActivty(activity);
