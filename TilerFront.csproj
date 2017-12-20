@@ -103,6 +103,7 @@
       <HintPath>..\packages\Google.Apis.Plus.v1.1.29.1.970\lib\net45\Google.Apis.Plus.v1.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="GoogleMapsApi, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null" />
     <Reference Include="log4net, Version=2.0.8.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
       <HintPath>..\packages\log4net.2.0.8\lib\net45-full\log4net.dll</HintPath>
       <Private>True</Private>
@@ -438,6 +439,7 @@
     <Compile Include="Controllers\UserController.cs" />
     <Content Include="App_Data\XmlDocument.xml" />
     <Content Include="Areas\HelpPage\HelpPage.css" />
+    <Compile Include="Controllers\WhatIfController.cs" />
     <Compile Include="DB_Schedule.cs" />
     <Compile Include="DTOs\PostBackStruct.cs" />
     <Compile Include="DTOs\PostError.cs" />
@@ -527,6 +529,7 @@
     <Compile Include="Models\UnregisteredUser.cs" />
     <Compile Include="Models\UrgencyTier.cs" />
     <Compile Include="Models\UserSchedule.cs" />
+    <Compile Include="Models\WhatIfModel.cs" />
     <Compile Include="OutLookConnector.cs" />
     <Compile Include="PeekResult.cs" />
     <Compile Include="PostBackData.cs" />
@@ -2726,6 +2729,7 @@
     <Folder Include="BigDataLogs\" />
     <Folder Include="Views\GoogleNotifications\" />
     <Folder Include="Views\GoogleNotification\" />
+    <Folder Include="Views\WhatIf\" />
     <Folder Include="WagTapCalLogs\" />
   </ItemGroup>
   <ItemGroup>

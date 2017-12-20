@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -106,8 +107,13 @@ namespace TilerFront
         {
             get
             {
-
+                JObject retValueJson = new JObject();
+                JObject error = new JObject();
+                error.Add("code", Status);
+                error.Add("Message", getErrorMessage(Status));
+                retValueJson.Add("Content", Data);
                 string retValue = "{\"Error\":{\"code\":\"" + Status + "\",\"Message\":\"" + getErrorMessage(Status) + "\"},\"Content\":" + Data + "}";
+                retValue = retValueJson.ToString();
                 return retValue;
             }
         }
