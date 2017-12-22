@@ -97,8 +97,17 @@ namespace TilerFront
         { 
             get
             {
-                TilerFront.Models.PostError retPostError = new TilerFront.Models.PostError() { code = this.Status.ToString(), Message = getErrorMessage(Status) };
-                TilerFront.Models.PostBackStruct PostBackData = new TilerFront.Models.PostBackStruct { Error = retPostError, Content = this.Data };
+                TilerFront.Models.PostBackStruct PostBackData;
+                if (this.Status == 0)
+                {
+                    PostBackData = new TilerFront.Models.PostBackStruct { Content = this.Data };
+                }
+                else
+                {
+                    TilerFront.Models.PostError retPostError = new TilerFront.Models.PostError() { code = this.Status.ToString(), Message = getErrorMessage(Status) };
+                    PostBackData = new TilerFront.Models.PostBackStruct { Error = retPostError, Content = this.Data };
+                }
+
                 return PostBackData;
             }
         }

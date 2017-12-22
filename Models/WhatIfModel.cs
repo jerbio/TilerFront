@@ -27,7 +27,7 @@ namespace TilerFront.Models
                 TimeSpan retValue;
                 if (DurationInMs != -1)
                 {
-                    retValue = TimeSpan.FromMilliseconds(DurationInMs * 1000);
+                    retValue = TimeSpan.FromMilliseconds(DurationInMs);
                 }
                 else
                 {

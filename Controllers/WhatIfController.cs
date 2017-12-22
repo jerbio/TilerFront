@@ -22,12 +22,12 @@ namespace TilerFront.Controllers
             if (myUserAccount.Status)
             {
                 DB_Schedule MySchedule = new DB_Schedule(myUserAccount, myAuthorizedUser.getRefNow());
-                Tuple<HealthEvaluation, HealthEvaluation> evaluation;
+                Tuple<Health, Health> evaluation;
                 if (String.IsNullOrEmpty(UserData.EventId)) {
                     evaluation = await MySchedule.WhatIfPushedAll(UserData.Duration, null);
                 } else
                 {
-                    evaluation = await MySchedule.WhatIfPushedAll(UserData.Duration, null);
+                    evaluation = await MySchedule.WhatIfPushed(UserData.Duration, new EventID (UserData.EventId), null);
                 }
 
                 JObject before = evaluation.Item1.ToJson();

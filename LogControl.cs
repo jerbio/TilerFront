@@ -988,6 +988,10 @@ namespace TilerFront
             MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.getTimeZone;
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("TimeCreaated"));
             MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.TimeCreated.ToString();
+            MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("TravelTimeAfter"));
+            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.TravelTimeAfter.ToString();
+            MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("TravelTimeBefore"));
+            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.TravelTimeBefore.ToString();
 
             if (MySubEvent.getIsEventRestricted)
             {
@@ -1911,6 +1915,12 @@ namespace TilerFront
                     retrievedSubEvent.TimeCreated = timeCreated;
                 }
 
+                TimeSpan TravelTimeAfter;
+                TimeSpan TravelTimeBefore;
+                TimeSpan.TryParse(MyXmlNode.ChildNodes[i].SelectSingleNode("TravelTimeAfter")?.InnerText ?? "", out TravelTimeAfter);
+                TimeSpan.TryParse(MyXmlNode.ChildNodes[i].SelectSingleNode("TravelTimeBefore")?.InnerText ?? "", out TravelTimeBefore);
+                retrievedSubEvent.TravelTimeAfter = TravelTimeAfter;
+                retrievedSubEvent.TravelTimeBefore = TravelTimeBefore;
                 MyArrayOfNodes.Add(retrievedSubEvent);
                 createReasonObjects(retrievedSubEvent, MyXmlNode.ChildNodes[i]);
             }
