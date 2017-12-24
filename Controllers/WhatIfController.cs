@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
+using System.Web.Http.Description;
 using System.Web.Mvc;
 using TilerElements;
 using TilerFront.Models;
@@ -13,6 +14,9 @@ namespace TilerFront.Controllers
 {
     public class WhatIfController : TilerApiController
     {
+        [System.Web.Http.HttpPost]
+        [ResponseType(typeof(PostBackStruct))]
+        [System.Web.Http.Route("api/WhatIf/PushedAll")]
         public async Task<IHttpActionResult> pushed([FromBody]WhatIfModel UserData)
         {
             AuthorizedUser myAuthorizedUser = UserData.User;
@@ -41,6 +45,9 @@ namespace TilerFront.Controllers
             return Ok(returnPostBack.getPostBack);
         }
 
+        [System.Web.Http.HttpPost]
+        [ResponseType(typeof(PostBackStruct))]
+        [System.Web.Http.Route("api/WhatIf/PushedNext")]
         public async Task<IHttpActionResult> pushedNext([FromBody]WhatIfModel UserData)
         {
             AuthorizedUser myAuthorizedUser = UserData.User;
