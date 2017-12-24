@@ -596,6 +596,7 @@
     <Content Include="img\TilerScreenWithMacNoBgrndCropped.png" />
     <Content Include="LoggedInUser.html" />
     <Content Include="MonthOverView.html" />
+    <Content Include="Scripts\AddNewEvent_Desktop0.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Scripts\Chart.js" />
@@ -2592,7 +2593,6 @@
     <Content Include="img\Icons\Weather\Unknow.png" />
     <Content Include="img\Icons\Weather\Whirl.png" />
     <Content Include="Scripts\AddNewEvent.js" />
-    <Content Include="Scripts\AddNewEvent_Desktop0.js" />
     <Content Include="Scripts\blur.min.js" />
     <Content Include="Scripts\bootstrap-datepicker.js" />
     <Content Include="ApplicationInsights.config">
