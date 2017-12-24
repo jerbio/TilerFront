@@ -1206,24 +1206,6 @@ namespace TilerFront.Controllers
                     DateTimeOffset newEndTime = FullEndTime;
 
                     string Frequency = RepeatFrequency.Trim().ToUpper();
-                    switch (Frequency)
-                    {
-                        case "DAILY":
-                            //FullEndTime = FullStartTime.AddDays(1);
-                            break;
-                        case "WEEKLY":
-                            //FullEndTime = FullStartTime.AddDays(7);
-                            break;
-                        case "MONTHLY":
-                            //FullEndTime = FullStartTime.AddMonths(1);
-                            break;
-                        case "YEARLY":
-                            //FullEndTime = FullStartTime.AddYears(1);
-                            break;
-                        default:
-                            break;
-                    }
-
                     RepeatEnd = newEndTime;
                 }
 
@@ -1320,49 +1302,6 @@ namespace TilerFront.Controllers
         /// <param name="DaySelection"></param>
         /// <returns></returns>
         [ApiExplorerSettings(IgnoreApi = true)]
-        /*
-        RestrictionProfile CreateRestrictionProfile(string Start, string End,string workWeek,TimeSpan TimeZoneOffSet ,string DaySelection="")
-        { 
-            DateTimeOffset RestrictStart = DateTimeOffset.Parse(Start).UtcDateTime;
-            RestrictStart=RestrictStart.Add(TimeZoneOffSet);
-            DateTimeOffset RestrictEnd = DateTimeOffset.Parse(End).UtcDateTime;
-            RestrictEnd=RestrictEnd.Add(TimeZoneOffSet);
-            bool WorkWeekFlag = Convert.ToBoolean(workWeek);
-
-            List<mTuple<bool, DayOfWeek>> allElements = (new mTuple<bool, System.DayOfWeek>[7]).ToList();
-            allElements[(int)DayOfWeek.Sunday] = new mTuple<bool, System.DayOfWeek>(false, DayOfWeek.Sunday);
-            allElements[(int)DayOfWeek.Monday] = new mTuple<bool, System.DayOfWeek>(false, DayOfWeek.Monday);
-            allElements[(int)DayOfWeek.Tuesday] = new mTuple<bool, System.DayOfWeek>(false, DayOfWeek.Tuesday);
-            allElements[(int)DayOfWeek.Wednesday] = new mTuple<bool, System.DayOfWeek>(false, DayOfWeek.Wednesday);
-            allElements[(int)DayOfWeek.Thursday] = new mTuple<bool, System.DayOfWeek>(false, DayOfWeek.Thursday);
-            allElements[(int)DayOfWeek.Friday] = new mTuple<bool, System.DayOfWeek>(false, DayOfWeek.Friday);
-            allElements[(int)DayOfWeek.Saturday] = new mTuple<bool, System.DayOfWeek>(false, DayOfWeek.Saturday);
-
-
-            DayOfWeek[] selectedDaysOftheweek = { };
-
-            if (!string.IsNullOrEmpty(DaySelection))
-            {
-                selectedDaysOftheweek = DaySelection.Split(',').Where(obj => !String.IsNullOrEmpty(obj)).Select(obj => RestrictionProfile.AllDaysOfWeek[Convert.ToInt32(obj)]).ToArray();
-            }
-            else 
-            {
-                selectedDaysOftheweek = RestrictionProfile.AllDaysOfWeek.ToArray();
-            }
-            RestrictionProfile retValue;
-            if (WorkWeekFlag)
-            {
-                retValue = new RestrictionProfile(7, DayOfWeek.Monday, RestrictStart, RestrictEnd);
-            }
-            else
-            {
-                RestrictionTimeLine  RestrictionTimeLine = new TilerElements.RestrictionTimeLine(RestrictStart,RestrictEnd);
-                retValue = new RestrictionProfile(selectedDaysOftheweek, RestrictionTimeLine);
-            }
-            return retValue;
-        }
-        */
-
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);
