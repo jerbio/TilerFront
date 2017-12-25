@@ -992,6 +992,10 @@ namespace TilerFront
             MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.TravelTimeAfter.ToString();
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("TravelTimeBefore"));
             MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.TravelTimeBefore.ToString();
+            MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("isWake"));
+            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.isWake.ToString();
+            MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("isSleep"));
+            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.isSleep.ToString();
 
             if (MySubEvent.getIsEventRestricted)
             {
@@ -1919,6 +1923,14 @@ namespace TilerFront
                 TimeSpan TravelTimeBefore;
                 TimeSpan.TryParse(MyXmlNode.ChildNodes[i].SelectSingleNode("TravelTimeAfter")?.InnerText ?? "", out TravelTimeAfter);
                 TimeSpan.TryParse(MyXmlNode.ChildNodes[i].SelectSingleNode("TravelTimeBefore")?.InnerText ?? "", out TravelTimeBefore);
+
+                bool isSleep, isWake;
+                bool.TryParse(MyXmlNode.ChildNodes[i].SelectSingleNode("isSleep")?.InnerText ?? "", out isSleep);
+                bool.TryParse(MyXmlNode.ChildNodes[i].SelectSingleNode("isWake")?.InnerText ?? "", out isWake);
+
+                retrievedSubEvent.isSleep = isSleep;
+                retrievedSubEvent.isWake = isWake;
+
                 retrievedSubEvent.TravelTimeAfter = TravelTimeAfter;
                 retrievedSubEvent.TravelTimeBefore = TravelTimeBefore;
                 MyArrayOfNodes.Add(retrievedSubEvent);
