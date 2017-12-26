@@ -11,6 +11,7 @@ namespace TilerFront.Models
         public long DurationInMs { get; set; } = -1;
         public string EventId { get; set; }
         public string FormattedAsISO8601 { get; set; }
+        public long NewTime { get; set; } = -1;
 
         public AuthorizedUser User
         {
@@ -31,12 +32,20 @@ namespace TilerFront.Models
                 }
                 else
                 {
-                    retValue = System.Xml.XmlConvert.ToTimeSpan(FormattedAsISO8601);
-                    if(string.IsNullOrEmpty(FormattedAsISO8601))
+                    if(NewTime != -1)
                     {
-                        throw new CustomErrors("Properties of WhatIfModel not properly initialized");
+                        retValue = refNow - Utility.JSStartTime.AddMilliseconds(NewTime);
+                    }
+                    else
+                    {
+                        retValue = System.Xml.XmlConvert.ToTimeSpan(FormattedAsISO8601);
+                        if (string.IsNullOrEmpty(FormattedAsISO8601))
+                        {
+                            throw new CustomErrors("Properties of WhatIfModel not properly initialized");
+                        }
                     }
                 }
+                
                 
                 return retValue;
             }

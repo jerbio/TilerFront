@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using DBTilerElement;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -58,26 +60,42 @@ namespace TilerFront.Controllers
             {
                 DB_Schedule MySchedule = new DB_Schedule(myUserAccount, myAuthorizedUser.getRefNow());
                 Tuple<Health, Health> evaluation;
-                
-                
-                if (String.IsNullOrEmpty(UserData.EventId))
-                {
-                    var calEventAndSubEvent = MySchedule.getNearestEventToNow();
-                    EventID eventId = new EventID(calEventAndSubEvent.Item2.getId);
-                    evaluation = await MySchedule.WhatIfPushed(UserData.Duration, eventId, null);
-                }
-                else
-                {
-                    evaluation = await MySchedule.WhatIfPushed(UserData.Duration, new EventID(UserData.EventId), null);
-                }
 
-                JObject before = evaluation.Item1.ToJson();
-                JObject after = evaluation.Item2.ToJson();
-                JObject resultData = new JObject();
-                resultData.Add("before", before);
-                resultData.Add("after", after);
-                returnPostBack = new PostBackData(resultData, 0);
-                return Ok(returnPostBack.getPostBack);
+                SubCalendarEvent subEvent = null;
+                try
+                {
+                    if (String.IsNullOrEmpty(UserData.EventId))
+                    {
+                        var calEventAndSubEvent = MySchedule.getNearestEventToNow();
+                        subEvent = calEventAndSubEvent.Item2;
+                        EventID eventId = new EventID(calEventAndSubEvent.Item2.getId);
+                        evaluation = await MySchedule.WhatIfPushed(UserData.Duration, eventId, null);
+                    }
+                    else
+                    {
+                        evaluation = await MySchedule.WhatIfPushed(UserData.Duration, new EventID(UserData.EventId), null);
+                    }
+
+                    JObject before = evaluation.Item1.ToJson();
+                    JObject after = evaluation.Item2.ToJson();
+                    JObject resultData = new JObject();
+                    if (subEvent != null)
+                    {
+                        SubCalEvent subcalevent = subEvent.ToSubCalEvent();
+                        JObject jsonSubcal = JObject.FromObject(subcalevent);
+                        resultData.Add("subEvent", jsonSubcal);
+                    }
+
+                    resultData.Add("before", before);
+                    resultData.Add("after", after);
+                    returnPostBack = new PostBackData(resultData, 0);
+                    return Ok(returnPostBack.getPostBack);
+                }
+                catch (CustomErrors error)
+                {
+                    return BadRequest(error.Message);
+                }
+                
             }
             else
             {
