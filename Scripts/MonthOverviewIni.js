@@ -3231,7 +3231,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                     $(myDom).addClass("SelectedWeekGridSubcalEvent");
                     global_previousSelectedSubCalEvent.push(myDom);
                     myDom.focus();
-            }
+                }
 
                   var ControlPanelNameOfSubeventInfo = document.getElementById("ControlPanelNameOfSubeventInfo");
                   var ControlPanelDeadlineOfSubeventInfo = document.getElementById("ControlPanelDeadlineOfSubeventInfo");
@@ -3348,6 +3348,9 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                 var ProcatinationCancelButton = getDomOrCreateNew("cancelProcatination");
                 var ControlPanelCloseButton = global_ControlPanelIconSet.getCloseButton();
                 var ProcrastinateEventModalContainer = getDomOrCreateNew("ProcrastinateEventModal");
+                let NotesModal = getDomOrCreateNew("NotesModal");
+                let NotesCancel = getDomOrCreateNew("cancelNotes");
+                let NotesSubmit = getDomOrCreateNew("submitNotes");
                 var ControlPanelProcrastinateButton = global_ControlPanelIconSet.getProcrastinateButton();
                 var ControlPanelLocationButton = global_ControlPanelIconSet.getLocationButton();
                 var ModalDelete = getDomOrCreateNew("ConfirmDeleteModal")
@@ -3415,7 +3418,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                     ControlPanelProcrastinateButton.onclick = null;
                     ControlPanelCloseButton.onclick = null;
                     ControlPanelLocationButton.onclick = null;
-            }
+                }
 
                 function generateBasePanel()
                 {
@@ -3435,11 +3438,32 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                             closeProcrastinatePanel();
                         }
                     }
-
-                
-
                 }
 
+                function slideOpenNotesModal() {
+                    NotesModal.focus();
+                    $(NotesModal).slideDown(500);
+                    NotesModal.onkeydown = NotesModal;
+                    function notesContainerKeyPress(e) {
+                        e.stopPropagation();
+                        if (e.which == 27)//escape key press
+                        {
+                            closeNotesPanel();
+                        }
+                    }
+                }
+
+
+                function closeNotesPanel(slidePanel) {
+                    getDomOrCreateNew("notesArea").value = ""
+                    if (slidePanel) {
+                        $(NotesModal).slideUp(500);
+                    } else {
+                        $(NotesModal).slideUp(0);
+                    }
+                }
+
+                NotesCancel.onclick = closeNotesPanel
                 function generateEditDoneCOntainer()
                 {
                     var SaveButton = getDomOrCreateNew("SaveButton", "button");
@@ -3499,6 +3523,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                     DeselectAllSideBarElements();
                     closeModalDelete();
                     closeProcrastinatePanel(true);
+                    closeNotesPanel(true)
                     deleteButton.onclick = null;
                     completeButton.onclick = null;
                     PauseResumeButton.onclick = null;
@@ -4046,9 +4071,18 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                 ControlPanelNameOfSubeventInfo.appendChild(NameContanierInput);
 
 
-                function removeInputBindings()
+                function renderNotesUIData(subEvent)
                 {
-                
+                    let editNotesbutton = getDomOrCreateNew("editNotes", "button");
+                    editNotesbutton.innerHTML = 'Edit Notes'
+                    editNotesbutton.onclick = slideOpenNotesModal
+                    let retValue = {
+                        button: editNotesbutton ,
+                        getNotesValue: function () {
+
+                        },
+                    }
+                    return retValue;
                 }
             
                 function extraOptionsData()
@@ -4060,17 +4094,25 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                     splitInputBox.onkeydown = stopPropagationOfKeyDown;
                     splitInputBox.value = Dictionary_OfCalendarData[SubEvent.CalendarID].TotalNumberOfEvents;
                     var splitInputBoxLabel = getDomOrCreateNew("splitInputBoxLabel","label");
-                    splitInputBoxLabel.innerHTML="Splits"
+                    splitInputBoxLabel.innerHTML = "Splits"
+                    var splitAndNoteContainer = getDomOrCreateNew("SplitCountAndNoteContainer");
+                    $(splitAndNoteContainer).addClass("SubEventInformationContainer");
                     var splitInputBoxContainer = getDomOrCreateNew("InputSplitCountContainer");
                     splitInputBoxContainer.appendChild(splitInputBoxLabel);
                     splitInputBoxContainer.appendChild(splitInputBox);
-                    $(splitInputBoxContainer).addClass("SubEventInformationContainer");
+
+
+                    let renderNoteResult = renderNotesUIData(null)
+
+
+                    splitAndNoteContainer.appendChild(splitInputBoxContainer)
+                    splitAndNoteContainer.appendChild(renderNoteResult.button)
 
                     var CompletionMap = getDomOrCreateNew("CompletionContainer");
                     var CompletionMapDom= generateCompletionMap(SubEvent)
                     CompletionMap .appendChild(CompletionMapDom);
                     var ContainerForExtraOptions = getDomOrCreateNew("ExtraOptionsContainer")
-                    ContainerForExtraOptions.appendChild(splitInputBoxContainer)
+                    ContainerForExtraOptions.appendChild(splitAndNoteContainer)
                     ContainerForExtraOptions.appendChild(CompletionMap)
                 
                     return ContainerForExtraOptions;
