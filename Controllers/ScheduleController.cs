@@ -558,7 +558,7 @@ namespace TilerFront.Controllers
                     location = TilerElements.Location.getDefaultLocation();
                 }
                 await MySchedule.FindMeSomethingToDo(location);
-                MySchedule.WriteFullScheduleToLogAndOutlook().Wait();
+                await MySchedule.WriteFullScheduleToLogAndOutlook().ConfigureAwait(false);
                 BusyTimeLine nextBusySchedule = MySchedule.NextActivity;
                 PostBackData myPostData;
                 if (nextBusySchedule != null)

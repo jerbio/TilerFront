@@ -4,6 +4,8 @@ using System.Linq;
 using System.Web;
 using System.Threading;
 using System.Web.Mvc;
+using BigDataTiler;
+using TilerElements;
 
 
 namespace TilerFront.Controllers
@@ -13,8 +15,6 @@ namespace TilerFront.Controllers
     {
         public ActionResult Index()
         {
-            //return View();
-            ///*
             if (User.Identity.IsAuthenticated)
             {
                 if (Request.Browser.IsMobileDevice)
@@ -31,9 +31,6 @@ namespace TilerFront.Controllers
             {
                 return View();
             }
-            
-            //*/
-            
         }
 
         [HttpPost]
