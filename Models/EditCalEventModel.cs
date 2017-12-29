@@ -16,10 +16,10 @@ namespace TilerFront.Models
         public string CalAddress { get; set; }
         public string CalAddressDescription { get; set; }
         public int AllEvents = 0;
-        public string Notes { private get; set; }
+        public string Notes { get; set; }
         public string EscapedNotes {
             get {
-                return System.Web.HttpUtility.UrlEncode(Notes?? "");
+                return Notes ?? "";
             }
         }
 

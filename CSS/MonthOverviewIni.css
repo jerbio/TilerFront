@@ -1345,7 +1345,7 @@ width: 100%;
         border-left-style: solid;
     outline: none;
     border-style: solid;
-    min-height: 310px;
+    min-height: 290px;
     margin-top: 10px;
     margin-bottom: 10px;
 }
@@ -1361,6 +1361,33 @@ width: 100%;
     flex: 1;
     margin-left: 10px;
     margin-right: 10px;
+}
+
+#editNotes {
+    border: 1px #ccc solid;
+    color: black;
+    background-color: white;
+    font-size: 16px;
+    font-family: 'texbold';
+    padding: 10px 15px;
+    -webkit-transition: all .2s ease-in-out;
+    -o-transition: all .2s ease-in-out;
+    -moz-transition: all .2s ease-in-out;
+    transition: all .2s ease-in-out;
+    cursor: pointer;
+}
+
+#SubmitButtonContainer {
+    margin-left: 95px;
+    margin-top: 3px;
+    margin-bottom: 80px;
+}
+
+#editNotes:focus,
+#editNotes:hover {
+    border: 1px transparent solid;
+    outline: none;
+    background-color: yellow;
 }
 
 #TimeBar {

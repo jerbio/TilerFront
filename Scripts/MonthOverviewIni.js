@@ -831,7 +831,6 @@ function RevealControlPanelSection(SelectedEvents)
 
     document.removeEventListener("keydown", containerKeyPress);//this is here just to avooid duplicate addition of the same keypress event
     document.addEventListener("keydown", containerKeyPress);
-    //document.onkeydown = containerKeyPress
    
     MultiSelectPanel.innerHTML = Object.keys(SelectedEvents).length+" Events Selected"
     ControlPanelCloseButton.onclick = global_ExitManager.triggerLastExitAndPop
@@ -3349,6 +3348,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                 var ControlPanelCloseButton = global_ControlPanelIconSet.getCloseButton();
                 var ProcrastinateEventModalContainer = getDomOrCreateNew("ProcrastinateEventModal");
                 let NotesModal = getDomOrCreateNew("NotesModal");
+                let NotesTextArea = getDomOrCreateNew("notesArea");
                 let NotesCancel = getDomOrCreateNew("cancelNotes");
                 let NotesSubmit = getDomOrCreateNew("submitNotes");
                 var ControlPanelProcrastinateButton = global_ControlPanelIconSet.getProcrastinateButton();
@@ -3442,8 +3442,10 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
 
                 function slideOpenNotesModal() {
                     NotesModal.focus();
+                    let noteText = SubEvent.Notes || ""
+                    NotesTextArea.value = decodeURI(noteText)
                     $(NotesModal).slideDown(500);
-                    NotesModal.onkeydown = NotesModal;
+                    NotesModal.onkeydown = notesContainerKeyPress;
                     function notesContainerKeyPress(e) {
                         e.stopPropagation();
                         if (e.which == 27)//escape key press
@@ -3464,6 +3466,11 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                 }
 
                 NotesCancel.onclick = closeNotesPanel
+                function submitNotes() {
+                    SaveButtonClick();
+                }
+                NotesSubmit.onclick = submitNotes
+
                 function generateEditDoneCOntainer()
                 {
                     var SaveButton = getDomOrCreateNew("SaveButton", "button");
@@ -3499,7 +3506,6 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                     return retValue;
                 }
 
-            
 
                 ControlPanelProcrastinateButton.onclick = slideOpenProcrastinateEventModal;
             
@@ -3568,6 +3574,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                 }
                 closeProcrastinatePanel(false)
                 closeModalDelete(false)
+                closeNotesPanel(false)
                 ActivateUserSearch.setSearchAsOff();
                 ControlPanelCloseButton.onclick = global_ExitManager.triggerLastExitAndPop;
 
@@ -4180,7 +4187,8 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                     Url = global_refTIlerUrl + "SubCalendarEvent/Update";
                     var HandleNEwPage = new LoadingScreenControl("Tiler is updating your schedule ...");
                     HandleNEwPage.Launch();
-
+                    let notesDom = getDomOrCreateNew("notesArea");
+                    let Notes = notesDom.value || SubEvent.Notes
                     var SaveData = {
                         UserName: UserCredentials.UserName,
                         UserID: UserCredentials.ID,
@@ -4193,8 +4201,8 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                         Split: splitValue,
                         ThirdPartyEventID: SubEvent.ThirdPartyEventID,
                         ThirdPartyUserID: SubEvent.ThirdPartyUserID,
-                        ThirdPartyType: SubEvent.ThirdPartyType
-
+                        ThirdPartyType: SubEvent.ThirdPartyType,
+                        Notes: Notes
                     };
                     SaveData.TimeZone = moment.tz.guess()
                     var exit= function (data) {
