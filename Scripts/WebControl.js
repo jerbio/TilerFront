@@ -1724,8 +1724,14 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
                 {
                     eventRepeatData.Misc.AllDoms.forEach(function (eachDom) { if (eachDom.status) { Days0fWeek += "" + eachDom.DayOfWeekIndex + "," } });
                 }
+                if (this.isEveryDay === undefined) {
+                    if (RepeatFrequency.toLowerCase() === 'daily') {
+                        this.isEveryDay = true
+                    }
+                }
             }
         }
+        this.isEveryDay = this.isEveryDay || false
         this.RepeatType = RepeatType;
         this.RepeatWeeklyData = Days0fWeek;
         this.RepeatFrequency = RepeatFrequency;
