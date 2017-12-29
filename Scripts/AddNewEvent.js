@@ -109,7 +109,6 @@ function LaunchAddnewEvent(LoopBackCaller, CurrentUser,isTIle)
             success: function (response) {
             },
             error: function (err) {
-                //debugger;
                 var myError = err;
                 var step = "err";
                 var NewMessage = "Oh No!!! Tiler is having issues modifying your schedule. Please try again Later :(";
@@ -119,7 +118,6 @@ function LaunchAddnewEvent(LoopBackCaller, CurrentUser,isTIle)
             }
 
         }).done(function (data) {
-            debugger;
             RefreshSubEventsMainDivSubEVents(CloseAddNewEvent);
 
             var SubEventDate = new Date(data.Content.SubCalStartDate)
@@ -156,7 +154,6 @@ function prepCalDataForPost()
         return null;
     }
     var Splits = EventSplits.Dom.value;
-    //debugger;
     var CalendarColor = EventColor.getColor();
     CalendarColor = { r: CalendarColor.r, g: CalendarColor.g, b: CalendarColor.b, s: CalendarColor.Selection, o: CalendarColor.a };
     var EventDuration = EventNonRigidDurationHolder.holder.ToTimeSpan();
@@ -226,7 +223,6 @@ function prepCalDataForPost()
     
     debugger;
     var NewEvent = new CalEventData(EventName, EventLocation, Splits, CalendarColor, EventDuration, EventStart, EventEnd, repeteOpitonSelect, RepetitionStart, RepetitionEnd, RigidFlag, RestrictionProfile);
-    debugger;
     NewEvent.RepeatData = null;
     return NewEvent;
 }

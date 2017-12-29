@@ -14,7 +14,7 @@ using System.IO.Compression;
 using System.Xml.Serialization;
 using System.Data.Entity;
 using TilerFront.Models;
-
+using BigDataTiler;
 #if ForceReadFromXml
 #else
 using CassandraUserLog;
@@ -44,6 +44,7 @@ namespace TilerFront
         protected DB_UserActivity activity;
         Dictionary<string, Func<XmlNode, Reason>> createDictionaryOfOPtionToFunction;
         protected TilerUser _TilerUser;
+        protected BigDataTiler.BigDataLogControl bigdataControl = new BigDataLogControl();
 
 #if ForceReadFromXml
 #else
@@ -201,7 +202,7 @@ namespace TilerFront
                     }
                     xmldoc.Save(LogFile);
                     xmldocCopy.Save(LogFileCopy);
-                    updateBigData(xmldocCopy, xmldoc);
+                    await updateBigData(xmldocCopy, xmldoc).ConfigureAwait(false);
                     if (dbLatestChange != null) {
                         await dbLatestChange;
                     }
@@ -282,7 +283,7 @@ namespace TilerFront
         /// </summary>
         /// <param name="oldData"></param>
         /// <param name="newData"></param>
-        public async void updateBigData(XmlDocument oldData, XmlDocument newData)
+        public async Task updateBigData(XmlDocument oldData, XmlDocument newData)
         {
             bool corruptZipFile = false;
             string zipFile = LoggedUserID + ".zip";
@@ -297,13 +298,13 @@ namespace TilerFront
                 }
                 XmlDocument combinedDoc = new XmlDocument();
 
-                XmlNode timeOfCreation = combinedDoc.CreateElement("TimeOfCreation");
+                XmlNode timeOfCreationNode = combinedDoc.CreateElement("TimeOfCreation");
                 XmlNode bigDataLog = combinedDoc.CreateElement("BigDataLog");
                 XmlNode miscDataLog = combinedDoc.CreateElement("MiscData");
                 miscDataLog.InnerText = activity.getMiscdata();
 
-                timeOfCreation.InnerXml = activity.ToXML();
-                bigDataLog.AppendChild(timeOfCreation);
+                timeOfCreationNode.InnerXml = activity.ToXML();
+                bigDataLog.AppendChild(timeOfCreationNode);
                 bigDataLog.AppendChild(miscDataLog);
                 XmlNode beforeProcessing = combinedDoc.CreateElement("BeforeProcessing");
                 XmlNode importedNBeforeProcessingNode = combinedDoc.ImportNode(oldData.DocumentElement as XmlNode, true);
@@ -321,49 +322,17 @@ namespace TilerFront
                 combinedDoc.AppendChild(bigDataLog);
                 XmlElement root = combinedDoc.DocumentElement;
                 combinedDoc.InsertBefore(xmldecl, root);
-                MemoryStream xmlStream = new MemoryStream();
-                combinedDoc.Save(xmlStream);
-                DateTimeOffset javascriptStart = new DateTimeOffset(1970, 1, 1, 0, 0, 0, new TimeSpan());
-                string beforFileName = ((long)(DateTimeOffset.UtcNow
-                   .Subtract(javascriptStart)
-                   .TotalMilliseconds)).ToString();
-
-
-                
-
-                if (File.Exists(fullZipPath))
+                DateTimeOffset timeOfCreation = DateTimeOffset.UtcNow;
+                LogChange log = new LogChange()
                 {
-                    corruptZipFile = true;
-                    using (FileStream zipToOpen = new FileStream(@fullZipPath, FileMode.Open))
-                    {
-                        using (ZipArchive archive = new ZipArchive(zipToOpen, ZipArchiveMode.Update))
-                        {
-                            ZipArchiveEntry readmeEntry = archive.CreateEntry(beforFileName + ".xml", CompressionLevel.Optimal);
-                            xmlStream.WriteTo(readmeEntry.Open());
-                        }
-                    }
-                }
-                else
-                {
-                    using (var memoryStream = new MemoryStream())
-                    {
-                        using (var archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
-                        {
-                            var demoFile = archive.CreateEntry(beforFileName + ".xml", CompressionLevel.Optimal);
-
-                            using (var entryStream = demoFile.Open())
-                            {
-                                xmlStream.WriteTo(entryStream);
-                            }
-                        }
-
-                        using (var fileStream = new FileStream(@fullZipPath, FileMode.Create))
-                        {
-                            memoryStream.Seek(0, SeekOrigin.Begin);
-                            memoryStream.CopyTo(fileStream);
-                        }
-                    }
-                }
+                    Id = Guid.NewGuid().ToString(),
+                    TimeOfCreation = timeOfCreation,
+                    JsTimeOfCreation = timeOfCreation.toJSMilliseconds(),
+                    TypeOfEvent = activity.TriggerType.ToString(),
+                    UserId = _TilerUser.Id
+                };
+                log.loadXmlFile(combinedDoc);
+                await bigdataControl.AddLogDocument(log).ConfigureAwait(false);
             }
             catch (Exception e)
             {
@@ -497,7 +466,7 @@ namespace TilerFront
                     }
                     xmldoc.Save(LogFile);
                     xmldocCopy.Save(LogFileCopy);
-                    updateBigData(xmldocCopy, xmldoc);
+                    await updateBigData(xmldocCopy, xmldoc).ConfigureAwait(false);
                     if (dbLatestChange != null)
                     {
                         await dbLatestChange;

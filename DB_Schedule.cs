@@ -132,7 +132,7 @@ namespace TilerFront
 
 
 
-            await myAccount.CommitEventToLogOld(AllEventDictionary.Values, EventID.LatestID.ToString());
+            await myAccount.CommitEventToLogOld(AllEventDictionary.Values, EventID.LatestID.ToString()).ConfigureAwait(false);
         }
 
         virtual public bool isScheduleLoadSuccessful
