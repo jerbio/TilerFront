@@ -5,6 +5,7 @@ using System.Web;
 using System.IO;
 using TilerElements;
 using System.Threading.Tasks;
+using System.Xml;
 
 namespace TilerFront
 {
@@ -34,6 +35,15 @@ namespace TilerFront
             {
                 return LogStatus;
             }
+        }
+
+        public override Task updateBigData(XmlDocument oldData, XmlDocument newData)
+        {
+
+            Task retValue = new Task(() => { });
+            retValue.RunSynchronously();
+            retValue.Wait();
+            return retValue;
         }
     }
 }

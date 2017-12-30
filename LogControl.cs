@@ -44,7 +44,6 @@ namespace TilerFront
         protected DB_UserActivity activity;
         Dictionary<string, Func<XmlNode, Reason>> createDictionaryOfOPtionToFunction;
         protected TilerUser _TilerUser;
-        protected BigDataTiler.BigDataLogControl bigdataControl = new BigDataLogControl();
 
 #if ForceReadFromXml
 #else
@@ -283,13 +282,13 @@ namespace TilerFront
         /// </summary>
         /// <param name="oldData"></param>
         /// <param name="newData"></param>
-        public async Task updateBigData(XmlDocument oldData, XmlDocument newData)
+        public virtual async Task updateBigData(XmlDocument oldData, XmlDocument newData)
         {
             bool corruptZipFile = false;
             string zipFile = LoggedUserID + ".zip";
             string zipFolder = LoggedUserID;
-
-            string fullZipPath = @BigDataLogLocation + zipFile;
+            BigDataLogControl bigdataControl = new BigDataLogControl();
+        string fullZipPath = @BigDataLogLocation + zipFile;
             try
             {
                 if (activity == null)
