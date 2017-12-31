@@ -221,6 +221,7 @@ namespace TilerFront
                 var RepetitionData = CalendarServiceData.Events.Instances(UserID, eachKeyValuePair.Key);
                 RepetitionData.ShowDeleted = false;
                 RepetitionData.TimeMax = DateTime.Now.AddDays(90);
+                RepetitionData.TimeMin = DateTime.Now.AddDays(-30);
                 var generatedRsults = await RepetitionData.ExecuteAsync().ConfigureAwait(false);
                 EventID CalendarEventID = EventID.generateGoogleCalendarEventID(myIndex);
                 List<Event> googleEventsWithinRange = generatedRsults.Items.Where(googleEvent => googleEvent.End.DateTime.Value.ToUniversalTime() > CalculationTimeLine.Start && CalculationTimeLine.End > googleEvent.Start.DateTime.Value.ToUniversalTime()).ToList();
