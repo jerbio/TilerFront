@@ -2548,6 +2548,7 @@
     <Content Include="Scripts\YuiCombo\3.18.1\yui\yui-min.js" />
     <Content Include="Scripts\YuiCombo\3.18.1\yui\yui.js" />
     <Content Include="Views\Home\Claims.cshtml" />
+    <Content Include="WagTapCalLogs\BeforeInsertionFixingStiticRestricted.xml.lnk" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="CSS\AddNewEvent.css" />
@@ -2736,6 +2737,31 @@
     <Content Include="Scripts\wrapper.js" />
     <Content Include="Scripts\yui-min.js" />
     <Content Include="Scripts\_references.js" />
+    <Content Include="WagTapCalLogs\0784aa9d-91b5-4977-888c-c37780d29c4d.xml" />
+    <Content Include="WagTapCalLogs\0929c8b9-c202-4c61-ae96-3257451a0818.xml" />
+    <Content Include="WagTapCalLogs\1a67c8b7-bde0-4820-9269-0b50a7d23afc.xml" />
+    <Content Include="WagTapCalLogs\2f6edb71-8ea3-4904-8fc8-b1531b355b90.xml" />
+    <Content Include="WagTapCalLogs\38bb0d3b-49af-46a8-aaaf-706a80f6c1b5.xml" />
+    <Content Include="WagTapCalLogs\39877a17-bcb6-4b43-bddc-3b3f3443cb10.xml" />
+    <Content Include="WagTapCalLogs\3c253eac-cf65-42c8-8d61-02109b7c233e.xml" />
+    <Content Include="WagTapCalLogs\4f4ce431-b653-4ab5-b3c9-9bb7a52ca485.xml" />
+    <Content Include="WagTapCalLogs\53c703d6-eae7-4b8f-a24a-1e3977cd25f8.xml" />
+    <Content Include="WagTapCalLogs\5dc22916-eaf6-4411-993a-b2f85a6ab229.xml" />
+    <Content Include="WagTapCalLogs\679fde89-b53c-4dee-bbe8-a6d641a79372.xml" />
+    <Content Include="WagTapCalLogs\7b7aab95-af86-46b9-9392-257e2e45d704.xml" />
+    <Content Include="WagTapCalLogs\84f10878-1e91-49e5-86f2-bac458bab141.xml" />
+    <Content Include="WagTapCalLogs\965c4186-8bc8-4b61-85f8-52f2a1632ad7.xml" />
+    <Content Include="WagTapCalLogs\9f129d20-882e-41f2-b551-459f602a83cc.xml" />
+    <Content Include="WagTapCalLogs\be1143d7-4901-48f4-b31b-ee5a9d123e17.xml" />
+    <Content Include="WagTapCalLogs\c5033def-fcef-433d-a443-b0b186c5af53.xml" />
+    <Content Include="WagTapCalLogs\c6e1714b-ce9b-447f-8f66-789af37d7c3e.xml" />
+    <Content Include="WagTapCalLogs\Copy_3c253eac-cf65-42c8-8d61-02109b7c233e.xml" />
+    <Content Include="WagTapCalLogs\Copy_5dc22916-eaf6-4411-993a-b2f85a6ab229.xml" />
+    <Content Include="WagTapCalLogs\Copy_be1143d7-4901-48f4-b31b-ee5a9d123e17.xml" />
+    <Content Include="WagTapCalLogs\Copy_d350ba4d-fe0b-445c-bed6-b6411c2156b3.xml" />
+    <Content Include="WagTapCalLogs\d350ba4d-fe0b-445c-bed6-b6411c2156b3.xml" />
+    <Content Include="WagTapCalLogs\d6d4c049-f572-4ea8-b1b7-ee67af284801.xml" />
+    <Content Include="WagTapCalLogs\fe2010be-0eb8-4909-ab02-3ab128fb7aa7.xml" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -2795,7 +2821,6 @@
     <Folder Include="Views\GoogleNotifications\" />
     <Folder Include="Views\GoogleNotification\" />
     <Folder Include="Views\WhatIf\" />
-    <Folder Include="WagTapCalLogs\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config">
