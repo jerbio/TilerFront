@@ -4081,7 +4081,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                 function renderNotesUIData(subEvent)
                 {
                     let editNotesbutton = getDomOrCreateNew("editNotes", "button");
-                    editNotesbutton.innerHTML = 'Edit Notes'
+                    editNotesbutton.innerHTML = SubEvent.Notes ? 'Edit Notes' : 'Add Notes'
                     editNotesbutton.onclick = slideOpenNotesModal
                     let retValue = {
                         button: editNotesbutton ,

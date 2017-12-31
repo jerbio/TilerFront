@@ -220,8 +220,8 @@ namespace TilerFront
                 KeyValuePair<string, Google.Apis.Calendar.v3.Data.Event> eachKeyValuePair = DictAsArray[j];
                 var RepetitionData = CalendarServiceData.Events.Instances(UserID, eachKeyValuePair.Key);
                 RepetitionData.ShowDeleted = false;
-                RepetitionData.TimeMax = DateTime.Now.AddDays(90);
-                RepetitionData.TimeMin = DateTime.Now.AddDays(-30);
+                RepetitionData.TimeMax = new DateTime(CalculationTimeLine.End.AddDays(5).Ticks, DateTimeKind.Utc);
+                RepetitionData.TimeMin = new DateTime(CalculationTimeLine.Start.AddDays(-5).Ticks, DateTimeKind.Utc);
                 var generatedRsults = await RepetitionData.ExecuteAsync().ConfigureAwait(false);
                 EventID CalendarEventID = EventID.generateGoogleCalendarEventID(myIndex);
                 List<Event> googleEventsWithinRange = generatedRsults.Items.Where(googleEvent => googleEvent.End.DateTime.Value.ToUniversalTime() > CalculationTimeLine.Start && CalculationTimeLine.End > googleEvent.Start.DateTime.Value.ToUniversalTime()).ToList();

@@ -2795,14 +2795,13 @@
     <Folder Include="Views\GoogleNotifications\" />
     <Folder Include="Views\GoogleNotification\" />
     <Folder Include="Views\WhatIf\" />
-    <Folder Include="WagTapCalLogs\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config">
       <SubType>Designer</SubType>
     </Content>
     <None Include="Project_Readme.html" />
-	<None Include="WagTapCalLogs\**\*" CopyToPublishDirectory="Always" />
+    <None Include="WagTapCalLogs\**\*" CopyToPublishDirectory="Always" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201505070935055_GoogleNotificationAuthentication.resx">
