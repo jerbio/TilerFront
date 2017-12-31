@@ -4094,45 +4094,43 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
             
                 function extraOptionsData()
                 {
-                    var splitInputBox = getDomOrCreateNew("InputSplitCount", "input");
-                    //splitInputBox.readOnly = true;
-                    splitInputBox.oninput= EditContainerData.RevealContainer;
-                    splitInputBox.setAttribute("type", "Number");
-                    splitInputBox.onkeydown = stopPropagationOfKeyDown;
-                    splitInputBox.value = Dictionary_OfCalendarData[SubEvent.CalendarID].TotalNumberOfEvents;
-                    var splitInputBoxLabel = getDomOrCreateNew("splitInputBoxLabel","label");
-                    splitInputBoxLabel.innerHTML = "Splits"
                     var splitAndNoteContainer = getDomOrCreateNew("SplitCountAndNoteContainer");
+                    var ContainerForExtraOptions = getDomOrCreateNew("ExtraOptionsContainer")
+                    ContainerForExtraOptions.appendChild(splitAndNoteContainer)
                     $(splitAndNoteContainer).addClass("SubEventInformationContainer");
-                    var splitInputBoxContainer = getDomOrCreateNew("InputSplitCountContainer");
-                    splitInputBoxContainer.appendChild(splitInputBoxLabel);
-                    splitInputBoxContainer.appendChild(splitInputBox);
+                    if (!Dictionary_OfCalendarData[SubEvent.CalendarID].Rigid) {
+                        var splitInputBox = getDomOrCreateNew("InputSplitCount", "input");
+                        splitInputBox.oninput = EditContainerData.RevealContainer;
+                        splitInputBox.setAttribute("type", "Number");
+                        splitInputBox.onkeydown = stopPropagationOfKeyDown;
+                        splitInputBox.value = Dictionary_OfCalendarData[SubEvent.CalendarID].TotalNumberOfEvents;
+                        var splitInputBoxLabel = getDomOrCreateNew("splitInputBoxLabel", "label");
+                        splitInputBoxLabel.innerHTML = "Splits"
+                        var splitInputBoxContainer = getDomOrCreateNew("InputSplitCountContainer");
+                        splitInputBoxContainer.appendChild(splitInputBoxLabel);
+                        splitInputBoxContainer.appendChild(splitInputBox);
+                        splitAndNoteContainer.appendChild(splitInputBoxContainer)
 
+                        var CompletionMap = getDomOrCreateNew("CompletionContainer");
+                        var CompletionMapDom = generateCompletionMap(SubEvent)
+                        CompletionMap.appendChild(CompletionMapDom);
+                        ContainerForExtraOptions.appendChild(CompletionMap)
+                    }
+                    
 
                     let renderNoteResult = renderNotesUIData(null)
 
 
-                    splitAndNoteContainer.appendChild(splitInputBoxContainer)
                     splitAndNoteContainer.appendChild(renderNoteResult.button)
-
-                    var CompletionMap = getDomOrCreateNew("CompletionContainer");
-                    var CompletionMapDom= generateCompletionMap(SubEvent)
-                    CompletionMap .appendChild(CompletionMapDom);
-                    var ContainerForExtraOptions = getDomOrCreateNew("ExtraOptionsContainer")
-                    ContainerForExtraOptions.appendChild(splitAndNoteContainer)
-                    ContainerForExtraOptions.appendChild(CompletionMap)
                 
                     return ContainerForExtraOptions;
                 }
 
             
                 SubCalStartInfo.appendChild(SubEventStartTime);
-                //SubCalTimeInfo.appendChild(AmDash0);
-                //SubCalTimeInfo.appendChild(SubEventEndTime);
                 SubCalStartInfo.appendChild(SubEventStartDate);
 
                 SubCalEndInfo.appendChild(SubEventEndTime);
-                //SubCalDateInfo.appendChild(AmDash1);
                 SubCalEndInfo.appendChild(SubEventEndDate);
 
 
@@ -4141,26 +4139,20 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
             
 
                 var ControlPanelDeadlineOfSubevent=getDomOrCreateNew("ControlPanelDeadlineOfSubevent")
-                //ControlPanelDeadlineOfSubeventInfo.appendChild(CalStartDate);
                 ControlPanelDeadlineOfSubeventInfo.appendChild(CalEndTime)
                 ControlPanelDeadlineOfSubeventInfo.appendChild(CalEndDate);
                 var optionData = extraOptionsData();
 
                 var InfoCOntainer = getDomOrCreateNew("InfoContainer")
-
-                InfoCOntainer.appendChild(optionData);
+                InfoCOntainer.appendChild(optionData);      
                 if (Dictionary_OfCalendarData[SubEvent.CalendarID].Rigid)
                 {
                     $(ControlPanelDeadlineOfSubevent).addClass("setAsDisplayNone");
-                    $(optionData).addClass("setAsDisplayNone");
-                
                 }
                 else
                 {
                     $(ControlPanelDeadlineOfSubevent).removeClass("setAsDisplayNone");
-                    $(optionData).removeClass("setAsDisplayNone");
                 }
-            
 
 
 
@@ -4169,7 +4161,6 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                     debugger;
                     var TimeZone = new Date().getTimezoneOffset();
                     var Url;
-                    //Url="RootWagTap/time.top?WagCommand=7";
                     SubEventStartTime.value =formatTimePortionOfStringToRightFormat(SubEventStartTime.value )
                     var SubCalStartDateTimeString = SubEventStartTime.value + " " + $(SubEventStartDate).datepicker("getDate").toLocaleDateString();
                     var SubCaStartDateInMS = Date.parse(SubCalStartDateTimeString) - (TimeZone * OneMinInMs)
