@@ -189,7 +189,7 @@ function generateHomePage(UserSchedule) {
     var AllRepeatEventDoms = generateRepeatEvents(UserSchedule.Schedule.RepeatCalendarEvent);*/
     InitializeMiddleDomUI(MiddleContentDom);
     
-    if (ClosestSubEventToNow.Dom != null)
+    if (ClosestSubEventToNow && ClosestSubEventToNow.Dom != null)
     {
         var position = $(ClosestSubEventToNow.Dom.Dom).position();
         setTimeout(function () {
