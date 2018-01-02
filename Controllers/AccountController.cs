@@ -632,6 +632,11 @@ namespace TilerFront.Controllers
             return RedirectToAction("VerifyCode", new { Provider = model.SelectedProvider, ReturnUrl = model.ReturnUrl, RememberMe = model.RememberMe });
         }
 
+
+        //public async Task<ActionResult> externalLogin(string returnUrl, SignInStatus signInstatus)
+        //{
+
+        //}
         //
         // GET: /Account/ExternalLoginCallback
         [AllowAnonymous]
@@ -642,7 +647,11 @@ namespace TilerFront.Controllers
             {
                 return RedirectToAction("Login");
             }
-            Controllers.ThirdPartyCalendarAuthenticationModelsController.initializeCurrentURI(System.Web.HttpContext.Current.Request.Url.Authority);
+
+            if (System.Web.HttpContext.Current != null)// this helps save the reurn uri for notification
+            {
+                Controllers.ThirdPartyCalendarAuthenticationModelsController.initializeCurrentURI(System.Web.HttpContext.Current.Request.Url.Authority);
+            }
             string ThirdPartyType;
             var result = await SignInManager.ExternalSignInAsync(loginInfo, isPersistent: false).ConfigureAwait(false);
             switch (result)
@@ -699,6 +708,17 @@ namespace TilerFront.Controllers
                             thirdPartyModel.Email = Email;
                             thirdPartyModel.Token = AccessToken;
                             thirdPartyModel.RefreshToken= RefreshToken;
+                        } else
+                        {
+                            string Email = loginInfo.Email;
+                            string AccessToken = loginInfo.ExternalIdentity.FindFirst("AccessToken").Value;
+                            thirdPartyModel = new ThirdPartyCalendarAuthenticationModel();
+                            thirdPartyModel.Deadline = Deadline;
+                            thirdPartyModel.Email = Email;
+                            thirdPartyModel.Token = AccessToken;
+                            thirdPartyModel.RefreshToken = RefreshToken;
+                            thirdPartyModel.ID = Email;
+                            await thirdPartyModel.revokeAccess().ConfigureAwait(false);
                         }
                     }
                     
