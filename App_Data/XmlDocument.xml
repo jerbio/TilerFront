@@ -798,7 +798,7 @@
             <param name="GoogleNotificationID"></param>
             <returns></returns>
         </member>
-        <member name="M:TilerFront.Controllers.ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(TilerCore.Schedule,System.String,TilerFront.Models.ApplicationDbContext)">
+        <member name="M:TilerFront.Controllers.ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(TilerCore.Schedule,System.String,TilerFront.Models.ApplicationDbContext,TilerElements.TimeLine,System.Boolean)">
             <summary>
             Function retrives the third party credential. Credential are used to retrieve calendar event. The retrieved events are used to populate mySchedule
             </summary>
@@ -1134,7 +1134,7 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:TilerFront.GoogleTilerEventControl.getThirdPartyControlForIndex(System.Collections.Generic.IEnumerable{TilerFront.GoogleTilerEventControl})">
+        <member name="M:TilerFront.GoogleTilerEventControl.getThirdPartyControlForIndex(System.Collections.Generic.IEnumerable{TilerFront.GoogleTilerEventControl},TilerElements.TimeLine,System.Boolean)">
             <summary>
             Function generates google calendar control. Its populated with events retrieved within +/- 90 days of google calendar update. It returns null if access to google api is lost.
             </summary>

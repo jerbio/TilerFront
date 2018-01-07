@@ -9,21 +9,9 @@
     }
 
 
-    if (e.which == 27)
+    if (e.which === 27)
     {
         return;
-
-        /*
-        if (ActivateUserSearch.isActive)
-        {
-            ActivateUserSearch.ClearSearch();
-            return;
-        }
-        else
-        {
-            return;
-        }
-        */
     }
 
 
@@ -32,7 +20,7 @@
         return;
     }
     //debugger;
-    if(((e.which<48)||(e.which>90))&&(e.which!=1))
+    if(((e.which<48)||(e.which>90))&&(e.which!==1))
     {
         return;
     }
@@ -130,7 +118,7 @@ function CallBackFunctionForReturnedValuesDesktop(data, DomContainer) {
 
     $(DomContainer.Dom).empty();
     (DomContainer.Dom).style.height = 0;
-    if (data.length == 0 || data.length == null || data.length == undefined) {
+    if (data.length === 0 || data.length === null || data.length === undefined) {
         DomContainer.innerHTML = "No Results";
         setTimeout(function () { $(DomContainer.Dom).empty(); }, 6000);
         return;
@@ -291,7 +279,7 @@ function CallBackFunctionForReturnedValuesDesktop(data, DomContainer) {
 
             function CleanUP()
             {
-                if (DeletionSelection.parentElement != null) {
+                if (DeletionSelection.parentElement !== null) {
                     DeletionSelection.parentElement.removeChild(DeletionSelection)
                 }
                 Exit();
@@ -322,7 +310,7 @@ function CallBackFunctionForReturnedValuesDesktop(data, DomContainer) {
 
             function CleanUP()
             {
-                if (ProcrastinationContainer.parentElement != null) {
+                if (ProcrastinationContainer.parentElement !== null) {
                     ProcrastinationContainer.parentElement.removeChild(ProcrastinationContainer)
                 }
                 Exit()

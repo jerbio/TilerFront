@@ -80,10 +80,7 @@ namespace TilerFront
         #region Functions
         override async public Task Initialize()
         {
-            {
-
-                await base.Initialize().ConfigureAwait(false);
-            }
+            await base.Initialize().ConfigureAwait(false);
         }
 
 
@@ -154,8 +151,13 @@ namespace TilerFront
 
         public async Task<CustomErrors> DeleteLog()
         {
-            CustomErrors retValue = null;
             await Initialize().ConfigureAwait(false);
+            return deleteLogFile(CurrentLog);
+        }
+
+        protected CustomErrors deleteLogFile(string CurrentLog)
+        {
+            CustomErrors retValue = null;
             try
             {
                 string NameOfFile = WagTapLogLocation + CurrentLog;
@@ -167,6 +169,20 @@ namespace TilerFront
             }
 
             return retValue;
+        }
+
+        public async Task<CustomErrors> DeleteLogOfUnregistedUser()
+        {
+            CustomErrors retValue = null;
+            var tilerUser = Database.Users.Find(ID);
+            if (tilerUser == null)
+            {
+                return deleteLogFile(CurrentLog);
+            }
+            else
+            {
+                throw new CustomErrors("Trying to delete a file of an active user");
+            }
         }
 
         async public override Task<DateTimeOffset> getDayReferenceTime(string NameOfFile = "")

@@ -74,7 +74,7 @@ namespace TilerFront
                     db.Entry(retrievedUser).State = EntityState.Added;
                 }
                 db.Entry(retrievedUser).State = EntityState.Modified;
-                waitForDbSave = TilerController.dbSaveChangesAsync(db);
+                TilerController.dbSaveChanges(db);
             }
 
             if(waitForDbSave != null)
@@ -88,6 +88,32 @@ namespace TilerFront
             try
             {
                 await db.SaveChangesAsync().ConfigureAwait(false);
+            }
+            catch (DbEntityValidationException e)
+            {
+                foreach (var eve in e.EntityValidationErrors)
+                {
+                    Console.WriteLine("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:",
+                        eve.Entry.Entity.GetType().Name, eve.Entry.State);
+                    foreach (var ve in eve.ValidationErrors)
+                    {
+                        Console.WriteLine("- Property: \"{0}\", Error: \"{1}\"",
+                            ve.PropertyName, ve.ErrorMessage);
+                    }
+                }
+                throw;
+            }
+            catch (Exception e)
+            {
+                throw new HttpException((int)HttpStatusCode.BadRequest, "Had issues sending updating your request\n" + e.ToString());
+            }
+        }
+
+        static public void dbSaveChanges(ApplicationDbContext db)
+        {
+            try
+            {
+                db.SaveChanges();
             }
             catch (DbEntityValidationException e)
             {

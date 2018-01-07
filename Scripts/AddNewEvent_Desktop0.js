@@ -2,7 +2,7 @@
 
 function addNewEvent(x, y, height, refStart)
 {
-    //debugger;
+    
     var AddEventPanel = getDomOrCreateNew("AddEventPanel");
     generateAddEventContainer(x, y, height, AddEventPanel.Dom, refStart);
     
@@ -10,7 +10,7 @@ function addNewEvent(x, y, height, refStart)
 
 function generatePostBackDataForTimeRestriction(RestrictionSlider)
 {
-    //debugger;
+    
     var RestrictionStatusButtonStatus = RestrictionSlider.getStatus();
     var RestrictionStart = RestrictionSlider.getStart();
     var RestrictionEnd = RestrictionSlider.getEnd();
@@ -261,7 +261,7 @@ function SubmitTile(Name, Address,AddressNick, Splits, Hour, Minutes, Deadline, 
 function generateModal(x, y, height, width,WeekStart, RenderPlane,UseCurrentTime)
 {
     //return;
-    //debugger;
+    
     initializeUserLocation();
 
     if (generateModal.isOn)
@@ -271,7 +271,7 @@ function generateModal(x, y, height, width,WeekStart, RenderPlane,UseCurrentTime
         return;
     }
 
-    //debugger;
+    
     global_ExitManager.triggerLastExitAndPop();
     generateModal.isOn = true;
     var modalAddDom = getDomOrCreateNew("AddModalDom");
@@ -355,7 +355,7 @@ function generateModal(x, y, height, width,WeekStart, RenderPlane,UseCurrentTime
 
     function removePanel()
     {
-        //debugger;
+        
         CloseModal();
     }
 
@@ -493,7 +493,7 @@ function generatePeek(CalEvent,Container)
     {
         $(Container).addClass("RevealPreviewPanel");
         /*
-        debugger;
+        ;
         var PeekDaysSampleData = [
                             { TotalDuration: 14, DurationRatio: 0.3, SleepTime: 4, DayIndex: 5 },
                             { TotalDuration: 12, DurationRatio: 0.5, SleepTime: 5, DayIndex: 6 },
@@ -581,7 +581,7 @@ function generatePeek(CalEvent,Container)
             
         }
         else {
-            //debugger;
+            
             generatePeek.ChartData.highcharts().series[1].setData(WorkData,true);
             generatePeek.ChartData.highcharts().series[0].setData(SleepData,true);
         }
@@ -813,10 +813,10 @@ function generateTilerEnabled(EndTimeContainer,SplitContainer)
 
 
 function AddToTileContainer(TileInptObject, Container) {
-    //debugger;
+    
     var AllElements = TileInptObject.getAllElements();
     for (var i = 0; i < AllElements.length; i++) {
-        //debugger;
+        
         var myElement = AllElements[i];
         if (myElement != null)
         {
@@ -828,7 +828,7 @@ function AddToTileContainer(TileInptObject, Container) {
 //Handles the activities of sliders. Sliders show up beneath the done button
 function InactiveSlider(InActiveDom, ActiveDom, ButtonElements, AutoSentence)
 {
-    //debugger;
+    
     var InactiveSliderID =  InactiveSlider.ID++;
     var ButtonSlide = generateMyButton(LoopBackFunction);
     var InActiveMessage = ButtonElements.InActiveMessage;
@@ -899,7 +899,7 @@ function InactiveSlider(InActiveDom, ActiveDom, ButtonElements, AutoSentence)
         else
         {
             Activate();
-            //debugger;
+            
 
             //var AllDoms = $(ButtonSlide).next("input")
             //$(ButtonSlide).next("div").next().children("input")[0].focus()
@@ -1060,7 +1060,7 @@ function cleanUpTimeRestriction(TimeRestrictionSlider)
     }
     function onCheckBoxChange(e)
     {
-        //debugger;
+        
         if (WorkDayCheckBox.checked)
         {
             triggerChangeInTime();
@@ -1084,7 +1084,7 @@ function cleanUpTimeRestriction(TimeRestrictionSlider)
 
     function onWeekDayCheckboxClick(e)
     {
-        //debugger;
+        
         if (WeekDayCheckBox.checked)
         {
             EveryDayCheckBox.checked = false;
@@ -1304,7 +1304,7 @@ function cleanUpTimeRestriction(TimeRestrictionSlider)
             {
                 for (var i= 0 ; i<WeekDayButtons.length;i++)
                 {
-                    //debugger;
+                    
                     var RestrictedWeekdayInputContainer = getDomOrCreateNew("RestrictedWeekdayInputContainer" + i);
                     $(RestrictedWeekdayInputContainer).addClass("RestrictedWeekdayInputContainer");
                     var StartRestrictedWeekdayInputContainer = getDomOrCreateNew("StartRestrictedWeekdayInputContainer" + i);
@@ -1370,7 +1370,7 @@ function cleanUpTimeRestriction(TimeRestrictionSlider)
         }
 
         function hideWeekDayButtons() {
-            //debugger;
+            
             InitializeWeekDayButtons();
             var RestrictionWeekDayContainer = RestrictiveWeekControl.RestrictionWeekDayContainer;
 
@@ -1962,7 +1962,6 @@ function AddTiledEvent()
 
         combinedCallBack.clear = function ()
         {
-            debugger;
             MyDataContainer.AllData.splice(0, MyDataContainer.AllData.length)
             MyDataContainer.Index = -1;
             //LocationAutoSuggestControl.clear();
@@ -1999,7 +1998,7 @@ function AddTiledEvent()
         //Tiler Address callback
         function AddressCallBack(data, DomContainer, InputCOntainer)
         {
-            //debugger;
+            
             var FullContainer = LocationAutoSuggestControl.getAutoSuggestControlContainer();
             InputBox.parentNode.appendChild(FullContainer);
             positionSearchResultContainer();
@@ -2007,7 +2006,7 @@ function AddTiledEvent()
             
 
             MyDataContainer.AllData.splice(0, MyDataContainer.AllData.length);
-            //debugger;
+            
             resolveEachRetrievedEvent.ID = 0;
             /*
             $(DomContainer).empty();
@@ -2029,7 +2028,7 @@ function AddTiledEvent()
                 resolveEachRetrievedEvent(data[i]);
             }
 
-            //debugger;
+            
             var CombinedDataIndex = 0;
             combinedCallBack.indexContainer[CombinedDataIndex] = MyDataContainer.AllData;
             combinedCallBack(CombinedDataIndex, MyDataContainer.AllData);
@@ -2037,7 +2036,7 @@ function AddTiledEvent()
             function ReseAutoSuggest() {
                 MyDataContainer.AllData.splice(0, MyDataContainer.AllData.length)
                 MyDataContainer.Index = -1;
-                //debugger;
+                
                 combinedCallBack.clear();
             }
 
@@ -2090,7 +2089,7 @@ function AddTiledEvent()
                     InsertIntoInput();
                     LocationAutoSuggestControl.HideContainer();
                     NickNameSlider.turnOnSlide();
-                    //debugger
+                    
                     var NickElements = NickNameSlider.getAllElements()
                     NickElements[0].TileInput.getInputDom().value = LocationData.Tag;
                     setTimeout(function () { InputBox.focus(), 200 });
@@ -2132,7 +2131,7 @@ function AddTiledEvent()
                 
                 if (status == google.maps.places.PlacesServiceStatus.OK) {
                     for (var i = 0; ((i < results.length)&&(i<5)); i++) {
-                        //debugger
+                        
                         resolveEachRetrievedEvent(results[i],i);
                     }
                 }
@@ -2207,7 +2206,7 @@ function AddTiledEvent()
                     InsertIntoInput();
                     LocationAutoSuggestControl.HideContainer();
                     NickNameSlider.turnOnSlide();
-                    //debugger
+                    
                     var NickElements = NickNameSlider.getAllElements();
                     getBusinessHourData(LocationData);
                     NickElements[0].TileInput.getInputDom().value = LocationData.name;
@@ -2216,7 +2215,7 @@ function AddTiledEvent()
 
                 function getBusinessHourData(LocationData)
                 {
-                    debugger;
+                    ;
                     var request = {
                         placeId: LocationData.place_id
                     };
@@ -2281,7 +2280,7 @@ function AddTiledEvent()
             {
                 if (LocationAutoSuggestControl.isContentOn() || GoogleAutoSuggestControl.isContentOn())
                 {
-                    debugger;
+                    ;
                     combinedCallBack.clear();
                     return;
                 }
@@ -2425,7 +2424,7 @@ function AddTiledEvent()
             }
         }, DefaultText: "Deadline", TriggerDone: true
     };
-    //debugger;
+    
     InActiveContainer.Hide();
 
 
@@ -2479,7 +2478,7 @@ function AddTiledEvent()
         //alert("show triggered");
         var keyEntryFunc = TileInputBox.Dictionary[Element4.ID].Me.getKeyCallBackFunc()
         var EndTimeInput = TileInputBox.Dictionary[Element4.ID].Me.getInputDom()
-        //debugger;
+        
         EndTimeInput.removeEventListener("keydown", keyEntryFunc);
     })
 
@@ -2580,7 +2579,7 @@ function AddTiledEvent()
 
     InvisiblePanel.Dom.appendChild(modalTileEvent.Dom);
     //document.addEventListener("keydown", UIAddTileUITrigger);
-    //debugger;
+    
     FirstElement.reveal();
     FirstElement.forceFocus();
     AddCloseButoon(modalTileEvent, true);
@@ -2721,7 +2720,6 @@ function TileInputBox(TabElement, ModalContainer, SendTile, Exit, HideInput, get
         var JSONProperty;
         if (TabElement.DropDown != undefined)
         {
-            ///debugger;
             AutoSuggestFunction = TabElement.DropDown(Exit, InputBox.Dom);
         }
         /*
@@ -2860,13 +2858,13 @@ function TileInputBox(TabElement, ModalContainer, SendTile, Exit, HideInput, get
         //
         if (TabElement.SubTileInputBox != undefined)
         {
-            //debugger;
+            
             TabElement.SubTileInputBox.forEach(revealEachElement);
         }
 
         function revealEachElement(eachSubTileInputBox)
         {
-            //debugger;
+            
             OtherElements= OtherElements.concat(eachSubTileInputBox.getAllElements());
             eachSubTileInputBox.ReplaceNextElement(NextElement.Data);
             eachSubTileInputBox.reveal();
@@ -3350,7 +3348,7 @@ function BindSubmitClick(Name, Address, AddressNick, Splits, Start, End, EventNo
 function SendScheduleInformation(NewEvent, CallBack)
 {
     //var url = "RootWagTap/time.top?WagCommand=1"
-    //debugger;
+    
     //NewEvent = null;
     var ErrorCheck = isCalEvenValidForSend(NewEvent)
     if (ErrorCheck.isError)
@@ -3393,7 +3391,7 @@ function SendScheduleInformation(NewEvent, CallBack)
     }).done(function (response) {
         HandleNEwPage.Hide();
         getRefreshedData.enableDataRefresh();
-        debugger;
+        ;
         var AffirmCallBack = affirmNewEvent(response);
         
         getRefreshedData(AffirmCallBack);
@@ -3491,10 +3489,10 @@ function affirmNewEvent(response)
                 setTimeout(function () {
                     //renderSubEventsClickEvents(EventID);
 
-                    //debugger;
+                    
                     //if (true)
                     {
-                        //debugger;
+                        
                         var CurrentWeekContainer = $(getDomOrCreateNew("CurrentWeekContainer"));
                         var TimeSizeDom = $(global_DictionaryOfSubEvents[EventID].TimeSizeDom)
                         var bar = $(TimeSizeDom).offset().top - $(CurrentWeekContainer).offset().top
@@ -3502,7 +3500,7 @@ function affirmNewEvent(response)
                         //$("#NameOfWeekContainerPlane").animate({ scrollTop: WidthInPixels }, 1000);
                         $("#CurrentWeekContainer").animate({ scrollTop: WidthInPixels }, 1000);
                     }
-                    //debugger;
+                    
                     global_UISetup.RenderOnSubEventClick(EventID);
                 }, 1500);
                 

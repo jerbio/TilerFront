@@ -35,14 +35,13 @@ namespace TilerFront.Controllers
                     case "google":
                         {
                             DateTimeOffset myNow = myUser.getRefNow();
-                            myNow = DateTimeOffset.UtcNow;
 
                             DB_Schedule NewSchedule = new DB_Schedule(retrievedUser, myNow);
 
                             Models.ThirdPartyCalendarAuthenticationModel AllIndexedThirdParty = await ScheduleController.getThirdPartyAuthentication(retrievedUser.UserID, myUser.ThirdPartyUserID, "Google", db);
                             GoogleTilerEventControl googleControl = new GoogleTilerEventControl(AllIndexedThirdParty, db);
                             await googleControl.updateSubEvent(myUser).ConfigureAwait(false);
-                            Dictionary<string, CalendarEvent> AllCalendarEvents = (await googleControl.getCalendarEvents().ConfigureAwait(false)).ToDictionary(obj => obj.getId, obj => obj);
+                            Dictionary<string, CalendarEvent> AllCalendarEvents = (await googleControl.getCalendarEvents(null, true).ConfigureAwait(false)).ToDictionary(obj => obj.getId, obj => obj);
                             GoogleThirdPartyControl googleEvents = new GoogleThirdPartyControl(AllCalendarEvents, AllIndexedThirdParty.getTilerUser());
                             DB_UserActivity activity = new DB_UserActivity(myNow, UserActivity.ActivityType.ThirdPartyUpdate);
                             retrievedUser.ScheduleLogControl.updateUserActivty(activity);
@@ -55,7 +54,7 @@ namespace TilerFront.Controllers
                     case "tiler":
                         {
                             DateTimeOffset myNow = myUser.getRefNow();
-                            myNow = DateTimeOffset.UtcNow;
+                            myNow = myUser.getRefNow();
                             DB_Schedule NewSchedule = new DB_Schedule(retrievedUser, myNow);
 
                             await ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(NewSchedule, retrievedUser.UserID, db).ConfigureAwait(false);
@@ -73,9 +72,8 @@ namespace TilerFront.Controllers
                             DateTimeOffset Deadline = TilerElementExtension.JSStartTime.AddMilliseconds(LongDeadline);
                             Deadline = Deadline.Add(myUser.getTImeSpan);
                             int SplitCount = (int)myUser.Split;
-                            //TimeSpan SpanPerSplit = TimeSpan.FromMilliseconds(myUser.Duration);
-
-                            Tuple<CustomErrors, Dictionary<string, CalendarEvent>> ScheduleUpdateMessage = NewSchedule.BundleChangeUpdate(myUser.EventID, myUser.EventName, newStart, newEnd, Begin, Deadline, SplitCount);//, SpanPerSplit);
+                            SubCalendarEvent subEventedited = NewSchedule.getSubCalendarEvent(myUser.EventID);
+                            Tuple<CustomErrors, Dictionary<string, CalendarEvent>> ScheduleUpdateMessage = NewSchedule.BundleChangeUpdate(myUser.EventID, new EventName(retrievedUser.getTilerUser(), subEventedited, myUser.EventName), newStart, newEnd, Begin, Deadline, SplitCount, myUser.EscapedNotes);
                             DB_UserActivity activity = new DB_UserActivity(myNow, UserActivity.ActivityType.InternalUpdate, new List<String>() { myUser.EventID });
                             retrievedUser.ScheduleLogControl.updateUserActivty(activity);
                             await NewSchedule.UpdateWithDifferentSchedule(ScheduleUpdateMessage.Item2).ConfigureAwait(false);

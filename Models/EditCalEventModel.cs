@@ -16,6 +16,12 @@ namespace TilerFront.Models
         public string CalAddress { get; set; }
         public string CalAddressDescription { get; set; }
         public int AllEvents = 0;
+        public string Notes { get; set; }
+        public string EscapedNotes {
+            get {
+                return Notes ?? "";
+            }
+        }
 
         public DateTimeOffset getStart()
         {

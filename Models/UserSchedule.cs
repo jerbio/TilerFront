@@ -27,9 +27,9 @@ namespace TilerFront.Models
             public double Longitude { get; set; } 
         }
 
-        public void populatePauseData(PausedEvent PausedEvent)
+        public void populatePauseData(PausedEvent PausedEvent, DateTimeOffset currentTime)
         {
-            DateTimeOffset CurrentTime = DateTimeOffset.UtcNow;
+            DateTimeOffset CurrentTime = currentTime;
             long RangeStart = (long)(CurrentTime - TilerElementExtension.JSStartTime).TotalMilliseconds;
             long RangeEnd = RangeStart + (long)TimeSpan.FromDays(1).TotalMilliseconds;
             Func<SubCalEvent, bool> predicate = (subEvent => 

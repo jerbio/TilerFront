@@ -166,6 +166,12 @@ namespace TilerFront.Models
             return RetValue;
         }
 
+        public async Task revokeAccess ()
+        {
+            UserCredential googleCredential = getGoogleOauthCredentials();
+            await googleCredential.RevokeTokenAsync(System.Threading.CancellationToken.None).ConfigureAwait(false);
+        }
+
         public GoogleNotificationRequestModel getGoogleNotificationCredentials(string NotificationEndPoint)
         {
             GoogleNotificationRequestModel RetValue = new GoogleNotificationRequestModel();

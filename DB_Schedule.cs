@@ -110,11 +110,11 @@ namespace TilerFront
             return;
         }
 
-        async virtual public Task WriteFullScheduleToLogAndOutlook(CalendarEvent newCalendarEvent=null)
+        async virtual public Task WriteFullScheduleToLogAndOutlook(CalendarEvent newCalendarEvent = null)
         {
             await CleanUpForUI().ConfigureAwait(false);
             myAccount.UpdateReferenceDayTime(ReferenceDayTIime);
-            
+
 
 
             foreach (List<CalendarEvent> eachTuple in ThirdPartyCalendars.Values)
@@ -130,7 +130,8 @@ namespace TilerFront
             {
                 (myOutlook).WriteToOutlook(MyCalEvent);
             }
-            await myAccount.Commit(AllEventDictionary.Values, newCalendarEvent, EventID.LatestID.ToString());
+
+            await myAccount.Commit(AllEventDictionary.Values, newCalendarEvent, EventID.LatestID.ToString()).ConfigureAwait(false);
         }
 
         virtual public bool isScheduleLoadSuccessful
@@ -173,11 +174,11 @@ namespace TilerFront
             HashSet<SubCalendarEvent> NotdoneYet = new HashSet<SubCalendarEvent>();// getNoneDoneYetBetweenNowAndReerenceStartTIme();
             if (!NewEvent.getRigid)
             {
-                NewEvent = EvaluateTotalTimeLineAndAssignValidTimeSpots(NewEvent, NotdoneYet, optimizeFirstTwentyFourHours: optimizeSchedule);
+                NewEvent = EvaluateTotalTimeLineAndAssignValidTimeSpots(NewEvent, NotdoneYet, null, optimizeFirstTwentyFourHours: optimizeSchedule);
             }
             else
             {
-                NewEvent = EvaluateTotalTimeLineAndAssignValidTimeSpots(NewEvent, NotdoneYet, null, 1, optimizeSchedule);
+                NewEvent = EvaluateTotalTimeLineAndAssignValidTimeSpots(NewEvent, NotdoneYet, null, null, 1, optimizeSchedule);
             }
 
 

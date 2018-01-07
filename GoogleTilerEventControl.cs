@@ -52,7 +52,7 @@ namespace TilerFront
             }
             EventID googleAuthenticationID = EventID.generateGoogleAuthenticationID(((TilerFront.Models.IndexedThirdPartyAuthentication)AuthenticationInfo).ThirdPartyIndex);
 
-            List<CalendarEvent> RetValueList = (await GoogleCalExtension.getAllCalEvents(list.Items, CalendarServiceInfo, EmailID, googleAuthenticationID).ConfigureAwait(false)).ToList();
+            List<CalendarEvent> RetValueList = (await GoogleCalExtension.getAllCalEvents(list.Items, CalendarServiceInfo, EmailID, googleAuthenticationID, null, false).ConfigureAwait(false)).ToList();
             RetValue = new GoogleThirdPartyControl(RetValueList);
             return RetValue;
         }
@@ -62,7 +62,7 @@ namespace TilerFront
         /// Function generates google calendar control. Its populated with events retrieved within +/- 90 days of google calendar update. It returns null if access to google api is lost.
         /// </summary>
         /// <returns></returns>
-        async static public Task<Tuple<List<GoogleTilerEventControl>, GoogleThirdPartyControl>> getThirdPartyControlForIndex(IEnumerable<GoogleTilerEventControl> AllGoogleControls)
+        async static public Task<Tuple<List<GoogleTilerEventControl>, GoogleThirdPartyControl>> getThirdPartyControlForIndex(IEnumerable<GoogleTilerEventControl> AllGoogleControls, TimeLine calucaltionTimeLine, bool getGoogleLocation)
         {
             List<GoogleTilerEventControl> AllControls = AllGoogleControls.ToList();
             GoogleThirdPartyControl RetrievedGoogleControls= null;
@@ -73,7 +73,7 @@ namespace TilerFront
             for (int j = 0; j < AllControls.Count; j++)
             {
                 GoogleTilerEventControl eachGoogleTilerEventControl = AllControls[j];
-                AllConcurrentTasks.Add(eachGoogleTilerEventControl.getCalendarEvents());
+                AllConcurrentTasks.Add(eachGoogleTilerEventControl.getCalendarEvents(calucaltionTimeLine, getGoogleLocation));
             }
 
             int i = 0;
@@ -153,7 +153,7 @@ namespace TilerFront
             return RetValue;
         }
 
-        async public Task<List<CalendarEvent>> getCalendarEventsForIndex()
+        async public Task<List<CalendarEvent>> getCalendarEventsForIndex(TimeLine CalculationTimeLine, bool retrieveGoogleLocation)
         {
 
             Events list = await getGoogleEvents().ConfigureAwait(false);
@@ -164,12 +164,12 @@ namespace TilerFront
             }
             
             EventID googleAuthenticationID = EventID.generateGoogleAuthenticationID(((TilerFront.Models.IndexedThirdPartyAuthentication)AuthenticationInfo).ThirdPartyIndex);
-            RetValue = (await GoogleCalExtension.getAllCalEvents(list.Items, CalendarServiceInfo, EmailID, googleAuthenticationID).ConfigureAwait(false)).ToList();
+            RetValue = (await GoogleCalExtension.getAllCalEvents(list.Items, CalendarServiceInfo, EmailID, googleAuthenticationID, CalculationTimeLine, retrieveGoogleLocation).ConfigureAwait(false)).ToList();
             
             return RetValue;
         }
 
-        async public Task<List<CalendarEvent>> getCalendarEvents()
+        async public Task<List<CalendarEvent>> getCalendarEvents(TimeLine calculationTimeLine, bool retrieveGoogleLocation)
         {
             //var PrepList = CalendarServiceInfo.Events.List(EmailID);
 
@@ -178,7 +178,7 @@ namespace TilerFront
             if(list!=null)
             {   
                 EventID googleAuthenticationID = EventID.generateGoogleAuthenticationID(0);
-                RetValue = (await GoogleCalExtension.getAllCalEvents(list.Items, CalendarServiceInfo, EmailID, googleAuthenticationID).ConfigureAwait(false)).ToList();
+                RetValue = (await GoogleCalExtension.getAllCalEvents(list.Items, CalendarServiceInfo, EmailID, googleAuthenticationID, calculationTimeLine, retrieveGoogleLocation).ConfigureAwait(false)).ToList();
             }
             return RetValue;
         }
@@ -225,7 +225,7 @@ namespace TilerFront
             return AuthenticationInfo;
         }
 
-        static async public Task<ConcurrentBag<CalendarEvent>> getAllCalEvents(IEnumerable<GoogleTilerEventControl>AllGoogleCalControl)
+        static async public Task<ConcurrentBag<CalendarEvent>> getAllCalEvents(IEnumerable<GoogleTilerEventControl>AllGoogleCalControl, TimeLine CalculationTimeLine, bool retrieveLocationFromGoogle = false)
         {
             ConcurrentBag<List<CalendarEvent>> RetValueListContainer = new System.Collections.Concurrent.ConcurrentBag<List<CalendarEvent>>();
             ConcurrentBag<Task<List<CalendarEvent>>> ConcurrentTask = new System.Collections.Concurrent.ConcurrentBag<System.Threading.Tasks.Task<List<TilerElements.CalendarEvent>>>();
@@ -234,7 +234,7 @@ namespace TilerFront
 
             foreach(GoogleTilerEventControl obj in AllGoogleCalControl)
             {
-                ConcurrentTask.Add(obj.getCalendarEventsForIndex());
+                ConcurrentTask.Add(obj.getCalendarEventsForIndex(CalculationTimeLine, false));
             }
             //);
 

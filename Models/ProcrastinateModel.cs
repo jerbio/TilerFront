@@ -7,8 +7,6 @@ namespace TilerFront.Models
 {
     public class ProcrastinateModel : AuthorizedUser
     {
-        
-
         public long DurationDays { get; set; }
         public long DurationHours { get; set; }
         public long DurationMins { get; set; }
@@ -29,6 +27,5 @@ namespace TilerFront.Models
                 return new TimeDuration { DurationDays = DurationDays, DurationHours = DurationHours, DurationMins = DurationMins };
             }
         }
-
     }
 }

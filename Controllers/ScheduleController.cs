@@ -80,16 +80,9 @@ namespace TilerFront.Controllers
                     var GoogleTilerEventControlobj = new GoogleTilerEventControl(obj, db);
                 }
 
-
-
-
-
-
-                //List<Task<List<CalendarEvent>>> getAllCalTasks = AllGoogleTilerEvents.Select(obj => obj.getCalendarEvents()).ToList();
-
                 List<CalendarEvent> ScheduleData = new List<CalendarEvent>();
 
-                Task<ConcurrentBag<CalendarEvent>> GoogleCalEventsTask = GoogleTilerEventControl.getAllCalEvents(AllGoogleTilerEvents);
+                Task<ConcurrentBag<CalendarEvent>> GoogleCalEventsTask = GoogleTilerEventControl.getAllCalEvents(AllGoogleTilerEvents, TimelineForData);
 
                 Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location>> ProfileData = await LogAccess.getProfileInfo(TimelineForData);
 
@@ -100,10 +93,6 @@ namespace TilerFront.Controllers
                 ScheduleData = ScheduleData.Concat(GoogleCalEvents).ToList();
                 IEnumerable<CalendarEvent> NonRepeatingEvents = ScheduleData.Where(obj => !obj.RepetitionStatus);
 
-
-
-
-                //IEnumerable<CalendarEvent> RepeatingEvents = ScheduleData.Where(obj => obj.RepetitionStatus).SelectMany(obj => obj.Repeat.RecurringCalendarEvents);
                 IList<UserSchedule.repeatedEventData> RepeatingEvents = ScheduleData.AsParallel().Where(obj => obj.RepetitionStatus).
                     Select(obj => new UserSchedule.repeatedEventData
                     {
@@ -125,7 +114,7 @@ namespace TilerFront.Controllers
 
                 //ApplicationDbContext db = new ApplicationDbContext();
                 PausedEvent currentPausedEvent = getCurrentPausedEvent(db);
-                currUserSchedule.populatePauseData(currentPausedEvent);
+                currUserSchedule.populatePauseData(currentPausedEvent, myAuthorizedUser.getRefNow());
                 InitScheduleProfile retValue = new InitScheduleProfile { Schedule = currUserSchedule, Name = myUserAccount.Usersname };
                 returnPostBack = new PostBackData(retValue, 0);
             }
@@ -230,7 +219,7 @@ namespace TilerFront.Controllers
                 }
 
 
-                DateTimeOffset myNow = DateTimeOffset.UtcNow;
+                DateTimeOffset myNow = myAuthorizedUser.getRefNow();
                 DB_Schedule MySchedule = new DB_Schedule(myUser, myNow);
                 SubCalendarEvent SubEvent = MySchedule.getSubCalendarEvent(myAuthorizedUser.EventID);
                 if ((!SubEvent.getRigid) && (SubEvent.getId != currentPausedEvent.EventId))
@@ -291,7 +280,7 @@ namespace TilerFront.Controllers
                 CalendarEvent pausedCalEvent = null;
                 if (PausedEvent != null)
                 {
-                    DateTimeOffset myNow = DateTimeOffset.UtcNow;
+                    DateTimeOffset myNow = myAuthorizedUser.getRefNow();
                     DB_Schedule MySchedule = new DB_Schedule(myUser, myNow);
                     DB_UserActivity activity = new DB_UserActivity(myAuthorizedUser.getRefNow(), UserActivity.ActivityType.Resume);
 
@@ -432,12 +421,12 @@ namespace TilerFront.Controllers
         /// <param name="mySchedule"></param>
         /// <param name="TilerUserID"></param>
         /// <returns></returns>
-        static internal async Task updatemyScheduleWithGoogleThirdpartyCalendar(Schedule mySchedule, string TilerUserID, ApplicationDbContext db)
+        static internal async Task updatemyScheduleWithGoogleThirdpartyCalendar(Schedule mySchedule, string TilerUserID, ApplicationDbContext db, TimeLine calcultionTimeLine = null, bool getGoogleLocation = true)
         {
             List<IndexedThirdPartyAuthentication> AllIndexedThirdParty = await getAllThirdPartyAuthentication(TilerUserID, db).ConfigureAwait(false);
             List<GoogleTilerEventControl> AllGoogleTilerEvents = AllIndexedThirdParty.Select(obj => new GoogleTilerEventControl (obj, db)).ToList();
 
-            Tuple<List<GoogleTilerEventControl>, GoogleThirdPartyControl> GoogleEvents = await GoogleTilerEventControl.getThirdPartyControlForIndex(AllGoogleTilerEvents).ConfigureAwait(false);
+            Tuple<List<GoogleTilerEventControl>, GoogleThirdPartyControl> GoogleEvents = await GoogleTilerEventControl.getThirdPartyControlForIndex(AllGoogleTilerEvents, calcultionTimeLine, getGoogleLocation).ConfigureAwait(false);
             Task DeleteInvalidAuthentication = ManageController.delelteGoogleAuthentication(GoogleEvents.Item1.Select(obj => obj.getDBAuthenticationData()));
             mySchedule.updateDataSetWithThirdPartyData(new Tuple<ThirdPartyControl.CalendarTool, IEnumerable<CalendarEvent>>(ThirdPartyControl.CalendarTool.google,new List<CalendarEvent> {GoogleEvents.Item2.getThirdpartyCalendarEvent()}));
             //mySchedule.updateDataSetWithThirdPartyData(new Tuple<ThirdPartyControl.CalendarTool.Google, GoogleEvents.Item2.);
@@ -471,7 +460,7 @@ namespace TilerFront.Controllers
                 {
                     fullTimeSpan = ProcrastinateDuration.TotalTimeSpan; ;
                 }
-                DB_Schedule MySchedule = new DB_Schedule(myUserAccount, DateTimeOffset.UtcNow);
+                DB_Schedule MySchedule = new DB_Schedule(myUserAccount, myAuthorizedUser.getRefNow());
 
                 await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, UserData.UserID, db).ConfigureAwait(false);
 
@@ -522,7 +511,7 @@ namespace TilerFront.Controllers
             UserAccountDirect myUser = await UserData.getUserAccountDirect(db);
             await myUser.Login();
 
-            DateTimeOffset myNow = DateTimeOffset.UtcNow;// myAuthorizedUser.getRefNow();
+            DateTimeOffset myNow = myAuthorizedUser.getRefNow();// myAuthorizedUser.getRefNow();
             DB_Schedule MySchedule = new DB_Schedule(myUser,myNow);
             DB_UserActivity activity = new DB_UserActivity(myNow, UserActivity.ActivityType.ProcrastinateSingle);
             JObject json = JObject.FromObject(UserData);
@@ -553,7 +542,7 @@ namespace TilerFront.Controllers
             await myUser.Login();
             if (myUser.Status)
             {
-                DateTimeOffset myNow = myNow = DateTimeOffset.UtcNow;
+                DateTimeOffset myNow = myNow = myAuthorizedUser.getRefNow();
                 DB_Schedule MySchedule = new DB_Schedule(myUser, myNow);
                 DB_UserActivity activity = new DB_UserActivity(myNow, UserActivity.ActivityType.Shuffle);
                 myUser.ScheduleLogControl.updateUserActivty(activity);
@@ -569,7 +558,7 @@ namespace TilerFront.Controllers
                     location = TilerElements.Location.getDefaultLocation();
                 }
                 await MySchedule.FindMeSomethingToDo(location);
-                MySchedule.WriteFullScheduleToLogAndOutlook().Wait();
+                await MySchedule.WriteFullScheduleToLogAndOutlook().ConfigureAwait(false);
                 BusyTimeLine nextBusySchedule = MySchedule.NextActivity;
                 PostBackData myPostData;
                 if (nextBusySchedule != null)
@@ -628,7 +617,7 @@ namespace TilerFront.Controllers
                         break;
                     case "tiler":
                         {
-                            DateTimeOffset myNow = DateTimeOffset.UtcNow;
+                            DateTimeOffset myNow = UserData.getRefNow();
                             //myNOw = UserData.getRefNow();
                             DB_Schedule MySchedule = new DB_Schedule(retrievedUser, myNow );
                             await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, UserData.UserID, db).ConfigureAwait(false);
@@ -661,7 +650,7 @@ namespace TilerFront.Controllers
         {
             UserAccountDirect myUser = await UserData.getUserAccountDirect(db);
             await myUser.Login();
-            DateTimeOffset myNow = DateTimeOffset.UtcNow;
+            DateTimeOffset myNow = UserData.getRefNow();
             DB_Schedule MySchedule = new DB_Schedule(myUser, myNow);
             IEnumerable<string> AllEventIDs = UserData.EventID.Split(',');
             DB_UserActivity activity = new DB_UserActivity(myNow, UserActivity.ActivityType.CompleteMultiple, AllEventIDs);
@@ -697,8 +686,7 @@ namespace TilerFront.Controllers
             PostBackData retValue;
             if (retrievedUser.Status)
             {
-                DateTimeOffset myNow = DateTimeOffset.UtcNow;
-                //myNow = UserData.getRefNow();
+                DateTimeOffset myNow = myUser.getRefNow();
 
                 DB_Schedule MySchedule = new DB_Schedule(retrievedUser, myNow);
                 DB_UserActivity activity = new DB_UserActivity(myNow, UserActivity.ActivityType.SetAsNowSingle);
@@ -739,7 +727,7 @@ namespace TilerFront.Controllers
             PostBackData retValue;
             if (retrievedUser.Status)
             {
-                DB_UserActivity activity = new DB_UserActivity(DateTimeOffset.UtcNow, UserActivity.ActivityType.Undo);
+                DB_UserActivity activity = new DB_UserActivity(myUser.getRefNow(), UserActivity.ActivityType.Undo);
                 retrievedUser.ScheduleLogControl.updateUserActivty(activity);
                 await retrievedUser.ScheduleLogControl.Undo().ConfigureAwait(false);
                 retValue = new PostBackData("\"Success\"", 0);
@@ -1024,11 +1012,8 @@ namespace TilerFront.Controllers
             if (myUser.Status)
             {
                 DateTimeOffset myNow = newEvent.getRefNow();
-                myNow = DateTimeOffset.UtcNow;
-                
-
                 CalendarEvent newCalendarEvent;
-                RestrictionProfile myRestrictionProfile = newEvent.getRestrictionProfile();
+                RestrictionProfile myRestrictionProfile = newEvent.getRestrictionProfile(myNow);
                 if (myRestrictionProfile != null)
                 {
                     string TimeString = StartDateEntry.Date.ToShortDateString() + " " + StartTime;
@@ -1040,7 +1025,7 @@ namespace TilerFront.Controllers
 
 
                     //RestrictionProfile myRestrictionProfile = CreateRestrictionProfile(newEvent.RestrictionStart, newEvent.RestrictionEnd, newEvent.isWorkWeek, newEvent.getTImeSpan);
-                    newCalendarEvent = new CalendarEventRestricted( Name, StartDateTime, EndDateTime, myRestrictionProfile, EventDuration, MyRepetition, false, true, Count, RigidScheduleFlag, EventLocation, new TimeSpan(0, 15, 0), new TimeSpan(0, 15, 0),null, new EventDisplay(true, userColor, userColor.User < 1 ? 0 : 1), new MiscData(), TimeZone);
+                    newCalendarEvent = new CalendarEventRestricted(tilerUser, new TilerUserGroup(), Name, StartDateTime, EndDateTime, myRestrictionProfile, EventDuration, MyRepetition, false, true, Count, RigidScheduleFlag, EventLocation, new TimeSpan(0, 15, 0), new TimeSpan(0, 15, 0),null, new EventDisplay(true, userColor, userColor.User < 1 ? 0 : 1), new MiscData(), TimeZone);
                 }
                 else
                 {
@@ -1113,7 +1098,6 @@ namespace TilerFront.Controllers
             try
             {
                 DateTimeOffset myNow = newEvent.getRefNow();
-                myNow = DateTimeOffset.UtcNow;
                 UserAccount RetrievedUser = await newEvent.getUserAccountDirect(db).ConfigureAwait(false);
                 DB_Schedule MySchedule = new DB_Schedule(RetrievedUser, myNow);
                 await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, RetrievedUser.UserID, db).ConfigureAwait(false);
@@ -1183,7 +1167,6 @@ namespace TilerFront.Controllers
 
             string StartTime = StartHour + ":" + StartMins;
             string EndTime = EndHour + ":" + EndMins;
-
             DateTimeOffset StartDateEntry = new DateTimeOffset(Convert.ToInt32(StartYear), Convert.ToInt32(StartMonth), Convert.ToInt32(StartDay), 0, 0, 0, new TimeSpan());
             DateTimeOffset EndDateEntry = new DateTimeOffset(Convert.ToInt32(EndYear), Convert.ToInt32(EndMonth), Convert.ToInt32(EndDay), 0, 0, 0, new TimeSpan());
 
@@ -1225,24 +1208,6 @@ namespace TilerFront.Controllers
                     DateTimeOffset newEndTime = FullEndTime;
 
                     string Frequency = RepeatFrequency.Trim().ToUpper();
-                    switch (Frequency)
-                    {
-                        case "DAILY":
-                            //FullEndTime = FullStartTime.AddDays(1);
-                            break;
-                        case "WEEKLY":
-                            //FullEndTime = FullStartTime.AddDays(7);
-                            break;
-                        case "MONTHLY":
-                            //FullEndTime = FullStartTime.AddMonths(1);
-                            break;
-                        case "YEARLY":
-                            //FullEndTime = FullStartTime.AddYears(1);
-                            break;
-                        default:
-                            break;
-                    }
-
                     RepeatEnd = newEndTime;
                 }
 
@@ -1275,12 +1240,11 @@ namespace TilerFront.Controllers
             if (myUser.Status)
             {
                 DateTimeOffset myNow = newEvent.getRefNow();
-                myNow = DateTimeOffset.UtcNow;
                 Schedule MySchedule = new DB_Schedule(myUser, myNow);
                 await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, myUser.UserID, db).ConfigureAwait(false);
 
                 CalendarEvent newCalendarEvent;
-                RestrictionProfile myRestrictionProfile = newEvent.getRestrictionProfile();
+                RestrictionProfile myRestrictionProfile = newEvent.getRestrictionProfile(myNow);
                 if (myRestrictionProfile!=null)
                 {
                     string TimeString = StartDateEntry.Date.ToShortDateString() + " " + StartTime;
@@ -1289,7 +1253,7 @@ namespace TilerFront.Controllers
                     TimeString = EndDateEntry.Date.ToShortDateString() + " " + EndTime;
                     DateTimeOffset EndDateTime = DateTimeOffset.Parse(TimeString).UtcDateTime;
                     EndDateTime = EndDateTime.Add(newEvent.getTImeSpan);
-                    newCalendarEvent = new CalendarEventRestricted(Name, StartDateTime, EndDateTime, myRestrictionProfile, EventDuration, MyRepetition, false, true, Count, RigidScheduleFlag, new TilerElements.Location(), new TimeSpan(0, 15, 0), new TimeSpan(0, 15, 0), null, new EventDisplay(true, userColor, userColor.User < 1 ? 0 : 1), new MiscData());
+                    newCalendarEvent = new CalendarEventRestricted(tilerUser, new TilerUserGroup(), Name, StartDateTime, EndDateTime, myRestrictionProfile, EventDuration, MyRepetition, false, true, Count, RigidScheduleFlag, new TilerElements.Location(), new TimeSpan(0, 15, 0), new TimeSpan(0, 15, 0), null, new EventDisplay(true, userColor, userColor.User < 1 ? 0 : 1), new MiscData());
                 }
                 else
                 {
@@ -1341,49 +1305,6 @@ namespace TilerFront.Controllers
         /// <param name="DaySelection"></param>
         /// <returns></returns>
         [ApiExplorerSettings(IgnoreApi = true)]
-        /*
-        RestrictionProfile CreateRestrictionProfile(string Start, string End,string workWeek,TimeSpan TimeZoneOffSet ,string DaySelection="")
-        { 
-            DateTimeOffset RestrictStart = DateTimeOffset.Parse(Start).UtcDateTime;
-            RestrictStart=RestrictStart.Add(TimeZoneOffSet);
-            DateTimeOffset RestrictEnd = DateTimeOffset.Parse(End).UtcDateTime;
-            RestrictEnd=RestrictEnd.Add(TimeZoneOffSet);
-            bool WorkWeekFlag = Convert.ToBoolean(workWeek);
-
-            List<mTuple<bool, DayOfWeek>> allElements = (new mTuple<bool, System.DayOfWeek>[7]).ToList();
-            allElements[(int)DayOfWeek.Sunday] = new mTuple<bool, System.DayOfWeek>(false, DayOfWeek.Sunday);
-            allElements[(int)DayOfWeek.Monday] = new mTuple<bool, System.DayOfWeek>(false, DayOfWeek.Monday);
-            allElements[(int)DayOfWeek.Tuesday] = new mTuple<bool, System.DayOfWeek>(false, DayOfWeek.Tuesday);
-            allElements[(int)DayOfWeek.Wednesday] = new mTuple<bool, System.DayOfWeek>(false, DayOfWeek.Wednesday);
-            allElements[(int)DayOfWeek.Thursday] = new mTuple<bool, System.DayOfWeek>(false, DayOfWeek.Thursday);
-            allElements[(int)DayOfWeek.Friday] = new mTuple<bool, System.DayOfWeek>(false, DayOfWeek.Friday);
-            allElements[(int)DayOfWeek.Saturday] = new mTuple<bool, System.DayOfWeek>(false, DayOfWeek.Saturday);
-
-
-            DayOfWeek[] selectedDaysOftheweek = { };
-
-            if (!string.IsNullOrEmpty(DaySelection))
-            {
-                selectedDaysOftheweek = DaySelection.Split(',').Where(obj => !String.IsNullOrEmpty(obj)).Select(obj => RestrictionProfile.AllDaysOfWeek[Convert.ToInt32(obj)]).ToArray();
-            }
-            else 
-            {
-                selectedDaysOftheweek = RestrictionProfile.AllDaysOfWeek.ToArray();
-            }
-            RestrictionProfile retValue;
-            if (WorkWeekFlag)
-            {
-                retValue = new RestrictionProfile(7, DayOfWeek.Monday, RestrictStart, RestrictEnd);
-            }
-            else
-            {
-                RestrictionTimeLine  RestrictionTimeLine = new TilerElements.RestrictionTimeLine(RestrictStart,RestrictEnd);
-                retValue = new RestrictionProfile(selectedDaysOftheweek, RestrictionTimeLine);
-            }
-            return retValue;
-        }
-        */
-
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);

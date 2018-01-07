@@ -60,7 +60,7 @@ namespace TilerFront.Controllers
             {
                 long myNow = (long)(DateTimeOffset.UtcNow - TilerElementExtension.JSStartTime).TotalMilliseconds; ;
                 IEnumerable<CalendarEvent> retrievedCalendarEvents = (await retrievedUser.ScheduleLogControl.getCalendarEventWithName(phrase)).Where(obj => obj.isActive);
-                retValue = new PostBackData(retrievedCalendarEvents.Select(obj => obj.ToCalEvent()).OrderBy(obj => Math.Abs(myNow - obj.EndDate)).ToList(), 0);
+                retValue = new PostBackData(retrievedCalendarEvents.OrderByDescending(obj => obj.TimeCreated).ThenByDescending(obj => obj.getId).Select(obj => obj.ToCalEvent()).OrderBy(obj => Math.Abs(myNow - obj.EndDate)).ToList(), 0);
             }
             
                 
@@ -210,7 +210,7 @@ namespace TilerFront.Controllers
                             Models.ThirdPartyCalendarAuthenticationModel AllIndexedThirdParty = await ScheduleController.getThirdPartyAuthentication(retrievedUser.UserID, myUser.ThirdPartyUserID, "Google", db);
                             GoogleTilerEventControl googleControl = new GoogleTilerEventControl(AllIndexedThirdParty, db);
                             await googleControl.updateSubEvent(myUser).ConfigureAwait(false);
-                            Dictionary<string, CalendarEvent>AllCalendarEvents =  (await googleControl.getCalendarEvents().ConfigureAwait(false)).ToDictionary(obj=>obj.getId, obj=>obj);
+                            Dictionary<string, CalendarEvent>AllCalendarEvents =  (await googleControl.getCalendarEvents(null, true).ConfigureAwait(false)).ToDictionary(obj=>obj.getId, obj=>obj);
 
                             GoogleThirdPartyControl googleEvents = new GoogleThirdPartyControl(AllCalendarEvents, AllIndexedThirdParty.getTilerUser());
 
@@ -230,7 +230,8 @@ namespace TilerFront.Controllers
                             newEnd = newEnd.Add(myUser.getTImeSpan);
                             int SplitCount = (int)myUser.Split;
                             TimeSpan SpanPerSplit = TimeSpan.FromMilliseconds(myUser.Duration);
-                            Tuple<CustomErrors, Dictionary<string, CalendarEvent>> ScheduleUpdateMessage = NewSchedule.BundleChangeUpdate(myUser.EventID, myUser.EventName, newStart, newEnd, SplitCount);//, SpanPerSplit);
+                            CalendarEvent calEvent = NewSchedule.getCalendarEvent(myUser.EventID);
+                            Tuple<CustomErrors, Dictionary<string, CalendarEvent>> ScheduleUpdateMessage = NewSchedule.BundleChangeUpdate(myUser.EventID, new EventName(retrievedUser.getTilerUser(), calEvent, myUser.EventName), newStart, newEnd, SplitCount, myUser.EscapedNotes);
                             DB_UserActivity activity = new DB_UserActivity(myUser.getRefNow(), UserActivity.ActivityType.InternalUpdateCalendarEvent, new List<String>() { myUser.EventID });
                             JObject json = JObject.FromObject(myUser);
                             activity.updateMiscelaneousInfo(json.ToString());

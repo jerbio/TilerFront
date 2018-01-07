@@ -14,7 +14,7 @@ using System.IO.Compression;
 using System.Xml.Serialization;
 using System.Data.Entity;
 using TilerFront.Models;
-
+using BigDataTiler;
 #if ForceReadFromXml
 #else
 using CassandraUserLog;
@@ -83,7 +83,6 @@ namespace TilerFront
                 {Reason.Options.RestrictedEvent.ToString(), (XmlNode node)=> { return  getRestrictedEventReason(node); } }
             };
         }
-
 
         public LogControl(TilerUser user, ApplicationDbContext database, string logLocation = "", DB_UserActivity useractivity = null)
         {
@@ -187,7 +186,7 @@ namespace TilerFront
                     }
                     xmldoc.Save(LogFile);
                     xmldocCopy.Save(LogFileCopy);
-                    updateBigData(xmldocCopy, xmldoc);
+                    await updateBigData(xmldocCopy, xmldoc).ConfigureAwait(false);
                     if (dbLatestChange != null) {
                         await dbLatestChange;
                     }
@@ -216,13 +215,13 @@ namespace TilerFront
         /// </summary>
         /// <param name="oldData"></param>
         /// <param name="newData"></param>
-        public async void updateBigData(XmlDocument oldData, XmlDocument newData)
+        public virtual async Task updateBigData(XmlDocument oldData, XmlDocument newData)
         {
             bool corruptZipFile = false;
             string zipFile = LoggedUserID + ".zip";
             string zipFolder = LoggedUserID;
-
-            string fullZipPath = @BigDataLogLocation + zipFile;
+            BigDataLogControl bigdataControl = new BigDataLogControl();
+        string fullZipPath = @BigDataLogLocation + zipFile;
             try
             {
                 if (activity == null)
@@ -231,13 +230,13 @@ namespace TilerFront
                 }
                 XmlDocument combinedDoc = new XmlDocument();
 
-                XmlNode timeOfCreation = combinedDoc.CreateElement("TimeOfCreation");
+                XmlNode timeOfCreationNode = combinedDoc.CreateElement("TimeOfCreation");
                 XmlNode bigDataLog = combinedDoc.CreateElement("BigDataLog");
                 XmlNode miscDataLog = combinedDoc.CreateElement("MiscData");
                 miscDataLog.InnerText = activity.getMiscdata();
 
-                timeOfCreation.InnerXml = activity.ToXML();
-                bigDataLog.AppendChild(timeOfCreation);
+                timeOfCreationNode.InnerXml = activity.ToXML();
+                bigDataLog.AppendChild(timeOfCreationNode);
                 bigDataLog.AppendChild(miscDataLog);
                 XmlNode beforeProcessing = combinedDoc.CreateElement("BeforeProcessing");
                 XmlNode importedNBeforeProcessingNode = combinedDoc.ImportNode(oldData.DocumentElement as XmlNode, true);
@@ -255,49 +254,17 @@ namespace TilerFront
                 combinedDoc.AppendChild(bigDataLog);
                 XmlElement root = combinedDoc.DocumentElement;
                 combinedDoc.InsertBefore(xmldecl, root);
-                MemoryStream xmlStream = new MemoryStream();
-                combinedDoc.Save(xmlStream);
-                DateTimeOffset javascriptStart = new DateTimeOffset(1970, 1, 1, 0, 0, 0, new TimeSpan());
-                string beforFileName = ((long)(DateTimeOffset.UtcNow
-                   .Subtract(javascriptStart)
-                   .TotalMilliseconds)).ToString();
-
-
-                
-
-                if (File.Exists(fullZipPath))
+                DateTimeOffset timeOfCreation = DateTimeOffset.UtcNow;
+                LogChange log = new LogChange()
                 {
-                    corruptZipFile = true;
-                    using (FileStream zipToOpen = new FileStream(@fullZipPath, FileMode.Open))
-                    {
-                        using (ZipArchive archive = new ZipArchive(zipToOpen, ZipArchiveMode.Update))
-                        {
-                            ZipArchiveEntry readmeEntry = archive.CreateEntry(beforFileName + ".xml", CompressionLevel.Optimal);
-                            xmlStream.WriteTo(readmeEntry.Open());
-                        }
-                    }
-                }
-                else
-                {
-                    using (var memoryStream = new MemoryStream())
-                    {
-                        using (var archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
-                        {
-                            var demoFile = archive.CreateEntry(beforFileName + ".xml", CompressionLevel.Optimal);
-
-                            using (var entryStream = demoFile.Open())
-                            {
-                                xmlStream.WriteTo(entryStream);
-                            }
-                        }
-
-                        using (var fileStream = new FileStream(@fullZipPath, FileMode.Create))
-                        {
-                            memoryStream.Seek(0, SeekOrigin.Begin);
-                            memoryStream.CopyTo(fileStream);
-                        }
-                    }
-                }
+                    Id = Guid.NewGuid().ToString(),
+                    TimeOfCreation = timeOfCreation,
+                    JsTimeOfCreation = timeOfCreation.toJSMilliseconds(),
+                    TypeOfEvent = activity.TriggerType.ToString(),
+                    UserId = _TilerUser.Id
+                };
+                log.loadXmlFile(combinedDoc);
+                await bigdataControl.AddLogDocument(log).ConfigureAwait(false);
             }
             catch (Exception e)
             {
@@ -338,6 +305,123 @@ namespace TilerFront
             return;
         }
 
+        async public Task<bool> WriteToLogOld(IEnumerable<CalendarEvent> AllEvents, string LatestID, string LogFile = "")
+        {
+            Task<bool>  retValue;
+
+
+
+            retValue = new Task<bool>(() => { return true; });
+            retValue.Start();
+            string LogFileCopy = "";
+            if (LogFile == "")
+            { 
+                LogFile = WagTapLogLocation + CurrentLog;
+                LogFileCopy = WagTapLogLocation + "Copy_" + CurrentLog;
+            }
+
+            
+
+            XmlDocument xmldoc = new XmlDocument();
+            XmlDocument xmldocCopy = new XmlDocument();
+            xmldoc.Load(LogFile);
+            try
+            {
+                xmldocCopy.Load(LogFileCopy);
+            }
+            catch
+            {
+                try
+                {
+                    xmldocCopy.Load(LogFileCopy);
+                }
+                catch(Exception e)
+                {
+                    Console.Write(e.Message);
+                }
+            }
+
+
+            xmldocCopy.InnerXml = xmldoc.InnerXml;
+            CachedLocation = await getLocationCache().ConfigureAwait(false); ;//populates with current location info
+            Dictionary<string, TilerElements.Location> OldLocationCache = new Dictionary<string, TilerElements.Location>(CachedLocation);
+            xmldoc.DocumentElement.SelectSingleNode("/ScheduleLog/LastIDCounter").InnerText = LatestID;
+            XmlNodeList EventSchedulesNodes = xmldoc.DocumentElement.SelectNodes("/ScheduleLog/EventSchedules");
+            
+            XmlNode EventSchedulesNodesNode = xmldoc.DocumentElement.SelectSingleNode("/ScheduleLog/EventSchedules");
+            XmlNode EventSchedulesNodesNodeCpy = xmldoc.CreateElement("NodeCopy");
+            EventSchedulesNodesNodeCpy.InnerXml = EventSchedulesNodesNode.InnerXml;
+            EventSchedulesNodesNode.RemoveAll();
+            XmlNodeList EventScheduleNodes = xmldoc.DocumentElement.SelectNodes("/ScheduleLog/EventSchedules/EventSchedule");
+            bool errorWritingFile = false;
+            CalendarEvent ErrorEvent = new CalendarEvent();
+            EventScheduleNodes = xmldoc.DocumentElement.SelectNodes("/ScheduleLog/EventSchedules/EventSchedule");
+            try
+            {
+                foreach (CalendarEvent MyEvent in AllEvents)
+                {
+                    {
+                        XmlElement EventScheduleNode;
+                        ErrorEvent = MyEvent;
+                        EventScheduleNode = CreateEventScheduleNode(MyEvent);
+                
+                        XmlNode MyImportedNode = xmldoc.ImportNode(EventScheduleNode as XmlNode, true);
+                        //(EventScheduleNode, true);
+                        if (!UpdateInnerXml(ref EventScheduleNodes, "ID", MyEvent.getId, EventScheduleNode))
+                        {
+                            xmldoc.DocumentElement.SelectSingleNode("/ScheduleLog/EventSchedules").AppendChild(MyImportedNode);
+                        }
+                        else
+                        {
+                            ;
+                        }
+                    }
+                }
+            }
+            catch(Exception e)
+            {
+                EventSchedulesNodesNode.InnerXml = EventSchedulesNodesNodeCpy.InnerXml;
+                errorWritingFile = true;
+            }
+
+            UpdateCacheLocation(xmldoc, OldLocationCache,NewLocation);
+            int loopCounter = 0;
+            while (true)
+            {
+                try
+                {
+                    Task dbLatestChange = null;
+                    if (!string.IsNullOrEmpty(_TilerUser.PasswordHash))
+                    {
+                        dbLatestChange = TilerController.saveLatestChange(Database, _TilerUser);
+                    }
+                    xmldoc.Save(LogFile);
+                    xmldocCopy.Save(LogFileCopy);
+                    await updateBigData(xmldocCopy, xmldoc).ConfigureAwait(false);
+                    if (dbLatestChange != null)
+                    {
+                        await dbLatestChange;
+                    }
+                    break;
+                }
+                catch (Exception e)
+                {
+                    Thread.Sleep(160);
+
+                    if (++loopCounter > 3)
+                    {
+                        throw new TimeoutException("Failed to update schedule log");
+                    }
+                }
+            }
+
+            if(errorWritingFile)
+            {
+                throw new Exception("Error wrtiting file" + ErrorEvent.getName);
+            }
+
+            return await retValue.ConfigureAwait(false); ;
+        }
         /// <summary>
         /// updates the logcontrol with a possible new location
         /// </summary>
@@ -607,6 +691,8 @@ namespace TilerFront
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.getIsProcrastinateCalendarEvent.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("TimeZone"));
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.getTimeZone;
+            MyEventScheduleNode.PrependChild(xmldoc.CreateElement("TimeCreaated"));
+            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.TimeCreated.ToString();
 
             if (MyEvent.getIsEventRestricted)
             {
@@ -815,6 +901,16 @@ namespace TilerFront
             MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.getIsProcrastinateCalendarEvent.ToString();
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("TimeZone"));
             MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.getTimeZone;
+            MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("TimeCreaated"));
+            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.TimeCreated.ToString();
+            MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("TravelTimeAfter"));
+            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.TravelTimeAfter.ToString();
+            MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("TravelTimeBefore"));
+            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.TravelTimeBefore.ToString();
+            MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("isWake"));
+            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.isWake.ToString();
+            MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("isSleep"));
+            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.isSleep.ToString();
 
             if (MySubEvent.getIsEventRestricted)
             {
@@ -1441,6 +1537,16 @@ namespace TilerFront
             {
                 DeleteCount = RetrievedEvent.AllSubEvents.Where(obj => !obj.isEnabled).Count();
             }
+
+            DateTimeOffset timeCreated;
+            XmlNode timeCreatednode = EventScheduleNode.SelectSingleNode("TimeCreated");
+            if (timeCreatednode != null)
+            {
+                timeCreated = DateTimeOffset.Parse(timeCreatednode.ToString());
+                RetrievedEvent.TimeCreated = timeCreated;
+            }
+
+
             RetrievedEvent.InitializeCounts(DeleteCount, CompleteCount);
 
             return RetrievedEvent;
@@ -1631,6 +1737,29 @@ namespace TilerFront
                         (retrievedSubEvent as DB_SubCalendarEventRestricted).PauseTime = PauseData.Item2;
                     }
                 }
+
+                DateTimeOffset timeCreated;
+                XmlNode timeCreatednode = MyXmlNode.ChildNodes[i].SelectSingleNode("TimeCreated");
+                if (timeCreatednode != null)
+                {
+                    timeCreated = DateTimeOffset.Parse(timeCreatednode.ToString());
+                    retrievedSubEvent.TimeCreated = timeCreated;
+                }
+
+                TimeSpan TravelTimeAfter;
+                TimeSpan TravelTimeBefore;
+                TimeSpan.TryParse(MyXmlNode.ChildNodes[i].SelectSingleNode("TravelTimeAfter")?.InnerText ?? "", out TravelTimeAfter);
+                TimeSpan.TryParse(MyXmlNode.ChildNodes[i].SelectSingleNode("TravelTimeBefore")?.InnerText ?? "", out TravelTimeBefore);
+
+                bool isSleep, isWake;
+                bool.TryParse(MyXmlNode.ChildNodes[i].SelectSingleNode("isSleep")?.InnerText ?? "", out isSleep);
+                bool.TryParse(MyXmlNode.ChildNodes[i].SelectSingleNode("isWake")?.InnerText ?? "", out isWake);
+
+                retrievedSubEvent.isSleep = isSleep;
+                retrievedSubEvent.isWake = isWake;
+
+                retrievedSubEvent.TravelTimeAfter = TravelTimeAfter;
+                retrievedSubEvent.TravelTimeBefore = TravelTimeBefore;
                 MyArrayOfNodes.Add(retrievedSubEvent);
                 createReasonObjects(retrievedSubEvent, MyXmlNode.ChildNodes[i]);
             }
