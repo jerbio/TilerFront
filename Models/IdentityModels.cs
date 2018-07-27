@@ -10,52 +10,19 @@ using TilerElements;
 namespace TilerFront.Models
 {
     // You can add profile data for the user by adding more properties to your TilerUser class, please visit http://go.microsoft.com/fwlink/?LinkID=317594 to learn more.
-    public class ApplicationDbContext : IdentityDbContext<TilerUser>
+    public class ApplicationDbContext : TilerDbContext
     {
-        public ApplicationDbContext()
-            : base("DefaultConnection", throwIfV1Schema: false)
+        public ApplicationDbContext(string connectionName = "DefaultConnection") : base(connectionName)
         {
         }
 
         public System.Data.Entity.DbSet<ThirdPartyCalendarAuthenticationModel> ThirdPartyAuthentication { get; set; }
         public System.Data.Entity.DbSet<GoogleNotificationWatchResponseModel> GoogleNotificationCredentials { get; set; }
         public System.Data.Entity.DbSet<PausedEvent> PausedEvents { get; set; }
-        public System.Data.Entity.DbSet<TilerEvent> events { get; set; }
-        public System.Data.Entity.DbSet<SubCalendarEvent> SubEvents { get; set; }
-        public System.Data.Entity.DbSet<CalendarEvent> CalEvents { get; set; }
-        public System.Data.Entity.DbSet<Repetition> Repetitions { get; set; }
-        public System.Data.Entity.DbSet<RestrictionProfile> Restrictions { get; set; }
-        public System.Data.Entity.DbSet<Location> Locations { get; set; }
-        public System.Data.Entity.DbSet<EventDisplay> UiParams { get; set; }
-        public System.Data.Entity.DbSet<MiscData> MiscData { get; set; }
-        public System.Data.Entity.DbSet<RestrictionDay> RestrictionDays { get; set; }
-        public System.Data.Entity.DbSet<TilerColor> UserColors { get; set; }
-        public System.Data.Entity.DbSet<Undo> undos { get; set; }
-        public System.Data.Entity.DbSet<CalendarEventRestricted> RestrictedCalEvents { get; set; }
-        public System.Data.Entity.DbSet<SubCalendarEventRestricted> RestrictedSubCalEvents { get; set; }
-        public System.Data.Entity.DbSet<RigidCalendarEvent> RigidCalEvents { get; set; }
-        public System.Data.Entity.DbSet<BusyTimeLine> BusyTimelines { get; set; }
-        public System.Data.Entity.DbSet<EventName> EventNames { get; set; }
-        public System.Data.Entity.DbSet<EventTimeLine> EventTimeLines { get; set; }
-        public System.Data.Entity.DbSet<Classification> EventType { get; set; }
-        public System.Data.Entity.DbSet<GoogleTilerUser> Googleusers { get; set; }
-        public System.Data.Entity.DbSet<NowProfile> NowProfiles { get; set; }
-        public System.Data.Entity.DbSet<ProcrastinateCalendarEvent> ProcrastinteAlls { get; set; }
-        public System.Data.Entity.DbSet<Procrastination> Procrastinations { get; set; }
-        public System.Data.Entity.DbSet<Reason> Reasons { get; set; }
-        public System.Data.Entity.DbSet<RestrictionTimeLine> RestrictionTimeLines { get; set; }
-        public System.Data.Entity.DbSet<ThirdPartyTilerUser> ThirdPartyTilerUsers { get; set; }
-        public System.Data.Entity.DbSet<TilerUserGroup> TilerUserGroups { get; set; }
 
         public static ApplicationDbContext Create()
         {
             return new ApplicationDbContext();
-        }
-
-        protected override void OnModelCreating(DbModelBuilder modelBuilder)
-        {
-            base.OnModelCreating(modelBuilder);
-            modelBuilder.Configurations.Add(new TilerElements.Fluent.TilerEventMapping());
         }
     }
 }

@@ -34,17 +34,12 @@ namespace TilerFront
             //useCassandra=false;
 //            SessionUser= new TilerUser();
         }
-        public LogControlDirect(TilerUser User, ApplicationDbContext database, string logLocation="")
+        public LogControlDirect(TilerUser User, ApplicationDbContext database)
         {
-            if (!string.IsNullOrEmpty(logLocation))
-            {
-                WagTapLogLocation = logLocation;
-            }
             _TilerUser = User;
             LogStatus = false;
             CachedLocation = new Dictionary<string, TilerElements.Location>();
-            Database = database;
-            CurrentLog = _TilerUser.Id.ToString() + ".xml";
+            _Database = database;
             LogStatus = true;
             ID = _TilerUser.Id;
             UserName = _TilerUser.UserName;
@@ -78,128 +73,8 @@ namespace TilerFront
 
 
         #region Functions
-        override async public Task Initialize()
-        {
-            await base.Initialize().ConfigureAwait(false);
-        }
-
-
-
-        public static void UpdateLogLocation(string LogLocation)
-        {
-            WagTapLogLocation = LogLocation;
-        }
-        public static string getLogLocation()
-        {
-            return WagTapLogLocation;
-        }
-#if ForceReadFromXml
-#else
-        public Task<bool> CommitToCassadra(IEnumerable<CalendarEvent> AllCalEvents)
-        {
-            return myCassandraAccess.Commit(AllCalEvents);
-        }
-
-        /// <summary>
-        /// Adds a new event to the cassandra db. Do not use with the old XML system.
-        /// </summary>
-        /// <param name="myEvent"></param>
-        async public Task AddNewEventToCassandra(CalendarEvent newEvent)
-        {
-            await myCassandraAccess.AddNewEventToTiler(newEvent);
-        }
-#endif
-
 
         #region Write Data
-
-        public CustomErrors genereateNewLogFile(string UserID)//creates a new xml log file. Uses the passed UserID
-        {
-
-            CustomErrors retValue = null;
-#if ForceReadFromXml
-#else
-            if (useCassandra)
-            {
-                return retValue;
-            }
-#endif
-            try
-            {
-
-                string NameOfFile = WagTapLogLocation + UserID + ".xml";
-                if (File.Exists(NameOfFile))
-                {
-                    File.Delete(NameOfFile);
-                }
-
-                FileStream myFileStream = File.Create(NameOfFile);
-                myFileStream.Close();
-
-                CurrentLog = UserID + ".xml";
-                EmptyCalendarXMLFile(NameOfFile);
-                //EmptyCalendarXMLFile();
-            }
-            catch (Exception e)
-            {
-                retValue = new CustomErrors("Error generating log\n" + e.ToString(), 20000000);
-            }
-
-            return retValue;
-
-        }
-
-        public async Task<CustomErrors> DeleteLog()
-        {
-            await Initialize().ConfigureAwait(false);
-            return deleteLogFile(CurrentLog);
-        }
-
-        protected CustomErrors deleteLogFile(string CurrentLog)
-        {
-            CustomErrors retValue = null;
-            try
-            {
-                string NameOfFile = WagTapLogLocation + CurrentLog;
-                File.Delete(NameOfFile);
-            }
-            catch (Exception e)
-            {
-                retValue = new CustomErrors(e.ToString(), 20002000);
-            }
-
-            return retValue;
-        }
-
-        public async Task<CustomErrors> DeleteLogOfUnregistedUser()
-        {
-            CustomErrors retValue = null;
-            var tilerUser = Database.Users.Find(ID);
-            if (tilerUser == null)
-            {
-                return deleteLogFile(CurrentLog);
-            }
-            else
-            {
-                throw new CustomErrors("Trying to delete a file of an active user");
-            }
-        }
-
-        async public override Task<DateTimeOffset> getDayReferenceTime(string NameOfFile = "")
-        {
-            if(!forcedLogin)
-            {
-                _TilerUser = await forceLogin().ConfigureAwait(false);
-            }
-            DateTimeOffset retValue = _TilerUser.EndfOfDay;
-            return retValue;
-        }
-
-        async public  Task<DateTimeOffset> getDayReferenceTimeFromXml(string NameOfFile = "")
-        {
-            return await base.getDayReferenceTime(NameOfFile);
-        }
-
         /// <summary>
         /// Function does nothing because updating start of day gets triggered in the manage controller
         /// </summary>
@@ -234,45 +109,7 @@ namespace TilerFront
             xmldoc.Save(LogFile);*/
             return;
         }
-
-        /*
-        public void WriteToLog(CalendarEvent MyEvent, string LogFile = "")//writes to an XML Log file. Takes calendar event as an argument
-        {
-            if (LogFile == "")
-            { LogFile = WagTapLogLocation + CurrentLog; }
-            XmlDocument xmldoc = new XmlDocument();
-            xmldoc.Load(LogFile);
-            CachedLocation = getLocationCache();//populates with current location info
-
-            xmldoc.DocumentElement.SelectSingleNode("/ScheduleLog/LastIDCounter").InnerText = MyEvent.ID;
-            XmlNodeList EventSchedulesNodes = xmldoc.DocumentElement.SelectNodes("/ScheduleLog/EventSchedules");
-            XmlNodeList EventScheduleNodes = xmldoc.DocumentElement.SelectNodes("/ScheduleLog/EventSchedules/EventSchedule");
-
-            XmlElement EventScheduleNode = CreateEventScheduleNode(MyEvent);
-            //EventSchedulesNodes[0].PrependChild(xmldoc.CreateElement("EventSchedule"));
-            //EventSchedulesNodes[0].ChildNodes[0].InnerXml = CreateEventScheduleNode(MyEvent).InnerXml;
-            XmlNode MyImportedNode = xmldoc.ImportNode(EventScheduleNode as XmlNode, true);
-            //(EventScheduleNode, true);
-            if (!UpdateInnerXml(ref EventScheduleNodes, "ID", MyEvent.ID.ToString(), EventScheduleNode))
-            {
-                xmldoc.DocumentElement.SelectSingleNode("/ScheduleLog/EventSchedules").AppendChild(MyImportedNode);
-            }
-
-            UpdateCacheLocation(xmldoc);
-            while (true)
-            {
-                try
-                {
-                    xmldoc.Save(LogFile);
-                    break;
-                }
-                catch (Exception e)
-                {
-                    Thread.Sleep(160);
-                }
-            }
-        }
-        */
+        
 //        async public Task<bool> WriteToLog(IEnumerable<CalendarEvent> AllEvents, string LatestID, string LogFile = "")
 //        {
 //            Task<bool>  retValue;
@@ -373,7 +210,7 @@ namespace TilerFront
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("EventSubSchedules"));
             //MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.Repetition.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("RigidFlag"));
-            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.getRigid.ToString();
+            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.isRigid.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Duration"));
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.getActiveDuration.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Split"));
@@ -536,278 +373,10 @@ namespace TilerFront
             var1.ChildNodes[0].InnerText = Arg1.TypeSelection.ToString();
             return var1;
         }
-        public void EmptyCalendarXMLFile(string dirString = "")
-        {
-            if (string.IsNullOrEmpty(dirString))
-            {
-                dirString = WagTapLogLocation + CurrentLog;
-            }
 
-            File.WriteAllText(dirString, "<?xml version=\"1.0\" encoding=\"utf-8\"?><ScheduleLog><LastIDCounter>0</LastIDCounter><referenceDay>12:00 AM</referenceDay><EventSchedules></EventSchedules></ScheduleLog>");
-        }
-
-        public void deleteAllCalendarEvets(string dirString = "")
-        {
-            #if ForceReadFromXml
-#else
-            if(useCassandra)
-            {
-                return;
-            }
-#endif
-            if (string.IsNullOrEmpty(dirString))
-            {
-                dirString = WagTapLogLocation + CurrentLog;
-            }
-
-            XmlDocument doc = new XmlDocument();
-            while (true)
-            {
-                if (!File.Exists(dirString))
-                {
-                    break;
-                }
-                try
-                {
-                    doc.Load(dirString);
-                    break;
-                }
-                catch (Exception e)
-                {
-                    Thread.Sleep(160);
-                }
-            }
-
-            XmlNode EventSchedulesNodes = doc.DocumentElement.SelectSingleNode("/ScheduleLog/EventSchedules");
-            EventSchedulesNodes.InnerText = "";
-            while (true)
-            {
-                try
-                {
-                    doc.Save(dirString);
-                    break;
-                }
-                catch (Exception e)
-                {
-                    Thread.Sleep(160);
-                }
-            }
-
-        }
         #endregion
 
         #region Read Data
-
-        /*
-        public string GetShortcutTarget(string file)
-        {
-            try
-            {
-                if (System.IO.Path.GetExtension(file).ToLower() != ".lnk")
-                {
-                    throw new Exception("Supplied file must be a .LNK file");
-                }
-
-                FileStream fileStream = File.Open(file, FileMode.Open, FileAccess.Read);
-                using (System.IO.BinaryReader fileReader = new BinaryReader(fileStream))
-                {
-                    fileStream.Seek(0x14, SeekOrigin.Begin);     // Seek to flags
-                    uint flags = fileReader.ReadUInt32();        // Read flags
-                    if ((flags & 1) == 1)
-                    {                      // Bit 1 set means we have to
-                        // skip the shell item ID list
-                        fileStream.Seek(0x4c, SeekOrigin.Begin); // Seek to the end of the header
-                        uint offset = fileReader.ReadUInt16();   // Read the length of the Shell item ID list
-                        fileStream.Seek(offset, SeekOrigin.Current); // Seek past it (to the file locator info)
-                    }
-
-                    long fileInfoStartsAt = fileStream.Position; // Store the offset where the file info
-                    // structure begins
-                    uint totalStructLength = fileReader.ReadUInt32(); // read the length of the whole struct
-                    fileStream.Seek(0xc, SeekOrigin.Current); // seek to offset to base pathname
-                    uint fileOffset = fileReader.ReadUInt32(); // read offset to base pathname
-                    // the offset is from the beginning of the file info struct (fileInfoStartsAt)
-                    fileStream.Seek((fileInfoStartsAt + fileOffset), SeekOrigin.Begin); // Seek to beginning of
-                    // base pathname (target)
-                    long pathLength = (totalStructLength + fileInfoStartsAt) - fileStream.Position - 2; // read
-                    // the base pathname. I don't need the 2 terminating nulls.
-                    char[] linkTarget = fileReader.ReadChars((int)pathLength); // should be unicode safe
-                    var link = new string(linkTarget);
-
-                    int begin = link.IndexOf("\0\0");
-                    if (begin > -1)
-                    {
-                        int end = link.IndexOf("\\\\", begin + 2) + 2;
-                        end = link.IndexOf('\0', end) + 1;
-
-                        string firstPart = link.Substring(0, begin);
-                        string secondPart = link.Substring(end);
-
-                        return firstPart + secondPart;
-                    }
-                    else
-                    {
-                        return link;
-                    }
-                }
-            }
-            catch
-            {
-                return "";
-            }
-        }
-
-        override public DateTimeOffset getDayReferenceTime(string NameOfFile = "")
-        {
-#if ForceReadFromXml
-#else
-            if (useCassandra)
-            {
-#if LocalDebug
-                return new DateTimeOffset(1970, 1, 1, 16, 0, 0, new TimeSpan());
-#else
-                return SessionUser.LastChange;
-#endif
-            }
-#endif 
-            
-            XmlDocument doc = getLogDataStore(NameOfFile);
-            XmlNode node = doc.DocumentElement.SelectSingleNode("/ScheduleLog/referenceDay");
-            DateTimeOffset retValue = DateTimeOffset.Parse(node.InnerText);
-
-            return retValue;
-        }
-
-        private XmlDocument getLogDataStore(string NameOfFile = "")
-        {
-
-            XmlDocument doc = new XmlDocument();
-            if (string.IsNullOrEmpty(NameOfFile))
-            {
-                //NameOfFile = "MyEventLog.xml";
-                NameOfFile = WagTapLogLocation + CurrentLog;
-            }
-#if readfromBeforeInsertionFixingStiticRestricted
-                NameOfFile = WagTapLogLocation + "BeforeInsertionFixingStiticRestricted.xml.lnk";
-                NameOfFile = GetShortcutTarget(NameOfFile);
-#endif
-            while (true)
-            {
-                if (!File.Exists(NameOfFile))
-                {
-                    break;
-                }
-                try
-                {
-                    doc.Load(NameOfFile);
-                    break;
-                }
-                catch (Exception e)
-                {
-                    Thread.Sleep(160);
-                    ;
-
-                }
-            }
-
-            return doc;
-        }
-        
-        async override private Task<Dictionary<string, Location_Elements>> getLocationCache(string NameOfFile = "")
-        {
-            Dictionary<string, Location_Elements> retValue = new Dictionary<string, Location_Elements>();
-#if ForceReadFromXml
-#else
-            if (useCassandra)
-            {
-                retValue = await myCassandraAccess.getAllCachedLocations();
-                return retValue;
-            }
-#endif
-
-
-            XmlDocument doc = getLogDataStore(NameOfFile);
-            XmlNode node = doc.DocumentElement.SelectSingleNode("/ScheduleLog/LocationCache");
-            if (node == null)
-            {
-                LastLocationID = 1;
-                return retValue;
-            }
-            LastLocationID = Convert.ToInt32(node.SelectSingleNode("LastID").InnerText);
-            XmlNodeList AllLocationNodes = node.SelectNodes("Locations/Location");
-            foreach (XmlNode eachXmlNode in AllLocationNodes)
-            {
-                Location_Elements Location = generateLocationObjectFromNode(eachXmlNode);
-
-                if (Location != null)
-                {
-                    if (!string.IsNullOrEmpty(Location.Description))
-                    {
-                        string Description = Location.Description.ToLower();
-                        if (!retValue.ContainsKey(Description))
-                        {
-                            retValue.Add(Description, Location);
-                        }
-                    }
-                }
-            }
-            return retValue;
-        }
-        
-
-        public Dictionary<string, CalendarEvent> getAllCalendarFromXml(TimeLine RangeOfLookUP)
-        {
-#if ForceReadFromXml
-#else
-            if (useCassandra)
-            {
-                return myCassandraAccess.getAllCalendarEvent();
-            }
-#endif
-
-            XmlDocument doc = getLogDataStore();
-            Dictionary<string, CalendarEvent> MyCalendarEventDictionary = new Dictionary<string, CalendarEvent>();
-
-
-            XmlNode node = doc.DocumentElement.SelectSingleNode("/ScheduleLog/LastIDCounter");
-            string LastUsedIndex = node.InnerText;
-            LastIDNumber = Convert.ToInt64(LastUsedIndex);
-            DateTimeOffset userReferenceDay;
-            XmlNode EventSchedulesNodes = doc.DocumentElement.SelectSingleNode("/ScheduleLog/EventSchedules");
-
-            string ID;
-            string Deadline;
-            string Split;
-            string Completed;
-            string Rigid;
-            string Name;
-            string[] StartDateTime;
-            string StartDate;
-            string StartTime;
-            string[] EndDateTime;
-            string EndDate;
-            string EndTime;
-            string PreDeadline;
-            string CalendarEventDuration;
-            string PreDeadlineFlag;
-            string EventRepetitionflag;
-            string PrepTimeFlag;
-            string PrepTime;
-
-            foreach (XmlNode EventScheduleNode in EventSchedulesNodes.ChildNodes)
-            {
-                CalendarEvent RetrievedEvent;
-                RetrievedEvent = getCalendarEventObjFromNode(EventScheduleNode, RangeOfLookUP);
-                if (RetrievedEvent != null)
-                { MyCalendarEventDictionary.Add(RetrievedEvent.Calendar_EventID.getCalendarEventComponent(), RetrievedEvent); }
-            }
-
-            return MyCalendarEventDictionary;
-        }
-         */
-        
-        
-
         Repetition getRepetitionObject(XmlNode RecurrenceXmlNode, TimeLine RangeOfLookUP)
         {
             Repetition RetValue = new Repetition();
@@ -1131,15 +700,6 @@ namespace TilerFront
         }
 
 
-        override public string getFullLogDir
-        {
-            get
-            {
-                return WagTapLogLocation + CurrentLog;
-            }
-
-        }
-
         override public TilerElements.Location defaultLocation
         {
             get
@@ -1153,14 +713,6 @@ namespace TilerFront
             get
             {
                 return _TilerUser.FullName;
-            }
-        }
-
-        public static string LogLocation
-        {
-            get
-            {
-                return WagTapLogLocation;
             }
         }
 

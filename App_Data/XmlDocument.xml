@@ -920,7 +920,7 @@
             Tiler controller that provides custom tiler functionality
             </summary>
         </member>
-        <member name="M:TilerFront.TilerController.saveLatestChange(TilerFront.Models.ApplicationDbContext,TilerElements.TilerUser)">
+        <member name="M:TilerFront.TilerController.saveLatestChange(TilerElements.TilerDbContext,TilerElements.TilerUser)">
             <summary>
             This is to be called when you need save the last change to the database
             </summary>
@@ -1194,7 +1194,7 @@
             <param name="userGroupNode">xml node with formated user group</param>
             <returns></returns>
         </member>
-        <member name="M:TilerFront.LogControl.getDayReferenceTime(System.String)">
+        <member name="M:TilerFront.LogControl.getDayReferenceTime">
             <summary>
             Function gets the end of the day of the specified user.
             </summary>
@@ -1216,6 +1216,12 @@
         <member name="M:TilerFront.UserAccount.getTilerUser">
             <summary>
             Gets the tilerUser account associated with the userAccount
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.UserAccountXml.Login">
+            <summary>
+            Function logs in the current user. It simply checks to see if the id already exists
             </summary>
             <returns></returns>
         </member>

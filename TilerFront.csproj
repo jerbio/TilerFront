@@ -514,12 +514,12 @@
     </Compile>
     <Compile Include="GoogleCalExtension.cs" />
     <Compile Include="GoogleTilerEventControl.cs" />
-    <Compile Include="LogControlDebug.cs" />
+    <Compile Include="LogControlXml.cs" />
     <Compile Include="LogControlDirect.cs" />
     <Compile Include="LogControl.cs" />
-    <Compile Include="Migrations\201711252335597_init.cs" />
-    <Compile Include="Migrations\201711252335597_init.Designer.cs">
-      <DependentUpon>201711252335597_init.cs</DependentUpon>
+    <Compile Include="Migrations\201806140214333_ini.cs" />
+    <Compile Include="Migrations\201806140214333_ini.Designer.cs">
+      <DependentUpon>201806140214333_ini.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
@@ -559,7 +559,7 @@
     <Compile Include="Startup.cs" />
     <Compile Include="Controllers\TilerApiController.cs" />
     <Compile Include="UserAccount.cs" />
-    <Compile Include="UserAccountDebug.cs" />
+    <Compile Include="UserAccountXml.cs" />
     <Compile Include="UserAccountDirect.cs" />
     <Content Include="Areas\RouteDebugger\Content\rdstyle.css" />
     <Content Include="Areas\RouteDebugger\Scripts\detect.js" />
@@ -2760,8 +2760,8 @@
     <None Include="WagTapCalLogs\**\*" CopyToPublishDirectory="Always" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201711252335597_init.resx">
-      <DependentUpon>201711252335597_init.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201806140214333_ini.resx">
+      <DependentUpon>201806140214333_ini.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

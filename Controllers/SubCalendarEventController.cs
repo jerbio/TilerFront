@@ -24,7 +24,7 @@ namespace TilerFront.Controllers
         [Route("api/SubCalendarEvent/Update")]
         public async Task<IHttpActionResult> UpdateCalEvent([FromBody]EditSubCalEventModel myUser)
         {
-            UserAccountDirect retrievedUser = await myUser.getUserAccountDirect(db); //new UserAccountDirect(myUser.UserName, myUser.UserID);
+            UserAccount retrievedUser = await myUser.getUserAccount(db); //new UserAccountDirect(myUser.UserName, myUser.UserID);
             await retrievedUser.Login();
             PostBackData retValue = new PostBackData("", 1);
             if (retrievedUser.Status)

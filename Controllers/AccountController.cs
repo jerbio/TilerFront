@@ -312,7 +312,7 @@ namespace TilerFront.Controllers
                 int Min=Convert.ToInt32(model.TimeZoneOffSet);
                 TimeSpan OffSet = TimeSpan.FromMinutes(Min);
                 DateTimeOffset EndOfDay = new DateTimeOffset(2014, 1, 1, 22, 0, 0, OffSet);
-                var user = new TilerUser { UserName = model.Username, Email = model.Email, FullName = model.FullName, EndfOfDay = EndOfDay.UtcDateTime};
+                var user = new TilerUser { UserName = model.Username, Email = model.Email, FirstName = model.FirstName?? "", LastName = model.LastName?? "", EndfOfDay = EndOfDay.UtcDateTime};
                 //var result = logGenerationresult.Item1;
                 //if (result.Succeeded)
                 //{
@@ -333,11 +333,6 @@ namespace TilerFront.Controllers
                         //return RedirectToAction("Index", "Home");
                         return RedirectToAction("Desktop", "Account");
                     }
-                    else
-                    {
-                    LogControlDirect LogToBedeleted = new LogControlDirect(user, this.db, "");
-                        await LogToBedeleted.DeleteLog();
-                    }
                 //}
                 AddErrors(result);
             }
@@ -346,13 +341,7 @@ namespace TilerFront.Controllers
             return View(model);
         }
 
-
-        // POST: /Account/Register
-        [HttpPost]
-        [AllowAnonymous]
-        [ValidateAntiForgeryToken]
-
-        public async Task<ActionResult> SignUp(RegisterViewModel model)
+        public async Task<ActionResult> RegisterUser(RegisterViewModel model)
         {
             Controllers.ThirdPartyCalendarAuthenticationModelsController.initializeCurrentURI(System.Web.HttpContext.Current.Request.Url.Authority);
             PostBackData retPost = new PostBackData("Failed to register user", 3);
@@ -362,8 +351,8 @@ namespace TilerFront.Controllers
                 int Min = Convert.ToInt32(model.TimeZoneOffSet);
                 TimeSpan OffSet = TimeSpan.FromMinutes(Min);
                 DateTimeOffset EndOfDay = new DateTimeOffset(2014, 1, 1, 22, 0, 0, OffSet);
-                var user = new TilerUser { UserName = model.Username, Email = model.Email, FullName = model.FullName, EndfOfDay = EndOfDay.UtcDateTime };
-                
+                var user = new TilerUser { UserName = model.Username, Email = model.Email, FirstName = model.FirstName, LastName = model.LastName, EndfOfDay = EndOfDay.UtcDateTime };
+
                 var result = await UserManager.CreateAsync(user, model.Password);
 
                 if (result.Succeeded)
@@ -381,7 +370,7 @@ namespace TilerFront.Controllers
                     {
                         LoopBackUrl = "/Account/Desktop";
                     }
-                        
+
                     retPost = new PostBackData(LoopBackUrl, 0);
                     RetValue.Data = (retPost.getPostBack);
                     return RetValue;
@@ -393,20 +382,26 @@ namespace TilerFront.Controllers
                     // var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
                     // await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
                 }
-                else
-                {
-                    LogControlDirect LogToBedeleted = new LogControlDirect(user, db, "");
-                    await LogToBedeleted.DeleteLog();
-                }
                 retPost = new PostBackData(string.Join("<br>", result.Errors.Select(obj => obj.Split('.')).SelectMany(obj => obj)), 3);
-                RetValue.Data= (retPost.getPostBack);
+                RetValue.Data = (retPost.getPostBack);
                 return RetValue;
             }
-            string AllErrors = string.Join("<br>", ModelState.Values.SelectMany(obj=>obj.Errors.Select(obj1=>obj1.ErrorMessage)));
+            string AllErrors = string.Join("<br>", ModelState.Values.SelectMany(obj => obj.Errors.Select(obj1 => obj1.ErrorMessage)));
             retPost = new PostBackData(AllErrors, 3);
             RetValue.Data = (retPost.getPostBack);
 
             return RetValue;
+        }
+
+
+        // POST: /Account/Register
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+
+        public async Task<ActionResult> SignUp(RegisterViewModel model)
+        {
+            return await RegisterUser(model);
         }
 
         //
@@ -719,7 +714,31 @@ namespace TilerFront.Controllers
                 {
                     return View("ExternalLoginFailure");
                 }
-                var user = new TilerUser { UserName = model.Email, Email = model.Email, FullName = info.ExternalIdentity.Name, EndfOfDay = DateTime.Now };
+                string[] nameArray = (info.ExternalIdentity.Name ?? "").Split(' ');
+                string LastName = "";
+                string FirstName = "";
+                string OtherName = "";
+                if (nameArray.Length > 0)
+                {
+                    FirstName = nameArray[0];
+                    if (nameArray.Length > 1)
+                    {
+                        LastName = nameArray.Last();
+                    }
+                    if(nameArray.Length > 2)
+                    {
+                        for (var i =1;i< nameArray.Length-1; i++ )
+                        {
+                            OtherName = nameArray[i];
+                            if(i+1 < nameArray.Length - 1)
+                            {
+                                OtherName += " ";
+                            }
+                        }
+                        
+                    }
+                }
+                var user = new TilerUser { UserName = model.Email, Email = model.Email, FirstName = FirstName, LastName = LastName, OtherName = OtherName, EndfOfDay = DateTime.Now };
 
 
                 var result = await UserManager.CreateAsync(user);
@@ -753,11 +772,6 @@ namespace TilerFront.Controllers
                         await SendThirdPartyAuthentication.ConfigureAwait(false);
                         await SendEmail.ConfigureAwait(false);
                         return RedirectToAction("Desktop", "Account");
-                    }
-                    else
-                    {
-                        LogControlDirect LogToBedeleted = new LogControlDirect(user, db);
-                        await LogToBedeleted.DeleteLog();
                     }
                 }
 

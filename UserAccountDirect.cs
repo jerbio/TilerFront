@@ -11,7 +11,7 @@ namespace TilerFront
 {
     public class UserAccountDirect:UserAccount
     {
-        ApplicationDbContext Database;
+        
         protected UserAccountDirect()
         {
             
@@ -19,10 +19,9 @@ namespace TilerFront
 
 
 
-        public UserAccountDirect(string userId, ApplicationDbContext database)
+        public UserAccountDirect(string userId, TilerDbContext database)
         {
             ID = userId;
-            Database = database;
         }
 
         /// <summary>
@@ -32,33 +31,19 @@ namespace TilerFront
         public override async System.Threading.Tasks.Task<bool> Login()
         {
             HttpContext ctx = HttpContext.Current;
-            DBTilerElement.DB_TilerUser tilerUser = new DBTilerElement.DB_TilerUser()
-            {
-                Id = ID
-            };
-            UserLog = new LogControlDirect(tilerUser, Database, "");
-            if (ctx != null)
-            {
-                await UserLog.Initialize();
-            }
 
-            
+            DBTilerElement.DB_TilerUser tilerUser = Database.Users.Find(ID) as DBTilerElement.DB_TilerUser;
+            UserLog = new LogControlDirect(tilerUser, Database as ApplicationDbContext);
 
-            bool retValue = UserLog.Status;
+            bool retValue = tilerUser != null;
             return retValue;
         }
 
 
-        override protected async Task<Dictionary<string, CalendarEvent>> getAllCalendarElements(TimeLine RangeOfLookup, string desiredDirectory = "")
+        override protected async Task<Dictionary<string, CalendarEvent>> getAllCalendarElements(TimeLine RangeOfLookup)
         {
             Dictionary<string, CalendarEvent> retValue = new Dictionary<string, CalendarEvent>();
             retValue = await UserLog.getAllCalendarFromXml(RangeOfLookup);
-            return retValue;
-        }
-
-        async override protected Task<DateTimeOffset> getDayReferenceTime(string desiredDirectory = "")
-        {
-            DateTimeOffset retValue = await UserLog.getDayReferenceTime(desiredDirectory);
             return retValue;
         }
 
@@ -131,22 +116,6 @@ namespace TilerFront
             get
             {
                 return Name;
-            }
-        }
-
-        public string getFullLogDir
-        {
-            get
-            {
-                return UserLog.getFullLogDir;
-            }
-        }
-
-        virtual public LogControl ScheduleLogControl
-        {
-            get
-            {
-                return UserLog;
             }
         }
 

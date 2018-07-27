@@ -34,7 +34,7 @@ namespace TilerFront
         }
         async virtual protected Task Initialize(DateTimeOffset referenceNow)
         {
-            DateTimeOffset StartOfDay = await myAccount.ScheduleData.getDayReferenceTime().ConfigureAwait(false);
+            DateTimeOffset StartOfDay = myAccount.ScheduleData.getDayReferenceTime();
             _Now = new ReferenceNow(referenceNow, StartOfDay);
             Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, Location>> profileData = await myAccount.ScheduleData.getProfileInfo().ConfigureAwait(false);
             if (profileData != null)
@@ -172,7 +172,7 @@ namespace TilerFront
             myWatch.Start();
 #endif
             HashSet<SubCalendarEvent> NotdoneYet = new HashSet<SubCalendarEvent>();// getNoneDoneYetBetweenNowAndReerenceStartTIme();
-            if (!NewEvent.getRigid)
+            if (!NewEvent.isRigid)
             {
                 NewEvent = EvaluateTotalTimeLineAndAssignValidTimeSpots(NewEvent, NotdoneYet, null, optimizeFirstTwentyFourHours: optimizeSchedule);
             }

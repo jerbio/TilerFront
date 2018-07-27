@@ -14,7 +14,6 @@ namespace TilerFront
             string BigDataocation = HttpContext.Current.Server.MapPath("~\\BigDataLogs\\");//initializes the log location
             //LogLocation = @"C:\Users\OluJerome\Documents\Visual Studio 2010\Projects\LearnCuDAVS2010\LearnCUDAConsoleApplication\bin\Debug\WagTapCalLogs\";
             //LogLocation = @"C:\Users\OluJerome\Documents\Visual Studio 2010\Projects\LearnCuDAVS2010\LearnCUDAConsoleApplication\WagTapCalLogs\";
-            TilerFront.LogControl.UpdateLogLocation(LogLocation);
             TilerFront.LogControl.UpdateBigDataLogLocation(BigDataocation);
             bundles.Add(new ScriptBundle("~/Scripts/signalR").Include(
                         "~/Scripts/jquery.signalR-{version}.js"));

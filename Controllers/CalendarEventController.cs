@@ -30,7 +30,7 @@ namespace TilerFront.Controllers
         [ResponseType(typeof(PostBackStruct))]
         public async Task<IHttpActionResult> GetCalEvent(string id,[FromUri]AuthorizedUser myUser )
         {
-            UserAccountDirect retrievedUser = await myUser.getUserAccountDirect(db);
+            UserAccount retrievedUser = await myUser.getUserAccount(db);
             await retrievedUser.Login();
             TilerElements.CalendarEvent retrievedCalendarEvent = await retrievedUser.ScheduleLogControl.getCalendarEventWithID(id);
             PostBackData retValue = new PostBackData(retrievedCalendarEvent.ToCalEvent(), 0);
@@ -51,7 +51,7 @@ namespace TilerFront.Controllers
         [Route("api/CalendarEvent/Name")]
         public async Task<IHttpActionResult> CalEventName([FromUri]NameSearchModel myUser)
         {
-            UserAccountDirect retrievedUser = await myUser.getUserAccountDirect(db);
+            UserAccount retrievedUser = await myUser.getUserAccount(db);
             await retrievedUser.Login();
             string phrase = myUser.Data;
 
@@ -78,7 +78,7 @@ namespace TilerFront.Controllers
         [Route("api/CalendarEvent")]
         public async Task<IHttpActionResult> DeleteCalEvent([FromBody]getEventModel myUser)
         {
-            UserAccountDirect retrievedUser = await myUser.getUserAccountDirect(db);// new UserAccount(myUser.UserName, myUser.UserID);
+            UserAccount retrievedUser = await myUser.getUserAccount(db);// new UserAccount(myUser.UserName, myUser.UserID);
             await retrievedUser.Login();
             PostBackData retValue;
             if (retrievedUser.Status)
@@ -123,7 +123,7 @@ namespace TilerFront.Controllers
         [Route("api/CalendarEvent/Complete")]
         public async Task<IHttpActionResult> CompleteCalEvent([FromBody]getEventModel myUser)
         {
-            UserAccountDirect retrievedUser = await myUser.getUserAccountDirect(db);// new UserAccount(myUser.UserName, myUser.UserID);
+            UserAccount retrievedUser = await myUser.getUserAccount(db);// new UserAccount(myUser.UserName, myUser.UserID);
             await retrievedUser.Login();
             PostBackData retValue;
             if (retrievedUser.Status)
@@ -156,7 +156,7 @@ namespace TilerFront.Controllers
         [Route("api/CalendarEvent/Now")]
         public async Task<IHttpActionResult> Now( [FromBody]NowEventModel nowEvent)
         {
-            UserAccountDirect retrievedUser = await nowEvent.getUserAccountDirect(db); //new UserAccountDirect(myUser.UserName, myUser.UserID);
+            UserAccount retrievedUser = await nowEvent.getUserAccount(db); //new UserAccountDirect(myUser.UserName, myUser.UserID);
             await retrievedUser.Login();
             DateTime myDate;
             PostBackData retValue;
@@ -193,7 +193,7 @@ namespace TilerFront.Controllers
         [Route("api/CalendarEvent/Update")]
         public async Task<IHttpActionResult> UpdateCalEvent([FromBody]EditCalEventModel myUser)    
         {
-            UserAccountDirect retrievedUser = await myUser.getUserAccountDirect(db); //new UserAccountDirect(myUser.UserName, myUser.UserID);
+            UserAccount retrievedUser = await myUser.getUserAccount(db); //new UserAccountDirect(myUser.UserName, myUser.UserID);
             await retrievedUser.Login();
             PostBackData retValue = new PostBackData("", 1);
 

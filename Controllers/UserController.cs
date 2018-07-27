@@ -162,7 +162,7 @@ namespace TilerFront.Controllers
         [Route("api/User/Location")]
         public async Task<IHttpActionResult> Location([FromUri]NameSearchModel SearchData)
         {
-            UserAccountDirect retrievedUser = await SearchData.getUserAccountDirect(db);
+            UserAccount retrievedUser = await SearchData.getUserAccount(db);
             await retrievedUser.Login();
 
             PostBackData retValue = new PostBackData("", 4);

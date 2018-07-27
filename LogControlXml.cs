@@ -9,21 +9,23 @@ using System.Xml;
 
 namespace TilerFront
 {
-    public class LogControlDebug:LogControlDirect
+    public class LogControlXml:LogControlDirect
     {
         string UserID;
+        public static string CurrentLog;
+        public static string WagTapLogLocation;
         /*
         public LogControlDebug(string userid)
         {
             UserID = userid;
         }
         */
-        public LogControlDebug(TilerUser User, string logLocation=""):base(User, null,logLocation)
+        public LogControlXml(TilerUser User, string logLocation=""):base(User, null)
         {
         }
 
 
-        async public override Task<DateTimeOffset> getDayReferenceTime(string NameOfFile = "")
+        override public DateTimeOffset getDayReferenceTime()
         {
             DateTimeOffset retValue = _TilerUser.EndfOfDay;
             return retValue;
@@ -36,6 +38,21 @@ namespace TilerFront
                 return LogStatus;
             }
         }
+
+        virtual async public Task Initialize()
+        {
+            CurrentLog = "";
+
+            CurrentLog = ID.ToString() + ".xml";
+            string LogDir = (WagTapLogLocation + CurrentLog);
+            string myCurrDir = Directory.GetCurrentDirectory();
+            Console.WriteLine("Log DIR is:" + LogDir);
+            LogStatus = File.Exists(LogDir);
+
+            _TilerUser = Database.Users.Find(ID);
+            UserName = _TilerUser.UserName;
+        }
+
 
         public override Task updateBigData(XmlDocument oldData, XmlDocument newData)
         {

@@ -59,7 +59,7 @@ namespace TilerFront.Controllers
 
         async Task<PostBackData> getDataFromRestEnd(getScheduleModel myAuthorizedUser)
         {
-            UserAccountDirect myUserAccount = await myAuthorizedUser.getUserAccountDirect(db);
+            UserAccount myUserAccount = await myAuthorizedUser.getUserAccount(db);
             HttpContext myCOntext = HttpContext.Current;
             await myUserAccount.Login();
             PostBackData returnPostBack;
@@ -139,7 +139,7 @@ namespace TilerFront.Controllers
         [Route("api/Schedule/DeletedSchedule")]
         public async Task<IHttpActionResult> GetDeletedSchedule([FromUri] getScheduleModel myAuthorizedUser)
         {
-            UserAccountDirect myUserAccount = await myAuthorizedUser.getUserAccountDirect(db);
+            UserAccount myUserAccount = await myAuthorizedUser.getUserAccount(db);
             HttpContext myCOntext = HttpContext.Current;
             await myUserAccount.Login();
             PostBackData returnPostBack;
@@ -198,7 +198,7 @@ namespace TilerFront.Controllers
         public async Task<IHttpActionResult> PauseSchedule([FromBody]getEventModel myAuthorizedUser)
         {
             //ApplicationDbContext db = new ApplicationDbContext();
-            UserAccountDirect myUser = await myAuthorizedUser.getUserAccountDirect(db);
+            UserAccount myUser = await myAuthorizedUser.getUserAccount(db);
             await myUser.Login();
 
             if (myUser.Status)
@@ -222,7 +222,7 @@ namespace TilerFront.Controllers
                 DateTimeOffset myNow = myAuthorizedUser.getRefNow();
                 DB_Schedule MySchedule = new DB_Schedule(myUser, myNow);
                 SubCalendarEvent SubEvent = MySchedule.getSubCalendarEvent(myAuthorizedUser.EventID);
-                if ((!SubEvent.getRigid) && (SubEvent.getId != currentPausedEvent.EventId))
+                if ((!SubEvent.isRigid) && (SubEvent.getId != currentPausedEvent.EventId))
                 {
                     DB_UserActivity activity = new DB_UserActivity(myAuthorizedUser.getRefNow(), UserActivity.ActivityType.Pause);
 
@@ -271,7 +271,7 @@ namespace TilerFront.Controllers
         {
 
             //ApplicationDbContext db = new ApplicationDbContext();
-            UserAccountDirect myUser = await myAuthorizedUser.getUserAccountDirect(db);
+            UserAccount myUser = await myAuthorizedUser.getUserAccount(db);
             await myUser.Login();
             if (myUser.Status)
             {
@@ -446,7 +446,7 @@ namespace TilerFront.Controllers
         {
 
             AuthorizedUser myAuthorizedUser = UserData.User;
-            UserAccountDirect myUserAccount = await UserData.getUserAccountDirect(db);
+            UserAccount myUserAccount = await UserData.getUserAccount(db);
             await myUserAccount.Login();
             if (myUserAccount.Status)
             {
@@ -508,7 +508,7 @@ namespace TilerFront.Controllers
             AuthorizedUser myAuthorizedUser = UserData.User;
             TimeDuration ProcrastinateDuration = UserData.ProcrastinateDuration;
             TimeSpan fullTimeSpan = myAuthorizedUser.getTImeSpan;
-            UserAccountDirect myUser = await UserData.getUserAccountDirect(db);
+            UserAccount myUser = await UserData.getUserAccount(db);
             await myUser.Login();
 
             DateTimeOffset myNow = myAuthorizedUser.getRefNow();// myAuthorizedUser.getRefNow();
@@ -538,7 +538,7 @@ namespace TilerFront.Controllers
         public async Task<IHttpActionResult> Shuffle([FromBody]ShuffleModel UserData)
         {
             AuthorizedUser myAuthorizedUser = UserData.User;
-            UserAccountDirect myUser = await UserData.getUserAccountDirect(db);
+            UserAccount myUser = await UserData.getUserAccount(db);
             await myUser.Login();
             if (myUser.Status)
             {
@@ -595,7 +595,7 @@ namespace TilerFront.Controllers
         [Route("api/Schedule/Event/Complete")]
         public async Task<IHttpActionResult> CompleteSubCalendarEvent([FromBody]getEventModel UserData)
         {
-            UserAccountDirect retrievedUser = await UserData.getUserAccountDirect(db);
+            UserAccount retrievedUser = await UserData.getUserAccount(db);
             await retrievedUser.Login();
             PostBackData retValue = new PostBackData("", 1);
             DB_UserActivity activity = new DB_UserActivity(UserData.getRefNow(), UserActivity.ActivityType.CompleteSingle);
@@ -648,7 +648,7 @@ namespace TilerFront.Controllers
         [Route("api/Schedule/Events/Complete")]
         public async Task<IHttpActionResult> CompleteSubCalendarEvents([FromBody]getEventModel UserData)
         {
-            UserAccountDirect myUser = await UserData.getUserAccountDirect(db);
+            UserAccount myUser = await UserData.getUserAccount(db);
             await myUser.Login();
             DateTimeOffset myNow = UserData.getRefNow();
             DB_Schedule MySchedule = new DB_Schedule(myUser, myNow);
@@ -681,7 +681,7 @@ namespace TilerFront.Controllers
         [Route("api/Schedule/Event/Now")]
         public async Task<IHttpActionResult> Now([FromBody]getEventModel myUser)
         {
-            UserAccountDirect retrievedUser = await myUser.getUserAccountDirect(db);// new UserAccountDirect(myUser.UserName, myUser.UserID);
+            UserAccount retrievedUser = await myUser.getUserAccount(db);// new UserAccountDirect(myUser.UserName, myUser.UserID);
             await retrievedUser.Login();
             PostBackData retValue;
             if (retrievedUser.Status)
@@ -722,7 +722,7 @@ namespace TilerFront.Controllers
         [Route("api/Schedule/Undo")]
         public async Task<IHttpActionResult> Undo([FromBody]AuthorizedUser myUser)
         {
-            UserAccountDirect retrievedUser = await myUser.getUserAccountDirect(db);// new UserAccountDirect(myUser.UserName, myUser.UserID);
+            UserAccount retrievedUser = await myUser.getUserAccount(db);// new UserAccountDirect(myUser.UserName, myUser.UserID);
             await retrievedUser.Login();
             PostBackData retValue;
             if (retrievedUser.Status)
@@ -754,7 +754,7 @@ namespace TilerFront.Controllers
         [Route("api/Schedule/Event")]
         public async Task<IHttpActionResult> DeleteEvent([FromBody]getEventModel myUser)
         {
-            UserAccountDirect retrievedUser = await myUser.getUserAccountDirect(db);
+            UserAccount retrievedUser = await myUser.getUserAccount(db);
             await retrievedUser.Login();
             PostBackData retValue= new PostBackData("", 1);
             if (retrievedUser.Status)
@@ -825,7 +825,7 @@ namespace TilerFront.Controllers
         [Route("api/Schedule/Events")]
         public async Task<IHttpActionResult> DeleteEvents([FromBody]getEventModel myUser)
         {
-            UserAccountDirect retrievedUser = await myUser.getUserAccountDirect(db);
+            UserAccount retrievedUser = await myUser.getUserAccount(db);
             await retrievedUser.Login();
             PostBackData retValue;
             if (retrievedUser.Status)
@@ -1003,7 +1003,7 @@ namespace TilerFront.Controllers
 
             
 
-            UserAccountDirect myUser = await newEvent.getUserAccountDirect(db);
+            UserAccount myUser = await newEvent.getUserAccount(db);
             PostBackData retValue;
             await myUser.Login();
             TilerUser tilerUser = myUser.getTilerUser();
@@ -1098,7 +1098,7 @@ namespace TilerFront.Controllers
             try
             {
                 DateTimeOffset myNow = newEvent.getRefNow();
-                UserAccount RetrievedUser = await newEvent.getUserAccountDirect(db).ConfigureAwait(false);
+                UserAccount RetrievedUser = await newEvent.getUserAccount(db).ConfigureAwait(false);
                 DB_Schedule MySchedule = new DB_Schedule(RetrievedUser, myNow);
                 await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, RetrievedUser.UserID, db).ConfigureAwait(false);
                 await MySchedule.UpdateScheduleDueToExternalChanges().ConfigureAwait(false);
@@ -1229,7 +1229,7 @@ namespace TilerFront.Controllers
                 EndDateEntry = RepeatEnd;
             }
 
-            UserAccountDirect myUser = await newEvent.getUserAccountDirect(db);
+            UserAccount myUser = await newEvent.getUserAccount(db);
             PostBackData retValue;
             await myUser.Login();
 
