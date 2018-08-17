@@ -12,6 +12,10 @@ namespace TilerFront.Models
     // You can add profile data for the user by adding more properties to your TilerUser class, please visit http://go.microsoft.com/fwlink/?LinkID=317594 to learn more.
     public class ApplicationDbContext : TilerDbContext
     {
+        public ApplicationDbContext()
+        {
+
+        }
         public ApplicationDbContext(string connectionName = "DefaultConnection") : base(connectionName)
         {
         }
