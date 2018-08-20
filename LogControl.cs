@@ -867,7 +867,7 @@ namespace TilerFront
             
         }
 
-        public void deleteAllCalendarEvets(string dirString = "")
+        public virtual void deleteAllCalendarEvents(string dirString = "")
         {
             _Database.CalEvents.Where(calEvent => calEvent.CreatorId == _TilerUser.Id)
                 .ForEachAsync(calEvent => {
@@ -1018,8 +1018,14 @@ namespace TilerFront
 
         async public virtual Task<Dictionary<string, CalendarEvent>> getAllCalendarFromXml(TimeLine RangeOfLookUP)
         {
-            Dictionary<string, CalendarEvent> MyCalendarEventDictionary = await _Database.CalEvents.Where(calEvent => calEvent.Start < RangeOfLookUP.End && calEvent.End > RangeOfLookUP.Start).ToDictionaryAsync(calEvent => calEvent.getId, calEvent => calEvent);
-            return MyCalendarEventDictionary;
+            if(RangeOfLookUP != null)
+            {
+                Dictionary<string, CalendarEvent> MyCalendarEventDictionary = await _Database.CalEvents.Where(calEvent => calEvent.Start < RangeOfLookUP.End && calEvent.End > RangeOfLookUP.Start).ToDictionaryAsync(calEvent => calEvent.getId, calEvent => calEvent);
+                return MyCalendarEventDictionary;
+            }
+
+            throw new NullReferenceException("You have to provide the range to lookup in the user calelndar");
+            
         }
 
         public virtual CalendarEvent getCalendarEventObjFromNode(XmlNode EventScheduleNode, TimeLine RangeOfLookUP)
@@ -1840,14 +1846,8 @@ namespace TilerFront
 
 
 
-        async public Task<Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location>>> getProfileInfo(TimeLine RangeOfLookup = null)
+        async virtual public Task<Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location>>> getProfileInfo(TimeLine RangeOfLookup)
         {
-            //getLocationCache
-            if (RangeOfLookup == null)
-            {
-                RangeOfLookup = new TimeLine(DateTimeOffset.UtcNow.AddYears(-10), DateTimeOffset.UtcNow.AddYears(10));
-            }
-
             Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location>> retValue;
             if (this.Status)
             {
@@ -1867,9 +1867,6 @@ namespace TilerFront
             }
             return retValue;
         }
-
-
-        
 
         async protected Task populateDefaultLocation(Dictionary<string, TilerElements.Location> locations = null)
         {
