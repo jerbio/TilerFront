@@ -215,7 +215,7 @@ namespace TilerFront
             }
 
 
-            await WriteFullScheduleToLogAndOutlook().ConfigureAwait(false);
+            await WriteFullScheduleToLogAndOutlook(NewEvent).ConfigureAwait(false);
 
             CompleteSchedule = getTimeLine();
 
