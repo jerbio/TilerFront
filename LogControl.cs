@@ -109,6 +109,7 @@ namespace TilerFront
 
         public async Task Undo(string LogFile = "")
         {
+            throw new NotImplementedException("Undo has not been fully implemented for RDBMS");
             Task<bool> retValue;
             retValue = new Task<bool>(() => { return true; });
             retValue.Start();
