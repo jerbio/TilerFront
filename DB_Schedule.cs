@@ -204,15 +204,9 @@ namespace TilerFront
                 LogStatus(NewEvent, "Adding New Event");
             }
             removeAllFromOutlook();
-            //RemoveAllCalendarEventFromLogAndCalendar();
-            try
-            {
-                AllEventDictionary.Add(NewEvent.Calendar_EventID.getCalendarEventComponent(), NewEvent);
-            }
-            catch
-            {
-                AllEventDictionary[NewEvent.getId] = NewEvent;
-            }
+            
+            AllEventDictionary.Add(NewEvent.Calendar_EventID.getCalendarEventComponent(), NewEvent);
+            
 
 
             await WriteFullScheduleToLogAndOutlook(NewEvent).ConfigureAwait(false);

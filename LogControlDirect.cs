@@ -675,14 +675,6 @@ namespace TilerFront
 
         #region Properties
 
-        public int LastUserID
-        {
-            get
-            {
-                return Convert.ToInt32(LastIDNumber);
-            }
-        }
-
         public override bool Status
         {
             get

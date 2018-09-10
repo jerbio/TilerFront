@@ -32,8 +32,6 @@ namespace TilerFront
         protected string UserName;
         string NameOfUser;
         protected static string BigDataLogLocation = "BigDataLogs\\";
-        //protected DBControl LogDBDataAccess;
-        protected long LastIDNumber;
         protected bool LogStatus;
         protected bool UpdateLocaitionCache = false;
         protected Dictionary<string, TilerElements.Location> CachedLocation;
@@ -61,7 +59,6 @@ namespace TilerFront
             ID="";
             UserName="";
             NameOfUser="";
-            LastIDNumber = 0;
             LogStatus=false;
 #if ForceReadFromXml
 #else
@@ -1021,7 +1018,7 @@ namespace TilerFront
         {
             if(RangeOfLookUP != null)
             {
-                Dictionary<string, CalendarEvent> MyCalendarEventDictionary = await _Database.CalEvents.Where(calEvent => calEvent.Start < RangeOfLookUP.End && calEvent.End > RangeOfLookUP.Start).ToDictionaryAsync(calEvent => calEvent.getId, calEvent => calEvent);
+                Dictionary<string, CalendarEvent> MyCalendarEventDictionary = await _Database.CalEvents.Where(calEvent => calEvent.Start < RangeOfLookUP.End && calEvent.End > RangeOfLookUP.Start).ToDictionaryAsync(calEvent => calEvent.Calendar_EventID.getCalendarEventComponent(), calEvent => calEvent);
                 return MyCalendarEventDictionary;
             }
 
@@ -1853,11 +1850,11 @@ namespace TilerFront
             if (this.Status)
             {
                 Task<Dictionary<string, TilerElements.Location>> TaskLocationCache = getLocationCache();
-                
+                Dictionary<string, TilerElements.Location> LocationCache = await TaskLocationCache.ConfigureAwait(false);
                 Dictionary<string, CalendarEvent> AllScheduleData =await this.getAllCalendarFromXml(RangeOfLookup);
 
                 DateTimeOffset ReferenceTime = getDayReferenceTime();
-                Dictionary<string, TilerElements.Location> LocationCache = await TaskLocationCache.ConfigureAwait(false);
+                
                 await populateDefaultLocation(LocationCache).ConfigureAwait(false);
 
                 retValue = new Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location>>(AllScheduleData, ReferenceTime, LocationCache);
@@ -1903,11 +1900,11 @@ namespace TilerFront
 
         #region Properties
 
-        public int LastUserID
+        virtual public int LastUserID
         {
             get
             {
-                return Convert.ToInt32(LastIDNumber);
+                return Convert.ToInt32(_TilerUser.LatestId);
             }
         }
 
