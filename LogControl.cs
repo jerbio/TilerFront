@@ -412,7 +412,7 @@ namespace TilerFront
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Completed"));
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.getIsComplete.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("RepetitionFlag"));
-            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.RepetitionStatus.ToString();
+            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.IsRepeat.ToString();
 
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("EventSubSchedules"));
             //MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.Repetition.ToString();
@@ -472,7 +472,7 @@ namespace TilerFront
             }
 
 
-            if (MyEvent.RepetitionStatus)
+            if (MyEvent.IsRepeat)
             {
                 MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Recurrence"));
                 MyEventScheduleNode.ChildNodes[0].InnerXml = CreateRepetitionNode(MyEvent.Repeat).InnerXml;
@@ -1010,15 +1010,20 @@ namespace TilerFront
 
         async virtual protected Task<Dictionary<string, TilerElements.Location>> getLocationCache(string NameOfFile = "")
         {
-            Dictionary<string, TilerElements.Location> retValue = await _Database.Locations.ToDictionaryAsync(obj => obj.Description, obj => obj);
+            Dictionary<string, TilerElements.Location> retValue = await _Database.Locations.Where(location => location.UserId == _TilerUser.Id).ToDictionaryAsync(obj => obj.Description, obj => obj);
             return retValue;
         }
 
-        async public virtual Task<Dictionary<string, CalendarEvent>> getAllCalendarFromXml(TimeLine RangeOfLookUP)
+        async public virtual Task<Dictionary<string, CalendarEvent>> getAllCalendarFromXml(TimeLine RangeOfLookUP, bool includeSubEvents = true)
         {
             if(RangeOfLookUP != null)
             {
-                Dictionary<string, CalendarEvent> MyCalendarEventDictionary = await _Database.CalEvents.Where(calEvent => calEvent.Start < RangeOfLookUP.End && calEvent.End > RangeOfLookUP.Start).ToDictionaryAsync(calEvent => calEvent.Calendar_EventID.getCalendarEventComponent(), calEvent => calEvent);
+                IQueryable<CalendarEvent> calEVents = _Database.CalEvents;
+                if(includeSubEvents)
+                {
+                    calEVents = _Database.CalEvents.Include("AllSubEvents_DB");
+                }
+                Dictionary<string, CalendarEvent> MyCalendarEventDictionary = await calEVents.Where(calEvent => calEvent.CreatorId == _TilerUser.Id && calEvent.Start < RangeOfLookUP.End && calEvent.End > RangeOfLookUP.Start).ToDictionaryAsync(calEvent => calEvent.Calendar_EventID.getCalendarEventComponent(), calEvent => calEvent);
                 return MyCalendarEventDictionary;
             }
 
