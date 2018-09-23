@@ -40,13 +40,6 @@ namespace TilerFront
         }
 
 
-        override protected async Task<Dictionary<string, CalendarEvent>> getAllCalendarElements(TimeLine RangeOfLookup)
-        {
-            Dictionary<string, CalendarEvent> retValue = new Dictionary<string, CalendarEvent>();
-            retValue = await UserLog.getAllCalendarFromXml(RangeOfLookup);
-            return retValue;
-        }
-
 
         override public bool DeleteAllCalendarEvents()
         {

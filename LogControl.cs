@@ -1019,9 +1019,24 @@ namespace TilerFront
             if(RangeOfLookUP != null)
             {
                 IQueryable<CalendarEvent> calEVents = _Database.CalEvents;
-                if(includeSubEvents)
+                if (includeSubEvents)
                 {
-                    calEVents = _Database.CalEvents.Include("AllSubEvents_DB");
+                    calEVents = _Database.CalEvents
+                        .Include(calEvent => calEvent.UiParams_EventDB)
+                        .Include(calEvent => calEvent.DataBlob_EventDB)
+                        .Include(calEvent => calEvent.Name)
+                        .Include(calEvent => calEvent.Name.Creator_EventDB)
+                        .Include(calEvent => calEvent.Location_DB)
+                        .Include(calEvent => calEvent.Creator_EventDB)
+                        .Include(calEvent => calEvent.Repetition_EventDB)
+                        .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.ParentCalendarEvent))
+                        .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Name))
+                        .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Name.Creator_EventDB))
+                        .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Creator_EventDB))
+                        .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.UiParams_EventDB))
+                        .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Location_DB))
+                        .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.DataBlob_EventDB));
+
                 }
                 Dictionary<string, CalendarEvent> MyCalendarEventDictionary = await calEVents.Where(calEvent => calEvent.CreatorId == _TilerUser.Id && calEvent.Start < RangeOfLookUP.End && calEvent.End > RangeOfLookUP.Start).ToDictionaryAsync(calEvent => calEvent.Calendar_EventID.getCalendarEventComponent(), calEvent => calEvent);
                 return MyCalendarEventDictionary;
@@ -1733,40 +1748,43 @@ namespace TilerFront
 
         public async Task<CalendarEvent> getCalendarEventWithID(string ID)
         {
-            TimeLine RangeOfLookup = new TimeLine(DateTimeOffset.UtcNow.AddYears(-1000), DateTimeOffset.UtcNow.AddYears(1000));
-            Dictionary<string, CalendarEvent> AllScheduleData = await getAllCalendarFromXml(RangeOfLookup);
-            CalendarEvent retValue = null;
-            if (AllScheduleData.ContainsKey(ID))
-            {
-                retValue = AllScheduleData[ID];
-            }
+            CalendarEvent retValue = await Database.CalEvents
+                .Include(calEvent => calEvent.UiParams_EventDB)
+                .Include(calEvent => calEvent.DataBlob_EventDB)
+                .Include(calEvent => calEvent.Name)
+                .Include(calEvent => calEvent.Name.Creator_EventDB)
+                .Include(calEvent => calEvent.Location_DB)
+                .Include(calEvent => calEvent.Creator_EventDB)
+                .Include(calEvent => calEvent.Repetition_EventDB)
+                .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents)
+                .Include(calEvent => calEvent.Repetition_EventDB.SubRepetitions)
+                .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.ParentCalendarEvent))
+                .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Name))
+                .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Name.Creator_EventDB))
+                .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Creator_EventDB))
+                .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.UiParams_EventDB))
+                .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Location_DB))
+                .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.DataBlob_EventDB)).SingleOrDefaultAsync(calEvent => calEvent.Id == ID);
             return retValue;
         }
 
-        public async Task<IList<CalendarEvent>> getCalendarEventWithName(string Name)
+        public async Task<IQueryable<CalendarEvent>> getCalendarEventWithName(string Name)
         {
-            IList<CalendarEvent> retValue = new CalendarEvent[0];
-#if ForceReadFromXml
-#else
-            if (useCassandra)
-            {
-                retValue = myCassandraAccess.SearchEventsByName(Name);
-                return retValue;
-            }
-#endif
+            //IList<CalendarEvent> retValue = new CalendarEvent[0];
+            IQueryable<EventName> eventNames = _Database.EventNames
+                .Where(name => name.CreatorId == _TilerUser.Id && name.NameValue.Contains(Name));
 
-            TimeLine RangeOfLookup = new TimeLine(DateTimeOffset.UtcNow.AddYears(-1000), DateTimeOffset.UtcNow.AddYears(1000));
-            Dictionary<string, CalendarEvent> AllScheduleData =await getAllCalendarFromXml(RangeOfLookup);
-            
-            Name = Name.ToLower();
-            if (AllScheduleData.Count > 0)
-            {
-                retValue = AllScheduleData.Values.Where(obj => obj.getName.NameValue.ToLower().Contains(Name)).ToList();
-            }
-
+            var retValue = getCalendarEventsForUser(_TilerUser.Id);
+            retValue.Where(calEvent => !calEvent.IsRepeatsChildCalEvent);
             return retValue;
         }
 
+
+        public IQueryable<CalendarEvent>getCalendarEventsForUser(string userId)
+        {
+            IQueryable<CalendarEvent> retValue = _Database.CalEvents.Where(calEvent => calEvent.Id == userId);
+            return retValue;
+        }
 
         async public Task<IList<TilerElements.Location>> getCachedLocationByName(string Name)
         {
