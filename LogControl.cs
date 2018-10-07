@@ -701,7 +701,7 @@ namespace TilerFront
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("EventSubSchedules"));
             //MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.Repetition.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("RigidFlag"));
-            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.getRigid.ToString();
+            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.isRigid.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Duration"));
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.getActiveDuration.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Split"));
@@ -925,7 +925,7 @@ namespace TilerFront
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("ThirdPartyID"));
             MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.ThirdPartyID;
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("Rigid"));
-            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.getRigid.ToString();
+            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.isRigid.ToString();
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("ID"));
             MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.getId;
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("Enabled"));
@@ -1808,7 +1808,7 @@ namespace TilerFront
                 Start = DateTimeOffset.Parse(MyXmlNode.ChildNodes[i].SelectSingleNode("ActiveStartTime").InnerText).UtcDateTime;
                 End = DateTimeOffset.Parse(MyXmlNode.ChildNodes[i].SelectSingleNode("ActiveEndTime").InnerText).UtcDateTime;
 
-                bool rigidFlag =MyParent.getRigid;
+                bool rigidFlag =MyParent.isRigid;
                 XmlNode rigidNode = MyXmlNode.ChildNodes[i].SelectSingleNode("Rigid");
                 if (rigidNode!=null)
                 {

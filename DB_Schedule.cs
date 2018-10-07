@@ -173,7 +173,7 @@ namespace TilerFront
             myWatch.Start();
 #endif
             HashSet<SubCalendarEvent> NotdoneYet = new HashSet<SubCalendarEvent>();// getNoneDoneYetBetweenNowAndReerenceStartTIme();
-            if (!NewEvent.getRigid)
+            if (!NewEvent.isRigid)
             {
                 NewEvent = EvaluateTotalTimeLineAndAssignValidTimeSpots(NewEvent, NotdoneYet, null, optimizeFirstTwentyFourHours: optimizeSchedule);
             }

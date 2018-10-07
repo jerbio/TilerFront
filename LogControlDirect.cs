@@ -373,7 +373,7 @@ namespace TilerFront
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("EventSubSchedules"));
             //MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.Repetition.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("RigidFlag"));
-            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.getRigid.ToString();
+            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.isRigid.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Duration"));
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.getActiveDuration.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Split"));

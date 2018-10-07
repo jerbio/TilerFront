@@ -222,7 +222,7 @@ namespace TilerFront.Controllers
                 DateTimeOffset myNow = myAuthorizedUser.getRefNow();
                 DB_Schedule MySchedule = new DB_Schedule(myUser, myNow);
                 SubCalendarEvent SubEvent = MySchedule.getSubCalendarEvent(myAuthorizedUser.EventID);
-                if ((!SubEvent.getRigid) && (SubEvent.getId != currentPausedEvent.EventId))
+                if ((!SubEvent.isRigid) && (SubEvent.getId != currentPausedEvent.EventId))
                 {
                     DB_UserActivity activity = new DB_UserActivity(myAuthorizedUser.getRefNow(), UserActivity.ActivityType.Pause);
 
