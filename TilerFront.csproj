@@ -637,6 +637,7 @@
     <Content Include="Content\bootstrap-theme.min.css.map" />
     <Content Include="Content\bootstrap-theme.css.map" />
     <None Include="Properties\PublishProfiles\mytilerkid - FTP.pubxml" />
+    <None Include="Properties\PublishProfiles\mytilerkid - FTP1.pubxml" />
     <None Include="Properties\PublishProfiles\mytilerkid - Web Deploy.pubxml" />
     <None Include="Scripts\jquery-3.2.1.intellisense.js" />
     <Content Include="Scripts\jquery-3.2.1.js" />
