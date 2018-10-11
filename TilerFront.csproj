@@ -259,9 +259,8 @@
     <Reference Include="sdk">
       <HintPath>..\module\sdk\bin\Debug\sdk.dll</HintPath>
     </Reference>
-    <Reference Include="SendGrid, Version=9.8.0.0, Culture=neutral, PublicKeyToken=4f047e93159395ca, processorArchitecture=MSIL">
-      <HintPath>..\packages\Sendgrid.9.9.0\lib\net452\SendGrid.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="SendGrid, Version=9.10.0.0, Culture=neutral, PublicKeyToken=4f047e93159395ca, processorArchitecture=MSIL">
+      <HintPath>..\packages\Sendgrid.9.10.0\lib\net452\SendGrid.dll</HintPath>
     </Reference>
     <Reference Include="SendGrid.CSharp.HTTP.Client, Version=3.3.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\SendGrid.CSharp.HTTP.Client.3.3.0\lib\SendGrid.CSharp.HTTP.Client.dll</HintPath>
@@ -517,53 +516,9 @@
     <Compile Include="LogControlDebug.cs" />
     <Compile Include="LogControlDirect.cs" />
     <Compile Include="LogControl.cs" />
-    <Compile Include="Migrations\201505070935055_GoogleNotificationAuthentication.cs" />
-    <Compile Include="Migrations\201505070935055_GoogleNotificationAuthentication.Designer.cs">
-      <DependentUpon>201505070935055_GoogleNotificationAuthentication.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201505080639133_GoogleNotificationAuthentication1.cs" />
-    <Compile Include="Migrations\201505080639133_GoogleNotificationAuthentication1.Designer.cs">
-      <DependentUpon>201505080639133_GoogleNotificationAuthentication1.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201605031337223_pauseEventTable.cs" />
-    <Compile Include="Migrations\201605031337223_pauseEventTable.Designer.cs">
-      <DependentUpon>201605031337223_pauseEventTable.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201605040341293_modifiedPuaseData.cs" />
-    <Compile Include="Migrations\201605040341293_modifiedPuaseData.Designer.cs">
-      <DependentUpon>201605040341293_modifiedPuaseData.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201605230745399_addedPausedEventForeignKeyRelationship.cs" />
-    <Compile Include="Migrations\201605230745399_addedPausedEventForeignKeyRelationship.Designer.cs">
-      <DependentUpon>201605230745399_addedPausedEventForeignKeyRelationship.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201605300652203_addedAbilityForPauseTime.cs" />
-    <Compile Include="Migrations\201605300652203_addedAbilityForPauseTime.Designer.cs">
-      <DependentUpon>201605300652203_addedAbilityForPauseTime.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201605300724181_addedPrimaryContraintForPauseTime.cs" />
-    <Compile Include="Migrations\201605300724181_addedPrimaryContraintForPauseTime.Designer.cs">
-      <DependentUpon>201605300724181_addedPrimaryContraintForPauseTime.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201612250817177_ApplicationUserToTilerUser.cs" />
-    <Compile Include="Migrations\201612250817177_ApplicationUserToTilerUser.Designer.cs">
-      <DependentUpon>201612250817177_ApplicationUserToTilerUser.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201612270435357_tilerUserLastUpdateChange.cs" />
-    <Compile Include="Migrations\201612270435357_tilerUserLastUpdateChange.Designer.cs">
-      <DependentUpon>201612270435357_tilerUserLastUpdateChange.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201612270701357_tilerUserLastUpdateChange_SwitchBack.cs" />
-    <Compile Include="Migrations\201612270701357_tilerUserLastUpdateChange_SwitchBack.Designer.cs">
-      <DependentUpon>201612270701357_tilerUserLastUpdateChange_SwitchBack.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201612270726466_tilerUserLastUpdateChange_SwitchBack1.cs" />
-    <Compile Include="Migrations\201612270726466_tilerUserLastUpdateChange_SwitchBack1.Designer.cs">
-      <DependentUpon>201612270726466_tilerUserLastUpdateChange_SwitchBack1.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201701090320486_differentiateEndOfDayFromLastModification.cs" />
-    <Compile Include="Migrations\201701090320486_differentiateEndOfDayFromLastModification.Designer.cs">
-      <DependentUpon>201701090320486_differentiateEndOfDayFromLastModification.cs</DependentUpon>
+    <Compile Include="Migrations\201810100708186_initial.cs" />
+    <Compile Include="Migrations\201810100708186_initial.Designer.cs">
+      <DependentUpon>201810100708186_initial.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
@@ -2804,41 +2759,8 @@
     <None Include="WagTapCalLogs\**\*" CopyToPublishDirectory="Always" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201505070935055_GoogleNotificationAuthentication.resx">
-      <DependentUpon>201505070935055_GoogleNotificationAuthentication.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201505080639133_GoogleNotificationAuthentication1.resx">
-      <DependentUpon>201505080639133_GoogleNotificationAuthentication1.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201605031337223_pauseEventTable.resx">
-      <DependentUpon>201605031337223_pauseEventTable.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201605040341293_modifiedPuaseData.resx">
-      <DependentUpon>201605040341293_modifiedPuaseData.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201605230745399_addedPausedEventForeignKeyRelationship.resx">
-      <DependentUpon>201605230745399_addedPausedEventForeignKeyRelationship.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201605300652203_addedAbilityForPauseTime.resx">
-      <DependentUpon>201605300652203_addedAbilityForPauseTime.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201605300724181_addedPrimaryContraintForPauseTime.resx">
-      <DependentUpon>201605300724181_addedPrimaryContraintForPauseTime.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201612250817177_ApplicationUserToTilerUser.resx">
-      <DependentUpon>201612250817177_ApplicationUserToTilerUser.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201612270435357_tilerUserLastUpdateChange.resx">
-      <DependentUpon>201612270435357_tilerUserLastUpdateChange.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201612270701357_tilerUserLastUpdateChange_SwitchBack.resx">
-      <DependentUpon>201612270701357_tilerUserLastUpdateChange_SwitchBack.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201612270726466_tilerUserLastUpdateChange_SwitchBack1.resx">
-      <DependentUpon>201612270726466_tilerUserLastUpdateChange_SwitchBack1.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201701090320486_differentiateEndOfDayFromLastModification.resx">
-      <DependentUpon>201701090320486_differentiateEndOfDayFromLastModification.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201810100708186_initial.resx">
+      <DependentUpon>201810100708186_initial.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
