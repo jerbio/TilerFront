@@ -197,41 +197,13 @@ namespace TilerFront
                 if (GoogleEvent.Start.DateTime != null)
                 {
                     TimeLine EventRange = new TimeLine(GoogleEvent.Start.DateTime.Value.ToUniversalTime(), GoogleEvent.End.DateTime.Value.ToUniversalTime());
-                    if (EventRange.InterferringTimeLine(CalculationTimeLine) != null || GoogleEvent.Recurrence != null)
+                    if (EventRange.InterferringTimeLine(CalculationTimeLine) != null || GoogleEvent.Recurrence != null) // took out manual check for repetition because of we set the property singleEvents in  the function getGoogleEvents in class GoogleTilerEventControl.cs. If you need the manual look up run "git checkout 8db3dab166909255ce112" and jump back to this file you should see logic about this below.
                     {
-                        if (GoogleEvent.Recurrence == null)
-                        {
-                            GoogleIDs.Add(GoogleEvent.Id);
-                            CalendarEvent calEvent = GoogleCalendarEvent.convertFromGoogleToCalendarEvent(GoogleEvent.ToSubCal(AuthenticationID, i, CalendarServiceData));
-                            RetValue.Add(calEvent);
-                            locations.Add(calEvent.Location);
-                        }
-                        else
-                        {
-                            RepeatingIDs.Add(GoogleEvent.Id, GoogleEvent);
-                        }
+                        GoogleIDs.Add(GoogleEvent.Id);
+                        CalendarEvent calEvent = GoogleCalendarEvent.convertFromGoogleToCalendarEvent(GoogleEvent.ToSubCal(AuthenticationID, i, CalendarServiceData));
+                        RetValue.Add(calEvent);
+                        locations.Add(calEvent.Location);
                     }
-                }
-            }
-            KeyValuePair<string, Google.Apis.Calendar.v3.Data.Event>[] DictAsArray = RepeatingIDs.ToArray();
-            for (uint j = 0; j < DictAsArray.Length; j++)
-            {
-                uint myIndex = i + j;
-                KeyValuePair<string, Google.Apis.Calendar.v3.Data.Event> eachKeyValuePair = DictAsArray[j];
-                var RepetitionData = CalendarServiceData.Events.Instances(UserID, eachKeyValuePair.Key);
-                RepetitionData.ShowDeleted = false;
-                RepetitionData.TimeMax = new DateTime(CalculationTimeLine.End.AddDays(5).Ticks, DateTimeKind.Utc);
-                RepetitionData.TimeMin = new DateTime(CalculationTimeLine.Start.AddDays(-5).Ticks, DateTimeKind.Utc);
-                var generatedRsults = await RepetitionData.ExecuteAsync().ConfigureAwait(false);
-                EventID CalendarEventID = EventID.generateGoogleCalendarEventID(myIndex);
-                List<Event> googleEventsWithinRange = generatedRsults.Items.Where(googleEvent => googleEvent.End.DateTime.Value.ToUniversalTime() > CalculationTimeLine.Start && CalculationTimeLine.End > googleEvent.Start.DateTime.Value.ToUniversalTime()).ToList();
-                List<SubCalendarEvent> AllRepeatSubCals = generateRepeatSubCalendarEvent(CalendarEventID, googleEventsWithinRange);
-                
-                if (AllRepeatSubCals.Count>0)
-                {
-                    CalendarEvent newlyCreatedCalEVent = CalEvent.FromGoogleToRepatCalendarEvent(AllRepeatSubCals);
-                    newlyCreatedCalEVent.AllSubEvents.AsParallel().ForAll((subEvent) => locations.Add(subEvent.Location));
-                    RetValue.Add(newlyCreatedCalEVent);
                 }
             }
 
