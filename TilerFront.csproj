@@ -520,6 +520,10 @@
     <Compile Include="Migrations\201810100708186_initial.Designer.cs">
       <DependentUpon>201810100708186_initial.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201810280504469_tilerUserEnhancement.cs" />
+    <Compile Include="Migrations\201810280504469_tilerUserEnhancement.Designer.cs">
+      <DependentUpon>201810280504469_tilerUserEnhancement.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -2777,6 +2781,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201810100708186_initial.resx">
       <DependentUpon>201810100708186_initial.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201810280504469_tilerUserEnhancement.resx">
+      <DependentUpon>201810280504469_tilerUserEnhancement.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

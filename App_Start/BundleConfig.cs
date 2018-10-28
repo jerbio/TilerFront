@@ -1,5 +1,7 @@
-﻿using System.Web;
+﻿using System.Configuration;
+using System.Web;
 using System.Web.Optimization;
+using TilerElements;
 
 namespace TilerFront
 {
@@ -16,6 +18,9 @@ namespace TilerFront
             //LogLocation = @"C:\Users\OluJerome\Documents\Visual Studio 2010\Projects\LearnCuDAVS2010\LearnCUDAConsoleApplication\WagTapCalLogs\";
             TilerFront.LogControl.UpdateLogLocation(LogLocation);
             TilerFront.LogControl.UpdateBigDataLogLocation(BigDataocation);
+
+            string apiKey = ConfigurationManager.AppSettings["googleMapsApiKey"];
+            Location.updateApiKey(apiKey);
             bundles.Add(new ScriptBundle("~/Scripts/signalR").Include(
                         "~/Scripts/jquery.signalR-{version}.js"));
 
