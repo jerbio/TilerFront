@@ -52,7 +52,7 @@ function setBlackLogoIcon() {
 }
 
 function getLatestData(data) {
-    var formattedScheduleData = StructuralizeNewData(data.Content)
+    var formattedScheduleData = StructuralizeNewData(data.content)
     function sortSubCalendarEventsByEndTime(subCalA, subCalB) {
         return subCalA.SubCalEndDate - subCalB.SubCalEndDate
     }

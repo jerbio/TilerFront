@@ -21,12 +21,12 @@ var CurrentTheme = UserTheme.Light;
 var UserCredentials;
 try
 {
-    //debugger;
+    
     UserCredentials=  RetrieveUserCredentials();
 }
 catch(e)
 {
-    //debugger;
+    
     UserCredentials= { UserName: "", ID: "", Name: "" };
 }
 
@@ -340,7 +340,7 @@ function StructuralizeNewData(NewData)
                     }
 
                 }
-                //debugger;
+                
                 var RangeStart = new Date(NowDate.getTime() - (OneHourInMs * 12));
                 var RangeEned = new Date(CurrentTheme.Now + TwelveHourMilliseconds);
 
@@ -356,7 +356,7 @@ function StructuralizeNewData(NewData)
     function PopulateDomForScheduleEvent(myEvent, Tiers, CalendarData) {
         
 
-        //debugger;
+        
         /*
         myEvent.SubCalStartDate = new Date(myEvent.SubCalStartDate + global_TimeZone_ms );
         myEvent.SubCalEndDate = new Date(myEvent.SubCalEndDate + global_TimeZone_ms );
@@ -2018,7 +2018,7 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
         Function emmpties the Dom element containing the list of returned values. It also sets the content status to false;
         */
         var clear = function () {
-            //debugger;
+            
             if (InputBarContainer.Dom.parentNode != null) {
                 $(InputBarContainer.Dom).empty();
                 //InputBarContainer.Dom.parentNode.removeChild(InputBarContainer.Dom);
@@ -2030,7 +2030,7 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
 
         function HideContainer()
         {
-            //debugger;
+            
             $(InputBarContainer.Dom).addClass("setAsDisplayNone");
             IsContentOn = false;
         }
@@ -2129,7 +2129,7 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
         function prepCalToBackEnd(InputDom, url, Method, SuggestedValuesContainer, e, IsNotTilerEndPoint,DataStructure) {
             return function ()
             {
-                //debugger;
+                
                 
                 cancelRequest();//cancels any preceeding requests
                 var FullLetter = InputDom.value;
@@ -2137,7 +2137,7 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
                 myRequest = null;
                 if (!(url))//checks if data set is already provided. If it is provided then it should just call the call back.
                 {
-                    //debugger;
+                    
                     var Data = url;
                     var AllDom = GenerateEachDomCallBack(Data, SuggestedValuesContainer, InputDom);
                     TimerResetID = ini_TimerResetID;
@@ -2182,7 +2182,7 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
                 {
                     //response = JSON.parse(response);
                     
-                    var data = IsNotTilerEndPoint ? response : response.Content;
+                    var data = IsNotTilerEndPoint ? response : response.content;
                     var AllDom = GenerateEachDomCallBack(data, SuggestedValuesContainer, InputDom);
                     TimerResetID = ini_TimerResetID;
                     myRequest = null;
@@ -2362,7 +2362,7 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
         }
         function onSlliderFocus()
         {
-            //debugger;
+            
             EnableCustomButtonContainer.Dom.onkeypress=(onKeyPress);
             function onKeyPress(e)
             {

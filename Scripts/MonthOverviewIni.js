@@ -1592,7 +1592,7 @@ getRefreshedData.callAllCallbacks = function (data) {
 }
 
 getRefreshedData.callAllPauseCallbacks = function (data) {
-    var pauseData = data.Content.Schedule.PauseData;
+    var pauseData = data.content.Schedule.PauseData;
     for (var key in getRefreshedData.pauseCallBacks) {
         getRefreshedData.pauseCallBacks[key](pauseData);
     }
@@ -1758,7 +1758,7 @@ getRefreshedData.pauseUnEnroll = function (Id) {
         {
             //NewData = JSON.parse(NewData);
             var PerformanceStart = new Date();
-            NewData = NewData.Content;
+            NewData = NewData.content;
             ActiveSubEvents = new Array();
             var StructuredData = StructuralizeNewData(NewData)
             TotalSubEventList = StructuredData.TotalSubEventList;
@@ -1805,7 +1805,7 @@ getRefreshedData.pauseUnEnroll = function (Id) {
 
         function getSubEvents(NewData)
         {
-            NewData=NewData.Content
+            NewData=NewData.content
             var DeletedTotalSubEventList = StructuralizeNewData(NewData).TotalSubEventList;
             CallBackAfterRefresh(DeletedTotalSubEventList);
         }

@@ -120,7 +120,7 @@ function LaunchAddnewEvent(LoopBackCaller, CurrentUser,isTIle)
         }).done(function (data) {
             RefreshSubEventsMainDivSubEVents(CloseAddNewEvent);
 
-            var SubEventDate = new Date(data.Content.SubCalStartDate)
+            var SubEventDate = new Date(data.content.SubCalStartDate)
             var myDropDown = new DropDownNotification();
             myDropDown.ShowMessage("Earliest time for \"" + NewEvent.Name + "\" is " + SubEventDate.toLocaleString());
         });
@@ -1332,7 +1332,7 @@ function createCalEventRecurrenceTab(IsTile)
 
     function LaunchTab(MiscData)
     {
-        var CurrentRange = MiscData[0].Content.getCurrentRangeOfAutoContainer();
+        var CurrentRange = MiscData[0].content.getCurrentRangeOfAutoContainer();
         var i = 0;
         var NumbeOfValids = new Array();
         for (i; i < AllDoms.length; i++)

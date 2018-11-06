@@ -146,7 +146,7 @@ function generateCalendarEvents(data) {
     //var JsonData = JSON.parse(data);
     var JsonData = (data);
 
-    generateLoggedInUserAccountUI(JsonData.Content);
+    generateLoggedInUserAccountUI(JsonData.content);
     //return JsonData;
 }
 
@@ -1694,7 +1694,7 @@ function generateModalForTIleOrModal()
 
     function sortOutData(PostData)
     {
-        var UserSchedule = PostData.Content;
+        var UserSchedule = PostData.content;
         var StructuredData = StructuralizeNewData(UserSchedule)
         TotalSubEventList = StructuredData.TotalSubEventList;
         ActiveSubEvents = StructuredData.ActiveSubEvents;

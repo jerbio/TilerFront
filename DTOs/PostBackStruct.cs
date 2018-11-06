@@ -8,6 +8,6 @@ namespace TilerFront.Models
     public class PostBackStruct
     {
         public PostError Error { get; set; }
-        public dynamic Content { get; set; }
+        public dynamic content { get; set; }
     }
 }

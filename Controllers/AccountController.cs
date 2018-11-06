@@ -166,7 +166,7 @@ namespace TilerFront.Controllers
                     }
                 case SignInStatus.RequiresVerification:
                     {
-                        retPost = new PostBackData("Verify User", 7);
+                        retPost = new PostBackData("Verify User", 8);
                         RetValue.Data = retPost.getPostBack;
                         return RetValue;
                         //return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = model.RememberMe });
@@ -182,6 +182,76 @@ namespace TilerFront.Controllers
                     }
             }
                  
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [ResponseType(typeof(PostBackStruct))]
+        public async Task<ActionResult> NativeSignIn(LoginViewModel model, string returnUrl)
+        {
+            JsonResult RetValue = new JsonResult();
+            PostBackData retPost;
+            if (!ModelState.IsValid)
+            {
+                retPost = new PostBackData("Invalid login attempt", 1);
+                RetValue.Data = retPost.getPostBack;
+                return RetValue;
+            }
+
+            // This doesn't count login failures towards account lockout
+            // To enable password failures to trigger account lockout, change to shouldLockout: true
+            var result = await SignInManager.PasswordSignInAsync(model.Username, model.Password, model.RememberMe, shouldLockout: false);
+            switch (result)
+            {
+                case SignInStatus.Success:
+                    {
+                        TilerUser user = db.Users.Find(model.Username);
+                        DateTimeOffset start = DateTimeOffset.UtcNow;
+                        string secret = OtherDeviceAuthentication.generateClientSecret();
+                        OtherDeviceAuthentication retValue = new OtherDeviceAuthentication()
+                        {
+                            Expiration = start.AddYears(1).toJSMilliseconds(),
+                            Start = start.toJSMilliseconds(),
+                            IsActive = true,
+                            Secret = OtherDeviceAuthentication.encryptSecret(secret),
+                            ClientId = Guid.NewGuid().ToString(),
+                            User = user,
+                            Device = model.Platform
+                        };
+
+                        db.OtherDeviceAuthentications.Add(retValue);
+                        await dbSaveChangesAsync().ConfigureAwait(false);
+                        retValue.Secret = secret;
+
+                        retPost = new PostBackData(retValue, 0);
+                        RetValue.Data = retPost.getPostBack;
+                        return RetValue;
+                    }
+
+                case SignInStatus.LockedOut:
+                    {
+                        retPost = new PostBackData("User Locked out", 7);
+                        RetValue.Data = retPost.getPostBack;
+                        return RetValue;
+                    }
+                case SignInStatus.RequiresVerification:
+                    {
+                        retPost = new PostBackData("Verify User", 8);
+                        RetValue.Data = retPost.getPostBack;
+                        return RetValue;
+                        //return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = model.RememberMe });
+
+                    }
+                case SignInStatus.Failure:
+                default:
+                    {
+                        retPost = new PostBackData("Invalid login attempt", 1);
+                        RetValue.Data = retPost.getPostBack;
+
+                        return RetValue;
+                    }
+            }
+
         }
 
 

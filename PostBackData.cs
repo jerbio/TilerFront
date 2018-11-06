@@ -98,8 +98,8 @@ namespace TilerFront
             get
             {
                 
-                TilerFront.Models.PostError retPostError = new TilerFront.Models.PostError() { code = this.Status.ToString(), Message = getErrorMessage(Status) };
-                TilerFront.Models.PostBackStruct PostBackData = new TilerFront.Models.PostBackStruct { Error = retPostError, Content = this.Data };
+                TilerFront.Models.PostError retPostError = new TilerFront.Models.PostError() { code = this.Status, message = getErrorMessage(Status) };
+                TilerFront.Models.PostBackStruct PostBackData = new TilerFront.Models.PostBackStruct { Error = retPostError, content = this.Data };
 
                 return PostBackData;
             }
@@ -112,9 +112,9 @@ namespace TilerFront
                 JObject retValueJson = new JObject();
                 JObject error = new JObject();
                 error.Add("code", Status);
-                error.Add("Message", getErrorMessage(Status));
-                retValueJson.Add("Content", Data);
-                string retValue = "{\"Error\":{\"code\":\"" + Status + "\",\"Message\":\"" + getErrorMessage(Status) + "\"},\"Content\":" + Data + "}";
+                error.Add("message", getErrorMessage(Status));
+                retValueJson.Add("content", Data);
+                string retValue = "{\"Error\":{\"code\":" + Status + ",\"message\":\"" + getErrorMessage(Status) + "\"},\"content\":" + Data + "}";
                 retValue = retValueJson.ToString();
                 return retValue;
             }

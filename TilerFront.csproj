@@ -495,6 +495,14 @@
     <Compile Include="Migrations\201810280504469_tilerUserEnhancement.Designer.cs">
       <DependentUpon>201810280504469_tilerUserEnhancement.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201811032124464_NativeLoginImplementation.cs" />
+    <Compile Include="Migrations\201811032124464_NativeLoginImplementation.Designer.cs">
+      <DependentUpon>201811032124464_NativeLoginImplementation.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201811060542404_OtherDeviceAuthenticationExtension.cs" />
+    <Compile Include="Migrations\201811060542404_OtherDeviceAuthenticationExtension.Designer.cs">
+      <DependentUpon>201811060542404_OtherDeviceAuthenticationExtension.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -2787,6 +2795,12 @@
     <EmbeddedResource Include="Migrations\201810280504469_tilerUserEnhancement.resx">
       <DependentUpon>201810280504469_tilerUserEnhancement.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201811032124464_NativeLoginImplementation.resx">
+      <DependentUpon>201811032124464_NativeLoginImplementation.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201811060542404_OtherDeviceAuthenticationExtension.resx">
+      <DependentUpon>201811060542404_OtherDeviceAuthenticationExtension.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
@@ -2814,6 +2828,8 @@
           <DevelopmentServerPort>11919</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>https://localhost:44322/</IISUrl>
+          <OverrideIISAppRootUrl>True</OverrideIISAppRootUrl>
+          <IISAppRootUrl>https://localhost:44322</IISAppRootUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

@@ -154,7 +154,7 @@ function generateSubEventEditPage(subEvent) {
                 let callBack = () => {
                     closeEditContainer(e)
                     CurrentTheme.TransitionOldContainer(); // removes the initial selected sub event details page
-                    let subEvent = result.Content.subEvent
+                    let subEvent = result.content.subEvent
                     subEvent.SubCalCalEventEnd = new Date(subEvent.SubCalCalEventEnd)
                     subEvent.SubCalCalEventStart = new Date(subEvent.SubCalCalEventStart)
                     subEvent.SubCalStartDate = new Date(subEvent.SubCalStartDate)

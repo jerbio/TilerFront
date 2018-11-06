@@ -463,7 +463,7 @@ function generatePeek(CalEvent,Container)
                 //$(myContainer).empty();
                 //myContainer.outerHTML = "";
                 var b = 3;
-                RevealPeekUI(Container, response.Content);
+                RevealPeekUI(Container, response.content);
                 //getRefreshedData.enableDataRefresh(true);
                 //affirmNewEvent(response);
                 createPeekUI.Connection = null;
@@ -3517,8 +3517,8 @@ function affirmNewEvent(response)
     }
     if (response.Error.code == 0)
     {
-        StartOfEvent = new Date(response.Content.SubCalCalEventStart);
-        EventID = response.Content.ID;
+        StartOfEvent = new Date(response.content.SubCalCalEventStart);
+        EventID = response.content.ID;
 
         /*
         if (global_GoToDay(StartOfEvent))

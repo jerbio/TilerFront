@@ -7,7 +7,7 @@ namespace TilerFront.Models
 {
     public class PostError
     {
-        public string code { get; set; }
-        public string Message { get; set; }
+        public int code { get; set; }
+        public string message { get; set; }
     }
 }

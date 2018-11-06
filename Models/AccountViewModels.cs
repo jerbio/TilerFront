@@ -76,6 +76,7 @@ namespace TilerFront.Models
 
         [Display(Name = "Remember me?")]
         public bool RememberMe { get; set; }
+        public string Platform { get; set; }
     }
 
 
