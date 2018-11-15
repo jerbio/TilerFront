@@ -11,7 +11,7 @@ namespace TilerFront.Models
     [Table("PausedEvent")]
     public class PausedEvent
     {
-        [Column(Order = 0), ForeignKey("User"), Index("UserIdAndSubEventIdClustering",Order =0, IsUnique = true, IsClustered = false), Index("UserIdAndPauseStatus", Order = 0)]
+        [Column(Order = 0),Key, ForeignKey("User"), Index("UserIdAndSubEventIdClustering",Order =0, IsUnique = true, IsClustered = false), Index("UserIdAndPauseStatus", Order = 0)]
         public string UserId { get; set; }
         TilerUser _User;
         /// <summary>

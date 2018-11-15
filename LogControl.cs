@@ -154,10 +154,10 @@ namespace TilerFront
             bool corruptZipFile = false;
             string zipFile = LoggedUserID + ".zip";
             string zipFolder = LoggedUserID;
-            BigDataLogControl bigdataControl = new BigDataLogControl();
-        string fullZipPath = @BigDataLogLocation + zipFile;
+            string fullZipPath = @BigDataLogLocation + zipFile;
             try
             {
+                BigDataLogControl bigdataControl = new BigDataLogControl();
                 if (activity == null)
                 {
                     activity = new DB_UserActivity(DateTimeOffset.UtcNow, UserActivity.ActivityType.None);
