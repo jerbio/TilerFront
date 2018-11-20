@@ -175,6 +175,18 @@ namespace TilerFront
             }
         }
 
+        public ReferenceNow Now
+        {
+            get
+            {
+                return UserLog.Now;
+            }
+            set
+            {
+                UserLog.Now = value;
+            }
+        }
+
         virtual public LogControl ScheduleData
         {
             get

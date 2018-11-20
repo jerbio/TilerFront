@@ -10,6 +10,7 @@ namespace TilerFront
 {
     public class DB_Schedule:Schedule
     {
+        protected UserAccount myAccount;
         protected DB_Schedule(Dictionary<string, CalendarEvent> allEventDictionary, DateTimeOffset starOfDay, Dictionary<string, Location> locations, DateTimeOffset referenceNow, UserAccount userAccount) : base(allEventDictionary, starOfDay, locations, referenceNow, userAccount.getTilerUser())
         {
             myAccount = userAccount;
@@ -20,7 +21,6 @@ namespace TilerFront
         {
 
         }
-        protected UserAccount myAccount;
         public DB_Schedule(UserAccount AccountEntry, DateTimeOffset referenceNow, DateTimeOffset startOfDay):base()
         {
             myAccount = AccountEntry;
@@ -36,6 +36,7 @@ namespace TilerFront
         {
             DateTimeOffset StartOfDay = await myAccount.ScheduleData.getDayReferenceTime().ConfigureAwait(false);
             _Now = new ReferenceNow(referenceNow, StartOfDay);
+            myAccount.Now = _Now;
             Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, Location>> profileData = await myAccount.ScheduleData.getProfileInfo().ConfigureAwait(false);
             if (profileData != null)
             {
