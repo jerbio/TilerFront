@@ -155,10 +155,22 @@ namespace TilerFront
             get
             {
                 return UserLog.Database;
-    }
+            }
         }
 
-#endregion 
+        public ReferenceNow Now
+        {
+            get
+            {
+                return UserLog.Now;
+            }
+            set
+            {
+                UserLog.Now = value;
+            }
+        }
+
+        #endregion
 
     }
 }

@@ -13,7 +13,6 @@ using System.Web;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.AspNet.Identity;
-using TilerElements;
 using TilerFront.Models;
 #if ForceReadFromXml
 #else
@@ -626,51 +625,6 @@ namespace TilerFront
             return TotalMinutes;
 
         }
-
-
-
-        /*
-        async public Task<Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, Location_Elements>>> getProfileInfo(TimeLine RangeOfLookup = null)
-        {
-            //getLocationCache
-            if (RangeOfLookup == null)
-            {
-                RangeOfLookup = new TimeLine(DateTimeOffset.UtcNow.AddYears(-10), DateTimeOffset.UtcNow.AddYears(10));
-            }
-
-            Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, Location_Elements>> retValue;
-            if (this.Status)
-            {
-                Task<Dictionary<string, Location_Elements>> TaskLocationCache = getLocationCache();
-                
-                Dictionary<string, CalendarEvent> AllScheduleData = this.getAllCalendarFromXml(RangeOfLookup);
-                DateTimeOffset ReferenceTime = getDayReferenceTime();
-                Dictionary<string, Location_Elements>  LocationCache = await TaskLocationCache;
-                populateDefaultLocation(LocationCache);
-                retValue = new Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, Location_Elements>>(AllScheduleData, ReferenceTime, LocationCache);
-            }
-            else
-            {
-                retValue = null;
-            }
-            return retValue;
-        }
-        */
-
-        
-
-
-        #region Cassandra Functions
-
-        void TransferXmlFileToCassandra()
-        { 
-        
-        }
-        
-        #endregion
-
-
-
         #endregion
 
         #region Properties

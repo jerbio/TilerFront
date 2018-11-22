@@ -40,7 +40,6 @@ namespace TilerFront
         protected DB_UserActivity activity;
         Dictionary<string, Func<XmlNode, Reason>> createDictionaryOfOPtionToFunction;
         protected TilerUser _TilerUser;
-
 #if ForceReadFromXml
 #else
         protected CassandraUserLog.CassandraLog myCassandraAccess;
@@ -1231,7 +1230,7 @@ namespace TilerFront
                 {
                     XmlNode RestrictionProfileNode = EventScheduleNode.SelectSingleNode("RestrictionProfile");
                     DB_RestrictionProfile myRestrictionProfile = (DB_RestrictionProfile)getRestrictionProfile(RestrictionProfileNode);
-                    RetrievedEvent = new DB_CalendarEventRestricted(RetrievedEvent,myRestrictionProfile);
+                    RetrievedEvent = new DB_CalendarEventRestricted(RetrievedEvent,myRestrictionProfile, this.Now);
                 }
             }
 
@@ -1448,7 +1447,7 @@ namespace TilerFront
                     { 
                         XmlNode RestrictionProfileNode =MyXmlNode.ChildNodes[i].SelectSingleNode("RestrictionProfile");
                         DB_RestrictionProfile myRestrictionProfile = (DB_RestrictionProfile)getRestrictionProfile(RestrictionProfileNode);
-                        retrievedSubEvent = new DB_SubCalendarEventRestricted(retrievedSubEvent, myRestrictionProfile);
+                        retrievedSubEvent = new DB_SubCalendarEventRestricted(retrievedSubEvent, myRestrictionProfile, this.Now);
                         (retrievedSubEvent as DB_SubCalendarEventRestricted).UsedTime = PauseData.Item1;
                         (retrievedSubEvent as DB_SubCalendarEventRestricted).PauseTime = PauseData.Item2;
                     }
@@ -2032,6 +2031,8 @@ namespace TilerFront
                 return _Database;
             }
         }
+
+        public ReferenceNow Now { get; set; }
 
         #endregion
     }
