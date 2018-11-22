@@ -13,7 +13,6 @@ using System.Web;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.AspNet.Identity;
-using TilerElements;
 using TilerFront.Models;
 #if ForceReadFromXml
 #else
