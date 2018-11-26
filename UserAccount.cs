@@ -21,6 +21,7 @@ namespace TilerFront
         protected string Name;
         protected string Username;
         string Password;
+        protected TilerDbContext _Database;
 
         public UserAccount()
         {
@@ -154,7 +155,7 @@ namespace TilerFront
         {
             get
             {
-                return UserLog.Database;
+                return _Database;
             }
         }
 

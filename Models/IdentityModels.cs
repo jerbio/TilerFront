@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.AspNet.Identity.EntityFramework;
 using TilerElements;
+using System.Data.Entity.Infrastructure;
 
 namespace TilerFront.Models
 {
@@ -14,10 +15,15 @@ namespace TilerFront.Models
     {
         public ApplicationDbContext()
         {
-
+            var adapter = (IObjectContextAdapter)this;
+            var objectContext = adapter.ObjectContext;
+            objectContext.CommandTimeout = 1 * 60; // value in seconds
         }
         public ApplicationDbContext(string connectionName = "DefaultConnection") : base(connectionName)
         {
+            var adapter = (IObjectContextAdapter)this;
+            var objectContext = adapter.ObjectContext;
+            objectContext.CommandTimeout = 1 * 60; // value in seconds
         }
 
         public System.Data.Entity.DbSet<ThirdPartyCalendarAuthenticationModel> ThirdPartyAuthentication { get; set; }

@@ -84,7 +84,7 @@ namespace TilerFront.Controllers
 
                 Task<ConcurrentBag<CalendarEvent>> GoogleCalEventsTask = GoogleTilerEventControl.getAllCalEvents(AllGoogleTilerEvents, TimelineForData);
 
-                Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location>> ProfileData = await LogAccess.getProfileInfo(TimelineForData);
+                Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location>> ProfileData = await LogAccess.getProfileInfo(TimelineForData, retrievalOption: LogControl.DataRetrivalOption.UiAll);
 
                 IEnumerable<CalendarEvent> GoogleCalEvents = await GoogleCalEventsTask.ConfigureAwait(false);
 
@@ -108,7 +108,6 @@ namespace TilerFront.Controllers
                         RepeatStartDate = obj.Start,
                         RepeatTotalDuration = obj.getActiveDuration
                     }).ToList();
-
 
                 UserSchedule currUserSchedule = new UserSchedule { NonRepeatCalendarEvent = NonRepeatingEvents.Select(obj => obj.ToCalEvent(TimelineForData)).ToArray(), RepeatCalendarEvent = RepeatingEvents };
 
@@ -197,7 +196,6 @@ namespace TilerFront.Controllers
         [Route("api/Schedule/Event/Pause")]
         public async Task<IHttpActionResult> PauseSchedule([FromBody]getEventModel myAuthorizedUser)
         {
-            //ApplicationDbContext db = new ApplicationDbContext();
             UserAccount myUser = await myAuthorizedUser.getUserAccount(db);
             await myUser.Login();
 
@@ -269,8 +267,6 @@ namespace TilerFront.Controllers
         [Route("api/Schedule/Event/Resume")]
         public async Task<IHttpActionResult> ResumeSchedule([FromBody]getEventModel myAuthorizedUser)
         {
-
-            //ApplicationDbContext db = new ApplicationDbContext();
             UserAccount myUser = await myAuthorizedUser.getUserAccount(db);
             await myUser.Login();
             if (myUser.Status)
@@ -458,7 +454,7 @@ namespace TilerFront.Controllers
                 }
                 else
                 {
-                    fullTimeSpan = ProcrastinateDuration.TotalTimeSpan; ;
+                    fullTimeSpan = ProcrastinateDuration.TotalTimeSpan;
                 }
                 DB_Schedule MySchedule = new DB_Schedule(myUserAccount, myAuthorizedUser.getRefNow());
 
@@ -880,33 +876,33 @@ namespace TilerFront.Controllers
             string Opacity = newEvent.Opacity;
             string ColorSelection = newEvent.ColorSelection;
             int Count = Convert.ToInt32(newEvent.Count??1.ToString()) ;
-            string DurationDays = newEvent.DurationDays; ;
-            string DurationHours = newEvent.DurationHours; ;
-            string DurationMins = newEvent.DurationMins; ;
-            string EndDay = newEvent.EndDay; ;
-            string EndHour = newEvent.EndHour; ;
-            string EndMins = newEvent.EndMins; ;
-            string EndMonth = newEvent.EndMonth; ;
-            string EndYear = newEvent.EndYear; ;
+            string DurationDays = newEvent.DurationDays;
+            string DurationHours = newEvent.DurationHours;
+            string DurationMins = newEvent.DurationMins;
+            string EndDay = newEvent.EndDay;
+            string EndHour = newEvent.EndHour;
+            string EndMins = newEvent.EndMins;
+            string EndMonth = newEvent.EndMonth;
+            string EndYear = newEvent.EndYear;
 
-            string LocationAddress = newEvent.LocationAddress; ;
-            string LocationTag = newEvent.LocationTag; ;
+            string LocationAddress = newEvent.LocationAddress;
+            string LocationTag = newEvent.LocationTag;
             EventName Name = new EventName(null, null, newEvent.Name);
 
-            string RepeatData = newEvent.RepeatData; ;
-            string RepeatEndDay = newEvent.RepeatEndDay; ;
-            string RepeatEndMonth = newEvent.RepeatEndMonth; ;
-            string RepeatEndYear = newEvent.RepeatEndYear; ;
-            string RepeatStartDay = newEvent.RepeatStartDay; ;
-            string RepeatStartMonth = newEvent.RepeatStartMonth; ;
-            string RepeatStartYear = newEvent.RepeatStartYear; ;
-            string RepeatType = newEvent.RepeatType; ;
-            string RepeatWeeklyData = newEvent.RepeatWeeklyData; ;
-            string Rigid = newEvent.Rigid; ;
-            string StartDay = newEvent.StartDay; ;
-            string StartHour = newEvent.StartHour; ;
-            string StartMins = newEvent.StartMins; ;
-            string StartMonth = newEvent.StartMonth; ;
+            string RepeatData = newEvent.RepeatData;
+            string RepeatEndDay = newEvent.RepeatEndDay;
+            string RepeatEndMonth = newEvent.RepeatEndMonth;
+            string RepeatEndYear = newEvent.RepeatEndYear;
+            string RepeatStartDay = newEvent.RepeatStartDay;
+            string RepeatStartMonth = newEvent.RepeatStartMonth;
+            string RepeatStartYear = newEvent.RepeatStartYear;
+            string RepeatType = newEvent.RepeatType;
+            string RepeatWeeklyData = newEvent.RepeatWeeklyData;
+            string Rigid = newEvent.Rigid;
+            string StartDay = newEvent.StartDay;
+            string StartHour = newEvent.StartHour;
+            string StartMins = newEvent.StartMins;
+            string StartMonth = newEvent.StartMonth;
             string StartYear = newEvent.StartYear;
             string RepeatFrequency = newEvent.RepeatFrequency;
             string TimeZone = newEvent.TimeZone;
@@ -1018,7 +1014,7 @@ namespace TilerFront.Controllers
                 if (myRestrictionProfile != null)
                 {
                     string TimeString = StartDateEntry.Date.ToShortDateString() + " " + StartTime;
-                    DateTimeOffset StartDateTime = DateTimeOffset.Parse(TimeString).UtcDateTime; ;
+                    DateTimeOffset StartDateTime = DateTimeOffset.Parse(TimeString).UtcDateTime;
                     StartDateTime = StartDateTime.Add(newEvent.getTImeSpan);
                     TimeString = EndDateEntry.Date.ToShortDateString() + " " + EndTime;
                     DateTimeOffset EndDateTime = DateTimeOffset.Parse(TimeString).UtcDateTime;
@@ -1055,7 +1051,10 @@ namespace TilerFront.Controllers
                 await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, myUser.UserID, db).ConfigureAwait(false);
 
                 await DoInitializeClassification;
-                newCalendarEvent.Repeat.PopulateRepetitionParameters(newCalendarEvent);
+                if (newCalendarEvent.IsRepeat)
+                {
+                    newCalendarEvent.Repeat.PopulateRepetitionParameters(newCalendarEvent);
+                }
                 string BeforemyName = newCalendarEvent.ToString(); //BColor + " -- " + Count + " -- " + DurationDays + " -- " + DurationHours + " -- " + DurationMins + " -- " + EndDay + " -- " + EndHour + " -- " + EndMins + " -- " + EndMonth + " -- " + EndYear + " -- " + GColor + " -- " + LocationAddress + " -- " + LocationTag + " -- " + Name + " -- " + RColor + " -- " + RepeatData + " -- " + RepeatEndDay + " -- " + RepeatEndMonth + " -- " + RepeatEndYear + " -- " + RepeatStartDay + " -- " + RepeatStartMonth + " -- " + RepeatStartYear + " -- " + RepeatType + " -- " + RepeatWeeklyData + " -- " + Rigid + " -- " + StartDay + " -- " + StartHour + " -- " + StartMins + " -- " + StartMonth + " -- " + StartYear;
                 string AftermyName = newCalendarEvent.ToString();
                 {
@@ -1064,8 +1063,7 @@ namespace TilerFront.Controllers
                     JObject json = JObject.FromObject(newEvent);
                     activity.updateMiscelaneousInfo(json.ToString());
                     myUser.ScheduleLogControl.updateUserActivty(activity);
-                    MySchedule.AddToSchedule(newCalendarEvent);
-                    await MySchedule.WriteFullScheduleToLogAndOutlook().ConfigureAwait(false);
+                    await MySchedule.AddToScheduleAndCommit(newCalendarEvent).ConfigureAwait(false);
                 }
                 
 
@@ -1130,35 +1128,35 @@ namespace TilerFront.Controllers
             string Opacity = newEvent.Opacity;
             string ColorSelection = newEvent.ColorSelection;
             int Count = Convert.ToInt32(newEvent.Count ?? 1.ToString());
-            string DurationDays = newEvent.DurationDays; ;
-            string DurationHours = newEvent.DurationHours; ;
-            string DurationMins = newEvent.DurationMins; ;
-            string EndDay = newEvent.EndDay; ;
-            string EndHour = newEvent.EndHour; ;
-            string EndMins = newEvent.EndMins; ;
-            string EndMonth = newEvent.EndMonth; ;
-            string EndYear = newEvent.EndYear; ;
+            string DurationDays = newEvent.DurationDays;
+            string DurationHours = newEvent.DurationHours;
+            string DurationMins = newEvent.DurationMins;
+            string EndDay = newEvent.EndDay;
+            string EndHour = newEvent.EndHour;
+            string EndMins = newEvent.EndMins;
+            string EndMonth = newEvent.EndMonth;
+            string EndYear = newEvent.EndYear;
 
             string LocationAddress = string.IsNullOrEmpty( newEvent.LocationAddress)?"": newEvent.LocationAddress;
             string LocationTag = LocationAddress = string.IsNullOrEmpty(newEvent.LocationTag) ? "" : newEvent.LocationTag;
             EventName Name = new EventName(null, null, newEvent.Name);
 
-            string RepeatData = newEvent.RepeatData; ;
-            string RepeatEndDay = newEvent.RepeatEndDay; ;
-            string RepeatEndMonth = newEvent.RepeatEndMonth; ;
-            string RepeatEndYear = newEvent.RepeatEndYear; ;
-            string RepeatStartDay = newEvent.RepeatStartDay; ;
-            string RepeatStartMonth = newEvent.RepeatStartMonth; ;
-            string RepeatStartYear = newEvent.RepeatStartYear; ;
-            string RepeatType = newEvent.RepeatType; ;
-            string RepeatWeeklyData = newEvent.RepeatWeeklyData; ;
-            string Rigid = newEvent.Rigid; ;
-            string StartDay = newEvent.StartDay; ;
-            string StartHour = newEvent.StartHour; ;
-            string StartMins = newEvent.StartMins; ;
-            string StartMonth = newEvent.StartMonth; ;
-            string StartYear = newEvent.StartYear; ;
-            string RepeatFrequency = newEvent.RepeatFrequency; ;
+            string RepeatData = newEvent.RepeatData;
+            string RepeatEndDay = newEvent.RepeatEndDay;
+            string RepeatEndMonth = newEvent.RepeatEndMonth;
+            string RepeatEndYear = newEvent.RepeatEndYear;
+            string RepeatStartDay = newEvent.RepeatStartDay;
+            string RepeatStartMonth = newEvent.RepeatStartMonth;
+            string RepeatStartYear = newEvent.RepeatStartYear;
+            string RepeatType = newEvent.RepeatType;
+            string RepeatWeeklyData = newEvent.RepeatWeeklyData;
+            string Rigid = newEvent.Rigid;
+            string StartDay = newEvent.StartDay;
+            string StartHour = newEvent.StartHour;
+            string StartMins = newEvent.StartMins;
+            string StartMonth = newEvent.StartMonth;
+            string StartYear = newEvent.StartYear;
+            string RepeatFrequency = newEvent.RepeatFrequency;
             string TimeZone = newEvent.TimeZone;
 
 
@@ -1249,7 +1247,7 @@ namespace TilerFront.Controllers
                 if (myRestrictionProfile!=null)
                 {
                     string TimeString = StartDateEntry.Date.ToShortDateString() + " " + StartTime;
-                    DateTimeOffset StartDateTime = DateTimeOffset.Parse(TimeString).UtcDateTime; ;
+                    DateTimeOffset StartDateTime = DateTimeOffset.Parse(TimeString).UtcDateTime;
                     StartDateTime = StartDateTime.Add(newEvent.getTImeSpan);
                     TimeString = EndDateEntry.Date.ToShortDateString() + " " + EndTime;
                     DateTimeOffset EndDateTime = DateTimeOffset.Parse(TimeString).UtcDateTime;
@@ -1275,8 +1273,11 @@ namespace TilerFront.Controllers
                 }
                 Name.Creator_EventDB = newCalendarEvent.getCreator;
                 Name.AssociatedEvent = newCalendarEvent;
-
-                newCalendarEvent.Repeat.PopulateRepetitionParameters(newCalendarEvent);
+                if(newCalendarEvent.IsRepeat)
+                {
+                    newCalendarEvent.Repeat.PopulateRepetitionParameters(newCalendarEvent);
+                }
+                
                 string BeforemyName = newCalendarEvent.ToString(); //BColor + " -- " + Count + " -- " + DurationDays + " -- " + DurationHours + " -- " + DurationMins + " -- " + EndDay + " -- " + EndHour + " -- " + EndMins + " -- " + EndMonth + " -- " + EndYear + " -- " + GColor + " -- " + LocationAddress + " -- " + LocationTag + " -- " + Name + " -- " + RColor + " -- " + RepeatData + " -- " + RepeatEndDay + " -- " + RepeatEndMonth + " -- " + RepeatEndYear + " -- " + RepeatStartDay + " -- " + RepeatStartMonth + " -- " + RepeatStartYear + " -- " + RepeatType + " -- " + RepeatWeeklyData + " -- " + Rigid + " -- " + StartDay + " -- " + StartHour + " -- " + StartMins + " -- " + StartMonth + " -- " + StartYear;
                 string AftermyName = newCalendarEvent.ToString();
 

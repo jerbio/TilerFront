@@ -22,6 +22,7 @@ namespace TilerFront
         public UserAccountDirect(string userId, TilerDbContext database)
         {
             ID = userId;
+            _Database = database;
         }
 
         /// <summary>
@@ -31,8 +32,7 @@ namespace TilerFront
         public override async System.Threading.Tasks.Task<bool> Login()
         {
             HttpContext ctx = HttpContext.Current;
-
-            DBTilerElement.DB_TilerUser tilerUser = Database.Users.Find(ID) as DBTilerElement.DB_TilerUser;
+            TilerUser tilerUser = Database.Users.Find(ID);
             UserLog = new LogControlDirect(tilerUser, Database as ApplicationDbContext);
 
             bool retValue = tilerUser != null;

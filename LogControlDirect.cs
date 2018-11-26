@@ -30,8 +30,6 @@ namespace TilerFront
         public LogControlDirect()
         {
             ScheduleMetadata = new Tuple<bool, string, DateTimeOffset, long>(false, "", new DateTimeOffset(), 0);
-            //useCassandra=false;
-//            SessionUser= new TilerUser();
         }
         public LogControlDirect(TilerUser User, ApplicationDbContext database)
         {

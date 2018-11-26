@@ -40,6 +40,7 @@ namespace TilerFront
         protected DB_UserActivity activity;
         Dictionary<string, Func<XmlNode, Reason>> createDictionaryOfOPtionToFunction;
         protected TilerUser _TilerUser;
+        public enum DataRetrivalOption { Evaluation, UiAll, UiSingle };
 #if ForceReadFromXml
 #else
         protected CassandraUserLog.CassandraLog myCassandraAccess;
@@ -465,7 +466,7 @@ namespace TilerFront
             if (MyEvent.getIsEventRestricted)
             {
                 CalendarEventRestricted restrictedMyEvent = (CalendarEventRestricted)MyEvent;
-                XmlElement restrictionProfileData = generateXMLRestrictionProfile(restrictedMyEvent.RetrictionInfo);
+                XmlElement restrictionProfileData = generateXMLRestrictionProfile(restrictedMyEvent.RetrictionProfile);
                 MyEventScheduleNode.PrependChild(xmldoc.CreateElement("RestrictionProfile"));
                 MyEventScheduleNode.ChildNodes[0].InnerXml = restrictionProfileData.InnerXml;
             }
@@ -569,7 +570,7 @@ namespace TilerFront
             {
                 XmlElement RestrictionNode = xmldoc.CreateElement("RestrictionNode");
                 XmlElement RestrictionDayOfWeekNode = xmldoc.CreateElement("RestrictionDayOfWeek");
-                RestrictionDayOfWeekNode.InnerText = eachTuple.DayOfWeek;
+                RestrictionDayOfWeekNode.InnerText = eachTuple.DayOfWeekString;
                 XmlElement RestrictionTimeLineNode = xmldoc.CreateElement("RestrictionTimeLineData");
                 RestrictionTimeLineNode.InnerXml=generateRestrictionTimeLineNode(eachTuple.RestrictionTimeLine).InnerXml;
                 RestrictionNode.AppendChild(RestrictionTimeLineNode);
@@ -1009,11 +1010,11 @@ namespace TilerFront
 
         async virtual protected Task<Dictionary<string, TilerElements.Location>> getLocationCache(string NameOfFile = "")
         {
-            Dictionary<string, TilerElements.Location> retValue = await _Database.Locations.Where(location => location.UserId == _TilerUser.Id).ToDictionaryAsync(obj => obj.Description, obj => obj);
+            Dictionary<string, TilerElements.Location> retValue = await _Database.Locations.Where(location => location.UserId == _TilerUser.Id).ToDictionaryAsync(obj => obj.Description, obj => obj).ConfigureAwait(false);
             return retValue;
         }
 
-        async public virtual Task<Dictionary<string, CalendarEvent>> getAllCalendarFromXml(TimeLine RangeOfLookUP, bool includeSubEvents = true)
+        async public virtual Task<Dictionary<string, CalendarEvent>> getAllCalendarFromXml(TimeLine RangeOfLookUP, bool includeSubEvents = true, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation, string singleCalEventId = null)
         {
             if(RangeOfLookUP != null)
             {
@@ -1060,7 +1061,36 @@ namespace TilerFront
                         .Include(calEvent => calEvent.Repetition_EventDB.SubRepetitions.Select(repetition => repetition.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB)))
                         .Include(calEvent => calEvent.Repetition_EventDB.SubRepetitions.Select(repetition => repetition.RepeatingEvents.Select(repCalEvent => repCalEvent.Procrastination_EventDB)))
                         .Include(calEvent => calEvent.Repetition_EventDB.SubRepetitions.Select(repetition => repetition.RepeatingEvents.Select(repCalEvent => repCalEvent.ProfileOfNow_EventDB)))
+                        .Include(calEvent => calEvent.RetrictionProfile)
+                        .Include(calEvent => calEvent.RetrictionProfile.DaySelection)
+                        .Include(calEvent => calEvent.RetrictionProfile.DaySelection.Select(restrictedDay => restrictedDay.RestrictionTimeLine))
+                        .Include(calEvent => calEvent.RetrictionProfile.NoNull_DaySelections)
+                        .Include(calEvent => calEvent.RetrictionProfile.NoNull_DaySelections.Select(restrictedDay => restrictedDay.RestrictionTimeLine))
+                        .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.RetrictionProfile))
+                        .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.RetrictionProfile.NoNull_DaySelections))
+                        .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.RetrictionProfile.DaySelection))
                         ;
+
+                    if (retrievalOption == DataRetrivalOption.UiAll)
+                    {
+                        calEVents = calEVents.Include(calEvent => calEvent.UiParams_EventDB)
+                            .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.UiParams_EventDB));
+                    } else if(retrievalOption == DataRetrivalOption.UiSingle)
+                    {
+                        if(!string.IsNullOrEmpty(singleCalEventId) && !string.IsNullOrWhiteSpace(singleCalEventId))
+                        {
+                            calEVents = calEVents.Where(calEvent => calEvent.Id == singleCalEventId)
+                            .Include(calEvent => calEvent.UiParams_EventDB)
+                            .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.UiParams_EventDB));
+                        } else
+                        {
+                            throw new ArgumentException("singleCalEventId cannot be null, empty or white space");
+                        }
+                    } else if(retrievalOption == DataRetrivalOption.Evaluation)
+                    {
+
+                    }
+                        
 
                 }
                 Dictionary<string, CalendarEvent> MyCalendarEventDictionary = await calEVents
@@ -1069,7 +1099,14 @@ namespace TilerFront
                         && calEvent.StartTime_EventDB < RangeOfLookUP.End 
                         && calEvent.EndTime_EventDB > RangeOfLookUP.Start)
                         .ToDictionaryAsync(calEvent => 
-                            calEvent.Calendar_EventID.getCalendarEventComponent(), calEvent => calEvent);
+                            calEvent.Calendar_EventID.getCalendarEventComponent(), calEvent => calEvent).ConfigureAwait(false);
+
+                foreach(CalendarEvent  calEvent in MyCalendarEventDictionary.Values.Where(calEvent => calEvent.getIsEventRestricted))
+                {
+                    (calEvent as CalendarEventRestricted).RetrictionProfile.InitializeOverLappingDictionary();
+                }
+
+                
                 return MyCalendarEventDictionary;
             }
 
@@ -1798,7 +1835,6 @@ namespace TilerFront
                 .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.UiParams_EventDB))
                 .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Location_DB))
                 .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.DataBlob_EventDB))
-                .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Procrastination_EventDB))
                 .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents)
                 .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB.Select(subEvent => subEvent.Name)))
                 .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.Location_DB))
@@ -1825,7 +1861,17 @@ namespace TilerFront
                 .Include(calEvent => calEvent.Repetition_EventDB.SubRepetitions.Select(repetition => repetition.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB)))
                 .Include(calEvent => calEvent.Repetition_EventDB.SubRepetitions.Select(repetition => repetition.RepeatingEvents.Select(repCalEvent => repCalEvent.Procrastination_EventDB)))
                 .Include(calEvent => calEvent.Repetition_EventDB.SubRepetitions.Select(repetition => repetition.RepeatingEvents.Select(repCalEvent => repCalEvent.ProfileOfNow_EventDB)))
+                .Include(calEvent => calEvent.RetrictionProfile.DaySelection.Select(restrictedDay => restrictedDay.RestrictionTimeLine))
+                .Include(calEvent => calEvent.RetrictionProfile.NoNull_DaySelections)
+                .Include(calEvent => calEvent.RetrictionProfile.NoNull_DaySelections.Select(restrictedDay => restrictedDay.RestrictionTimeLine))
+                .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.RetrictionProfile))
+                .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.RetrictionProfile.NoNull_DaySelections))
+                .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.RetrictionProfile.DaySelection))
                 .SingleOrDefaultAsync(calEvent => calEvent.Id == ID);
+            if(retValue.getIsEventRestricted)
+            {
+                (retValue as CalendarEventRestricted).RetrictionProfile.InitializeOverLappingDictionary();
+            }
             return retValue;
         }
 
@@ -1928,14 +1974,14 @@ namespace TilerFront
 
 
 
-        async virtual public Task<Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location>>> getProfileInfo(TimeLine RangeOfLookup)
+        async virtual public Task<Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location>>> getProfileInfo(TimeLine RangeOfLookup, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation, string singleCalEventId = null)
         {
             Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location>> retValue;
             if (this.Status)
             {
                 Task<Dictionary<string, TilerElements.Location>> TaskLocationCache = getLocationCache();
                 Dictionary<string, TilerElements.Location> LocationCache = await TaskLocationCache.ConfigureAwait(false);
-                Dictionary<string, CalendarEvent> AllScheduleData =await this.getAllCalendarFromXml(RangeOfLookup);
+                Dictionary<string, CalendarEvent> AllScheduleData =await this.getAllCalendarFromXml(RangeOfLookup, retrievalOption: retrievalOption, singleCalEventId: singleCalEventId);
 
                 DateTimeOffset ReferenceTime = getDayReferenceTime();
                 
