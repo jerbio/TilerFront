@@ -224,7 +224,7 @@ namespace TilerFront.Controllers
                     {
                         UserController myUserCtrl = new UserController();
                         TilerUser SessionUser = await myUserCtrl.GetUser(User.Identity.GetUserId(), User.Identity.GetUserName());
-                        RetValue = new UserAccountDirect(SessionUser.Id, db);
+                        RetValue = new UserAccountDirect(SessionUser.Id, dbContext);
                         return RetValue;   
                     }
                 default:

@@ -24,12 +24,18 @@ namespace TilerFront
     /// </summary>
     public class TilerController : Controller
     {
-        protected ApplicationDbContext db = new ApplicationDbContext();
+        protected ApplicationDbContext dbContext;
+        protected TilerController(): base ()
+        {
+            dbContext = new ApplicationDbContext();
+            dbContext.Database.Log = s => System.Diagnostics.Debug.WriteLine(s);
+        }
+        
         protected async Task dbSaveChangesAsync()
         {
             try
             {
-                await db.SaveChangesAsync();
+                await dbContext.SaveChangesAsync();
             }
             catch (DbEntityValidationException e)
             {

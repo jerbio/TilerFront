@@ -1092,6 +1092,11 @@
             Full Address for new event. Fully described in default format. e.g 1234 stret apt 56 Kingston, CO 78901
             </summary>
         </member>
+        <member name="P:TilerFront.Models.UnregisteredEvent.LocationId">
+            <summary>
+            Should be populated when the location is from a cache
+            </summary>
+        </member>
         <!-- Badly formed XML comment ignored for member "P:TilerFront.Models.UnregisteredEvent.LocationTag" -->
         <member name="P:TilerFront.Models.UnregisteredEvent.Name">
             <summary>

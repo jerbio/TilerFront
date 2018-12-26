@@ -18,6 +18,7 @@ using Newtonsoft.Json.Linq;
 using Microsoft.AspNet.Identity;
 using System.Data.Entity;
 using TilerCore;
+using Location = TilerElements.Location;
 
 namespace TilerFront.Controllers
 {
@@ -885,6 +886,7 @@ namespace TilerFront.Controllers
             string EndMonth = newEvent.EndMonth;
             string EndYear = newEvent.EndYear;
 
+            string LocationId = newEvent.LocationId;
             string LocationAddress = newEvent.LocationAddress;
             string LocationTag = newEvent.LocationTag;
             EventName Name = new EventName(null, null, newEvent.Name);
@@ -913,6 +915,7 @@ namespace TilerFront.Controllers
 
             string StartTime = StartHour + ":" + StartMins;
             string EndTime = EndHour + ":" + EndMins;
+            UserAccount myUser = await newEvent.getUserAccount(db);
 
             DateTimeOffset StartDateEntry = new DateTimeOffset(Convert.ToInt32(StartYear), Convert.ToInt32(StartMonth), Convert.ToInt32(StartDay), 0, 0, 0, new TimeSpan());
             DateTimeOffset EndDateEntry = new DateTimeOffset(Convert.ToInt32(EndYear), Convert.ToInt32(EndMonth), Convert.ToInt32(EndDay), 0, 0, 0, new TimeSpan());
@@ -923,7 +926,12 @@ namespace TilerFront.Controllers
             bool RigidScheduleFlag = Convert.ToBoolean(Rigid);
             TilerElements.Location EventLocation = new TilerElements.Location(LocationAddress, LocationTag);
             EventLocation.Validate();
-
+            Location retrievedLocation =await db.Locations.SingleOrDefaultAsync(location => location.UserId == myUser.UserID && location.Description == EventLocation.Description).ConfigureAwait(false);
+            if(retrievedLocation != null)
+            {
+                retrievedLocation.update(EventLocation);
+                EventLocation = retrievedLocation;
+            }
             Repetition MyRepetition = new Repetition();
             DateTimeOffset RepeatStart = new DateTimeOffset();
             DateTimeOffset RepeatEnd = new DateTimeOffset();
@@ -997,9 +1005,6 @@ namespace TilerFront.Controllers
                 EndDateEntry = MyRepetition.Range.End > EndDateEntry ? MyRepetition.Range.End : EndDateEntry;
             }
 
-            
-
-            UserAccount myUser = await newEvent.getUserAccount(db);
             PostBackData retValue;
             await myUser.Login();
             TilerUser tilerUser = myUser.getTilerUser();
@@ -1020,8 +1025,6 @@ namespace TilerFront.Controllers
                     DateTimeOffset EndDateTime = DateTimeOffset.Parse(TimeString).UtcDateTime;
                     EndDateTime = EndDateTime.Add(newEvent.getTImeSpan);
 
-
-                    //RestrictionProfile myRestrictionProfile = CreateRestrictionProfile(newEvent.RestrictionStart, newEvent.RestrictionEnd, newEvent.isWorkWeek, newEvent.getTImeSpan);
                     newCalendarEvent = new CalendarEventRestricted(tilerUser, new TilerUserGroup(), Name, StartDateTime, EndDateTime, myRestrictionProfile, EventDuration, MyRepetition, false, true, Count, RigidScheduleFlag, EventLocation, new TimeSpan(0, 15, 0), new TimeSpan(0, 15, 0),null, MySchedule.Now, new EventDisplay(true, userColor, userColor.User < 1 ? 0 : 1), new MiscData(), TimeZone);
                 }
                 else
@@ -1031,16 +1034,14 @@ namespace TilerFront.Controllers
                     DateTimeOffset EndData = DateTimeOffset.Parse(EndTime + " " + EndDateEntry.Date.ToShortDateString()).UtcDateTime;
                     EndData = EndData.Add(newEvent.getTImeSpan);
                     if (RigidScheduleFlag) {
-                        newCalendarEvent = new RigidCalendarEvent(//EventID.GenerateCalendarEvent(), 
+                        newCalendarEvent = new RigidCalendarEvent(
                             Name, StartData, EndData, EventDuration,new TimeSpan(), new TimeSpan(), MyRepetition, EventLocation,  new EventDisplay(true, userColor, userColor.User < 1 ? 0 : 1), new MiscData(), true,false, tilerUser, new TilerUserGroup(), TimeZone, null);
                     }
                     else
                     {
-                        newCalendarEvent = new CalendarEvent(//EventID.GenerateCalendarEvent(), 
-                            Name, StartData, EndData, EventDuration, new TimeSpan(), new TimeSpan(), Count, MyRepetition, EventLocation, new EventDisplay(true, userColor, userColor.User < 1 ? 0 : 1), new MiscData(), null, new NowProfile(), true, false, tilerUser, new TilerUserGroup(), TimeZone, null);
+                        newCalendarEvent = new CalendarEvent(
+                            Name, StartData, EndData, EventDuration, new TimeSpan(), new TimeSpan(), Count, MyRepetition, EventLocation, new EventDisplay(true, userColor, userColor.User < 1 ? 0 : 1), new MiscData(), new Procrastination(new DateTimeOffset(), new TimeSpan()), new NowProfile(), true, false, tilerUser, new TilerUserGroup(), TimeZone, null);
                     }
-                    
-                    //newCalendarEvent = new CalendarEvent(Name, StartData, EndData, Count, "", EventDuration, MyRepetition, true, RigidScheduleFlag, "", true, EventLocation, true, new EventDisplay(true, userColor, userColor.User < 1 ? 0 : 1), new MiscData(), false);
                 }
                 Name.Creator_EventDB = newCalendarEvent.getCreator;
                 Name.AssociatedEvent = newCalendarEvent;

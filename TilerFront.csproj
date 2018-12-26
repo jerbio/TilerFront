@@ -508,11 +508,6 @@
     <Compile Include="LogControlXml.cs" />
     <Compile Include="LogControlDirect.cs" />
     <Compile Include="LogControl.cs" />
-    <Compile Include="Migrations\201811250355400_init.cs" />
-    <Compile Include="Migrations\201811250355400_init.Designer.cs">
-      <DependentUpon>201811250355400_init.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\AuthorizedUser.cs" />
@@ -549,6 +544,7 @@
     <Compile Include="SocketHubs\ScheduleChange.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="Controllers\TilerApiController.cs" />
+    <Compile Include="ThirdPartyCalendarControl.cs" />
     <Compile Include="UserAccount.cs" />
     <Compile Include="UserAccountXml.cs" />
     <Compile Include="UserAccountDirect.cs" />
@@ -2760,6 +2756,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="BigDataLogs\" />
+    <Folder Include="Migrations\" />
     <Folder Include="Views\GoogleNotifications\" />
     <Folder Include="Views\GoogleNotification\" />
     <Folder Include="Views\WhatIf\" />
@@ -2802,11 +2799,6 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="Scripts\index.d.ts" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Migrations\201811250355400_init.resx">
-      <DependentUpon>201811250355400_init.cs</DependentUpon>
-    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

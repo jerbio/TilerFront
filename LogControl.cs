@@ -15,6 +15,7 @@ using System.Xml.Serialization;
 using System.Data.Entity;
 using TilerFront.Models;
 using BigDataTiler;
+using System.Data.Entity.Core.Objects;
 #if ForceReadFromXml
 #else
 using CassandraUserLog;
@@ -27,7 +28,7 @@ namespace TilerFront
 {
     public class LogControl
     {
-        protected TilerDbContext _Database;
+        protected TilerDbContext _Context;
         protected string ID;
         protected string UserName;
         string NameOfUser;
@@ -84,7 +85,7 @@ namespace TilerFront
             LogStatus = false;
             CachedLocation = new Dictionary<string, TilerElements.Location>();
             _TilerUser = user;
-            _Database = database;
+            _Context = database;
         }
         #region Functions
         public static void UpdateBigDataLogLocation(string bigLogLocation)
@@ -119,7 +120,7 @@ namespace TilerFront
                     Task dbLatestChange = null;
                     if (!string.IsNullOrEmpty(_TilerUser.PasswordHash))
                     {
-                        dbLatestChange = TilerController.saveLatestChange(_Database, _TilerUser);
+                        dbLatestChange = TilerController.saveLatestChange(_Context, _TilerUser);
                     }
                     if (dbLatestChange != null) {
                         await dbLatestChange;
@@ -248,7 +249,7 @@ namespace TilerFront
 
         async Task Commit(IEnumerable<CalendarEvent> calendarEvents, TilerUser tilerUser)
         {
-            await _Database.SaveChangesAsync();
+            await _Context.SaveChangesAsync();
         }
 
         public async Task Commit(IEnumerable<CalendarEvent> calendarEvents, CalendarEvent calendarEvent, String LatestId)
@@ -256,7 +257,7 @@ namespace TilerFront
             _TilerUser.LatestId = LatestId;
             if (calendarEvent!=null)
             {
-                _Database.CalEvents.Add(calendarEvent);
+                _Context.CalEvents.Add(calendarEvent);
             }
             await Commit(calendarEvents, _TilerUser);
         }
@@ -327,12 +328,12 @@ namespace TilerFront
 
         virtual public async Task AddNewLocation(TilerElements.Location Location)
         {
-            _Database.Locations.Add(Location);
+            _Context.Locations.Add(Location);
         }
 
         virtual public async Task updateLocationNode(TilerElements.Location Location)
         {
-            TilerElements.Location location = await _Database.Locations.FindAsync(Location.Id).ConfigureAwait(false);
+            TilerElements.Location location = await _Context.Locations.FindAsync(Location.Id).ConfigureAwait(false);
             location.update(Location);
         }
 
@@ -867,7 +868,7 @@ namespace TilerFront
 
         public virtual void deleteAllCalendarEvents(string dirString = "")
         {
-            _Database.CalEvents.Where(calEvent => calEvent.CreatorId == _TilerUser.Id)
+            _Context.CalEvents.Where(calEvent => calEvent.CreatorId == _TilerUser.Id)
                 .ForEachAsync(calEvent => {
                     calEvent.Disable(false);
                 });
@@ -998,7 +999,7 @@ namespace TilerFront
             TilerUser user = _TilerUser;
             if (user == null)
             {
-                user = _Database.Users.Find(ID);
+                user = _Context.Users.Find(ID);
                 if(user==null)
                 {
                     throw new NullReferenceException("Cannot find user with ID " + ID);
@@ -1010,7 +1011,7 @@ namespace TilerFront
 
         async virtual protected Task<Dictionary<string, TilerElements.Location>> getLocationCache(string NameOfFile = "")
         {
-            Dictionary<string, TilerElements.Location> retValue = await _Database.Locations.Where(location => location.UserId == _TilerUser.Id).ToDictionaryAsync(obj => obj.Description, obj => obj).ConfigureAwait(false);
+            Dictionary<string, TilerElements.Location> retValue = await _Context.Locations.Where(location => location.UserId == _TilerUser.Id).ToDictionaryAsync(obj => obj.Description, obj => obj).ConfigureAwait(false);
             return retValue;
         }
 
@@ -1018,16 +1019,15 @@ namespace TilerFront
         {
             if(RangeOfLookUP != null)
             {
-                IQueryable<CalendarEvent> calEVents = _Database.CalEvents;
+                IQueryable<CalendarEvent> calEVents = _Context.CalEvents;
                 if (includeSubEvents)
                 {
-                    calEVents = _Database.CalEvents
+                    calEVents = _Context.CalEvents
                         .Include(calEvent => calEvent.DataBlob_EventDB)
                         .Include(calEvent => calEvent.Name)
                         .Include(calEvent => calEvent.Name.Creator_EventDB)
                         .Include(calEvent => calEvent.Location_DB)
                         .Include(calEvent => calEvent.Creator_EventDB)
-                        .Include(calEvent => calEvent.Repetition_EventDB)
                         .Include(calEvent => calEvent.Procrastination_EventDB)
                         .Include(calEvent => calEvent.ProfileOfNow_EventDB)
                         .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.ParentCalendarEvent))
@@ -1038,6 +1038,7 @@ namespace TilerFront
                         .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Location_DB))
                         .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.DataBlob_EventDB))
                         .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Procrastination_EventDB))
+                        .Include(calEvent => calEvent.Repetition_EventDB)
                         .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents)
                         .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB.Select(subEvent => subEvent.Name)))
                         .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.Location_DB))
@@ -1093,15 +1094,28 @@ namespace TilerFront
                         
 
                 }
+
                 Dictionary<string, CalendarEvent> MyCalendarEventDictionary = await calEVents
-                    .Where(calEvent => 
-                        calEvent.CreatorId == _TilerUser.Id 
-                        && calEvent.StartTime_EventDB < RangeOfLookUP.End 
+                    .Where(calEvent =>
+                        calEvent.CreatorId == _TilerUser.Id
+                        && calEvent.StartTime_EventDB < RangeOfLookUP.End
                         && calEvent.EndTime_EventDB > RangeOfLookUP.Start)
-                        .ToDictionaryAsync(calEvent => 
+                        .ToDictionaryAsync(calEvent =>
                             calEvent.Calendar_EventID.getCalendarEventComponent(), calEvent => calEvent).ConfigureAwait(false);
 
-                foreach(CalendarEvent  calEvent in MyCalendarEventDictionary.Values.Where(calEvent => calEvent.getIsEventRestricted))
+                //var query = calEVents
+                //    .Where(calEvent =>
+                //        calEvent.CreatorId == _TilerUser.Id
+                //        && calEvent.StartTime_EventDB < RangeOfLookUP.End
+                //        && calEvent.EndTime_EventDB > RangeOfLookUP.Start);
+
+                //var sqlString = query.ToString();
+                //Console.WriteLine(sqlString);
+                //System.Diagnostics.Debug.WriteLine(sqlString);
+
+
+                //Dictionary<string, CalendarEvent> MyCalendarEventDictionary = new Dictionary<string, CalendarEvent>();
+                foreach (CalendarEvent  calEvent in MyCalendarEventDictionary.Values.Where(calEvent => calEvent.getIsEventRestricted))
                 {
                     (calEvent as CalendarEventRestricted).RetrictionProfile.InitializeOverLappingDictionary();
                 }
@@ -1834,6 +1848,7 @@ namespace TilerFront
                 .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Creator_EventDB))
                 .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.UiParams_EventDB))
                 .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Location_DB))
+                .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Procrastination_EventDB))
                 .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.DataBlob_EventDB))
                 .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents)
                 .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB.Select(subEvent => subEvent.Name)))
@@ -1868,9 +1883,35 @@ namespace TilerFront
                 .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.RetrictionProfile.NoNull_DaySelections))
                 .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.RetrictionProfile.DaySelection))
                 .SingleOrDefaultAsync(calEvent => calEvent.Id == ID);
-            if(retValue.getIsEventRestricted)
+            if(retValue !=null && retValue.getIsEventRestricted)
             {
                 (retValue as CalendarEventRestricted).RetrictionProfile.InitializeOverLappingDictionary();
+            }
+            return retValue;
+        }
+
+        public async Task<SubCalendarEvent> getSubEventWithID(string ID)
+        {
+            SubCalendarEvent retValue = await Database.SubEvents
+                .Include(subEvent => subEvent.UiParams_EventDB)
+                .Include(subEvent => subEvent.DataBlob_EventDB)
+                .Include(subEvent => subEvent.Name)
+                .Include(subEvent => subEvent.Name.Creator_EventDB)
+                .Include(subEvent => subEvent.Location_DB)
+                .Include(subEvent => subEvent.Creator_EventDB)
+                .Include(subEvent => subEvent.Repetition_EventDB)
+                .Include(subEvent => subEvent.DataBlob_EventDB)
+                .Include(subEvent => subEvent.Procrastination_EventDB)
+                .Include(subEvent => subEvent.ProfileOfNow_EventDB)
+                .Include(subEvent => subEvent.ParentCalendarEvent)
+                .Include(subEvent => subEvent.Repetition_EventDB.RepeatingEvents)
+                .Include(subEvent => subEvent.RetrictionProfile.DaySelection.Select(restrictedDay => restrictedDay.RestrictionTimeLine))
+                .Include(subEvent => subEvent.RetrictionProfile.NoNull_DaySelections)
+                .Include(subEvent => subEvent.RetrictionProfile.NoNull_DaySelections.Select(restrictedDay => restrictedDay.RestrictionTimeLine))
+                .SingleOrDefaultAsync(subEvent => subEvent.Id == ID);
+            if (retValue.getIsEventRestricted)
+            {
+                (retValue as SubCalendarEventRestricted).RetrictionProfile.InitializeOverLappingDictionary();
             }
             return retValue;
         }
@@ -1878,7 +1919,7 @@ namespace TilerFront
         public async Task<IQueryable<CalendarEvent>> getCalendarEventWithName(string Name)
         {
             //IList<CalendarEvent> retValue = new CalendarEvent[0];
-            IQueryable<EventName> eventNames = _Database.EventNames
+            IQueryable<EventName> eventNames = _Context.EventNames
                 .Where(name => name.CreatorId == _TilerUser.Id && name.NameValue.Contains(Name));
 
             var retValue = getCalendarEventsForUser(_TilerUser.Id);
@@ -1889,7 +1930,7 @@ namespace TilerFront
 
         public IQueryable<CalendarEvent>getCalendarEventsForUser(string userId)
         {
-            IQueryable<CalendarEvent> retValue = _Database.CalEvents.Where(calEvent => calEvent.Id == userId);
+            IQueryable<CalendarEvent> retValue = _Context.CalEvents.Where(calEvent => calEvent.Id == userId);
             return retValue;
         }
 
@@ -2074,7 +2115,7 @@ namespace TilerFront
         {
             get
             {
-                return _Database;
+                return _Context;
             }
         }
 

@@ -31,12 +31,12 @@ namespace TilerFront
         {
             ScheduleMetadata = new Tuple<bool, string, DateTimeOffset, long>(false, "", new DateTimeOffset(), 0);
         }
-        public LogControlDirect(TilerUser User, ApplicationDbContext database)
+        public LogControlDirect(TilerUser User, ApplicationDbContext dbContext)
         {
             _TilerUser = User;
             LogStatus = false;
             CachedLocation = new Dictionary<string, TilerElements.Location>();
-            _Database = database;
+            _Context = dbContext;
             LogStatus = true;
             ID = _TilerUser.Id;
             UserName = _TilerUser.UserName;
