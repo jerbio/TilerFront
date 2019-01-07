@@ -166,12 +166,12 @@ namespace TilerFront.Controllers
 
                 await ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(NewSchedule, nowEvent.UserID, db).ConfigureAwait(false);
 
-                Tuple<CustomErrors, Dictionary<string, CalendarEvent>> ScheduleUpdateMessage = NewSchedule.SetCalendarEventAsNow(nowEvent.ID);
+                var ScheduleUpdateMessage = NewSchedule.SetCalendarEventAsNow(nowEvent.ID);
                 DB_UserActivity activity = new DB_UserActivity(nowEvent.getRefNow(), UserActivity.ActivityType.SetAsNowCalendarEvent, new List<String>() { nowEvent.ID });
                 JObject json = JObject.FromObject(nowEvent);
                 activity.updateMiscelaneousInfo(json.ToString());
                 retrievedUser.ScheduleLogControl.updateUserActivty(activity);
-                await NewSchedule.UpdateWithDifferentSchedule(ScheduleUpdateMessage.Item2).ConfigureAwait(false);
+                await NewSchedule.persistToDB().ConfigureAwait(false);
                 retValue = new PostBackData(ScheduleUpdateMessage.Item1);
             }
             else
@@ -238,7 +238,7 @@ namespace TilerFront.Controllers
 
                             retrievedUser.ScheduleLogControl.updateUserActivty(activity);
 
-                            await NewSchedule.UpdateWithDifferentSchedule(ScheduleUpdateMessage.Item2).ConfigureAwait(false);
+                            await NewSchedule.persistToDB().ConfigureAwait(false);
                             retValue = new PostBackData(ScheduleUpdateMessage.Item1);
                         }
                         break;

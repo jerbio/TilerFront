@@ -928,6 +928,12 @@
             <param name="user">The referemce tiler user</param>
             <returns></returns>
         </member>
+        <member name="M:TilerFront.DB_Schedule.CleanUpForUI(System.Collections.Generic.IEnumerable{TilerElements.CalendarEvent})">
+            <summary>
+            Function rearranges the sub events by Id to be associated with the order of time
+            </summary>
+            <returns></returns>
+        </member>
         <member name="P:TilerFront.Models.AuthorizedUser.TimeZone">
             <summary>
             TimeZone desired by the user. This defaults to UTC

@@ -313,32 +313,38 @@ namespace TilerFront.Controllers
                 TimeSpan OffSet = TimeSpan.FromMinutes(Min);
                 DateTimeOffset EndOfDay = new DateTimeOffset(2014, 1, 1, 22, 0, 0, OffSet);
                 var user = new TilerUser { UserName = model.Username, Email = model.Email, FirstName = model.FirstName?? "", LastName = model.LastName?? "", EndfOfDay = EndOfDay.UtcDateTime};
-                //var result = logGenerationresult.Item1;
-                //if (result.Succeeded)
-                //{
-                    var result = await UserManager.CreateAsync(user, model.Password);
+                
+                var result = await UserManager.CreateAsync(user, model.Password);
 
-                    if (result.Succeeded)
-                    {
-                        await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
-                        Task SendEmail = SendEmailConfirmationAsync(user.Id, "Please Confirm Your Tiler Account!");
-                        await SendEmail.ConfigureAwait(false);
+                if (result.Succeeded)
+                {
+                    await createProcrastinateCalendarEvent(user).ConfigureAwait(false);
+                    await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
+                    Task SendEmail = SendEmailConfirmationAsync(user.Id, "Please Confirm Your Tiler Account!");
+                    await SendEmail.ConfigureAwait(false);
 
-                        // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=320771
-                        // Send an email with this link
-                        // string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
-                        // var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-                        // await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
+                    // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=320771
+                    // Send an email with this link
+                    // string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
+                    // var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
+                    // await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
                         
-                        //return RedirectToAction("Index", "Home");
-                        return RedirectToAction("Desktop", "Account");
-                    }
-                //}
+                    //return RedirectToAction("Index", "Home");
+                    return RedirectToAction("Desktop", "Account");
+                }
                 AddErrors(result);
             }
 
             // If we got this far, something failed, redisplay form
             return View(model);
+        }
+
+        public async Task createProcrastinateCalendarEvent (TilerUser user)
+        {
+            DateTimeOffset now = DateTimeOffset.UtcNow;
+            CalendarEvent procrastinateCalEvent = ProcrastinateCalendarEvent.generateProcrastinateAll(now, user, TimeSpan.FromSeconds(1), "UTC");
+            dbContext.CalEvents.Add(procrastinateCalEvent);
+            await dbContext.SaveChangesAsync().ConfigureAwait(false);
         }
 
         public async Task<ActionResult> RegisterUser(RegisterViewModel model)
@@ -357,6 +363,7 @@ namespace TilerFront.Controllers
 
                 if (result.Succeeded)
                 {
+                    await createProcrastinateCalendarEvent(user).ConfigureAwait(false);
                     await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
                     Task SendEmail = SendEmailConfirmationAsync(user.Id, "Please Confirm Your Tiler Account!");
                     await SendEmail.ConfigureAwait(false);
@@ -749,6 +756,7 @@ namespace TilerFront.Controllers
                     result = await UserManager.AddLoginAsync(user.Id, info.Login);
                     if (result.Succeeded )
                     {
+                        await createProcrastinateCalendarEvent(user).ConfigureAwait(false);
                         await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
                         Task SendThirdPartyAuthentication = new Task(() => { });
                         if (ThirdPartyCredentials!=null)

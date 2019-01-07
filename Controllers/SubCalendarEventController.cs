@@ -76,7 +76,7 @@ namespace TilerFront.Controllers
                             Tuple<CustomErrors, Dictionary<string, CalendarEvent>> ScheduleUpdateMessage = NewSchedule.BundleChangeUpdate(myUser.EventID, new EventName(retrievedUser.getTilerUser(), subEventedited, myUser.EventName), newStart, newEnd, Begin, Deadline, SplitCount, myUser.EscapedNotes);
                             DB_UserActivity activity = new DB_UserActivity(myNow, UserActivity.ActivityType.InternalUpdate, new List<String>() { myUser.EventID });
                             retrievedUser.ScheduleLogControl.updateUserActivty(activity);
-                            await NewSchedule.UpdateWithDifferentSchedule(ScheduleUpdateMessage.Item2).ConfigureAwait(false);
+                            await NewSchedule.persistToDB().ConfigureAwait(false);
                             SubCalendarEvent subEvent = NewSchedule.getSubCalendarEvent(myUser.EventID);
                             CalendarEvent calendarEvent = NewSchedule.getCalendarEvent(myUser.EventID);
                             SubCalEvent subCalEvent =  subEvent.ToSubCalEvent(calendarEvent);

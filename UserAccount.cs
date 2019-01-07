@@ -88,6 +88,11 @@ namespace TilerFront
             await UserLog.Commit(AllEvents, calendarEvent, LatestID).ConfigureAwait(false);
         }
 
+        virtual async public Task DiscardChanges()
+        {
+            await UserLog.DiscardChanges().ConfigureAwait(false);
+        }
+
         virtual public LogControl ScheduleLogControl
         {
             get

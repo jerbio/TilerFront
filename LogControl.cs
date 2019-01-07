@@ -249,7 +249,7 @@ namespace TilerFront
 
         async Task Commit(IEnumerable<CalendarEvent> calendarEvents, TilerUser tilerUser)
         {
-            await _Context.SaveChangesAsync();
+            await _Context.SaveChangesAsync().ConfigureAwait(false);
         }
 
         public async Task Commit(IEnumerable<CalendarEvent> calendarEvents, CalendarEvent calendarEvent, String LatestId)
@@ -259,7 +259,30 @@ namespace TilerFront
             {
                 _Context.CalEvents.Add(calendarEvent);
             }
-            await Commit(calendarEvents, _TilerUser);
+            await Commit(calendarEvents, _TilerUser).ConfigureAwait(false);
+        }
+
+        public async Task DiscardChanges()
+        {
+            var changedEntries = _Context.ChangeTracker.Entries()
+                .Where(x => x.State != EntityState.Unchanged).ToList();
+
+            foreach (var entry in changedEntries)
+            {
+                switch (entry.State)
+                {
+                    case EntityState.Modified:
+                        entry.CurrentValues.SetValues(entry.OriginalValues);
+                        entry.State = EntityState.Unchanged;
+                        break;
+                    case EntityState.Added:
+                        entry.State = EntityState.Detached;
+                        break;
+                    case EntityState.Deleted:
+                        entry.State = EntityState.Unchanged;
+                        break;
+                }
+            }
         }
 
         public async Task UpdateLocationCache(XmlDocument xmldoc, Dictionary<string, TilerElements.Location> currentCache, TilerElements.Location NewLocation )
@@ -1830,60 +1853,59 @@ namespace TilerFront
 
         public async Task<CalendarEvent> getCalendarEventWithID(string ID)
         {
-            CalendarEvent retValue = await Database.CalEvents
-                .Include(calEvent => calEvent.UiParams_EventDB)
-                .Include(calEvent => calEvent.DataBlob_EventDB)
-                .Include(calEvent => calEvent.Name)
-                .Include(calEvent => calEvent.Name.Creator_EventDB)
-                .Include(calEvent => calEvent.Location_DB)
-                .Include(calEvent => calEvent.Creator_EventDB)
-                .Include(calEvent => calEvent.Repetition_EventDB)
-                .Include(calEvent => calEvent.DataBlob_EventDB)
-                .Include(calEvent => calEvent.Procrastination_EventDB)
-                .Include(calEvent => calEvent.ProfileOfNow_EventDB)
-                .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.ParentCalendarEvent))
-                .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Name))
-                .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.DataBlob_EventDB))
-                .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Name.Creator_EventDB))
-                .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Creator_EventDB))
-                .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.UiParams_EventDB))
-                .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Location_DB))
-                .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Procrastination_EventDB))
-                .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.DataBlob_EventDB))
-                .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents)
-                .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB.Select(subEvent => subEvent.Name)))
-                .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.Location_DB))
-                .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.UiParams_EventDB))
-                .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.DataBlob_EventDB))
-                .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.Name))
-                .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.DataBlob_EventDB))
-                .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.Name.Creator_EventDB))
-                .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.Creator_EventDB))
-                .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.Repetition_EventDB))
-                .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.Location_DB))
-                .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.Procrastination_EventDB))
-                .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.ProfileOfNow_EventDB))
-                .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB.Select(subEvent => subEvent.ParentCalendarEvent)))
-                .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB.Select(subEvent => subEvent.Name)))
-                .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB.Select(subEvent => subEvent.Name.Creator_EventDB)))
-                .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB.Select(subEvent => subEvent.DataBlob_EventDB)))
-                .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB.Select(subEvent => subEvent.UiParams_EventDB)))
-                .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB.Select(subEvent => subEvent.Location_DB)))
-                .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB.Select(subEvent => subEvent.DataBlob_EventDB)))
-                .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB.Select(subEvent => subEvent.Procrastination_EventDB)))
-                .Include(calEvent => calEvent.Repetition_EventDB.SubRepetitions)
-                .Include(calEvent => calEvent.Repetition_EventDB.SubRepetitions.Select(repetition => repetition.SubRepetitions))
-                .Include(calEvent => calEvent.Repetition_EventDB.SubRepetitions.Select(repetition => repetition.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB)))
-                .Include(calEvent => calEvent.Repetition_EventDB.SubRepetitions.Select(repetition => repetition.RepeatingEvents.Select(repCalEvent => repCalEvent.Procrastination_EventDB)))
-                .Include(calEvent => calEvent.Repetition_EventDB.SubRepetitions.Select(repetition => repetition.RepeatingEvents.Select(repCalEvent => repCalEvent.ProfileOfNow_EventDB)))
-                .Include(calEvent => calEvent.RetrictionProfile.DaySelection.Select(restrictedDay => restrictedDay.RestrictionTimeLine))
-                .Include(calEvent => calEvent.RetrictionProfile.NoNull_DaySelections)
-                .Include(calEvent => calEvent.RetrictionProfile.NoNull_DaySelections.Select(restrictedDay => restrictedDay.RestrictionTimeLine))
-                .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.RetrictionProfile))
-                .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.RetrictionProfile.NoNull_DaySelections))
-                .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.RetrictionProfile.DaySelection))
-                .SingleOrDefaultAsync(calEvent => calEvent.Id == ID);
-            if(retValue !=null && retValue.getIsEventRestricted)
+            var query = _Context.CalEvents
+                        .Include(calEvent => calEvent.DataBlob_EventDB)
+                        .Include(calEvent => calEvent.Name)
+                        .Include(calEvent => calEvent.Name.Creator_EventDB)
+                        .Include(calEvent => calEvent.Location_DB)
+                        .Include(calEvent => calEvent.Creator_EventDB)
+                        .Include(calEvent => calEvent.Procrastination_EventDB)
+                        .Include(calEvent => calEvent.ProfileOfNow_EventDB)
+                        .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.ParentCalendarEvent))
+                        .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Name))
+                        .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.DataBlob_EventDB))
+                        .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Name.Creator_EventDB))
+                        .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Creator_EventDB))
+                        .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Location_DB))
+                        .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.DataBlob_EventDB))
+                        .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Procrastination_EventDB))
+                        .Include(calEvent => calEvent.Repetition_EventDB)
+                        .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents)
+                        .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB.Select(subEvent => subEvent.Name)))
+                        .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.Location_DB))
+                        .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.DataBlob_EventDB))
+                        .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.Name))
+                        .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.DataBlob_EventDB))
+                        .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.Name.Creator_EventDB))
+                        .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.Creator_EventDB))
+                        .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.Repetition_EventDB))
+                        .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.Location_DB))
+                        .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.Procrastination_EventDB))
+                        .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.ProfileOfNow_EventDB))
+                        .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB.Select(subEvent => subEvent.ParentCalendarEvent)))
+                        .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB.Select(subEvent => subEvent.Name)))
+                        .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB.Select(subEvent => subEvent.Name.Creator_EventDB)))
+                        .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB.Select(subEvent => subEvent.DataBlob_EventDB)))
+                        .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB.Select(subEvent => subEvent.Location_DB)))
+                        .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB.Select(subEvent => subEvent.Procrastination_EventDB)))
+                        .Include(calEvent => calEvent.Repetition_EventDB.SubRepetitions)
+                        .Include(calEvent => calEvent.Repetition_EventDB.SubRepetitions.Select(repetition => repetition.SubRepetitions))
+                        .Include(calEvent => calEvent.Repetition_EventDB.SubRepetitions.Select(repetition => repetition.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB)))
+                        .Include(calEvent => calEvent.Repetition_EventDB.SubRepetitions.Select(repetition => repetition.RepeatingEvents.Select(repCalEvent => repCalEvent.Procrastination_EventDB)))
+                        .Include(calEvent => calEvent.Repetition_EventDB.SubRepetitions.Select(repetition => repetition.RepeatingEvents.Select(repCalEvent => repCalEvent.ProfileOfNow_EventDB)))
+                        .Include(calEvent => calEvent.RetrictionProfile)
+                        .Include(calEvent => calEvent.RetrictionProfile.DaySelection)
+                        .Include(calEvent => calEvent.RetrictionProfile.DaySelection.Select(restrictedDay => restrictedDay.RestrictionTimeLine))
+                        .Include(calEvent => calEvent.RetrictionProfile.NoNull_DaySelections)
+                        .Include(calEvent => calEvent.RetrictionProfile.NoNull_DaySelections.Select(restrictedDay => restrictedDay.RestrictionTimeLine))
+                        .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.RetrictionProfile))
+                        .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.RetrictionProfile.NoNull_DaySelections))
+                        .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.RetrictionProfile.DaySelection));
+
+            CalendarEvent retValue = await query.SingleOrDefaultAsync(calEvent => calEvent.Id == ID).ConfigureAwait(false);
+
+            var sql = query.ToString();
+            if (retValue !=null && retValue.getIsEventRestricted)
             {
                 (retValue as CalendarEventRestricted).RetrictionProfile.InitializeOverLappingDictionary();
             }

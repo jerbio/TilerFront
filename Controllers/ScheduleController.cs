@@ -469,7 +469,7 @@ namespace TilerFront.Controllers
                 JObject json = JObject.FromObject(UserData);
                 activity.updateMiscelaneousInfo(json.ToString());
                 myUserAccount.ScheduleLogControl.updateUserActivty(activity);
-                await MySchedule.UpdateWithDifferentSchedule(ScheduleUpdateMessage.Item2);
+                await MySchedule.persistToDB();
                 PostBackData myPostData;
                 BusyTimeLine nextBusySchedule = MySchedule.NextActivity;
                 if (nextBusySchedule != null)
@@ -516,8 +516,8 @@ namespace TilerFront.Controllers
             myUser.ScheduleLogControl.updateUserActivty(activity);
             await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, UserData.UserID, db).ConfigureAwait(false);
 
-            Tuple<CustomErrors, Dictionary<string, CalendarEvent>> ScheduleUpdateMessage = MySchedule.ProcrastinateJustAnEvent(UserData.EventID, ProcrastinateDuration.TotalTimeSpan);
-            await MySchedule.UpdateWithDifferentSchedule(ScheduleUpdateMessage.Item2);
+            var ScheduleUpdateMessage = MySchedule.ProcrastinateJustAnEvent(UserData.EventID, ProcrastinateDuration.TotalTimeSpan);
+            await MySchedule.persistToDB();
             PostBackData myPostData = new PostBackData("\"Success\"", 0);
             TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
             scheduleChangeSocket.triggerRefreshData(myUser.getTilerUser());
@@ -695,8 +695,8 @@ namespace TilerFront.Controllers
 
                 await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, myUser.UserID, db).ConfigureAwait(false);
 
-                Tuple<CustomErrors, Dictionary<string, CalendarEvent>> retValue0 = MySchedule.SetEventAsNow(myUser.EventID, true);
-                await MySchedule.UpdateWithDifferentSchedule(retValue0.Item2);
+                var retValue0 = MySchedule.SetEventAsNow(myUser.EventID, true);
+                await MySchedule.persistToDB();
                 retValue = new PostBackData("\"Success\"", 0);
             }
             else

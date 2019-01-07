@@ -92,31 +92,46 @@ namespace TilerFront
             removeAllFromOutlook();
         }
 
-        async Task CleanUpForUI()
+
+        /// <summary>
+        /// Function rearranges the sub events by Id to be associated with the order of time
+        /// </summary>
+        /// <returns></returns>
+        async Task CleanUpForUI(IEnumerable<CalendarEvent> calEvents)
         {
-            foreach (CalendarEvent eachCalendarEvent in AllEventDictionary.Values)
-            {
-                List<DateTimeOffset> AllStratTImes = eachCalendarEvent.ActiveSubEvents.AsParallel().Select(obj => obj.Start).ToList();
-                AllStratTImes.Sort();
-
-                List<SubCalendarEvent> OrderedSubEvent = eachCalendarEvent.ActiveSubEvents.OrderBy(obj => obj.SubEvent_ID.getSubCalendarEventID()).ToList();
-
-
-                Parallel.For(0, OrderedSubEvent.Count, i =>
+            calEvents.AsParallel()
+                .ForAll(async (eachCalendarEvent) =>
                 {
-                    SubCalendarEvent SubEvent = OrderedSubEvent[i];
-                    DateTimeOffset TIme = AllStratTImes[i];
-                    SubEvent.shiftEvent(TIme - SubEvent.Start);
-                });
-
-                //IEnumerable<SubCalendarEvent> AllShifted = AllStratTImes.AsParallel().Zip(OrderedSubEvent.AsParallel(), (TIme, SubEvent) => { SubEvent.shiftEvent(TIme - SubEvent.Start); return SubEvent; });
-            }
+                    if(!eachCalendarEvent.IsRepeat)
+                    {
+                        shiftSUbEventsByTimeAndId(eachCalendarEvent.ActiveSubEvents);
+                    } else
+                    {
+                        await CleanUpForUI(eachCalendarEvent.Repeat.RecurringCalendarEvents()).ConfigureAwait(false);
+                    }
+                }
+            );
             return;
+        }
+
+        void shiftSUbEventsByTimeAndId(IEnumerable<SubCalendarEvent> subEvents)
+        {
+            List<DateTimeOffset> AllStartTimes = subEvents.AsParallel().Where(obj => !obj.isLocked).Select(obj => obj.Start).ToList();
+            AllStartTimes.Sort();
+            List<SubCalendarEvent> OrderedSubEvent = subEvents.Where(obj => !obj.isLocked).OrderBy(obj => obj.SubEvent_ID.getSubCalendarEventID()).ToList();
+
+
+            Parallel.For(0, OrderedSubEvent.Count, i =>
+            {
+                SubCalendarEvent SubEvent = OrderedSubEvent[i];
+                DateTimeOffset TIme = AllStartTimes[i];
+                SubEvent.shiftEvent(TIme - SubEvent.Start);
+            });
         }
 
         async virtual public Task WriteFullScheduleToLogAndOutlook(CalendarEvent newCalendarEvent = null)
         {
-            await CleanUpForUI().ConfigureAwait(false);
+            await CleanUpForUI(AllEventDictionary.Values).ConfigureAwait(false);
             myAccount.UpdateReferenceDayTime(ReferenceDayTIime);
 
 
@@ -161,13 +176,19 @@ namespace TilerFront
             }
         }
 
-        async virtual public Task UpdateWithDifferentSchedule(Dictionary<string, CalendarEvent> UpdatedSchedule)
+        async virtual public Task persistToDB(bool persistOldChanges = false)
         {
             //RemoveAllCalendarEventFromLogAndCalendar();
-            removeAllFromOutlook();
-            AllEventDictionary = UpdatedSchedule;
-            await WriteFullScheduleToLogAndOutlook();
-            CompleteSchedule = getTimeLine();
+            if(!persistOldChanges)
+            {
+                removeAllFromOutlook();
+                await WriteFullScheduleToLogAndOutlook().ConfigureAwait(false);
+                CompleteSchedule = getTimeLine();
+            } else
+            {
+                await myAccount.DiscardChanges().ConfigureAwait(false);
+            }
+            
         }
 
         async virtual public Task<CustomErrors> AddToScheduleAndCommit(CalendarEvent NewEvent, bool optimizeSchedule = true)
