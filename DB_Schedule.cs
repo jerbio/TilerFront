@@ -116,9 +116,9 @@ namespace TilerFront
 
         void shiftSUbEventsByTimeAndId(IEnumerable<SubCalendarEvent> subEvents)
         {
-            List<DateTimeOffset> AllStartTimes = subEvents.AsParallel().Where(obj => !obj.isLocked).Select(obj => obj.Start).ToList();
+            List<DateTimeOffset> AllStartTimes = subEvents.AsParallel().Where(obj => !obj.isLocked && !obj.LockToId).Select(obj => obj.Start).ToList();
             AllStartTimes.Sort();
-            List<SubCalendarEvent> OrderedSubEvent = subEvents.Where(obj => !obj.isLocked).OrderBy(obj => obj.SubEvent_ID.getSubCalendarEventID()).ToList();
+            List<SubCalendarEvent> OrderedSubEvent = subEvents.Where(obj => !obj.isLocked && !obj.LockToId).OrderBy(obj => obj.SubEvent_ID.getSubCalendarEventID()).ToList();
 
 
             Parallel.For(0, OrderedSubEvent.Count, i =>
@@ -176,10 +176,10 @@ namespace TilerFront
             }
         }
 
-        async virtual public Task persistToDB(bool persistOldChanges = false)
+        async virtual public Task persistToDB(bool persistNewChanges = true)
         {
             //RemoveAllCalendarEventFromLogAndCalendar();
-            if(!persistOldChanges)
+            if(persistNewChanges)
             {
                 removeAllFromOutlook();
                 await WriteFullScheduleToLogAndOutlook().ConfigureAwait(false);
