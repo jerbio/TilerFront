@@ -508,6 +508,15 @@
     <Compile Include="LogControlXml.cs" />
     <Compile Include="LogControlDirect.cs" />
     <Compile Include="LogControl.cs" />
+    <Compile Include="Migrations\201901100735275_init.cs" />
+    <Compile Include="Migrations\201901100735275_init.Designer.cs">
+      <DependentUpon>201901100735275_init.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201901120711180_removeTravelTIme.cs" />
+    <Compile Include="Migrations\201901120711180_removeTravelTIme.Designer.cs">
+      <DependentUpon>201901120711180_removeTravelTIme.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\AuthorizedUser.cs" />
@@ -2756,7 +2765,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="BigDataLogs\" />
-    <Folder Include="Migrations\" />
     <Folder Include="Views\GoogleNotifications\" />
     <Folder Include="Views\GoogleNotification\" />
     <Folder Include="Views\WhatIf\" />
@@ -2799,6 +2807,14 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="Scripts\index.d.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201901100735275_init.resx">
+      <DependentUpon>201901100735275_init.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201901120711180_removeTravelTIme.resx">
+      <DependentUpon>201901120711180_removeTravelTIme.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

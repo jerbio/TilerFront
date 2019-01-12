@@ -1122,7 +1122,9 @@ namespace TilerFront
                     .Where(calEvent =>
                         calEvent.CreatorId == _TilerUser.Id
                         && calEvent.StartTime_EventDB < RangeOfLookUP.End
-                        && calEvent.EndTime_EventDB > RangeOfLookUP.Start)
+                        && calEvent.EndTime_EventDB > RangeOfLookUP.Start
+                        && !calEvent.IsRepeatsChildCalEvent
+                        )
                         .ToDictionaryAsync(calEvent =>
                             calEvent.Calendar_EventID.getCalendarEventComponent(), calEvent => calEvent).ConfigureAwait(false);
 
