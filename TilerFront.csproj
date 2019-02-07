@@ -508,13 +508,9 @@
     <Compile Include="LogControlXml.cs" />
     <Compile Include="LogControlDirect.cs" />
     <Compile Include="LogControl.cs" />
-    <Compile Include="Migrations\201901100735275_init.cs" />
-    <Compile Include="Migrations\201901100735275_init.Designer.cs">
-      <DependentUpon>201901100735275_init.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201901120711180_removeTravelTIme.cs" />
-    <Compile Include="Migrations\201901120711180_removeTravelTIme.Designer.cs">
-      <DependentUpon>201901120711180_removeTravelTIme.cs</DependentUpon>
+    <Compile Include="Migrations\201901122032208_removeTimeBeforeAfer.cs" />
+    <Compile Include="Migrations\201901122032208_removeTimeBeforeAfer.Designer.cs">
+      <DependentUpon>201901122032208_removeTimeBeforeAfer.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
@@ -2809,11 +2805,8 @@
     <TypeScriptCompile Include="Scripts\index.d.ts" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201901100735275_init.resx">
-      <DependentUpon>201901100735275_init.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201901120711180_removeTravelTIme.resx">
-      <DependentUpon>201901120711180_removeTravelTIme.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201901122032208_removeTimeBeforeAfer.resx">
+      <DependentUpon>201901122032208_removeTimeBeforeAfer.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
