@@ -553,6 +553,9 @@
     <Compile Include="UserAccount.cs" />
     <Compile Include="UserAccountXml.cs" />
     <Compile Include="UserAccountDirect.cs" />
+    <Content Include="App_Data\aspnet-TilerFront-ground_log.ldf">
+      <DependentUpon>aspnet-TilerFront-ground.mdf</DependentUpon>
+    </Content>
     <Content Include="Areas\HelpPage\HelpPage.css" />
     <Content Include="Areas\RouteDebugger\Content\rdstyle.css" />
     <Content Include="Areas\RouteDebugger\Scripts\detect.js" />
@@ -610,6 +613,7 @@
     <Content Include="img\TilerScreenWithMacNoBgrnd.png" />
     <Content Include="img\TilerScreenWithMacNoBgrndCropped.png" />
     <Content Include="LoggedInUser.html" />
+    <Content Include="App_Data\aspnet-TilerFront-ground.mdf" />
     <Content Include="MonthOverView.html" />
     <Content Include="Scripts\AddNewEvent_Desktop0.js" />
     <Content Include="Scripts\bootstrap.bundle.js" />
@@ -2805,8 +2809,8 @@
     <TypeScriptCompile Include="Scripts\index.d.ts" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201901122032208_removeTimeBeforeAfer.resx">
-      <DependentUpon>201901122032208_removeTimeBeforeAfer.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201902190721375_completionDeletionCountDefault.resx">
+      <DependentUpon>201902190721375_completionDeletionCountDefault.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

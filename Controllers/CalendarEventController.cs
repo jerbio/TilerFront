@@ -58,9 +58,17 @@ namespace TilerFront.Controllers
             PostBackData retValue = new PostBackData("", 4);
             if (retrievedUser.Status)
             {
-                long myNow = (long)(DateTimeOffset.UtcNow - TilerElementExtension.JSStartTime).TotalMilliseconds; ;
-                IEnumerable<CalendarEvent> retrievedCalendarEvents = (await retrievedUser.ScheduleLogControl.getCalendarEventWithName(phrase)).Where(obj => obj.isActive);
-                retValue = new PostBackData(retrievedCalendarEvents.OrderByDescending(obj => obj.TimeCreated).ThenByDescending(obj => obj.getId).Select(obj => obj.ToCalEvent()).OrderBy(obj => Math.Abs(myNow - obj.EndDate)).ToList(), 0);
+                long myNow = (long)(DateTimeOffset.UtcNow - TilerElementExtension.JSStartTime).TotalMilliseconds;
+                IEnumerable<CalendarEvent> retrievedCalendarEvents = (await retrievedUser.ScheduleLogControl.getCalendarEventWithName(phrase));
+                    //.Where(obj => obj.isActive);
+                var allCalEvent = retrievedCalendarEvents
+                    .ToList();
+                retValue = new PostBackData(
+                    allCalEvent
+                    .OrderByDescending(obj => obj.TimeCreated)
+                    .ThenByDescending(obj => obj.getId)
+                    .Select(obj => obj.ToCalEvent(includeSubevents: false))
+                    .OrderBy(obj => Math.Abs(myNow - obj.EndDate)).ToList(), 0);
             }
             
                 

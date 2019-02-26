@@ -1943,7 +1943,13 @@ namespace TilerFront
             }
             return retValue;
         }
-
+        public void reloadContext()
+        {
+            foreach (var entity in _Context.ChangeTracker.Entries())
+            {
+                entity.Reload();
+            }
+        }
         public async Task<SubCalendarEvent> getSubEventWithID(string ID)
         {
             SubCalendarEvent retValue = await Database.SubEvents
@@ -1972,19 +1978,34 @@ namespace TilerFront
 
         public async Task<IQueryable<CalendarEvent>> getCalendarEventWithName(string Name)
         {
-            //IList<CalendarEvent> retValue = new CalendarEvent[0];
             IQueryable<EventName> eventNames = _Context.EventNames
-                .Where(name => name.CreatorId == _TilerUser.Id && name.NameValue.Contains(Name));
+                .Where(name => name.CreatorId == _TilerUser.Id && name.Name.Contains(Name));
+            var result = eventNames.Join(_Context.CalEvents
+                .Include(CalEvent => CalEvent.UiParams_EventDB)
+                .Include(CalEvent => CalEvent.DataBlob_EventDB)
+                .Where(calEvent => !calEvent.IsRepeatsChildCalEvent),
+                eventName => eventName.Id,
+                calEvent => calEvent.Name.Id,
+                (eventName, calEvent) => new { calEvent = calEvent, eventName = eventName }
+                );
+            var res = result
+                .Select(obj => obj.calEvent);
 
-            var retValue = getCalendarEventsForUser(_TilerUser.Id);
-            retValue.Where(calEvent => !calEvent.IsRepeatsChildCalEvent);
+            var retValue = res
+                .Include(obj => obj.DataBlob_EventDB)
+                .Include(obj => obj.UiParams_EventDB)
+                .Include(obj => obj.Name);
             return retValue;
         }
 
 
         public IQueryable<CalendarEvent>getCalendarEventsForUser(string userId)
         {
-            IQueryable<CalendarEvent> retValue = _Context.CalEvents.Where(calEvent => calEvent.Id == userId);
+            IQueryable<CalendarEvent> retValue = _Context.CalEvents
+                .Include(CalEvent => CalEvent.Name)
+                .Include(CalEvent => CalEvent.UiParams_EventDB)
+                .Include(CalEvent => CalEvent.DataBlob_EventDB)
+                .Where(calEvent => calEvent.CreatorId == userId);
             return retValue;
         }
 
