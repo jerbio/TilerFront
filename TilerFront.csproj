@@ -508,9 +508,9 @@
     <Compile Include="LogControlXml.cs" />
     <Compile Include="LogControlDirect.cs" />
     <Compile Include="LogControl.cs" />
-    <Compile Include="Migrations\201901122032208_removeTimeBeforeAfer.cs" />
-    <Compile Include="Migrations\201901122032208_removeTimeBeforeAfer.Designer.cs">
-      <DependentUpon>201901122032208_removeTimeBeforeAfer.cs</DependentUpon>
+    <Compile Include="Migrations\201903040535043_initial.cs" />
+    <Compile Include="Migrations\201903040535043_initial.Designer.cs">
+      <DependentUpon>201903040535043_initial.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
@@ -2809,8 +2809,8 @@
     <TypeScriptCompile Include="Scripts\index.d.ts" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201902190721375_completionDeletionCountDefault.resx">
-      <DependentUpon>201902190721375_completionDeletionCountDefault.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201903040535043_initial.resx">
+      <DependentUpon>201903040535043_initial.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
