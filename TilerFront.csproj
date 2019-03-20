@@ -2809,8 +2809,8 @@
     <TypeScriptCompile Include="Scripts\index.d.ts" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201902190721375_completionDeletionCountDefault.resx">
-      <DependentUpon>201902190721375_completionDeletionCountDefault.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201903040535043_initial.resx">
+      <DependentUpon>201903040535043_initial.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
