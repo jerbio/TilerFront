@@ -508,9 +508,9 @@
     <Compile Include="LogControlXml.cs" />
     <Compile Include="LogControlDirect.cs" />
     <Compile Include="LogControl.cs" />
-    <Compile Include="Migrations\201901122032208_removeTimeBeforeAfer.cs" />
-    <Compile Include="Migrations\201901122032208_removeTimeBeforeAfer.Designer.cs">
-      <DependentUpon>201901122032208_removeTimeBeforeAfer.cs</DependentUpon>
+    <Compile Include="Migrations\201902190721375_completionDeletionCountDefault.cs" />
+    <Compile Include="Migrations\201902190721375_completionDeletionCountDefault.Designer.cs">
+      <DependentUpon>201902190721375_completionDeletionCountDefault.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />

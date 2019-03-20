@@ -166,7 +166,6 @@ namespace TilerFront.Controllers
         {
             UserAccount retrievedUser = await nowEvent.getUserAccount(db); //new UserAccountDirect(myUser.UserName, myUser.UserID);
             await retrievedUser.Login();
-            DateTime myDate;
             PostBackData retValue;
             if (retrievedUser.Status)
             {

@@ -2089,6 +2089,33 @@ namespace TilerFront
         }
 
 
+        public void cleanupDB()
+        {
+            _Context.Database.ExecuteSqlCommand("TRUNCATE TABLE Undoes");
+            _Context.Database.ExecuteSqlCommand("TRUNCATE TABLE TilerEvents");
+            _Context.Database.ExecuteSqlCommand("DELETE FROM Procrastinations");
+            _Context.Database.ExecuteSqlCommand("DELETE FROM  EventNames");
+            _Context.Database.ExecuteSqlCommand("DELETE FROM  Reasons");
+            _Context.Database.ExecuteSqlCommand("DELETE FROM  Locations");
+            _Context.Database.ExecuteSqlCommand("DELETE FROM  Repetitions");
+            _Context.Database.ExecuteSqlCommand("DELETE FROM  MiscDatas");
+            _Context.Database.ExecuteSqlCommand("DELETE FROM  TilerUserGroups");
+            _Context.Database.ExecuteSqlCommand("DELETE FROM  EventDisplays");
+            _Context.Database.ExecuteSqlCommand("DELETE FROM  TilerColors");
+            _Context.Database.ExecuteSqlCommand("DELETE FROM  AspNetUsers");
+            _Context.Database.ExecuteSqlCommand("DELETE FROM  RestrictionDays");
+            _Context.Database.ExecuteSqlCommand("DELETE FROM  RestrictionTimeLines");
+            _Context.Database.ExecuteSqlCommand("DELETE FROM  RestrictionProfiles");
+            _Context.Database.ExecuteSqlCommand("DELETE FROM  Classifications");
+            _Context.Database.ExecuteSqlCommand("DELETE FROM  NowProfiles");
+            _Context.Database.ExecuteSqlCommand("DELETE FROM  EventTimeLines");
+            _Context.Database.ExecuteSqlCommand("DELETE FROM  AspNetRoles");
+            _Context.Database.ExecuteSqlCommand("DELETE FROM  AspNetUserRoles");
+            _Context.Database.ExecuteSqlCommand("DELETE FROM  AspNetUserLogins");
+            _Context.Database.ExecuteSqlCommand("DELETE FROM  AspNetUserClaims");
+
+
+        }
 
         async virtual public Task<Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location>>> getProfileInfo(TimeLine RangeOfLookup, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation, string singleCalEventId = null)
         {

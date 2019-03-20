@@ -303,8 +303,6 @@ namespace TilerFront.Controllers
                 }
                 */
                 TilerUser myUser = await UserManager.FindByIdAsync(User.Identity.GetUserId());
-                TimeSpan OffSetSpan= TimeSpan.FromMinutes(Convert.ToInt32( model.TimeZoneOffSet));
-                TimeOfDay = TimeOfDay.ToOffset(OffSetSpan);
                 myUser.EndfOfDay=TimeOfDay.DateTime;
                 myUser.TimeZone = model.TimeZone;
                 result = await UserManager.UpdateAsync(myUser);
