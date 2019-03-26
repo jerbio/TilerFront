@@ -85,7 +85,7 @@ namespace TilerFront.Controllers
 
                 Task<ConcurrentBag<CalendarEvent>> GoogleCalEventsTask = GoogleTilerEventControl.getAllCalEvents(AllGoogleTilerEvents, TimelineForData);
 
-                Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location>> ProfileData = await LogAccess.getProfileInfo(TimelineForData, retrievalOption: LogControl.DataRetrivalOption.UiAll);
+                Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location>> ProfileData = await LogAccess.getProfileInfo(TimelineForData, null, retrievalOption: LogControl.DataRetrivalOption.UiAll);
 
                 IEnumerable<CalendarEvent> GoogleCalEvents = await GoogleCalEventsTask.ConfigureAwait(false);
 
@@ -153,7 +153,7 @@ namespace TilerFront.Controllers
                 LogControl LogAccess = myUserAccount.ScheduleLogControl;
                 List<CalendarEvent> ScheduleData = new List<CalendarEvent>();
 
-                Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location>> ProfileData = await LogAccess.getProfileInfo(TimelineForData);
+                Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location>> ProfileData = await LogAccess.getProfileInfo(TimelineForData, null);
 
                 ScheduleData = ScheduleData.Concat(ProfileData.Item1.Values).ToList();
 

@@ -508,9 +508,9 @@
     <Compile Include="LogControlXml.cs" />
     <Compile Include="LogControlDirect.cs" />
     <Compile Include="LogControl.cs" />
-    <Compile Include="Migrations\201902190721375_completionDeletionCountDefault.cs" />
-    <Compile Include="Migrations\201902190721375_completionDeletionCountDefault.Designer.cs">
-      <DependentUpon>201902190721375_completionDeletionCountDefault.cs</DependentUpon>
+    <Compile Include="Migrations\201903250357105_afterSetAsNowUpdate.cs" />
+    <Compile Include="Migrations\201903250357105_afterSetAsNowUpdate.Designer.cs">
+      <DependentUpon>201903250357105_afterSetAsNowUpdate.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
@@ -2807,6 +2807,11 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="Scripts\index.d.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201903250357105_afterSetAsNowUpdate.resx">
+      <DependentUpon>201903250357105_afterSetAsNowUpdate.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
