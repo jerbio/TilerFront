@@ -72,6 +72,7 @@ namespace TilerFront.Controllers
 
 
                 LogControl LogAccess = myUserAccount.ScheduleLogControl;
+                //LogAccess.deleteAllDatabaseData();
                 List<IndexedThirdPartyAuthentication> AllIndexedThirdParty = await getAllThirdPartyAuthentication(myUserAccount.UserID, db).ConfigureAwait(false);
 
                 List<GoogleTilerEventControl> AllGoogleTilerEvents = AllIndexedThirdParty.Select(obj => new GoogleTilerEventControl(obj, db)).ToList();
