@@ -512,6 +512,10 @@
     <Compile Include="Migrations\201903250357105_afterSetAsNowUpdate.Designer.cs">
       <DependentUpon>201903250357105_afterSetAsNowUpdate.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201904190615377_restrictedUpdate.cs" />
+    <Compile Include="Migrations\201904190615377_restrictedUpdate.Designer.cs">
+      <DependentUpon>201904190615377_restrictedUpdate.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -2811,6 +2815,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201903250357105_afterSetAsNowUpdate.resx">
       <DependentUpon>201903250357105_afterSetAsNowUpdate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201904190615377_restrictedUpdate.resx">
+      <DependentUpon>201904190615377_restrictedUpdate.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
