@@ -1219,6 +1219,11 @@
             <param name="RestrictionTimeLineNode"></param>
             <returns></returns>
         </member>
+        <member name="M:TilerFront.LogControl.deleteAllDatabaseData">
+            <summary>
+            This function wipes out the database completely.BECAREFUL. You''l need to comment out the lines below return
+            </summary>
+        </member>
         <member name="T:TilerFront.TilerApiController">
             <summary>
             Tiler controller that provides custom tiler functionality

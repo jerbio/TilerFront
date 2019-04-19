@@ -2071,7 +2071,10 @@ namespace TilerFront
         }
 
 
-        public void cleanupDB()
+        /// <summary>
+        /// This function wipes out the database completely.BECAREFUL. You''l need to comment out the lines below return
+        /// </summary>
+        public void deleteAllDatabaseData()
         {
             return;
             //_Context.Database.ExecuteSqlCommand("TRUNCATE TABLE Undoes");

@@ -508,9 +508,13 @@
     <Compile Include="LogControlXml.cs" />
     <Compile Include="LogControlDirect.cs" />
     <Compile Include="LogControl.cs" />
-    <Compile Include="Migrations\201903250357105_afterSetAsNowUpdate.cs" />
-    <Compile Include="Migrations\201903250357105_afterSetAsNowUpdate.Designer.cs">
-      <DependentUpon>201903250357105_afterSetAsNowUpdate.cs</DependentUpon>
+    <Compile Include="Migrations\201904080615175_durationCOnversion.cs" />
+    <Compile Include="Migrations\201904080615175_durationCOnversion.Designer.cs">
+      <DependentUpon>201904080615175_durationCOnversion.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201904090539357_incrementCOuntAndIsENabled.cs" />
+    <Compile Include="Migrations\201904090539357_incrementCOuntAndIsENabled.Designer.cs">
+      <DependentUpon>201904090539357_incrementCOuntAndIsENabled.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\201904190615377_restrictedUpdate.cs" />
     <Compile Include="Migrations\201904190615377_restrictedUpdate.Designer.cs">
@@ -2813,8 +2817,11 @@
     <TypeScriptCompile Include="Scripts\index.d.ts" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201903250357105_afterSetAsNowUpdate.resx">
-      <DependentUpon>201903250357105_afterSetAsNowUpdate.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201904080615175_durationCOnversion.resx">
+      <DependentUpon>201904080615175_durationCOnversion.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201904090539357_incrementCOuntAndIsENabled.resx">
+      <DependentUpon>201904090539357_incrementCOuntAndIsENabled.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201904190615377_restrictedUpdate.resx">
       <DependentUpon>201904190615377_restrictedUpdate.cs</DependentUpon>
