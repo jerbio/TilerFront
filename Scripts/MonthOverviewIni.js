@@ -4218,14 +4218,18 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                                 //exitSelectedEventScreen();
                             }
                             else {
-                                alert("error detected with marking as complete");
+                                var NewMessage = myContainer.Error && myContainer.Error.code && myContainer.Error.Message ? myContainer.Error.Message : "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
+                                var ExitAfter = {
+                                    ExitNow: true, Delay: 5000
+                                };
+                                HandleNEwPage.UpdateMessage(NewMessage, ExitAfter, exit);
                             }
 
                         },
                         error: function (err) {
                             var myError = err;
                             var step = "err";
-                            var NewMessage = "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
+                            var NewMessage = err.Error && err.Error.code && err.Error.Message ? err.Error.Message : "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
                             var ExitAfter = {
                                 ExitNow: true, Delay: 1000
                             };

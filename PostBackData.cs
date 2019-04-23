@@ -61,6 +61,7 @@ namespace TilerFront
             if (Error != null)
             {
                 Data = Error.Message;
+                Message = Error.Message;
                 Status = Error.Code;
             }
             
@@ -75,15 +76,22 @@ namespace TilerFront
         string getErrorMessage(int errorCode)
         {
             string retValue;
-            if (errorCode >= 20000000)
+            string defaultMessage = "Tiler is having some issues please try again later";
+            if (errorCode < 20000000)
             {
-                retValue = "Tiler is having some issues please try again later";
+                retValue = defaultMessage;
                 return retValue;
             }
 
             if (string.IsNullOrEmpty(Message))
             {
-                retValue = errorDictionary[errorCode];
+                if(errorDictionary.ContainsKey(errorCode))
+                {
+                    retValue = errorDictionary[errorCode];
+                } else {
+                    retValue = defaultMessage;
+                }
+                
             }
             else
             {
