@@ -508,9 +508,13 @@
     <Compile Include="LogControlXml.cs" />
     <Compile Include="LogControlDirect.cs" />
     <Compile Include="LogControl.cs" />
-    <Compile Include="Migrations\201904190615377_restrictedUpdate.cs" />
-    <Compile Include="Migrations\201904190615377_restrictedUpdate.Designer.cs">
-      <DependentUpon>201904190615377_restrictedUpdate.cs</DependentUpon>
+    <Compile Include="Migrations\201904250356487_init.cs" />
+    <Compile Include="Migrations\201904250356487_init.Designer.cs">
+      <DependentUpon>201904250356487_init.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201904250648153_modelUpdate.cs" />
+    <Compile Include="Migrations\201904250648153_modelUpdate.Designer.cs">
+      <DependentUpon>201904250648153_modelUpdate.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
@@ -553,6 +557,7 @@
     <Compile Include="UserAccount.cs" />
     <Compile Include="UserAccountXml.cs" />
     <Compile Include="UserAccountDirect.cs" />
+    <Content Include="App_Data\aspnet-TilerFront-ground.mdf" />
     <Content Include="App_Data\aspnet-TilerFront-ground_log.ldf">
       <DependentUpon>aspnet-TilerFront-ground.mdf</DependentUpon>
     </Content>
@@ -613,7 +618,6 @@
     <Content Include="img\TilerScreenWithMacNoBgrnd.png" />
     <Content Include="img\TilerScreenWithMacNoBgrndCropped.png" />
     <Content Include="LoggedInUser.html" />
-    <Content Include="App_Data\aspnet-TilerFront-ground.mdf" />
     <Content Include="MonthOverView.html" />
     <Content Include="Scripts\AddNewEvent_Desktop0.js" />
     <Content Include="Scripts\bootstrap.bundle.js" />
@@ -2809,8 +2813,11 @@
     <TypeScriptCompile Include="Scripts\index.d.ts" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201904190615377_restrictedUpdate.resx">
-      <DependentUpon>201904190615377_restrictedUpdate.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201904250356487_init.resx">
+      <DependentUpon>201904250356487_init.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201904250648153_modelUpdate.resx">
+      <DependentUpon>201904250648153_modelUpdate.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

@@ -1144,7 +1144,14 @@ namespace TilerFront
                     calAsRestricted.RetrictionProfile.InitializeOverLappingDictionary();
                     if(Now!= null)
                     {
-                        calAsRestricted.setNow(Now);
+                        if (retrievalOption == DataRetrivalOption.Evaluation)
+                        {
+                            calAsRestricted.setNow(Now, true);
+                        }
+                        else
+                        {
+                            calAsRestricted.setNow(Now, false);
+                        }
                     }
                     
                 }
