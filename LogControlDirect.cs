@@ -316,61 +316,6 @@ namespace TilerFront
             }
             return false;
         }
-
-        public bool UpdateXMLInnerText(ref XmlNodeList MyLogList, string NodeName, string IdentifierData, string UpdatedData)
-        {
-            foreach (XmlNode MyNode in MyLogList)
-            {
-                if (MyNode.SelectSingleNode("/" + NodeName).InnerText == IdentifierData)
-                {
-                    MyNode.SelectSingleNode("/" + NodeName).InnerText = UpdatedData;
-
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        public XmlElement createDisplayUINode(EventDisplay Arg1, string ElementIdentifier)
-        {
-            XmlDocument xmldoc = new XmlDocument();
-            XmlElement var1 = xmldoc.CreateElement(ElementIdentifier);
-            var1.PrependChild(xmldoc.CreateElement("Color"));
-            var1.ChildNodes[0].InnerXml = createColorNode(Arg1.UIColor, "Color").InnerXml;
-            var1.PrependChild(xmldoc.CreateElement("Type"));
-            var1.ChildNodes[0].InnerText = Arg1.isDefault.ToString();
-            return var1;
-        }
-
-        public XmlElement createColorNode(TilerColor Arg1, string ElementIdentifier)
-        {
-            XmlDocument xmldoc = new XmlDocument();
-            XmlElement var1 = xmldoc.CreateElement(ElementIdentifier);
-            var1.PrependChild(xmldoc.CreateElement("Opacity"));
-            var1.ChildNodes[0].InnerText = Arg1.O.ToString();
-            var1.PrependChild(xmldoc.CreateElement("Red"));
-            var1.ChildNodes[0].InnerText = Arg1.R.ToString();
-            var1.PrependChild(xmldoc.CreateElement("Green"));
-            var1.ChildNodes[0].InnerText = Arg1.G.ToString();
-            var1.PrependChild(xmldoc.CreateElement("Blue"));
-            var1.ChildNodes[0].InnerText = Arg1.B.ToString();
-            var1.PrependChild(xmldoc.CreateElement("UserSelection"));
-            var1.ChildNodes[0].InnerText = Arg1.User.ToString();
-
-            return var1;
-        }
-
-        public XmlElement createMiscDataNode(MiscData Arg1, string ElementIdentifier)
-        {
-            XmlDocument xmldoc = new XmlDocument();
-            XmlElement var1 = xmldoc.CreateElement(ElementIdentifier);
-            var1.PrependChild(xmldoc.CreateElement("UserNote"));
-            var1.ChildNodes[0].InnerText = Arg1.UserNote.ToString();
-            var1.PrependChild(xmldoc.CreateElement("TypeSelection"));
-            var1.ChildNodes[0].InnerText = Arg1.TypeSelection.ToString();
-            return var1;
-        }
-
         #endregion
 
         #region Read Data

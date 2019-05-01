@@ -859,7 +859,7 @@ namespace TilerFront
             var1.PrependChild(xmldoc.CreateElement("Color"));
             var1.ChildNodes[0].InnerXml = createColorNode(Arg1.UIColor, "Color").InnerXml;
             var1.PrependChild(xmldoc.CreateElement("Type"));
-            var1.ChildNodes[0].InnerText = Arg1.isDefault.ToString();
+            var1.ChildNodes[0].InnerText = Arg1.Default.ToString();
             return var1;
         }
 
@@ -1069,8 +1069,12 @@ namespace TilerFront
                         .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Location_DB))
                         .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.DataBlob_EventDB))
                         .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Procrastination_EventDB))
-                        .Include(calEvent => calEvent.Repetition_EventDB)
+                        .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents)
                         .Include(calEvent => calEvent.Repetition_EventDB.SubRepetitions)
+                        .Include(calEvent => calEvent.Repetition_EventDB.SubRepetitions.Select(repetition => repetition.SubRepetitions))
+                        .Include(calEvent => calEvent.Repetition_EventDB.SubRepetitions.Select(repetition => repetition.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB)))
+                        .Include(calEvent => calEvent.Repetition_EventDB.SubRepetitions.Select(repetition => repetition.RepeatingEvents.Select(repCalEvent => repCalEvent.Procrastination_EventDB)))
+                        .Include(calEvent => calEvent.Repetition_EventDB.SubRepetitions.Select(repetition => repetition.RepeatingEvents.Select(repCalEvent => repCalEvent.ProfileOfNow_EventDB)))
                         .Include(calEvent => calEvent.RetrictionProfile)
                         .Include(calEvent => calEvent.RetrictionProfile.DaySelection)
                         .Include(calEvent => calEvent.RetrictionProfile.DaySelection.Select(restrictedDay => restrictedDay.RestrictionTimeLine))
@@ -1084,7 +1088,12 @@ namespace TilerFront
                     if (retrievalOption == DataRetrivalOption.UiAll)
                     {
                         calEVents = calEVents.Include(calEvent => calEvent.UiParams_EventDB)
-                            .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.UiParams_EventDB));
+                            .Include(calEvent => calEvent.UiParams_EventDB.UIColor)
+                            .Include(calEvent => calEvent.AllSubEvents_DB
+                                .Select(subEvent => subEvent.UiParams_EventDB))
+                            .Include(calEvent => calEvent.AllSubEvents_DB
+                                .Select(subEvent => subEvent.UiParams_EventDB.UIColor)
+                            );
                     } else if(retrievalOption == DataRetrivalOption.UiSingle)
                     {
                         if(!string.IsNullOrEmpty(singleCalEventId) && !string.IsNullOrWhiteSpace(singleCalEventId))
@@ -1131,11 +1140,11 @@ namespace TilerFront
                     }
                 }
 
-                foreach(var tuple in calToRepeatCalEvents.Values)
-                {
-                    Repetition repetition = new DB_Repetition(tuple.Item1, tuple.Item2);
-                    tuple.Item1.Repetition_EventDB = repetition;
-                }
+                //foreach(var tuple in calToRepeatCalEvents.Values)
+                //{
+                //    Repetition repetition = new DB_Repetition(tuple.Item1, tuple.Item2);
+                //    tuple.Item1.Repetition_EventDB = repetition;
+                //}
 
                 Dictionary<string, CalendarEvent> MyCalendarEventDictionary = parentCalEvents.ToDictionary(calEvent => calEvent.Calendar_EventID.getCalendarEventComponent(), calEvent => calEvent);
                 foreach (CalendarEvent  calEvent in MyCalendarEventDictionary.Values.Where(calEvent => calEvent.getIsEventRestricted))
@@ -1795,18 +1804,18 @@ namespace TilerFront
         public EventDisplay getDisplayUINode(XmlNode Arg1)
         {
             XmlNode var1 = Arg1.SelectSingleNode("UIParams");
-            int DefaultFlag = Convert.ToInt32(var1.SelectSingleNode("Type").InnerText);
+            int DisplayType = Convert.ToInt32(var1.SelectSingleNode("Type").InnerText);
             bool DisplayFlag = Convert.ToBoolean(var1.SelectSingleNode("Visible").InnerText);
             EventDisplay retValue;
             TilerColor colorNode = getColorNode(var1);
-            if (DefaultFlag == 0)
+            if (DisplayType==0)
             {
                 retValue = new EventDisplay();
             }
             else
             {
 
-                retValue = new EventDisplay(DisplayFlag, colorNode, DefaultFlag);
+                retValue = new EventDisplay(DisplayFlag, colorNode, DisplayType);
             }
             return retValue;
         }
@@ -1864,12 +1873,12 @@ namespace TilerFront
             return retValue;
         }
 
-        public virtual async Task<CalendarEvent> getCalendarEventWithID(EventID id)
+        public virtual async Task<CalendarEvent> getCalendarEventWithID(EventID id, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation)
         {
-            return await getCalendarEventWithID(id.getRepeatCalendarEventID()).ConfigureAwait(false);
+            return await getCalendarEventWithID(id.getRepeatCalendarEventID(), retrievalOption).ConfigureAwait(false);
         }
 
-        public async Task<CalendarEvent> getCalendarEventWithID(string id)
+        public async Task<CalendarEvent> getCalendarEventWithID(string id, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation)
         {
             EventID idObj = new EventID(id);
             id = idObj.getRepeatCalendarEventID();
@@ -1922,6 +1931,20 @@ namespace TilerFront
                         .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.RetrictionProfile))
                         .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.RetrictionProfile.NoNull_DaySelections))
                         .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.RetrictionProfile.DaySelection));
+
+            if (retrievalOption == DataRetrivalOption.UiAll)
+            {
+                query = query.Include(calEvent => calEvent.UiParams_EventDB)
+                    .Include(calEvent => calEvent.UiParams_EventDB.UIColor)
+                    .Include(calEvent => calEvent.AllSubEvents_DB
+                        .Select(subEvent => subEvent.UiParams_EventDB))
+                    .Include(calEvent => calEvent.AllSubEvents_DB
+                        .Select(subEvent => subEvent.UiParams_EventDB.UIColor)
+                    )
+                    //.Include(calEvent => calEvent.AllSubEvents_DB
+                    //    .Select(subEvent => subEvent.UiParams_EventDB.UIColor))
+                    ;
+            }
 
             CalendarEvent retValue = await query.SingleOrDefaultAsync(calEvent => calEvent.Id == id).ConfigureAwait(false);
 

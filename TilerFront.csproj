@@ -508,13 +508,9 @@
     <Compile Include="LogControlXml.cs" />
     <Compile Include="LogControlDirect.cs" />
     <Compile Include="LogControl.cs" />
-    <Compile Include="Migrations\201904250356487_init.cs" />
-    <Compile Include="Migrations\201904250356487_init.Designer.cs">
-      <DependentUpon>201904250356487_init.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201904250648153_modelUpdate.cs" />
-    <Compile Include="Migrations\201904250648153_modelUpdate.Designer.cs">
-      <DependentUpon>201904250648153_modelUpdate.cs</DependentUpon>
+    <Compile Include="Migrations\201904272052547_spanChange.cs" />
+    <Compile Include="Migrations\201904272052547_spanChange.Designer.cs">
+      <DependentUpon>201904272052547_spanChange.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
@@ -2813,11 +2809,8 @@
     <TypeScriptCompile Include="Scripts\index.d.ts" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201904250356487_init.resx">
-      <DependentUpon>201904250356487_init.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201904250648153_modelUpdate.resx">
-      <DependentUpon>201904250648153_modelUpdate.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201904272052547_spanChange.resx">
+      <DependentUpon>201904272052547_spanChange.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
