@@ -363,7 +363,7 @@ namespace TilerFront
 
             foreach (XmlNode MyNode in ListOfRepeatEventScheduleNode)
             {
-                CalendarEvent myCalendarEvent = getCalendarEventObjFromNode(MyNode, RangeOfLookUP);
+                CalendarEvent myCalendarEvent = getCalendarEventObjFromNode(MyNode);
                 if (myCalendarEvent != null)
                 {
                     ListOfRepeatCalendarNodes.Add(myCalendarEvent);

@@ -11,25 +11,27 @@ namespace TilerFront
     public class DB_Schedule:Schedule
     {
         protected UserAccount myAccount;
-        protected DB_Schedule(Dictionary<string, CalendarEvent> allEventDictionary, DateTimeOffset starOfDay, Dictionary<string, Location> locations, DateTimeOffset referenceNow, UserAccount userAccount) : base(allEventDictionary, starOfDay, locations, referenceNow, userAccount.getTilerUser())
+        protected DB_Schedule(Dictionary<string, CalendarEvent> allEventDictionary, DateTimeOffset starOfDay, Dictionary<string, Location> locations, DateTimeOffset referenceNow, UserAccount userAccount, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation) : base(allEventDictionary, starOfDay, locations, referenceNow, userAccount.getTilerUser())
         {
             myAccount = userAccount;
         }
 
 
-        protected DB_Schedule(Dictionary<string, CalendarEvent> allEventDictionary, DateTimeOffset starOfDay, Dictionary<string, Location> locations, DateTimeOffset referenceNow, TilerUser user):base(allEventDictionary, starOfDay, locations, referenceNow, user)
+        protected DB_Schedule(Dictionary<string, CalendarEvent> allEventDictionary, DateTimeOffset starOfDay, Dictionary<string, Location> locations, DateTimeOffset referenceNow, TilerUser user, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation):base(allEventDictionary, starOfDay, locations, referenceNow, user)
         {
 
         }
-        public DB_Schedule(UserAccount AccountEntry, DateTimeOffset referenceNow, DateTimeOffset startOfDay):base()
+        public DB_Schedule(UserAccount AccountEntry, DateTimeOffset referenceNow, DateTimeOffset startOfDay, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation):base()
         {
             myAccount = AccountEntry;
+            this.retrievalOption = retrievalOption;
             Initialize(referenceNow, startOfDay).Wait();
             
         }
-        public DB_Schedule(UserAccount AccountEntry, DateTimeOffset referenceNow)
+        public DB_Schedule(UserAccount AccountEntry, DateTimeOffset referenceNow, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation)
         {
             myAccount = AccountEntry;
+            this.retrievalOption = retrievalOption;
             Initialize(referenceNow).Wait();
         }
         async virtual protected Task Initialize(DateTimeOffset referenceNow)
@@ -68,7 +70,7 @@ namespace TilerFront
 
             _Now = new ReferenceNow(referenceNow, StartOfDay);
             TimeLine RangeOfLookup = new TimeLine(_Now.constNow.AddYears(-10), _Now.constNow.AddYears(10));
-            Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, Location>> profileData = await myAccount.ScheduleData.getProfileInfo(RangeOfLookup, _Now).ConfigureAwait(false);
+            Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, Location>> profileData = await myAccount.ScheduleData.getProfileInfo(RangeOfLookup, _Now, this.retrievalOption).ConfigureAwait(false);
             if (profileData != null)
             {
                 DateTimeOffset referenceDayTimeNow = new DateTimeOffset(Now.calculationNow.Year, Now.calculationNow.Month, Now.calculationNow.Day, profileData.Item2.Hour, profileData.Item2.Minute, profileData.Item2.Second, new TimeSpan());// profileData.Item2;
@@ -294,6 +296,30 @@ namespace TilerFront
             }
 
             throw new Exception("Hey you are yet to retrieve the latest third party schedule");
+        }
+
+        /// <summary>
+        /// Function creates a schedule dump that is equivalent to schedule from RDBMS
+        /// </summary>
+        /// <returns></returns>
+        virtual async public Task<ScheduleDump> CreateScheduleDump()
+        {
+            return await myAccount.ScheduleLogControl.CreateScheduleDump(this.getAllCalendarEvents(), myAccount.getTilerUser()).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Creates a schedule dump and then persists it to the DB
+        /// </summary>
+        /// <returns></returns>
+        virtual async public Task<ScheduleDump> CreateAndPersistScheduleDump(ScheduleDump scheduleDump = null)
+        {
+            scheduleDump = scheduleDump ?? await this.CreateScheduleDump().ConfigureAwait(false);
+            scheduleDump.ReferenceNow = this.Now.constNow;
+            scheduleDump.StartOfDay = this.Now.StartOfDay;
+
+            myAccount.ScheduleLogControl.Database.ScheduleDumps.Add(scheduleDump);
+            await persistToDB().ConfigureAwait(false);
+            return scheduleDump;
         }
 
     }

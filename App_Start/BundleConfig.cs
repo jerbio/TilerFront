@@ -57,6 +57,10 @@ namespace TilerFront
                     "~/Scripts/RegisterIni.js"
                 ));
 
+            bundles.Add(new StyleBundle("~/Content/ManagePageJS").Include(
+                    "~/Scripts/ManageController.js"
+                ));
+
             bundles.Add(new StyleBundle("~/Content/RegistrationCss").Include(
                     "~/CSS/MainUI.css",
                     "~/CSS/Registration.css"

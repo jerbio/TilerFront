@@ -934,6 +934,18 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:TilerFront.DB_Schedule.CreateScheduleDump">
+            <summary>
+            Function creates a schedule dump that is equivalent to schedule from RDBMS
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.DB_Schedule.CreateAndPersistScheduleDump(TilerElements.ScheduleDump)">
+            <summary>
+            Creates a schedule dump and then persists it to the DB
+            </summary>
+            <returns></returns>
+        </member>
         <member name="P:TilerFront.Models.AuthorizedUser.TimeZone">
             <summary>
             TimeZone desired by the user. This defaults to UTC

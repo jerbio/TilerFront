@@ -86,7 +86,7 @@ namespace TilerFront.Controllers
 
                 Task<ConcurrentBag<CalendarEvent>> GoogleCalEventsTask = GoogleTilerEventControl.getAllCalEvents(AllGoogleTilerEvents, TimelineForData);
 
-                Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location>> ProfileData = await LogAccess.getProfileInfo(TimelineForData, null, retrievalOption: LogControl.DataRetrivalOption.UiAll);
+                Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location>> ProfileData = await LogAccess.getProfileInfo(TimelineForData, null, retrievalOption: DataRetrivalOption.UiAll);
 
                 IEnumerable<CalendarEvent> GoogleCalEvents = await GoogleCalEventsTask.ConfigureAwait(false);
 
@@ -575,6 +575,43 @@ namespace TilerFront.Controllers
                 TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
                 scheduleChangeSocket.triggerRefreshData(myUser.getTilerUser());
                 return Ok(myPostData.getPostBack);
+            }
+            throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.Unauthorized)
+            {
+                ReasonPhrase = "Unauthorized access to tiler"
+            });
+        }
+
+
+        [HttpPost]
+        [ResponseType(typeof(PostBackStruct))]
+        [Route("api/Schedule/DumpData")]
+        public async Task<IHttpActionResult> DumpData([FromBody]DumpModel UserData)
+        {
+            AuthorizedUser myAuthorizedUser = UserData.User;
+            UserAccount myUser = await UserData.getUserAccount(db);
+            await myUser.Login();
+            if (myUser.Status)
+            {
+                DateTimeOffset myNow = myNow = myAuthorizedUser.getRefNow();
+                DB_Schedule MySchedule = new DB_Schedule(myUser, myNow);
+                DB_UserActivity activity = new DB_UserActivity(myNow, UserActivity.ActivityType.Shuffle);
+                ScheduleDump scheduleDump = await MySchedule.CreateScheduleDump().ConfigureAwait(false);
+                scheduleDump.Notes = UserData.Notes;
+                await MySchedule.CreateAndPersistScheduleDump(scheduleDump).ConfigureAwait(false);
+
+                ScheduleDump scheduleDumpCopy = new ScheduleDump()
+                {
+                    Id = scheduleDump.Id,
+                    Notes = scheduleDump.Notes,
+                    UserId = scheduleDump.UserId,
+                    ScheduleXmlString= "<?xml version=\"1.0\" encoding=\"utf-8\"?><ScheduleLog><LastIDCounter>1024</LastIDCounter><referenceDay>8:00 AM</referenceDay><EventSchedules></EventSchedules></ScheduleLog>"
+                };
+                scheduleDumpCopy.Id = scheduleDump.Id;
+                TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
+                scheduleChangeSocket.triggerRefreshData(myUser.getTilerUser());
+                PostBackData postBack = new PostBackData(scheduleDumpCopy, 0);
+                return Ok(postBack.getPostBack);
             }
             throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.Unauthorized)
             {

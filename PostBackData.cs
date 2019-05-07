@@ -41,7 +41,7 @@ namespace TilerFront
         int Status=0;
         string Message;
 
-        public PostBackData(int StatusEntry)
+        public PostBackData(int StatusEntry=0)
         {
             Message = "";
             Status = StatusEntry;

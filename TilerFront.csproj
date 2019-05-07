@@ -512,10 +512,19 @@
     <Compile Include="Migrations\201904272052547_spanChange.Designer.cs">
       <DependentUpon>201904272052547_spanChange.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201905060559043_scheduleDump.cs" />
+    <Compile Include="Migrations\201905060559043_scheduleDump.Designer.cs">
+      <DependentUpon>201905060559043_scheduleDump.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201905060854254_scheduleDumpPropertyrim.cs" />
+    <Compile Include="Migrations\201905060854254_scheduleDumpPropertyrim.Designer.cs">
+      <DependentUpon>201905060854254_scheduleDumpPropertyrim.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\AuthorizedUser.cs" />
+    <Compile Include="Models\DumpModel.cs" />
     <Compile Include="Models\EditCalEventModel.cs" />
     <Compile Include="Models\EditSubCalEventModel.cs" />
     <Compile Include="Models\getEventModel.cs" />
@@ -689,6 +698,7 @@
     <Content Include="Scripts\jquery_mobile_datebox.js" />
     <Content Include="Scripts\knockout-3.4.2.debug.js" />
     <Content Include="Scripts\knockout-3.4.2.js" />
+    <Content Include="Scripts\ManageController.js" />
     <Content Include="Scripts\moment-timezone-utils.js" />
     <Content Include="Scripts\moment-timezone-with-data-2012-2022.js" />
     <Content Include="Scripts\moment-timezone-with-data-2012-2022.min.js" />
@@ -2811,6 +2821,12 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201904272052547_spanChange.resx">
       <DependentUpon>201904272052547_spanChange.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201905060559043_scheduleDump.resx">
+      <DependentUpon>201905060559043_scheduleDump.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201905060854254_scheduleDumpPropertyrim.resx">
+      <DependentUpon>201905060854254_scheduleDumpPropertyrim.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
