@@ -934,13 +934,13 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:TilerFront.DB_Schedule.CreateScheduleDump">
+        <member name="M:TilerFront.DB_Schedule.CreateScheduleDump(TilerElements.ReferenceNow)">
             <summary>
             Function creates a schedule dump that is equivalent to schedule from RDBMS
             </summary>
             <returns></returns>
         </member>
-        <member name="M:TilerFront.DB_Schedule.CreateAndPersistScheduleDump(TilerElements.ScheduleDump)">
+        <member name="M:TilerFront.DB_Schedule.CreateAndPersistScheduleDump(TilerElements.ScheduleDump,TilerElements.ReferenceNow)">
             <summary>
             Creates a schedule dump and then persists it to the DB
             </summary>
@@ -1215,6 +1215,13 @@
             Function retrieves a tiler user group form an xmlnode. Npte if there isn't a node a new object will be created with the isNull flag set
             </summary>
             <param name="userGroupNode">xml node with formated user group</param>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.LogControl.GetScheduleDump(System.String)">
+            <summary>
+            gets the Schedule dump by the dump id
+            </summary>
+            <param name="dumpId"></param>
             <returns></returns>
         </member>
         <member name="M:TilerFront.LogControl.getDayReferenceTime">

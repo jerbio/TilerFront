@@ -241,13 +241,13 @@ namespace TilerFront
             return;
         }
 
-        async public Task<ScheduleDump> CreateScheduleDump(IEnumerable<CalendarEvent> AllEvents, TilerUser user)
+        async public Task<ScheduleDump> CreateScheduleDump(IEnumerable<CalendarEvent> AllEvents, TilerUser user, ReferenceNow now)
         {
             Task<ScheduleDump> retValue;
 
 
             XmlDocument xmldoc = new XmlDocument();
-            xmldoc.InnerXml = "<?xml version=\"1.0\" encoding=\"utf-8\"?><ScheduleLog><LastIDCounter>1024</LastIDCounter><referenceDay>8:00 AM</referenceDay><EventSchedules></EventSchedules></ScheduleLog>";
+            xmldoc.InnerXml = "<?xml version=\"1.0\" encoding=\"utf-8\"?><ScheduleLog><LastIDCounter>1024</LastIDCounter><referenceDay>"+now.StartOfDay.DateTime+"</referenceDay><EventSchedules></EventSchedules></ScheduleLog>";
 
             CachedLocation = await getLocationCache().ConfigureAwait(false); ;//populates with current location info
             Dictionary<string, TilerElements.Location> OldLocationCache = new Dictionary<string, TilerElements.Location>(CachedLocation);
@@ -294,7 +294,9 @@ namespace TilerFront
             ScheduleDump scheduleDump = new ScheduleDump()
             {
                 UserId = user.Id,
-                ScheduleXmlString = xmldoc.InnerXml
+                ScheduleXmlString = xmldoc.InnerXml,
+                ReferenceNow = now.constNow,
+                StartOfDay = now.StartOfDay
             };
             retValue = new Task<ScheduleDump>(() => { return scheduleDump; });
             retValue.Start();
@@ -1146,6 +1148,16 @@ namespace TilerFront
             return retValue;
         }
 
+        /// <summary>
+        /// gets the Schedule dump by the dump id
+        /// </summary>
+        /// <param name="dumpId"></param>
+        /// <returns></returns>
+        public async Task<ScheduleDump> GetScheduleDump (string dumpId)
+        {
+            ScheduleDump retValue =  await Database.ScheduleDumps.FindAsync(dumpId).ConfigureAwait(false);
+            return retValue;
+        }
 
 
         public string GetShortcutTarget(string file)

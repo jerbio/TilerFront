@@ -619,6 +619,29 @@ namespace TilerFront.Controllers
             });
         }
 
+        [HttpGet]
+        [ResponseType(typeof(PostBackStruct))]
+        [Route("api/Schedule/DumpData")]
+        public async Task<IHttpActionResult> getDumpData([FromUri]DumpModel UserData)
+        {
+            AuthorizedUser myAuthorizedUser = UserData.User;
+            UserAccount myUser = await UserData.getUserAccount(db);
+            await myUser.Login();
+            if (myUser.Status)
+            {
+                ScheduleDump retValue = await myUser.ScheduleLogControl.GetScheduleDump(UserData.Id).ConfigureAwait(false);
+                TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
+                scheduleChangeSocket.triggerRefreshData(myUser.getTilerUser());
+                PostBackData postBack = new PostBackData(retValue, 0);
+                return Ok(retValue.ScheduleXmlString);
+            }
+            throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.Unauthorized)
+            {
+                ReasonPhrase = "Unauthorized access to tiler"
+            });
+        }
+
+
 
         /// <summary>
         /// Marks an Event as complete.  Note this also triggers a readjust to the schedule

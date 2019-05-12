@@ -508,17 +508,9 @@
     <Compile Include="LogControlXml.cs" />
     <Compile Include="LogControlDirect.cs" />
     <Compile Include="LogControl.cs" />
-    <Compile Include="Migrations\201904272052547_spanChange.cs" />
-    <Compile Include="Migrations\201904272052547_spanChange.Designer.cs">
-      <DependentUpon>201904272052547_spanChange.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201905060559043_scheduleDump.cs" />
-    <Compile Include="Migrations\201905060559043_scheduleDump.Designer.cs">
-      <DependentUpon>201905060559043_scheduleDump.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201905060854254_scheduleDumpPropertyrim.cs" />
-    <Compile Include="Migrations\201905060854254_scheduleDumpPropertyrim.Designer.cs">
-      <DependentUpon>201905060854254_scheduleDumpPropertyrim.cs</DependentUpon>
+    <Compile Include="Migrations\201905120638233_init.cs" />
+    <Compile Include="Migrations\201905120638233_init.Designer.cs">
+      <DependentUpon>201905120638233_init.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
@@ -2819,14 +2811,8 @@
     <TypeScriptCompile Include="Scripts\index.d.ts" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201904272052547_spanChange.resx">
-      <DependentUpon>201904272052547_spanChange.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201905060559043_scheduleDump.resx">
-      <DependentUpon>201905060559043_scheduleDump.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201905060854254_scheduleDumpPropertyrim.resx">
-      <DependentUpon>201905060854254_scheduleDumpPropertyrim.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201905120638233_init.resx">
+      <DependentUpon>201905120638233_init.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

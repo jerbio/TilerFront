@@ -302,18 +302,20 @@ namespace TilerFront
         /// Function creates a schedule dump that is equivalent to schedule from RDBMS
         /// </summary>
         /// <returns></returns>
-        virtual async public Task<ScheduleDump> CreateScheduleDump()
+        virtual async public Task<ScheduleDump> CreateScheduleDump(ReferenceNow referenceNow = null)
         {
-            return await myAccount.ScheduleLogControl.CreateScheduleDump(this.getAllCalendarEvents(), myAccount.getTilerUser()).ConfigureAwait(false);
+            referenceNow = referenceNow ?? this.Now;
+            return await myAccount.ScheduleLogControl.CreateScheduleDump(this.getAllCalendarEvents(), myAccount.getTilerUser(), referenceNow).ConfigureAwait(false);
         }
 
         /// <summary>
         /// Creates a schedule dump and then persists it to the DB
         /// </summary>
         /// <returns></returns>
-        virtual async public Task<ScheduleDump> CreateAndPersistScheduleDump(ScheduleDump scheduleDump = null)
+        virtual async public Task<ScheduleDump> CreateAndPersistScheduleDump(ScheduleDump scheduleDump = null, ReferenceNow now = null)
         {
-            scheduleDump = scheduleDump ?? await this.CreateScheduleDump().ConfigureAwait(false);
+            ReferenceNow refNow = now ?? this.Now;
+            scheduleDump = scheduleDump ?? await this.CreateScheduleDump(refNow).ConfigureAwait(false);
             scheduleDump.ReferenceNow = this.Now.constNow;
             scheduleDump.StartOfDay = this.Now.StartOfDay;
 

@@ -15,5 +15,7 @@ namespace TilerFront.Models
                 return new AuthorizedUser { UserName = UserName, UserID = UserID, MobileFlag = MobileFlag, TimeZoneOffset = TimeZoneOffset };
             }
         }
+
+        public string Id { get; set; }
     }
 }
