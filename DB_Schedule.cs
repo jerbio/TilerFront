@@ -152,7 +152,7 @@ namespace TilerFront
                 (myOutlook).WriteToOutlook(MyCalEvent);
             }
 
-            await myAccount.Commit(AllEventDictionary.Values, newCalendarEvent, EventID.LatestID.ToString()).ConfigureAwait(false);
+            await myAccount.Commit(AllEventDictionary.Values, newCalendarEvent, EventID.LatestID.ToString(), this.Now).ConfigureAwait(false);
         }
 
         virtual public bool isScheduleLoadSuccessful

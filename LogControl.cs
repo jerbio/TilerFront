@@ -244,10 +244,10 @@ namespace TilerFront
         async public Task<ScheduleDump> CreateScheduleDump(IEnumerable<CalendarEvent> AllEvents, TilerUser user, ReferenceNow now)
         {
             Task<ScheduleDump> retValue;
-
+            
 
             XmlDocument xmldoc = new XmlDocument();
-            xmldoc.InnerXml = "<?xml version=\"1.0\" encoding=\"utf-8\"?><ScheduleLog><LastIDCounter>1024</LastIDCounter><referenceDay>"+now.StartOfDay.DateTime+"</referenceDay><EventSchedules></EventSchedules></ScheduleLog>";
+            xmldoc.InnerXml = "<?xml version=\"1.0\" encoding=\"utf-8\"?><ScheduleLog><LastIDCounter>1024</LastIDCounter><referenceDay>"+now.StartOfDay.DateTime+ "</referenceDay><lastUpdated>" + user.LastScheduleModification.DateTime + "</lastUpdated><EventSchedules></EventSchedules></ScheduleLog>";
 
             CachedLocation = await getLocationCache().ConfigureAwait(false); ;//populates with current location info
             Dictionary<string, TilerElements.Location> OldLocationCache = new Dictionary<string, TilerElements.Location>(CachedLocation);
@@ -382,9 +382,10 @@ namespace TilerFront
             await _Context.SaveChangesAsync().ConfigureAwait(false);
         }
 
-        public async Task Commit(IEnumerable<CalendarEvent> calendarEvents, CalendarEvent calendarEvent, String LatestId)
+        public async Task Commit(IEnumerable<CalendarEvent> calendarEvents, CalendarEvent calendarEvent, String LatestId, ReferenceNow now)
         {
             _TilerUser.LatestId = LatestId;
+            _TilerUser.LastScheduleModification = now.constNow;
             if (calendarEvent!=null)
             {
                 _Context.CalEvents.Add(calendarEvent);
@@ -1819,7 +1820,7 @@ namespace TilerFront
                     { 
                         XmlNode RestrictionProfileNode =MyXmlNode.ChildNodes[i].SelectSingleNode("RestrictionProfile");
                         DB_RestrictionProfile myRestrictionProfile = (DB_RestrictionProfile)getRestrictionProfile(RestrictionProfileNode);
-                        retrievedSubEvent = new DB_SubCalendarEventRestricted(retrievedSubEvent, myRestrictionProfile, this.Now);
+                        retrievedSubEvent = new DB_SubCalendarEventRestricted(retrievedSubEvent, myRestrictionProfile, MyParent as CalendarEventRestricted, this.Now);
                         (retrievedSubEvent as DB_SubCalendarEventRestricted).UsedTime = PauseData.Item1;
                         (retrievedSubEvent as DB_SubCalendarEventRestricted).PauseTime = PauseData.Item2;
                     }
@@ -1922,7 +1923,7 @@ namespace TilerFront
 
         DayOfWeek getRestrictionDayOfWeek(XmlNode RestrictionDayOfWeek)
         {
-            DayOfWeek retValue = RestrictionProfile.AllDaysOfWeek[Convert.ToInt32(RestrictionDayOfWeek.SelectSingleNode("RestrictionDayOfWeek").InnerText)];
+            DayOfWeek retValue = Utility.ParseEnum<DayOfWeek>(RestrictionDayOfWeek.SelectSingleNode("RestrictionDayOfWeek").InnerText);
             return retValue;
         }
 
