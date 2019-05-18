@@ -934,7 +934,7 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:TilerFront.DB_Schedule.CreateScheduleDump(TilerElements.ReferenceNow)">
+        <member name="M:TilerFront.DB_Schedule.CreateScheduleDump(TilerElements.ReferenceNow,System.String)">
             <summary>
             Function creates a schedule dump that is equivalent to schedule from RDBMS
             </summary>

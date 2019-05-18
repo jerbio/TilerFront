@@ -39,7 +39,7 @@ namespace TilerFront
             DateTimeOffset StartOfDay = myAccount.ScheduleData.getDayReferenceTime();
             _Now = new ReferenceNow(referenceNow, StartOfDay);
             TimeLine RangeOfLookup = new TimeLine(_Now.constNow.AddYears(-10), _Now.constNow.AddYears(10));
-            Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, Location>> profileData = await myAccount.ScheduleData.getProfileInfo(RangeOfLookup, _Now).ConfigureAwait(false);
+            Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, Location>> profileData = await myAccount.ScheduleData.getProfileInfo(RangeOfLookup, _Now, retrievalOption).ConfigureAwait(false);
             myAccount.Now = _Now;
             if (profileData != null)
             {
@@ -195,43 +195,7 @@ namespace TilerFront
 
         async virtual public Task<CustomErrors> AddToScheduleAndCommit(CalendarEvent NewEvent, bool optimizeSchedule = true)
         {
-#if enableTimer
-            myWatch.Start();
-#endif
-            HashSet<SubCalendarEvent> NotdoneYet = new HashSet<SubCalendarEvent>();// getNoneDoneYetBetweenNowAndReerenceStartTIme();
-            if (!NewEvent.isRigid)
-            {
-                NewEvent = EvaluateTotalTimeLineAndAssignValidTimeSpots(NewEvent, NotdoneYet, null, optimizeFirstTwentyFourHours: optimizeSchedule);
-            }
-            else
-            {
-                NewEvent = EvaluateTotalTimeLineAndAssignValidTimeSpots(NewEvent, NotdoneYet, null, null, 1, optimizeSchedule);
-            }
-
-
-            ///
-
-            if (NewEvent == null)//checks if event was assigned and ID ehich means it was successfully able to find a spot
-            {
-
-                return NewEvent.Error;
-            }
-
-            if (NewEvent.getId == "" || NewEvent == null)//checks if event was assigned and ID ehich means it was successfully able to find a spot
-            {
-                return NewEvent.Error;
-            }
-
-
-            if (NewEvent.Error != null)
-            {
-                LogStatus(NewEvent, "Adding New Event");
-            }
-            removeAllFromOutlook();
-            
-            AllEventDictionary.Add(NewEvent.Calendar_EventID.getCalendarEventComponent(), NewEvent);
-            
-
+            AddToSchedule(NewEvent, optimizeSchedule);
 
             await WriteFullScheduleToLogAndOutlook(NewEvent).ConfigureAwait(false);
 
@@ -302,10 +266,10 @@ namespace TilerFront
         /// Function creates a schedule dump that is equivalent to schedule from RDBMS
         /// </summary>
         /// <returns></returns>
-        virtual async public Task<ScheduleDump> CreateScheduleDump(ReferenceNow referenceNow = null)
+        virtual async public Task<ScheduleDump> CreateScheduleDump(ReferenceNow referenceNow = null, string notes="")
         {
             referenceNow = referenceNow ?? this.Now;
-            return await myAccount.ScheduleLogControl.CreateScheduleDump(this.getAllCalendarEvents(), myAccount.getTilerUser(), referenceNow).ConfigureAwait(false);
+            return await myAccount.ScheduleLogControl.CreateScheduleDump(this.getAllCalendarEvents(), myAccount.getTilerUser(), referenceNow, notes).ConfigureAwait(false);
         }
 
         /// <summary>

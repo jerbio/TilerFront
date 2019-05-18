@@ -557,6 +557,12 @@ namespace TilerFront.Controllers
                 }
                 await MySchedule.FindMeSomethingToDo(location);
                 await MySchedule.WriteFullScheduleToLogAndOutlook().ConfigureAwait(false);
+
+                List<SubCalendarEvent> allSubEvents = MySchedule.getAllCalendarEvents().Where(calEvent => calEvent.isActive).SelectMany(calEvent => calEvent.ActiveSubEvents).ToList();
+                TimeLine timeLine = new TimeLine();
+                timeLine.AddBusySlots(allSubEvents.Select(subEvent => subEvent.ActiveSlot));
+                List<BlobSubCalendarEvent> interferringSubEvents = Utility.getConflictingEvents(allSubEvents);
+
                 BusyTimeLine nextBusySchedule = MySchedule.NextActivity;
                 PostBackData myPostData;
                 if (nextBusySchedule != null)
@@ -596,7 +602,7 @@ namespace TilerFront.Controllers
                 DateTimeOffset myNow = myNow = myAuthorizedUser.getRefNow();
                 DB_Schedule MySchedule = new DB_Schedule(myUser, myNow);
                 DB_UserActivity activity = new DB_UserActivity(myNow, UserActivity.ActivityType.Shuffle);
-                ScheduleDump scheduleDump = await MySchedule.CreateScheduleDump().ConfigureAwait(false);
+                ScheduleDump scheduleDump = await MySchedule.CreateScheduleDump(notes: UserData.Notes).ConfigureAwait(false);
                 scheduleDump.Notes = UserData.Notes;
                 await MySchedule.CreateAndPersistScheduleDump(scheduleDump).ConfigureAwait(false);
 
