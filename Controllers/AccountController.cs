@@ -318,6 +318,7 @@ namespace TilerFront.Controllers
 
                 if (result.Succeeded)
                 {
+                    user = dbContext.Users.Find(user.Id);
                     await createProcrastinateCalendarEvent(user).ConfigureAwait(false);
                     await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
                     Task SendEmail = SendEmailConfirmationAsync(user.Id, "Please Confirm Your Tiler Account!");
@@ -363,6 +364,7 @@ namespace TilerFront.Controllers
 
                 if (result.Succeeded)
                 {
+                    user = dbContext.Users.Find(user.Id);
                     await createProcrastinateCalendarEvent(user).ConfigureAwait(false);
                     await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
                     Task SendEmail = SendEmailConfirmationAsync(user.Id, "Please Confirm Your Tiler Account!");
@@ -756,6 +758,7 @@ namespace TilerFront.Controllers
                     result = await UserManager.AddLoginAsync(user.Id, info.Login);
                     if (result.Succeeded )
                     {
+                        user = dbContext.Users.Find(user.Id);
                         await createProcrastinateCalendarEvent(user).ConfigureAwait(false);
                         await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
                         Task SendThirdPartyAuthentication = new Task(() => { });

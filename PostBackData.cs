@@ -34,7 +34,7 @@ namespace TilerFront
             {10001000,"User Already exists"},
             {30001000,"Registration exception. Check DB control with user credentials"},
             {40001000,"Publication Error."},//Just testing
-            {50005000,"Pause/Resume Bug."},//Just testing
+            {50005000,"Pause/Resume Bug."},
             {100,"I have no idea"}
         };
         dynamic Data;
@@ -77,7 +77,7 @@ namespace TilerFront
         {
             string retValue;
             string defaultMessage = "Tiler is having some issues please try again later";
-            if (errorCode < 20000000)
+            if (errorCode > 20000000)
             {
                 retValue = defaultMessage;
                 return retValue;
