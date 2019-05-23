@@ -332,41 +332,28 @@ namespace TilerFront
 
             foreach (KeyValuePair<string, TilerElements.Location> eachKeyValuePair in CachedLocation)
             {
-                if (!currentCache.ContainsKey(eachKeyValuePair.Key))
+                    
+                string LocationID = eachKeyValuePair.Value.Id;
+                XmlElement myCacheLocationNode = CreateLocationNode(eachKeyValuePair.Value, "Location");
+
+                XmlNode MyImportedNode = xmldoc.ImportNode(myCacheLocationNode as XmlNode, true);
+                myCacheLocationNode = MyImportedNode as XmlElement;
+
+
+                XmlNode LocationIDNode = xmldoc.CreateElement("LocationID");
+                XmlNode CacheNameNode = xmldoc.CreateElement("CachedName");
+                CacheNameNode.InnerText = eachKeyValuePair.Value.Description.ToLower();
+                LocationIDNode.InnerText = LocationID.ToString();
+                MyImportedNode.PrependChild(LocationIDNode);
+                MyImportedNode.PrependChild(CacheNameNode);
+                MyImportedNode = xmldoc.ImportNode(myCacheLocationNode as XmlNode, true);
+
+                if (!UpdateInnerXml(ref AllCachedLocations, "LocationID", LocationID.ToString(), myCacheLocationNode))
                 {
-                    //if (!eachKeyValuePair.Value.isNull)
-                    {
-                        string LocationID = eachKeyValuePair.Value.Id;
-                        XmlElement myCacheLocationNode = CreateLocationNode(eachKeyValuePair.Value, "Location");
-
-                        XmlNode MyImportedNode = xmldoc.ImportNode(myCacheLocationNode as XmlNode, true);
-                        myCacheLocationNode = MyImportedNode as XmlElement;
-
-
-                        XmlNode LocationIDNode = xmldoc.CreateElement("LocationID");
-                        XmlNode CacheNameNode = xmldoc.CreateElement("CachedName");
-                        CacheNameNode.InnerText = eachKeyValuePair.Value.Description.ToLower();
-                        LocationIDNode.InnerText = LocationID.ToString();
-                        MyImportedNode.PrependChild(LocationIDNode);
-                        MyImportedNode.PrependChild(CacheNameNode);
-                        MyImportedNode = xmldoc.ImportNode(myCacheLocationNode as XmlNode, true);
-
-                        if (!UpdateInnerXml(ref AllCachedLocations, "LocationID", LocationID.ToString(), myCacheLocationNode))
-                        {
-                            xmldoc.DocumentElement.SelectSingleNode("/ScheduleLog/LocationCache/Locations").AppendChild(MyImportedNode);
-                        }
-                    }
+                    xmldoc.DocumentElement.SelectSingleNode("/ScheduleLog/LocationCache/Locations").AppendChild(MyImportedNode);
                 }
-                else
-                {
-                    if (NewLocation != null)
-                    {
-                        if (NewLocation.Description.ToLower() == eachKeyValuePair.Key)
-                        {
-                            updateScheduleLocationNode(NewLocation, xmldoc);
-                        }
-                    }
-                }
+                    
+                
             }
         }
 
@@ -1241,7 +1228,7 @@ namespace TilerFront
 
         async virtual protected Task<Dictionary<string, TilerElements.Location>> getLocationCache(string NameOfFile = "")
         {
-            Dictionary<string, TilerElements.Location> retValue = await _Context.Locations.Where(location => location.UserId == _TilerUser.Id).ToDictionaryAsync(obj => obj.Description, obj => obj).ConfigureAwait(false);
+            Dictionary<string, TilerElements.Location> retValue = await _Context.Locations.Where(location => location.UserId == _TilerUser.Id).ToDictionaryAsync(obj => obj.Description.ToLower(), obj => obj).ConfigureAwait(false);
             return retValue;
         }
 
