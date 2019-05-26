@@ -6,14 +6,6 @@ var DebugLocal = true;
 //var global_refTIlerUrl = "http://localhost:53201/api/";
 //var global_refTIlerUrl = "http://tilersmart.azurewebsites.net/api/";
 var global_refTIlerUrl = window.location.origin + "/api/";
-if (Debug)
-{
-    global_refTIlerUrl = "http://mytilerKid.azurewebsites.net/api/";
-    if(DebugLocal)
-    {
-        global_refTIlerUrl = "https://localhost:44305/api/";
-    }
-}
 var global_PositionCoordinate = { Latitude: 40.0274, Longitude: -105.2519, isInitialized: false, Message: "Uninitialized" };;
 
 var UserTheme = { Light: new Theme("Light"), Dark: new Theme("Dark") };
@@ -100,12 +92,11 @@ function SetCookie(CookieValue)
 function GetCookieValue()//verifies that user has cookies
 {
     var CookieName = "TilerCaluserWaggy";
-    var CookieValue = "";
+    var CookieValue = "";//= JSON.parse(CookieValue);
     var DocumentCookie = " " + document.cookie + ";";
     var CookieSearchStr = " " + CookieName + "=";
     var CookieStartPosition = DocumentCookie.indexOf(CookieSearchStr);
     var CookieEndPosition;
-	var CookieValue ;//= JSON.parse(CookieValue);
 
     if (CookieStartPosition != -1) {
         CookieStartPosition += CookieSearchStr.length;

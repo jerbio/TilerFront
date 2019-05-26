@@ -249,7 +249,7 @@ namespace TilerFront
             XmlDocument xmldoc = new XmlDocument();
             xmldoc.InnerXml = "<?xml version=\"1.0\" encoding=\"utf-8\"?><ScheduleLog><LastIDCounter>1024</LastIDCounter><referenceDay>"+now.StartOfDay.DateTime+ "</referenceDay><scheduleNotes>" + notes + "</scheduleNotes><lastUpdated>" + user.LastScheduleModification.DateTime + "</lastUpdated><EventSchedules></EventSchedules></ScheduleLog>";
 
-            CachedLocation = await getLocationCache().ConfigureAwait(false); ;//populates with current location info
+            CachedLocation = await getAllLocationsByUser().ConfigureAwait(false); ;//populates with current location info
             Dictionary<string, TilerElements.Location> OldLocationCache = new Dictionary<string, TilerElements.Location>(CachedLocation);
             xmldoc.DocumentElement.SelectSingleNode("/ScheduleLog/LastIDCounter").InnerText = "false";
             XmlNodeList EventSchedulesNodes = xmldoc.DocumentElement.SelectNodes("/ScheduleLog/EventSchedules");
@@ -1226,9 +1226,21 @@ namespace TilerFront
             return retValue;
         }
 
-        async virtual protected Task<Dictionary<string, TilerElements.Location>> getLocationCache(string NameOfFile = "")
+        virtual protected IQueryable<TilerElements.Location> getLocationsByUserId(string userId)
         {
-            Dictionary<string, TilerElements.Location> retValue = await _Context.Locations.Where(location => location.UserId == _TilerUser.Id).ToDictionaryAsync(obj => obj.Description.ToLower(), obj => obj).ConfigureAwait(false);
+            IQueryable<TilerElements.Location> retValue = _Context.Locations.Where(location => location.UserId == userId);
+            return retValue;
+        }
+
+        virtual public IQueryable<TilerElements.Location> getLocationsByDescription(string description)
+        {
+            IQueryable<TilerElements.Location> retValue = getLocationsByUserId(_TilerUser.Id).Where(location => location.SearchdDescription.Contains(description));
+            return retValue;
+        }
+
+        async virtual protected Task<Dictionary<string, TilerElements.Location>> getAllLocationsByUser()
+        {
+            Dictionary<string, TilerElements.Location> retValue = await _Context.Locations.Where(location => location.UserId == _TilerUser.Id).ToDictionaryAsync(obj => obj.SearchdDescription.ToLower(), obj => obj).ConfigureAwait(false);
             return retValue;
         }
 
@@ -2288,30 +2300,6 @@ namespace TilerFront
                 .Where(calEvent => calEvent.CreatorId == userId);
             return retValue;
         }
-
-        async public Task<IList<TilerElements.Location>> getCachedLocationByName(string Name)
-        {
-
-            IList<TilerElements.Location> retValue = new List<TilerElements.Location>();
-#if ForceReadFromXml
-#else
-            if (useCassandra)
-            {
-                retValue = myCassandraAccess.SearchLocationByName(Name);
-                return retValue;
-            }
-#endif
-            TimeLine RangeOfLookup = new TimeLine(DateTimeOffset.UtcNow.AddYears(-1000), DateTimeOffset.UtcNow.AddYears(1000));
-            CachedLocation = await getLocationCache().ConfigureAwait(false); ;
-            
-
-            Name = Name.ToLower();
-            if (CachedLocation.Count > 0)
-            {
-                retValue = CachedLocation.Select(obj => obj.Value).Where(obj1 => obj1.Description.ToLower().Contains(Name) || obj1.Address.ToLower().Contains(Name)).ToList();
-            }
-            return retValue;
-        }
         #endregion
 
         private DateTimeOffset stringToDateTime(string MyDateTimeString)//String should be in format "MM/DD/YY HH:MM:SSA"
@@ -2406,7 +2394,7 @@ namespace TilerFront
             Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location>> retValue;
             if (this.Status)
             {
-                Task<Dictionary<string, TilerElements.Location>> TaskLocationCache = getLocationCache();
+                Task<Dictionary<string, TilerElements.Location>> TaskLocationCache = getAllLocationsByUser();
                 Dictionary<string, TilerElements.Location> LocationCache = await TaskLocationCache.ConfigureAwait(false);
                 Dictionary<string, CalendarEvent> AllScheduleData =await this.getAllCalendarFromXml(RangeOfLookup, Now, retrievalOption: retrievalOption, singleCalEventId: singleCalEventId);
 
@@ -2433,7 +2421,7 @@ namespace TilerFront
 
                 retValue = TilerElements.Location.getDefaultLocation();
                 DefaultLocation = retValue;
-                locations = await getLocationCache().ConfigureAwait(false);
+                locations = await getAllLocationsByUser().ConfigureAwait(false);
                 return;
             }
 
@@ -2441,7 +2429,7 @@ namespace TilerFront
             {
                 retValue = TilerElements.Location.getDefaultLocation();
                 DefaultLocation = retValue;
-                locations = await getLocationCache().ConfigureAwait(false);
+                locations = await getAllLocationsByUser().ConfigureAwait(false);
                 return;
             }
 

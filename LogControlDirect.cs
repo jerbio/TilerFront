@@ -503,7 +503,7 @@ namespace TilerFront
             }
 #endif
             TimeLine RangeOfLookup = new TimeLine(DateTimeOffset.UtcNow.AddYears(-1000), DateTimeOffset.UtcNow.AddYears(1000));
-            CachedLocation =await getLocationCache();
+            CachedLocation =await getAllLocationsByUser();
             
 
             Name = Name.ToLower();
