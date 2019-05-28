@@ -58,7 +58,7 @@ namespace TilerFront.Controllers
         }
 
 
-        async Task<PostBackData> getDataFromRestEnd(getScheduleModel myAuthorizedUser)
+        async Task<PostBackData> getDataFromRestEnd(getScheduleModel myAuthorizedUser, TimeLine TimelineForData = null)
         {
             UserAccount myUserAccount = await myAuthorizedUser.getUserAccount(db);
             HttpContext myCOntext = HttpContext.Current;
@@ -68,7 +68,7 @@ namespace TilerFront.Controllers
             {
                 DateTimeOffset StartTime = new DateTimeOffset(myAuthorizedUser.StartRange * TimeSpan.TicksPerMillisecond, new TimeSpan()).AddYears(1969).Add(-myAuthorizedUser.getTImeSpan);
                 DateTimeOffset EndTime = new DateTimeOffset(myAuthorizedUser.EndRange * TimeSpan.TicksPerMillisecond, new TimeSpan()).AddYears(1969).Add(-myAuthorizedUser.getTImeSpan);
-                TimeLine TimelineForData = new TimeLine(StartTime.AddDays(-5), EndTime.AddDays(5));
+                TimelineForData = TimelineForData ?? new TimeLine(StartTime.AddDays(-90), EndTime.AddDays(90));
 
 
                 LogControl LogAccess = myUserAccount.ScheduleLogControl;
