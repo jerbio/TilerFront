@@ -4098,23 +4098,28 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                     var ContainerForExtraOptions = getDomOrCreateNew("ExtraOptionsContainer")
                     ContainerForExtraOptions.appendChild(splitAndNoteContainer)
                     $(splitAndNoteContainer).addClass("SubEventInformationContainer");
+                    var splitInputBox = getDomOrCreateNew("InputSplitCount", "input");
+                    var splitInputBoxContainer = getDomOrCreateNew("InputSplitCountContainer");
                     if (!Dictionary_OfCalendarData[SubEvent.CalendarID].Rigid) {
-                        var splitInputBox = getDomOrCreateNew("InputSplitCount", "input");
                         splitInputBox.oninput = EditContainerData.RevealContainer;
                         splitInputBox.setAttribute("type", "Number");
                         splitInputBox.onkeydown = stopPropagationOfKeyDown;
                         splitInputBox.value = Dictionary_OfCalendarData[SubEvent.CalendarID].TotalNumberOfEvents;
                         var splitInputBoxLabel = getDomOrCreateNew("splitInputBoxLabel", "label");
                         splitInputBoxLabel.innerHTML = "Splits"
-                        var splitInputBoxContainer = getDomOrCreateNew("InputSplitCountContainer");
+                        
                         splitInputBoxContainer.appendChild(splitInputBoxLabel);
                         splitInputBoxContainer.appendChild(splitInputBox);
-                        splitAndNoteContainer.appendChild(splitInputBoxContainer)
-
+                        splitAndNoteContainer.appendChild(splitInputBoxContainer);
                         var CompletionMap = getDomOrCreateNew("CompletionContainer");
                         var CompletionMapDom = generateCompletionMap(SubEvent)
                         CompletionMap.appendChild(CompletionMapDom);
                         ContainerForExtraOptions.appendChild(CompletionMap)
+                    } else {
+                        splitInputBox.Dom.value = 1;
+                        splitInputBoxContainer.appendChild(splitInputBox);
+                        splitAndNoteContainer.appendChild(splitInputBoxContainer);
+                        $(splitInputBoxContainer.Dom).hide();
                     }
                     
 
