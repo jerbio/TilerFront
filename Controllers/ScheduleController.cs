@@ -18,6 +18,7 @@ using Newtonsoft.Json.Linq;
 using Microsoft.AspNet.Identity;
 using System.Data.Entity;
 using TilerCore;
+using Location = TilerElements.Location;
 
 namespace TilerFront.Controllers
 {
@@ -57,9 +58,9 @@ namespace TilerFront.Controllers
         }
 
 
-        async Task<PostBackData> getDataFromRestEnd(getScheduleModel myAuthorizedUser)
+        async Task<PostBackData> getDataFromRestEnd(getScheduleModel myAuthorizedUser, TimeLine TimelineForData = null)
         {
-            UserAccountDirect myUserAccount = await myAuthorizedUser.getUserAccountDirect(db);
+            UserAccount myUserAccount = await myAuthorizedUser.getUserAccount(db);
             HttpContext myCOntext = HttpContext.Current;
             await myUserAccount.Login();
             PostBackData returnPostBack;
@@ -67,10 +68,11 @@ namespace TilerFront.Controllers
             {
                 DateTimeOffset StartTime = new DateTimeOffset(myAuthorizedUser.StartRange * TimeSpan.TicksPerMillisecond, new TimeSpan()).AddYears(1969).Add(-myAuthorizedUser.getTImeSpan);
                 DateTimeOffset EndTime = new DateTimeOffset(myAuthorizedUser.EndRange * TimeSpan.TicksPerMillisecond, new TimeSpan()).AddYears(1969).Add(-myAuthorizedUser.getTImeSpan);
-                TimeLine TimelineForData = new TimeLine(StartTime.AddDays(-5), EndTime.AddDays(5));
+                TimelineForData = TimelineForData ?? new TimeLine(StartTime.AddDays(-90), EndTime.AddDays(90));
 
 
                 LogControl LogAccess = myUserAccount.ScheduleLogControl;
+                //LogAccess.deleteAllDatabaseData();
                 List<IndexedThirdPartyAuthentication> AllIndexedThirdParty = await getAllThirdPartyAuthentication(myUserAccount.UserID, db).ConfigureAwait(false);
 
                 List<GoogleTilerEventControl> AllGoogleTilerEvents = AllIndexedThirdParty.Select(obj => new GoogleTilerEventControl(obj, db)).ToList();
@@ -84,21 +86,21 @@ namespace TilerFront.Controllers
 
                 Task<ConcurrentBag<CalendarEvent>> GoogleCalEventsTask = GoogleTilerEventControl.getAllCalEvents(AllGoogleTilerEvents, TimelineForData);
 
-                Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location>> ProfileData = await LogAccess.getProfileInfo(TimelineForData);
+                Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location>> ProfileData = await LogAccess.getProfileInfo(TimelineForData, null, retrievalOption: DataRetrivalOption.UiAll);
 
                 IEnumerable<CalendarEvent> GoogleCalEvents = await GoogleCalEventsTask.ConfigureAwait(false);
 
                 ScheduleData = ScheduleData.Concat(ProfileData.Item1.Values.Where(obj => obj.isActive)).ToList();
 
                 ScheduleData = ScheduleData.Concat(GoogleCalEvents).ToList();
-                IEnumerable<CalendarEvent> NonRepeatingEvents = ScheduleData.Where(obj => !obj.RepetitionStatus);
+                IEnumerable<CalendarEvent> NonRepeatingEvents = ScheduleData.Where(obj => !obj.IsRepeat);
 
-                IList<UserSchedule.repeatedEventData> RepeatingEvents = ScheduleData.AsParallel().Where(obj => obj.RepetitionStatus).
+                IList<UserSchedule.repeatedEventData> RepeatingEvents = ScheduleData.AsParallel().Where(obj => obj.IsRepeat).
                     Select(obj => new UserSchedule.repeatedEventData
                     {
                         ID = obj.Calendar_EventID.ToString(),
-                        Latitude = obj.Location.XCoordinate,
-                        Longitude = obj.Location.YCoordinate,
+                        Latitude = obj.Location.Latitude,
+                        Longitude = obj.Location.Longitude,
                         RepeatAddress = obj.Location.Address,
                         RepeatAddressDescription = obj.Location.Description,
                         RepeatCalendarName = obj.getName.NameValue,
@@ -108,7 +110,6 @@ namespace TilerFront.Controllers
                         RepeatStartDate = obj.Start,
                         RepeatTotalDuration = obj.getActiveDuration
                     }).ToList();
-
 
                 UserSchedule currUserSchedule = new UserSchedule { NonRepeatCalendarEvent = NonRepeatingEvents.Select(obj => obj.ToCalEvent(TimelineForData)).ToArray(), RepeatCalendarEvent = RepeatingEvents };
 
@@ -139,7 +140,7 @@ namespace TilerFront.Controllers
         [Route("api/Schedule/DeletedSchedule")]
         public async Task<IHttpActionResult> GetDeletedSchedule([FromUri] getScheduleModel myAuthorizedUser)
         {
-            UserAccountDirect myUserAccount = await myAuthorizedUser.getUserAccountDirect(db);
+            UserAccount myUserAccount = await myAuthorizedUser.getUserAccount(db);
             HttpContext myCOntext = HttpContext.Current;
             await myUserAccount.Login();
             PostBackData returnPostBack;
@@ -153,22 +154,22 @@ namespace TilerFront.Controllers
                 LogControl LogAccess = myUserAccount.ScheduleLogControl;
                 List<CalendarEvent> ScheduleData = new List<CalendarEvent>();
 
-                Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location>> ProfileData = await LogAccess.getProfileInfo(TimelineForData);
+                Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location>> ProfileData = await LogAccess.getProfileInfo(TimelineForData, null);
 
                 ScheduleData = ScheduleData.Concat(ProfileData.Item1.Values).ToList();
 
-                IEnumerable<CalendarEvent> NonRepeatingEvents = ScheduleData.Where(obj => !obj.RepetitionStatus);
+                IEnumerable<CalendarEvent> NonRepeatingEvents = ScheduleData.Where(obj => !obj.IsRepeat);
 
 
 
 
                 //IEnumerable<CalendarEvent> RepeatingEvents = ScheduleData.Where(obj => obj.RepetitionStatus).SelectMany(obj => obj.Repeat.RecurringCalendarEvents);
-                IList<UserSchedule.repeatedEventData> RepeatingEvents = ScheduleData.AsParallel().Where(obj => obj.RepetitionStatus).
+                IList<UserSchedule.repeatedEventData> RepeatingEvents = ScheduleData.AsParallel().Where(obj => obj.IsRepeat).
                     Select(obj => new UserSchedule.repeatedEventData
                     {
                         ID = obj.Calendar_EventID.ToString(),
-                        Latitude = obj.Location.XCoordinate,
-                        Longitude = obj.Location.YCoordinate,
+                        Latitude = obj.Location.Latitude,
+                        Longitude = obj.Location.Longitude,
                         RepeatAddress = obj.Location.Address,
                         RepeatAddressDescription = obj.Location.Description,
                         RepeatCalendarName = obj.getName.NameValue,
@@ -197,8 +198,7 @@ namespace TilerFront.Controllers
         [Route("api/Schedule/Event/Pause")]
         public async Task<IHttpActionResult> PauseSchedule([FromBody]getEventModel myAuthorizedUser)
         {
-            //ApplicationDbContext db = new ApplicationDbContext();
-            UserAccountDirect myUser = await myAuthorizedUser.getUserAccountDirect(db);
+            UserAccount myUser = await myAuthorizedUser.getUserAccount(db);
             await myUser.Login();
 
             if (myUser.Status)
@@ -269,9 +269,7 @@ namespace TilerFront.Controllers
         [Route("api/Schedule/Event/Resume")]
         public async Task<IHttpActionResult> ResumeSchedule([FromBody]getEventModel myAuthorizedUser)
         {
-
-            //ApplicationDbContext db = new ApplicationDbContext();
-            UserAccountDirect myUser = await myAuthorizedUser.getUserAccountDirect(db);
+            UserAccount myUser = await myAuthorizedUser.getUserAccount(db);
             await myUser.Login();
             if (myUser.Status)
             {
@@ -446,7 +444,7 @@ namespace TilerFront.Controllers
         {
 
             AuthorizedUser myAuthorizedUser = UserData.User;
-            UserAccountDirect myUserAccount = await UserData.getUserAccountDirect(db);
+            UserAccount myUserAccount = await UserData.getUserAccount(db);
             await myUserAccount.Login();
             if (myUserAccount.Status)
             {
@@ -458,7 +456,7 @@ namespace TilerFront.Controllers
                 }
                 else
                 {
-                    fullTimeSpan = ProcrastinateDuration.TotalTimeSpan; ;
+                    fullTimeSpan = ProcrastinateDuration.TotalTimeSpan;
                 }
                 DB_Schedule MySchedule = new DB_Schedule(myUserAccount, myAuthorizedUser.getRefNow());
 
@@ -472,7 +470,7 @@ namespace TilerFront.Controllers
                 JObject json = JObject.FromObject(UserData);
                 activity.updateMiscelaneousInfo(json.ToString());
                 myUserAccount.ScheduleLogControl.updateUserActivty(activity);
-                await MySchedule.UpdateWithDifferentSchedule(ScheduleUpdateMessage.Item2);
+                await MySchedule.persistToDB();
                 PostBackData myPostData;
                 BusyTimeLine nextBusySchedule = MySchedule.NextActivity;
                 if (nextBusySchedule != null)
@@ -508,7 +506,7 @@ namespace TilerFront.Controllers
             AuthorizedUser myAuthorizedUser = UserData.User;
             TimeDuration ProcrastinateDuration = UserData.ProcrastinateDuration;
             TimeSpan fullTimeSpan = myAuthorizedUser.getTImeSpan;
-            UserAccountDirect myUser = await UserData.getUserAccountDirect(db);
+            UserAccount myUser = await UserData.getUserAccount(db);
             await myUser.Login();
 
             DateTimeOffset myNow = myAuthorizedUser.getRefNow();// myAuthorizedUser.getRefNow();
@@ -519,8 +517,8 @@ namespace TilerFront.Controllers
             myUser.ScheduleLogControl.updateUserActivty(activity);
             await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, UserData.UserID, db).ConfigureAwait(false);
 
-            Tuple<CustomErrors, Dictionary<string, CalendarEvent>> ScheduleUpdateMessage = MySchedule.ProcrastinateJustAnEvent(UserData.EventID, ProcrastinateDuration.TotalTimeSpan);
-            await MySchedule.UpdateWithDifferentSchedule(ScheduleUpdateMessage.Item2);
+            var ScheduleUpdateMessage = MySchedule.ProcrastinateJustAnEvent(UserData.EventID, ProcrastinateDuration.TotalTimeSpan);
+            await MySchedule.persistToDB();
             PostBackData myPostData = new PostBackData("\"Success\"", 0);
             TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
             scheduleChangeSocket.triggerRefreshData(myUser.getTilerUser());
@@ -538,7 +536,7 @@ namespace TilerFront.Controllers
         public async Task<IHttpActionResult> Shuffle([FromBody]ShuffleModel UserData)
         {
             AuthorizedUser myAuthorizedUser = UserData.User;
-            UserAccountDirect myUser = await UserData.getUserAccountDirect(db);
+            UserAccount myUser = await UserData.getUserAccount(db);
             await myUser.Login();
             if (myUser.Status)
             {
@@ -559,6 +557,12 @@ namespace TilerFront.Controllers
                 }
                 await MySchedule.FindMeSomethingToDo(location);
                 await MySchedule.WriteFullScheduleToLogAndOutlook().ConfigureAwait(false);
+
+                List<SubCalendarEvent> allSubEvents = MySchedule.getAllCalendarEvents().Where(calEvent => calEvent.isActive).SelectMany(calEvent => calEvent.ActiveSubEvents).ToList();
+                TimeLine timeLine = new TimeLine();
+                timeLine.AddBusySlots(allSubEvents.Select(subEvent => subEvent.ActiveSlot));
+                List<BlobSubCalendarEvent> interferringSubEvents = Utility.getConflictingEvents(allSubEvents);
+
                 BusyTimeLine nextBusySchedule = MySchedule.NextActivity;
                 PostBackData myPostData;
                 if (nextBusySchedule != null)
@@ -585,6 +589,66 @@ namespace TilerFront.Controllers
         }
 
 
+        [HttpPost]
+        [ResponseType(typeof(PostBackStruct))]
+        [Route("api/Schedule/DumpData")]
+        public async Task<IHttpActionResult> DumpData([FromBody]DumpModel UserData)
+        {
+            AuthorizedUser myAuthorizedUser = UserData.User;
+            UserAccount myUser = await UserData.getUserAccount(db);
+            await myUser.Login();
+            if (myUser.Status)
+            {
+                DateTimeOffset myNow = myNow = myAuthorizedUser.getRefNow();
+                DB_Schedule MySchedule = new DB_Schedule(myUser, myNow);
+                DB_UserActivity activity = new DB_UserActivity(myNow, UserActivity.ActivityType.Shuffle);
+                ScheduleDump scheduleDump = await MySchedule.CreateScheduleDump(notes: UserData.Notes).ConfigureAwait(false);
+                scheduleDump.Notes = UserData.Notes;
+                await MySchedule.CreateAndPersistScheduleDump(scheduleDump).ConfigureAwait(false);
+
+                ScheduleDump scheduleDumpCopy = new ScheduleDump()
+                {
+                    Id = scheduleDump.Id,
+                    Notes = scheduleDump.Notes,
+                    UserId = scheduleDump.UserId,
+                    ScheduleXmlString= "<?xml version=\"1.0\" encoding=\"utf-8\"?><ScheduleLog><LastIDCounter>1024</LastIDCounter><referenceDay>8:00 AM</referenceDay><EventSchedules></EventSchedules></ScheduleLog>"
+                };
+                scheduleDumpCopy.Id = scheduleDump.Id;
+                TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
+                scheduleChangeSocket.triggerRefreshData(myUser.getTilerUser());
+                PostBackData postBack = new PostBackData(scheduleDumpCopy, 0);
+                return Ok(postBack.getPostBack);
+            }
+            throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.Unauthorized)
+            {
+                ReasonPhrase = "Unauthorized access to tiler"
+            });
+        }
+
+        [HttpGet]
+        [ResponseType(typeof(PostBackStruct))]
+        [Route("api/Schedule/DumpData")]
+        public async Task<IHttpActionResult> getDumpData([FromUri]DumpModel UserData)
+        {
+            AuthorizedUser myAuthorizedUser = UserData.User;
+            UserAccount myUser = await UserData.getUserAccount(db);
+            await myUser.Login();
+            if (myUser.Status)
+            {
+                ScheduleDump retValue = await myUser.ScheduleLogControl.GetScheduleDump(UserData.Id).ConfigureAwait(false);
+                TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
+                scheduleChangeSocket.triggerRefreshData(myUser.getTilerUser());
+                PostBackData postBack = new PostBackData(retValue, 0);
+                return Ok(retValue.ScheduleXmlString);
+            }
+            throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.Unauthorized)
+            {
+                ReasonPhrase = "Unauthorized access to tiler"
+            });
+        }
+
+
+
         /// <summary>
         /// Marks an Event as complete.  Note this also triggers a readjust to the schedule
         /// </summary>
@@ -595,7 +659,7 @@ namespace TilerFront.Controllers
         [Route("api/Schedule/Event/Complete")]
         public async Task<IHttpActionResult> CompleteSubCalendarEvent([FromBody]getEventModel UserData)
         {
-            UserAccountDirect retrievedUser = await UserData.getUserAccountDirect(db);
+            UserAccount retrievedUser = await UserData.getUserAccount(db);
             await retrievedUser.Login();
             PostBackData retValue = new PostBackData("", 1);
             DB_UserActivity activity = new DB_UserActivity(UserData.getRefNow(), UserActivity.ActivityType.CompleteSingle);
@@ -648,7 +712,7 @@ namespace TilerFront.Controllers
         [Route("api/Schedule/Events/Complete")]
         public async Task<IHttpActionResult> CompleteSubCalendarEvents([FromBody]getEventModel UserData)
         {
-            UserAccountDirect myUser = await UserData.getUserAccountDirect(db);
+            UserAccount myUser = await UserData.getUserAccount(db);
             await myUser.Login();
             DateTimeOffset myNow = UserData.getRefNow();
             DB_Schedule MySchedule = new DB_Schedule(myUser, myNow);
@@ -681,7 +745,7 @@ namespace TilerFront.Controllers
         [Route("api/Schedule/Event/Now")]
         public async Task<IHttpActionResult> Now([FromBody]getEventModel myUser)
         {
-            UserAccountDirect retrievedUser = await myUser.getUserAccountDirect(db);// new UserAccountDirect(myUser.UserName, myUser.UserID);
+            UserAccount retrievedUser = await myUser.getUserAccount(db);// new UserAccountDirect(myUser.UserName, myUser.UserID);
             await retrievedUser.Login();
             PostBackData retValue;
             if (retrievedUser.Status)
@@ -698,8 +762,8 @@ namespace TilerFront.Controllers
 
                 await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, myUser.UserID, db).ConfigureAwait(false);
 
-                Tuple<CustomErrors, Dictionary<string, CalendarEvent>> retValue0 = MySchedule.SetEventAsNow(myUser.EventID, true);
-                await MySchedule.UpdateWithDifferentSchedule(retValue0.Item2);
+                var retValue0 = MySchedule.SetEventAsNow(myUser.EventID, true);
+                await MySchedule.persistToDB();
                 retValue = new PostBackData("\"Success\"", 0);
             }
             else
@@ -722,7 +786,7 @@ namespace TilerFront.Controllers
         [Route("api/Schedule/Undo")]
         public async Task<IHttpActionResult> Undo([FromBody]AuthorizedUser myUser)
         {
-            UserAccountDirect retrievedUser = await myUser.getUserAccountDirect(db);// new UserAccountDirect(myUser.UserName, myUser.UserID);
+            UserAccount retrievedUser = await myUser.getUserAccount(db);// new UserAccountDirect(myUser.UserName, myUser.UserID);
             await retrievedUser.Login();
             PostBackData retValue;
             if (retrievedUser.Status)
@@ -754,7 +818,7 @@ namespace TilerFront.Controllers
         [Route("api/Schedule/Event")]
         public async Task<IHttpActionResult> DeleteEvent([FromBody]getEventModel myUser)
         {
-            UserAccountDirect retrievedUser = await myUser.getUserAccountDirect(db);
+            UserAccount retrievedUser = await myUser.getUserAccount(db);
             await retrievedUser.Login();
             PostBackData retValue= new PostBackData("", 1);
             if (retrievedUser.Status)
@@ -825,7 +889,7 @@ namespace TilerFront.Controllers
         [Route("api/Schedule/Events")]
         public async Task<IHttpActionResult> DeleteEvents([FromBody]getEventModel myUser)
         {
-            UserAccountDirect retrievedUser = await myUser.getUserAccountDirect(db);
+            UserAccount retrievedUser = await myUser.getUserAccount(db);
             await retrievedUser.Login();
             PostBackData retValue;
             if (retrievedUser.Status)
@@ -880,33 +944,34 @@ namespace TilerFront.Controllers
             string Opacity = newEvent.Opacity;
             string ColorSelection = newEvent.ColorSelection;
             int Count = Convert.ToInt32(newEvent.Count??1.ToString()) ;
-            string DurationDays = newEvent.DurationDays; ;
-            string DurationHours = newEvent.DurationHours; ;
-            string DurationMins = newEvent.DurationMins; ;
-            string EndDay = newEvent.EndDay; ;
-            string EndHour = newEvent.EndHour; ;
-            string EndMins = newEvent.EndMins; ;
-            string EndMonth = newEvent.EndMonth; ;
-            string EndYear = newEvent.EndYear; ;
+            string DurationDays = newEvent.DurationDays;
+            string DurationHours = newEvent.DurationHours;
+            string DurationMins = newEvent.DurationMins;
+            string EndDay = newEvent.EndDay;
+            string EndHour = newEvent.EndHour;
+            string EndMins = newEvent.EndMins;
+            string EndMonth = newEvent.EndMonth;
+            string EndYear = newEvent.EndYear;
 
-            string LocationAddress = newEvent.LocationAddress; ;
-            string LocationTag = newEvent.LocationTag; ;
-            EventName Name = new EventName(newEvent.Name);
+            string LocationId = newEvent.LocationId;
+            string LocationAddress = newEvent.LocationAddress;
+            string LocationTag = newEvent.LocationTag;
+            EventName Name = new EventName(null, null, newEvent.Name);
 
-            string RepeatData = newEvent.RepeatData; ;
-            string RepeatEndDay = newEvent.RepeatEndDay; ;
-            string RepeatEndMonth = newEvent.RepeatEndMonth; ;
-            string RepeatEndYear = newEvent.RepeatEndYear; ;
-            string RepeatStartDay = newEvent.RepeatStartDay; ;
-            string RepeatStartMonth = newEvent.RepeatStartMonth; ;
-            string RepeatStartYear = newEvent.RepeatStartYear; ;
-            string RepeatType = newEvent.RepeatType; ;
-            string RepeatWeeklyData = newEvent.RepeatWeeklyData; ;
-            string Rigid = newEvent.Rigid; ;
-            string StartDay = newEvent.StartDay; ;
-            string StartHour = newEvent.StartHour; ;
-            string StartMins = newEvent.StartMins; ;
-            string StartMonth = newEvent.StartMonth; ;
+            string RepeatData = newEvent.RepeatData;
+            string RepeatEndDay = newEvent.RepeatEndDay;
+            string RepeatEndMonth = newEvent.RepeatEndMonth;
+            string RepeatEndYear = newEvent.RepeatEndYear;
+            string RepeatStartDay = newEvent.RepeatStartDay;
+            string RepeatStartMonth = newEvent.RepeatStartMonth;
+            string RepeatStartYear = newEvent.RepeatStartYear;
+            string RepeatType = newEvent.RepeatType;
+            string RepeatWeeklyData = newEvent.RepeatWeeklyData;
+            string Rigid = newEvent.Rigid;
+            string StartDay = newEvent.StartDay;
+            string StartHour = newEvent.StartHour;
+            string StartMins = newEvent.StartMins;
+            string StartMonth = newEvent.StartMonth;
             string StartYear = newEvent.StartYear;
             string RepeatFrequency = newEvent.RepeatFrequency;
             string TimeZone = newEvent.TimeZone;
@@ -917,6 +982,7 @@ namespace TilerFront.Controllers
 
             string StartTime = StartHour + ":" + StartMins;
             string EndTime = EndHour + ":" + EndMins;
+            UserAccount myUser = await newEvent.getUserAccount(db);
 
             DateTimeOffset StartDateEntry = new DateTimeOffset(Convert.ToInt32(StartYear), Convert.ToInt32(StartMonth), Convert.ToInt32(StartDay), 0, 0, 0, new TimeSpan());
             DateTimeOffset EndDateEntry = new DateTimeOffset(Convert.ToInt32(EndYear), Convert.ToInt32(EndMonth), Convert.ToInt32(EndDay), 0, 0, 0, new TimeSpan());
@@ -927,7 +993,12 @@ namespace TilerFront.Controllers
             bool RigidScheduleFlag = Convert.ToBoolean(Rigid);
             TilerElements.Location EventLocation = new TilerElements.Location(LocationAddress, LocationTag);
             EventLocation.Validate();
-
+            Location retrievedLocation =await db.Locations.SingleOrDefaultAsync(location => location.UserId == myUser.UserID && location.Description == EventLocation.Description).ConfigureAwait(false);
+            if(retrievedLocation != null)
+            {
+                retrievedLocation.update(EventLocation);
+                EventLocation = retrievedLocation;
+            }
             Repetition MyRepetition = new Repetition();
             DateTimeOffset RepeatStart = new DateTimeOffset();
             DateTimeOffset RepeatEnd = new DateTimeOffset();
@@ -1001,9 +1072,6 @@ namespace TilerFront.Controllers
                 EndDateEntry = MyRepetition.Range.End > EndDateEntry ? MyRepetition.Range.End : EndDateEntry;
             }
 
-            
-
-            UserAccountDirect myUser = await newEvent.getUserAccountDirect(db);
             PostBackData retValue;
             await myUser.Login();
             TilerUser tilerUser = myUser.getTilerUser();
@@ -1014,18 +1082,17 @@ namespace TilerFront.Controllers
                 DateTimeOffset myNow = newEvent.getRefNow();
                 CalendarEvent newCalendarEvent;
                 RestrictionProfile myRestrictionProfile = newEvent.getRestrictionProfile(myNow);
+                DB_Schedule MySchedule = new DB_Schedule(myUser, myNow);
                 if (myRestrictionProfile != null)
                 {
                     string TimeString = StartDateEntry.Date.ToShortDateString() + " " + StartTime;
-                    DateTimeOffset StartDateTime = DateTimeOffset.Parse(TimeString).UtcDateTime; ;
+                    DateTimeOffset StartDateTime = DateTimeOffset.Parse(TimeString).UtcDateTime;
                     StartDateTime = StartDateTime.Add(newEvent.getTImeSpan);
                     TimeString = EndDateEntry.Date.ToShortDateString() + " " + EndTime;
                     DateTimeOffset EndDateTime = DateTimeOffset.Parse(TimeString).UtcDateTime;
                     EndDateTime = EndDateTime.Add(newEvent.getTImeSpan);
 
-
-                    //RestrictionProfile myRestrictionProfile = CreateRestrictionProfile(newEvent.RestrictionStart, newEvent.RestrictionEnd, newEvent.isWorkWeek, newEvent.getTImeSpan);
-                    newCalendarEvent = new CalendarEventRestricted(tilerUser, new TilerUserGroup(), Name, StartDateTime, EndDateTime, myRestrictionProfile, EventDuration, MyRepetition, false, true, Count, RigidScheduleFlag, EventLocation, new TimeSpan(0, 15, 0), new TimeSpan(0, 15, 0),null, new EventDisplay(true, userColor, userColor.User < 1 ? 0 : 1), new MiscData(), TimeZone);
+                    newCalendarEvent = new CalendarEventRestricted(tilerUser, new TilerUserGroup(), Name, StartDateTime, EndDateTime, myRestrictionProfile, EventDuration, MyRepetition, false, true, Count, RigidScheduleFlag, EventLocation, new TimeSpan(0, 15, 0), new TimeSpan(0, 15, 0),null, MySchedule.Now, new EventDisplay(true, userColor, userColor.User < 1 ? 0 : 1), new MiscData(), TimeZone);
                 }
                 else
                 {
@@ -1034,25 +1101,28 @@ namespace TilerFront.Controllers
                     DateTimeOffset EndData = DateTimeOffset.Parse(EndTime + " " + EndDateEntry.Date.ToShortDateString()).UtcDateTime;
                     EndData = EndData.Add(newEvent.getTImeSpan);
                     if (RigidScheduleFlag) {
-                        newCalendarEvent = new RigidCalendarEvent(//EventID.GenerateCalendarEvent(), 
+                        newCalendarEvent = new RigidCalendarEvent(
                             Name, StartData, EndData, EventDuration,new TimeSpan(), new TimeSpan(), MyRepetition, EventLocation,  new EventDisplay(true, userColor, userColor.User < 1 ? 0 : 1), new MiscData(), true,false, tilerUser, new TilerUserGroup(), TimeZone, null);
                     }
                     else
                     {
-                        newCalendarEvent = new CalendarEvent(//EventID.GenerateCalendarEvent(), 
-                            Name, StartData, EndData, EventDuration, new TimeSpan(), new TimeSpan(), Count, MyRepetition, EventLocation, new EventDisplay(true, userColor, userColor.User < 1 ? 0 : 1), new MiscData(), null, new NowProfile(), true, false, tilerUser, new TilerUserGroup(), TimeZone, null);
+                        newCalendarEvent = new CalendarEvent(
+                            Name, StartData, EndData, EventDuration, new TimeSpan(), new TimeSpan(), Count, MyRepetition, EventLocation, new EventDisplay(true, userColor, userColor.User < 1 ? 0 : 1), new MiscData(), new Procrastination(new DateTimeOffset(), new TimeSpan()), new NowProfile(), true, false, tilerUser, new TilerUserGroup(), TimeZone, null);
                     }
-                    
-                    //newCalendarEvent = new CalendarEvent(Name, StartData, EndData, Count, "", EventDuration, MyRepetition, true, RigidScheduleFlag, "", true, EventLocation, true, new EventDisplay(true, userColor, userColor.User < 1 ? 0 : 1), new MiscData(), false);
                 }
+                Name.Creator_EventDB = newCalendarEvent.getCreator;
+                Name.AssociatedEvent = newCalendarEvent;
                 Task DoInitializeClassification=newCalendarEvent.InitializeClassification();
 
-                DB_Schedule MySchedule = new DB_Schedule(myUser, myNow);
+                
 
                 await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, myUser.UserID, db).ConfigureAwait(false);
 
                 await DoInitializeClassification;
-                newCalendarEvent.Repeat.PopulateRepetitionParameters(newCalendarEvent);
+                if (newCalendarEvent.IsRepeat)
+                {
+                    newCalendarEvent.Repeat.PopulateRepetitionParameters(newCalendarEvent);
+                }
                 string BeforemyName = newCalendarEvent.ToString(); //BColor + " -- " + Count + " -- " + DurationDays + " -- " + DurationHours + " -- " + DurationMins + " -- " + EndDay + " -- " + EndHour + " -- " + EndMins + " -- " + EndMonth + " -- " + EndYear + " -- " + GColor + " -- " + LocationAddress + " -- " + LocationTag + " -- " + Name + " -- " + RColor + " -- " + RepeatData + " -- " + RepeatEndDay + " -- " + RepeatEndMonth + " -- " + RepeatEndYear + " -- " + RepeatStartDay + " -- " + RepeatStartMonth + " -- " + RepeatStartYear + " -- " + RepeatType + " -- " + RepeatWeeklyData + " -- " + Rigid + " -- " + StartDay + " -- " + StartHour + " -- " + StartMins + " -- " + StartMonth + " -- " + StartYear;
                 string AftermyName = newCalendarEvent.ToString();
                 {
@@ -1061,8 +1131,7 @@ namespace TilerFront.Controllers
                     JObject json = JObject.FromObject(newEvent);
                     activity.updateMiscelaneousInfo(json.ToString());
                     myUser.ScheduleLogControl.updateUserActivty(activity);
-                    MySchedule.AddToSchedule(newCalendarEvent);
-                    await MySchedule.WriteFullScheduleToLogAndOutlook().ConfigureAwait(false);
+                    await MySchedule.AddToScheduleAndCommit(newCalendarEvent).ConfigureAwait(false);
                 }
                 
 
@@ -1096,7 +1165,7 @@ namespace TilerFront.Controllers
             try
             {
                 DateTimeOffset myNow = newEvent.getRefNow();
-                UserAccount RetrievedUser = await newEvent.getUserAccountDirect(db).ConfigureAwait(false);
+                UserAccount RetrievedUser = await newEvent.getUserAccount(db).ConfigureAwait(false);
                 DB_Schedule MySchedule = new DB_Schedule(RetrievedUser, myNow);
                 await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, RetrievedUser.UserID, db).ConfigureAwait(false);
                 await MySchedule.UpdateScheduleDueToExternalChanges().ConfigureAwait(false);
@@ -1127,35 +1196,35 @@ namespace TilerFront.Controllers
             string Opacity = newEvent.Opacity;
             string ColorSelection = newEvent.ColorSelection;
             int Count = Convert.ToInt32(newEvent.Count ?? 1.ToString());
-            string DurationDays = newEvent.DurationDays; ;
-            string DurationHours = newEvent.DurationHours; ;
-            string DurationMins = newEvent.DurationMins; ;
-            string EndDay = newEvent.EndDay; ;
-            string EndHour = newEvent.EndHour; ;
-            string EndMins = newEvent.EndMins; ;
-            string EndMonth = newEvent.EndMonth; ;
-            string EndYear = newEvent.EndYear; ;
+            string DurationDays = newEvent.DurationDays;
+            string DurationHours = newEvent.DurationHours;
+            string DurationMins = newEvent.DurationMins;
+            string EndDay = newEvent.EndDay;
+            string EndHour = newEvent.EndHour;
+            string EndMins = newEvent.EndMins;
+            string EndMonth = newEvent.EndMonth;
+            string EndYear = newEvent.EndYear;
 
             string LocationAddress = string.IsNullOrEmpty( newEvent.LocationAddress)?"": newEvent.LocationAddress;
             string LocationTag = LocationAddress = string.IsNullOrEmpty(newEvent.LocationTag) ? "" : newEvent.LocationTag;
-            EventName Name = new EventName(newEvent.Name);
+            EventName Name = new EventName(null, null, newEvent.Name);
 
-            string RepeatData = newEvent.RepeatData; ;
-            string RepeatEndDay = newEvent.RepeatEndDay; ;
-            string RepeatEndMonth = newEvent.RepeatEndMonth; ;
-            string RepeatEndYear = newEvent.RepeatEndYear; ;
-            string RepeatStartDay = newEvent.RepeatStartDay; ;
-            string RepeatStartMonth = newEvent.RepeatStartMonth; ;
-            string RepeatStartYear = newEvent.RepeatStartYear; ;
-            string RepeatType = newEvent.RepeatType; ;
-            string RepeatWeeklyData = newEvent.RepeatWeeklyData; ;
-            string Rigid = newEvent.Rigid; ;
-            string StartDay = newEvent.StartDay; ;
-            string StartHour = newEvent.StartHour; ;
-            string StartMins = newEvent.StartMins; ;
-            string StartMonth = newEvent.StartMonth; ;
-            string StartYear = newEvent.StartYear; ;
-            string RepeatFrequency = newEvent.RepeatFrequency; ;
+            string RepeatData = newEvent.RepeatData;
+            string RepeatEndDay = newEvent.RepeatEndDay;
+            string RepeatEndMonth = newEvent.RepeatEndMonth;
+            string RepeatEndYear = newEvent.RepeatEndYear;
+            string RepeatStartDay = newEvent.RepeatStartDay;
+            string RepeatStartMonth = newEvent.RepeatStartMonth;
+            string RepeatStartYear = newEvent.RepeatStartYear;
+            string RepeatType = newEvent.RepeatType;
+            string RepeatWeeklyData = newEvent.RepeatWeeklyData;
+            string Rigid = newEvent.Rigid;
+            string StartDay = newEvent.StartDay;
+            string StartHour = newEvent.StartHour;
+            string StartMins = newEvent.StartMins;
+            string StartMonth = newEvent.StartMonth;
+            string StartYear = newEvent.StartYear;
+            string RepeatFrequency = newEvent.RepeatFrequency;
             string TimeZone = newEvent.TimeZone;
 
 
@@ -1227,7 +1296,7 @@ namespace TilerFront.Controllers
                 EndDateEntry = RepeatEnd;
             }
 
-            UserAccountDirect myUser = await newEvent.getUserAccountDirect(db);
+            UserAccount myUser = await newEvent.getUserAccount(db);
             PostBackData retValue;
             await myUser.Login();
 
@@ -1246,12 +1315,12 @@ namespace TilerFront.Controllers
                 if (myRestrictionProfile!=null)
                 {
                     string TimeString = StartDateEntry.Date.ToShortDateString() + " " + StartTime;
-                    DateTimeOffset StartDateTime = DateTimeOffset.Parse(TimeString).UtcDateTime; ;
+                    DateTimeOffset StartDateTime = DateTimeOffset.Parse(TimeString).UtcDateTime;
                     StartDateTime = StartDateTime.Add(newEvent.getTImeSpan);
                     TimeString = EndDateEntry.Date.ToShortDateString() + " " + EndTime;
                     DateTimeOffset EndDateTime = DateTimeOffset.Parse(TimeString).UtcDateTime;
                     EndDateTime = EndDateTime.Add(newEvent.getTImeSpan);
-                    newCalendarEvent = new CalendarEventRestricted(tilerUser, new TilerUserGroup(), Name, StartDateTime, EndDateTime, myRestrictionProfile, EventDuration, MyRepetition, false, true, Count, RigidScheduleFlag, new TilerElements.Location(), new TimeSpan(0, 15, 0), new TimeSpan(0, 15, 0), null, new EventDisplay(true, userColor, userColor.User < 1 ? 0 : 1), new MiscData());
+                    newCalendarEvent = new CalendarEventRestricted(tilerUser, new TilerUserGroup(), Name, StartDateTime, EndDateTime, myRestrictionProfile, EventDuration, MyRepetition, false, true, Count, RigidScheduleFlag, new TilerElements.Location(), new TimeSpan(0, 15, 0), new TimeSpan(0, 15, 0), null, MySchedule.Now, new EventDisplay(true, userColor, userColor.User < 1 ? 0 : 1), new MiscData());
                 }
                 else
                 {
@@ -1270,9 +1339,13 @@ namespace TilerFront.Controllers
                             Name, StartData, EndData, EventDuration, new TimeSpan(), new TimeSpan(), Count, MyRepetition, EventLocation, new EventDisplay(true, userColor, userColor.User < 1 ? 0 : 1), new MiscData(), null, new NowProfile(), true, false, tilerUser, new TilerUserGroup(), TimeZone, null);
                     }
                 }
-
-
-                newCalendarEvent.Repeat.PopulateRepetitionParameters(newCalendarEvent);
+                Name.Creator_EventDB = newCalendarEvent.getCreator;
+                Name.AssociatedEvent = newCalendarEvent;
+                if(newCalendarEvent.IsRepeat)
+                {
+                    newCalendarEvent.Repeat.PopulateRepetitionParameters(newCalendarEvent);
+                }
+                
                 string BeforemyName = newCalendarEvent.ToString(); //BColor + " -- " + Count + " -- " + DurationDays + " -- " + DurationHours + " -- " + DurationMins + " -- " + EndDay + " -- " + EndHour + " -- " + EndMins + " -- " + EndMonth + " -- " + EndYear + " -- " + GColor + " -- " + LocationAddress + " -- " + LocationTag + " -- " + Name + " -- " + RColor + " -- " + RepeatData + " -- " + RepeatEndDay + " -- " + RepeatEndMonth + " -- " + RepeatEndYear + " -- " + RepeatStartDay + " -- " + RepeatStartMonth + " -- " + RepeatStartYear + " -- " + RepeatType + " -- " + RepeatWeeklyData + " -- " + Rigid + " -- " + StartDay + " -- " + StartHour + " -- " + StartMins + " -- " + StartMonth + " -- " + StartYear;
                 string AftermyName = newCalendarEvent.ToString();
 

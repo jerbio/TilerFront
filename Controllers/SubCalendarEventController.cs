@@ -24,7 +24,7 @@ namespace TilerFront.Controllers
         [Route("api/SubCalendarEvent/Update")]
         public async Task<IHttpActionResult> UpdateCalEvent([FromBody]EditSubCalEventModel myUser)
         {
-            UserAccountDirect retrievedUser = await myUser.getUserAccountDirect(db); //new UserAccountDirect(myUser.UserName, myUser.UserID);
+            UserAccount retrievedUser = await myUser.getUserAccount(db); //new UserAccountDirect(myUser.UserName, myUser.UserID);
             await retrievedUser.Login();
             PostBackData retValue = new PostBackData("", 1);
             if (retrievedUser.Status)
@@ -72,16 +72,26 @@ namespace TilerFront.Controllers
                             DateTimeOffset Deadline = TilerElementExtension.JSStartTime.AddMilliseconds(LongDeadline);
                             Deadline = Deadline.Add(myUser.getTImeSpan);
                             int SplitCount = (int)myUser.Split;
-                            Tuple<CustomErrors, Dictionary<string, CalendarEvent>> ScheduleUpdateMessage = NewSchedule.BundleChangeUpdate(myUser.EventID,  new EventName(myUser.EventName), newStart, newEnd, Begin, Deadline, SplitCount, myUser.EscapedNotes);
-                            DB_UserActivity activity = new DB_UserActivity(myNow, UserActivity.ActivityType.InternalUpdate, new List<String>() { myUser.EventID });
-                            retrievedUser.ScheduleLogControl.updateUserActivty(activity);
-                            await NewSchedule.UpdateWithDifferentSchedule(ScheduleUpdateMessage.Item2).ConfigureAwait(false);
-                            SubCalendarEvent subEvent = NewSchedule.getSubCalendarEvent(myUser.EventID);
-                            CalendarEvent calendarEvent = NewSchedule.getCalendarEvent(myUser.EventID);
-                            SubCalEvent subCalEvent =  subEvent.ToSubCalEvent(calendarEvent);
-                            JObject retSubEvent = new JObject();
-                            retSubEvent.Add("subEvent", JObject.FromObject(subCalEvent));
-                            retValue = new PostBackData(retSubEvent, 0);
+                            if(SplitCount >= 1)
+                            {
+                                SubCalendarEvent subEventedited = NewSchedule.getSubCalendarEvent(myUser.EventID);
+                                Tuple<CustomErrors, Dictionary<string, CalendarEvent>> ScheduleUpdateMessage = NewSchedule.BundleChangeUpdate(myUser.EventID, new EventName(retrievedUser.getTilerUser(), subEventedited, myUser.EventName), newStart, newEnd, Begin, Deadline, SplitCount, myUser.EscapedNotes);
+                                DB_UserActivity activity = new DB_UserActivity(myNow, UserActivity.ActivityType.InternalUpdate, new List<String>() { myUser.EventID });
+                                retrievedUser.ScheduleLogControl.updateUserActivty(activity);
+                                await NewSchedule.persistToDB().ConfigureAwait(false);
+                                EventID eventId = new EventID(myUser.EventID);
+                                CalendarEvent calendarEvent = await retrievedUser.ScheduleLogControl.getCalendarEventWithID(eventId).ConfigureAwait(false);
+                                SubCalendarEvent subEvent = calendarEvent.ActiveSubEvents.FirstOrDefault();
+                                SubCalEvent subCalEvent = subEvent.ToSubCalEvent(calendarEvent);
+                                JObject retSubEvent = new JObject();
+                                retSubEvent.Add("subEvent", JObject.FromObject(subCalEvent));
+                                retValue = new PostBackData(retSubEvent, 0);
+                            } else
+                            {
+                                CustomErrors error = new CustomErrors(CustomErrors.Errors.TilerConfig_Zero_SplitCount);
+                                retValue = new PostBackData(error);
+                            }
+                            
                         }
                         break;
                     default:

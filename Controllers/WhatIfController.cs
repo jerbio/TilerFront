@@ -22,7 +22,7 @@ namespace TilerFront.Controllers
         public async Task<IHttpActionResult> pushed([FromBody]WhatIfModel UserData)
         {
             AuthorizedUser myAuthorizedUser = UserData.User;
-            UserAccountDirect myUserAccount = await UserData.getUserAccountDirect(db);
+            UserAccount myUserAccount = await UserData.getUserAccount(db);
             await myUserAccount.Login();
             PostBackData returnPostBack;
             if (myUserAccount.Status)
@@ -53,7 +53,7 @@ namespace TilerFront.Controllers
         public async Task<IHttpActionResult> pushedNext([FromBody]WhatIfModel UserData)
         {
             AuthorizedUser myAuthorizedUser = UserData.User;
-            UserAccountDirect myUserAccount = await UserData.getUserAccountDirect(db);
+            UserAccount myUserAccount = await UserData.getUserAccount(db);
             await myUserAccount.Login();
             PostBackData returnPostBack;
             if (myUserAccount.Status)

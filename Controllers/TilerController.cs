@@ -24,12 +24,18 @@ namespace TilerFront
     /// </summary>
     public class TilerController : Controller
     {
-        protected ApplicationDbContext db = new ApplicationDbContext();
+        protected ApplicationDbContext dbContext;
+        protected TilerController(): base ()
+        {
+            dbContext = new ApplicationDbContext();
+            dbContext.Database.Log = s => System.Diagnostics.Debug.WriteLine(s);
+        }
+        
         protected async Task dbSaveChangesAsync()
         {
             try
             {
-                await db.SaveChangesAsync();
+                await dbContext.SaveChangesAsync();
             }
             catch (DbEntityValidationException e)
             {
@@ -57,7 +63,7 @@ namespace TilerFront
         /// <param name="db">The database context for accessing db</param>
         /// <param name="user">The referemce tiler user</param>
         /// <returns></returns>
-        public static async Task saveLatestChange(ApplicationDbContext db, TilerUser user)
+        public static async Task saveLatestChange(TilerDbContext db, TilerUser user)
         {
             TilerUser retrievedUser = await ((db.Users) as DbSet<TilerUser>) .FindAsync(user.Id).ConfigureAwait(false);
             if(user.ClearAllId != retrievedUser.ClearAllId)
@@ -74,7 +80,7 @@ namespace TilerFront
                     db.Entry(retrievedUser).State = EntityState.Added;
                 }
                 db.Entry(retrievedUser).State = EntityState.Modified;
-                TilerController.dbSaveChanges(db);
+                TilerController.dbSaveChanges(db as ApplicationDbContext);
             }
 
             if(waitForDbSave != null)

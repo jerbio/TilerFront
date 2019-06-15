@@ -72,6 +72,11 @@ namespace TilerFront.Models
         /// </summary>
         public string LocationAddress { get; set; }
         /// <summary>
+        /// Should be populated when the location is from a cache
+        /// </summary>
+        public string LocationId { get; set; }
+
+        /// <summary>
         /// Prefereed Nick name for location. If Nick name already exists, it overwrites previous full address & long lat with new nick name
         /// </summary>
         public string LocationTag { get; set; }

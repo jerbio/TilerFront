@@ -31,25 +31,34 @@ namespace TilerFront.Models
             return refNow;
         }
 
-        async public Task<UserAccountDirect> getUserAccountDirect(ApplicationDbContext db)
+        async virtual public Task<UserAccount> getUserAccount(TilerDbContext db=null)
         {
-            return new UserAccountDirect(UserID, db);
-        }
-
-        async public Task<UserAccountDebug> getUserAccountDebug(bool Passive = true)
-        {
-            Controllers.UserController myUserController = new Controllers.UserController();
-            TilerUser User;
-
-            if (Passive)
+            if (db != null)
             {
-                User = new TilerUser() { UserName = UserName, Id = UserID, FullName = "" };
+                return new UserAccountDirect(UserID, db);
             }
             else
             {
-                User = await myUserController.GetUser(UserID, UserName);
+                TilerUser User = new TilerUser() { UserName = UserName, Id = UserID};
+                return new UserAccountXml(User);
             }
-            return new UserAccountDebug(User);
+            
         }
+
+        //async public Task<UserAccountDebug> getUserAccountDebug(bool Passive = true)
+        //{
+        //    Controllers.UserController myUserController = new Controllers.UserController();
+        //    TilerUser User;
+        //    ApplicationDbContext db = new ApplicationDbContext();
+        //    if (Passive)
+        //    {
+        //        User = new TilerUser() { UserName = UserName, Id = UserID, FullName = "" };
+        //    }
+        //    else
+        //    {
+        //        User = await myUserController.GetUser(UserID, UserName);
+        //    }
+        //    return new UserAccountDebug(User);
+        //}
     }
 }

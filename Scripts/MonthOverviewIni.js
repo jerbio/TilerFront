@@ -4098,23 +4098,28 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                     var ContainerForExtraOptions = getDomOrCreateNew("ExtraOptionsContainer")
                     ContainerForExtraOptions.appendChild(splitAndNoteContainer)
                     $(splitAndNoteContainer).addClass("SubEventInformationContainer");
+                    var splitInputBox = getDomOrCreateNew("InputSplitCount", "input");
+                    var splitInputBoxContainer = getDomOrCreateNew("InputSplitCountContainer");
                     if (!Dictionary_OfCalendarData[SubEvent.CalendarID].Rigid) {
-                        var splitInputBox = getDomOrCreateNew("InputSplitCount", "input");
                         splitInputBox.oninput = EditContainerData.RevealContainer;
                         splitInputBox.setAttribute("type", "Number");
                         splitInputBox.onkeydown = stopPropagationOfKeyDown;
                         splitInputBox.value = Dictionary_OfCalendarData[SubEvent.CalendarID].TotalNumberOfEvents;
                         var splitInputBoxLabel = getDomOrCreateNew("splitInputBoxLabel", "label");
                         splitInputBoxLabel.innerHTML = "Splits"
-                        var splitInputBoxContainer = getDomOrCreateNew("InputSplitCountContainer");
+                        
                         splitInputBoxContainer.appendChild(splitInputBoxLabel);
                         splitInputBoxContainer.appendChild(splitInputBox);
-                        splitAndNoteContainer.appendChild(splitInputBoxContainer)
-
+                        splitAndNoteContainer.appendChild(splitInputBoxContainer);
                         var CompletionMap = getDomOrCreateNew("CompletionContainer");
                         var CompletionMapDom = generateCompletionMap(SubEvent)
                         CompletionMap.appendChild(CompletionMapDom);
                         ContainerForExtraOptions.appendChild(CompletionMap)
+                    } else {
+                        splitInputBox.Dom.value = 1;
+                        splitInputBoxContainer.appendChild(splitInputBox);
+                        splitAndNoteContainer.appendChild(splitInputBoxContainer);
+                        $(splitInputBoxContainer.Dom).hide();
                     }
                     
 
@@ -4218,14 +4223,18 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                                 //exitSelectedEventScreen();
                             }
                             else {
-                                alert("error detected with marking as complete");
+                                var NewMessage = myContainer.Error && myContainer.Error.code && myContainer.Error.Message ? myContainer.Error.Message : "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
+                                var ExitAfter = {
+                                    ExitNow: true, Delay: 5000
+                                };
+                                HandleNEwPage.UpdateMessage(NewMessage, ExitAfter, exit);
                             }
 
                         },
                         error: function (err) {
                             var myError = err;
                             var step = "err";
-                            var NewMessage = "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
+                            var NewMessage = err.Error && err.Error.code && err.Error.Message ? err.Error.Message : "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
                             var ExitAfter = {
                                 ExitNow: true, Delay: 1000
                             };

@@ -14,7 +14,7 @@ namespace TilerFront
             OldLog = HttpContext.Current.Server.MapPath("~\\OldLogs\\");
             string LogLocation = HttpContext.Current.Server.MapPath("~\\WagTapCalLogs\\");//initializes the log location\
             string BigDataocation = HttpContext.Current.Server.MapPath("~\\BigDataLogs\\");//initializes the log location
-            TilerFront.LogControl.UpdateLogLocation(LogLocation);
+
             TilerFront.LogControl.UpdateBigDataLogLocation(BigDataocation);
 
             string apiKey = ConfigurationManager.AppSettings["googleMapsApiKey"];
@@ -54,6 +54,10 @@ namespace TilerFront
 
             bundles.Add(new StyleBundle("~/Content/RegistrationJS").Include(
                     "~/Scripts/RegisterIni.js"
+                ));
+
+            bundles.Add(new StyleBundle("~/Content/ManagePageJS").Include(
+                    "~/Scripts/ManageController.js"
                 ));
 
             bundles.Add(new StyleBundle("~/Content/RegistrationCss").Include(

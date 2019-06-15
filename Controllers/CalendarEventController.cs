@@ -30,9 +30,9 @@ namespace TilerFront.Controllers
         [ResponseType(typeof(PostBackStruct))]
         public async Task<IHttpActionResult> GetCalEvent(string id,[FromUri]AuthorizedUser myUser )
         {
-            UserAccountDirect retrievedUser = await myUser.getUserAccountDirect(db);
+            UserAccount retrievedUser = await myUser.getUserAccount(db);
             await retrievedUser.Login();
-            TilerElements.CalendarEvent retrievedCalendarEvent = retrievedUser.ScheduleLogControl.getCalendarEventWithID(id);
+            TilerElements.CalendarEvent retrievedCalendarEvent = await retrievedUser.ScheduleLogControl.getCalendarEventWithID(id);
             PostBackData retValue = new PostBackData(retrievedCalendarEvent.ToCalEvent(), 0);
 
 
@@ -51,16 +51,24 @@ namespace TilerFront.Controllers
         [Route("api/CalendarEvent/Name")]
         public async Task<IHttpActionResult> CalEventName([FromUri]NameSearchModel myUser)
         {
-            UserAccountDirect retrievedUser = await myUser.getUserAccountDirect(db);
+            UserAccount retrievedUser = await myUser.getUserAccount(db);
             await retrievedUser.Login();
             string phrase = myUser.Data;
 
             PostBackData retValue = new PostBackData("", 4);
             if (retrievedUser.Status)
             {
-                long myNow = (long)(myUser.getRefNow() - TilerElementExtension.JSStartTime).TotalMilliseconds; ;
-                IEnumerable<CalendarEvent> retrievedCalendarEvents = retrievedUser.ScheduleLogControl.getCalendarEventWithName(phrase).Where(obj => obj.isActive);
-                retValue = new PostBackData(retrievedCalendarEvents.OrderByDescending(obj => obj.TimeCreated).ThenByDescending(obj=>obj.getId).Select(obj => obj.ToCalEvent()).OrderBy(obj => Math.Abs(myNow - obj.EndDate)).ToList(), 0);
+                long myNow = (long)(DateTimeOffset.UtcNow - TilerElementExtension.JSStartTime).TotalMilliseconds;
+                IEnumerable<CalendarEvent> retrievedCalendarEvents = (await retrievedUser.ScheduleLogControl.getCalendarEventWithName(phrase));
+                    //.Where(obj => obj.isActive);
+                var allCalEvent = retrievedCalendarEvents
+                    .ToList();
+                retValue = new PostBackData(
+                    allCalEvent
+                    .OrderByDescending(obj => obj.TimeCreated)
+                    .ThenByDescending(obj => obj.getId)
+                    .Select(obj => obj.ToCalEvent(includeSubevents: false))
+                    .OrderBy(obj => Math.Abs(myNow - obj.EndDate)).ToList(), 0);
             }
             
                 
@@ -68,59 +76,6 @@ namespace TilerFront.Controllers
             return Ok(retValue.getPostBack);
         }
 
-
-        /*
-        // POST api/CalendarEvent
-        [ResponseType(typeof(CalEvent))]
-        public async Task<IHttpActionResult> PostCalEvent([FromBody]CalEvent calevent)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            db.CalEvents.Add(calevent);
-
-            try
-            {
-                await db.SaveChangesAsync();
-            }
-            catch (DbUpdateException)
-            {
-                if (CalEventExists(calevent.ID))
-                {
-                    return Conflict();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return CreatedAtRoute("DefaultApi", new { id = calevent.ID }, calevent);
-        }
-        
-        // DELETE api/CalendarEvent/5
-        [ResponseType(typeof(PostBackStruct))]
-        public async Task<IHttpActionResult> DeleteCalEvent(string id, bool readjust, [FromBody]AuthorizedUser myUser )
-        {
-            UserAccountDirect retrievedUser = await myUser.getUserAccount();// new UserAccount(myUser.UserName, myUser.UserID);
-            await retrievedUser.Login();
-            PostBackData retValue ;
-            if(retrievedUser.Status)
-            {
-                My24HourTimerWPF.Schedule NewSchedule = new My24HourTimerWPF.Schedule(retrievedUser, new DateTime(myUser.getRefNow().Ticks));
-                CustomErrors messageReturned= NewSchedule.deleteCalendarEventAndReadjust(id);
-                retValue = new PostBackData(messageReturned, messageReturned.Code);
-            }
-            else
-            {
-                retValue = new PostBackData("",1);
-            }
-
-            return Ok(retValue.getPostBack);
-        }
-        */
         /// <summary>
         /// Deletes a calendar event.
         /// </summary>
@@ -131,7 +86,7 @@ namespace TilerFront.Controllers
         [Route("api/CalendarEvent")]
         public async Task<IHttpActionResult> DeleteCalEvent([FromBody]getEventModel myUser)
         {
-            UserAccountDirect retrievedUser = await myUser.getUserAccountDirect(db);// new UserAccount(myUser.UserName, myUser.UserID);
+            UserAccount retrievedUser = await myUser.getUserAccount(db);// new UserAccount(myUser.UserName, myUser.UserID);
             await retrievedUser.Login();
             PostBackData retValue;
             if (retrievedUser.Status)
@@ -176,7 +131,7 @@ namespace TilerFront.Controllers
         [Route("api/CalendarEvent/Complete")]
         public async Task<IHttpActionResult> CompleteCalEvent([FromBody]getEventModel myUser)
         {
-            UserAccountDirect retrievedUser = await myUser.getUserAccountDirect(db);// new UserAccount(myUser.UserName, myUser.UserID);
+            UserAccount retrievedUser = await myUser.getUserAccount(db);// new UserAccount(myUser.UserName, myUser.UserID);
             await retrievedUser.Login();
             PostBackData retValue;
             if (retrievedUser.Status)
@@ -209,9 +164,8 @@ namespace TilerFront.Controllers
         [Route("api/CalendarEvent/Now")]
         public async Task<IHttpActionResult> Now( [FromBody]NowEventModel nowEvent)
         {
-            UserAccountDirect retrievedUser = await nowEvent.getUserAccountDirect(db); //new UserAccountDirect(myUser.UserName, myUser.UserID);
+            UserAccount retrievedUser = await nowEvent.getUserAccount(db); //new UserAccountDirect(myUser.UserName, myUser.UserID);
             await retrievedUser.Login();
-            DateTime myDate;
             PostBackData retValue;
             if (retrievedUser.Status)
             {
@@ -219,12 +173,12 @@ namespace TilerFront.Controllers
 
                 await ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(NewSchedule, nowEvent.UserID, db).ConfigureAwait(false);
 
-                Tuple<CustomErrors, Dictionary<string, CalendarEvent>> ScheduleUpdateMessage = NewSchedule.SetCalendarEventAsNow(nowEvent.ID);
+                var ScheduleUpdateMessage = NewSchedule.SetCalendarEventAsNow(nowEvent.ID);
                 DB_UserActivity activity = new DB_UserActivity(nowEvent.getRefNow(), UserActivity.ActivityType.SetAsNowCalendarEvent, new List<String>() { nowEvent.ID });
                 JObject json = JObject.FromObject(nowEvent);
                 activity.updateMiscelaneousInfo(json.ToString());
                 retrievedUser.ScheduleLogControl.updateUserActivty(activity);
-                await NewSchedule.UpdateWithDifferentSchedule(ScheduleUpdateMessage.Item2).ConfigureAwait(false);
+                await NewSchedule.persistToDB().ConfigureAwait(false);
                 retValue = new PostBackData(ScheduleUpdateMessage.Item1);
             }
             else
@@ -246,7 +200,7 @@ namespace TilerFront.Controllers
         [Route("api/CalendarEvent/Update")]
         public async Task<IHttpActionResult> UpdateCalEvent([FromBody]EditCalEventModel myUser)    
         {
-            UserAccountDirect retrievedUser = await myUser.getUserAccountDirect(db); //new UserAccountDirect(myUser.UserName, myUser.UserID);
+            UserAccount retrievedUser = await myUser.getUserAccount(db); //new UserAccountDirect(myUser.UserName, myUser.UserID);
             await retrievedUser.Login();
             PostBackData retValue = new PostBackData("", 1);
 
@@ -283,14 +237,15 @@ namespace TilerFront.Controllers
                             newEnd = newEnd.Add(myUser.getTImeSpan);
                             int SplitCount = (int)myUser.Split;
                             TimeSpan SpanPerSplit = TimeSpan.FromMilliseconds(myUser.Duration);
-                            Tuple<CustomErrors, Dictionary<string, CalendarEvent>> ScheduleUpdateMessage = NewSchedule.BundleChangeUpdate(myUser.EventID, new EventName(myUser.EventName), newStart, newEnd, SplitCount, myUser.EscapedNotes);
+                            CalendarEvent calEvent = NewSchedule.getCalendarEvent(myUser.EventID);
+                            Tuple<CustomErrors, Dictionary<string, CalendarEvent>> ScheduleUpdateMessage = NewSchedule.BundleChangeUpdate(myUser.EventID, new EventName(retrievedUser.getTilerUser(), calEvent, myUser.EventName), newStart, newEnd, SplitCount, myUser.EscapedNotes);
                             DB_UserActivity activity = new DB_UserActivity(myUser.getRefNow(), UserActivity.ActivityType.InternalUpdateCalendarEvent, new List<String>() { myUser.EventID });
                             JObject json = JObject.FromObject(myUser);
                             activity.updateMiscelaneousInfo(json.ToString());
 
                             retrievedUser.ScheduleLogControl.updateUserActivty(activity);
 
-                            await NewSchedule.UpdateWithDifferentSchedule(ScheduleUpdateMessage.Item2).ConfigureAwait(false);
+                            await NewSchedule.persistToDB().ConfigureAwait(false);
                             retValue = new PostBackData(ScheduleUpdateMessage.Item1);
                         }
                         break;
