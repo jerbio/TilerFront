@@ -21,6 +21,7 @@ namespace TilerFront
         protected string Name;
         protected string Username;
         string Password;
+        protected TilerDbContext _Database;
 
         public UserAccount()
         {
@@ -48,16 +49,16 @@ namespace TilerFront
         }
 
 
-        virtual protected Dictionary<string, CalendarEvent>  getAllCalendarElements(TimeLine RangeOfLookup, string desiredDirectory="")
+        virtual protected async Task<Dictionary<string, CalendarEvent>>  getAllCalendarElements(TimeLine RangeOfLookup, ReferenceNow now)
         {
             Dictionary<string, CalendarEvent> retValue=new Dictionary<string,CalendarEvent>();
-            retValue = UserLog.getAllCalendarFromXml(RangeOfLookup);
+            retValue = await UserLog.getAllCalendarFromXml(RangeOfLookup, now).ConfigureAwait(false);
             return retValue;
         }
 
-        virtual async protected Task<DateTimeOffset> getDayReferenceTime(string desiredDirectory = "")
+        virtual async protected Task<DateTimeOffset> getDayReferenceTime()
         {
-            DateTimeOffset retValue = await  UserLog.getDayReferenceTime(desiredDirectory);
+            DateTimeOffset retValue = UserLog.getDayReferenceTime();
             return retValue;
         }
 
@@ -67,7 +68,7 @@ namespace TilerFront
             
             if (UserLog.Status)
             {
-                UserLog.deleteAllCalendarEvets();
+                UserLog.deleteAllCalendarEvents();
                 retValue = true;
             }
             else
@@ -77,48 +78,28 @@ namespace TilerFront
             return retValue;
         }
 
-        virtual async public Task<CustomErrors> DeleteLog()
-        {
-            return await UserLog.DeleteLog();
-        }
-
         virtual public void UpdateReferenceDayTime(DateTimeOffset referenceTime)
         {
             UserLog.UpdateReferenceDayInXMLLog(referenceTime);
         }
-        /*
-        public void CommitEventToLog(CalendarEvent MyCalEvent)
+
+        virtual async public Task Commit(IEnumerable<CalendarEvent> AllEvents, CalendarEvent calendarEvent, String LatestID, ReferenceNow now)
         {
-            UserLog.WriteToLog(MyCalEvent);
-        }
-        */
-        virtual async public Task  CommitEventToLogOld(IEnumerable<CalendarEvent> AllEvents,string LatestID,string LogFile="")
-        {
-            await UserLog.WriteToLogOld(AllEvents, LatestID, LogFile).ConfigureAwait(false);
+            await UserLog.Commit(AllEvents, calendarEvent, LatestID, now).ConfigureAwait(false);
         }
 
-        
-#if ForceReadFromXml
-#else
-        async public Task batchMigrateXML()
+        virtual async public Task DiscardChanges()
         {
-            await UserLog.BatchMigrateXML();
+            await UserLog.DiscardChanges().ConfigureAwait(false);
         }
-        /// <summary>
-        /// This inserts a new entry cassandra into cassandra and updates the search engines. Use this when writing data to cassandra db.
-        /// </summary>
-        /// <param name="newCalEvent"></param>
-        /// <returns></returns>
 
-        virtual async public Task AddNewEventToLog(CalendarEvent newCalEvent)
+        virtual public LogControl ScheduleLogControl
         {
-            if(LogControl.useCassandra)
+            get
             {
-                await UserLog.AddNewEventToCassandra(newCalEvent);
+                return UserLog;
             }
         }
-#endif
-
 
 
         #region properties
@@ -167,14 +148,6 @@ namespace TilerFront
             }
         }
 
-        public string getFullLogDir
-        {
-            get 
-            {
-                return UserLog.getFullLogDir;
-            }
-        }
-
         virtual public LogControl ScheduleData
         {
             get
@@ -183,7 +156,27 @@ namespace TilerFront
             }
         }
 
-#endregion 
+        virtual protected TilerDbContext Database
+        {
+            get
+            {
+                return _Database;
+            }
+        }
+
+        public ReferenceNow Now
+        {
+            get
+            {
+                return UserLog.Now;
+            }
+            set
+            {
+                UserLog.Now = value;
+            }
+        }
+
+        #endregion
 
     }
 }

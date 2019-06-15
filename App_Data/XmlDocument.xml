@@ -920,12 +920,30 @@
             Tiler controller that provides custom tiler functionality
             </summary>
         </member>
-        <member name="M:TilerFront.TilerController.saveLatestChange(TilerFront.Models.ApplicationDbContext,TilerElements.TilerUser)">
+        <member name="M:TilerFront.TilerController.saveLatestChange(TilerElements.TilerDbContext,TilerElements.TilerUser)">
             <summary>
             This is to be called when you need save the last change to the database
             </summary>
             <param name="db">The database context for accessing db</param>
             <param name="user">The referemce tiler user</param>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.DB_Schedule.CleanUpForUI(System.Collections.Generic.IEnumerable{TilerElements.CalendarEvent})">
+            <summary>
+            Function rearranges the sub events by Id to be associated with the order of time
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.DB_Schedule.CreateScheduleDump(TilerElements.ReferenceNow,System.String)">
+            <summary>
+            Function creates a schedule dump that is equivalent to schedule from RDBMS
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.DB_Schedule.CreateAndPersistScheduleDump(TilerElements.ScheduleDump,TilerElements.ReferenceNow)">
+            <summary>
+            Creates a schedule dump and then persists it to the DB
+            </summary>
             <returns></returns>
         </member>
         <member name="P:TilerFront.Models.AuthorizedUser.TimeZone">
@@ -1092,6 +1110,11 @@
             Full Address for new event. Fully described in default format. e.g 1234 stret apt 56 Kingston, CO 78901
             </summary>
         </member>
+        <member name="P:TilerFront.Models.UnregisteredEvent.LocationId">
+            <summary>
+            Should be populated when the location is from a cache
+            </summary>
+        </member>
         <!-- Badly formed XML comment ignored for member "P:TilerFront.Models.UnregisteredEvent.LocationTag" -->
         <member name="P:TilerFront.Models.UnregisteredEvent.Name">
             <summary>
@@ -1194,7 +1217,14 @@
             <param name="userGroupNode">xml node with formated user group</param>
             <returns></returns>
         </member>
-        <member name="M:TilerFront.LogControl.getDayReferenceTime(System.String)">
+        <member name="M:TilerFront.LogControl.GetScheduleDump(System.String)">
+            <summary>
+            gets the Schedule dump by the dump id
+            </summary>
+            <param name="dumpId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.LogControl.getDayReferenceTime">
             <summary>
             Function gets the end of the day of the specified user.
             </summary>
@@ -1208,6 +1238,11 @@
             <param name="RestrictionTimeLineNode"></param>
             <returns></returns>
         </member>
+        <member name="M:TilerFront.LogControl.deleteAllDatabaseData">
+            <summary>
+            This function wipes out the database completely.BECAREFUL. You''l need to comment out the lines below return
+            </summary>
+        </member>
         <member name="T:TilerFront.TilerApiController">
             <summary>
             Tiler controller that provides custom tiler functionality
@@ -1216,6 +1251,12 @@
         <member name="M:TilerFront.UserAccount.getTilerUser">
             <summary>
             Gets the tilerUser account associated with the userAccount
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.UserAccountXml.Login">
+            <summary>
+            Function logs in the current user. It simply checks to see if the id already exists
             </summary>
             <returns></returns>
         </member>

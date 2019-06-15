@@ -11,7 +11,7 @@ namespace TilerFront
 {
     public class UserAccountDirect:UserAccount
     {
-        ApplicationDbContext Database;
+        
         protected UserAccountDirect()
         {
             
@@ -19,10 +19,10 @@ namespace TilerFront
 
 
 
-        public UserAccountDirect(string userId, ApplicationDbContext database)
+        public UserAccountDirect(string userId, TilerDbContext database)
         {
             ID = userId;
-            Database = database;
+            _Database = database;
         }
 
         /// <summary>
@@ -32,64 +32,22 @@ namespace TilerFront
         public override async System.Threading.Tasks.Task<bool> Login()
         {
             HttpContext ctx = HttpContext.Current;
-            DBTilerElement.DB_TilerUser tilerUser = new DBTilerElement.DB_TilerUser()
-            {
-                Id = ID
-            };
-            UserLog = new LogControlDirect(tilerUser, Database, "");
-            if (ctx != null)
-            {
-                await UserLog.Initialize();
-            }
+            TilerUser tilerUser = Database.Users.Find(ID);
+            UserLog = new LogControlDirect(tilerUser, Database as ApplicationDbContext);
 
-            
-
-            bool retValue = UserLog.Status;
+            bool retValue = tilerUser != null;
             return retValue;
         }
 
 
-        override protected Dictionary<string, CalendarEvent> getAllCalendarElements(TimeLine RangeOfLookup, string desiredDirectory = "")
-        {
-            Dictionary<string, CalendarEvent> retValue = new Dictionary<string, CalendarEvent>();
-            retValue = UserLog.getAllCalendarFromXml(RangeOfLookup);
-            return retValue;
-        }
 
-        async override protected Task<DateTimeOffset> getDayReferenceTime(string desiredDirectory = "")
-        {
-            DateTimeOffset retValue = await UserLog.getDayReferenceTime(desiredDirectory);
-            return retValue;
-        }
-
-
-        async public Task<CustomErrors> Register(TilerUser user, LogControl newLog)
-        {
-            UserLog = newLog;
-            CustomErrors retValue = newLog.genereateNewLogFile(user.Id);
-            return retValue;
-        }
-
-        override async public Task<CustomErrors> DeleteLog()
-        {
-            return await UserLog.DeleteLog();
-        }
-        
-        //async public Task CommitEventToLog(IEnumerable<CalendarEvent> AllEvents, string LatestID, string LogFile = "")
-        //{
-        //    await ((LogControlDirect)UserLog).WriteToLog(AllEvents, LatestID, LogFile);
-        //    sessionUser.LastChange = DateTimeOffset.UtcNow.DateTime;
-        //    Task SaveChangesToDB = new Controllers.UserController().SaveUser(sessionUser);
-        //    await SaveChangesToDB;
-        //}
-        
         override public bool DeleteAllCalendarEvents()
         {
             bool retValue = false;
 
             if (UserLog.Status)
             {
-                UserLog.deleteAllCalendarEvets();
+                UserLog.deleteAllCalendarEvents();
                 retValue = true;
             }
             else
@@ -151,22 +109,6 @@ namespace TilerFront
             get
             {
                 return Name;
-            }
-        }
-
-        public string getFullLogDir
-        {
-            get
-            {
-                return UserLog.getFullLogDir;
-            }
-        }
-
-        virtual public LogControl ScheduleLogControl
-        {
-            get
-            {
-                return UserLog;
             }
         }
 

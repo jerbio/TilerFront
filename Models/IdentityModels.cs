@@ -6,34 +6,24 @@ using System;
 using System.Collections.Generic;
 using Microsoft.AspNet.Identity.EntityFramework;
 using TilerElements;
+using System.Data.Entity.Infrastructure;
 
 namespace TilerFront.Models
 {
     // You can add profile data for the user by adding more properties to your TilerUser class, please visit http://go.microsoft.com/fwlink/?LinkID=317594 to learn more.
-    //public class TilerUser : IdentityUser
-    //{
-    //    public string FullName { get; set; }
-    //    public DateTime LastChange { get; set; }
-    //    public string UserName { get; set; }
-    //    public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<TilerUser> manager)
-    //    {
-    //        Note the authenticationType must match the one defined in CookieAuthenticationOptions.AuthenticationType
-
-
-    //       var userIdentity = await manager.CreateIdentityAsync(this, DefaultAuthenticationTypes.ApplicationCookie);
-    //        Add custom user claims here
-
-
-
-    //        return userIdentity;
-    //    }
-    //}
-
-    public class ApplicationDbContext : IdentityDbContext<TilerUser>
+    public class ApplicationDbContext : TilerDbContext
     {
         public ApplicationDbContext()
-            : base("DefaultConnection", throwIfV1Schema: false)
         {
+            var adapter = (IObjectContextAdapter)this;
+            var objectContext = adapter.ObjectContext;
+            objectContext.CommandTimeout = 1 * 60; // value in seconds
+        }
+        public ApplicationDbContext(string connectionName = "DefaultConnection") : base(connectionName)
+        {
+            var adapter = (IObjectContextAdapter)this;
+            var objectContext = adapter.ObjectContext;
+            objectContext.CommandTimeout = 1 * 60; // value in seconds
         }
 
         public System.Data.Entity.DbSet<ThirdPartyCalendarAuthenticationModel> ThirdPartyAuthentication { get; set; }

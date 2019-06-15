@@ -95,7 +95,10 @@ namespace TilerFront.Controllers
                 PhoneNumber = await UserManager.GetPhoneNumberAsync(userId),
                 TwoFactor = await UserManager.GetTwoFactorEnabledAsync(userId),
                 Logins = await UserManager.GetLoginsAsync(userId),
-                BrowserRemembered = await AuthenticationManager.TwoFactorBrowserRememberedAsync(userId)
+                BrowserRemembered = await AuthenticationManager.TwoFactorBrowserRememberedAsync(userId),
+                Id = userId,
+                UserName = User.Identity.GetUserName(),
+                FullName = User.Identity.Name
             };
             return View(model);
         }
@@ -303,8 +306,6 @@ namespace TilerFront.Controllers
                 }
                 */
                 TilerUser myUser = await UserManager.FindByIdAsync(User.Identity.GetUserId());
-                TimeSpan OffSetSpan= TimeSpan.FromMinutes(Convert.ToInt32( model.TimeZoneOffSet));
-                TimeOfDay = TimeOfDay.ToOffset(OffSetSpan);
                 myUser.EndfOfDay=TimeOfDay.DateTime;
                 myUser.TimeZone = model.TimeZone;
                 result = await UserManager.UpdateAsync(myUser);
@@ -326,20 +327,20 @@ namespace TilerFront.Controllers
         public async Task<ActionResult> ImportCalendar()
         {
             string userID = User.Identity.GetUserId();
-            return View((await db.ThirdPartyAuthentication.Where(obj => userID == obj.TilerID).ToListAsync()).Select(obj => obj.getThirdPartyOut()));
+            return View((await dbContext.ThirdPartyAuthentication.Where(obj => userID == obj.TilerID).ToListAsync()).Select(obj => obj.getThirdPartyOut()));
         }
 
         async public Task<List<ThirdPartyCalendarAuthenticationModel>> getAllThirdPartyAuthentication()
         {
             string userID = User.Identity.GetUserId();
-            List<ThirdPartyCalendarAuthenticationModel> RetValue = (await db.ThirdPartyAuthentication.Where(obj => userID == obj.TilerID).ToListAsync().ConfigureAwait(false));
+            List<ThirdPartyCalendarAuthenticationModel> RetValue = (await dbContext.ThirdPartyAuthentication.Where(obj => userID == obj.TilerID).ToListAsync().ConfigureAwait(false));
             return RetValue;
         }
 
         async Task<ThirdPartyCalendarAuthenticationModel> getGoogleAuthenticationData(string TilerUSerID,string EmailID )
         {
             Object[] Param = { TilerUSerID, EmailID, TilerElements.ThirdPartyControl.CalendarTool.google.ToString()};
-            ThirdPartyCalendarAuthenticationModel checkingThirdPartyCalendarAuthentication = await db.ThirdPartyAuthentication.FindAsync(Param);
+            ThirdPartyCalendarAuthenticationModel checkingThirdPartyCalendarAuthentication = await dbContext.ThirdPartyAuthentication.FindAsync(Param);
             return checkingThirdPartyCalendarAuthentication;
         }
 
@@ -396,7 +397,7 @@ namespace TilerFront.Controllers
                 else 
                 {
                     Object[] Param = { thirdPartyCalendarAuthentication.TilerID, thirdPartyCalendarAuthentication.Email, thirdPartyCalendarAuthentication.ProviderID };
-                    ThirdPartyCalendarAuthenticationModel checkingThirdPartyCalendarAuthentication = await db.ThirdPartyAuthentication.FindAsync(Param);
+                    ThirdPartyCalendarAuthenticationModel checkingThirdPartyCalendarAuthentication = await dbContext.ThirdPartyAuthentication.FindAsync(Param);
                     if (checkingThirdPartyCalendarAuthentication != null)
                     {
                         await deleteGoogleAccount(thirdPartyCalendarAuthentication.getThirdPartyOut()).ConfigureAwait(false);
@@ -463,7 +464,7 @@ namespace TilerFront.Controllers
                         ThirdPartyCalendarAuthenticationModel retrievedAuthentication = await getGoogleAuthenticationData(UserID, Email).ConfigureAwait(false);
                         try 
                         {
-                            await retrievedAuthentication.refreshAndCommitToken(db).ConfigureAwait(false);
+                            await retrievedAuthentication.refreshAndCommitToken(dbContext).ConfigureAwait(false);
                         }
                         catch
                         {

@@ -328,8 +328,10 @@ function RegisterUser(FullName, UserName, Password,PassWordConfirmation, Email)
 
     var __RequestVerificationToken = $('input[name=__RequestVerificationToken]').val();
     //var LoginCredentials = { Username: UserName, Password: Password, };
+    let firstName = FullName[0];
+    let lastName = FullName[1];
 
-    var RegistrationCredentials = { Username: UserName, Password: Password, ConfirmPassword: PassWordConfirmation, FullName: FullName, Email: Email, __RequestVerificationToken: __RequestVerificationToken, TimeZoneOffSet: TimeZone };
+    var RegistrationCredentials = { Username: UserName, Password: Password, ConfirmPassword: PassWordConfirmation, FirstName: firstName, LastName: lastName, Email: Email, __RequestVerificationToken: __RequestVerificationToken, TimeZoneOffSet: TimeZone };
     
     //var url="RootWagTap/time.top?WagCommand=3";
     //var url = global_refTIlerUrl + "User/New";

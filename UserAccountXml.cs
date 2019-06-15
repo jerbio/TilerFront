@@ -6,20 +6,24 @@ using TilerElements;
 
 namespace TilerFront
 {
-    public class UserAccountDebug:UserAccountDirect
+    public class UserAccountXml:UserAccountDirect
     {
-        public UserAccountDebug(TilerUser user)
+        public UserAccountXml(TilerUser user)
         {
-            UserLog = new LogControlDebug(user, "");
+            UserLog = new LogControlXml(user, "");
             ID = SessionUser.Id;
         }
 
+        /// <summary>
+        /// Function logs in the current user. It simply checks to see if the id already exists
+        /// </summary>
+        /// <returns></returns>
         public override async System.Threading.Tasks.Task<bool> Login()
         {
             HttpContext ctx = HttpContext.Current;
             if (ctx != null)
             {
-                await UserLog.Initialize();
+                await (UserLog as LogControlXml).Initialize();
             }
 
 
@@ -35,4 +39,5 @@ namespace TilerFront
         }
         */
     }
+
 }

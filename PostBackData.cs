@@ -34,14 +34,14 @@ namespace TilerFront
             {10001000,"User Already exists"},
             {30001000,"Registration exception. Check DB control with user credentials"},
             {40001000,"Publication Error."},//Just testing
-            {50005000,"Pause/Resume Bug."},//Just testing
+            {50005000,"Pause/Resume Bug."},
             {100,"I have no idea"}
         };
         dynamic Data;
         int Status=0;
         string Message;
 
-        public PostBackData(int StatusEntry)
+        public PostBackData(int StatusEntry=0)
         {
             Message = "";
             Status = StatusEntry;
@@ -61,6 +61,7 @@ namespace TilerFront
             if (Error != null)
             {
                 Data = Error.Message;
+                Message = Error.Message;
                 Status = Error.Code;
             }
             
@@ -75,15 +76,22 @@ namespace TilerFront
         string getErrorMessage(int errorCode)
         {
             string retValue;
-            if (errorCode >= 20000000)
+            string defaultMessage = "Tiler is having some issues please try again later";
+            if (errorCode > 20000000)
             {
-                retValue = "Tiler is having some issues please try again later";
+                retValue = defaultMessage;
                 return retValue;
             }
 
             if (string.IsNullOrEmpty(Message))
             {
-                retValue = errorDictionary[errorCode];
+                if(errorDictionary.ContainsKey(errorCode))
+                {
+                    retValue = errorDictionary[errorCode];
+                } else {
+                    retValue = defaultMessage;
+                }
+                
             }
             else
             {
