@@ -67,11 +67,12 @@ namespace TilerElements
             this._Complete = false;
             this._DeletedCount = 1;
             this._CompletedCount = 1;
-            if(AllCalendarEvent.Count() > 0)
+            this._Name = new EventName(null, this, "GOOGLE MOTHER EVENT");
+            this._DataBlob = new MiscData();
+            if (AllCalendarEvent.Count() > 0)
             {
                 this._EventRepetition = new Repetition(true, this.RangeTimeLine, "Daily", AllCalendarEvent.ToArray());
             }
-            this._Name= new EventName( null, this, "GOOGLE MOTHER EVENT");
             this._ProfileOfNow = new NowProfile();
         }
     }
