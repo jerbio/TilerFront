@@ -1574,6 +1574,7 @@ namespace TilerFront
 
             if (rigidFlag && procrastinationEventFlag)
             {
+                creator.ClearAllId = ID;
                 RetrievedEvent = new DB_ProcrastinateCalendarEvent(new EventID(creator.getClearAllEventsId()), Name, start, end, CalendarEventDuration, PreDeadline, PrepTime, Recurrence, location, UiData, noteData, EVentEnableFlag, completedFlag, creator, userGroup, timeZone, Split);
             }
             else {
