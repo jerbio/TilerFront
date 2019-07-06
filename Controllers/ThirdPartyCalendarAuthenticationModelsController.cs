@@ -25,13 +25,12 @@ using Google.Apis.Util.Store;
 
 namespace TilerFront.Controllers
 {
-    public static class ThirdPartyCalendarAuthenticationModelsController// : Controller
+    public class ThirdPartyCalendarAuthenticationModelsController : TilerApiController
     {
-        private static ApplicationDbContext db = new ApplicationDbContext();
-        private static string CurrentURI = null;
-        private static bool isCurrentURIUpdated = false;
+        private string CurrentURI = null;
+        private bool isCurrentURIUpdated = false;
 
-        static public async Task<bool> CreateGoogle(ThirdPartyCalendarAuthenticationModel thirdPartyCalendarAuthentication)
+        public async Task<bool> CreateGoogle(ThirdPartyCalendarAuthenticationModel thirdPartyCalendarAuthentication)
         {
             bool RetValue = false;
             //if (ModelState.IsValid)
@@ -92,7 +91,7 @@ namespace TilerFront.Controllers
             return RetValue;
         }
 
-        public static void initializeCurrentURI(string URIEntry)
+        public void initializeCurrentURI(string URIEntry)
         {
             if(string.IsNullOrEmpty( CurrentURI))
             {
@@ -104,7 +103,7 @@ namespace TilerFront.Controllers
         }
 
 
-        static public async Task<bool> SendRequestForGoogleNotification(ThirdPartyCalendarAuthenticationModel AuthenticationData)
+        public async Task<bool> SendRequestForGoogleNotification(ThirdPartyCalendarAuthenticationModel AuthenticationData)
         {
             bool RetValue = false;
             try
@@ -197,7 +196,7 @@ namespace TilerFront.Controllers
             return RetValue;
         }
 
-        static public async Task<bool> deleteGoogleAccount(ThirdPartyAuthenticationForView modelData)
+        public async Task<bool> deleteGoogleAccount(ThirdPartyAuthenticationForView modelData)
         {
             bool RetValue = false;
             ThirdPartyCalendarAuthenticationModel ThirdPartyAuth = db.ThirdPartyAuthentication.Where(obj => obj.ID == modelData.ID).Single();

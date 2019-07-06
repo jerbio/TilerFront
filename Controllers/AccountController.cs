@@ -306,7 +306,8 @@ namespace TilerFront.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Register(RegisterViewModel model)
         {
-            Controllers.ThirdPartyCalendarAuthenticationModelsController.initializeCurrentURI(System.Web.HttpContext.Current.Request.Url.Authority);
+            ThirdPartyCalendarAuthenticationModelsController thirdPartyController = new ThirdPartyCalendarAuthenticationModelsController();
+            thirdPartyController.initializeCurrentURI(System.Web.HttpContext.Current.Request.Url.Authority);
             if (ModelState.IsValid)
             {
                 int Min=Convert.ToInt32(model.TimeZoneOffSet);
@@ -350,7 +351,8 @@ namespace TilerFront.Controllers
 
         public async Task<ActionResult> RegisterUser(RegisterViewModel model)
         {
-            Controllers.ThirdPartyCalendarAuthenticationModelsController.initializeCurrentURI(System.Web.HttpContext.Current.Request.Url.Authority);
+            ThirdPartyCalendarAuthenticationModelsController thirdPartyController = new ThirdPartyCalendarAuthenticationModelsController();
+            thirdPartyController.initializeCurrentURI(System.Web.HttpContext.Current.Request.Url.Authority);
             PostBackData retPost = new PostBackData("Failed to register user", 3);
             JsonResult RetValue = new JsonResult();
             if (ModelState.IsValid)
@@ -616,7 +618,8 @@ namespace TilerFront.Controllers
 
             if (System.Web.HttpContext.Current != null)// this helps save the reurn uri for notification
             {
-                Controllers.ThirdPartyCalendarAuthenticationModelsController.initializeCurrentURI(System.Web.HttpContext.Current.Request.Url.Authority);
+                ThirdPartyCalendarAuthenticationModelsController thirdPartyController = new ThirdPartyCalendarAuthenticationModelsController();
+                thirdPartyController.initializeCurrentURI(System.Web.HttpContext.Current.Request.Url.Authority);
             }
             string ThirdPartyType;
             var result = await SignInManager.ExternalSignInAsync(loginInfo, isPersistent: false).ConfigureAwait(false);
@@ -816,7 +819,8 @@ namespace TilerFront.Controllers
                 //await NewAccountCalendarImportation.refreshAuthenticationToken().ConfigureAwait(false);
 
                 HttpContext myContext = System.Web.HttpContext.Current;
-                await ThirdPartyCalendarAuthenticationModelsController.CreateGoogle(NewAccountCalendarImportation);
+                ThirdPartyCalendarAuthenticationModelsController thirdPartyController = new ThirdPartyCalendarAuthenticationModelsController();
+                await thirdPartyController.CreateGoogle(NewAccountCalendarImportation);
                 RetValue = true;
             }
             catch

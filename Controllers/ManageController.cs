@@ -349,7 +349,8 @@ namespace TilerFront.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> deleteGoogleAccount(ThirdPartyAuthenticationForView modelData)
         {
-            await ThirdPartyCalendarAuthenticationModelsController.deleteGoogleAccount(modelData).ConfigureAwait(false);
+            ThirdPartyCalendarAuthenticationModelsController thirdPartyController = new ThirdPartyCalendarAuthenticationModelsController();
+            await thirdPartyController.deleteGoogleAccount(modelData).ConfigureAwait(false);
             return RedirectToAction("ImportCalendar");
         }
 
@@ -379,11 +380,12 @@ namespace TilerFront.Controllers
                 bool makeAdditionCall = false;
                 if (!deletGoogleCalendarFromLog)
                 {
-                    if(System.Web.HttpContext.Current != null)// this helps save the reurn uri for notification
+                    ThirdPartyCalendarAuthenticationModelsController thirdPartyController = new ThirdPartyCalendarAuthenticationModelsController();
+                    if (System.Web.HttpContext.Current != null)// this helps save the reurn uri for notification
                     {
-                        Controllers.ThirdPartyCalendarAuthenticationModelsController.initializeCurrentURI(System.Web.HttpContext.Current.Request.Url.Authority);
+                        thirdPartyController.initializeCurrentURI(System.Web.HttpContext.Current.Request.Url.Authority);
                     }
-                    bool successInCreation = await ThirdPartyCalendarAuthenticationModelsController.CreateGoogle(thirdPartyCalendarAuthentication).ConfigureAwait(false);
+                    bool successInCreation = await thirdPartyController.CreateGoogle(thirdPartyCalendarAuthentication).ConfigureAwait(false);
                     if (successInCreation)
                     {
                         ;
