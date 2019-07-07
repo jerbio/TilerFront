@@ -658,7 +658,7 @@ namespace TilerFront
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.getIsProcrastinateCalendarEvent.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("TimeZone"));
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.getTimeZone;
-            MyEventScheduleNode.PrependChild(xmldoc.CreateElement("TimeCreaated"));
+            MyEventScheduleNode.PrependChild(xmldoc.CreateElement("TimeCreated"));
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.TimeCreated.ToString();
 
             if (MyEvent.getIsEventRestricted)
@@ -868,7 +868,7 @@ namespace TilerFront
             MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.getIsProcrastinateCalendarEvent.ToString();
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("TimeZone"));
             MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.getTimeZone;
-            MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("TimeCreaated"));
+            MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("TimeCreated"));
             MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.TimeCreated.ToString();
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("TravelTimeAfter"));
             MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.TravelTimeAfter.ToString();
@@ -1633,9 +1633,14 @@ namespace TilerFront
 
             DateTimeOffset timeCreated;
             XmlNode timeCreatednode = EventScheduleNode.SelectSingleNode("TimeCreated");
+            if(timeCreatednode == null)
+            {
+                timeCreatednode = EventScheduleNode.SelectSingleNode("TimeCreaated"); // this is to handle previous typo issues
+            }
+
             if (timeCreatednode != null)
             {
-                timeCreated = DateTimeOffset.Parse(timeCreatednode.ToString());
+                timeCreated = DateTimeOffset.Parse(timeCreatednode.InnerText.ToString());
                 RetrievedEvent.TimeCreated = timeCreated;
             }
 
