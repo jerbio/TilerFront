@@ -57,7 +57,7 @@ namespace TilerFront
             return retValue;
         }
         
-        public static SubCalEvent ToSubCal(this Event myEvent, EventID AuthenticationID, uint CurrentCount, CalendarService CalendarServiceData)
+        public static SubCalEvent ToSubCal(this Event myEvent, EventID AuthenticationID, uint CurrentCount)
         {
             SubCalEvent retValue = new SubCalEvent();
             retValue.ThirdPartyEventID = myEvent.Id;
@@ -119,7 +119,7 @@ namespace TilerFront
                         if (GoogleEvent.Recurrence == null)
                         {
                             GoogleIDs.Add(GoogleEvent.Id);
-                            RetValue.Add(GoogleEvent.ToSubCal(AuthenticationID,i, CalendarServiceData));
+                            RetValue.Add(GoogleEvent.ToSubCal(AuthenticationID,i));
                         }
                         else
                         {
@@ -147,7 +147,7 @@ namespace TilerFront
                     RepetitionData.ShowDeleted = false;
                     RepetitionData.TimeMax = DateTime.Now.AddDays(90);
                     var generatedRsults = await RepetitionData.ExecuteAsync().ConfigureAwait(false);
-                    List<SubCalEvent> AllRepeatSubCals = generatedRsults.Items.Select(obj => obj.ToSubCal(AuthenticationID,(myIndex), CalendarServiceData)).ToList();
+                    List<SubCalEvent> AllRepeatSubCals = generatedRsults.Items.Select(obj => obj.ToSubCal(AuthenticationID,(myIndex))).ToList();
                     AllRepeatSubCals.ForEach(obj => {
                         if (!GoogleIDs.Contains(obj.ThirdPartyEventID))
                         {RetValue.Add(obj); }
@@ -200,7 +200,7 @@ namespace TilerFront
                     if (EventRange.InterferringTimeLine(CalculationTimeLine) != null || GoogleEvent.Recurrence != null) // took out manual check for repetition because of we set the property singleEvents in  the function getGoogleEvents in class GoogleTilerEventControl.cs. If you need the manual look up run "git checkout 8db3dab166909255ce112" and jump back to this file you should see logic about this below.
                     {
                         GoogleIDs.Add(GoogleEvent.Id);
-                        CalendarEvent calEvent = GoogleCalendarEvent.convertFromGoogleToCalendarEvent(GoogleEvent.ToSubCal(AuthenticationID, i, CalendarServiceData));
+                        CalendarEvent calEvent = GoogleCalendarEvent.convertFromGoogleToCalendarEvent(GoogleEvent.ToSubCal(AuthenticationID, i));
                         RetValue.Add(calEvent);
                         locations.Add(calEvent.Location);
                     }

@@ -37,12 +37,12 @@ namespace TilerFront
         protected bool LogStatus;
         protected bool UpdateLocaitionCache = false;
         protected Dictionary<string, TilerElements.Location> CachedLocation;
-        protected TilerElements.Location DefaultLocation= new TilerElements.Location();
+        protected TilerElements.Location DefaultLocation = new TilerElements.Location();
         protected TilerElements.Location NewLocation;
         protected DB_UserActivity activity;
         Dictionary<string, Func<XmlNode, Reason>> createDictionaryOfOPtionToFunction;
         protected TilerUser _TilerUser;
-        
+
 #if ForceReadFromXml
 #else
         protected CassandraUserLog.CassandraLog myCassandraAccess;
@@ -50,18 +50,18 @@ namespace TilerFront
         protected LocationSearchHandler LocationSearcher;
 #endif
         Tuple<bool, string, DateTimeOffset, long> ScheduleMetadata;
-        
+
 #if ForceReadFromXml
 #else
         public static bool useCassandra=true;
 #endif
 
         protected LogControl()
-        { 
-            ID="";
-            UserName="";
-            NameOfUser="";
-            LogStatus=false;
+        {
+            ID = "";
+            UserName = "";
+            NameOfUser = "";
+            LogStatus = false;
 #if ForceReadFromXml
 #else
             NameSearcher = new EventNameSearchHandler();
@@ -101,7 +101,7 @@ namespace TilerFront
         public TilerUser getTilerRetrievedUser()
         {
             return _TilerUser;
-                 
+
         }
 
         #region Write Data
@@ -206,7 +206,7 @@ namespace TilerFront
             }
             catch (Exception e)
             {
-                if(corruptZipFile)
+                if (corruptZipFile)
                 {
                     File.Delete(fullZipPath);
                 }
@@ -244,10 +244,10 @@ namespace TilerFront
         async public Task<ScheduleDump> CreateScheduleDump(IEnumerable<CalendarEvent> AllEvents, TilerUser user, ReferenceNow now, string notes)
         {
             Task<ScheduleDump> retValue;
-            
+
 
             XmlDocument xmldoc = new XmlDocument();
-            xmldoc.InnerXml = "<?xml version=\"1.0\" encoding=\"utf-8\"?><ScheduleLog><LastIDCounter>1024</LastIDCounter><referenceDay>"+now.StartOfDay.DateTime+ "</referenceDay><scheduleNotes>" + notes + "</scheduleNotes><lastUpdated>" + user.LastScheduleModification.DateTime + "</lastUpdated><EventSchedules></EventSchedules></ScheduleLog>";
+            xmldoc.InnerXml = "<?xml version=\"1.0\" encoding=\"utf-8\"?><ScheduleLog><LastIDCounter>1024</LastIDCounter><referenceDay>" + now.StartOfDay.DateTime + "</referenceDay><scheduleNotes>" + notes + "</scheduleNotes><lastUpdated>" + user.LastScheduleModification.DateTime + "</lastUpdated><EventSchedules></EventSchedules></ScheduleLog>";
 
             CachedLocation = await getAllLocationsByUser().ConfigureAwait(false); ;//populates with current location info
             Dictionary<string, TilerElements.Location> OldLocationCache = new Dictionary<string, TilerElements.Location>(CachedLocation);
@@ -332,7 +332,7 @@ namespace TilerFront
 
             foreach (KeyValuePair<string, TilerElements.Location> eachKeyValuePair in CachedLocation)
             {
-                    
+
                 string LocationID = eachKeyValuePair.Value.Id;
                 XmlElement myCacheLocationNode = CreateLocationNode(eachKeyValuePair.Value, "Location");
 
@@ -352,8 +352,8 @@ namespace TilerFront
                 {
                     xmldoc.DocumentElement.SelectSingleNode("/ScheduleLog/LocationCache/Locations").AppendChild(MyImportedNode);
                 }
-                    
-                
+
+
             }
         }
 
@@ -365,7 +365,7 @@ namespace TilerFront
             {
                 _Context.Entry(subEvent).State = EntityState.Deleted;
             }
-            
+
             await _Context.SaveChangesAsync().ConfigureAwait(false);
         }
 
@@ -373,7 +373,7 @@ namespace TilerFront
         {
             _TilerUser.LatestId = LatestId;
             _TilerUser.LastScheduleModification = now.constNow;
-            if (calendarEvent!=null)
+            if (calendarEvent != null)
             {
                 _Context.CalEvents.Add(calendarEvent);
             }
@@ -403,7 +403,7 @@ namespace TilerFront
             }
         }
 
-        public async Task UpdateLocationCache(XmlDocument xmldoc, Dictionary<string, TilerElements.Location> currentCache, TilerElements.Location NewLocation )
+        public async Task UpdateLocationCache(XmlDocument xmldoc, Dictionary<string, TilerElements.Location> currentCache, TilerElements.Location NewLocation)
         {
             XmlNode LocationCacheNode = xmldoc.DocumentElement.SelectSingleNode("/ScheduleLog/LocationCache");
             if (LocationCacheNode == null)
@@ -419,7 +419,7 @@ namespace TilerFront
             XmlNodeList AllCachedLocations = xmldoc.DocumentElement.SelectNodes("/ScheduleLog/LocationCache/Locations/Location");
 
 
-           
+
             foreach (KeyValuePair<string, TilerElements.Location> eachKeyValuePair in CachedLocation)
             {
                 if (!currentCache.ContainsKey(eachKeyValuePair.Key))
@@ -581,7 +581,7 @@ namespace TilerFront
             XmlElement userGroupNode = xmlDoc.CreateElement("UserGroup");
             XmlElement idNode = xmlDoc.CreateElement("Id");
             XmlElement usersNode = xmlDoc.CreateElement("Users");
-            foreach(TilerUser user in usergroup.users)
+            foreach (TilerUser user in usergroup.users)
             {
                 XmlElement userNode = generateTilerUserNode(user);
                 usersNode.AppendChild(userNode);
@@ -624,7 +624,7 @@ namespace TilerFront
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.End.UtcDateTime.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("PrepTime"));
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.getPreparation.ToString();
-            
+
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("CompletionCount"));
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.CompletionCount.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("DeletionCount"));
@@ -660,6 +660,8 @@ namespace TilerFront
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.getTimeZone;
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("TimeCreaated"));
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.TimeCreated.ToString();
+            MyEventScheduleNode.PrependChild(xmldoc.CreateElement("ThirdpartyType"));
+            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.ThirdpartyType.ToString();
 
             if (MyEvent.getIsEventRestricted)
             {
@@ -770,7 +772,7 @@ namespace TilerFront
                 XmlElement RestrictionDayOfWeekNode = xmldoc.CreateElement("RestrictionDayOfWeek");
                 RestrictionDayOfWeekNode.InnerText = eachTuple.DayOfWeekString;
                 XmlElement RestrictionTimeLineNode = xmldoc.CreateElement("RestrictionTimeLineData");
-                RestrictionTimeLineNode.InnerXml=generateRestrictionTimeLineNode(eachTuple.RestrictionTimeLine).InnerXml;
+                RestrictionTimeLineNode.InnerXml = generateRestrictionTimeLineNode(eachTuple.RestrictionTimeLine).InnerXml;
                 RestrictionNode.AppendChild(RestrictionTimeLineNode);
                 RestrictionNode.AppendChild(RestrictionDayOfWeekNode);
                 RestrictionProfileNode.AppendChild(RestrictionNode);
@@ -797,11 +799,11 @@ namespace TilerFront
 
             SubCalendarEventRestricted restrictedMySub;
             XmlDocument xmldoc = new XmlDocument();
-            
 
 
-            
-            
+
+
+
             XmlElement MyEventSubScheduleNode = xmldoc.CreateElement("EventSubSchedule");
             DateTimeOffset StartTime = MySubEvent.Start;
             StartTime = StartTime.removeSecondsAndMilliseconds();
@@ -878,11 +880,13 @@ namespace TilerFront
             MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.isWake.ToString();
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("isSleep"));
             MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.isSleep.ToString();
+            MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("ThirdpartyType"));
+            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.ThirdpartyType.ToString();
 
             if (MySubEvent.getIsEventRestricted)
             {
                 restrictedMySub = (SubCalendarEventRestricted)MySubEvent;
-                XmlElement restrictionProfileData =  generateXMLRestrictionProfile(restrictedMySub.RetrictionInfo);
+                XmlElement restrictionProfileData = generateXMLRestrictionProfile(restrictedMySub.RetrictionInfo);
                 MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("RestrictionProfile"));
                 MyEventSubScheduleNode.ChildNodes[0].InnerXml = restrictionProfileData.InnerXml;
             }
@@ -909,7 +913,7 @@ namespace TilerFront
 
             return RetValue;
         }
-        public XmlElement ReasonForPosition(List<Reason> reasons, string ElementIdentifier= "TimePositionReasons") {
+        public XmlElement ReasonForPosition(List<Reason> reasons, string ElementIdentifier = "TimePositionReasons") {
             XmlSerializer serializer = new XmlSerializer(typeof(List<Reason>));
             XmlDocument xmldoc = new XmlDocument();
             XmlElement retValue = xmldoc.CreateElement(ElementIdentifier);
@@ -931,7 +935,7 @@ namespace TilerFront
             string MappedAddress = "";
             string IsNull = true.ToString(); ;
             string CheckCalendarEvent = 0.ToString();
-            if ((Arg1 != null) )//&& (!Arg1.isNull))
+            if ((Arg1 != null))//&& (!Arg1.isNull))
             {
                 XCoordinate = Arg1.Latitude.ToString();
                 YCoordinate = Arg1.Longitude.ToString();
@@ -1028,7 +1032,7 @@ namespace TilerFront
             XmlDocument xmldoc = new XmlDocument();
             XmlElement var1 = xmldoc.CreateElement(ElementIdentifier);
             var1.PrependChild(xmldoc.CreateElement("Color"));
-            if(Arg1 == null)
+            if (Arg1 == null)
             {
                 Arg1 = new EventDisplay();
             }
@@ -1070,7 +1074,7 @@ namespace TilerFront
         }
         public void EmptyCalendarXMLFile(string dirString = "")
         {
-            
+
         }
 
         public virtual void deleteAllCalendarEvents(string dirString = "")
@@ -1083,7 +1087,7 @@ namespace TilerFront
         #endregion
 
         #region Read Data
-        
+
         /// <summary>
         /// Function retrieves a db_tiler user from an xmlnode.  Note if there is no user node it returns an object in which the isNull property is set to true
         /// </summary>
@@ -1092,7 +1096,7 @@ namespace TilerFront
         protected DB_TilerUser getTilerLoggedUser(XmlNode userNode)
         {
             DB_TilerUser retValue = new DB_TilerUser();
-            if(userNode!= null)
+            if (userNode != null)
             {
                 XmlNode idNode = userNode.SelectSingleNode("Id");
                 string id = idNode.InnerText;
@@ -1141,9 +1145,9 @@ namespace TilerFront
         /// </summary>
         /// <param name="dumpId"></param>
         /// <returns></returns>
-        public async Task<ScheduleDump> GetScheduleDump (string dumpId)
+        public async Task<ScheduleDump> GetScheduleDump(string dumpId)
         {
-            ScheduleDump retValue =  await Database.ScheduleDumps.FindAsync(dumpId).ConfigureAwait(false);
+            ScheduleDump retValue = await Database.ScheduleDumps.FindAsync(dumpId).ConfigureAwait(false);
             return retValue;
         }
 
@@ -1217,7 +1221,7 @@ namespace TilerFront
             if (user == null)
             {
                 user = _Context.Users.Find(ID);
-                if(user==null)
+                if (user == null)
                 {
                     throw new NullReferenceException("Cannot find user with ID " + ID);
                 }
@@ -1277,7 +1281,7 @@ namespace TilerFront
 
         async public virtual Task<Dictionary<string, CalendarEvent>> getAllCalendarFromXml(TimeLine RangeOfLookUP, ReferenceNow Now, bool includeSubEvents = true, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation, string singleCalEventId = null)
         {
-            if(RangeOfLookUP != null)
+            if (RangeOfLookUP != null)
             {
                 IQueryable<CalendarEvent> calEVents = _Context.CalEvents;
                 if (includeSubEvents)
@@ -1325,9 +1329,9 @@ namespace TilerFront
                             .Include(calEvent => calEvent.AllSubEvents_DB
                                 .Select(subEvent => subEvent.UiParams_EventDB.UIColor)
                             );
-                    } else if(retrievalOption == DataRetrivalOption.UiSingle)
+                    } else if (retrievalOption == DataRetrivalOption.UiSingle)
                     {
-                        if(!string.IsNullOrEmpty(singleCalEventId) && !string.IsNullOrWhiteSpace(singleCalEventId))
+                        if (!string.IsNullOrEmpty(singleCalEventId) && !string.IsNullOrWhiteSpace(singleCalEventId))
                         {
                             calEVents = calEVents.Where(calEvent => calEvent.Id == singleCalEventId)
                             .Include(calEvent => calEvent.UiParams_EventDB)
@@ -1337,7 +1341,7 @@ namespace TilerFront
                             throw new ArgumentException("singleCalEventId cannot be null, empty or white space");
                         }
                     }
-                        
+
 
                 }
 
@@ -1351,18 +1355,18 @@ namespace TilerFront
                         && calEvent.EndTime_EventDB > RangeOfLookUP.Start
                         ).ForEachAsync((calEvent) =>
                         {
-                            if(calEvent.IsRepeatsChildCalEvent)
+                            if (calEvent.IsRepeatsChildCalEvent)
                             {
                                 childCalEvents.Add(calEvent);
                             } else
                             {
                                 parentCalEvents.Add(calEvent);
                             }
-                            
+
                         });
 
-                Dictionary<string, Tuple<CalendarEvent, List<CalendarEvent>>> calToRepeatCalEvents = parentCalEvents.ToDictionary(obj => obj.Calendar_EventID.getCalendarEventComponent(), obj => new Tuple<CalendarEvent, List<CalendarEvent>>( obj, new List<CalendarEvent>()));
-                foreach(CalendarEvent calEvent in childCalEvents)
+                Dictionary<string, Tuple<CalendarEvent, List<CalendarEvent>>> calToRepeatCalEvents = parentCalEvents.ToDictionary(obj => obj.Calendar_EventID.getCalendarEventComponent(), obj => new Tuple<CalendarEvent, List<CalendarEvent>>(obj, new List<CalendarEvent>()));
+                foreach (CalendarEvent calEvent in childCalEvents)
                 {
                     string calId = calEvent.Calendar_EventID.getCalendarEventComponent();
                     if (calToRepeatCalEvents.ContainsKey(calId))
@@ -1378,11 +1382,11 @@ namespace TilerFront
                 //}
 
                 Dictionary<string, CalendarEvent> MyCalendarEventDictionary = parentCalEvents.ToDictionary(calEvent => calEvent.Calendar_EventID.getCalendarEventComponent(), calEvent => calEvent);
-                foreach (CalendarEvent  calEvent in MyCalendarEventDictionary.Values.Where(calEvent => calEvent.getIsEventRestricted))
+                foreach (CalendarEvent calEvent in MyCalendarEventDictionary.Values.Where(calEvent => calEvent.getIsEventRestricted))
                 {
                     CalendarEventRestricted calAsRestricted = calEvent as CalendarEventRestricted;
                     calAsRestricted.RetrictionProfile.InitializeOverLappingDictionary();
-                    if(Now!= null)
+                    if (Now != null)
                     {
                         if (retrievalOption == DataRetrivalOption.Evaluation)
                         {
@@ -1393,21 +1397,23 @@ namespace TilerFront
                             calAsRestricted.setNow(Now, false);
                         }
                     }
-                    
+
                 }
 
-                
+
                 return MyCalendarEventDictionary;
             }
 
             throw new NullReferenceException("You have to provide the range to lookup in the user calelndar");
-            
+
         }
 
 
-        public virtual Dictionary<string, CalendarEvent> getAllCalendarFromXml(ScheduleDump scheduleDump)
+        public virtual Tuple<Dictionary<string, CalendarEvent>, Dictionary<ThirdPartyControl.CalendarTool, List<CalendarEvent>>> getAllCalendarFromXml(ScheduleDump scheduleDump)
         {
             Dictionary<string, CalendarEvent> MyCalendarEventDictionary = new Dictionary<string, CalendarEvent>();
+            List<CalendarEvent> googleCalendarEvents = new List<CalendarEvent>();
+            Dictionary<ThirdPartyControl.CalendarTool, List<CalendarEvent>> thirdPartyCalendarEvent = new Dictionary<ThirdPartyControl.CalendarTool, List<CalendarEvent>>();
             XmlDocument doc = scheduleDump.XmlDoc;
             XmlNode IdNode = doc.DocumentElement.SelectSingleNode("/ScheduleLog/LastIDCounter");
 
@@ -1435,23 +1441,32 @@ namespace TilerFront
 
             if (EventSchedulesNodes.ChildNodes != null)
             {
+                string googleId = EventID.generateGoogleCalendarEventID(0).getCalendarEventComponent();
                 foreach (XmlNode EventScheduleNode in EventSchedulesNodes.ChildNodes)
                 {
                     CalendarEvent RetrievedEvent;
-
-                    //RetrievedEvent = getCalendarEventObjFromNode(EventScheduleNode, RangeOfLookUP);
-                    ///*
                     RetrievedEvent = getCalendarEventObjFromNode(EventScheduleNode);
-                    //*/
-
                     if (RetrievedEvent != null)
-                    { MyCalendarEventDictionary.Add(RetrievedEvent.Calendar_EventID.getCalendarEventComponent(), RetrievedEvent); }
+                    {
+                        string id = RetrievedEvent.Calendar_EventID.getCalendarEventComponent();
+                        MyCalendarEventDictionary.Add(id, RetrievedEvent);
+                        if (googleId == id)
+                        {
+                            googleCalendarEvents.Add(RetrievedEvent);
+                        }
+                    }
                 }
-
             }
+            #region GoogleCalendarEvent
+            ThirdPartyCalendarEvent googleCalendarEvent = new GoogleCalendarEvent(googleCalendarEvents, _TilerUser);
+            thirdPartyCalendarEvent.Add(ThirdPartyControl.CalendarTool.google, new List<CalendarEvent>() { googleCalendarEvent });
+            #endregion
 
+            Tuple<Dictionary<string, CalendarEvent>, Dictionary<ThirdPartyControl.CalendarTool, List<CalendarEvent>>> retValue = new Tuple<Dictionary<string, CalendarEvent>, Dictionary<ThirdPartyControl.CalendarTool, List<CalendarEvent>>>(
+                MyCalendarEventDictionary,
+                thirdPartyCalendarEvent);
 
-            return MyCalendarEventDictionary;
+            return retValue;
         }
 
         public virtual CalendarEvent getCalendarEventObjFromNode(XmlNode EventScheduleNode)
@@ -1493,13 +1508,13 @@ namespace TilerFront
 
             DateTimeOffset StartDateTimeStruct = DateTimeOffset.Parse(EventScheduleNode.SelectSingleNode("StartTime").InnerText).UtcDateTime;
             DateTimeOffset EndDateTimeStruct = DateTimeOffset.Parse(EventScheduleNode.SelectSingleNode("Deadline").InnerText).UtcDateTime;
-            DateTimeOffset start = DateTimeOffset.Parse( EventScheduleNode.SelectSingleNode("StartTime").InnerText);
+            DateTimeOffset start = DateTimeOffset.Parse(EventScheduleNode.SelectSingleNode("StartTime").InnerText);
             StartDateTime = EventScheduleNode.SelectSingleNode("StartTime").InnerText.Split(' ');
 
             StartDate = StartDateTime[0];
             StartTime = StartDateTime[1] + StartDateTime[2];
             EndDateTime = EventScheduleNode.SelectSingleNode("Deadline").InnerText.Split(' ');
-            DateTimeOffset end= DateTimeOffset.Parse(EventScheduleNode.SelectSingleNode("Deadline").InnerText);
+            DateTimeOffset end = DateTimeOffset.Parse(EventScheduleNode.SelectSingleNode("Deadline").InnerText);
             EndDate = EndDateTime[0];
             EndTime = EndDateTime[1] + EndDateTime[2];
             DateTimeOffset StartTimeConverted = DateTimeOffset.Parse(StartDate).UtcDateTime;// new DateTimeOffset(Convert.ToInt32(StartDate.Split('/')[2]), Convert.ToInt32(StartDate.Split('/')[0]), Convert.ToInt32(StartDate.Split('/')[1]));
@@ -1517,9 +1532,9 @@ namespace TilerFront
             {
                 Recurrence = new Repetition();
             }
-            Split = Convert.ToInt32( EventScheduleNode.SelectSingleNode("Split").InnerText);
-            PreDeadline = TimeSpan.Parse( EventScheduleNode.SelectSingleNode("PreDeadline").InnerText);
-            CalendarEventDuration = TimeSpan.Parse( EventScheduleNode.SelectSingleNode("Duration").InnerText);
+            Split = Convert.ToInt32(EventScheduleNode.SelectSingleNode("Split").InnerText);
+            PreDeadline = TimeSpan.Parse(EventScheduleNode.SelectSingleNode("PreDeadline").InnerText);
+            CalendarEventDuration = TimeSpan.Parse(EventScheduleNode.SelectSingleNode("Duration").InnerText);
             PrepTime = TimeSpan.Parse(EventScheduleNode.SelectSingleNode("PrepTime").InnerText);
             Completed = EventScheduleNode.SelectSingleNode("Completed").InnerText;
             EnableFlag = EventScheduleNode.SelectSingleNode("Enabled").InnerText;
@@ -1536,7 +1551,7 @@ namespace TilerFront
             EventDisplay UiData = getDisplayUINode(EventScheduleNode);
             Procrastination procrastinationData = generateProcrastinationObject(EventScheduleNode);
             NowProfile NowProfileData = generateNowProfile(EventScheduleNode);
-            bool procrastinationEventFlag = Convert.ToBoolean(EventScheduleNode.SelectSingleNode("isProcrastinateEvent")?.InnerText?? "False");
+            bool procrastinationEventFlag = Convert.ToBoolean(EventScheduleNode.SelectSingleNode("isProcrastinateEvent")?.InnerText ?? "False");
             bool rigidFlag = Convert.ToBoolean(Rigid);
             string timeZone = EventScheduleNode.SelectSingleNode("TimeZone")?.InnerText ?? "UTC";
             TilerUser creator = getTilerLoggedUser(EventScheduleNode.SelectSingleNode("UserNode"));
@@ -1548,12 +1563,12 @@ namespace TilerFront
                     UserName = this.UserName,
                     isNull = false
                 };
-                if(creator.Id == this._TilerUser.Id)
+                if (creator.Id == this._TilerUser.Id)
                 {
                     creator = this._TilerUser;
                 }
             }
-            
+
             TilerUserGroup userGroup = getTilerUserGroup(EventScheduleNode.SelectSingleNode("UserGroup"));
             CalendarEvent RetrievedEvent = null;
             if (rigidFlag)
@@ -1563,8 +1578,8 @@ namespace TilerFront
                     RetrievedEvent = new RigidCalendarEvent(//new EventID(ID), 
                     Name, start, end, CalendarEventDuration, PreDeadline, PrepTime, Recurrence, location, UiData, noteData, EVentEnableFlag, completedFlag, creator, userGroup, timeZone, new EventID(ID));
                 }
-                
-                    
+
+
 
 
             } else
@@ -1590,6 +1605,18 @@ namespace TilerFront
                 return null;
             }*/
 
+
+            XmlNode calendarTypeNode = EventScheduleNode.SelectSingleNode("ThirdpartyType");
+            if (calendarTypeNode != null)
+            {
+                ThirdPartyControl.CalendarTool calendarType = getThirdPartyCalendarType(calendarTypeNode);
+                if (calendarType != ThirdPartyControl.CalendarTool.tiler)
+                {
+                    DB_CalendarEvent calEvent = (RetrievedEvent as DB_CalendarEvent);
+                    calEvent.CalendarType = calendarType;
+                }
+            }
+
             if (rigidFlag && procrastinationEventFlag)
             {
                 RetrievedEvent = new DB_ProcrastinateCalendarEvent(RetrievedEvent as DB_ProcrastinateCalendarEvent, AllSubCalEvents);
@@ -1598,16 +1625,16 @@ namespace TilerFront
             {
                 RetrievedEvent = new CalendarEvent(RetrievedEvent, AllSubCalEvents);
             }
-                
-            
-            
+
+
+
             if (restrictedNode != null)
             {
                 if (Convert.ToBoolean(restrictedNode.InnerText))
                 {
                     XmlNode RestrictionProfileNode = EventScheduleNode.SelectSingleNode("RestrictionProfile");
                     DB_RestrictionProfile myRestrictionProfile = (DB_RestrictionProfile)getRestrictionProfile(RestrictionProfileNode);
-                    RetrievedEvent = new DB_CalendarEventRestricted(RetrievedEvent,myRestrictionProfile, this.Now);
+                    RetrievedEvent = new DB_CalendarEventRestricted(RetrievedEvent, myRestrictionProfile, this.Now);
                 }
             }
 
@@ -1619,7 +1646,6 @@ namespace TilerFront
             {
                 CompleteCount = RetrievedEvent.AllSubEvents.Where(obj => obj.getIsComplete).Count();
             }
-
 
             if ((deleteNode != null))
             {
@@ -1637,7 +1663,6 @@ namespace TilerFront
                 timeCreated = DateTimeOffset.Parse(timeCreatednode.ToString());
                 RetrievedEvent.TimeCreated = timeCreated;
             }
-
 
             RetrievedEvent.InitializeCounts(DeleteCount, CompleteCount);
 
@@ -1849,6 +1874,16 @@ namespace TilerFront
                 retrievedSubEvent.TravelTimeAfter = TravelTimeAfter;
                 retrievedSubEvent.TravelTimeBefore = TravelTimeBefore;
                 MyArrayOfNodes.Add(retrievedSubEvent);
+                XmlNode calendarTypeNode = SubEventNode.SelectSingleNode("ThirdpartyType");
+                if (calendarTypeNode != null)
+                {
+                    ThirdPartyControl.CalendarTool calendarType = getThirdPartyCalendarType(calendarTypeNode);
+                    if (calendarType != ThirdPartyControl.CalendarTool.tiler)
+                    {
+                        DB_SubCalendarEvent subEvent = (retrievedSubEvent as DB_SubCalendarEvent);
+                        subEvent.CalendarType = calendarType;
+                    }
+                }
                 createReasonObjects(retrievedSubEvent, MyXmlNode.ChildNodes[i]);
             }
             
@@ -1924,6 +1959,12 @@ namespace TilerFront
         DayOfWeek getRestrictionDayOfWeek(XmlNode RestrictionDayOfWeek)
         {
             DayOfWeek retValue = Utility.ParseEnum<DayOfWeek>(RestrictionDayOfWeek.SelectSingleNode("RestrictionDayOfWeek").InnerText);
+            return retValue;
+        }
+
+        ThirdPartyControl.CalendarTool getThirdPartyCalendarType(XmlNode thirdPartyTypeNode)
+        {
+            ThirdPartyControl.CalendarTool retValue = Utility.ParseEnum<ThirdPartyControl.CalendarTool>(thirdPartyTypeNode.InnerText);
             return retValue;
         }
 
