@@ -602,6 +602,7 @@ namespace TilerFront.Controllers
                 DateTimeOffset myNow = myNow = myAuthorizedUser.getRefNow();
                 DB_Schedule MySchedule = new DB_Schedule(myUser, myNow);
                 DB_UserActivity activity = new DB_UserActivity(myNow, UserActivity.ActivityType.Shuffle);
+                await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, myUser.UserID, db).ConfigureAwait(false);
                 ScheduleDump scheduleDump = await MySchedule.CreateScheduleDump(notes: UserData.Notes).ConfigureAwait(false);
                 scheduleDump.Notes = UserData.Notes;
                 await MySchedule.CreateAndPersistScheduleDump(scheduleDump).ConfigureAwait(false);

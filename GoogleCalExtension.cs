@@ -21,7 +21,7 @@ namespace TilerFront
     {
         static HashSet<string> GoogleIDs = new HashSet<string>();
         
-        public static SubCalEvent ToRepeatInstance(this Google.Apis.Calendar.v3.Data.Event myEvent, EventID CalendarID,uint CurrentCount)
+        public static SubCalEvent ToRepeatInstance(this Event myEvent, EventID CalendarID,uint CurrentCount)
         {
             SubCalEvent retValue = new SubCalEvent();
             retValue.ThirdPartyEventID = myEvent.Id;
@@ -57,7 +57,7 @@ namespace TilerFront
             return retValue;
         }
         
-        public static SubCalEvent ToSubCal(this Google.Apis.Calendar.v3.Data.Event myEvent, EventID AuthenticationID, uint CurrentCount,Google.Apis.Calendar.v3.CalendarService CalendarServiceData)
+        public static SubCalEvent ToSubCal(this Event myEvent, EventID AuthenticationID, uint CurrentCount)
         {
             SubCalEvent retValue = new SubCalEvent();
             retValue.ThirdPartyEventID = myEvent.Id;
@@ -91,13 +91,13 @@ namespace TilerFront
             return retValue;
         }
 
-        public async static Task<IEnumerable<SubCalendarEvent>> getAllSubCallEvents(IList<Google.Apis.Calendar.v3.Data.Event> AllSubCals, Google.Apis.Calendar.v3.CalendarService CalendarServiceData, string UserID, EventID AuthenticationID)
+        public async static Task<IEnumerable<SubCalendarEvent>> getAllSubCallEvents(IList<Event> AllSubCals, CalendarService CalendarServiceData, string UserID, EventID AuthenticationID)
         {
             //ThirdPartyControl.CalendarTool calendarInUser =  ThirdPartyControl.CalendarTool.Google;
             
-            List<Google.Apis.Calendar.v3.Data.Event> AllSubCalNoCancels = AllSubCals.Where(obj => obj.Status != "cancelled").ToList();
+            List<Event> AllSubCalNoCancels = AllSubCals.Where(obj => obj.Status != "cancelled").ToList();
 
-            Dictionary<string,Google.Apis.Calendar.v3.Data.Event > RepeatingIDs = new Dictionary<string,Google.Apis.Calendar.v3.Data.Event>();
+            Dictionary<string, Event> RepeatingIDs = new Dictionary<string, Event>();
 
             ConcurrentBag<SubCalEvent> RetValue = new ConcurrentBag<SubCalEvent>();
 
@@ -106,7 +106,7 @@ namespace TilerFront
             uint i = 0;
             for (; i < AllSubCalNoCancels.Count;i++ )
             {
-                Google.Apis.Calendar.v3.Data.Event GoogleEvent = AllSubCalNoCancels[(int)i];
+                Event GoogleEvent = AllSubCalNoCancels[(int)i];
 
                 
 
@@ -119,7 +119,7 @@ namespace TilerFront
                         if (GoogleEvent.Recurrence == null)
                         {
                             GoogleIDs.Add(GoogleEvent.Id);
-                            RetValue.Add(GoogleEvent.ToSubCal(AuthenticationID,i, CalendarServiceData));
+                            RetValue.Add(GoogleEvent.ToSubCal(AuthenticationID,i));
                         }
                         else
                         {
@@ -131,7 +131,7 @@ namespace TilerFront
             }
 
 
-            KeyValuePair<string, Google.Apis.Calendar.v3.Data.Event> []DictAsArray = RepeatingIDs.ToArray();
+            KeyValuePair<string, Event> []DictAsArray = RepeatingIDs.ToArray();
 
 
             //foreach (KeyValuePair<string, Google.Apis.Calendar.v3.Data.Event> eachKeyValuePair in RepeatingIDs)
@@ -142,12 +142,12 @@ namespace TilerFront
             //Parallel.For(0, DictAsArray.Length, async (j) =>
                 {
                     uint myIndex = i + j;
-                    KeyValuePair<string, Google.Apis.Calendar.v3.Data.Event> eachKeyValuePair = DictAsArray[j];
+                    KeyValuePair<string, Event> eachKeyValuePair = DictAsArray[j];
                     var RepetitionData = CalendarServiceData.Events.Instances(UserID, eachKeyValuePair.Key);
                     RepetitionData.ShowDeleted = false;
                     RepetitionData.TimeMax = DateTime.Now.AddDays(90);
                     var generatedRsults = await RepetitionData.ExecuteAsync().ConfigureAwait(false);
-                    List<SubCalEvent> AllRepeatSubCals = generatedRsults.Items.Select(obj => obj.ToSubCal(AuthenticationID,(myIndex), CalendarServiceData)).ToList();
+                    List<SubCalEvent> AllRepeatSubCals = generatedRsults.Items.Select(obj => obj.ToSubCal(AuthenticationID,(myIndex))).ToList();
                     AllRepeatSubCals.ForEach(obj => {
                         if (!GoogleIDs.Contains(obj.ThirdPartyEventID))
                         {RetValue.Add(obj); }
@@ -160,12 +160,12 @@ namespace TilerFront
 
         
 
-        static List<SubCalendarEvent> generateRepeatSubCalendarEvent(EventID CalendarEventID, IList<Google.Apis.Calendar.v3.Data.Event> AllSubCalEvents)
+        static List<SubCalendarEvent> generateRepeatSubCalendarEvent(EventID CalendarEventID, IList<Event> AllSubCalEvents)
         {
             uint j = 1;
             List<SubCalEvent> RetValueSubCalEvents = new List<SubCalEvent>();
             List<SubCalendarEvent> RetValue = new List<SubCalendarEvent>();
-            foreach(Google.Apis.Calendar.v3.Data.Event eachEvent in AllSubCalEvents)
+            foreach(Event eachEvent in AllSubCalEvents)
             {
                 if (!GoogleIDs.Contains(eachEvent.Id))
                 {
@@ -178,11 +178,11 @@ namespace TilerFront
             return RetValue;
         }
 
-        public async static Task<IEnumerable<CalendarEvent>> getAllCalEvents(IList<Google.Apis.Calendar.v3.Data.Event> AllSubCals, Google.Apis.Calendar.v3.CalendarService CalendarServiceData, string UserID,EventID AuthenticationID, TimeLine CalculationTimeLine, bool retrieveLocationFromGoogle)
+        public async static Task<IEnumerable<CalendarEvent>> getAllCalEvents(IList<Event> AllSubCals, CalendarService CalendarServiceData, string UserID,EventID AuthenticationID, TimeLine CalculationTimeLine, bool retrieveLocationFromGoogle)
         {
-            List<Google.Apis.Calendar.v3.Data.Event> AllSubCalNoCancels = AllSubCals.Where(obj => obj.Status != "cancelled").ToList();
+            List<Event> AllSubCalNoCancels = AllSubCals.Where(obj => obj.Status != "cancelled").ToList();
 
-            Dictionary<string, Google.Apis.Calendar.v3.Data.Event> RepeatingIDs = new Dictionary<string, Google.Apis.Calendar.v3.Data.Event>();
+            Dictionary<string, Event> RepeatingIDs = new Dictionary<string, Event>();
 
             ConcurrentBag<CalendarEvent> RetValue = new ConcurrentBag<CalendarEvent>();
             if (CalculationTimeLine == null) {
@@ -193,14 +193,14 @@ namespace TilerFront
             uint i = 0;
             for (; i < AllSubCalNoCancels.Count; i++)
             {
-                Google.Apis.Calendar.v3.Data.Event GoogleEvent = AllSubCalNoCancels[(int)i];
+                Event GoogleEvent = AllSubCalNoCancels[(int)i];
                 if (GoogleEvent.Start.DateTime != null)
                 {
                     TimeLine EventRange = new TimeLine(GoogleEvent.Start.DateTime.Value.ToUniversalTime(), GoogleEvent.End.DateTime.Value.ToUniversalTime());
                     if (EventRange.InterferringTimeLine(CalculationTimeLine) != null || GoogleEvent.Recurrence != null) // took out manual check for repetition because of we set the property singleEvents in  the function getGoogleEvents in class GoogleTilerEventControl.cs. If you need the manual look up run "git checkout 8db3dab166909255ce112" and jump back to this file you should see logic about this below.
                     {
                         GoogleIDs.Add(GoogleEvent.Id);
-                        CalendarEvent calEvent = GoogleCalendarEvent.convertFromGoogleToCalendarEvent(GoogleEvent.ToSubCal(AuthenticationID, i, CalendarServiceData));
+                        CalendarEvent calEvent = GoogleCalendarEvent.convertFromGoogleToCalendarEvent(GoogleEvent.ToSubCal(AuthenticationID, i));
                         RetValue.Add(calEvent);
                         locations.Add(calEvent.Location);
                     }
