@@ -1861,7 +1861,7 @@ namespace TilerFront
                 XmlNode timeCreatednode = MyXmlNode.ChildNodes[i].SelectSingleNode("TimeCreated");
                 if (timeCreatednode != null)
                 {
-                    timeCreated = DateTimeOffset.Parse(timeCreatednode.ToString());
+                    timeCreated = DateTimeOffset.Parse(timeCreatednode.InnerText);
                     retrievedSubEvent.TimeCreated = timeCreated;
                 }
 
