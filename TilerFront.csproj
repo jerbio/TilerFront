@@ -539,7 +539,6 @@
     <Compile Include="Models\UrgencyTier.cs" />
     <Compile Include="Models\UserSchedule.cs" />
     <Compile Include="Models\WhatIfModel.cs" />
-    <Compile Include="NogControl.cs" />
     <Compile Include="OutLookConnector.cs" />
     <Compile Include="PeekResult.cs" />
     <Compile Include="PostBackData.cs" />
