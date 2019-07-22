@@ -37,7 +37,7 @@ namespace TilerFront
         async virtual protected Task Initialize(DateTimeOffset referenceNow)
         {
             DateTimeOffset StartOfDay = myAccount.ScheduleData.getDayReferenceTime();
-            _Now = new ReferenceNow(referenceNow, StartOfDay);
+            _Now = new ReferenceNow(referenceNow, StartOfDay, myAccount.getTilerUser().TimeZoneDifference);
             TimeLine RangeOfLookup = new TimeLine(_Now.constNow.AddYears(-10), _Now.constNow.AddYears(10));
             Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, Location>> profileData = await myAccount.ScheduleData.getProfileInfo(RangeOfLookup, _Now, retrievalOption).ConfigureAwait(false);
             myAccount.Now = _Now;
@@ -68,7 +68,7 @@ namespace TilerFront
                 throw new Exception("Using non verified tiler Account, try logging into account first.");
             }
 
-            _Now = new ReferenceNow(referenceNow, StartOfDay);
+            _Now = new ReferenceNow(referenceNow, StartOfDay, myAccount.getTilerUser().TimeZoneDifference);
             TimeLine RangeOfLookup = new TimeLine(_Now.constNow.AddYears(-10), _Now.constNow.AddYears(10));
             Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, Location>> profileData = await myAccount.ScheduleData.getProfileInfo(RangeOfLookup, _Now, this.retrievalOption).ConfigureAwait(false);
             if (profileData != null)

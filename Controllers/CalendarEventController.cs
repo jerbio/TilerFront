@@ -87,6 +87,7 @@ namespace TilerFront.Controllers
         public async Task<IHttpActionResult> DeleteCalEvent([FromBody]getEventModel myUser)
         {
             UserAccount retrievedUser = await myUser.getUserAccount(db);// new UserAccount(myUser.UserName, myUser.UserID);
+            retrievedUser.getTilerUser().updateTimeZoneDifference(myUser.getTimeSpan);
             await retrievedUser.Login();
             PostBackData retValue;
             if (retrievedUser.Status)
@@ -132,6 +133,7 @@ namespace TilerFront.Controllers
         public async Task<IHttpActionResult> CompleteCalEvent([FromBody]getEventModel myUser)
         {
             UserAccount retrievedUser = await myUser.getUserAccount(db);// new UserAccount(myUser.UserName, myUser.UserID);
+            retrievedUser.getTilerUser().updateTimeZoneDifference(myUser.getTimeSpan);
             await retrievedUser.Login();
             PostBackData retValue;
             if (retrievedUser.Status)
@@ -232,9 +234,9 @@ namespace TilerFront.Controllers
                             DB_Schedule NewSchedule = new DB_Schedule(retrievedUser, myUser.getRefNow());
                             
                             DateTimeOffset newStart = TilerElementExtension.JSStartTime.AddMilliseconds(myUser.Start);
-                            newStart = newStart.Add(myUser.getTImeSpan);
+                            newStart = newStart.Add(myUser.getTimeSpan);
                             DateTimeOffset newEnd = TilerElementExtension.JSStartTime.AddMilliseconds(myUser.End);
-                            newEnd = newEnd.Add(myUser.getTImeSpan);
+                            newEnd = newEnd.Add(myUser.getTimeSpan);
                             int SplitCount = (int)myUser.Split;
                             TimeSpan SpanPerSplit = TimeSpan.FromMilliseconds(myUser.Duration);
                             CalendarEvent calEvent = NewSchedule.getCalendarEvent(myUser.EventID);

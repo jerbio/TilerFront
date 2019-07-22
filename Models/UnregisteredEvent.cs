@@ -132,7 +132,7 @@ namespace TilerFront.Models
             bool WorkWeek = Boolean.Parse(isWorkWeek);
             DateTimeOffset myNow = currentTime;
             DateTimeOffset RestrictStart = new DateTimeOffset(myNow.Year, myNow.Month, myNow.Day, 0,0, 0,new TimeSpan());
-            RestrictStart = RestrictStart.Add(-getTImeSpan);
+            RestrictStart = RestrictStart.Add(-getTimeSpan);
             DateTimeOffset RestrictEnd = RestrictStart.AddSeconds(-1);
             RestrictionProfile retValue;
             DayOfWeek[] selectedDaysOftheweek = { };
@@ -140,8 +140,8 @@ namespace TilerFront.Models
             {
                 if ((DateTimeOffset.TryParse(RestrictionStart, out RestrictStart)) && ((DateTimeOffset.TryParse(RestrictionEnd, out RestrictEnd))))
                 {
-                    RestrictStart = RestrictStart.Add(getTImeSpan);
-                    RestrictEnd = RestrictEnd.Add(getTImeSpan);
+                    RestrictStart = RestrictStart.Add(getTimeSpan);
+                    RestrictEnd = RestrictEnd.Add(getTimeSpan);
                     selectedDaysOftheweek = RestrictionProfile.AllDaysOfWeek.ToArray();
                     if (WorkWeek)
                     {
@@ -161,7 +161,7 @@ namespace TilerFront.Models
             }
 
 
-            retValue = RestrictiveWeek.getRestriction(getTImeSpan);
+            retValue = RestrictiveWeek.getRestriction(getTimeSpan);
 
             
             return retValue;

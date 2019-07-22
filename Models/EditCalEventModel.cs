@@ -26,7 +26,7 @@ namespace TilerFront.Models
         public DateTimeOffset getStart()
         {
             DateTimeOffset newStart = TilerElementExtension.JSStartTime.AddMilliseconds(this.Start);
-            newStart = newStart.Add(this.getTImeSpan);
+            newStart = newStart.Add(this.getTimeSpan);
             return newStart;
         }
 
@@ -34,7 +34,7 @@ namespace TilerFront.Models
         public DateTimeOffset getEnd()
         {
             DateTimeOffset newEnd = TilerElementExtension.JSStartTime.AddMilliseconds(this.End);
-            newEnd = newEnd.Add(this.getTImeSpan);
+            newEnd = newEnd.Add(this.getTimeSpan);
             return newEnd;
         }
     }

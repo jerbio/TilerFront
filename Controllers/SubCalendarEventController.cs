@@ -24,7 +24,8 @@ namespace TilerFront.Controllers
         [Route("api/SubCalendarEvent/Update")]
         public async Task<IHttpActionResult> UpdateCalEvent([FromBody]EditSubCalEventModel myUser)
         {
-            UserAccount retrievedUser = await myUser.getUserAccount(db); //new UserAccountDirect(myUser.UserName, myUser.UserID);
+            UserAccount retrievedUser = await myUser.getUserAccount(db);
+            retrievedUser.getTilerUser().updateTimeZoneDifference(myUser.getTimeSpan);
             await retrievedUser.Login();
             PostBackData retValue = new PostBackData("", 1);
             if (retrievedUser.Status)
@@ -64,13 +65,13 @@ namespace TilerFront.Controllers
                             long LongBegin = Convert.ToInt64(myUser.CalStart);
                             long LongDeadline = Convert.ToInt64(myUser.CalEnd);
                             DateTimeOffset newStart = TilerElementExtension.JSStartTime.AddMilliseconds(StartLong);
-                            newStart = newStart.Add(myUser.getTImeSpan);
+                            newStart = newStart.Add(myUser.getTimeSpan);
                             DateTimeOffset newEnd = TilerElementExtension.JSStartTime.AddMilliseconds(EndLong);
-                            newEnd = newEnd.Add(myUser.getTImeSpan);
+                            newEnd = newEnd.Add(myUser.getTimeSpan);
                             DateTimeOffset Begin = TilerElementExtension.JSStartTime.AddMilliseconds(LongBegin);
-                            Begin = Begin.Add(myUser.getTImeSpan);
+                            Begin = Begin.Add(myUser.getTimeSpan);
                             DateTimeOffset Deadline = TilerElementExtension.JSStartTime.AddMilliseconds(LongDeadline);
-                            Deadline = Deadline.Add(myUser.getTImeSpan);
+                            Deadline = Deadline.Add(myUser.getTimeSpan);
                             int SplitCount = (int)myUser.Split;
                             if(SplitCount >= 1)
                             {

@@ -16,7 +16,7 @@ namespace TilerFront.Models
         /// </summary>
         public string TimeZone { get; set; } = "UTC";
         protected DateTimeOffset refNow = DateTimeOffset.UtcNow;
-        public TimeSpan getTImeSpan
+        public TimeSpan getTimeSpan
         {
             get 
             {
