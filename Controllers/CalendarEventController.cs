@@ -87,8 +87,8 @@ namespace TilerFront.Controllers
         public async Task<IHttpActionResult> DeleteCalEvent([FromBody]getEventModel myUser)
         {
             UserAccount retrievedUser = await myUser.getUserAccount(db);// new UserAccount(myUser.UserName, myUser.UserID);
-            retrievedUser.getTilerUser().updateTimeZoneDifference(myUser.getTimeSpan);
             await retrievedUser.Login();
+            retrievedUser.getTilerUser().updateTimeZoneDifference(myUser.getTimeSpan);
             PostBackData retValue;
             if (retrievedUser.Status)
             {
@@ -133,8 +133,8 @@ namespace TilerFront.Controllers
         public async Task<IHttpActionResult> CompleteCalEvent([FromBody]getEventModel myUser)
         {
             UserAccount retrievedUser = await myUser.getUserAccount(db);// new UserAccount(myUser.UserName, myUser.UserID);
-            retrievedUser.getTilerUser().updateTimeZoneDifference(myUser.getTimeSpan);
             await retrievedUser.Login();
+            retrievedUser.getTilerUser().updateTimeZoneDifference(myUser.getTimeSpan);
             PostBackData retValue;
             if (retrievedUser.Status)
             {
@@ -168,13 +168,12 @@ namespace TilerFront.Controllers
         {
             UserAccount retrievedUser = await nowEvent.getUserAccount(db); //new UserAccountDirect(myUser.UserName, myUser.UserID);
             await retrievedUser.Login();
+            retrievedUser.getTilerUser().updateTimeZoneDifference(nowEvent.getTimeSpan);
             PostBackData retValue;
             if (retrievedUser.Status)
             {
                 DB_Schedule NewSchedule = new DB_Schedule(retrievedUser, nowEvent.getRefNow());
-
                 await ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(NewSchedule, nowEvent.UserID, db).ConfigureAwait(false);
-
                 var ScheduleUpdateMessage = NewSchedule.SetCalendarEventAsNow(nowEvent.ID);
                 DB_UserActivity activity = new DB_UserActivity(nowEvent.getRefNow(), UserActivity.ActivityType.SetAsNowCalendarEvent, new List<String>() { nowEvent.ID });
                 JObject json = JObject.FromObject(nowEvent);
@@ -204,6 +203,7 @@ namespace TilerFront.Controllers
         {
             UserAccount retrievedUser = await myUser.getUserAccount(db); //new UserAccountDirect(myUser.UserName, myUser.UserID);
             await retrievedUser.Login();
+            retrievedUser.getTilerUser().updateTimeZoneDifference(myUser.getTimeSpan);
             PostBackData retValue = new PostBackData("", 1);
 
 
@@ -231,6 +231,7 @@ namespace TilerFront.Controllers
                         break;
                     case "tiler":
                         {
+                            
                             DB_Schedule NewSchedule = new DB_Schedule(retrievedUser, myUser.getRefNow());
                             
                             DateTimeOffset newStart = TilerElementExtension.JSStartTime.AddMilliseconds(myUser.Start);

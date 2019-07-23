@@ -1691,7 +1691,11 @@ namespace TilerFront
                 timeCreated = DateTimeOffset.Parse(timeCreatednode.InnerText.ToString());
                 RetrievedEvent.TimeCreated = timeCreated;
             }
-            EventPreference eventPreference = getEventPreference(eventPreferenceNode);
+            EventPreference eventPreference = new EventPreference();
+            if (eventPreferenceNode!=null)
+            {
+                eventPreference = getEventPreference(eventPreferenceNode);
+            }
             RetrievedEvent.DayPreference_DB = eventPreference;
 
             RetrievedEvent.InitializeCounts(DeleteCount, CompleteCount);

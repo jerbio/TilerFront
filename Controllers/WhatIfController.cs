@@ -24,6 +24,7 @@ namespace TilerFront.Controllers
             AuthorizedUser myAuthorizedUser = UserData.User;
             UserAccount myUserAccount = await UserData.getUserAccount(db);
             await myUserAccount.Login();
+            myUserAccount.getTilerUser().updateTimeZoneDifference(UserData.getTimeSpan);
             PostBackData returnPostBack;
             if (myUserAccount.Status)
             {
@@ -55,6 +56,7 @@ namespace TilerFront.Controllers
             AuthorizedUser myAuthorizedUser = UserData.User;
             UserAccount myUserAccount = await UserData.getUserAccount(db);
             await myUserAccount.Login();
+            myUserAccount.getTilerUser().updateTimeZoneDifference(UserData.getTimeSpan);
             PostBackData returnPostBack;
             if (myUserAccount.Status)
             {

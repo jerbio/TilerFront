@@ -25,8 +25,8 @@ namespace TilerFront.Controllers
         public async Task<IHttpActionResult> UpdateCalEvent([FromBody]EditSubCalEventModel myUser)
         {
             UserAccount retrievedUser = await myUser.getUserAccount(db);
-            retrievedUser.getTilerUser().updateTimeZoneDifference(myUser.getTimeSpan);
             await retrievedUser.Login();
+            retrievedUser.getTilerUser().updateTimeZoneDifference(myUser.getTimeSpan);
             PostBackData retValue = new PostBackData("", 1);
             if (retrievedUser.Status)
             {

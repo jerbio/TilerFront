@@ -37,7 +37,7 @@ namespace TilerFront
         /// <returns></returns>
         public virtual TilerUser getTilerUser()
         {
-            return SessionUser;
+            return SessionUser;// if this is null check if you made call to login()
         }
 
         protected TilerUser SessionUser

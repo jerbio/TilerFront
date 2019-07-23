@@ -63,6 +63,7 @@ namespace TilerFront.Controllers
             UserAccount myUserAccount = await myAuthorizedUser.getUserAccount(db);
             HttpContext myCOntext = HttpContext.Current;
             await myUserAccount.Login();
+            myUserAccount.getTilerUser().updateTimeZoneDifference(myAuthorizedUser.getTimeSpan);
             PostBackData returnPostBack;
             if (myUserAccount.Status)
             {
@@ -141,9 +142,9 @@ namespace TilerFront.Controllers
         public async Task<IHttpActionResult> GetDeletedSchedule([FromUri] getScheduleModel myAuthorizedUser)
         {
             UserAccount myUserAccount = await myAuthorizedUser.getUserAccount(db);
-            myUserAccount.getTilerUser().updateTimeZoneDifference(myAuthorizedUser.getTimeSpan);
             HttpContext myCOntext = HttpContext.Current;
             await myUserAccount.Login();
+            myUserAccount.getTilerUser().updateTimeZoneDifference(myAuthorizedUser.getTimeSpan);
             PostBackData returnPostBack;
             if (myUserAccount.Status)
             {
@@ -200,9 +201,8 @@ namespace TilerFront.Controllers
         public async Task<IHttpActionResult> PauseSchedule([FromBody]getEventModel myAuthorizedUser)
         {
             UserAccount myUser = await myAuthorizedUser.getUserAccount(db);
-            myUser.getTilerUser().updateTimeZoneDifference(myAuthorizedUser.getTimeSpan);
             await myUser.Login();
-
+            myUser.getTilerUser().updateTimeZoneDifference(myAuthorizedUser.getTimeSpan);
             if (myUser.Status)
             {
                 List<PausedEvent> pausedEvents = getCurrentPausedEventAndPausedEventWithId(db, myAuthorizedUser.EventID, myUser.UserID);
@@ -272,8 +272,8 @@ namespace TilerFront.Controllers
         public async Task<IHttpActionResult> ResumeSchedule([FromBody]getEventModel myAuthorizedUser)
         {
             UserAccount myUser = await myAuthorizedUser.getUserAccount(db);
-            myUser.getTilerUser().updateTimeZoneDifference(myAuthorizedUser.getTimeSpan);
             await myUser.Login();
+            myUser.getTilerUser().updateTimeZoneDifference(myAuthorizedUser.getTimeSpan);
             if (myUser.Status)
             {
                 PausedEvent PausedEvent = getCurrentPausedEvent(db, myUser.UserID);
@@ -447,8 +447,8 @@ namespace TilerFront.Controllers
         {
             AuthorizedUser myAuthorizedUser = UserData.User;
             UserAccount myUserAccount = await UserData.getUserAccount(db);
-            myUserAccount.getTilerUser().updateTimeZoneDifference(UserData.getTimeSpan);
             await myUserAccount.Login();
+            myUserAccount.getTilerUser().updateTimeZoneDifference(UserData.getTimeSpan);
             if (myUserAccount.Status)
             {
                 TimeDuration ProcrastinateDuration = UserData.ProcrastinateDuration;
@@ -510,8 +510,8 @@ namespace TilerFront.Controllers
             TimeDuration ProcrastinateDuration = UserData.ProcrastinateDuration;
             TimeSpan fullTimeSpan = myAuthorizedUser.getTimeSpan;
             UserAccount myUser = await UserData.getUserAccount(db);
-            myUser.getTilerUser().updateTimeZoneDifference(UserData.getTimeSpan);
             await myUser.Login();
+            myUser.getTilerUser().updateTimeZoneDifference(UserData.getTimeSpan);
 
             DateTimeOffset myNow = myAuthorizedUser.getRefNow();// myAuthorizedUser.getRefNow();
             DB_Schedule MySchedule = new DB_Schedule(myUser,myNow);
@@ -541,8 +541,8 @@ namespace TilerFront.Controllers
         {
             AuthorizedUser myAuthorizedUser = UserData.User;
             UserAccount myUser = await UserData.getUserAccount(db);
-            myUser.getTilerUser().updateTimeZoneDifference(UserData.getTimeSpan);
             await myUser.Login();
+            myUser.getTilerUser().updateTimeZoneDifference(UserData.getTimeSpan);
             if (myUser.Status)
             {
                 DateTimeOffset myNow = myNow = myAuthorizedUser.getRefNow();
@@ -601,8 +601,8 @@ namespace TilerFront.Controllers
         {
             AuthorizedUser myAuthorizedUser = UserData.User;
             UserAccount myUser = await UserData.getUserAccount(db);
-            myUser.getTilerUser().updateTimeZoneDifference(UserData.getTimeSpan);
             await myUser.Login();
+            myUser.getTilerUser().updateTimeZoneDifference(UserData.getTimeSpan);
             if (myUser.Status)
             {
                 DateTimeOffset myNow = myNow = myAuthorizedUser.getRefNow();
@@ -639,8 +639,8 @@ namespace TilerFront.Controllers
         {
             AuthorizedUser myAuthorizedUser = UserData.User;
             UserAccount myUser = await UserData.getUserAccount(db);
-            myUser.getTilerUser().updateTimeZoneDifference(UserData.getTimeSpan);
             await myUser.Login();
+            myUser.getTilerUser().updateTimeZoneDifference(UserData.getTimeSpan);
             if (myUser.Status)
             {
                 ScheduleDump retValue = await myUser.ScheduleLogControl.GetScheduleDump(UserData.Id).ConfigureAwait(false);
@@ -668,8 +668,8 @@ namespace TilerFront.Controllers
         public async Task<IHttpActionResult> CompleteSubCalendarEvent([FromBody]getEventModel UserData)
         {
             UserAccount retrievedUser = await UserData.getUserAccount(db);
-            retrievedUser.getTilerUser().updateTimeZoneDifference(UserData.getTimeSpan);
             await retrievedUser.Login();
+            retrievedUser.getTilerUser().updateTimeZoneDifference(UserData.getTimeSpan);
             PostBackData retValue = new PostBackData("", 1);
             DB_UserActivity activity = new DB_UserActivity(UserData.getRefNow(), UserActivity.ActivityType.CompleteSingle);
             JObject json = JObject.FromObject(UserData);
@@ -722,8 +722,8 @@ namespace TilerFront.Controllers
         public async Task<IHttpActionResult> CompleteSubCalendarEvents([FromBody]getEventModel UserData)
         {
             UserAccount myUser = await UserData.getUserAccount(db);
-            myUser.getTilerUser().updateTimeZoneDifference(UserData.getTimeSpan);
             await myUser.Login();
+            myUser.getTilerUser().updateTimeZoneDifference(UserData.getTimeSpan);
             DateTimeOffset myNow = UserData.getRefNow();
             DB_Schedule MySchedule = new DB_Schedule(myUser, myNow);
             IEnumerable<string> AllEventIDs = UserData.EventID.Split(',');
@@ -757,10 +757,10 @@ namespace TilerFront.Controllers
         {
             UserAccount retrievedUser = await myUser.getUserAccount(db);// new UserAccountDirect(myUser.UserName, myUser.UserID);
             await retrievedUser.Login();
+            retrievedUser.getTilerUser().updateTimeZoneDifference(myUser.getTimeSpan);
             PostBackData retValue;
             if (retrievedUser.Status)
             {
-                retrievedUser.getTilerUser().updateTimeZoneDifference(myUser.getTimeSpan);
                 DateTimeOffset myNow = myUser.getRefNow();
 
                 DB_Schedule MySchedule = new DB_Schedule(retrievedUser, myNow);
@@ -799,6 +799,7 @@ namespace TilerFront.Controllers
         {
             UserAccount retrievedUser = await myUser.getUserAccount(db);// new UserAccountDirect(myUser.UserName, myUser.UserID);
             await retrievedUser.Login();
+            retrievedUser.getTilerUser().updateTimeZoneDifference(myUser.getTimeSpan);
             PostBackData retValue;
             if (retrievedUser.Status)
             {
@@ -831,6 +832,7 @@ namespace TilerFront.Controllers
         {
             UserAccount retrievedUser = await myUser.getUserAccount(db);
             await retrievedUser.Login();
+            retrievedUser.getTilerUser().updateTimeZoneDifference(myUser.getTimeSpan);
             PostBackData retValue= new PostBackData("", 1);
             if (retrievedUser.Status)
             {
@@ -901,8 +903,8 @@ namespace TilerFront.Controllers
         public async Task<IHttpActionResult> DeleteEvents([FromBody]getEventModel myUser)
         {
             UserAccount retrievedUser = await myUser.getUserAccount(db);
-            retrievedUser.getTilerUser().updateTimeZoneDifference(myUser.getTimeSpan);
             await retrievedUser.Login();
+            retrievedUser.getTilerUser().updateTimeZoneDifference(myUser.getTimeSpan);
             PostBackData retValue;
             if (retrievedUser.Status)
             {
@@ -995,7 +997,6 @@ namespace TilerFront.Controllers
             string StartTime = StartHour + ":" + StartMins;
             string EndTime = EndHour + ":" + EndMins;
             UserAccount myUser = await newEvent.getUserAccount(db);
-            myUser.getTilerUser().updateTimeZoneDifference(newEvent.getTimeSpan);
 
             DateTimeOffset StartDateEntry = new DateTimeOffset(Convert.ToInt32(StartYear), Convert.ToInt32(StartMonth), Convert.ToInt32(StartDay), 0, 0, 0, new TimeSpan());
             DateTimeOffset EndDateEntry = new DateTimeOffset(Convert.ToInt32(EndYear), Convert.ToInt32(EndMonth), Convert.ToInt32(EndDay), 0, 0, 0, new TimeSpan());
@@ -1088,6 +1089,7 @@ namespace TilerFront.Controllers
             PostBackData retValue;
             await myUser.Login();
             TilerUser tilerUser = myUser.getTilerUser();
+            myUser.getTilerUser().updateTimeZoneDifference(newEvent.getTimeSpan);
             Task HoldUpForWriteNewEvent;
             Task CommitChangesToSchedule;
             if (myUser.Status)
@@ -1312,7 +1314,7 @@ namespace TilerFront.Controllers
             UserAccount myUser = await newEvent.getUserAccount(db);
             PostBackData retValue;
             await myUser.Login();
-
+            myUser.getTilerUser().updateTimeZoneDifference(newEvent.getTimeSpan);
             TilerUser tilerUser = myUser.getTilerUser();
 
             Task HoldUpForWriteNewEvent;
