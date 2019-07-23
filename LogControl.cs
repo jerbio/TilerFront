@@ -1304,7 +1304,6 @@ namespace TilerFront
             if (includeSubEvents)
             {
                 calEVents = calEVents
-                    .Where(calEvent => calEvent.IsEnabled_DB)
                     .Include(calEvent => calEvent.DataBlob_EventDB)
                     .Include(calEvent => calEvent.Name)
                     .Include(calEvent => calEvent.Name.Creator_EventDB)
@@ -1357,12 +1356,13 @@ namespace TilerFront
             return calEVents;
         }
 
-        async public virtual Task<Dictionary<string, CalendarEvent>> getAllCalendarFromXml(TimeLine RangeOfLookUP, ReferenceNow Now, bool includeSubEvents = true, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation, string singleCalEventId = null)
+        async public virtual Task<Dictionary<string, CalendarEvent>> getAllEnabledCalendarFromXml(TimeLine RangeOfLookUP, ReferenceNow Now, bool includeSubEvents = true, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation, string singleCalEventId = null)
         {
             if (RangeOfLookUP != null)
             {
                 bool isSingleId = !string.IsNullOrEmpty(singleCalEventId) && !string.IsNullOrWhiteSpace(singleCalEventId);
                 IQueryable<CalendarEvent> calEVents = getCalendarEventQuery(retrievalOption, includeSubEvents);
+                calEVents = calEVents.Where(calEvent => calEvent.IsEnabled_DB);
                 if (isSingleId)
                 {
                     calEVents = calEVents.Where(calEvent => calEvent.Id == singleCalEventId)
@@ -2471,7 +2471,7 @@ namespace TilerFront
             {
                 Task<Dictionary<string, TilerElements.Location>> TaskLocationCache = getAllLocationsByUser();
                 Dictionary<string, TilerElements.Location> LocationCache = await TaskLocationCache.ConfigureAwait(false);
-                Dictionary<string, CalendarEvent> AllScheduleData = await this.getAllCalendarFromXml(RangeOfLookup, Now, retrievalOption: retrievalOption, singleCalEventId: singleCalEventId);
+                Dictionary<string, CalendarEvent> AllScheduleData = await this.getAllEnabledCalendarFromXml(RangeOfLookup, Now, retrievalOption: retrievalOption, singleCalEventId: singleCalEventId);
 
                 DateTimeOffset ReferenceTime = getDayReferenceTime();
 

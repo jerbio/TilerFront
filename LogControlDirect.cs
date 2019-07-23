@@ -456,7 +456,7 @@ namespace TilerFront
         public async Task<CalendarEvent> getCalendarEventWithID(string ID, ReferenceNow now)
         {
             TimeLine RangeOfLookup = new TimeLine(DateTimeOffset.UtcNow.AddYears(-1000), DateTimeOffset.UtcNow.AddYears(1000));
-            Dictionary<string, CalendarEvent> AllScheduleData = await getAllCalendarFromXml(RangeOfLookup, now);
+            Dictionary<string, CalendarEvent> AllScheduleData = await getAllEnabledCalendarFromXml(RangeOfLookup, now);
             CalendarEvent retValue = null;
             if (AllScheduleData.ContainsKey(ID))
             {
@@ -478,7 +478,7 @@ namespace TilerFront
 #endif
 
             TimeLine RangeOfLookup = new TimeLine(DateTimeOffset.UtcNow.AddYears(-1000), DateTimeOffset.UtcNow.AddYears(1000));
-            Dictionary<string, CalendarEvent> AllScheduleData = await getAllCalendarFromXml(RangeOfLookup, null);// null for now object because for a name look up you don't need a now update
+            Dictionary<string, CalendarEvent> AllScheduleData = await getAllEnabledCalendarFromXml(RangeOfLookup, null);// null for now object because for a name look up you don't need a now update
             
             Name = Name.ToLower();
             if (AllScheduleData.Count > 0)
