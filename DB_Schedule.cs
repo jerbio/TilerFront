@@ -11,34 +11,36 @@ namespace TilerFront
     public class DB_Schedule:Schedule
     {
         protected UserAccount myAccount;
-        protected DB_Schedule(Dictionary<string, CalendarEvent> allEventDictionary, DateTimeOffset starOfDay, Dictionary<string, Location> locations, DateTimeOffset referenceNow, UserAccount userAccount, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation) : base(allEventDictionary, starOfDay, locations, referenceNow, userAccount.getTilerUser())
+        protected DB_Schedule(Dictionary<string, CalendarEvent> allEventDictionary, DateTimeOffset starOfDay, Dictionary<string, Location> locations, DateTimeOffset referenceNow, UserAccount userAccount, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation, TimeLine rangeOfLookup = null) : base(allEventDictionary, starOfDay, locations, referenceNow, userAccount.getTilerUser(), rangeOfLookup)
         {
             myAccount = userAccount;
         }
 
 
-        protected DB_Schedule(Dictionary<string, CalendarEvent> allEventDictionary, DateTimeOffset starOfDay, Dictionary<string, Location> locations, DateTimeOffset referenceNow, TilerUser user, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation):base(allEventDictionary, starOfDay, locations, referenceNow, user)
+        protected DB_Schedule(Dictionary<string, CalendarEvent> allEventDictionary, DateTimeOffset starOfDay, Dictionary<string, Location> locations, DateTimeOffset referenceNow, TilerUser user, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation, TimeLine rangeOfLookup = null) : base(allEventDictionary, starOfDay, locations, referenceNow, user, rangeOfLookup)
         {
 
         }
-        public DB_Schedule(UserAccount AccountEntry, DateTimeOffset referenceNow, DateTimeOffset startOfDay, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation):base()
+        public DB_Schedule(UserAccount AccountEntry, DateTimeOffset referenceNow, DateTimeOffset startOfDay, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation, TimeLine rangeOfLookup = null) : base()
         {
             myAccount = AccountEntry;
             this.retrievalOption = retrievalOption;
+            this.RangeOfLookup = rangeOfLookup;
             Initialize(referenceNow, startOfDay).Wait();
             
         }
-        public DB_Schedule(UserAccount AccountEntry, DateTimeOffset referenceNow, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation)
+        public DB_Schedule(UserAccount AccountEntry, DateTimeOffset referenceNow, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation, TimeLine rangeOfLookup = null)
         {
             myAccount = AccountEntry;
             this.retrievalOption = retrievalOption;
+            this.RangeOfLookup = rangeOfLookup;
             Initialize(referenceNow).Wait();
         }
         async virtual protected Task Initialize(DateTimeOffset referenceNow)
         {
             DateTimeOffset StartOfDay = myAccount.ScheduleData.getDayReferenceTime();
             _Now = new ReferenceNow(referenceNow, StartOfDay, myAccount.getTilerUser().TimeZoneDifference);
-            TimeLine RangeOfLookup = new TimeLine(_Now.constNow.AddYears(-10), _Now.constNow.AddYears(10));
+            this.RangeOfLookup = this.RangeOfLookup ?? new TimeLine(_Now.constNow.AddDays(-Schedule.TimeLookUpDayCount), _Now.constNow.AddYears(Schedule.TimeLookUpDayCount));
             Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, Location>> profileData = await myAccount.ScheduleData.getProfileInfo(RangeOfLookup, _Now, retrievalOption).ConfigureAwait(false);
             myAccount.Now = _Now;
             if (profileData != null)

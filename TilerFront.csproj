@@ -508,9 +508,13 @@
     <Compile Include="LogControlXml.cs" />
     <Compile Include="LogControlDirect.cs" />
     <Compile Include="LogControl.cs" />
-    <Compile Include="Migrations\201907230700310_init.cs" />
-    <Compile Include="Migrations\201907230700310_init.Designer.cs">
-      <DependentUpon>201907230700310_init.cs</DependentUpon>
+    <Compile Include="Migrations\201907230452528_dayPreference.cs" />
+    <Compile Include="Migrations\201907230452528_dayPreference.Designer.cs">
+      <DependentUpon>201907230452528_dayPreference.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201907300616542_dayPreferenceRealignments.cs" />
+    <Compile Include="Migrations\201907300616542_dayPreferenceRealignments.Designer.cs">
+      <DependentUpon>201907300616542_dayPreferenceRealignments.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
@@ -2812,8 +2816,11 @@
     <TypeScriptCompile Include="Scripts\index.d.ts" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201907230700310_init.resx">
-      <DependentUpon>201907230700310_init.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201907230452528_dayPreference.resx">
+      <DependentUpon>201907230452528_dayPreference.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201907300616542_dayPreferenceRealignments.resx">
+      <DependentUpon>201907300616542_dayPreferenceRealignments.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

@@ -1490,6 +1490,13 @@ namespace TilerFront
                 
 
                 Dictionary<string, Tuple<CalendarEvent, List<CalendarEvent>>> calToRepeatCalEvents = parentCalEvents.ToDictionary(obj => obj.Calendar_EventID.getCalendarEventComponent(), obj => new Tuple<CalendarEvent, List<CalendarEvent>>(obj, new List<CalendarEvent>()));
+
+                foreach(CalendarEvent calEvent in parentCalEvents.Where((calEvent) => calEvent.IsRepeat))
+                {
+                    IEnumerable<CalendarEvent> exceptionList = calEvent.Repeat.RepeatingEvents.Where((repeatingEvent) => !(repeatingEvent.StartTime_EventDB < RangeOfLookUP.End
+                        && repeatingEvent.EndTime_EventDB > RangeOfLookUP.Start));
+                    calEvent.Repeat.RepeatingEvents = calEvent.Repeat.RepeatingEvents.Except(exceptionList).ToList();
+                }
                 foreach (CalendarEvent calEvent in childCalEvents)
                 {
                     string calId = calEvent.Calendar_EventID.getCalendarEventComponent();
