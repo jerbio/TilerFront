@@ -275,8 +275,13 @@ function StructuralizeNewData(NewData)
     var Dictionary_OfSubEvents = {};
     if (NewData != "")
     {
-        generateNonRepeatEvents(NewData.Schedule.NonRepeatCalendarEvent);
-        generateRepeatEvents(NewData.Schedule.RepeatCalendarEvent);
+        if (!NewData.Schedule.SubCalendarEvents) {
+            generateNonRepeatEvents(NewData.Schedule.NonRepeatCalendarEvent);
+            generateRepeatEvents(NewData.Schedule.RepeatCalendarEvent);
+        } else {
+            NewData.Schedule.SubCalendarEvents.forEach(SubCalendaEventsCreateDomElement)
+        }
+        
         CleanupData();
     }
     else {
@@ -289,25 +294,21 @@ function StructuralizeNewData(NewData)
 
     function generateNonRepeatEvents(AllNonRepeatingEvents) {
         AllNonRepeatingEvents.forEach(CalendarCreateDomElement);
-        //return AllNonRepeatingEvents;
     }
 
-
-    function CalendarCreateDomElement(CalendarEvent) {
+    function SubCalendaEventsCreateDomElement(SubCalendarEvent) {
         //function is responsible for populating Dictionary_OfSubEvents. It also tries to populate the respective sub event dom
         var UIColor = {};
-        UIColor.R = CalendarEvent.RColor;
-        UIColor.G = CalendarEvent.GColor;
-        UIColor.B = CalendarEvent.BColor;
-        UIColor.O = CalendarEvent.OColor;
-        UIColor.S = CalendarEvent.ColorSelection;
-        var CalendarData = { CompletedEvents: CalendarEvent.NumberOfCompletedTasks, DeletedEvents: CalendarEvent.NumberOfDeletedEvents, TotalNumberOfEvents: CalendarEvent.NumberOfSubEvents, UI: UIColor, Rigid: CalendarEvent.Rigid };
+        UIColor.R = SubCalendarEvent.RColor;
+        UIColor.G = SubCalendarEvent.GColor;
+        UIColor.B = SubCalendarEvent.BColor;
+        UIColor.O = SubCalendarEvent.OColor;
+        UIColor.S = SubCalendarEvent.ColorSelection;
+        let CalendarEvent = SubCalendarEvent.CalEvent;
+        var CalendarData = { CompletedEvents: CalendarEvent.NumberOfCompletedTasks|| 0, DeletedEvents: CalendarEvent.NumberOfDeletedEvents||0, TotalNumberOfEvents: CalendarEvent.NumberOfSubEvents||0, UI: UIColor, Rigid: CalendarEvent.Rigid };
         Dictionary_OfCalendarData[CalendarEvent.ID] = CalendarData;
-        var i = 0;
-        for (; i < CalendarEvent.AllSubCalEvents.length; i++) {
-            CalendarEvent.AllSubCalEvents[i].Name = CalendarEvent.CalendarName;
-            TotalSubEventList.push(PopulateDomForScheduleEvent(CalendarEvent.AllSubCalEvents[i], CalendarEvent.Tiers, CalendarData));
-        }
+        SubCalendarEvent.Name = SubCalendarEvent.SubCalCalendarName
+        TotalSubEventList.push(PopulateDomForScheduleEvent(SubCalendarEvent, CalendarEvent.Tiers, CalendarData));
     }
 
 

@@ -19,6 +19,7 @@ using Microsoft.AspNet.Identity;
 using System.Data.Entity;
 using TilerCore;
 using Location = TilerElements.Location;
+using System.Diagnostics;
 
 namespace TilerFront.Controllers
 {
@@ -65,6 +66,7 @@ namespace TilerFront.Controllers
             await myUserAccount.Login();
             myUserAccount.getTilerUser().updateTimeZoneDifference(myAuthorizedUser.getTimeSpan);
             PostBackData returnPostBack;
+            TilerUser tilerUser = myUserAccount.getTilerUser();
             if (myUserAccount.Status)
             {
                 DateTimeOffset StartTime = new DateTimeOffset(myAuthorizedUser.StartRange * TimeSpan.TicksPerMillisecond, new TimeSpan()).AddYears(1969).Add(-myAuthorizedUser.getTimeSpan);
@@ -73,11 +75,9 @@ namespace TilerFront.Controllers
 
 
                 LogControl LogAccess = myUserAccount.ScheduleLogControl;
-                //LogAccess.deleteAllDatabaseData();
                 List<IndexedThirdPartyAuthentication> AllIndexedThirdParty = await getAllThirdPartyAuthentication(myUserAccount.UserID, db).ConfigureAwait(false);
 
                 List<GoogleTilerEventControl> AllGoogleTilerEvents = AllIndexedThirdParty.Select(obj => new GoogleTilerEventControl(obj, db)).ToList();
-                //AllIndexedThirdParty.Select(obj => new GoogleTilerEventControl(obj)).ToList();
                 foreach (IndexedThirdPartyAuthentication obj in AllIndexedThirdParty)
                 {
                     var GoogleTilerEventControlobj = new GoogleTilerEventControl(obj, db);
@@ -86,35 +86,24 @@ namespace TilerFront.Controllers
                 List<CalendarEvent> ScheduleData = new List<CalendarEvent>();
 
                 Task<ConcurrentBag<CalendarEvent>> GoogleCalEventsTask = GoogleTilerEventControl.getAllCalEvents(AllGoogleTilerEvents, TimelineForData);
+                ReferenceNow now = new ReferenceNow(myAuthorizedUser.getRefNow(), tilerUser.EndfOfDay, tilerUser.TimeZoneDifference);
 
-                Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location>> ProfileData = await LogAccess.getProfileInfo(TimelineForData, null, retrievalOption: DataRetrivalOption.All);
+                IEnumerable<SubCalendarEvent> subEvents = await LogAccess.getAllEnabledSubCalendarEvent(TimelineForData, now, true, DataRetrivalOption.Ui).ConfigureAwait(false);
+                //Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location>> ProfileData = await LogAccess.getProfileInfo(TimelineForData, null, retrievalOption: DataRetrivalOption.Ui);
+                //IEnumerable<CalendarEvent> calEvents = ProfileData.Item1.Values;
+
 
                 IEnumerable<CalendarEvent> GoogleCalEvents = await GoogleCalEventsTask.ConfigureAwait(false);
 
-                ScheduleData = ScheduleData.Concat(ProfileData.Item1.Values.Where(obj => obj.isActive)).ToList();
 
-                ScheduleData = ScheduleData.Concat(GoogleCalEvents).ToList();
-                IEnumerable<CalendarEvent> NonRepeatingEvents = ScheduleData.Where(obj => !obj.IsRepeat);
-
-                IList<UserSchedule.repeatedEventData> RepeatingEvents = ScheduleData.AsParallel().Where(obj => obj.IsRepeat).
-                    Select(obj => new UserSchedule.repeatedEventData
-                    {
-                        ID = obj.Calendar_EventID.ToString(),
-                        Latitude = obj.Location.Latitude,
-                        Longitude = obj.Location.Longitude,
-                        RepeatAddress = obj.Location.Address,
-                        RepeatAddressDescription = obj.Location.Description,
-                        RepeatCalendarName = obj.getName.NameValue,
-                        RepeatCalendarEvents = obj.Repeat.RecurringCalendarEvents().AsParallel().
-                                Select(obj1 => obj1.ToCalEvent(TimelineForData)).ToList(),
-                        RepeatEndDate = obj.End,
-                        RepeatStartDate = obj.Start,
-                        RepeatTotalDuration = obj.getActiveDuration
-                    }).ToList();
-
-                UserSchedule currUserSchedule = new UserSchedule { NonRepeatCalendarEvent = NonRepeatingEvents.Select(obj => obj.ToCalEvent(TimelineForData)).ToArray(), RepeatCalendarEvent = RepeatingEvents };
-
-                //ApplicationDbContext db = new ApplicationDbContext();
+                subEvents = subEvents.Concat(GoogleCalEvents.SelectMany(subEvent => subEvent.AllSubEvents));
+                UserSchedule currUserSchedule = new UserSchedule {
+                    //NonRepeatCalendarEvent = NonRepeatingEvents.Select(obj => obj.ToCalEvent(TimelineForData)).ToArray(),
+                    //RepeatCalendarEvent = RepeatingEvents,
+                    SubCalendarEvents = subEvents.Select(subEvent => 
+                        subEvent.ToSubCalEvent(subEvent.ParentCalendarEvent)
+                    ).ToList()
+                };
                 PausedEvent currentPausedEvent = getCurrentPausedEvent(db);
                 currUserSchedule.populatePauseData(currentPausedEvent, myAuthorizedUser.getRefNow());
                 InitScheduleProfile retValue = new InitScheduleProfile { Schedule = currUserSchedule, Name = myUserAccount.Usersname };
@@ -127,6 +116,70 @@ namespace TilerFront.Controllers
 
             return returnPostBack;
         }
+
+
+        [HttpGet]
+        [ResponseType(typeof(PostBackStruct))]
+        [Route("api/Schedule/FixDBInstance")]
+        public async Task<IHttpActionResult> FixRepetition([FromUri] getScheduleModel myAuthorizedUser)
+        {
+            myAuthorizedUser = new getScheduleModel()
+            {
+                UserName = "jerbio",
+                UserID = "6bc6992f-3222-4fd8-9e2b-b94eba2fb717"
+            };
+            UserAccount myUserAccount = await myAuthorizedUser.getUserAccount(db);
+            HttpContext myCOntext = HttpContext.Current;
+            await myUserAccount.Login();
+            myUserAccount.getTilerUser().updateTimeZoneDifference(myAuthorizedUser.getTimeSpan);
+            PostBackData returnPostBack;
+            TilerUser tilerUser = myUserAccount.getTilerUser();
+            if (myUserAccount.Status)
+            {
+                LogControl LogAccess = myUserAccount.ScheduleLogControl;
+
+                //IQueryable<CalendarEvent> destroy = LogAccess.getItAll();
+                //List<CalendarEvent> all = destroy.ToList();
+
+                //var lookupWindow = new TimeLine(myAuthorizedUser.getRefNow().AddYears(-10), myAuthorizedUser.getRefNow().AddYears(10));
+                //var Schedule = new DB_Schedule(myUserAccount, myAuthorizedUser.getRefNow(), retrievalOption: DataRetrivalOption.All, rangeOfLookup: lookupWindow);
+
+                //IQueryable<CalendarEvent> calQuery = LogAccess.getCalendarEventQuery(DataRetrivalOption.All, true);
+                //calQuery = calQuery
+                //    .Include(calEvent => calEvent.Repetition_EventDB.SubRepetitions)
+                //    .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents)
+                //    .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repEvent => repEvent.AllSubEvents_DB))
+                //    //.Include(calEvent => calEvent.Repetition_EventDB
+                //    //    .SubRepetitions.Select(repetition => repetition.RepeatingEvents.Select(repCalEvent => repCalEvent.DayPreference_DB)))
+                //    //.Include(calEvent => calEvent.Repetition_EventDB
+                //    //    .SubRepetitions.Select(repetition => repetition.RepeatingEvents.Select(repCalEvent => repCalEvent.UiParams_EventDB.UIColor)))
+                //    //.Include(calEvent => calEvent.Repetition_EventDB.SubRepetitions.Select(repetition => repetition.RepeatingEvents.Select(repCalEvent => repCalEvent.ProfileOfNow_EventDB)))
+                //    //.Include(calEvent => calEvent.Repetition_EventDB.SubRepetitions.Select(repetition => repetition.RepeatingEvents.Select(repCalEvent => repCalEvent.DayPreference_DB)))
+                //    //.Include(calEvent => calEvent.Repetition_EventDB.SubRepetitions.Select(repetition => repetition.RepeatingEvents.Select(repCalEvent => repCalEvent.ProfileOfNow_EventDB)));
+                //;
+                //IEnumerable<CalendarEvent> calEvents = await calQuery.ToListAsync().ConfigureAwait(false);
+                //foreach(CalendarEvent calEvent in calEvents)
+                //{
+                //    if (calEvent.Repeat != null)
+                //    {
+                //        calEvent.Repeat.ParentEvent = calEvent;
+                //        foreach (SubCalendarEvent subEvent in calEvent.AllSubEvents)
+                //        {
+                //            subEvent.RepeatParentEvent = calEvent;
+                //        }
+                //    }
+
+                //}
+                //ReferenceNow now = new ReferenceNow(DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, new TimeSpan());
+                //await myUserAccount.Commit(calEvents, null, myUserAccount.getTilerUser().LatestId, now).ConfigureAwait(false);
+            }
+            returnPostBack = new PostBackData("", 0);
+
+            return Ok(returnPostBack.getPostBack);
+
+        }
+
+
 
         // GET api/schedule
         /// <summary>

@@ -12,6 +12,7 @@ namespace TilerFront.Models
     {
         public IList<repeatedEventData> RepeatCalendarEvent { get; set; }
         public IList<CalEvent> NonRepeatCalendarEvent { get; set; }
+        public IList<SubCalEvent> SubCalendarEvents { get; set; }
         public JObject PauseData { get; set; } = new JObject();
         public class repeatedEventData
         {
@@ -41,13 +42,9 @@ namespace TilerFront.Models
                 }
                 return false;
             });
-            List<SubCalEvent> allSubEvents = this.RepeatCalendarEvent.SelectMany(obj => obj.RepeatCalendarEvents.SelectMany(CalEvent => CalEvent.AllSubCalEvents)).Concat(NonRepeatCalendarEvent.SelectMany(obj => obj.AllSubCalEvents)) .ToList();
-            List<SubCalEvent> subEvents = new List<SubCalEvent>();
-            subEvents = this.RepeatCalendarEvent.SelectMany(obj => obj.RepeatCalendarEvents.SelectMany(CalEvent => CalEvent.AllSubCalEvents.Where(predicate))).ToList();
-            subEvents = subEvents.Concat(NonRepeatCalendarEvent.SelectMany(obj => obj.AllSubCalEvents.Where(predicate))).OrderBy(subEvent => subEvent.SubCalStartDate).ToList();
+            List<SubCalEvent> allSubEvents = this.SubCalendarEvents == null ? this.RepeatCalendarEvent.SelectMany(obj => obj.RepeatCalendarEvents.SelectMany(CalEvent => CalEvent.AllSubCalEvents)).Concat(NonRepeatCalendarEvent.SelectMany(obj => obj.AllSubCalEvents)) .ToList(): this.SubCalendarEvents.ToList();
             SubCalEvent pausedSubEVent = allSubEvents.FirstOrDefault(obj => obj.isPaused);
-
-
+            
             //creates paused event from the list of events derived
             if((pausedSubEVent != null) && (PausedEvent == null))
             {
@@ -57,10 +54,10 @@ namespace TilerFront.Models
                     isPauseDeleted = pausedSubEVent.isEnabled
                 };
             }
-            subEvents = subEvents.Take(10).ToList();
+            allSubEvents = allSubEvents.Take(10).ToList();
             dynamic RetValue = new JObject();
             RetValue.pausedEvent = PausedEvent == null? null : JObject.FromObject(PausedEvent);
-            RetValue.subEvents = JArray.FromObject(subEvents);
+            RetValue.subEvents = JArray.FromObject(allSubEvents);
             this.PauseData = RetValue as JObject;
         }
 
