@@ -1546,7 +1546,7 @@ namespace TilerFront
                         && !subEvent.ParentCalendarEvent.Complete_EventDB
                         && subEvent.ParentCalendarEvent.StartTime_EventDB < RangeOfLookUP.End
                         && subEvent.ParentCalendarEvent.EndTime_EventDB > RangeOfLookUP.Start
-                        &&  (!subEvent.IsRepeat || (subEvent.RepeatParentEvent.IsEnabled_DB
+                        && ((subEvent.RepeatParentEventId == null) || (subEvent.RepeatParentEvent !=null && subEvent.RepeatParentEvent.IsEnabled_DB
                         && !subEvent.RepeatParentEvent.Complete_EventDB
                         && subEvent.RepeatParentEvent.StartTime_EventDB < RangeOfLookUP.End
                         && subEvent.RepeatParentEvent.EndTime_EventDB > RangeOfLookUP.Start))
