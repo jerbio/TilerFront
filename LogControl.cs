@@ -1603,7 +1603,11 @@ namespace TilerFront
                         new HashSet<string>(repeatCalEvents.Select(calEvent => calEvent.Id))
                     );
                     repeatCalQuery = repeatCalQuery.Where(calEvent => calEvent.CreatorId == _TilerUser.Id);
-                    repeatCalQuery = repeatCalQuery.Include(calEvent => calEvent.Repetition_EventDB.SubRepetitions);
+                    repeatCalQuery = repeatCalQuery
+                        .Include(calEvent => calEvent.AllSubEvents_DB)
+                        .Include(calEvent => calEvent.Repetition_EventDB.SubRepetitions)
+                        .Include(calEvent => calEvent.Repetition_EventDB.SubRepetitions
+                            .Select(repeat => repeat.RepeatingEvents.Select(repCal => repCal.AllSubEvents_DB)));
                 }
                 
                 List<CalendarEvent> nonRepeatList = nonRepeatCalQuery !=null ? await nonRepeatCalQuery.ToListAsync().ConfigureAwait(false) : new List<CalendarEvent>();
@@ -1611,6 +1615,7 @@ namespace TilerFront
 
                 List<CalendarEvent> parentCalEvents = new List<CalendarEvent>();
                 List<CalendarEvent> childCalEvents = new List<CalendarEvent>();
+                List<CalendarEvent> sweekDayCalendarEvents = new List<CalendarEvent>();
                 foreach (CalendarEvent calEvent in repeatResultList.Concat(nonRepeatList))
                 {
                     if(!calEvent.IsRepeatsChildCalEvent)
@@ -1619,7 +1624,14 @@ namespace TilerFront
                     }
                     else
                     {
-                        childCalEvents.Add(calEvent);
+                        if(!calEvent.IsRepeatsChildCalEvent || !calEvent.IsRepeat)
+                        {
+                            childCalEvents.Add(calEvent);
+                        } else
+                        {
+                            sweekDayCalendarEvents.Add(calEvent);
+                        }
+                        
                     }
                 }
                 

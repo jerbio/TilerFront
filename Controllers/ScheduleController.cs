@@ -826,7 +826,7 @@ namespace TilerFront.Controllers
 
                 await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, myUser.UserID, db).ConfigureAwait(false);
 
-                var retValue0 = MySchedule.SetEventAsNow(myUser.EventID, true);
+                var retValue0 = MySchedule.SetSubeventAsNow(myUser.EventID, true);
                 await MySchedule.persistToDB();
                 retValue = new PostBackData("\"Success\"", 0);
             }
