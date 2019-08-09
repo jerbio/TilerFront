@@ -26,7 +26,7 @@ namespace TilerFront.Controllers
         {
             UserAccount retrievedUser = await myUser.getUserAccount(db);
             await retrievedUser.Login();
-            retrievedUser.getTilerUser().updateTimeZoneDifference(myUser.getTimeSpan);
+            retrievedUser.getTilerUser().updateTimeZoneTimeSpan(myUser.getTimeSpan);
             PostBackData retValue = new PostBackData("", 1);
             if (retrievedUser.Status)
             {

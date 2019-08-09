@@ -88,7 +88,7 @@ namespace TilerFront.Controllers
         {
             UserAccount retrievedUser = await myUser.getUserAccount(db);// new UserAccount(myUser.UserName, myUser.UserID);
             await retrievedUser.Login();
-            retrievedUser.getTilerUser().updateTimeZoneDifference(myUser.getTimeSpan);
+            retrievedUser.getTilerUser().updateTimeZoneTimeSpan(myUser.getTimeSpan);
             PostBackData retValue;
             if (retrievedUser.Status)
             {
@@ -134,7 +134,7 @@ namespace TilerFront.Controllers
         {
             UserAccount retrievedUser = await myUser.getUserAccount(db);// new UserAccount(myUser.UserName, myUser.UserID);
             await retrievedUser.Login();
-            retrievedUser.getTilerUser().updateTimeZoneDifference(myUser.getTimeSpan);
+            retrievedUser.getTilerUser().updateTimeZoneTimeSpan(myUser.getTimeSpan);
             PostBackData retValue;
             if (retrievedUser.Status)
             {
@@ -168,7 +168,7 @@ namespace TilerFront.Controllers
         {
             UserAccount retrievedUser = await nowEvent.getUserAccount(db); //new UserAccountDirect(myUser.UserName, myUser.UserID);
             await retrievedUser.Login();
-            retrievedUser.getTilerUser().updateTimeZoneDifference(nowEvent.getTimeSpan);
+            retrievedUser.getTilerUser().updateTimeZoneTimeSpan(nowEvent.getTimeSpan);
             PostBackData retValue;
             if (retrievedUser.Status)
             {
@@ -203,7 +203,7 @@ namespace TilerFront.Controllers
         {
             UserAccount retrievedUser = await myUser.getUserAccount(db); //new UserAccountDirect(myUser.UserName, myUser.UserID);
             await retrievedUser.Login();
-            retrievedUser.getTilerUser().updateTimeZoneDifference(myUser.getTimeSpan);
+            retrievedUser.getTilerUser().updateTimeZoneTimeSpan(myUser.getTimeSpan);
             PostBackData retValue = new PostBackData("", 1);
 
 

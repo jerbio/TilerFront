@@ -293,11 +293,10 @@ namespace TilerFront.Controllers
                 return View(model);
             }
             //bool isDST = Convert.ToBoolean(model.Dst);
-            string TimeString = model.TimeOfDay + TilerElementExtension.JSStartTime.Date.ToShortDateString();
             var result= IdentityResult.Failed(new string[]{"Invalid Time Start Of Time"});
 
             DateTimeOffset TimeOfDay = new DateTimeOffset();
-            if (DateTimeOffset.TryParse(TimeString,out TimeOfDay))
+            if (DateTimeOffset.TryParse(model.TimeOfDay, out TimeOfDay))
             {  
                 /*
                 if(isDST)
@@ -308,6 +307,8 @@ namespace TilerFront.Controllers
                 TilerUser myUser = await UserManager.FindByIdAsync(User.Identity.GetUserId());
                 myUser.EndfOfDay=TimeOfDay.DateTime;
                 myUser.TimeZone = model.TimeZone;
+                myUser.EndfOfDayString = model.TimeOfDay;
+                myUser.updateTimeZone();
                 result = await UserManager.UpdateAsync(myUser);
             }
 
