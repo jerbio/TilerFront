@@ -59,7 +59,7 @@ namespace TilerFront.Controllers
             if (retrievedUser.Status)
             {
                 long myNow = (long)(DateTimeOffset.UtcNow - TilerElementExtension.JSStartTime).TotalMilliseconds;
-                IEnumerable<CalendarEvent> retrievedCalendarEvents = (await retrievedUser.ScheduleLogControl.getCalendarEventWithName(phrase));
+                IEnumerable<CalendarEvent> retrievedCalendarEvents = (await retrievedUser.ScheduleLogControl.getEnabledCalendarEventWithName(phrase));
                     //.Where(obj => obj.isActive);
                 var allCalEvent = retrievedCalendarEvents
                     .ToList();

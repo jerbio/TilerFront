@@ -2622,14 +2622,14 @@ namespace TilerFront
             return retValue;
         }
 
-        public async Task<IQueryable<CalendarEvent>> getCalendarEventWithName(string Name)
+        public async Task<IQueryable<CalendarEvent>> getEnabledCalendarEventWithName(string Name)
         {
             IQueryable<EventName> eventNames = _Context.EventNames
                 .Where(name => name.CreatorId == _TilerUser.Id && name.Name.Contains(Name));
             var result = eventNames.Join(_Context.CalEvents
                 .Include(CalEvent => CalEvent.UiParams_EventDB)
                 .Include(CalEvent => CalEvent.DataBlob_EventDB)
-                .Where(calEvent => !calEvent.IsRepeatsChildCalEvent),
+                .Where(calEvent => !calEvent.IsRepeatsChildCalEvent && calEvent.IsEnabled_DB),
                 eventName => eventName.Id,
                 calEvent => calEvent.Name.Id,
                 (eventName, calEvent) => new { calEvent = calEvent, eventName = eventName }

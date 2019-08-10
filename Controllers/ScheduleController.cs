@@ -1181,15 +1181,23 @@ namespace TilerFront.Controllers
                 Name.Creator_EventDB = newCalendarEvent.getCreator;
                 Name.AssociatedEvent = newCalendarEvent;
                 Task DoInitializeClassification=newCalendarEvent.InitializeClassification();
+                MyRepetition.ParentEvent = newCalendarEvent;
 
-                
 
                 await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, myUser.UserID, db).ConfigureAwait(false);
 
                 await DoInitializeClassification;
                 if (newCalendarEvent.IsRepeat)
                 {
-                    newCalendarEvent.Repeat.PopulateRepetitionParameters(newCalendarEvent);
+                    if(newCalendarEvent.getIsEventRestricted)
+                    {
+                        newCalendarEvent.Repeat.PopulateRepetitionParameters(newCalendarEvent as CalendarEventRestricted);
+                    }
+                    else
+                    {
+                        newCalendarEvent.Repeat.PopulateRepetitionParameters(newCalendarEvent);
+                    }
+                    
                 }
                 string BeforemyName = newCalendarEvent.ToString(); //BColor + " -- " + Count + " -- " + DurationDays + " -- " + DurationHours + " -- " + DurationMins + " -- " + EndDay + " -- " + EndHour + " -- " + EndMins + " -- " + EndMonth + " -- " + EndYear + " -- " + GColor + " -- " + LocationAddress + " -- " + LocationTag + " -- " + Name + " -- " + RColor + " -- " + RepeatData + " -- " + RepeatEndDay + " -- " + RepeatEndMonth + " -- " + RepeatEndYear + " -- " + RepeatStartDay + " -- " + RepeatStartMonth + " -- " + RepeatStartYear + " -- " + RepeatType + " -- " + RepeatWeeklyData + " -- " + Rigid + " -- " + StartDay + " -- " + StartHour + " -- " + StartMins + " -- " + StartMonth + " -- " + StartYear;
                 string AftermyName = newCalendarEvent.ToString();

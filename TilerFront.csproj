@@ -508,9 +508,9 @@
     <Compile Include="LogControlXml.cs" />
     <Compile Include="LogControlDirect.cs" />
     <Compile Include="LogControl.cs" />
-    <Compile Include="Migrations\201908080655057_endOfDayFix.cs" />
-    <Compile Include="Migrations\201908080655057_endOfDayFix.Designer.cs">
-      <DependentUpon>201908080655057_endOfDayFix.cs</DependentUpon>
+    <Compile Include="Migrations\201908090707116_init.cs" />
+    <Compile Include="Migrations\201908090707116_init.Designer.cs">
+      <DependentUpon>201908090707116_init.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
@@ -671,7 +671,6 @@
     <Content Include="Scripts\bootstrap.js.map" />
     <Content Include="Scripts\bootstrap.bundle.min.js.map" />
     <Content Include="Scripts\bootstrap.bundle.js.map" />
-    <None Include="Properties\PublishProfiles\mytilerkid - Web Deploy1.pubxml" />
     <None Include="Scripts\jquery-3.4.1.intellisense.js" />
     <Content Include="Scripts\jquery-3.4.1.js" />
     <Content Include="Scripts\jquery-3.4.1.min.js" />
@@ -2812,8 +2811,8 @@
     <TypeScriptCompile Include="Scripts\index.d.ts" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201908080655057_endOfDayFix.resx">
-      <DependentUpon>201908080655057_endOfDayFix.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201908090707116_init.resx">
+      <DependentUpon>201908090707116_init.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
