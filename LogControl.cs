@@ -41,7 +41,10 @@ namespace TilerFront
         protected TilerElements.Location NewLocation;
         protected DB_UserActivity activity;
         Dictionary<string, Func<XmlNode, Reason>> createDictionaryOfOPtionToFunction;
+        Dictionary<string, CalendarEvent> _AllScheduleData;
+        protected ScheduleDump _TempDump;
         protected TilerUser _TilerUser;
+        protected bool _UpdateBigData = true;
 
 #if ForceReadFromXml
 #else
@@ -156,63 +159,67 @@ namespace TilerFront
         /// <param name="newData"></param>
         public virtual async Task updateBigData(XmlDocument oldData, XmlDocument newData)
         {
-            bool corruptZipFile = false;
-            string zipFile = LoggedUserID + ".zip";
-            string zipFolder = LoggedUserID;
-            string fullZipPath = @BigDataLogLocation + zipFile;
-            try
+            if(_UpdateBigData)
             {
-                BigDataLogControl bigdataControl = new BigDataLogControl();
-                if (activity == null)
+                bool corruptZipFile = false;
+                string zipFile = LoggedUserID + ".zip";
+                string zipFolder = LoggedUserID;
+                string fullZipPath = @BigDataLogLocation + zipFile;
+                try
                 {
-                    activity = new DB_UserActivity(DateTimeOffset.UtcNow, UserActivity.ActivityType.None);
+                    BigDataLogControl bigdataControl = new BigDataLogControl();
+                    if (activity == null)
+                    {
+                        activity = new DB_UserActivity(DateTimeOffset.UtcNow, UserActivity.ActivityType.None);
+                    }
+                    XmlDocument combinedDoc = new XmlDocument();
+
+                    XmlNode timeOfCreationNode = combinedDoc.CreateElement("TimeOfCreation");
+                    XmlNode bigDataLog = combinedDoc.CreateElement("BigDataLog");
+                    XmlNode miscDataLog = combinedDoc.CreateElement("MiscData");
+                    miscDataLog.InnerText = activity.getMiscdata();
+
+                    timeOfCreationNode.InnerXml = activity.ToXML();
+                    bigDataLog.AppendChild(timeOfCreationNode);
+                    bigDataLog.AppendChild(miscDataLog);
+                    XmlNode beforeProcessing = combinedDoc.CreateElement("BeforeProcessing");
+                    XmlNode importedNBeforeProcessingNode = combinedDoc.ImportNode(oldData.DocumentElement as XmlNode, true);
+                    beforeProcessing.PrependChild(importedNBeforeProcessingNode);
+
+                    XmlNode afterProcessing = combinedDoc.CreateElement("AfterProcessing");
+                    XmlNode importedNAfterProcessingNode = combinedDoc.ImportNode(newData.DocumentElement as XmlNode, true);
+                    afterProcessing.PrependChild(importedNAfterProcessingNode);
+
+                    bigDataLog.AppendChild(beforeProcessing);
+                    bigDataLog.AppendChild(afterProcessing);
+
+                    XmlDeclaration xmldecl;
+                    xmldecl = combinedDoc.CreateXmlDeclaration("1.0", "utf-8", null);
+                    combinedDoc.AppendChild(bigDataLog);
+                    XmlElement root = combinedDoc.DocumentElement;
+                    combinedDoc.InsertBefore(xmldecl, root);
+                    DateTimeOffset timeOfCreation = DateTimeOffset.UtcNow;
+                    LogChange log = new LogChange()
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        TimeOfCreation = timeOfCreation,
+                        JsTimeOfCreation = timeOfCreation.toJSMilliseconds(),
+                        TypeOfEvent = activity.TriggerType.ToString(),
+                        UserId = _TilerUser.Id
+                    };
+                    log.loadXmlFile(combinedDoc);
+                    await bigdataControl.AddLogDocument(log).ConfigureAwait(false);
                 }
-                XmlDocument combinedDoc = new XmlDocument();
-
-                XmlNode timeOfCreationNode = combinedDoc.CreateElement("TimeOfCreation");
-                XmlNode bigDataLog = combinedDoc.CreateElement("BigDataLog");
-                XmlNode miscDataLog = combinedDoc.CreateElement("MiscData");
-                miscDataLog.InnerText = activity.getMiscdata();
-
-                timeOfCreationNode.InnerXml = activity.ToXML();
-                bigDataLog.AppendChild(timeOfCreationNode);
-                bigDataLog.AppendChild(miscDataLog);
-                XmlNode beforeProcessing = combinedDoc.CreateElement("BeforeProcessing");
-                XmlNode importedNBeforeProcessingNode = combinedDoc.ImportNode(oldData.DocumentElement as XmlNode, true);
-                beforeProcessing.PrependChild(importedNBeforeProcessingNode);
-
-                XmlNode afterProcessing = combinedDoc.CreateElement("AfterProcessing");
-                XmlNode importedNAfterProcessingNode = combinedDoc.ImportNode(newData.DocumentElement as XmlNode, true);
-                afterProcessing.PrependChild(importedNAfterProcessingNode);
-
-                bigDataLog.AppendChild(beforeProcessing);
-                bigDataLog.AppendChild(afterProcessing);
-
-                XmlDeclaration xmldecl;
-                xmldecl = combinedDoc.CreateXmlDeclaration("1.0", "utf-8", null);
-                combinedDoc.AppendChild(bigDataLog);
-                XmlElement root = combinedDoc.DocumentElement;
-                combinedDoc.InsertBefore(xmldecl, root);
-                DateTimeOffset timeOfCreation = DateTimeOffset.UtcNow;
-                LogChange log = new LogChange()
+                catch (Exception e)
                 {
-                    Id = Guid.NewGuid().ToString(),
-                    TimeOfCreation = timeOfCreation,
-                    JsTimeOfCreation = timeOfCreation.toJSMilliseconds(),
-                    TypeOfEvent = activity.TriggerType.ToString(),
-                    UserId = _TilerUser.Id
-                };
-                log.loadXmlFile(combinedDoc);
-                await bigdataControl.AddLogDocument(log).ConfigureAwait(false);
-            }
-            catch (Exception e)
-            {
-                if (corruptZipFile)
-                {
-                    File.Delete(fullZipPath);
+                    if (corruptZipFile)
+                    {
+                        File.Delete(fullZipPath);
+                    }
+                    CustomErrors retValue = new CustomErrors("Error generating bigdata log\n" + e.ToString(), 20000000);
                 }
-                CustomErrors retValue = new CustomErrors("Error generating bigdata log\n" + e.ToString(), 20000000);
             }
+            
         }
 
         virtual public void UpdateReferenceDayInXMLLog(DateTimeOffset referenceDay, string LogFile = "")
@@ -242,7 +249,7 @@ namespace TilerFront
             return;
         }
 
-        async public Task<ScheduleDump> CreateScheduleDump(IEnumerable<CalendarEvent> AllEvents, TilerUser user, ReferenceNow now, string notes)
+        async public Task<ScheduleDump> CreateScheduleDump(IEnumerable<CalendarEvent> AllEvents, TilerUser user, ReferenceNow now, string notes, Dictionary<string, TilerElements.Location> cachedLocation = null)
         {
             Task<ScheduleDump> retValue;
 
@@ -250,7 +257,7 @@ namespace TilerFront
             XmlDocument xmldoc = new XmlDocument();
             xmldoc.InnerXml = "<?xml version=\"1.0\" encoding=\"utf-8\"?><ScheduleLog><LastIDCounter>1024</LastIDCounter><referenceDay>" + now.StartOfDay.DateTime + "</referenceDay><scheduleNotes>" + notes + "</scheduleNotes><lastUpdated>" + user.LastScheduleModification.DateTime + "</lastUpdated><EventSchedules></EventSchedules></ScheduleLog>";
 
-            CachedLocation = await getAllLocationsByUser().ConfigureAwait(false); ;//populates with current location info
+            CachedLocation = cachedLocation ?? await getAllLocationsByUser().ConfigureAwait(false); ;//populates with current location info
             Dictionary<string, TilerElements.Location> OldLocationCache = new Dictionary<string, TilerElements.Location>(CachedLocation);
             xmldoc.DocumentElement.SelectSingleNode("/ScheduleLog/LastIDCounter").InnerText = "false";
             XmlNodeList EventSchedulesNodes = xmldoc.DocumentElement.SelectNodes("/ScheduleLog/EventSchedules");
@@ -359,15 +366,22 @@ namespace TilerFront
         }
 
 
-        async Task Commit(IEnumerable<CalendarEvent> calendarEvents, TilerUser tilerUser)
+        protected virtual async Task Commit(IEnumerable<CalendarEvent> calendarEvents, TilerUser tilerUser)
         {
             IEnumerable<SubCalendarEvent> subevents = calendarEvents.SelectMany(calEVent => calEVent.RemoveSubEventFromEntity);
             foreach (SubCalendarEvent subEvent in subevents)
             {
                 _Context.Entry(subEvent).State = EntityState.Deleted;
             }
+            Task saveDbChangesTask = _Context.SaveChangesAsync();
+            ReferenceNow now = new ReferenceNow(_TempDump.ReferenceNow, _TempDump.StartOfDay, _TilerUser.TimeZoneDifference);
+            Task<ScheduleDump> scheduleDumpCreationTask = CreateScheduleDump(calendarEvents, _TilerUser, now, "", CachedLocation);
+            await scheduleDumpCreationTask.ConfigureAwait(false);
+            ScheduleDump scheduleDump = scheduleDumpCreationTask.Result;
 
-            await _Context.SaveChangesAsync().ConfigureAwait(false);
+            Task updateBigDataTask =  updateBigData(_TempDump.XmlDoc, scheduleDump.XmlDoc);
+            await updateBigDataTask.ConfigureAwait(false);
+            await saveDbChangesTask.ConfigureAwait(false);
         }
 
         public async Task Commit(IEnumerable<CalendarEvent> calendarEvents, CalendarEvent calendarEvent, String LatestId, ReferenceNow now)
@@ -2710,6 +2724,11 @@ namespace TilerFront
 
         }
 
+        public async virtual Task createTempDump(ReferenceNow now)
+        {
+            _TempDump = await CreateScheduleDump(_AllScheduleData.Values, this._TilerUser, now, "").ConfigureAwait(false);
+        }
+
 
         /// <summary>
         /// This function wipes out the database completely.BECAREFUL. You''l need to comment out the lines below return
@@ -2752,7 +2771,8 @@ namespace TilerFront
                 Dictionary<string, TilerElements.Location> LocationCache = await TaskLocationCache.ConfigureAwait(false);
                 RangeOfLookup  = RangeOfLookup == null ? new TimeLine(Now.constNow.AddYears(-200), Now.constNow.AddYears(200)) : RangeOfLookup;
                 Dictionary<string, CalendarEvent> AllScheduleData = await this.getAllEnabledCalendar(RangeOfLookup, Now, retrievalOption: retrievalOption);
-
+                _AllScheduleData = AllScheduleData;
+                await createTempDump(Now).ConfigureAwait(false);
                 DateTimeOffset ReferenceTime = getDayReferenceTime();
 
                 await populateDefaultLocation(LocationCache).ConfigureAwait(false);
