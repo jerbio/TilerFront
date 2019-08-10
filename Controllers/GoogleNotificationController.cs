@@ -29,7 +29,7 @@ namespace TilerFront.Controllers
             if (continueIntoTrigger)
             {
                 string ChannelID = myContext.Request.Headers["X-Goog-Channel-ID"];
-                ScheduleController.googleNotificationTrigger(ChannelID, db);
+                await ScheduleController.googleNotificationTrigger(ChannelID, db).ConfigureAwait(false);
             }
 
             return retValue;
@@ -43,7 +43,7 @@ namespace TilerFront.Controllers
             if (continueIntoTrigger)
             {
                 string ChannelID = "2090f290-682a-47a7-9bfc-dcdc9f685993";
-                ScheduleController.googleNotificationTrigger(ChannelID, db);
+                await ScheduleController.googleNotificationTrigger(ChannelID, db).ConfigureAwait(false);
             }
             OkNegotiatedContentResult<string> retValue = new OkNegotiatedContentResult<string>("thumbs up", this);
             return retValue;
