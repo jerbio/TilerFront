@@ -52,7 +52,7 @@ namespace TilerFront
         virtual protected async Task<Dictionary<string, CalendarEvent>>  getAllCalendarElements(TimeLine RangeOfLookup, ReferenceNow now)
         {
             Dictionary<string, CalendarEvent> retValue=new Dictionary<string,CalendarEvent>();
-            retValue = await UserLog.getAllEnabledCalendar(RangeOfLookup, now).ConfigureAwait(false);
+            retValue = await UserLog.getAllEnabledCalendarEvent(RangeOfLookup, now).ConfigureAwait(false);
             return retValue;
         }
 
