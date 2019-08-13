@@ -2490,8 +2490,10 @@ namespace TilerFront
             {
                 return new NowProfile();
             }
-            bool initializedFlag = Convert.ToBoolean(NowProfileNode.SelectSingleNode("Initialized").InnerText);
-            DateTimeOffset preferredTime = DateTimeOffset.Parse(NowProfileNode.SelectSingleNode("PreferredStart").InnerText).UtcDateTime;
+            string innerText = NowProfileNode.SelectSingleNode("Initialized").InnerText;
+            bool initializedFlag = string.IsNullOrEmpty(innerText) ? false : Convert.ToBoolean(NowProfileNode.SelectSingleNode("Initialized").InnerText);
+            innerText = NowProfileNode.SelectSingleNode("PreferredStart").InnerText;
+            DateTimeOffset preferredTime = string.IsNullOrEmpty(innerText) ? new DateTimeOffset() : DateTimeOffset.Parse(innerText).UtcDateTime;
             DB_NowProfile retValue = new DB_NowProfile(preferredTime, initializedFlag);
             return retValue;
         }
@@ -2678,7 +2680,8 @@ namespace TilerFront
         {
             XmlNode var1 = Arg1.SelectSingleNode("MiscData");
             string stringData = (var1.SelectSingleNode("UserNote").InnerText);
-            int NoteData = Convert.ToInt32(var1.SelectSingleNode("TypeSelection").InnerText);
+            string innerText = var1.SelectSingleNode("TypeSelection").InnerText;
+            int NoteData = Convert.ToInt32(string.IsNullOrEmpty(innerText)?"0":"1");
             MiscData retValue = new MiscData(stringData, NoteData);
             return retValue;
         }
