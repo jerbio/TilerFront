@@ -688,7 +688,7 @@ namespace TilerFront.Controllers
         [HttpGet]
         [ResponseType(typeof(PostBackStruct))]
         [Route("api/Schedule/DumpData")]
-        public async Task<IHttpActionResult> getDumpData([FromUri]DumpModel UserData)
+        public async Task<HttpResponseMessage> getDumpData([FromUri]DumpModel UserData)
         {
             AuthorizedUser myAuthorizedUser = UserData.User;
             UserAccount myUser = await UserData.getUserAccount(db);
@@ -700,7 +700,26 @@ namespace TilerFront.Controllers
                 TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
                 scheduleChangeSocket.triggerRefreshData(myUser.getTilerUser());
                 PostBackData postBack = new PostBackData(retValue, 0);
-                return Ok(retValue.ScheduleXmlString);
+
+                System.IO.MemoryStream xmlStream = new System.IO.MemoryStream();
+                retValue.XmlDoc.Save(xmlStream);
+                xmlStream.Flush();
+                xmlStream.Position = 0;
+
+
+                var result = new HttpResponseMessage(HttpStatusCode.OK)
+                {
+                    Content = new ByteArrayContent(xmlStream.ToArray())
+                };
+                result.Content.Headers.ContentDisposition =
+                    new System.Net.Http.Headers.ContentDispositionHeaderValue("attachment")
+                    {
+                        FileName = UserData.Id+".xml"
+                    };
+                result.Content.Headers.ContentType =
+                    new System.Net.Http.Headers.MediaTypeHeaderValue("application/octet-stream");
+
+                return result;
             }
             throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.Unauthorized)
             {
