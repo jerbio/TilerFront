@@ -216,10 +216,10 @@ namespace TilerFront
 
         static void batchValidateLocations(IEnumerable<TilerElements.Location> iterlocations)
         {
-            ILookup<string, TilerElements.Location> addressesToLocations = iterlocations.ToLookup(location => location.Address, location => location);
+            ILookup<string, TilerElements.Location> addressesToLocations = iterlocations.ToLookup(location => location.Address.Trim(), location => location);
             foreach (var kvL in addressesToLocations)
             {
-                TilerElements.Location location = new TilerElements.Location(kvL.Key.Trim());
+                TilerElements.Location location = new TilerElements.Location(kvL.Key);
                 if (location.Validate())
                 {
                     var allLocations = addressesToLocations[kvL.Key];
