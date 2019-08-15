@@ -207,63 +207,34 @@ namespace TilerFront
                 }
             }
 
-            if(retrieveLocationFromGoogle)
+            if (retrieveLocationFromGoogle)
             {
-                HashSet<TilerElements.Location> hashLocation = new HashSet<TilerElements.Location>(locations);
-                batchValidateLocations(hashLocation);
+                batchValidateLocations(locations);
             }
             return RetValue;
         }
 
-        static void batchValidateLocations (IEnumerable<TilerElements.Location> iterlocations)
+        static void batchValidateLocations(IEnumerable<TilerElements.Location> iterlocations)
         {
-            ConcurrentDictionary<string, ConcurrentBag<TilerElements.Location>> addressesToLocations = new ConcurrentDictionary<string, ConcurrentBag<TilerElements.Location>>();
-            iterlocations.AsParallel().ForAll((location) => {
-                ConcurrentBag<TilerElements.Location> locations;
-                string address = location.Address;
-                address = address.Replace(",", "_");
-                address = Regex.Replace(address, @"\s+", "_");
-                address = Regex.Replace(address, @"_+", "_");
-                if (addressesToLocations.ContainsKey(address))
-                {
-                    locations = addressesToLocations[address];
-                }
-                else
-                {
-                    locations = new ConcurrentBag<TilerElements.Location>();
-                    bool addSuccess = false;
-                    while (!addSuccess)
-                    {
-
-                        addSuccess = addressesToLocations.TryAdd(address, locations);
-                        if(!addSuccess)
-                        {
-                            addSuccess = addressesToLocations.ContainsKey(address);
-                        }
-                    }
-                }
-                if (!String.IsNullOrEmpty(address))
-                {
-                    locations.Add(location);
-                }
-            });
-
-            addressesToLocations.AsParallel().ForAll((kvp) =>
+            ILookup<string, TilerElements.Location> addressesToLocations = iterlocations.ToLookup(location => location.Address.Trim(), location => location);
+            foreach (var kvL in addressesToLocations)
             {
-                TilerElements.Location location = new TilerElements.Location(kvp.Key);
+                TilerElements.Location location = new TilerElements.Location(kvL.Key);
                 if (location.Validate())
                 {
-                    kvp.Value.AsParallel().ForAll((eachLocation) =>
+                    var allLocations = addressesToLocations[kvL.Key];
+
+                    allLocations.AsParallel().ForAll((eachLocation) =>
                     {
                         eachLocation.update(location);
                     });
                 }
-            });
+            }
         }
-        
 
 
-        
+
+
         //System.Collections.Generic.IList<Google.Apis.Calendar.v3.Data.Event> {System.Collections.Generic.List<Google.Apis.Calendar.v3.Data.Event>}
 
     }
