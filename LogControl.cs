@@ -1556,7 +1556,8 @@ namespace TilerFront
                     );
 
             allSubCalQuery = allSubCalQuery.Where(calEvent => calEvent.CreatorId == _TilerUser.Id);
-            var retValue = await allSubCalQuery.ToListAsync().ConfigureAwait(false);
+            var retValue = await allSubCalQuery
+                .ToListAsync().ConfigureAwait(false);
 
             return retValue;
 
@@ -1732,7 +1733,7 @@ namespace TilerFront
                         && subEvent.RepeatParentEvent.StartTime_EventDB < RangeOfLookUP.End
                         && subEvent.RepeatParentEvent.EndTime_EventDB > RangeOfLookUP.Start))
                     )
-                    .Include(subEvent => subEvent.ParentCalendarEvent)
+                    .Include(subEvent => subEvent.ParentCalendarEvent.RepeatParent_DB)
                     .Include(subEvent => subEvent.RepeatParentEvent)
                     ;
                 HashSet<CalendarEvent> parentCals = new HashSet<CalendarEvent>();
@@ -1742,6 +1743,8 @@ namespace TilerFront
                 HashSet<string> repeatIds = new HashSet<string>();
                 foreach (SubCalendarEvent subEvent in subCalendarEvents)
                 {
+
+                    CalendarEvent parentCalEvent = subEvent.ParentCalendarEvent;
                     parentCals.Add(subEvent.ParentCalendarEvent);
                     allIds.Add(subEvent.ParentCalendarEvent.Id);
                     if (subEvent.RepeatParentEvent!=null)
@@ -1749,6 +1752,11 @@ namespace TilerFront
                         repeatIds.Add(subEvent.RepeatParentEvent.Id);
                         repeatCalendarEvents.Add(subEvent.RepeatParentEvent as CalendarEvent);
                         parentCals.Add(subEvent.RepeatParentEvent as CalendarEvent);
+                    }
+
+                    if(subEvent.ParentCalendarEvent.RepeatParent_DB!= null)
+                    {
+                        parentCals.Add(subEvent.ParentCalendarEvent.RepeatParent_DB);
                     }
                 }
 
