@@ -1402,7 +1402,7 @@ namespace TilerFront.Controllers
             if (myUser.Status)
             {
                 DateTimeOffset myNow = newEvent.getRefNow();
-                Schedule MySchedule = new DB_Schedule(myUser, myNow);
+                Schedule MySchedule = new DB_Schedule(myUser, myNow, createDump: false);
                 await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, myUser.UserID, db).ConfigureAwait(false);
 
                 CalendarEvent newCalendarEvent;

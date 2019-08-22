@@ -3155,7 +3155,7 @@ namespace TilerFront
 
         }
 
-        async virtual public Task<Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location>>> getProfileInfo(TimeLine RangeOfLookup, ReferenceNow Now, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation)
+        async virtual public Task<Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location>>> getProfileInfo(TimeLine RangeOfLookup, ReferenceNow Now, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation, bool createDump = true)
         {
             Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location>> retValue;
             if (this.Status)
@@ -3164,8 +3164,12 @@ namespace TilerFront
                 Dictionary<string, TilerElements.Location> LocationCache = await TaskLocationCache.ConfigureAwait(false);
                 RangeOfLookup  = RangeOfLookup == null ? new TimeLine(Now.constNow.AddYears(-200), Now.constNow.AddYears(200)) : RangeOfLookup;
                 Dictionary<string, CalendarEvent> AllScheduleData = await this.getAllEnabledCalendarEvent(RangeOfLookup, Now, retrievalOption: retrievalOption);
-                _AllScheduleData = AllScheduleData;
-                await createTempDump(Now).ConfigureAwait(false);
+                if(createDump)
+                {
+                    _AllScheduleData = AllScheduleData;
+                    await createTempDump(Now).ConfigureAwait(false);
+                }
+                
                 DateTimeOffset ReferenceTime = getDayReferenceTime();
 
                 await populateDefaultLocation(LocationCache).ConfigureAwait(false);
