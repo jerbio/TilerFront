@@ -1770,7 +1770,12 @@ namespace TilerFront
                     .Include(calendarEvent => calendarEvent.ProfileOfNow_EventDB)
                     .Include(calendarEvent => calendarEvent.DayPreference_DB)
                     .Include(calendarEvent => calendarEvent.Procrastination_EventDB)
-                    .Include(calendarEvent => calendarEvent.RetrictionProfile),
+                    .Include(calendarEvent => calendarEvent.RetrictionProfile)
+                    .Include(calEvent => calEvent.RetrictionProfile.DaySelection)
+                    .Include(calEvent => calEvent.RetrictionProfile.DaySelection.Select(restrictedDay => restrictedDay.RestrictionTimeLine))
+                    .Include(calEvent => calEvent.RetrictionProfile.NoNull_DaySelections)
+                    .Include(calEvent => calEvent.RetrictionProfile.NoNull_DaySelections.Select(restrictedDay => restrictedDay.RestrictionTimeLine))
+                    .Include(calEvent => calEvent.Procrastination_EventDB),
                     calEvent => calEvent.Id,
                     dbCalEvent => dbCalEvent.Id,
                     (calEvent, dbCalEvent) => new { calEvent, dbCalEvent })
