@@ -123,15 +123,41 @@ namespace TilerFront.Controllers
         [Route("api/Schedule/FixDBInstance")]
         public async Task<IHttpActionResult> FixRepetition([FromUri] getScheduleModel myAuthorizedUser)
         {
+            string userId = "c88d59b9-6fb0-4238-86c1-0a9daf88966a";
+            string userName = "jerbio";
             myAuthorizedUser = new getScheduleModel()
             {
-                UserName = "jerbio",
-                UserID = "6bc6992f-3222-4fd8-9e2b-b94eba2fb717"
+                UserName = userName,
+                UserID = userId
             };
             UserAccount myUserAccount = await myAuthorizedUser.getUserAccount(db);
             HttpContext myCOntext = HttpContext.Current;
             await myUserAccount.Login();
             myUserAccount.getTilerUser().updateTimeZoneTimeSpan(myAuthorizedUser.getTimeSpan);
+            TimeLine timeLine = new TimeLine(Utility.BeginningOfTime, Utility.BeginningOfTime.AddYears(3000));
+            ReferenceNow now = new ReferenceNow(Utility.BeginningOfTime, Utility.BeginningOfTime, new TimeSpan());
+            LogControl logControl = myUserAccount.ScheduleLogControl;
+            var calEvents = await logControl.getAllEnabledCalendarEventOlder(timeLine, now).ConfigureAwait(false);
+            foreach(var parentCalEvent in calEvents.Values)
+            {
+                if(parentCalEvent.IsRepeat)
+                {
+                    foreach (var calEvent in parentCalEvent.Repeat.RecurringCalendarEvents())
+                    {
+                        calEvent.setRepeatParent(parentCalEvent);
+                        if(calEvent.Repeat.SubRepetitions.Count > 0)
+                        {
+
+                        }
+                    }
+                    parentCalEvent.deleteAllSubCalendarEvents();
+                }   
+            }
+
+            await myUserAccount.Commit(calEvents.Values, null, myUserAccount.getTilerUser().LatestId, now).ConfigureAwait(false);
+
+
+
             PostBackData returnPostBack;
             //TilerUser tilerUser = myUserAccount.getTilerUser();
             //if (myUserAccount.Status)
@@ -659,7 +685,7 @@ namespace TilerFront.Controllers
             if (myUser.Status)
             {
                 DateTimeOffset myNow = myNow = myAuthorizedUser.getRefNow();
-                DB_Schedule MySchedule = new DB_Schedule(myUser, myNow);
+                DB_Schedule MySchedule = new DB_Schedule(myUser, myNow, createDump: false);
                 DB_UserActivity activity = new DB_UserActivity(myNow, UserActivity.ActivityType.Shuffle);
                 await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, myUser.UserID, db).ConfigureAwait(false);
                 ScheduleDump scheduleDump = await MySchedule.CreateScheduleDump(notes: UserData.Notes).ConfigureAwait(false);
@@ -1438,7 +1464,14 @@ namespace TilerFront.Controllers
                 Name.AssociatedEvent = newCalendarEvent;
                 if(newCalendarEvent.IsRepeat)
                 {
-                    newCalendarEvent.Repeat.PopulateRepetitionParameters(newCalendarEvent);
+                    if (newCalendarEvent.getIsEventRestricted)
+                    {
+                        newCalendarEvent.Repeat.PopulateRepetitionParameters(newCalendarEvent as CalendarEventRestricted);
+                    }
+                    else
+                    {
+                        newCalendarEvent.Repeat.PopulateRepetitionParameters(newCalendarEvent);
+                    }
                 }
                 
                 string BeforemyName = newCalendarEvent.ToString(); //BColor + " -- " + Count + " -- " + DurationDays + " -- " + DurationHours + " -- " + DurationMins + " -- " + EndDay + " -- " + EndHour + " -- " + EndMins + " -- " + EndMonth + " -- " + EndYear + " -- " + GColor + " -- " + LocationAddress + " -- " + LocationTag + " -- " + Name + " -- " + RColor + " -- " + RepeatData + " -- " + RepeatEndDay + " -- " + RepeatEndMonth + " -- " + RepeatEndYear + " -- " + RepeatStartDay + " -- " + RepeatStartMonth + " -- " + RepeatStartYear + " -- " + RepeatType + " -- " + RepeatWeeklyData + " -- " + Rigid + " -- " + StartDay + " -- " + StartHour + " -- " + StartMins + " -- " + StartMonth + " -- " + StartYear;
