@@ -540,7 +540,8 @@ namespace TilerFront.Controllers
                 {
                     fullTimeSpan = ProcrastinateDuration.TotalTimeSpan;
                 }
-                DB_Schedule MySchedule = new DB_Schedule(myUserAccount, myAuthorizedUser.getRefNow());
+                DateTimeOffset nowTime = myAuthorizedUser.getRefNow();
+                DB_Schedule MySchedule = new DB_Schedule(myUserAccount, nowTime);
 
                 await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, UserData.UserID, db).ConfigureAwait(false);
 
@@ -789,7 +790,6 @@ namespace TilerFront.Controllers
                     case "tiler":
                         {
                             DateTimeOffset myNow = UserData.getRefNow();
-                            //myNOw = UserData.getRefNow();
                             DB_Schedule MySchedule = new DB_Schedule(retrievedUser, myNow );
                             await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, UserData.UserID, db).ConfigureAwait(false);
                             activity.eventIds.Add(UserData.EventID);
