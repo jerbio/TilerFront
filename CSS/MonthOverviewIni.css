@@ -379,7 +379,6 @@ body {
 .gridSubevent {
   position:absolute;
   cursor: pointer;
-  //width:12.87%;
   transition:all 1s;
   overflow:hidden;
   text-align:left;
@@ -438,8 +437,6 @@ body {
   position: relative;
   overflow-x: hidden;
   overflow-y: hidden;
-  //margin-left: 3em;
-  //box-shadow: inset rgba(20,20,20,0.3) 5px -1px 4px;
 }
 .WeekGridRenderPlane 
 {
@@ -688,9 +685,7 @@ body {
 */
 .SelectedWeekGridSubcalEvent
 {
-  //box-shadow:rgba(10,10,10,.9) 0px 0px 8px;
   z-index:4;
-  //border:solid 2px rgb(80,80,80);
   background-color:yellow !important;
   transition:all .1s;
 }
@@ -838,7 +833,6 @@ body {
   overflow-x: visible;
   overflow-y:hidden;
   border-left:2px solid black;
-  //box-shadow: -2px 0px 2px rgb(136, 136, 136);
   transform:translateX(-100%);
   display:none;
   
@@ -970,10 +964,17 @@ body {
     cursor: pointer;
     width: 100%;
     height: 100%;
-    //border-radius: 5px;
-    //left: 3px;
-    //display: inline-block;
-    //box-shadow: rgba(10,10,10,0.2) 0px 2px 3px;
+}
+
+.ListElementDataContentContainerColorCurrentSubevent 
+{
+    border: solid yellow 5px;
+    width: calc(100% - 30px);
+}
+.ListElementDataContentContainerColorNextSubevent
+{
+  border: solid #bfbfb5 5px;
+  width: calc(100% - 30px);
 }
 
 .ListElementDataContentContainerClassic
@@ -981,11 +982,9 @@ body {
     position: relative;
     cursor: pointer;
     width: calc(100% - 17px);
-    //height: 90%;
     border-radius: 5px;
     left: 3px;
     display: inline-block;
-    //box-shadow: rgba(10,10,10,0.2) 0px 2px 3px;
 }
 
 .EventLockImgContainer {
@@ -1010,7 +1009,6 @@ body {
     /* border: solid black 1px; */
     text-align: center;
     border-radius: 5px;
-    //box-shadow: rgba(30,30,30,.8) 0 0 6px;
     font-size: 15px;
     color:rgba(0, 114, 206,1);
 }
@@ -1058,7 +1056,6 @@ body {
 {
     width:100%;
     display: inline-block;
-    //margin: 0 9px;
     position: absolute;
     top: 50%;
     left:0;
@@ -1085,7 +1082,6 @@ body {
 .CurrentDayMonthBar
 {
     color: rgba(0, 114, 206,1);
-    //text-shadow: rgba(10,10,10,.3) 0 0 10px;
     font-weight: bolder;
 }
 
@@ -1110,7 +1106,7 @@ body {
 }
 .MultipleBarSelectionContainer
 {
-    //display:none;
+    
 }
 
 #AllMonthsContainer {
@@ -1172,7 +1168,6 @@ body {
 
 .YearSelected
 {
-    //position:absolute;
     background: rgba(0, 114, 206,.6);
     border:solid rgb(250,250,250) 1px;
     box-sizing:border-box;
@@ -1236,14 +1231,12 @@ body {
     width:100%;
     height:100%;
     border:white 1px solid;
-    //border-radius:3px;
     z-index:-1;
 }
 
 .FullColorAugmentation 
 {
-    //border:white 1px solid;
-    //height: 60px;
+    
 }
 
 
@@ -1341,7 +1334,10 @@ width: 100%;
 }
 
 
-#NotesTextAreaContainer {    height: 100%;    display: flex;    flex-direction: column;
+#NotesTextAreaContainer {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 #Notes {

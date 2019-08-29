@@ -348,10 +348,11 @@ function ResetClassicUIEffects()
     getRefreshedData.enableDataRefresh();
 }
 
-function RenderListTimeInformation(DayOfWeek, ID)
+function RenderListTimeInformation(DayOfWeek, ID, isNext)
 {
     var RefSubEvent = global_DictionaryOfSubEvents[ID];
-
+    let now = Date.now()
+    let isCurrentDayOfWeek = now < DayOfWeek.End.getTime() && now >= DayOfWeek.Start.getTime();
     var TopPixels = ((DayOfWeek.UISpecs[ID].css.top / 100) * global_DayHeight) + global_DayTop;
     var ListElementContainer = getDomOrCreateNew("SubEventReference" + ID);
     ListElementContainer.setAttribute("draggable", true);
@@ -413,6 +414,18 @@ function RenderListTimeInformation(DayOfWeek, ID)
     $(ListElementDataContentContainer.Dom).addClass("ListElementDataContentContainer");
     ListElementDataContentContainer.Dom.appendChild(NameDataPerListElement.Dom);
     ListElementDataContentContainer.Dom.appendChild(BottomPanelListElement.Dom);
+    let currentSubEventClassName = "ListElementDataContentContainerColorCurrentSubevent";
+    let nextSubEventClassName = "ListElementDataContentContainerColorCurrentSubevent";
+    if(isCurrentDayOfWeek) {
+        let isCurrentSubEvent = now < RefSubEvent.SubCalEndDate.getTime() && now >= RefSubEvent.SubCalStartDate.getTime();
+        if(isCurrentSubEvent) {
+            $(ColorContainer.Dom).addClass(currentSubEventClassName);
+        }
+
+        if(isNext) {
+            $(ColorContainer.Dom).addClass(nextSubEventClassName);
+        }
+    }
 
     RefSubEvent.gridDoms.push(ListElementDataContentContainer.Dom)
     ColorContainer.appendChild(ListElementDataContentContainer)
@@ -456,13 +469,25 @@ function RenderListTimeInformation(DayOfWeek, ID)
     DayOfWeek.renderPlane.Dom.appendChild(ListElementContainer);
     //DayOfWeek.renderPlane.Dom.appendChild(DayOfWeek.UISpecs[ID].refrenceListElement.Dom)
 
-    DayOfWeek.UISpecs[ID].DataElement = ColorContainer
+    DayOfWeek.UISpecs[ID].DataElement = ColorContainer;
     RefSubEvent.ListRefElement = ListElementContainer;
 
     var HeightPx = (DayOfWeek.UISpecs[ID].css.height / 100) * global_DayHeight;
     var EndPixelTop = TopPixels + HeightPx;
     ///BestBottom is data on tab a level which ends before myData. BestBottom.Count data member is the level, BestBOttom.End is the end pixel of this base tab
-    var RetValue= { Start: DayOfWeek.UISpecs[ID].Start, CalCCount: 0, Data: DayOfWeek.UISpecs[ID], ID: ID, BestBottom: { End: 10000, Count: 0 }, Count: 0, EarlierCount: 0, top: TopPixels, end: EndPixelTop, refSubEvent: ListElementContainer }
+    var RetValue= { 
+        Start: DayOfWeek.UISpecs[ID].Start, 
+        CalCCount: 0, 
+        Data: DayOfWeek.UISpecs[ID], 
+        ID: ID, 
+        BestBottom: { End: 10000, Count: 0 }, 
+        Count: 0, 
+        EarlierCount: 0, 
+        top: TopPixels, 
+        end: EndPixelTop, 
+        currentSubEventClassName: currentSubEventClassName,
+        nextSubEventClassName: nextSubEventClassName,
+        refSubEvent: ListElementContainer };
     return RetValue;
 
 }
@@ -1974,10 +1999,45 @@ getRefreshedData.pauseUnEnroll = function (Id) {
         ev.target.appendChild(document.getElementById(data));
     }
 
+    function refreshNext(nowSubEvent, dayOfWeek) {
+        let now = Date.now()
+        let duration = now - nowSubEvent.SubCalEndDate.getTime()
+        function getNextSubEvent () {
+
+        }
+
+        if(nowSubEvent)  {
+            setTimeout( function() {
+                $(nowSubEvent.Dom).removeClass (nowSubEvent.currentSubEventClassName);
+            }, duration)
+        }
+        let SortedUISpecs = []
+        for (var ID in dayOfWeek.UISpecs)
+        {
+            if (dayOfWeek.UISpecs[ID].Enabled)
+            {
+                var SortedUISpecs_Element = dayOfWeek.UISpecs[ID];
+                SortedUISpecs.push({SubEvent:SortedUISpecs_Element,ID: ID});
+                
+            }
+        }
+
+        SortedUISpecs.sort(function (a, b)
+        {
+            //var Diff = (a.SubEvent.Start) - (b.SubEvent.Start)
+            return (a.SubEvent.Start) - (b.SubEvent.Start);
+        });
+
+        
+    }
+
     function triggerSubEventRenderOnMonth(DayOfWeek)
     {
         var verfyDate = new Date(2014, 5, 15, 0, 0, 0, 0);
         var a = 0;
+        let foundNextEvent = false
+        let now = Date.now()
+        let isCurrentDayOfWeek = now < DayOfWeek.End.getTime() && now >= DayOfWeek.Start.getTime();
     
 
         var IntersectingArrayData = new Array();
@@ -2003,7 +2063,16 @@ getRefreshedData.pauseUnEnroll = function (Id) {
         for (var i = 0; i < SortedUISpecs.length; i++)
         {
             var Element = SortedUISpecs[i];
-            var myData = global_UISetup.RenderTimeInformation(DayOfWeek, Element.ID);
+            let subEvent = Element.SubEvent;
+            let possibleNext = now < subEvent.Start;
+            let isNext = false
+            if(isCurrentDayOfWeek && possibleNext && !foundNextEvent) {
+                foundNextEvent = true
+                isNext = true
+            }
+            
+            var myData = global_UISetup.RenderTimeInformation(DayOfWeek, Element.ID, isNext);
+            
             IntersectingArrayData.push(myData);
         }
 
