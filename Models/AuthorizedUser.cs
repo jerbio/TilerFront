@@ -15,7 +15,7 @@ namespace TilerFront.Models
         /// TimeZone desired by the user. This defaults to UTC
         /// </summary>
         public string TimeZone { get; set; } = "UTC";
-        protected DateTimeOffset refNow = DateTimeOffset.UtcNow;
+        protected DateTimeOffset refNow = DateTimeOffset.UtcNow.removeSecondsAndMilliseconds();
         public TimeSpan getTimeSpan
         {
             get 
