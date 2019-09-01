@@ -854,7 +854,7 @@ body {
 
 .TimeDataFormat 
 {
-    width: 100%;
+    width: 95%;
     height: auto;
     position: relative;
     font-size: 12px;
@@ -964,17 +964,6 @@ body {
     cursor: pointer;
     width: 100%;
     height: 100%;
-}
-
-.ListElementDataContentContainerColorCurrentSubevent 
-{
-    border: solid yellow 5px;
-    width: calc(100% - 30px);
-}
-.ListElementDataContentContainerColorNextSubevent
-{
-  border: solid #bfbfb5 5px;
-  width: calc(100% - 30px);
 }
 
 .ListElementDataContentContainerClassic

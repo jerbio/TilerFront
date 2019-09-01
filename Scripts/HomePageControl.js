@@ -1,5 +1,5 @@
-var TotalSubEventList = new Array();
-var ActiveSubEvents = new Array();
+var TotalSubEventList = [];
+var ActiveSubEvents = [];
 var TwelveHourMilliseconds = OneHourInMs * 12;
 var Dictionary_OfSubEvents = {};
 var Dictionary_OfCalendarData = {};
@@ -7,7 +7,9 @@ var ToBeReorganized = [];
 var global_DeltaSubevents = [];
 var lowestMsToNow=999999999999999;
 var ClosestSubEventToNow;
-var global_RenderedList = new Array();
+var global_RenderedList = [];
+let currentSubevent
+let nextSubEvent
 
 
 
@@ -182,7 +184,7 @@ function generateHomePage(UserSchedule) {
     }
 
     ActiveSubEvents.forEach(function (myEvent) {
-        var MobileDom = genereateMobileDoms(myEvent);
+        var MobileDom = generateMobileDoms(myEvent);
         myEvent.Dom = MobileDom;
     });
     /*var AllNonrepeatingNonEvents = generateNonRepeatEvents(UserSchedule.Schedule.NonRepeatCalendarEvent);
@@ -708,7 +710,7 @@ function generateModalForTIleOrModal()
     
 
 
-    function genereateMobileDoms(myEvent) {
+    function generateMobileDoms(myEvent) {
         Tiers = myEvent.Tiers;
         var EventDom = getDomOrCreateNew("EventID" + myEvent.ID);
         var HorizontalLine = InsertHorizontalLine("70%", "15%", "100%")//creates underlying gray Line
@@ -824,6 +826,8 @@ function generateModalForTIleOrModal()
         //myEvent.SubCalEndDate.setHours(refEnd.Hour, refEnd.Minute);
 
         var toString = myEvent.SubCalStartDate.toLocaleString();
+
+
         $(EventDom.Dom).addClass("EventDomContainer");
         $(EventDom.Dom).addClass(CurrentTheme.FontColor);
         $(EventDom_ContainerA.Dom).addClass("EventDomContainerA");
@@ -1633,6 +1637,7 @@ function generateModalForTIleOrModal()
     {
         var CurrentTopPercent = 0;
         var TopIncrement = 0;
+        let now = Date.now()
         ActiveSubEvents.sort(function (a, b) { return (a.SubCalStartDate) - (b.SubCalStartDate) });
         /*AllNonRepeatingEvents.forEach(
             function (CalendarEvent)
@@ -1659,6 +1664,18 @@ function generateModalForTIleOrModal()
                 Dom.appendChild(SubCalEvent.Dom.Dom);
                 //SubCalEvent.Dom.Dom.style.top = "100%";
                 var myFunc = generateAFunction(CurrentTopPercent, SubCalEvent.Dom.Dom);
+                let isCurrentSubEvent = now < SubCalEvent.SubCalEndDate.getTime() && now >= SubCalEvent.SubCalStartDate.getTime();
+                if(isCurrentSubEvent && !currentSubevent) {
+                    currentSubevent = SubCalEvent;
+                    renderNowUi(SubCalEvent);
+                }
+                if(!currentSubevent && !nextSubEvent) {
+                    let isNext = now < SubCalEvent.SubCalStartDate.getTime();
+                    if(isNext) {
+                        nextSubEvent = SubCalEvent;
+                        renderNextUi(SubCalEvent);
+                    }
+                }
                 deferredCall(CurrentTopPercent * 1, myFunc);
                 //CurrentTopPercent += TopIncrement;
             }
@@ -1667,6 +1684,42 @@ function generateModalForTIleOrModal()
         //global_RenderedList = ActiveSubEvents;
     }
 
+    function renderNowUi (subEvent) {
+        if(subEvent) {
+            let currentSubEventClassName = "ListElementContainerCurrentSubevent";
+            let ListElementContainer = subEvent.Dom
+            $(ListElementContainer.Dom).addClass(currentSubEventClassName);
+            let nextSubEventTimeSpanInMs =  subEvent.SubCalEndDate.getTime() - Date.now();
+            let nextSubEventIndex = TotalSubEventList.indexOf(subEvent)
+            if(nextSubEventIndex >=0 && nextSubEventIndex < TotalSubEventList.length - 1) {
+                ++nextSubEventIndex;
+                let nextSubEvent = TotalSubEventList[nextSubEventIndex]
+                if(nextSubEventTimeSpanInMs >= OneMinInMs) {
+                    setTimeout(() => {
+                        $(ListElementContainer.Dom).removeClass(currentSubEventClassName);
+                        renderNextUi(nextSubEvent);
+                    }, nextSubEventTimeSpanInMs)
+                } else {
+                    $(ListElementContainer.Dom).removeClass(currentSubEventClassName);
+                    renderNowUi(nextSubEvent);
+                }
+            }
+        }
+    }
+
+
+    function renderNextUi(nextSubEvent) {
+        if(nextSubEvent) {
+            let nextSubEventClassName = "ListElementContainerNextSubevent";
+            let ListElementContainer = nextSubEvent.Dom;
+            $(ListElementContainer.Dom).addClass(nextSubEventClassName);
+            let timeSpanInMs = nextSubEvent.SubCalStartDate.getTime() - Date.now()
+            setTimeout(() => {
+                renderNowUi(nextSubEvent)
+                $(ListElementContainer.Dom).removeClass(nextSubEventClassName);
+            }, timeSpanInMs)
+        }
+    }
     function RefreshSubEventsMainDivSubEVents(CallBack)
     {
         //debugger;
@@ -1708,7 +1761,7 @@ function generateModalForTIleOrModal()
             ClosestSubEventToNow = getClosestToNow(TotalSubEventList, new Date());
         }
         ActiveSubEvents.forEach(function (myEvent) {
-            var MobileDom = genereateMobileDoms(myEvent);
+            var MobileDom = generateMobileDoms(myEvent);
             myEvent.Dom = MobileDom;
         });
         /*
