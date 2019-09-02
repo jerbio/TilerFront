@@ -1028,7 +1028,7 @@ width: 20px;
 .ListElementContainerCurrentSubevent 
 {
   left: 0px;
-  background-color: yellow;
+  background-image: linear-gradient(rgba(255, 255, 255, .5), rgba(255, 255, 0, .7));
   padding-top: 8px;
   padding-right: 8px;
 }

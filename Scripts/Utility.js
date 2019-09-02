@@ -74,3 +74,69 @@ function spliceSlice(str, index, count, add) {
 
     return str.slice(0, index) + (add || "") + str.slice(index + count);
 }
+
+function buildFunctionSubscription (method) {
+    function generateMethod(updatedMethod) {
+        let retValue = function () {
+            let _this = this;
+            let args = [...arguments];
+            if(typeof(retValue.before) === 'object') {
+                let beforeValues = Object.values(retValue.before);
+                beforeValues.forEach(_func => {
+                    _func();
+                });
+            }
+            updatedMethod.apply( _this, args );
+            if(typeof(retValue.after) === 'object') {
+                let afterValues = Object.values(retValue.after);
+                afterValues.forEach(_func => {
+                    _func();
+                });
+            }
+            
+        }
+        
+        retValue.enroll = function (callback, isBefore) {
+            let id = null;
+            if (isFunction(callback)) {
+                id = generateUUID();
+                if(!retValue.before) {
+                    retValue.before = {
+                        
+                    };
+                } 
+                if(!retValue.after) {
+                    retValue.after = {
+                        
+                    };
+                }
+                if(isBefore) {
+                    retValue.before[id] = callback;
+                } else {
+                    retValue.after[id] =  callback;
+                }
+                
+            }
+            else {
+                throw "Non function provided when function is expected in buildFunctionSubscription"
+            }
+            return id;
+        };
+        
+        retValue.unEnroll = function (id, onlyBefore, onlyAfter) {
+            if(onlyBefore){
+                delete retValue.before[id];
+            } 
+            if(onlyAfter) {
+                delete retValue.after[id];
+            }
+            if(!onlyBefore && !onlyAfter) {
+                delete retValue.callBacks[id];
+            }
+        };
+        return retValue;
+    }
+
+    let retValue = generateMethod(method);
+    return retValue;
+}

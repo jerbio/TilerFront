@@ -1765,11 +1765,11 @@ getRefreshedData.pauseUnEnroll = function (Id) {
         }).done(function (response)
         {
             //alert("done generating");
-            PopulateMonthGrid(DataHolder.Data, RangeData);
-            if (CallBackAfterRefresh != null)
-            {
+            if (CallBackAfterRefresh != null) {
                 CallBackAfterRefresh(response);
             }
+            PopulateMonthGrid(DataHolder.Data, RangeData);
+
             getRefreshedData.enableDataRefresh();
         });
 
@@ -2036,6 +2036,28 @@ getRefreshedData.pauseUnEnroll = function (Id) {
             }, timeSpanInMs)
         }
     }
+
+function resetEventStatusUi() {
+    if (global_UISetup.currentSubEvent) {
+        let allCurrents = []
+        let currentSubEventClassName = "ListElementContainerCurrentSubevent";
+        let elements = $('.' + currentSubEventClassName)
+        for (let i = 0; i < elements.length; i++) {
+            let element = elements.get(i);
+            $(element).removeClass(currentSubEventClassName);
+        }
+    }
+    if (global_UISetup.nextSubEvent) {
+        let nextSubEventClassName = "ListElementContainerNextSubevent";
+        let elements = $('.' + nextSubEventClassName)
+        for (let i = 0; i < elements.length; i++) {
+            let element = elements.get(i);
+            $(element).removeClass(nextSubEventClassName);
+        }
+    }
+}
+
+getRefreshedData.enroll(resetEventStatusUi);
 
     function triggerSubEventRenderOnMonth(DayOfWeek)
     {

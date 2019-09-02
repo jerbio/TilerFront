@@ -147,7 +147,7 @@ function generateCalendarEvents(data) {
     //alert(typeof (data));
     //var JsonData = JSON.parse(data);
     var JsonData = (data);
-
+    resetEventStatusUi()
     generateLoggedInUserAccountUI(JsonData.Content);
     //return JsonData;
 }
@@ -186,6 +186,7 @@ function generateHomePage(UserSchedule) {
     ActiveSubEvents.forEach(function (myEvent) {
         var MobileDom = generateMobileDoms(myEvent);
         myEvent.Dom = MobileDom;
+        processNowAndNextRendering(myEvent);
     });
     /*var AllNonrepeatingNonEvents = generateNonRepeatEvents(UserSchedule.Schedule.NonRepeatCalendarEvent);
     var AllRepeatEventDoms = generateRepeatEvents(UserSchedule.Schedule.RepeatCalendarEvent);*/
@@ -1630,7 +1631,21 @@ function generateModalForTIleOrModal()
     }
 
 
-    
+    function processNowAndNextRendering(SubCalEvent) {
+        let now = Date.now();
+        let isCurrentSubEvent = now < SubCalEvent.SubCalEndDate.getTime() && now >= SubCalEvent.SubCalStartDate.getTime();
+        if(isCurrentSubEvent && !currentSubevent) {
+            currentSubevent = SubCalEvent;
+            renderNowUi(SubCalEvent);
+        }
+        if(!currentSubevent && !nextSubEvent) {
+            let isNext = now < SubCalEvent.SubCalStartDate.getTime();
+            if(isNext) {
+                nextSubEvent = SubCalEvent;
+                renderNextUi(SubCalEvent);
+            }
+        }
+    }
 
 
     function InitializeMiddleDomUI(Dom)
@@ -1664,18 +1679,6 @@ function generateModalForTIleOrModal()
                 Dom.appendChild(SubCalEvent.Dom.Dom);
                 //SubCalEvent.Dom.Dom.style.top = "100%";
                 var myFunc = generateAFunction(CurrentTopPercent, SubCalEvent.Dom.Dom);
-                let isCurrentSubEvent = now < SubCalEvent.SubCalEndDate.getTime() && now >= SubCalEvent.SubCalStartDate.getTime();
-                if(isCurrentSubEvent && !currentSubevent) {
-                    currentSubevent = SubCalEvent;
-                    renderNowUi(SubCalEvent);
-                }
-                if(!currentSubevent && !nextSubEvent) {
-                    let isNext = now < SubCalEvent.SubCalStartDate.getTime();
-                    if(isNext) {
-                        nextSubEvent = SubCalEvent;
-                        renderNextUi(SubCalEvent);
-                    }
-                }
                 deferredCall(CurrentTopPercent * 1, myFunc);
                 //CurrentTopPercent += TopIncrement;
             }
@@ -1720,6 +1723,7 @@ function generateModalForTIleOrModal()
             }, timeSpanInMs)
         }
     }
+
     function RefreshSubEventsMainDivSubEVents(CallBack)
     {
         //debugger;
@@ -1735,7 +1739,34 @@ function generateModalForTIleOrModal()
             CallBack();
         }
     }
+
+    RefreshSubEventsMainDivSubEVents = buildFunctionSubscription(RefreshSubEventsMainDivSubEVents)
+
+    function resetEventStatusUi() {
+        if (currentSubevent) {
+            let allCurrents = []
+            let currentSubEventClassName = "ListElementContainerCurrentSubevent";
+            let elements = $('.' + currentSubEventClassName)
+            for (let i = 0; i < elements.length; i++) {
+                let element = elements.get(i);
+                $(element).removeClass(currentSubEventClassName);
+            }
+            currentSubevent= undefined;
+        }
+        if (nextSubEvent) {
+            let nextSubEventClassName = "ListElementContainerNextSubevent";
+            let elements = $('.' + nextSubEventClassName)
+            for (let i = 0; i < elements.length; i++) {
+                let element = elements.get(i);
+                $(element).removeClass(nextSubEventClassName);
+            }
+            nextSubEvent= undefined;
+        }
+    }
+
+    resetEventStatusUi = buildFunctionSubscription(resetEventStatusUi)
     
+    RefreshSubEventsMainDivSubEVents.enroll(resetEventStatusUi, true);
 
     function getNewData(OldActiveEvents)
     {
@@ -1763,6 +1794,7 @@ function generateModalForTIleOrModal()
         ActiveSubEvents.forEach(function (myEvent) {
             var MobileDom = generateMobileDoms(myEvent);
             myEvent.Dom = MobileDom;
+            processNowAndNextRendering(myEvent);
         });
         /*
         var AllNonrepeatingNonEvents = generateNonRepeatEvents(UserSchedule.Schedule.NonRepeatCalendarEvent);
