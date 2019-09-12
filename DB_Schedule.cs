@@ -137,7 +137,7 @@ namespace TilerFront
             });
         }
 
-        async virtual public Task WriteFullScheduleToLogAndOutlook(CalendarEvent newCalendarEvent = null)
+        async virtual public Task WriteFullScheduleToLog(CalendarEvent newCalendarEvent = null)
         {
             await CleanUpForUI(AllEventDictionary.Values).ConfigureAwait(false);
             myAccount.UpdateReferenceDayTime(ReferenceDayTIime);
@@ -150,12 +150,6 @@ namespace TilerFront
                 {
                     AllEventDictionary.Remove(THirpartyCalendarEvents.Calendar_EventID.getCalendarEventComponent());
                 }
-            }
-
-            TilerFront.OutLookConnector myOutlook = new OutLookConnector();
-            foreach (CalendarEvent MyCalEvent in AllEventDictionary.Values)
-            {
-                (myOutlook).WriteToOutlook(MyCalEvent);
             }
 
             await myAccount.Commit(AllEventDictionary.Values, newCalendarEvent, EventID.LatestID.ToString(), this.Now).ConfigureAwait(false);
@@ -190,7 +184,7 @@ namespace TilerFront
             if(persistNewChanges)
             {
                 removeAllFromOutlook();
-                await WriteFullScheduleToLogAndOutlook().ConfigureAwait(false);
+                await WriteFullScheduleToLog().ConfigureAwait(false);
                 CompleteSchedule = getTimeLine();
             } else
             {
@@ -203,7 +197,7 @@ namespace TilerFront
         {
             AddToSchedule(NewEvent, optimizeSchedule);
 
-            await WriteFullScheduleToLogAndOutlook(NewEvent).ConfigureAwait(false);
+            await WriteFullScheduleToLog(NewEvent).ConfigureAwait(false);
 
             CompleteSchedule = getTimeLine();
 
@@ -226,7 +220,7 @@ namespace TilerFront
             AddToSchedule(TempEvent);
             AllEventDictionary.Remove(TempEvent.Calendar_EventID.getCalendarEventComponent());
             AllEventDictionary.Remove(TempEvent.Calendar_EventID.ToString());
-            await WriteFullScheduleToLogAndOutlook().ConfigureAwait(false);
+            await WriteFullScheduleToLog().ConfigureAwait(false);
             return;
         }
 
@@ -243,7 +237,7 @@ namespace TilerFront
                 }
             }
             retrievedThirdParty = true;
-            await WriteFullScheduleToLogAndOutlook().ConfigureAwait(false);
+            await WriteFullScheduleToLog().ConfigureAwait(false);
         }
 
 

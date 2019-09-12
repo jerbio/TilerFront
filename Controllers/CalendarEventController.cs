@@ -99,7 +99,7 @@ namespace TilerFront.Controllers
                 activity.updateMiscelaneousInfo(json.ToString());
                 retrievedUser.ScheduleLogControl.updateUserActivty(activity);
                 CustomErrors messageReturned = await NewSchedule.deleteCalendarEventAndReadjust(myUser.EventID).ConfigureAwait(false);
-                await NewSchedule.WriteFullScheduleToLogAndOutlook().ConfigureAwait(false);
+                await NewSchedule.WriteFullScheduleToLog().ConfigureAwait(false);
                 int errorCode = messageReturned?.Code ?? 0;
                 retValue = new PostBackData(messageReturned, errorCode);
             }
@@ -145,7 +145,7 @@ namespace TilerFront.Controllers
                 activity.updateMiscelaneousInfo(json.ToString());
                 retrievedUser.ScheduleLogControl.updateUserActivty(activity);
                 CustomErrors messageReturned = await NewSchedule.markAsCompleteCalendarEventAndReadjust(myUser.EventID).ConfigureAwait(false);
-                await NewSchedule.WriteFullScheduleToLogAndOutlook().ConfigureAwait(false);
+                await NewSchedule.WriteFullScheduleToLog().ConfigureAwait(false);
                 int errorCode = messageReturned?.Code ?? 0;
                 retValue = new PostBackData(messageReturned, errorCode);
             }

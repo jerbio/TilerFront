@@ -312,7 +312,7 @@ namespace TilerFront.Controllers
 
                     myUser.ScheduleLogControl.updateUserActivty(activity);
                     await MySchedule.PauseEvent(myAuthorizedUser.EventID, currentPausedEventId);
-                    await MySchedule.WriteFullScheduleToLogAndOutlook().ConfigureAwait(false);
+                    await MySchedule.WriteFullScheduleToLog().ConfigureAwait(false);
                     PausedEvent paused;
                     PausedEvent InstanceOfPausedEventAlreadyInDb = pausedEvents.FirstOrDefault(obj => obj.EventId == myAuthorizedUser.EventID);
 
@@ -368,7 +368,7 @@ namespace TilerFront.Controllers
                     activity.updateMiscelaneousInfo(json.ToString());
                     myUser.ScheduleLogControl.updateUserActivty(activity);
                     await MySchedule.ContinueEvent(PausedEvent.EventId);
-                    await MySchedule.WriteFullScheduleToLogAndOutlook().ConfigureAwait(false);
+                    await MySchedule.WriteFullScheduleToLog().ConfigureAwait(false);
                     pausedSubEvent = MySchedule.getSubCalendarEvent(PausedEvent.EventId);
                     pausedCalEvent = MySchedule.getCalendarEvent(PausedEvent.EventId);
                     PausedEvent.isPauseDeleted = true;
@@ -641,7 +641,7 @@ namespace TilerFront.Controllers
                     location = TilerElements.Location.getDefaultLocation();
                 }
                 await MySchedule.FindMeSomethingToDo(location);
-                await MySchedule.WriteFullScheduleToLogAndOutlook().ConfigureAwait(false);
+                await MySchedule.WriteFullScheduleToLog().ConfigureAwait(false);
 
                 List<SubCalendarEvent> allSubEvents = MySchedule.getAllCalendarEvents().Where(calEvent => calEvent.isActive).SelectMany(calEvent => calEvent.ActiveSubEvents).ToList();
                 TimeLine timeLine = new TimeLine();
@@ -795,7 +795,7 @@ namespace TilerFront.Controllers
                             activity.eventIds.Add(UserData.EventID);
                             retrievedUser.ScheduleLogControl.updateUserActivty(activity);
                             MySchedule.markSubEventAsCompleteCalendarEventAndReadjust(UserData.EventID);
-                            await MySchedule.WriteFullScheduleToLogAndOutlook().ConfigureAwait(false);
+                            await MySchedule.WriteFullScheduleToLog().ConfigureAwait(false);
                             retValue = new PostBackData("\"Success\"", 0);
                         }
                         break;
@@ -834,7 +834,7 @@ namespace TilerFront.Controllers
 
             
             await MySchedule.markSubEventsAsComplete(AllEventIDs).ConfigureAwait(false);
-            MySchedule.WriteFullScheduleToLogAndOutlook().Wait();
+            MySchedule.WriteFullScheduleToLog().Wait();
             PostBackData myPostData = new PostBackData("\"Success\"", 0);
 
             TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
@@ -959,7 +959,7 @@ namespace TilerFront.Controllers
                             await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, myUser.UserID, db).ConfigureAwait(false);
 
                             await MySchedule.deleteSubCalendarEvent(myUser.EventID).ConfigureAwait(false);
-                            await MySchedule.WriteFullScheduleToLogAndOutlook().ConfigureAwait(false);
+                            await MySchedule.WriteFullScheduleToLog().ConfigureAwait(false);
                             retValue = new PostBackData("\"Success\"", 0);   
                         }
                         break;
@@ -1012,7 +1012,7 @@ namespace TilerFront.Controllers
                 DB_UserActivity activity = new DB_UserActivity(myUser.getRefNow(), UserActivity.ActivityType.DeleteMultiple, AllEventIDs);
                 retrievedUser.ScheduleLogControl.updateUserActivty(activity);
                 await MySchedule.deleteSubCalendarEvents(AllEventIDs);
-                await MySchedule.WriteFullScheduleToLogAndOutlook().ConfigureAwait(false);
+                await MySchedule.WriteFullScheduleToLog().ConfigureAwait(false);
                 retValue = new PostBackData("\"Success\"", 0);
             }
             else

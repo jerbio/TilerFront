@@ -28,7 +28,18 @@ namespace TilerFront.Models
 
         public DateTimeOffset getRefNow()
         {
-            return refNow;
+            string timeInString = "";
+            
+            if(string.IsNullOrEmpty(timeInString))
+            {
+                return refNow;
+            }
+            else
+            {
+                DateTimeOffset retValue = DateTimeOffset.Parse(timeInString);
+                return retValue;
+            }
+            
         }
 
         async virtual public Task<UserAccount> getUserAccount(TilerDbContext db=null)
