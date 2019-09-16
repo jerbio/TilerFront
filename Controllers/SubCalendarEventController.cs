@@ -70,8 +70,17 @@ namespace TilerFront.Controllers
                             newEnd = newEnd.Add(myUser.getTimeSpan);
                             DateTimeOffset Begin = TilerElementExtension.JSStartTime.AddMilliseconds(LongBegin);
                             Begin = Begin.Add(myUser.getTimeSpan);
+                            if(LongBegin == 0)
+                            {
+                                Begin = Utility.BeginningOfTime;
+                            }
+
                             DateTimeOffset Deadline = TilerElementExtension.JSStartTime.AddMilliseconds(LongDeadline);
                             Deadline = Deadline.Add(myUser.getTimeSpan);
+                            if (LongDeadline == 0)
+                            {
+                                Deadline = Utility.BeginningOfTime;
+                            }
                             int SplitCount = (int)myUser.Split;
                             if(SplitCount >= 1)
                             {

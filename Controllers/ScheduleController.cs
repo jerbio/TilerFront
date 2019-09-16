@@ -150,7 +150,7 @@ namespace TilerFront.Controllers
 
                         }
                     }
-                    parentCalEvent.deleteAllSubCalendarEvents();
+                    parentCalEvent.deleteAllSubCalendarEventsFromRepeatParentCalendarEvent();
                 }   
             }
 
