@@ -62,7 +62,7 @@ namespace TilerFront
             SubCalEvent retValue = new SubCalEvent();
             retValue.ThirdPartyEventID = myEvent.Id;
             retValue.ThirdPartyType = ThirdPartyControl.CalendarTool.google.ToString();
-            retValue.ThirdPartyUserID = myEvent.Organizer.Email;
+            retValue.ThirdPartyUserID = myEvent.Organizer?.Email;
 
 
             retValue.ID = AuthenticationID.getIDUpToRepeatDayCalendarEvent()+"_" + CurrentCount + "_1";
@@ -79,8 +79,12 @@ namespace TilerFront
             retValue.SubCalAddressDescription = myEvent.Location;// SubCalendarEventEntry.Location.Description;
             retValue.SubCalAddress = myEvent.Location;
             retValue.SubCalCalendarName = myEvent.Summary;
+            if(retValue.ThirdPartyUserID == null || retValue.SubCalCalendarName == null)
+            {
+                retValue.SubCalCalendarName = "busy";
+            }
 
-            retValue.SubCalCalEventStart = retValue.SubCalStartDate;
+                retValue.SubCalCalEventStart = retValue.SubCalStartDate;
             retValue.SubCalCalEventEnd = retValue.SubCalEndDate;
 
             retValue.isComplete = false;
@@ -100,8 +104,8 @@ namespace TilerFront
             Dictionary<string, Event> RepeatingIDs = new Dictionary<string, Event>();
 
             ConcurrentBag<SubCalEvent> RetValue = new ConcurrentBag<SubCalEvent>();
-
-            TimeLine CalculationTimeLine = new TimeLine(DateTimeOffset.UtcNow.AddDays(-90), DateTimeOffset.UtcNow.AddDays(90));
+            DateTimeOffset now = DateTimeOffset.UtcNow.removeSecondsAndMilliseconds();
+            TimeLine CalculationTimeLine = new TimeLine(now.AddDays(Utility.defaultBeginDay), now.AddDays(Utility.defaultEndDay));
 
             uint i = 0;
             for (; i < AllSubCalNoCancels.Count;i++ )
@@ -145,7 +149,7 @@ namespace TilerFront
                     KeyValuePair<string, Event> eachKeyValuePair = DictAsArray[j];
                     var RepetitionData = CalendarServiceData.Events.Instances(UserID, eachKeyValuePair.Key);
                     RepetitionData.ShowDeleted = false;
-                    RepetitionData.TimeMax = DateTime.Now.AddDays(90);
+                    RepetitionData.TimeMax = DateTime.Now.AddDays(Utility.defaultEndDay);
                     var generatedRsults = await RepetitionData.ExecuteAsync().ConfigureAwait(false);
                     List<SubCalEvent> AllRepeatSubCals = generatedRsults.Items.Select(obj => obj.ToSubCal(AuthenticationID,(myIndex))).ToList();
                     AllRepeatSubCals.ForEach(obj => {
@@ -183,10 +187,10 @@ namespace TilerFront
             List<Event> AllSubCalNoCancels = AllSubCals.Where(obj => obj.Status != "cancelled").ToList();
 
             Dictionary<string, Event> RepeatingIDs = new Dictionary<string, Event>();
-
+            DateTimeOffset now = DateTimeOffset.UtcNow;
             ConcurrentBag<CalendarEvent> RetValue = new ConcurrentBag<CalendarEvent>();
             if (CalculationTimeLine == null) {
-                CalculationTimeLine = new TimeLine(DateTimeOffset.UtcNow.AddDays(-90), DateTimeOffset.UtcNow.AddDays(90));
+                CalculationTimeLine = new TimeLine(now.AddDays(Utility.defaultBeginDay), now.AddDays(Utility.defaultEndDay));
             }
 
             ConcurrentBag<TilerElements.Location> locations = new ConcurrentBag<TilerElements.Location>();

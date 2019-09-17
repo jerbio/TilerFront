@@ -71,7 +71,7 @@ namespace TilerFront.Controllers
             {
                 DateTimeOffset StartTime = new DateTimeOffset(myAuthorizedUser.StartRange * TimeSpan.TicksPerMillisecond, new TimeSpan()).AddYears(1969).Add(-myAuthorizedUser.getTimeSpan);
                 DateTimeOffset EndTime = new DateTimeOffset(myAuthorizedUser.EndRange * TimeSpan.TicksPerMillisecond, new TimeSpan()).AddYears(1969).Add(-myAuthorizedUser.getTimeSpan);
-                TimelineForData = TimelineForData ?? new TimeLine(StartTime.AddDays(-90), EndTime.AddDays(90));
+                TimelineForData = TimelineForData ?? new TimeLine(StartTime.AddDays(Utility.defaultBeginDay), EndTime.AddDays(30));
 
 
                 LogControl LogAccess = myUserAccount.ScheduleLogControl;

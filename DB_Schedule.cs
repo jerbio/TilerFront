@@ -44,7 +44,7 @@ namespace TilerFront
         {
             DateTimeOffset StartOfDay = myAccount.ScheduleData.getDayReferenceTime();
             _Now = new ReferenceNow(referenceNow, StartOfDay, myAccount.getTilerUser().TimeZoneDifference);
-            this.RangeOfLookup = this.RangeOfLookup ?? new TimeLine(_Now.constNow.AddDays(-Schedule.TimeLookUpDayCount), _Now.constNow.AddYears(Schedule.TimeLookUpDayCount));
+            this.RangeOfLookup = this.RangeOfLookup ?? new TimeLine(_Now.constNow.AddDays(Schedule.TimeLookUpDayStart), _Now.constNow.AddDays(Schedule.TimeLookUpDayEnd));
             Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, Location>> profileData = await myAccount.ScheduleData.getProfileInfo(RangeOfLookup, _Now, retrievalOption, _CreateDump).ConfigureAwait(false);
             myAccount.Now = _Now;
             if (profileData != null)
