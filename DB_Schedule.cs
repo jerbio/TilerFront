@@ -183,9 +183,7 @@ namespace TilerFront
             //RemoveAllCalendarEventFromLogAndCalendar();
             if(persistNewChanges)
             {
-                removeAllFromOutlook();
                 await WriteFullScheduleToLog().ConfigureAwait(false);
-                CompleteSchedule = getTimeLine();
             } else
             {
                 await myAccount.DiscardChanges().ConfigureAwait(false);

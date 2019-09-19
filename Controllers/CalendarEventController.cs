@@ -66,9 +66,9 @@ namespace TilerFront.Controllers
                 retValue = new PostBackData(
                     allCalEvent
                     .OrderByDescending(obj => obj.TimeCreated)
-                    .ThenByDescending(obj => obj.getId)
+                    .ThenByDescending(obj => obj.End)
                     .Select(obj => obj.ToCalEvent(includeSubevents: false))
-                    .OrderBy(obj => Math.Abs(myNow - obj.EndDate)).ToList(), 0);
+                    .ToList(), 0);
             }
             
                 

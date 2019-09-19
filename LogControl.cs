@@ -1548,10 +1548,35 @@ namespace TilerFront
                         && !subEvent.ParentCalendarEvent.Complete_EventDB
                         && subEvent.ParentCalendarEvent.StartTime_EventDB < RangeOfLookUP.End
                         && subEvent.ParentCalendarEvent.EndTime_EventDB > RangeOfLookUP.Start
-                        && ((subEvent.RepeatParentEventId == null) || (subEvent.RepeatParentEvent !=null && subEvent.RepeatParentEvent.IsEnabled_DB
-                        && !subEvent.RepeatParentEvent.Complete_EventDB
-                        && subEvent.RepeatParentEvent.StartTime_EventDB < RangeOfLookUP.End
-                        && subEvent.RepeatParentEvent.EndTime_EventDB > RangeOfLookUP.Start))
+                        && (
+                                (subEvent.RepeatParentEventId == null) || 
+                                (
+                                    (
+                                        (
+                                            subEvent.RepeatParentEventId != null && subEvent.RepeatParentEvent.IsEnabled_DB
+                                            && !subEvent.RepeatParentEvent.Complete_EventDB
+                                            && subEvent.RepeatParentEvent.StartTime_EventDB < RangeOfLookUP.End
+                                            && subEvent.RepeatParentEvent.EndTime_EventDB > RangeOfLookUP.Start
+                                        ) &&
+                                        (subEvent.RepeatParentEvent != null && subEvent.RepeatParentEvent.IsEnabled_DB)
+                                    )
+                                    && (
+                                        (
+                                            (subEvent.RepeatParentEvent.RepeatParentEventId == null) ||
+                                            (
+                                                (
+                                                    subEvent.RepeatParentEvent.RepeatParentEventId != null && subEvent.RepeatParentEvent.RepeatParentEvent.IsEnabled_DB
+                                                    && !subEvent.RepeatParentEvent.RepeatParentEvent.Complete_EventDB
+                                                    && subEvent.RepeatParentEvent.RepeatParentEvent.StartTime_EventDB < RangeOfLookUP.End
+                                                    && subEvent.RepeatParentEvent.RepeatParentEvent.EndTime_EventDB > RangeOfLookUP.Start
+                                                ) &&
+                                                (subEvent.RepeatParentEvent.RepeatParentEvent != null && subEvent.RepeatParentEvent.RepeatParentEvent.IsEnabled_DB)
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+
                         
                     );
 
@@ -1732,6 +1757,34 @@ namespace TilerFront
                         && !subEvent.RepeatParentEvent.Complete_EventDB
                         && subEvent.RepeatParentEvent.StartTime_EventDB < RangeOfLookUP.End
                         && subEvent.RepeatParentEvent.EndTime_EventDB > RangeOfLookUP.Start))
+                        && (
+                                (subEvent.RepeatParentEventId == null) ||
+                                (
+                                    (
+                                        (
+                                            subEvent.RepeatParentEventId != null && subEvent.RepeatParentEvent.IsEnabled_DB
+                                            && !subEvent.RepeatParentEvent.Complete_EventDB
+                                            && subEvent.RepeatParentEvent.StartTime_EventDB < RangeOfLookUP.End
+                                            && subEvent.RepeatParentEvent.EndTime_EventDB > RangeOfLookUP.Start
+                                        ) &&
+                                        (subEvent.RepeatParentEvent != null && subEvent.RepeatParentEvent.IsEnabled_DB)
+                                    )
+                                    && (
+                                        (
+                                            (subEvent.RepeatParentEvent.RepeatParentEventId == null) ||
+                                            (
+                                                (
+                                                    subEvent.RepeatParentEvent.RepeatParentEventId != null && subEvent.RepeatParentEvent.RepeatParentEvent.IsEnabled_DB
+                                                    && !subEvent.RepeatParentEvent.RepeatParentEvent.Complete_EventDB
+                                                    && subEvent.RepeatParentEvent.RepeatParentEvent.StartTime_EventDB < RangeOfLookUP.End
+                                                    && subEvent.RepeatParentEvent.RepeatParentEvent.EndTime_EventDB > RangeOfLookUP.Start
+                                                ) &&
+                                                (subEvent.RepeatParentEvent.RepeatParentEvent != null && subEvent.RepeatParentEvent.RepeatParentEvent.IsEnabled_DB)
+                                            )
+                                        )
+                                    )
+                                )
+                            )
                     )
                     .Include(subEvent => subEvent.ParentCalendarEvent.RepeatParent_DB)
                     .Include(subEvent => subEvent.RepeatParentEvent)
