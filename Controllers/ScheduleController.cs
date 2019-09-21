@@ -1252,7 +1252,7 @@ namespace TilerFront.Controllers
                     JObject json = JObject.FromObject(newEvent);
                     activity.updateMiscelaneousInfo(json.ToString());
                     myUser.ScheduleLogControl.updateUserActivty(activity);
-                    await MySchedule.AddToScheduleAndCommit(newCalendarEvent).ConfigureAwait(false);
+                    await MySchedule.AddToScheduleAndCommitAsync(newCalendarEvent).ConfigureAwait(false);
                 }
                 
 

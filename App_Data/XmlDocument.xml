@@ -934,6 +934,21 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:TilerFront.DB_Schedule.AddToScheduleAndCommitAsync(TilerElements.CalendarEvent,System.Boolean)">
+            <summary>
+            Function adds a new event to the schedule but is async chronous
+            </summary>
+            <param name="NewEvent"></param>
+            <param name="optimizeSchedule"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.DB_Schedule.AddToScheduleAndCommit(TilerElements.CalendarEvent,System.Boolean)">
+            <summary>
+            Function adds a new event to the schedule 
+            </summary>
+            <param name="NewEvent"></param>
+            <param name="optimizeSchedule"></param>
+        </member>
         <member name="M:TilerFront.DB_Schedule.CreateScheduleDump(TilerElements.ReferenceNow,System.String)">
             <summary>
             Function creates a schedule dump that is equivalent to schedule from RDBMS

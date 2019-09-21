@@ -191,16 +191,34 @@ namespace TilerFront
             
         }
 
-        async virtual public Task<CustomErrors> AddToScheduleAndCommit(CalendarEvent NewEvent, bool optimizeSchedule = true)
+        /// <summary>
+        /// Function adds a new event to the schedule but is async chronous
+        /// </summary>
+        /// <param name="NewEvent"></param>
+        /// <param name="optimizeSchedule"></param>
+        /// <returns></returns>
+        async virtual public Task<CustomErrors> AddToScheduleAndCommitAsync(CalendarEvent NewEvent, bool optimizeSchedule = true)
         {
             AddToSchedule(NewEvent, optimizeSchedule);
 
             await WriteFullScheduleToLog(NewEvent).ConfigureAwait(false);
+            CompleteSchedule = getTimeLine();
+            return NewEvent.Error;
+        }
+
+        /// <summary>
+        /// Function adds a new event to the schedule 
+        /// </summary>
+        /// <param name="NewEvent"></param>
+        /// <param name="optimizeSchedule"></param>
+        virtual public CustomErrors AddToScheduleAndCommit(CalendarEvent NewEvent, bool optimizeSchedule = true)
+        {
+            AddToSchedule(NewEvent, optimizeSchedule);
+
+            var writeToLogTask = WriteFullScheduleToLog(NewEvent);
+            writeToLogTask.Wait();
 
             CompleteSchedule = getTimeLine();
-
-
-            
             return NewEvent.Error;
         }
 
