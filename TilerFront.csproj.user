@@ -8,7 +8,7 @@
     <WebStackScaffolding_IsReferencingScriptLibrariesSelected>True</WebStackScaffolding_IsReferencingScriptLibrariesSelected>
     <WebStackScaffolding_LayoutPageFile />
     <WebStackScaffolding_ControllerDialogWidth>600</WebStackScaffolding_ControllerDialogWidth>
-    <NameOfLastUsedPublishProfile>mytilerkid - Web Deploy - LaptopDeploy</NameOfLastUsedPublishProfile>
+    <NameOfLastUsedPublishProfile>mytilerkid - Web Deploy - DesktopDeploy</NameOfLastUsedPublishProfile>
     <WebStackScaffolding_DbContextTypeFullName>TilerFront.Models.ApplicationDbContext</WebStackScaffolding_DbContextTypeFullName>
     <WebStackScaffolding_IsViewGenerationSelected>True</WebStackScaffolding_IsViewGenerationSelected>
     <WebStackScaffolding_IsAsyncSelected>True</WebStackScaffolding_IsAsyncSelected>
