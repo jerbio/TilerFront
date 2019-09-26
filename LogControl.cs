@@ -1590,6 +1590,7 @@ namespace TilerFront
 
         async public virtual Task<Dictionary<string, CalendarEvent>> getAllEnabledCalendarEventOlder(TimeLine RangeOfLookUP, ReferenceNow Now, bool includeSubEvents = true, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation)
         {
+            CalendarEvent defaultCalEvent = CalendarEvent.getEmptyCalendarEvent(EventID.GenerateCalendarEvent(), Now.constNow, Now.constNow.AddHours(1));
             if (RangeOfLookUP != null)
             {
                 IQueryable<CalendarEvent> allCalQuery = getCalendarEventQuery(DataRetrivalOption.None, includeSubEvents: false);
@@ -1684,12 +1685,14 @@ namespace TilerFront
 
                 foreach (CalendarEvent calEvent in parentCalEvents.Where(calEvent => calEvent.IsRepeat))
                 {
+                    calEvent.DefaultCalendarEvent = defaultCalEvent;
                     string calComponentId = calEvent.getTilerID.getCalendarEventComponent();
                     if (calToRepeatCalEvents.ContainsKey(calComponentId))
                     {
                         List<CalendarEvent> calEvents = calToRepeatCalEvents[calComponentId].Item2;
                         if (calEvent.Repeat.SubRepetitions != null && calEvent.Repeat.SubRepetitions.Count > 0)
                         {
+                            calEvent.DefaultCalendarEvent = defaultCalEvent;
                             var weekDayToRepetition = calEvents.ToLookup(repCalEvent => (DayOfWeek)(Convert.ToInt32(repCalEvent.getTilerID.getRepeatDayCalendarEventComponent())), repCalEvent => repCalEvent);
                             foreach (var kvp in weekDayToRepetition)
                             {
@@ -1712,6 +1715,7 @@ namespace TilerFront
                 Dictionary<string, CalendarEvent> MyCalendarEventDictionary = parentCalEvents.Where(calEvent => !calEvent.IsRepeatsChildCalEvent).ToDictionary(calEvent => calEvent.Calendar_EventID.getCalendarEventComponent(), calEvent => calEvent);
                 foreach (CalendarEvent calEvent in MyCalendarEventDictionary.Values.Where(calEvent => calEvent.getIsEventRestricted))
                 {
+                    calEvent.DefaultCalendarEvent = defaultCalEvent;
                     CalendarEventRestricted calAsRestricted = calEvent as CalendarEventRestricted;
                     if (retrievalOption != DataRetrivalOption.Ui)
                     {
@@ -1742,6 +1746,7 @@ namespace TilerFront
 
         async public virtual Task<Dictionary<string, CalendarEvent>> getAllEnabledCalendarEvent(TimeLine RangeOfLookUP, ReferenceNow Now, bool includeSubEvents = true, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation)
         {
+            CalendarEvent defaultCalEvent = CalendarEvent.getEmptyCalendarEvent(EventID.GenerateCalendarEvent(), Now.constNow, Now.constNow.AddHours(1));
             if (RangeOfLookUP != null)
             {
                 IQueryable<SubCalendarEvent> subCalendarEvents = getSubCalendarEventQuery(retrievalOption, true);
@@ -1798,6 +1803,7 @@ namespace TilerFront
                 {
 
                     CalendarEvent parentCalEvent = subEvent.ParentCalendarEvent;
+                    parentCalEvent.DefaultCalendarEvent = defaultCalEvent;
                     parentCals.Add(subEvent.ParentCalendarEvent);
                     allIds.Add(subEvent.ParentCalendarEvent.Id);
                     if (subEvent.RepeatParentEvent!=null)
@@ -1869,6 +1875,7 @@ namespace TilerFront
                 List<CalendarEvent> weekDayCalendarEvents = new List<CalendarEvent>();
                 foreach (var calEvent in calendarEvents)
                 {
+                    calEvent.DefaultCalendarEvent = defaultCalEvent;
                     if (!calEvent.IsRepeatsChildCalEvent)
                     {
                         parentCalEvents.Add(calEvent);
@@ -1891,6 +1898,7 @@ namespace TilerFront
 
                 foreach (CalendarEvent calEvent in childCalEvents)
                 {
+                    calEvent.DefaultCalendarEvent = defaultCalEvent;
                     string calId = calEvent.Calendar_EventID.getCalendarEventComponent();
                     if (calToRepeatCalEvents.ContainsKey(calId))
                     {
@@ -1900,6 +1908,7 @@ namespace TilerFront
 
                 foreach (CalendarEvent calEvent in parentCalEvents.Where(calEvent => calEvent.IsRepeat))
                 {
+                    calEvent.DefaultCalendarEvent = defaultCalEvent;
                     string calComponentId = calEvent.getTilerID.getCalendarEventComponent();
                     if (calToRepeatCalEvents.ContainsKey(calComponentId))
                     {
@@ -1938,6 +1947,7 @@ namespace TilerFront
                 foreach (CalendarEvent calEvent in MyCalendarEventDictionary.Values.Where(calEvent => calEvent.getIsEventRestricted))
                 {
                     CalendarEventRestricted calAsRestricted = calEvent as CalendarEventRestricted;
+                    calEvent.DefaultCalendarEvent = defaultCalEvent;
                     if (retrievalOption != DataRetrivalOption.Ui)
                     {
                         calAsRestricted.RetrictionProfile.InitializeOverLappingDictionary();
@@ -2171,7 +2181,7 @@ namespace TilerFront
         }
 
 
-        public virtual Tuple<Dictionary<string, CalendarEvent>, Dictionary<ThirdPartyControl.CalendarTool, List<CalendarEvent>>> getAllCalendarFromXml(ScheduleDump scheduleDump)
+        public virtual Tuple<Dictionary<string, CalendarEvent>, Dictionary<ThirdPartyControl.CalendarTool, List<CalendarEvent>>> getAllCalendarFromXml(ScheduleDump scheduleDump, ReferenceNow now)
         {
             Dictionary<string, CalendarEvent> MyCalendarEventDictionary = new Dictionary<string, CalendarEvent>();
             List<CalendarEvent> googleCalendarEvents = new List<CalendarEvent>();
@@ -2200,6 +2210,8 @@ namespace TilerFront
             string EventRepetitionflag;
             string PrepTimeFlag;
             string PrepTime;
+            CalendarEvent defaultCalendarEvent = CalendarEvent.getEmptyCalendarEvent(EventID.GenerateCalendarEvent(), Now.constNow, Now.constNow.AddHours(1));
+
 
             if (EventSchedulesNodes.ChildNodes != null)
             {
@@ -2210,6 +2222,14 @@ namespace TilerFront
                     RetrievedEvent = getCalendarEventObjFromNode(EventScheduleNode);
                     if (RetrievedEvent != null)
                     {
+                        RetrievedEvent.DefaultCalendarEvent = defaultCalendarEvent;
+                        if(RetrievedEvent.IsRepeat)
+                        {
+                            foreach(CalendarEvent calEvent in RetrievedEvent.Repeat.RecurringCalendarEvents())
+                            {
+                                calEvent.DefaultCalendarEvent = defaultCalendarEvent;
+                            }
+                        }
                         string id = RetrievedEvent.Calendar_EventID.getCalendarEventComponent();
                         MyCalendarEventDictionary.Add(id, RetrievedEvent);
                         if (googleId == id)
