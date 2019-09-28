@@ -1,4 +1,5 @@
 ﻿//#define UseDefaultLocation
+//#define liveDebugging
 
 using System;
 using System.Collections.Generic;
@@ -368,6 +369,10 @@ namespace TilerFront
 
         protected virtual async Task Commit(IEnumerable<CalendarEvent> calendarEvents, TilerUser tilerUser)
         {
+#if liveDebugging
+            return;
+#else
+
             IEnumerable<SubCalendarEvent> subevents = calendarEvents.SelectMany(calEVent => calEVent.RemoveSubEventFromEntity);
             foreach (SubCalendarEvent subEvent in subevents)
             {
@@ -386,6 +391,7 @@ namespace TilerFront
             }
 
             await saveDbChangesTask.ConfigureAwait(false);
+#endif
         }
 
         public async Task Commit(IEnumerable<CalendarEvent> calendarEvents, CalendarEvent calendarEvent, String LatestId, ReferenceNow now)
@@ -1121,9 +1127,9 @@ namespace TilerFront
                     calEvent.Disable(false);
                 });
         }
-        #endregion
+#endregion
 
-        #region Read Data
+#region Read Data
 
         /// <summary>
         /// Function retrieves a db_tiler user from an xmlnode.  Note if there is no user node it returns an object in which the isNull property is set to true
@@ -2239,10 +2245,10 @@ namespace TilerFront
                     }
                 }
             }
-            #region GoogleCalendarEvent
+#region GoogleCalendarEvent
             ThirdPartyCalendarEvent googleCalendarEvent = new GoogleCalendarEvent(googleCalendarEvents, _TilerUser);
             thirdPartyCalendarEvent.Add(ThirdPartyControl.CalendarTool.google, new List<CalendarEvent>() { googleCalendarEvent });
-            #endregion
+#endregion
 
             Tuple<Dictionary<string, CalendarEvent>, Dictionary<ThirdPartyControl.CalendarTool, List<CalendarEvent>>> retValue = new Tuple<Dictionary<string, CalendarEvent>, Dictionary<ThirdPartyControl.CalendarTool, List<CalendarEvent>>>(
                 MyCalendarEventDictionary,
@@ -3139,7 +3145,7 @@ namespace TilerFront
                 .Where(calEvent => calEvent.CreatorId == userId);
             return retValue;
         }
-        #endregion
+#endregion
 
         private DateTimeOffset stringToDateTime(string MyDateTimeString)//String should be in format "MM/DD/YY HH:MM:SSA"
         {
@@ -3291,9 +3297,9 @@ namespace TilerFront
             DefaultLocation = AverageLocations;
 
         }
-        #endregion
+#endregion
 
-        #region Properties
+#region Properties
 
         virtual public int LastUserID
         {
@@ -3345,7 +3351,7 @@ namespace TilerFront
 
         public ReferenceNow Now { get; set; }
 
-        #endregion
+#endregion
     }
 
 }

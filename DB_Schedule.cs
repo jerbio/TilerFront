@@ -133,7 +133,7 @@ namespace TilerFront
             {
                 SubCalendarEvent SubEvent = OrderedSubEvent[i];
                 DateTimeOffset TIme = AllStartTimes[i];
-                SubEvent.shiftEvent(TIme - SubEvent.Start);
+                SubEvent.shiftEvent(TIme - SubEvent.Start, true);
             });
         }
 
@@ -198,7 +198,7 @@ namespace TilerFront
         /// <param name="optimizeSchedule"></param>
         /// <returns></returns>
         async virtual public Task<CustomErrors> AddToScheduleAndCommitAsync(CalendarEvent NewEvent, bool optimizeSchedule = true)
-        {
+        {   
             AddToSchedule(NewEvent, optimizeSchedule);
 
             await WriteFullScheduleToLog(NewEvent).ConfigureAwait(false);
