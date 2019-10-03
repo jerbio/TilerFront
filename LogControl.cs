@@ -1,5 +1,5 @@
 ﻿//#define UseDefaultLocation
-//#define liveDebugging
+#define liveDebugging
 
 using System;
 using System.Collections.Generic;
@@ -18,6 +18,7 @@ using TilerFront.Models;
 using BigDataTiler;
 using System.Data.Entity.Core.Objects;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 #if ForceReadFromXml
 #else
 using CassandraUserLog;
@@ -252,6 +253,7 @@ namespace TilerFront
 
         async public Task<ScheduleDump> CreateScheduleDump(IEnumerable<CalendarEvent> AllEvents, TilerUser user, ReferenceNow now, string notes, Dictionary<string, TilerElements.Location> cachedLocation = null)
         {
+            return null;
             Task<ScheduleDump> retValue;
 
 
@@ -1543,6 +1545,8 @@ namespace TilerFront
 
         async public virtual Task<IEnumerable<SubCalendarEvent>> getAllEnabledSubCalendarEvent(TimeLine RangeOfLookUP, ReferenceNow Now, bool includeOtherEntities = true, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation)
         {
+            Stopwatch watch = new Stopwatch();
+            watch.Start();
             IQueryable<SubCalendarEvent> allSubCalQuery = getSubCalendarEventQuery(retrievalOption, includeOtherEntities: includeOtherEntities);
             allSubCalQuery = allSubCalQuery
                 .Where(subEvent =>
@@ -1589,7 +1593,9 @@ namespace TilerFront
             allSubCalQuery = allSubCalQuery.Where(calEvent => calEvent.CreatorId == _TilerUser.Id);
             var retValue = await allSubCalQuery
                 .ToListAsync().ConfigureAwait(false);
-
+            watch.Stop();
+            TimeSpan dictionaryReorgSpan = watch.Elapsed;
+            Debug.WriteLine("all subEvents" + dictionaryReorgSpan.ToString());
             return retValue;
 
         }
@@ -1752,6 +1758,8 @@ namespace TilerFront
 
         async public virtual Task<Dictionary<string, CalendarEvent>> getAllEnabledCalendarEvent(TimeLine RangeOfLookUP, ReferenceNow Now, bool includeSubEvents = true, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation)
         {
+            Stopwatch watch = new Stopwatch();
+            watch.Start();
             CalendarEvent defaultCalEvent = CalendarEvent.getEmptyCalendarEvent(EventID.GenerateCalendarEvent(), Now.constNow, Now.constNow.AddHours(1));
             if (RangeOfLookUP != null)
             {
@@ -1796,16 +1804,24 @@ namespace TilerFront
                                     )
                                 )
                             )
-                    )
+                        )
                     .Include(subEvent => subEvent.ParentCalendarEvent.RepeatParent_DB)
                     .Include(subEvent => subEvent.RepeatParentEvent)
                     ;
+                subCalendarEvents = subCalendarEvents.Where(calEvent => calEvent.CreatorId == _TilerUser.Id);
                 HashSet<CalendarEvent> parentCals = new HashSet<CalendarEvent>();
                 HashSet<CalendarEvent> repeatCalendarEvents = new HashSet<CalendarEvent>();
                 HashSet<string> allIds= new HashSet<string>();
                 HashSet<string> repeatParentIds = new HashSet<string>();
                 HashSet<string> repeatIds = new HashSet<string>();
-                foreach (SubCalendarEvent subEvent in subCalendarEvents)
+                
+                List<SubCalendarEvent>  subEventsRetrieved = subCalendarEvents.ToList();
+                watch.Stop();
+                TimeSpan subeventSpan = watch.Elapsed;
+                Debug.WriteLine("sub event span " + subeventSpan.ToString());
+                watch.Reset();
+                watch.Start();
+                foreach (SubCalendarEvent subEvent in subEventsRetrieved)
                 {
 
                     CalendarEvent parentCalEvent = subEvent.ParentCalendarEvent;
@@ -1824,7 +1840,10 @@ namespace TilerFront
                         parentCals.Add(subEvent.ParentCalendarEvent.RepeatParent_DB);
                     }
                 }
-
+                watch.Stop();
+                TimeSpan noParenttSpan = watch.Elapsed;
+                watch.Reset();
+                watch.Start();
 
                 var loadedCalendarEvents = parentCals.Join(_Context.CalEvents
                     .Include(calendarEvent => calendarEvent.DataBlob_EventDB)
@@ -1835,11 +1854,11 @@ namespace TilerFront
                     .Include(calendarEvent => calendarEvent.ProfileOfNow_EventDB)
                     .Include(calendarEvent => calendarEvent.DayPreference_DB)
                     .Include(calendarEvent => calendarEvent.Procrastination_EventDB)
-                    .Include(calendarEvent => calendarEvent.RetrictionProfile)
-                    .Include(calEvent => calEvent.RetrictionProfile.DaySelection)
-                    .Include(calEvent => calEvent.RetrictionProfile.DaySelection.Select(restrictedDay => restrictedDay.RestrictionTimeLine))
-                    .Include(calEvent => calEvent.RetrictionProfile.NoNull_DaySelections)
-                    .Include(calEvent => calEvent.RetrictionProfile.NoNull_DaySelections.Select(restrictedDay => restrictedDay.RestrictionTimeLine))
+                    //.Include(calendarEvent => calendarEvent.RetrictionProfile)
+                    //.Include(calEvent => calEvent.RetrictionProfile.DaySelection)
+                    //.Include(calEvent => calEvent.RetrictionProfile.DaySelection.Select(restrictedDay => restrictedDay.RestrictionTimeLine))
+                    //.Include(calEvent => calEvent.RetrictionProfile.NoNull_DaySelections)
+                    //.Include(calEvent => calEvent.RetrictionProfile.NoNull_DaySelections.Select(restrictedDay => restrictedDay.RestrictionTimeLine))
                     .Include(calEvent => calEvent.Procrastination_EventDB),
                     calEvent => calEvent.Id,
                     dbCalEvent => dbCalEvent.Id,
@@ -1847,9 +1866,6 @@ namespace TilerFront
                     .Select(obj => obj.dbCalEvent).ToList();
 
                 parentCals = new HashSet<CalendarEvent>(loadedCalendarEvents);
-
-
-
 
 
                 List<CalendarEvent> calendarEvents = new List<CalendarEvent>();
@@ -1874,6 +1890,11 @@ namespace TilerFront
 
 
                 calendarEvents.AddRange(parentCals);
+                watch.Stop();
+
+                TimeSpan parenttSpan = watch.Elapsed;
+                watch.Reset();
+                watch.Start();
 
 
                 List<CalendarEvent> parentCalEvents = new List<CalendarEvent>();
@@ -1971,6 +1992,12 @@ namespace TilerFront
                     }
 
                 }
+
+                watch.Stop();
+                TimeSpan dictionaryReorgSpan = watch.Elapsed;
+                Debug.WriteLine("no parentSpan " + noParenttSpan.ToString());
+                Debug.WriteLine("parentSpan " + parenttSpan.ToString());
+                Debug.WriteLine("dictionaryReorgSpan " + dictionaryReorgSpan.ToString());
 
                 return MyCalendarEventDictionary;
             }
