@@ -18,6 +18,7 @@ using TilerFront.Models;
 using BigDataTiler;
 using System.Data.Entity.Core.Objects;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 #if ForceReadFromXml
 #else
 using CassandraUserLog;
@@ -1523,6 +1524,8 @@ namespace TilerFront
 
         async public virtual Task<IEnumerable<SubCalendarEvent>> getAllEnabledSubCalendarEvent(TimeLine RangeOfLookUP, ReferenceNow Now, bool includeOtherEntities = true, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation)
         {
+            Stopwatch watch = new Stopwatch();
+            watch.Start();
             IQueryable<SubCalendarEvent> allSubCalQuery = getSubCalendarEventQuery(retrievalOption, includeOtherEntities: includeOtherEntities);
             allSubCalQuery = allSubCalQuery
                 .Where(subEvent =>
@@ -1569,7 +1572,9 @@ namespace TilerFront
             allSubCalQuery = allSubCalQuery.Where(calEvent => calEvent.CreatorId == _TilerUser.Id);
             var retValue = await allSubCalQuery
                 .ToListAsync().ConfigureAwait(false);
-
+            watch.Stop();
+            TimeSpan dictionaryReorgSpan = watch.Elapsed;
+            Debug.WriteLine("all subEvents" + dictionaryReorgSpan.ToString());
             return retValue;
 
         }
@@ -1732,6 +1737,8 @@ namespace TilerFront
 
         async public virtual Task<Dictionary<string, CalendarEvent>> getAllEnabledCalendarEvent(TimeLine RangeOfLookUP, ReferenceNow Now, bool includeSubEvents = true, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation)
         {
+            Stopwatch watch = new Stopwatch();
+            watch.Start();
             CalendarEvent defaultCalEvent = CalendarEvent.getEmptyCalendarEvent(EventID.GenerateCalendarEvent(), Now.constNow, Now.constNow.AddHours(1));
             if (RangeOfLookUP != null)
             {
@@ -1785,6 +1792,12 @@ namespace TilerFront
                 HashSet<string> allIds= new HashSet<string>();
                 HashSet<string> repeatParentIds = new HashSet<string>();
                 HashSet<string> repeatIds = new HashSet<string>();
+                List<SubCalendarEvent> subEventsRetrieved = subCalendarEvents.ToList();
+                watch.Stop();
+                TimeSpan subeventSpan = watch.Elapsed;
+                Debug.WriteLine("sub event span " + subeventSpan.ToString());
+                watch.Reset();
+                watch.Start();
                 foreach (SubCalendarEvent subEvent in subCalendarEvents)
                 {
 
@@ -1805,6 +1818,10 @@ namespace TilerFront
                     }
                 }
 
+                watch.Stop();
+                TimeSpan noParenttSpan = watch.Elapsed;
+                watch.Reset();
+                watch.Start();
 
                 var loadedCalendarEvents = parentCals.Join(_Context.CalEvents
                     .Include(calendarEvent => calendarEvent.DataBlob_EventDB)
@@ -1850,7 +1867,11 @@ namespace TilerFront
 
 
                 calendarEvents.AddRange(parentCals);
+                watch.Stop();
 
+                TimeSpan parenttSpan = watch.Elapsed;
+                watch.Reset();
+                watch.Start();
 
                 List<CalendarEvent> parentCalEvents = new List<CalendarEvent>();
                 List<CalendarEvent> childCalEvents = new List<CalendarEvent>();
@@ -1947,6 +1968,12 @@ namespace TilerFront
                     }
 
                 }
+
+                watch.Stop();
+                TimeSpan dictionaryReorgSpan = watch.Elapsed;
+                Debug.WriteLine("no parentSpan " + noParenttSpan.ToString());
+                Debug.WriteLine("parentSpan " + parenttSpan.ToString());
+                Debug.WriteLine("dictionaryReorgSpan " + dictionaryReorgSpan.ToString());
 
                 return MyCalendarEventDictionary;
             }
