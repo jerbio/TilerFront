@@ -1,5 +1,5 @@
 ﻿//#define UseDefaultLocation
-#define liveDebugging
+//#define liveDebugging
 
 using System;
 using System.Collections.Generic;
@@ -253,10 +253,7 @@ namespace TilerFront
 
         async public Task<ScheduleDump> CreateScheduleDump(IEnumerable<CalendarEvent> AllEvents, TilerUser user, ReferenceNow now, string notes, Dictionary<string, TilerElements.Location> cachedLocation = null)
         {
-            return null;
             Task<ScheduleDump> retValue;
-
-
             XmlDocument xmldoc = new XmlDocument();
             xmldoc.InnerXml = "<?xml version=\"1.0\" encoding=\"utf-8\"?><ScheduleLog><LastIDCounter>1024</LastIDCounter><referenceDay>" + now.StartOfDay.DateTime + "</referenceDay><scheduleNotes>" + notes + "</scheduleNotes><lastUpdated>" + user.LastScheduleModification.DateTime + "</lastUpdated><EventSchedules></EventSchedules></ScheduleLog>";
 
@@ -1375,8 +1372,6 @@ namespace TilerFront
                 .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Location_DB))
                 .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.DataBlob_EventDB))
                 .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.RetrictionProfile))
-                .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.RetrictionProfile.NoNull_DaySelections))
-                .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.RetrictionProfile.DaySelection))
                 .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Procrastination_EventDB))
                 .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.ProfileOfNow_EventDB));
             ;
@@ -1420,8 +1415,6 @@ namespace TilerFront
                     .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Location_DB))
                     .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.DataBlob_EventDB))
                     .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.RetrictionProfile))
-                    .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.RetrictionProfile.NoNull_DaySelections))
-                    .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.RetrictionProfile.DaySelection))
                     .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Procrastination_EventDB))
                     .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.ProfileOfNow_EventDB));
                 ;
@@ -1439,10 +1432,6 @@ namespace TilerFront
             {
                 calEVents = calEVents
                     .Include(calEvent => calEvent.RetrictionProfile)
-                    .Include(calEvent => calEvent.RetrictionProfile.DaySelection)
-                    .Include(calEvent => calEvent.RetrictionProfile.DaySelection.Select(restrictedDay => restrictedDay.RestrictionTimeLine))
-                    .Include(calEvent => calEvent.RetrictionProfile.NoNull_DaySelections)
-                    .Include(calEvent => calEvent.RetrictionProfile.NoNull_DaySelections.Select(restrictedDay => restrictedDay.RestrictionTimeLine))
                     .Include(calEvent => calEvent.Procrastination_EventDB)
                     .Include(calEvent => calEvent.DayPreference_DB);
 
@@ -1460,10 +1449,6 @@ namespace TilerFront
                     .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Procrastination_EventDB))
                     .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.ProfileOfNow_EventDB))
                     .Include(calEvent => calEvent.RetrictionProfile)
-                    .Include(calEvent => calEvent.RetrictionProfile.DaySelection)
-                    .Include(calEvent => calEvent.RetrictionProfile.DaySelection.Select(restrictedDay => restrictedDay.RestrictionTimeLine))
-                    .Include(calEvent => calEvent.RetrictionProfile.NoNull_DaySelections)
-                    .Include(calEvent => calEvent.RetrictionProfile.NoNull_DaySelections.Select(restrictedDay => restrictedDay.RestrictionTimeLine))
                     ;
             }
 
@@ -1514,10 +1499,6 @@ namespace TilerFront
             {
                 subEvents = subEvents
                     .Include(subEvent => subEvent.RetrictionProfile)
-                    .Include(subEvent => subEvent.RetrictionProfile.DaySelection)
-                    .Include(subEvent => subEvent.RetrictionProfile.DaySelection.Select(restrictedDay => restrictedDay.RestrictionTimeLine))
-                    .Include(subEvent => subEvent.RetrictionProfile.NoNull_DaySelections)
-                    .Include(subEvent => subEvent.RetrictionProfile.NoNull_DaySelections.Select(restrictedDay => restrictedDay.RestrictionTimeLine))
                     .Include(subEvent => subEvent.Procrastination_EventDB)
                     .Include(subEvent => subEvent.ProfileOfNow_EventDB);
             }
@@ -1529,10 +1510,6 @@ namespace TilerFront
                     .Include(subEvent => subEvent.Procrastination_EventDB)
                     .Include(subEvent => subEvent.ProfileOfNow_EventDB)
                     .Include(subEvent => subEvent.RetrictionProfile)
-                    .Include(subEvent => subEvent.RetrictionProfile.DaySelection)
-                    .Include(subEvent => subEvent.RetrictionProfile.DaySelection.Select(restrictedDay => restrictedDay.RestrictionTimeLine))
-                    .Include(subEvent => subEvent.RetrictionProfile.NoNull_DaySelections)
-                    .Include(subEvent => subEvent.RetrictionProfile.NoNull_DaySelections.Select(restrictedDay => restrictedDay.RestrictionTimeLine))
                     .Include(subEvent => subEvent.Procrastination_EventDB)
                     .Include(subEvent => subEvent.ProfileOfNow_EventDB);
             }
@@ -1541,6 +1518,8 @@ namespace TilerFront
             .Include(subEvent => subEvent.ParentCalendarEvent);
             return subEvents;
         }
+
+
 
 
         async public virtual Task<IEnumerable<SubCalendarEvent>> getAllEnabledSubCalendarEvent(TimeLine RangeOfLookUP, ReferenceNow Now, bool includeOtherEntities = true, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation)
@@ -1854,12 +1833,8 @@ namespace TilerFront
                     .Include(calendarEvent => calendarEvent.ProfileOfNow_EventDB)
                     .Include(calendarEvent => calendarEvent.DayPreference_DB)
                     .Include(calendarEvent => calendarEvent.Procrastination_EventDB)
-                    //.Include(calendarEvent => calendarEvent.RetrictionProfile)
-                    //.Include(calEvent => calEvent.RetrictionProfile.DaySelection)
-                    //.Include(calEvent => calEvent.RetrictionProfile.DaySelection.Select(restrictedDay => restrictedDay.RestrictionTimeLine))
-                    //.Include(calEvent => calEvent.RetrictionProfile.NoNull_DaySelections)
-                    //.Include(calEvent => calEvent.RetrictionProfile.NoNull_DaySelections.Select(restrictedDay => restrictedDay.RestrictionTimeLine))
-                    .Include(calEvent => calEvent.Procrastination_EventDB),
+                    .Include(calendarEvent => calendarEvent.RetrictionProfile)
+                    ,
                     calEvent => calEvent.Id,
                     dbCalEvent => dbCalEvent.Id,
                     (calEvent, dbCalEvent) => new { calEvent, dbCalEvent })
@@ -2005,7 +1980,6 @@ namespace TilerFront
             throw new NullReferenceException("You have to provide the range to lookup in the user calelndar");
 
         }
-
 
         async public virtual Task<Dictionary<string, CalendarEvent>> getAllEnabledCalendarEventOld(TimeLine RangeOfLookUP, ReferenceNow Now, bool includeSubEvents = true, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation)
         {
@@ -3129,9 +3103,10 @@ namespace TilerFront
                 .Include(subEvent => subEvent.ProfileOfNow_EventDB)
                 .Include(subEvent => subEvent.ParentCalendarEvent)
                 .Include(subEvent => subEvent.Repetition_EventDB.RepeatingEvents)
-                .Include(subEvent => subEvent.RetrictionProfile.DaySelection.Select(restrictedDay => restrictedDay.RestrictionTimeLine))
-                .Include(subEvent => subEvent.RetrictionProfile.NoNull_DaySelections)
-                .Include(subEvent => subEvent.RetrictionProfile.NoNull_DaySelections.Select(restrictedDay => restrictedDay.RestrictionTimeLine))
+                .Include(subEvent => subEvent.RetrictionProfile)
+                //.Include(subEvent => subEvent.RetrictionProfile.DaySelection.Select(restrictedDay => restrictedDay.RestrictionTimeLine))
+                //.Include(subEvent => subEvent.RetrictionProfile.NoNull_DaySelections)
+                //.Include(subEvent => subEvent.RetrictionProfile.NoNull_DaySelections.Select(restrictedDay => restrictedDay.RestrictionTimeLine))
                 .SingleOrDefaultAsync(subEvent => subEvent.Id == ID);
             if (retValue.getIsEventRestricted)
             {
