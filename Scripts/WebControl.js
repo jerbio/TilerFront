@@ -13,12 +13,10 @@ var CurrentTheme = UserTheme.Light;
 var UserCredentials;
 try
 {
-    //debugger;
     UserCredentials=  RetrieveUserCredentials();
 }
 catch(e)
 {
-    //debugger;
     UserCredentials= { UserName: "", ID: "", Name: "" };
 }
 
@@ -1657,9 +1655,9 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
         this.DurationDays = 0;// eventDuration.Days;
         this.DurationHours = eventDuration.Hours;
         this.DurationMins = eventDuration.Mins;
-        this.StartHour = eventStart.Time.Hour;
+        this.StartHour = eventStart.IsDefault && !rigidFlag ? 0 : eventStart.Time.Hour;
         this.EndHour = eventEnd.Time.Hour;
-        this.StartMins = eventStart.Time.Minute;
+        this.StartMins = eventStart.IsDefault && !rigidFlag ? 0 : eventStart.Time.Minute;
         this.EndMins = eventEnd.Time.Minute;
         this.StartDay = eventStart.Date.getDate();
         this.EndDay = eventEnd.Date.getDate();

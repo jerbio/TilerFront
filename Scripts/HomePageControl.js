@@ -2015,19 +2015,14 @@ function generateModalForTIleOrModal()
         return function () {
             var TimePickerValue = Timpicker !=null?Timpicker.Dom.value:"12:00am";
             var DatePickerValue = DatePicker.Dom.value;
+            let IsDefault = false;
             if (Timpicker.Dom.value.toLowerCase() == "")//handles initializing string values string 
             {
                 TimePickerValue = getTimeStringFromDate(new Date(Date.now())).replace(" ", "");
+                IsDefault = true;
             }
 
             if ((DatePicker.Dom.value.toLowerCase() == "") || (DatePicker.Dom.value.toLowerCase() == "")) {
-                /*
-                if (DatePicker.Dom.value.toLowerCase() == "")
-                {
-                    ExtraDayInMS = OneDayInMs;
-                }
-                */
-
                 var DayPlusOne = Number(new Date(Date.now())) + ExtraDayInMS;
                 {
                     DayPlusOne = new Date(DayPlusOne);
@@ -2041,7 +2036,7 @@ function generateModalForTIleOrModal()
 
             var TwentyFourHourTime =AP_To24Hour(TimePickerValue);
             var DateData = date_mm_dd__yyyy_ToDateObj(DatePickerValue, "/")
-            var retValue = { Time: TwentyFourHourTime, Date: DateData };
+            var retValue = { Time: TwentyFourHourTime, Date: DateData, IsDefault: IsDefault };
 
             return retValue;
 

@@ -575,7 +575,10 @@ function createCalEventNameTab(isTIle)
     //$(AutoScheduleRangeConstraintContainerStartTimePicker.Dom).timepicker();
 
     AutoScheduleRangeConstraintContainerStartTimePicker.Dom.value = "";
-    AutoScheduleRangeConstraintContainerStartTimePicker.Dom.setAttribute("placeholder", "Start Time (Default:Now) hh:mm am/pm");
+    let tilePlaceHolderString = "12:00 am"
+    let eventPlaceHolderString = "Start Time (Default:Now)"
+    let placeHolderString = isTIle ? tilePlaceHolderString : eventPlaceHolderString;
+    AutoScheduleRangeConstraintContainerStartTimePicker.Dom.setAttribute("placeholder", placeHolderString);
     $(AutoScheduleRangeConstraintContainerStartTimePicker.Dom).addClass(CurrentTheme.FontColor);
     AutoScheduleRangeConstraintContainerStartDatePicker.Dom.value = "";
     AutoScheduleRangeConstraintContainerStartDatePicker.Dom.setAttribute("placeholder", "Start Date (Default:Today) mm/dd/yyyy");

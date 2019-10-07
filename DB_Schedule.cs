@@ -288,6 +288,16 @@ namespace TilerFront
             return await myAccount.ScheduleLogControl.CreateScheduleDump(this.getAllCalendarEvents(), myAccount.getTilerUser(), referenceNow, notes).ConfigureAwait(false);
         }
 
+        virtual public void DisableScheduleDump()
+        {
+            myAccount.ScheduleLogControl.disableUpdateBigData();
+        }
+
+        virtual public void EnableScheduleDump()
+        {
+            myAccount.ScheduleLogControl.enableUpdateBigData();
+        }
+
         /// <summary>
         /// Creates a schedule dump and then persists it to the DB
         /// </summary>

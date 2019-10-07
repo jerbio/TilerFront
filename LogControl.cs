@@ -378,7 +378,7 @@ namespace TilerFront
                 _Context.Entry(subEvent).State = EntityState.Deleted;
             }
             Task saveDbChangesTask = _Context.SaveChangesAsync();
-            if(_TempDump!= null)
+            if(_TempDump!= null && _UpdateBigData)
             {
                 ReferenceNow now = new ReferenceNow(_TempDump.ReferenceNow, _TempDump.StartOfDay, _TilerUser.TimeZoneDifference);
                 Task<ScheduleDump> scheduleDumpCreationTask = CreateScheduleDump(calendarEvents, _TilerUser, now, "", CachedLocation);
@@ -1582,6 +1582,7 @@ namespace TilerFront
         async public virtual Task<Dictionary<string, CalendarEvent>> getAllEnabledCalendarEventOlder(TimeLine RangeOfLookUP, ReferenceNow Now, bool includeSubEvents = true, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation)
         {
             CalendarEvent defaultCalEvent = CalendarEvent.getEmptyCalendarEvent(EventID.GenerateCalendarEvent(), Now.constNow, Now.constNow.AddHours(1));
+            defaultCalEvent.Creator_EventDB = _TilerUser;
             if (RangeOfLookUP != null)
             {
                 IQueryable<CalendarEvent> allCalQuery = getCalendarEventQuery(DataRetrivalOption.None, includeSubEvents: false);
@@ -3251,7 +3252,7 @@ namespace TilerFront
                 Dictionary<string, TilerElements.Location> LocationCache = await TaskLocationCache.ConfigureAwait(false);
                 RangeOfLookup  = RangeOfLookup == null ? new TimeLine(Now.constNow.AddYears(-200), Now.constNow.AddYears(200)) : RangeOfLookup;
                 Dictionary<string, CalendarEvent> AllScheduleData = await this.getAllEnabledCalendarEvent(RangeOfLookup, Now, retrievalOption: retrievalOption);
-                if(createDump)
+                if(createDump && _UpdateBigData)
                 {
                     _AllScheduleData = AllScheduleData;
                     await createTempDump(Now).ConfigureAwait(false);
@@ -3354,7 +3355,18 @@ namespace TilerFront
 
         public ReferenceNow Now { get; set; }
 
-#endregion
+        #endregion
+
+        public void disableUpdateBigData()
+        {
+            _UpdateBigData = false;
+        }
+
+        public void enableUpdateBigData()
+        {
+            _UpdateBigData = true;
+        }
+
     }
 
 }
