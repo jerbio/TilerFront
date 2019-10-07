@@ -688,6 +688,8 @@ namespace TilerFront
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.ThirdpartyType.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("EventPreference"));
             MyEventScheduleNode.ChildNodes[0].InnerText = CreateEventPreference(MyEvent.DayPreference).InnerXml;
+            MyEventScheduleNode.PrependChild(xmldoc.CreateElement("LastCompletionTimes"));
+            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.LastCompletionTime_DB;
 
 
             if (MyEvent.getIsEventRestricted)
@@ -909,6 +911,10 @@ namespace TilerFront
             MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.isSleep.ToString();
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("ThirdpartyType"));
             MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.ThirdpartyType.ToString();
+            MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("AutoDeleted"));
+            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.AutoDeleted_EventDB.ToString();
+            MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("AutoDeletionReason"));
+            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.AutoDeletion_ReasonDB.ToString();
 
             if (MySubEvent.getIsEventRestricted)
             {
@@ -2465,6 +2471,11 @@ namespace TilerFront
 
             RetrievedEvent.InitializeCounts(DeleteCount, CompleteCount);
 
+            XmlNode LastCompletionTimesNode = EventScheduleNode.SelectSingleNode("LastCompletionTimes");
+            if(LastCompletionTimesNode!=null)
+            {
+                RetrievedEvent.LastCompletionTime_DB = LastCompletionTimesNode.InnerText;
+            }
             return RetrievedEvent;
         }
 
@@ -2700,6 +2711,19 @@ namespace TilerFront
                         subEvent.CalendarType = calendarType;
                     }
                 }
+
+                XmlNode autoDeletedNode = MyXmlNode.ChildNodes[i].SelectSingleNode("AutoDeleted");
+                if(autoDeletedNode != null)
+                {
+                    retrievedSubEvent.AutoDeleted_EventDB = Convert.ToBoolean(autoDeletedNode.InnerText);
+                }
+
+                XmlNode AutoDeletionReasonNode = MyXmlNode.ChildNodes[i].SelectSingleNode("AutoDeletionReason");
+                if (AutoDeletionReasonNode != null)
+                {
+                    retrievedSubEvent.AutoDeletion_ReasonDB = AutoDeletionReasonNode.InnerText;
+                }
+
                 createReasonObjects(retrievedSubEvent, MyXmlNode.ChildNodes[i]);
             }
 
