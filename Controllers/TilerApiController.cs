@@ -31,8 +31,7 @@ namespace TilerFront
         protected ApplicationDbContext db = new ApplicationDbContext();
         protected TilerApiController  (): base()
         {
-            db.Database.Log = Console.Write;
-
+            //db.Database.Log = s => System.Diagnostics.Debug.WriteLine(s);
             //#if loggingEnables
 
             //            using (var sqlLogFile = new StreamWriter("C:\\temp\\LogFile.txt"))
