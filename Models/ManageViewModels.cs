@@ -26,24 +26,6 @@ namespace TilerFront.Models
 
         [Display(Name = "CalendarID")]
         public string ID { get; set; }
-        [Display(Name = "Calendars")]
-        public ICollection<ThirdPartyCalendarGroupForView> CalendarGroups { get; set; }
-    }
-
-    public class ThirdPartyCalendarGroupForView
-    {
-        public string ID { get; set; }
-        [Display(Name = "Description")]
-        public string Description { get; set; }
-
-        [Display(Name = "Enabled")]
-        public bool Active { get; set; }
-
-        [Display(Name = "Address")]
-        public string Address { get; set; }
-
-        [Display(Name = "Address Name")]
-        public string AddressNickName { get; set; }
     }
 
     public class ManageLoginsViewModel
