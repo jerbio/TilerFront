@@ -6,44 +6,68 @@
 
 <h2>Index</h2>
 
-    
-    <div>
-        <div>@Html.ActionLink("Add Google Calendar", "ImportGoogle", "Manage")</div>
-    </div>
-    <table class="table">
-        <tr>
-        
-            <th>
-                @Html.DisplayNameFor(model => model.Email)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ProviderName)
-            </th>
-            <th></th>
-        </tr>
 
-    @foreach (var item in Model) {
-        <tr>
-        @using (Html.BeginForm("deleteGoogleAccount", "Manage", FormMethod.Post))
-        {
-            @Html.AntiForgeryToken();
-            <td>
-                @Html.DisplayFor(modelItem => item.Email)
-                @Html.TextBoxFor(modelItem => item.Email, new { @Name = "Email", @class = "form-control", @style = "display:none;" })
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ProviderName)
-                @Html.TextBoxFor(modelItem => item.ProviderName, new { @Name = "ProviderName", @class = "form-control", @style = "display:none;" })
-            </td>
-            <td>
-                @Html.TextBoxFor(modelItem => item.ID, new { @Name = "ID",  @class = "form-control", @style = "display:none;", @id = "TimeZoneData" })
-            </td>
+<div>
+    <div>@Html.ActionLink("Add Google Calendar", "ImportGoogle", "Manage")</div>
+</div>
+<table class="table">
+    <tr>
 
-            <td>
-                <input type="submit" value="Delete" class="btn btn-default" />
-            </td>
-            
-        }
+        <th>
+            @Html.DisplayNameFor(model => model.Email)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.ProviderName)
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            @using (Html.BeginForm("deleteGoogleAccount", "Manage", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken();
+                <td>
+                    @Html.DisplayFor(modelItem => item.Email)
+                    @Html.TextBoxFor(modelItem => item.Email, new { @Name = "Email", @class = "form-control", @style = "display:none;" })
+                    <table>
+                        <tr>
+                            @foreach (var calGroup in item.CalendarGroups)
+                            {
+                                <td>
+                                    @Html.DisplayFor(modelItem => calGroup.Description)
+                                    @Html.TextBoxFor(modelItem => calGroup.Description)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => calGroup.Active)
+                                    @Html.RadioButtonFor(modelItem => calGroup.Active)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => calGroup.Address)
+                                    @Html.TextBoxFor(modelItem => calGroup.Address)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => calGroup.AddressNickName)
+                                    @Html.TextBoxFor(modelItem => calGroup.AddressNickName)
+                                </td>
+                            }
+                        </tr>
+                        </table>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ProviderName)
+                    @Html.TextBoxFor(modelItem => item.ProviderName, new { @Name = "ProviderName", @class = "form-control", @style = "display:none;" })
+                </td>
+                <td>
+                    @Html.TextBoxFor(modelItem => item.ID, new { @Name = "ID", @class = "form-control", @style = "display:none;", @id = "TimeZoneData" })
+                </td>
+
+                <td>
+                    <input type="submit" value="Delete" class="btn btn-default" />
+                </td>
+
+            }
             <!--
             <td>
                 @*Html.ActionLink("Edit", "Edit", new { id=item.ID }) |
@@ -52,5 +76,5 @@
             </td>-->
         </tr>
     }
-    </table>
+</table>
 

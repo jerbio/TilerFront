@@ -18,6 +18,7 @@ namespace TilerFront.Models
     public class ThirdPartyCalendarAuthenticationModel
     {
         public string ID { get; set; }
+        List<ThirdPartyCalendarSubGroup> _CalendarGroups;
         [Key]
         [Column(Order=1)]
         public string TilerID { get; set; }
@@ -40,6 +41,13 @@ namespace TilerFront.Models
             }
         }
         public DateTimeOffset Deadline { get; set; }
+        public ICollection<ThirdPartyCalendarSubGroup> CalendarGroups {
+            get {
+                return _CalendarGroups ?? (_CalendarGroups = new List<ThirdPartyCalendarSubGroup>());
+            }
+            set {
+                _CalendarGroups = value.ToList();
+            } }
 
         /// <summary>
         /// Converts "this" object to "ThirdPartyAuthenticationForView" object. This is to be used to generate the more secure information on the user for the management of third party accounts on the front end
@@ -47,7 +55,15 @@ namespace TilerFront.Models
         /// <returns></returns>
         public ThirdPartyAuthenticationForView getThirdPartyOut()
         {
-            ThirdPartyAuthenticationForView RetValue = new ThirdPartyAuthenticationForView() { Email = this.Email, ProviderName =this.ProviderID, ID=this.ID };
+
+            var calendarGroup = this._CalendarGroups?.Where(_CalendarGroup => _CalendarGroup!=null).Select(_CalendarGroup => _CalendarGroup.getThirdPartyOut()).ToList();
+            ThirdPartyAuthenticationForView RetValue = new ThirdPartyAuthenticationForView()
+            {
+                Email = this.Email,
+                ProviderName = this.ProviderID,
+                ID = this.ID,
+                CalendarGroups = calendarGroup
+            };
             return RetValue;
         }
 
