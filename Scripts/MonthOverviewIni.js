@@ -2038,7 +2038,8 @@ getRefreshedData.pauseUnEnroll = function (Id) {
     }
 
 function resetEventStatusUi() {
-    if (global_UISetup.currentSubEvent) {
+    //processes current subevent reset
+    {
         let allCurrents = []
         let currentSubEventClassName = "ListElementContainerCurrentSubevent";
         let elements = $('.' + currentSubEventClassName)
@@ -2046,14 +2047,17 @@ function resetEventStatusUi() {
             let element = elements.get(i);
             $(element).removeClass(currentSubEventClassName);
         }
+        global_UISetup.currentSubEvent= null
     }
-    if (global_UISetup.nextSubEvent) {
+    //processes next subevent reset
+    {
         let nextSubEventClassName = "ListElementContainerNextSubevent";
         let elements = $('.' + nextSubEventClassName)
         for (let i = 0; i < elements.length; i++) {
             let element = elements.get(i);
             $(element).removeClass(nextSubEventClassName);
         }
+        global_UISetup.nextSubEvent = null
     }
 }
 
@@ -2545,6 +2549,7 @@ function renderSideBarEvents(DayOfWeek, ID, MyArray, Index, TabCount)
             if (global_DictionaryOfSubEvents[ID].ColorSelection > 0) {
                 //$(RefEvent.refrenceListElement.Dom).addClass(global_AllColorClasses[global_DictionaryOfSubEvents[ID].ColorSelection].cssClass);
                 $(RefEvent.DataElement.Dom).addClass(global_AllColorClasses[global_DictionaryOfSubEvents[ID].ColorSelection].cssClass);
+                $(RefEvent.DataElement.Dom).addClass("subEventColor");
         }
 
     }
@@ -3223,16 +3228,6 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                 SubEvent.gridDoms.push(EventDom.Dom);
 
                 $(EventDom.Dom).addClass("gridSubevent");
-            
-
-                if (SubEvent.ID == "110972_7_110976_110977")
-                {
-                    //debugger;
-                }
-                $(EventDom.Dom).hover(function () {
-                    //setTimeout(function () { debugger; },100)
-                
-                });
 
                 EventDom.setAttribute("Title", SubEvent.SubCalStartDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + " - " + SubEvent.SubCalEndDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
                 //debugger;
