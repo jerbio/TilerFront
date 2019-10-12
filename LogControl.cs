@@ -36,6 +36,7 @@ namespace TilerFront
         protected string UserName;
         string NameOfUser;
         protected static string BigDataLogLocation = "BigDataLogs\\";
+        protected static string LogLocation = "BigDataLogs\\";
         protected bool LogStatus;
         protected bool UpdateLocaitionCache = false;
         protected Dictionary<string, TilerElements.Location> CachedLocation;
@@ -97,6 +98,16 @@ namespace TilerFront
         public static void UpdateBigDataLogLocation(string bigLogLocation)
         {
             BigDataLogLocation = bigLogLocation;
+        }
+
+        public static void UpdateLogLocation(string logLocation)
+        {
+            LogLocation = logLocation;
+        }
+
+        public static string getLogLocation()
+        {
+            return LogLocation;
         }
 
         /// <summary>

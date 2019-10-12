@@ -92,6 +92,12 @@ namespace TilerFront.Controllers
                 //Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location>> ProfileData = await LogAccess.getProfileInfo(TimelineForData, null, retrievalOption: DataRetrivalOption.Ui);
                 //IEnumerable<CalendarEvent> calEvents = ProfileData.Item1.Values;
 
+                if (!string.IsNullOrEmpty(xmlFileId) && !string.IsNullOrWhiteSpace(xmlFileId))
+                {
+                    var tempSched = TilerTests.TestUtility.getSchedule(xmlFileId, connectionName: "DefaultConnection", filePath: LogControl.getLogLocation());
+                    var MySchedule = (DB_Schedule)tempSched.Item1;
+                    subEvents = MySchedule.getAllCalendarEvents().SelectMany(obj => obj.ActiveSubEvents);
+                }
 
                 IEnumerable<CalendarEvent> GoogleCalEvents = await GoogleCalEventsTask.ConfigureAwait(false);
 
@@ -1197,6 +1203,13 @@ namespace TilerFront.Controllers
                     JObject json = JObject.FromObject(newEvent);
                     activity.updateMiscelaneousInfo(json.ToString());
                     myUser.ScheduleLogControl.updateUserActivty(activity);
+
+                    if (!string.IsNullOrEmpty(xmlFileId) && !string.IsNullOrWhiteSpace(xmlFileId))
+                    {
+                        var tempSched = TilerTests.TestUtility.getSchedule(xmlFileId, connectionName: "DefaultConnection", filePath: LogControl.getLogLocation());
+                        MySchedule = (DB_Schedule)tempSched.Item1;
+                    }
+
                     await MySchedule.AddToScheduleAndCommitAsync(newCalendarEvent).ConfigureAwait(false);
                 }
                 
@@ -1378,7 +1391,7 @@ namespace TilerFront.Controllers
 
                 CalendarEvent newCalendarEvent;
                 RestrictionProfile myRestrictionProfile = newEvent.getRestrictionProfile(myNow);
-                if (myRestrictionProfile!=null)
+                if (myRestrictionProfile != null)
                 {
                     string TimeString = StartDateEntry.Date.ToShortDateString() + " " + StartTime;
                     DateTimeOffset StartDateTime = DateTimeOffset.Parse(TimeString).UtcDateTime;
@@ -1392,6 +1405,7 @@ namespace TilerFront.Controllers
                 {
                     DateTimeOffset StartData = DateTimeOffset.Parse(StartTime + " " + StartDateEntry.Date.ToShortDateString()).UtcDateTime;
                     StartData = StartData.Add(newEvent.getTimeSpan);
+                    StartData = newEvent.getRefNow();
                     DateTimeOffset EndData = DateTimeOffset.Parse(EndTime + " " + EndDateEntry.Date.ToShortDateString()).UtcDateTime;
                     EndData = EndData.Add(newEvent.getTimeSpan);
                     if (RigidScheduleFlag)
@@ -1407,7 +1421,7 @@ namespace TilerFront.Controllers
                 }
                 Name.Creator_EventDB = newCalendarEvent.getCreator;
                 Name.AssociatedEvent = newCalendarEvent;
-                if(newCalendarEvent.IsRepeat)
+                if (newCalendarEvent.IsRepeat)
                 {
                     if (newCalendarEvent.getIsEventRestricted)
                     {
@@ -1418,9 +1432,13 @@ namespace TilerFront.Controllers
                         newCalendarEvent.Repeat.PopulateRepetitionParameters(newCalendarEvent);
                     }
                 }
-                
+
                 string BeforemyName = newCalendarEvent.ToString(); //BColor + " -- " + Count + " -- " + DurationDays + " -- " + DurationHours + " -- " + DurationMins + " -- " + EndDay + " -- " + EndHour + " -- " + EndMins + " -- " + EndMonth + " -- " + EndYear + " -- " + GColor + " -- " + LocationAddress + " -- " + LocationTag + " -- " + Name + " -- " + RColor + " -- " + RepeatData + " -- " + RepeatEndDay + " -- " + RepeatEndMonth + " -- " + RepeatEndYear + " -- " + RepeatStartDay + " -- " + RepeatStartMonth + " -- " + RepeatStartYear + " -- " + RepeatType + " -- " + RepeatWeeklyData + " -- " + Rigid + " -- " + StartDay + " -- " + StartHour + " -- " + StartMins + " -- " + StartMonth + " -- " + StartYear;
                 string AftermyName = newCalendarEvent.ToString();
+                if (!string.IsNullOrEmpty(xmlFileId) && !string.IsNullOrWhiteSpace(xmlFileId)) {
+                    var tempSched = TilerTests.TestUtility.getSchedule(xmlFileId, connectionName: "DefaultConnection", filePath: LogControl.getLogLocation());
+                    MySchedule = (DB_Schedule)tempSched.Item1;
+                }
 
                 Tuple<List<SubCalendarEvent>[], DayTimeLine[], List<SubCalendarEvent>> peekingEvents = MySchedule.peekIntoSchedule(newCalendarEvent);
                 PeekResult peekData = new PeekResult(peekingEvents.Item1, peekingEvents.Item2, peekingEvents.Item3);

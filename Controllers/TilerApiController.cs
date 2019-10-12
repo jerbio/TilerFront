@@ -28,6 +28,7 @@ namespace TilerFront
     /// </summary>
     public class TilerApiController: ApiController
     {
+        protected static string xmlFileId = "";
         protected ApplicationDbContext db = new ApplicationDbContext();
         protected TilerApiController  (): base()
         {
