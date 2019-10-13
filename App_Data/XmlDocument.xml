@@ -1263,6 +1263,11 @@
             Tiler controller that provides custom tiler functionality
             </summary>
         </member>
+        <member name="F:TilerFront.TilerApiController.xmlFileId">
+            <summary>
+            name of file to be read from wagtapcallogs
+            </summary>
+        </member>
         <member name="M:TilerFront.UserAccount.getTilerUser">
             <summary>
             Gets the tilerUser account associated with the userAccount

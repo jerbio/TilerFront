@@ -28,6 +28,9 @@ namespace TilerFront
     /// </summary>
     public class TilerApiController: ApiController
     {
+        /// <summary>
+        /// name of file to be read from wagtapcallogs
+        /// </summary>
         protected static string xmlFileId = "";
         protected ApplicationDbContext db = new ApplicationDbContext();
         protected TilerApiController  (): base()
