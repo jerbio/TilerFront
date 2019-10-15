@@ -961,6 +961,21 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="P:TilerFront.Models.AuthorizedUser.UserLongitude">
+            <summary>
+            Longitude of user
+            </summary>
+        </member>
+        <member name="P:TilerFront.Models.AuthorizedUser.UserLatitude">
+            <summary>
+            Latitude of user
+            </summary>
+        </member>
+        <member name="P:TilerFront.Models.AuthorizedUser.UserLocationVerified">
+            <summary>
+            IsLocationVerified
+            </summary>
+        </member>
         <member name="P:TilerFront.Models.AuthorizedUser.TimeZone">
             <summary>
             TimeZone desired by the user. This defaults to UTC
@@ -1120,6 +1135,16 @@
             Year component of End date.
             </summary>
         </member>
+        <member name="P:TilerFront.Models.UnregisteredEvent.LookupString">
+            <summary>
+            Address provided by user
+            </summary>
+        </member>
+        <member name="P:TilerFront.Models.UnregisteredEvent.LocationIsVerified">
+            <summary>
+            Address is a confirmed location from google maps or mapping service
+            </summary>
+        </member>
         <member name="P:TilerFront.Models.UnregisteredEvent.LocationAddress">
             <summary>
             Full Address for new event. Fully described in default format. e.g 1234 stret apt 56 Kingston, CO 78901
@@ -1128,6 +1153,11 @@
         <member name="P:TilerFront.Models.UnregisteredEvent.LocationId">
             <summary>
             Should be populated when the location is from a cache
+            </summary>
+        </member>
+        <member name="P:TilerFront.Models.UnregisteredEvent.LocationSource">
+            <summary>
+            Source from where location is pulled
             </summary>
         </member>
         <!-- Badly formed XML comment ignored for member "P:TilerFront.Models.UnregisteredEvent.LocationTag" -->
@@ -1261,6 +1291,11 @@
         <member name="T:TilerFront.TilerApiController">
             <summary>
             Tiler controller that provides custom tiler functionality
+            </summary>
+        </member>
+        <member name="F:TilerFront.TilerApiController.xmlFileId">
+            <summary>
+            name of file to be read from wagtapcallogs
             </summary>
         </member>
         <member name="M:TilerFront.UserAccount.getTilerUser">

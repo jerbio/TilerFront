@@ -1,4 +1,6 @@
-﻿using System;
+﻿//#define loadFromXml
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -91,8 +93,14 @@ namespace TilerFront.Controllers
                 IEnumerable<SubCalendarEvent> subEvents = await LogAccess.getAllEnabledSubCalendarEvent(TimelineForData, now, true, DataRetrivalOption.Ui).ConfigureAwait(false);
                 //Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location>> ProfileData = await LogAccess.getProfileInfo(TimelineForData, null, retrievalOption: DataRetrivalOption.Ui);
                 //IEnumerable<CalendarEvent> calEvents = ProfileData.Item1.Values;
-
-
+#if loadFromXml
+                if (!string.IsNullOrEmpty(xmlFileId) && !string.IsNullOrWhiteSpace(xmlFileId))
+                {
+                    var tempSched = TilerTests.TestUtility.getSchedule(xmlFileId, connectionName: "DefaultConnection", filePath: LogControl.getLogLocation());
+                    var MySchedule = (DB_Schedule)tempSched.Item1;
+                    subEvents = MySchedule.getAllCalendarEvents().SelectMany(obj => obj.ActiveSubEvents);
+                }
+#endif
                 IEnumerable<CalendarEvent> GoogleCalEvents = await GoogleCalEventsTask.ConfigureAwait(false);
 
 
@@ -123,7 +131,7 @@ namespace TilerFront.Controllers
         [Route("api/Schedule/FixDBInstance")]
         public async Task<IHttpActionResult> FixRepetition([FromUri] getScheduleModel myAuthorizedUser)
         {
-            string userId = "c88d59b9-6fb0-4238-86c1-0a9daf88966a";
+            string userId = "4751e09f-b592-4e45-9fba-3425ff95b1da";
             string userName = "jerbio";
             myAuthorizedUser = new getScheduleModel()
             {
@@ -134,71 +142,23 @@ namespace TilerFront.Controllers
             HttpContext myCOntext = HttpContext.Current;
             await myUserAccount.Login();
             myUserAccount.getTilerUser().updateTimeZoneTimeSpan(myAuthorizedUser.getTimeSpan);
+
+            var locations = myUserAccount.ScheduleLogControl.getAllLocationsQuery();
+            foreach(Location location in  locations.ToList() )
+            {
+                location.IsVerified = !location.isNull && !location.isDefault;
+            }
+
             TimeLine timeLine = new TimeLine(Utility.BeginningOfTime, Utility.BeginningOfTime.AddYears(3000));
             ReferenceNow now = new ReferenceNow(Utility.BeginningOfTime, Utility.BeginningOfTime, new TimeSpan());
             LogControl logControl = myUserAccount.ScheduleLogControl;
-            var calEvents = await logControl.getAllEnabledCalendarEventOlder(timeLine, now).ConfigureAwait(false);
-            foreach(var parentCalEvent in calEvents.Values)
-            {
-                if(parentCalEvent.IsRepeat)
-                {
-                    foreach (var calEvent in parentCalEvent.Repeat.RecurringCalendarEvents())
-                    {
-                        calEvent.setRepeatParent(parentCalEvent);
-                        if(calEvent.Repeat.SubRepetitions.Count > 0)
-                        {
-
-                        }
-                    }
-                    parentCalEvent.deleteAllSubCalendarEventsFromRepeatParentCalendarEvent();
-                }   
-            }
+            var calEvents = await logControl.getAllEnabledCalendarEventOld(timeLine, now).ConfigureAwait(false);
 
             await myUserAccount.Commit(calEvents.Values, null, myUserAccount.getTilerUser().LatestId, now).ConfigureAwait(false);
 
 
 
             PostBackData returnPostBack;
-            //TilerUser tilerUser = myUserAccount.getTilerUser();
-            //if (myUserAccount.Status)
-            //{
-            //    LogControl LogAccess = myUserAccount.ScheduleLogControl;
-
-            //    //IQueryable<CalendarEvent> destroy = LogAccess.getItAll();
-            //    //List<CalendarEvent> all = destroy.ToList();
-
-            //    //var lookupWindow = new TimeLine(myAuthorizedUser.getRefNow().AddYears(-10), myAuthorizedUser.getRefNow().AddYears(10));
-            //    //var Schedule = new DB_Schedule(myUserAccount, myAuthorizedUser.getRefNow(), retrievalOption: DataRetrivalOption.All, rangeOfLookup: lookupWindow);
-
-            //    IQueryable<CalendarEvent> calQuery = LogAccess.getCalendarEventQuery(DataRetrivalOption.All, true);
-            //    calQuery = calQuery
-            //        .Include(calEvent => calEvent.Repetition_EventDB.SubRepetitions)
-            //        .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents)
-            //        .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repEvent => repEvent.AllSubEvents_DB))
-            //    //.Include(calEvent => calEvent.Repetition_EventDB
-            //    //    .SubRepetitions.Select(repetition => repetition.RepeatingEvents.Select(repCalEvent => repCalEvent.DayPreference_DB)))
-            //    //.Include(calEvent => calEvent.Repetition_EventDB
-            //    //    .SubRepetitions.Select(repetition => repetition.RepeatingEvents.Select(repCalEvent => repCalEvent.UiParams_EventDB.UIColor)))
-            //    //.Include(calEvent => calEvent.Repetition_EventDB.SubRepetitions.Select(repetition => repetition.RepeatingEvents.Select(repCalEvent => repCalEvent.ProfileOfNow_EventDB)))
-            //    //.Include(calEvent => calEvent.Repetition_EventDB.SubRepetitions.Select(repetition => repetition.RepeatingEvents.Select(repCalEvent => repCalEvent.DayPreference_DB)))
-            //    //.Include(calEvent => calEvent.Repetition_EventDB.SubRepetitions.Select(repetition => repetition.RepeatingEvents.Select(repCalEvent => repCalEvent.ProfileOfNow_EventDB)));
-            //    ;
-            //    IEnumerable<CalendarEvent> calEvents = await calQuery.ToListAsync().ConfigureAwait(false);
-            //    foreach (CalendarEvent calEvent in calEvents)
-            //    {
-            //        if (calEvent.Repeat != null)
-            //        {
-            //            calEvent.Repeat.ParentEvent = calEvent;
-            //            foreach (SubCalendarEvent subEvent in calEvent.AllSubEvents)
-            //            {
-            //                subEvent.RepeatParentEvent = calEvent;
-            //            }
-            //        }
-
-            //    }
-            //    ReferenceNow now = new ReferenceNow(DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, new TimeSpan());
-            //    await myUserAccount.Commit(calEvents, null, myUserAccount.getTilerUser().LatestId, now).ConfigureAwait(false);
-            //}
             returnPostBack = new PostBackData("", 0);
 
             return Ok(returnPostBack.getPostBack);
@@ -1089,8 +1049,13 @@ namespace TilerFront.Controllers
             string TimeZone = newEvent.TimeZone;
             string TimeZoneOrigin = newEvent.TimeZoneOrigin;
             string restrictionPreference = newEvent.isRestricted;
+            string lookupString_arg = newEvent.LookupString;
+            string locationIsVerified_arg = newEvent.LocationIsVerified;
 
             bool restrictionFlag = Convert.ToBoolean(restrictionPreference);
+            bool locationIsVerified = Convert.ToBoolean(locationIsVerified_arg);
+            string lookupString = lookupString_arg;
+
 
             string StartTime = StartHour + ":" + StartMins;
             string EndTime = EndHour + ":" + EndMins;
@@ -1104,11 +1069,17 @@ namespace TilerFront.Controllers
 
             bool RigidScheduleFlag = Convert.ToBoolean(Rigid);
             TilerElements.Location EventLocation = new TilerElements.Location(LocationAddress, LocationTag);
-            EventLocation.Validate();
-            Location retrievedLocation =await db.Locations.SingleOrDefaultAsync(location => location.UserId == myUser.UserID && location.Description == EventLocation.Description).ConfigureAwait(false);
+            EventLocation.LookupString = lookupString;
+            if (locationIsVerified)
+            {
+                EventLocation.verify();
+            }
+            
+            Location retrievedLocation =await db.Locations.SingleOrDefaultAsync(location => location.UserId == myUser.UserID && location.SearchdDescription == EventLocation.SearchdDescription).ConfigureAwait(false);
             if(retrievedLocation != null)
             {
-                retrievedLocation.update(EventLocation);
+                bool resetLocationValidation = (string.IsNullOrEmpty(LocationId) || string.IsNullOrWhiteSpace(LocationId)) || retrievedLocation.Id != LocationId;
+                retrievedLocation.update(EventLocation, resetLocationValidation);
                 EventLocation = retrievedLocation;
             }
             Repetition MyRepetition = new Repetition();
@@ -1252,6 +1223,14 @@ namespace TilerFront.Controllers
                     JObject json = JObject.FromObject(newEvent);
                     activity.updateMiscelaneousInfo(json.ToString());
                     myUser.ScheduleLogControl.updateUserActivty(activity);
+#if loadFromXml
+                    if (!string.IsNullOrEmpty(xmlFileId) && !string.IsNullOrWhiteSpace(xmlFileId))
+                    {
+                        var tempSched = TilerTests.TestUtility.getSchedule(xmlFileId, connectionName: "DefaultConnection", filePath: LogControl.getLogLocation());
+                        MySchedule = (DB_Schedule)tempSched.Item1;
+                    }
+#endif
+
                     await MySchedule.AddToScheduleAndCommitAsync(newCalendarEvent).ConfigureAwait(false);
                 }
                 
@@ -1347,7 +1326,10 @@ namespace TilerFront.Controllers
             string StartYear = newEvent.StartYear;
             string RepeatFrequency = newEvent.RepeatFrequency;
             string TimeZone = newEvent.TimeZone;
-
+            string lookupString_arg = newEvent.LookupString;
+            string locationIsVerified_arg = newEvent.LocationIsVerified;
+            bool locationIsVerified = Convert.ToBoolean(locationIsVerified_arg);
+            string lookupString = lookupString_arg;
 
             string restrictionPreference = newEvent.isRestricted;
 
@@ -1363,7 +1345,12 @@ namespace TilerFront.Controllers
 
             bool RigidScheduleFlag = Convert.ToBoolean(Rigid);
             TilerElements.Location EventLocation = new TilerElements.Location(LocationAddress, LocationTag);
-            EventLocation.Validate();
+            EventLocation.LookupString = lookupString;
+            if (locationIsVerified)
+            {
+                EventLocation.verify();
+            }
+                
 
             Repetition MyRepetition = new Repetition();
             DateTimeOffset RepeatStart = new DateTimeOffset();
@@ -1433,7 +1420,7 @@ namespace TilerFront.Controllers
 
                 CalendarEvent newCalendarEvent;
                 RestrictionProfile myRestrictionProfile = newEvent.getRestrictionProfile(myNow);
-                if (myRestrictionProfile!=null)
+                if (myRestrictionProfile != null)
                 {
                     string TimeString = StartDateEntry.Date.ToShortDateString() + " " + StartTime;
                     DateTimeOffset StartDateTime = DateTimeOffset.Parse(TimeString).UtcDateTime;
@@ -1447,6 +1434,7 @@ namespace TilerFront.Controllers
                 {
                     DateTimeOffset StartData = DateTimeOffset.Parse(StartTime + " " + StartDateEntry.Date.ToShortDateString()).UtcDateTime;
                     StartData = StartData.Add(newEvent.getTimeSpan);
+                    StartData = newEvent.getRefNow();
                     DateTimeOffset EndData = DateTimeOffset.Parse(EndTime + " " + EndDateEntry.Date.ToShortDateString()).UtcDateTime;
                     EndData = EndData.Add(newEvent.getTimeSpan);
                     if (RigidScheduleFlag)
@@ -1462,7 +1450,7 @@ namespace TilerFront.Controllers
                 }
                 Name.Creator_EventDB = newCalendarEvent.getCreator;
                 Name.AssociatedEvent = newCalendarEvent;
-                if(newCalendarEvent.IsRepeat)
+                if (newCalendarEvent.IsRepeat)
                 {
                     if (newCalendarEvent.getIsEventRestricted)
                     {
@@ -1473,9 +1461,15 @@ namespace TilerFront.Controllers
                         newCalendarEvent.Repeat.PopulateRepetitionParameters(newCalendarEvent);
                     }
                 }
-                
+
                 string BeforemyName = newCalendarEvent.ToString(); //BColor + " -- " + Count + " -- " + DurationDays + " -- " + DurationHours + " -- " + DurationMins + " -- " + EndDay + " -- " + EndHour + " -- " + EndMins + " -- " + EndMonth + " -- " + EndYear + " -- " + GColor + " -- " + LocationAddress + " -- " + LocationTag + " -- " + Name + " -- " + RColor + " -- " + RepeatData + " -- " + RepeatEndDay + " -- " + RepeatEndMonth + " -- " + RepeatEndYear + " -- " + RepeatStartDay + " -- " + RepeatStartMonth + " -- " + RepeatStartYear + " -- " + RepeatType + " -- " + RepeatWeeklyData + " -- " + Rigid + " -- " + StartDay + " -- " + StartHour + " -- " + StartMins + " -- " + StartMonth + " -- " + StartYear;
                 string AftermyName = newCalendarEvent.ToString();
+#if loadFromXml
+                if (!string.IsNullOrEmpty(xmlFileId) && !string.IsNullOrWhiteSpace(xmlFileId)) {
+                    var tempSched = TilerTests.TestUtility.getSchedule(xmlFileId, connectionName: "DefaultConnection", filePath: LogControl.getLogLocation());
+                    MySchedule = (DB_Schedule)tempSched.Item1;
+                }
+#endif
 
                 Tuple<List<SubCalendarEvent>[], DayTimeLine[], List<SubCalendarEvent>> peekingEvents = MySchedule.peekIntoSchedule(newCalendarEvent);
                 PeekResult peekData = new PeekResult(peekingEvents.Item1, peekingEvents.Item2, peekingEvents.Item3);

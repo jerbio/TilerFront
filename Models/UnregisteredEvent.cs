@@ -68,6 +68,14 @@ namespace TilerFront.Models
         /// </summary>
         public string EndYear { get; set; }
         /// <summary>
+        /// Address provided by user
+        /// </summary>
+        public string LookupString { get; set; }
+        /// <summary>
+        /// Address is a confirmed location from google maps or mapping service
+        /// </summary>
+        public string LocationIsVerified { get; set; }
+        /// <summary>
         /// Full Address for new event. Fully described in default format. e.g 1234 stret apt 56 Kingston, CO 78901
         /// </summary>
         public string LocationAddress { get; set; }
@@ -75,7 +83,10 @@ namespace TilerFront.Models
         /// Should be populated when the location is from a cache
         /// </summary>
         public string LocationId { get; set; }
-
+        /// <summary>
+        /// Source from where location is pulled
+        /// </summary>
+        public string LocationSource { get; set; }
         /// <summary>
         /// Prefereed Nick name for location. If Nick name already exists, it overwrites previous full address & long lat with new nick name
         /// </summary>
@@ -84,6 +95,7 @@ namespace TilerFront.Models
         /// Name of Newly added Tile/Event
         /// </summary>
         public string Name { get; set; }
+
         /// <summary>
         /// ***No current use***
         /// </summary>

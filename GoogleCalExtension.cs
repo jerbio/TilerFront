@@ -224,7 +224,7 @@ namespace TilerFront
             foreach (var kvL in addressesToLocations)
             {
                 TilerElements.Location location = new TilerElements.Location(kvL.Key);
-                if (location.Validate())
+                if (location.verify())
                 {
                     var allLocations = addressesToLocations[kvL.Key];
 

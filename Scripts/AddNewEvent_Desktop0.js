@@ -154,12 +154,12 @@ function prepSendTile(NameInput, AddressInput, NickNameSlider, SpliInput, HourIn
         {
             NickName = NickNameSlider.getAllElements()[0].TileInput.getInputDom().value;
         }
-        var newEvent= SubmitTile(NameInput.value, AddressInput.value,NickName, SpliInput.value, HourInput.value, MinuteInput.value, DeadlineInput.value, RepetitionInput.value, calendarColor, RepetitionFlag, restrictionData);
+        var newEvent= SubmitTile(NameInput.value, AddressInput,NickName, SpliInput.value, HourInput.value, MinuteInput.value, DeadlineInput.value, RepetitionInput.value, calendarColor, RepetitionFlag, restrictionData, AddressInput);
         SendScheduleInformation(newEvent, global_ExitManager.triggerLastExitAndPop);
     }
 }
 
-function SubmitTile(Name, Address,AddressNick, Splits, Hour, Minutes, Deadline, Repetition, CalendarColor,RepetitionFlag,TimeRestrictions)
+function SubmitTile(Name, AddressInput,AddressNick, Splits, Hour, Minutes, Deadline, Repetition, CalendarColor,RepetitionFlag,TimeRestrictions)
 {
     var DictOfData = {};
     DictOfData["day"] = { Range: OneDayInMs, Type: { Name: "Daily", Index: 0 }, Misc: null }
@@ -176,9 +176,11 @@ function SubmitTile(Name, Address,AddressNick, Splits, Hour, Minutes, Deadline, 
         return null;
     }
     */
+    let Address = AddressInput.value
     var LocationAddress = Address;
+    let LocationIsVerified = AddressInput.LocationIsVerified;
     var LocationNickName = AddressNick;
-    var EventLocation = new Location(LocationNickName, LocationAddress);
+    var EventLocation = new Location(LocationNickName, LocationAddress, LocationIsVerified, AddressInput.LocationId);
     Hour = Hour != "" ? Hour : 0;
     Minutes = Minutes != "" ? Minutes : 0;
 
@@ -676,7 +678,7 @@ function generateAddEventContainer(x,y,height,Container,refStartTime)
     
 
     $(SubmitButton.Selector.Button.Dom).click(function () {
-        var NewEvent = BindSubmitClick(NameDom.Selector.Input.Dom.value, LocationDom.Selector.Address.Dom.value, LocationDom.Selector.NickName.Dom.value, SplitCount.Selector.Input.Dom.value, StartDom, EndDom, DurationDom, null, true, ColorPicker.Selector.getColor(), global_ExitManager.triggerLastExitAndPop, recurrence);
+        var NewEvent = BindSubmitClick(NameDom.Selector.Input.Dom.value, LocationDom.Selector.Address.Dom, LocationDom.Selector.NickName.Dom.value, SplitCount.Selector.Input.Dom.value, StartDom, EndDom, DurationDom, null, true, ColorPicker.Selector.getColor(), global_ExitManager.triggerLastExitAndPop, recurrence);
         SendScheduleInformation(NewEvent, global_ExitManager.triggerLastExitAndPop);
     })
     AddCloseButoon(NewEventcontainer, false);
@@ -2097,7 +2099,10 @@ function AddTiledEvent()
 
                 function InsertIntoInput()
                 {
-                    InputCOntainer.value = LocationData.Address;
+                    updateLocationInputWithClickData(InputCOntainer, LocationData.Address, "tiler", LocationData.LocationId)
+                    if (LocationData.isVerified !== undefined && LocationData.isVerified !== null) {
+                        InputCOntainer.LocationIsVerified = LocationData.isVerified;
+                    }
                 }
 
                 return RetValue;
@@ -2252,15 +2257,13 @@ function AddTiledEvent()
                 }
 
                 function InsertIntoInput() {
-                    InputCOntainer.value = LocationData.formatted_address;
+                    updateLocationInputWithClickData(InputCOntainer, LocationData.formatted_address, "google")
                 }
 
                 return RetValue;
             }
             generateDomForEach.CurrentHover = null;
         }
-
-        
 
         function positionSearchResultContainer()
         {
@@ -2321,6 +2324,8 @@ function AddTiledEvent()
                 CombinedData.AllData[CombinedData.Index].Select();
                 return;
             }
+            e.target.LocationIsVerified = false
+            resetLocationInput(e.target)
             LocationAutoSuggestControl.enableSendRequest();
             GoogleAutoSuggestControl.enableSendRequest();
         }
@@ -2555,7 +2560,7 @@ function AddTiledEvent()
         var myColor = ColorPicker.Selector.getColor();
         var restrictionData = generatePostBackDataForTimeRestriction(TimeRestrictionSlider);
         
-        var peekEvent = SubmitTile(Element1.TileInput.getInputDom().value, "","", Splits.getInputDom().value, Hour.getInputDom().value, Min.getInputDom().value, Element4.TileInput.getInputDom().value, RepetionChoice.getInputDom().value, myColor, RepetionSlider.getStatus(), restrictionData);
+        var peekEvent = SubmitTile(Element1.TileInput.getInputDom().value, {},"", Splits.getInputDom().value, Hour.getInputDom().value, Min.getInputDom().value, Element4.TileInput.getInputDom().value, RepetionChoice.getInputDom().value, myColor, RepetionSlider.getStatus(), restrictionData);
         setTimeout(function () { generatePeek(peekEvent, PreviewPanel) }, 300);
     }
 
@@ -3276,9 +3281,9 @@ function generateSubmitButton()
 }
 
 
-function BindSubmitClick(Name, Address, AddressNick, Splits, Start, End, EventNonRigidDurationHolder, RepetitionEnd, RigidFlag, CalendarColor,ExitAdditionScreen,EventRepetition)
+function BindSubmitClick(Name, AddressDom, AddressNick, Splits, Start, End, EventNonRigidDurationHolder, RepetitionEnd, RigidFlag, CalendarColor,ExitAdditionScreen,EventRepetition)
 {
-    var EventLocation = new Location(AddressNick, Address);
+    var EventLocation = new Location(AddressNick, AddressDom.Dom.value.AddressDom.Dom.LocationIsVerified, AddressDom.LocationId);
     var EventName = Name;
     var EventName = Name;
     /*
@@ -3363,6 +3368,7 @@ function SendScheduleInformation(NewEvent, CallBack)
     NewEvent.TimeZoneOffset = TimeZone;
     NewEvent.TimeZone = moment.tz.guess()
     var url = global_refTIlerUrl + "Schedule/Event";
+    preSendRequestWithLocation(NewEvent)
     var HandleNEwPage = new LoadingScreenControl("Tiler is Adding \"" + NewEvent.Name + " \" to your schedule ...");
     HandleNEwPage.Launch();
     $.ajax({

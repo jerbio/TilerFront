@@ -28,11 +28,14 @@ namespace TilerFront
     /// </summary>
     public class TilerApiController: ApiController
     {
+        /// <summary>
+        /// name of file to be read from wagtapcallogs
+        /// </summary>
+        protected static string xmlFileId = "";
         protected ApplicationDbContext db = new ApplicationDbContext();
         protected TilerApiController  (): base()
         {
-            db.Database.Log = Console.Write;
-
+            //db.Database.Log = s => System.Diagnostics.Debug.WriteLine(s);
             //#if loggingEnables
 
             //            using (var sqlLogFile = new StreamWriter("C:\\temp\\LogFile.txt"))

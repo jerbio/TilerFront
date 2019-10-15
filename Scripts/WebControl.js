@@ -13,12 +13,10 @@ var CurrentTheme = UserTheme.Light;
 var UserCredentials;
 try
 {
-    //debugger;
     UserCredentials=  RetrieveUserCredentials();
 }
 catch(e)
 {
-    //debugger;
     UserCredentials= { UserName: "", ID: "", Name: "" };
 }
 
@@ -1638,10 +1636,12 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
     }
 
 
-    function Location(Tag,Address)
+function Location(Tag, Address, LocationIsVerified, LocationId)
     {
         this.Tag = Tag;
         this.Address = Address;
+        this.LocationIsVerified = LocationIsVerified;
+        this.LocationId = LocationId;
     }
 
     function CalEventData(eventName, eventLocation, eventCounts, eventColor, eventDuration, eventStart, eventEnd, eventRepeatData, eventRepeatStart, eventRepeatEnd, rigidFlag, RestrictionData)
@@ -1649,6 +1649,8 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
         this.Name = eventName;
         this.LocationTag = eventLocation.Tag;
         this.LocationAddress = eventLocation.Address;
+        this.LocationIsVerified = eventLocation.LocationIsVerified;
+        this.LocationId = eventLocation.LocationId;
         this.RColor = eventColor.r;
         this.GColor = eventColor.g;
         this.BColor = eventColor.b;
@@ -1657,9 +1659,9 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
         this.DurationDays = 0;// eventDuration.Days;
         this.DurationHours = eventDuration.Hours;
         this.DurationMins = eventDuration.Mins;
-        this.StartHour = eventStart.Time.Hour;
+        this.StartHour = eventStart.IsDefault && !rigidFlag ? 0 : eventStart.Time.Hour;
         this.EndHour = eventEnd.Time.Hour;
-        this.StartMins = eventStart.Time.Minute;
+        this.StartMins = eventStart.IsDefault && !rigidFlag ? 0 : eventStart.Time.Minute;
         this.EndMins = eventEnd.Time.Minute;
         this.StartDay = eventStart.Date.getDate();
         this.EndDay = eventEnd.Date.getDate();

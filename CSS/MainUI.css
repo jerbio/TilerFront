@@ -874,45 +874,63 @@ input
     border:none;
 }
 
-.defaultColorOrb {
-    background-color:yellow;
+.defaultColorOrb,
+.SideBar.defaultColorOrb {
+    background-color: yellow;
 }
-.redOrb {
-    background-color:#ff4731 !important;
+.redOrb,
+.SideBar.redOrb {
+    background-color: #ff4731;
 }
-.greenOrb
-{
-    background-color:#3de66b !important;
+.greenOrb,
+.SideBar.greenOrb {
+    background-color: #3de66b;
 }
-.purpleOrb 
-{
-    background-color: #d24fd2 !important;
+.purpleOrb,
+.SideBar.purpleOrb {
+    background-color: #d24fd2;
 }
-.skeleOrb
-{
-    background-color:#9149f5 !important;
+.skeleOrb,
+.SideBar.skeleOrb {
+    background-color: #9149f5;
 }
-.mariOrb
-{
-    background-color:#ff80e7 !important;
+.mariOrb,
+.SideBar.mariOrb {
+    background-color: #ff80e7;
 }
-.ldonBoysOrb 
-{
-    background-color:#ff6338 !important;
+.ldonBoysOrb,
+.SideBar.ldonBoysOrb {
+    background-color: #ff6338;
 }
-.storyOrb{
-    background-color:#6ec9ff !important;
+.storyOrb,
+.SideBar.storyOrb {
+    background-color: #6ec9ff;
 }
 
-.oriOrb
-{
-    background-color:#87FFDD !important;
+.oriOrb,
+.SideBar.oriOrb {
+    background-color: #87FFDD;
+}
+
+.subEventColor{
+
+}
+
+.ListElementContainerCurrentSubevent .subEventColor {
+    background-color: unset;
+    box-shadow: none;
+    border-radius: unset;
+}
+
+.ListElementContainerCurrentSubevent.FullColorAugmentation {
+    background-image: none;
+    background-color: yellow;
 }
 
 
 .EnableButtonOn {
-    left:50%;
-    position:absolute;
+    left: 50%;
+    position: absolute;
 }
 .EnableButtonOff {
     left:0%;
@@ -1025,12 +1043,15 @@ width: 20px;
     display: inline-block;
 }
 
-.ListElementContainerCurrentSubevent 
-{
-  left: 0px;
-  background-image: linear-gradient(rgba(255, 255, 255, .5), rgba(255, 255, 0, .7));
-  padding-top: 8px;
-  padding-right: 8px;
+.ListElementContainerCurrentSubevent {
+    left: 0px;
+    background-image: linear-gradient(rgba(255, 255, 255, .5), rgba(255, 255, 0, .7));
+    padding-top: 8px;
+    padding-right: 8px;
+    border-radius: 10px;
+    box-shadow: rgba(10,10,10,0.2) 0px 2px 3px;
+    margin-bottom: 5px;
+    border: solid 1px rgb(220, 220, 220);
 }
 
 .ListElementContainerNextSubevent
@@ -1040,4 +1061,9 @@ width: 20px;
   padding-top: 8px;
   padding-right: 8px;
   border-right: none;
+  border-radius: 10px;
+}
+
+.ListElementContainerCurrentSubevent .ListElementColorContainer {
+    box-shadow: none;
 }

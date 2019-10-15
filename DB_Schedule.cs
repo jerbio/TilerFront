@@ -12,6 +12,10 @@ namespace TilerFront
     {
         protected UserAccount myAccount;
         protected bool _CreateDump;
+        protected DB_Schedule(): base()
+        {
+
+        }
         protected DB_Schedule(Dictionary<string, CalendarEvent> allEventDictionary, DateTimeOffset starOfDay, Dictionary<string, Location> locations, DateTimeOffset referenceNow, UserAccount userAccount, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation, TimeLine rangeOfLookup = null, bool createDump = true) : base(allEventDictionary, starOfDay, locations, referenceNow, userAccount.getTilerUser(), rangeOfLookup)
         {
             myAccount = userAccount;
@@ -286,6 +290,16 @@ namespace TilerFront
         {
             referenceNow = referenceNow ?? this.Now;
             return await myAccount.ScheduleLogControl.CreateScheduleDump(this.getAllCalendarEvents(), myAccount.getTilerUser(), referenceNow, notes).ConfigureAwait(false);
+        }
+
+        virtual public void DisableScheduleDump()
+        {
+            myAccount.ScheduleLogControl.disableUpdateBigData();
+        }
+
+        virtual public void EnableScheduleDump()
+        {
+            myAccount.ScheduleLogControl.enableUpdateBigData();
         }
 
         /// <summary>

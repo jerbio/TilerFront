@@ -23,7 +23,9 @@ namespace TilerFront
                 TimeSpan TotalActiveSpan = SubCalendarEvent.TotalActiveDuration(obj);
                 double ActiveTimeDuration =TotalActiveSpan.TotalMilliseconds;
                 double durationRatio = ActiveTimeDuration/DayReferences[i].TimelineSpan.TotalMilliseconds;
-                PeekDay MyPeekDay = new PeekDay { DayIndex = (int)myDay.Start.DayOfWeek, AllSubEvents = obj.Select(obj1 => obj1.ToSubCalEvent()).ToArray(), TotalDuration = TotalActiveSpan.TotalHours, DurationRatio = durationRatio, SleepTime = SleepSpan.TotalHours };
+                var notBlobSubevent = obj.Where(o => !o.isBlobEvent).ToList();
+                var allSubEvents = notBlobSubevent.Concat(obj.Where(o => o.isBlobEvent).SelectMany(o => (o as BlobSubCalendarEvent).getSubCalendarEventsInBlob()));
+                PeekDay MyPeekDay = new PeekDay { DayIndex = (int)myDay.Start.DayOfWeek, AllSubEvents = allSubEvents.Select(obj1 => obj1.ToSubCalEvent()).ToArray(), TotalDuration = TotalActiveSpan.TotalHours, DurationRatio = durationRatio, SleepTime = SleepSpan.TotalHours };
                 return MyPeekDay;
             }).ToArray();
             ConflictingCount = ConflictingEvents.Count();

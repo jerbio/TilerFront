@@ -415,6 +415,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\My24HourTimerWPF\TilerElements\bin\Debug\TilerElements.dll</HintPath>
     </Reference>
+    <Reference Include="TilerTests">
+      <HintPath>..\..\My24HourTimerWPF\TilerTests\bin\Debug\TilerTests.dll</HintPath>
+    </Reference>
     <Reference Include="WebGrease, Version=1.6.5135.21930, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\WebGrease.1.6.0\lib\WebGrease.dll</HintPath>
@@ -508,9 +511,13 @@
     <Compile Include="LogControlXml.cs" />
     <Compile Include="LogControlDirect.cs" />
     <Compile Include="LogControl.cs" />
-    <Compile Include="Migrations\201910101213093_init.cs" />
-    <Compile Include="Migrations\201910101213093_init.Designer.cs">
-      <DependentUpon>201910101213093_init.cs</DependentUpon>
+    <Compile Include="Migrations\201910131147279_locationUpdateFromGoogle.cs" />
+    <Compile Include="Migrations\201910131147279_locationUpdateFromGoogle.Designer.cs">
+      <DependentUpon>201910131147279_locationUpdateFromGoogle.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201910141016431_verifiedLocation.cs" />
+    <Compile Include="Migrations\201910141016431_verifiedLocation.Designer.cs">
+      <DependentUpon>201910141016431_verifiedLocation.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
@@ -2812,8 +2819,11 @@
     <TypeScriptCompile Include="Scripts\index.d.ts" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201910101213093_init.resx">
-      <DependentUpon>201910101213093_init.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201910131147279_locationUpdateFromGoogle.resx">
+      <DependentUpon>201910131147279_locationUpdateFromGoogle.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201910141016431_verifiedLocation.resx">
+      <DependentUpon>201910141016431_verifiedLocation.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
@@ -2849,17 +2859,6 @@
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets'))" />
-    <Error Condition="!Exists('..\packages\Microsoft.Diagnostics.Instrumentation.Extensions.Intercept.0.14.0-build02545\build\Microsoft.Diagnostics.Instrumentation.Extensions.Intercept.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Diagnostics.Instrumentation.Extensions.Intercept.0.14.0-build02545\build\Microsoft.Diagnostics.Instrumentation.Extensions.Intercept.targets'))" />
-    <Error Condition="!Exists('..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets'))" />
-    <Error Condition="!Exists('..\..\My24HourTimerWPF\packages\Microsoft.Azure.DocumentDB.2.5.1\build\Microsoft.Azure.DocumentDB.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\My24HourTimerWPF\packages\Microsoft.Azure.DocumentDB.2.5.1\build\Microsoft.Azure.DocumentDB.targets'))" />
-    <Error Condition="!Exists('..\..\My24HourTimerWPF\packages\EntityFramework.6.3.0\build\EntityFramework.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\My24HourTimerWPF\packages\EntityFramework.6.3.0\build\EntityFramework.props'))" />
-    <Error Condition="!Exists('..\..\My24HourTimerWPF\packages\EntityFramework.6.3.0\build\EntityFramework.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\My24HourTimerWPF\packages\EntityFramework.6.3.0\build\EntityFramework.targets'))" />
-    <Error Condition="!Exists('..\..\My24HourTimerWPF\packages\Microsoft.ApplicationInsights.DependencyCollector.2.11.1\build\Microsoft.ApplicationInsights.DependencyCollector.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\My24HourTimerWPF\packages\Microsoft.ApplicationInsights.DependencyCollector.2.11.1\build\Microsoft.ApplicationInsights.DependencyCollector.targets'))" />
-    <Error Condition="!Exists('..\..\My24HourTimerWPF\packages\Microsoft.ApplicationInsights.PerfCounterCollector.2.11.1\build\Microsoft.ApplicationInsights.PerfCounterCollector.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\My24HourTimerWPF\packages\Microsoft.ApplicationInsights.PerfCounterCollector.2.11.1\build\Microsoft.ApplicationInsights.PerfCounterCollector.targets'))" />
-    <Error Condition="!Exists('..\..\My24HourTimerWPF\packages\Microsoft.ApplicationInsights.WindowsServer.TelemetryChannel.2.11.0\build\Microsoft.ApplicationInsights.WindowsServer.TelemetryChannel.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\My24HourTimerWPF\packages\Microsoft.ApplicationInsights.WindowsServer.TelemetryChannel.2.11.0\build\Microsoft.ApplicationInsights.WindowsServer.TelemetryChannel.targets'))" />
-    <Error Condition="!Exists('..\..\My24HourTimerWPF\packages\Microsoft.ApplicationInsights.WindowsServer.2.11.1\build\Microsoft.ApplicationInsights.WindowsServer.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\My24HourTimerWPF\packages\Microsoft.ApplicationInsights.WindowsServer.2.11.1\build\Microsoft.ApplicationInsights.WindowsServer.targets'))" />
-    <Error Condition="!Exists('..\..\My24HourTimerWPF\packages\Microsoft.ApplicationInsights.Web.2.11.1\build\Microsoft.ApplicationInsights.Web.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\My24HourTimerWPF\packages\Microsoft.ApplicationInsights.Web.2.11.1\build\Microsoft.ApplicationInsights.Web.targets'))" />
   </Target>
   <Import Project="..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
   <Import Project="..\packages\Microsoft.Diagnostics.Instrumentation.Extensions.Intercept.0.14.0-build02545\build\Microsoft.Diagnostics.Instrumentation.Extensions.Intercept.targets" Condition="Exists('..\packages\Microsoft.Diagnostics.Instrumentation.Extensions.Intercept.0.14.0-build02545\build\Microsoft.Diagnostics.Instrumentation.Extensions.Intercept.targets')" />

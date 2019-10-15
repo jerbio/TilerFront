@@ -91,6 +91,7 @@ function LaunchAddnewEvent(LoopBackCaller, CurrentUser,isTIle)
         var TimeZone = new Date().getTimezoneOffset();
         NewEvent.TimeZoneOffset = TimeZone;
         NewEvent.TimeZone = moment.tz.guess()
+        preSendRequestWithLocation(NewEvent)
         var url = global_refTIlerUrl + "Schedule/Event";
 
         var HandleNEwPage = new LoadingScreenControl("Tiler is Adding \"" + NewEvent.Name+ " \" to your schedule ...");
@@ -146,7 +147,7 @@ function LaunchAddnewEvent(LoopBackCaller, CurrentUser,isTIle)
 
 function prepCalDataForPost()
 {    
-    var EventLocation = new Location(EventAddressTagDom.Dom.value, EventAddressDom.Dom.value);
+    var EventLocation = new Location(EventAddressTagDom.Dom.value, EventAddressDom.Dom.value, EventAddressDom.Dom.LocationIsVerified, EventAddressDom.Dom.LocationId);
     var EventName = EventNameDom.Dom.value;
     if (EventName == "")
     {
@@ -388,7 +389,10 @@ function createCalEventNameTab(isTIle)
             {
                 var TagInputDom = CalEventAddressTagInputDom.Input.Dom;
                 TagInputDom.value = LocationData.Tag;
-                AddressInputDom.value = LocationData.Address;
+                updateLocationInputWithClickData(AddressInputDom, LocationData.Address, "tiler", LocationData.LocationId)
+                if (LocationData.isVerified !== undefined && LocationData.isVerified !== null) {
+                    AddressInputDom.LocationIsVerified = LocationData.isVerified;
+                }
                 (DomContainer.Dom).style.height = 0;
                 $(DomContainer.Dom).empty();
             }
@@ -439,6 +443,10 @@ function createCalEventNameTab(isTIle)
     AutoSuggestInputBar.setAttribute("placeholder", CalEventAddressParam.Default);
 
     $(AutoSuggestInputBar).addClass(CurrentTheme.BorderColor);
+    $(AutoSuggestInputBar.Dom).keypress(function (e) {
+        resetLocationInput(e.target)
+    })
+    
 
 
 
@@ -575,7 +583,10 @@ function createCalEventNameTab(isTIle)
     //$(AutoScheduleRangeConstraintContainerStartTimePicker.Dom).timepicker();
 
     AutoScheduleRangeConstraintContainerStartTimePicker.Dom.value = "";
-    AutoScheduleRangeConstraintContainerStartTimePicker.Dom.setAttribute("placeholder", "Start Time (Default:Now) hh:mm am/pm");
+    let tilePlaceHolderString = "12:00 am"
+    let eventPlaceHolderString = "Start Time (Default:Now)"
+    let placeHolderString = isTIle ? tilePlaceHolderString : eventPlaceHolderString;
+    AutoScheduleRangeConstraintContainerStartTimePicker.Dom.setAttribute("placeholder", placeHolderString);
     $(AutoScheduleRangeConstraintContainerStartTimePicker.Dom).addClass(CurrentTheme.FontColor);
     AutoScheduleRangeConstraintContainerStartDatePicker.Dom.value = "";
     AutoScheduleRangeConstraintContainerStartDatePicker.Dom.setAttribute("placeholder", "Start Date (Default:Today) mm/dd/yyyy");

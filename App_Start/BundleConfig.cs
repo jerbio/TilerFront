@@ -9,14 +9,17 @@ namespace TilerFront
     {
         // For more information on bundling, visit http://go.microsoft.com/fwlink/?LinkId=301862
         public static string OldLog;
+        public static string LogLocation;
+        public static string BigDataocation;
         public static void RegisterBundles(BundleCollection bundles)
         {
             OldLog = HttpContext.Current.Server.MapPath("~\\OldLogs\\");
-            string LogLocation = HttpContext.Current.Server.MapPath("~\\WagTapCalLogs\\");//initializes the log location\
-            string BigDataocation = HttpContext.Current.Server.MapPath("~\\BigDataLogs\\");//initializes the log location
+            LogLocation = HttpContext.Current.Server.MapPath("~\\WagTapCalLogs\\");//initializes the log location\
+            BigDataocation = HttpContext.Current.Server.MapPath("~\\BigDataLogs\\");//initializes the log location
             //LogLocation = @"C:\Users\OluJerome\Documents\Visual Studio 2010\Projects\LearnCuDAVS2010\LearnCUDAConsoleApplication\bin\Debug\WagTapCalLogs\";
             //LogLocation = @"C:\Users\OluJerome\Documents\Visual Studio 2010\Projects\LearnCuDAVS2010\LearnCUDAConsoleApplication\WagTapCalLogs\";
             TilerFront.LogControl.UpdateBigDataLogLocation(BigDataocation);
+            TilerFront.LogControl.UpdateLogLocation(LogLocation);
 
             string apiKey = ConfigurationManager.AppSettings["googleMapsApiKey"];
             Location.updateApiKey(apiKey);

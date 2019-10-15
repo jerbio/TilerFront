@@ -140,3 +140,26 @@ function buildFunctionSubscription (method) {
     let retValue = generateMethod(method);
     return retValue;
 }
+
+function preSendRequestWithLocation(postData) {
+    if (global_PositionCoordinate.isInitialized) {
+        postData.UserLongitude = global_PositionCoordinate.Longitude
+        postData.UserLatitude = global_PositionCoordinate.Latitude
+        postData.UserLocationVerified = global_PositionCoordinate.isInitialized
+    } else {
+        postData.UserLocationVerified = false
+    }
+}
+
+function updateLocationInputWithClickData(inputDom, address, source, locationId) {
+    inputDom.LocationId = locationId;
+    inputDom.value = address;
+    inputDom.LocationSource = source;
+    inputDom.LocationIsVerified = true
+}
+
+function resetLocationInput(inputDom) {
+    inputDom.LocationId = null;
+    inputDom.LocationSource = null;
+    inputDom.LocationIsVerified = false
+}

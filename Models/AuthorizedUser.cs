@@ -12,6 +12,18 @@ namespace TilerFront.Models
         public bool MobileFlag { get; set; }
         public int TimeZoneOffset { get; set; }
         /// <summary>
+        /// Longitude of user
+        /// </summary>
+        public string UserLongitude { get; set; }
+        /// <summary>
+        /// Latitude of user
+        /// </summary>
+        public string UserLatitude { get; set; }
+        /// <summary>
+        /// IsLocationVerified
+        /// </summary>
+        public string UserLocationVerified { get; set; }
+        /// <summary>
         /// TimeZone desired by the user. This defaults to UTC
         /// </summary>
         public string TimeZone { get; set; } = "UTC";
