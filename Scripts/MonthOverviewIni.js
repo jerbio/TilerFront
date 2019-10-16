@@ -736,6 +736,7 @@ function RevealControlPanelSection(SelectedEvents)
             //var URL = "RootWagTap/time.top?WagCommand=6"
             var URL = global_refTIlerUrl + "Schedule/Events";
             DeletionEvent.TimeZone = moment.tz.guess()
+            preSendRequestWithLocation(DeletionEvent);
             var HandleNEwPage = new LoadingScreenControl("Tiler is Deleting your event :)");
             HandleNEwPage.Launch();
 
@@ -800,6 +801,7 @@ function RevealControlPanelSection(SelectedEvents)
                 UserName: UserCredentials.UserName, UserID: UserCredentials.ID, EventID: AllIds, TimeZoneOffset: TimeZone
             };
             MarkAsCompleteData.TimeZone = moment.tz.guess()
+            preSendRequestWithLocation(MarkAsCompleteData);
             var exit = function (data) {
                 HandleNEwPage.Hide();
                 //triggerUIUPdate();//hack alert
@@ -1747,7 +1749,7 @@ getRefreshedData.pauseUnEnroll = function (Id) {
         }
         getRefreshedData.disableDataRefresh();
         var PostData = { UserName: UserCredentials.UserName, UserID: UserCredentials.ID, StartRange: RangeData.Start.getTime(), EndRange: RangeData.End.getTime(), TimeZoneOffset: TimeZone };
-
+        preSendRequestWithLocation(PostData);
         $.ajax({
             type: "GET",
             url: myurl,
@@ -1811,7 +1813,7 @@ getRefreshedData.pauseUnEnroll = function (Id) {
         }
         getRefreshedData.disableDataRefresh();
         var PostData = { UserName: UserCredentials.UserName, UserID: UserCredentials.ID, StartRange: RangeData.Start.getTime(), EndRange: RangeData.End.getTime(), TimeZoneOffset: TimeZone };
-
+        preSendRequestWithLocation(PostData);
         $.ajax({
             type: "GET",
             url: myurl,
@@ -3691,7 +3693,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                         PauseEvent.TimeZone = moment.tz.guess()
                         var HandleNEwPage = new LoadingScreenControl("Tiler is Pausing your event :)");
                         HandleNEwPage.Launch();
-
+                        preSendRequestWithLocation(PauseEvent);
                         var exit = function (data) {
                             HandleNEwPage.Hide();
                             //triggerUIUPdate();//hack alert
@@ -3758,7 +3760,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                             global_ExitManager.triggerLastExitAndPop();
                             //getRefreshedData();
                         }
-
+                        preSendRequestWithLocation(ContinueEvent);
                         $.ajax({
                             type: "POST",
                             url: URL,
@@ -3826,7 +3828,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                         DeletionEvent.TimeZone = moment.tz.guess()
                         var HandleNEwPage = new LoadingScreenControl("Tiler is Deleting your event :)");
                         HandleNEwPage.Launch();
-
+                        preSendRequestWithLocation(DeletionEvent);
                         var exit = function (data) {
                             HandleNEwPage.Hide();
                             //triggerUIUPdate();//hack alert
@@ -3884,6 +3886,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                     NowData.TimeZone = moment.tz.guess()
                     var HandleNEwPage = new LoadingScreenControl("Tiler is Postponing  :)");
                     HandleNEwPage.Launch();
+                    preSendRequestWithLocation(NowData);
 
                     var exit = function (data) {
                         HandleNEwPage.Hide();
@@ -3950,6 +3953,8 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                             ThirdPartyType: SubEvent.ThirdPartyType
                         };
                         MarkAsCompleteData.TimeZone = moment.tz.guess()
+                        preSendRequestWithLocation(MarkAsCompleteData);
+
                         var exit = function (data) {
                             HandleNEwPage.Hide();
                             //triggerUIUPdate();//hack alert
@@ -4293,6 +4298,8 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                         Notes: Notes
                     };
                     SaveData.TimeZone = moment.tz.guess()
+                    preSendRequestWithLocation(SaveData);
+
                     var exit= function (data) {
                         HandleNEwPage.Hide();
                         //triggerUIUPdate();//hack alert
@@ -4853,6 +4860,8 @@ function GlobaPauseResumeButtonManager(events) {
             var URL = global_refTIlerUrl + "Schedule/Event/Pause";
             var HandleNEwPage = new LoadingScreenControl("Tiler is Pausing your event :)");
             HandleNEwPage.Launch();
+            preSendRequestWithLocation(PauseEvent);
+
 
             var exit = function (data) {
                 HandleNEwPage.Hide();
@@ -4907,6 +4916,7 @@ function GlobaPauseResumeButtonManager(events) {
             var URL = global_refTIlerUrl + "Schedule/Event/Resume";
             var HandleNEwPage = new LoadingScreenControl("Tiler resuming your event :)");
             HandleNEwPage.Launch();
+            preSendRequestWithLocation(ContinueEvent);
 
             var exit = function (data) {
                 HandleNEwPage.Hide();

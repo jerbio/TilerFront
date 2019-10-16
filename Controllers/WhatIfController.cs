@@ -29,6 +29,7 @@ namespace TilerFront.Controllers
             if (myUserAccount.Status)
             {
                 DB_Schedule MySchedule = new DB_Schedule(myUserAccount, myAuthorizedUser.getRefNow());
+                MySchedule.CurrentLocation = myAuthorizedUser.getCurrentLocation();
                 Tuple<Health, Health> evaluation;
                 evaluation = await MySchedule.WhatIfPushedAll(UserData.Duration, null);
 
@@ -61,6 +62,7 @@ namespace TilerFront.Controllers
             if (myUserAccount.Status)
             {
                 DB_Schedule MySchedule = new DB_Schedule(myUserAccount, myAuthorizedUser.getRefNow());
+                MySchedule.CurrentLocation = myAuthorizedUser.getCurrentLocation();
                 Tuple<Health, Health> evaluation;
 
                 SubCalendarEvent subEvent = null;

@@ -144,6 +144,7 @@ function generateSubEventEditPage(subEvent) {
         postData.ThirdPartyType = subEvent.ThirdPartyType
         let url = global_refTIlerUrl + "SubCalendarEvent/Update"
         postData.TimeZone = moment.tz.guess()
+        preSendRequestWithLocation(postData);
         var HandleNEwPage = new LoadingScreenControl("Tiler is Updating the event ...");
         HandleNEwPage.Launch();
         $.ajax({

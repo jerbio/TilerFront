@@ -45,6 +45,7 @@ function InitializeHomePage(DomContainer)
     */
     var occupy = "occupy";
     var preppePostdData = { UserName: verifiedUser.UserName, UserID: verifiedUser.UserID };
+    preSendRequestWithLocation(preppePostdData);
     retrieveUserSchedule(myurl, preppePostdData,generateCalendarEvents);
 }
 
@@ -343,6 +344,7 @@ function generateProcrastinateAllFunction(TimeData,CallBack)
     TimeData.Hours
     HandleNEwPage.Launch();
     var URL = global_refTIlerUrl + "Schedule/ProcrastinateAll";
+    preSendRequestWithLocation(NowData);
     $.ajax({
         type: "POST",
         url: URL,
@@ -404,6 +406,7 @@ function prepFunctionForCompletionOfEvent(EventID, CallBack) {
             ThirdPartyType: SubEvent.ThirdPartyType
         };
         MarkAsCompleteData.TimeZone = moment.tz.guess()
+        preSendRequestWithLocation(MarkAsCompleteData);
         $.ajax({
             type: "POST",
             url: Url,
@@ -1261,6 +1264,7 @@ function generateModalForTIleOrModal()
             var URL = global_refTIlerUrl + "Schedule/Event/Procrastinate";
             var HandleNEwPage = new LoadingScreenControl("Tiler is Postponing  :)");
             HandleNEwPage.Launch();
+            preSendRequestWithLocation(NowData);
             $.ajax({
                 type: "POST",
                 url: URL,
@@ -1489,7 +1493,7 @@ function generateModalForTIleOrModal()
             NowData.TimeZone = moment.tz.guess()
             var HandleNEwPage = new LoadingScreenControl("Tiler is moving up your Event ...  :)");
             HandleNEwPage.Launch();
-            
+            preSendRequestWithLocation(NowData);
 
             $.ajax({
                 type: "POST",
@@ -1597,7 +1601,7 @@ function generateModalForTIleOrModal()
             var URL = global_refTIlerUrl + "Schedule/Event";
             var HandleNEwPage = new LoadingScreenControl("Tiler is Deleting your event :)");
             HandleNEwPage.Launch();
-
+            preSendRequestWithLocation(DeletionEvent);
             $.ajax({
                 type: "DELETE",
                 url: URL,
@@ -1773,6 +1777,7 @@ function generateModalForTIleOrModal()
         var myurl = global_refTIlerUrl + "Schedule";
         var verifiedUser = GetCookieValue();
         var preppePostdData = { UserName: verifiedUser.UserName, UserID: verifiedUser.UserID };
+        preSendRequestWithLocation(preppePostdData);
         retrieveUserSchedule(myurl, preppePostdData, sortOutData);
     }
 

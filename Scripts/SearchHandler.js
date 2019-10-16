@@ -145,6 +145,7 @@ function CallBackFunctionForReturnedValues(data, DomContainer) {
 
             var Url = global_refTIlerUrl + "CalendarEvent/Now/";
             var NowData = { UserName: UserCredentials.UserName, ID: CalendarEventID, UserID: UserCredentials.ID, TimeZoneOffset: TimeZone };
+            preSendRequestWithLocation(NowData);
             NowData.TimeZone = moment.tz.guess()
             $.ajax({
                 type: "POST",

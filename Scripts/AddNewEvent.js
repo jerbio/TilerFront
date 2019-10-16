@@ -96,8 +96,8 @@ function LaunchAddnewEvent(LoopBackCaller, CurrentUser,isTIle)
 
         var HandleNEwPage = new LoadingScreenControl("Tiler is Adding \"" + NewEvent.Name+ " \" to your schedule ...");
         HandleNEwPage.Launch();
-        
 
+        preSendRequestWithLocation(NewEvent);
         $.ajax({
             type: "POST",
             url: url,

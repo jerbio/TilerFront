@@ -23,7 +23,8 @@ function getDumpRequest(e, callBackSuccess, callBackFailure, callBackDone) {
         //var HandleNEwPage = new LoadingScreenControl("Tiler is getting the data dump:)");
         //HandleNEwPage.Launch();
         scheduleDumpData.TimeZone = moment.tz.guess()
-        
+        preSendRequestWithLocation(scheduleDumpData);
+
         let params = jQuery.param(scheduleDumpData);
         let fullUrl = URL + "?" + params
         let hrefId = "dumpHref"
@@ -71,6 +72,7 @@ function createScheduleDumpequest(e, callBackSuccess, callBackFailure, callBackD
 
         var HandleNEwPage = new LoadingScreenControl("Tiler is saving the data dump:)");
         scheduleDumpData.TimeZone = moment.tz.guess()
+        preSendRequestWithLocation(scheduleDumpData);
         HandleNEwPage.Launch();
 
         var exitSendMessage = function (data) {
@@ -120,6 +122,7 @@ function createScheduleDumpequest(e, callBackSuccess, callBackFailure, callBackD
 
         var URL = global_refTIlerUrl + "Schedule/DumpData";
         scheduleDumpData.TimeZone = moment.tz.guess()
+        preSendRequestWithLocation(scheduleDumpData);
 
         let params = jQuery.param(scheduleDumpData);
         let fullUrl = URL + "?" + params

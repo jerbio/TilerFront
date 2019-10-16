@@ -461,6 +461,7 @@ function sendUndoRequest(CallBack)
     //var URL= "RootWagTap/time.top?WagCommand=2";
     var URL = global_refTIlerUrl + "Schedule/Undo";
     var HandleNEwPage = new LoadingScreenControl("Tiler is Undoing :)");
+    preSendRequestWithLocation(UndoData);
     HandleNEwPage.Launch();
     var ProcrastinateRequest = $.ajax({
         type: "POST",
@@ -972,6 +973,7 @@ function procrastinateSubEvent(ID, Day, Hour, Minute,CallBackSuccess,CallBackFai
     var URL = global_refTIlerUrl + "Schedule/Event/Procrastinate";
     var HandleNEwPage = new LoadingScreenControl("Tiler is Postponing  :)");
     NowData.TimeZone = moment.tz.guess()
+    preSendRequestWithLocation(NowData);
     HandleNEwPage.Launch();
     var ProcrastinateRequest = $.ajax({
         type: "POST",
@@ -998,6 +1000,7 @@ function setSubCalendarEventAsNow(SubEventID, CallBackSuccess, CallBackFailure, 
     var TimeZone = new Date().getTimezoneOffset();
     var NowData = { UserName: UserCredentials.UserName, UserID: UserCredentials.ID, EventID: SubEventID, TimeZoneOffset: TimeZone };
     var URL = myurl = global_refTIlerUrl + "Schedule/Event/Now";
+    preSendRequestWithLocation(NowData);
 
     var ProcrastinateRequest= $.ajax({
         type: "POST",
@@ -1017,6 +1020,7 @@ function SetCalendarEventAsNow(CalendarEventID, CallBackSuccess, CallBackFailure
     var TimeZone = new Date().getTimezoneOffset();
     var NowData = { UserName: UserCredentials.UserName, UserID: UserCredentials.ID, ID: SubEventID, TimeZoneOffset: TimeZone };
     var URL = myurl = global_refTIlerUrl + "CalendarEvent/Now/";
+    preSendRequestWithLocation(NowData);
 
     var AjaxRequest = $.ajax({
         type: "POST",
@@ -1042,6 +1046,7 @@ function deleteSubEvent(SubEventID, CallBackSuccess, CallBackFailure, CallBackDo
     var URL = global_refTIlerUrl + "Schedule/Event";
     var HandleNEwPage = new LoadingScreenControl("Tiler is Deleting your event :)");
     DeletionEvent.TimeZone = moment.tz.guess()
+    preSendRequestWithLocation(DeletionEvent);
     HandleNEwPage.Launch();
 
     var AjaxRequest = $.ajax({
@@ -1073,6 +1078,7 @@ function deleteCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure, 
     var HandleNEwPage = new LoadingScreenControl("Tiler is Deleting your event :)");
     HandleNEwPage.Launch();
     DeletionEvent.TimeZone = moment.tz.guess()
+    preSendRequestWithLocation(DeletionEvent);
     var AjaxRequest = $.ajax({
         type: "DELETE",
         url: URL,
@@ -1102,6 +1108,7 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
 
     var MarkAsCompleteData = { UserName: UserCredentials.UserName, UserID: UserCredentials.ID, EventID: CalendarEventID, TimeZoneOffset: TimeZone };
     MarkAsCompleteData.TimeZone = moment.tz.guess()
+    preSendRequestWithLocation(MarkAsCompleteData);
     var AjaxRequest = $.ajax({
         type: "POST",
         url: Url,
@@ -2669,6 +2676,7 @@ function Location(Tag, Address, LocationIsVerified, LocationId)
             var HandleNEwPage = new LoadingScreenControl("Tiler looking up the next good event  :)");
             HandleNEwPage.Launch();
             ShuffleData.TimeZone = moment.tz.guess()
+            preSendRequestWithLocation(ShuffleData);
             var exit = function (data) {
                 HandleNEwPage.Hide();
                 global_ExitManager.triggerLastExitAndPop();

@@ -93,6 +93,7 @@ namespace TilerFront.Controllers
             if (retrievedUser.Status)
             {
                 DB_Schedule NewSchedule = new DB_Schedule(retrievedUser, myUser.getRefNow());
+                NewSchedule.CurrentLocation = myUser.getCurrentLocation();
                 await ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(NewSchedule, retrievedUser.UserID, db).ConfigureAwait(false);
                 DB_UserActivity activity = new DB_UserActivity(myUser.getRefNow(), UserActivity.ActivityType.DeleteCalendarEvent, new List<String>() { myUser.EventID });
                 JObject json = JObject.FromObject(myUser);
@@ -139,6 +140,7 @@ namespace TilerFront.Controllers
             if (retrievedUser.Status)
             {
                 DB_Schedule NewSchedule = new DB_Schedule(retrievedUser, myUser.getRefNow());
+                NewSchedule.CurrentLocation = myUser.getCurrentLocation();
                 await ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(NewSchedule, retrievedUser.UserID, db).ConfigureAwait(false);
                 DB_UserActivity activity = new DB_UserActivity(myUser.getRefNow(), UserActivity.ActivityType.CompleteCalendarEvent, new List<String>(){myUser.EventID});
                 JObject json = JObject.FromObject(myUser);
@@ -174,6 +176,7 @@ namespace TilerFront.Controllers
             if (retrievedUser.Status)
             {
                 DB_Schedule NewSchedule = new DB_Schedule(retrievedUser, nowEvent.getRefNow());
+                NewSchedule.CurrentLocation = nowEvent.getCurrentLocation();
                 await ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(NewSchedule, nowEvent.UserID, db).ConfigureAwait(false);
                 var ScheduleUpdateMessage = NewSchedule.SetCalendarEventAsNow(nowEvent.ID);
                 DB_UserActivity activity = new DB_UserActivity(nowEvent.getRefNow(), UserActivity.ActivityType.SetAsNowCalendarEvent, new List<String>() { nowEvent.ID });
@@ -225,6 +228,7 @@ namespace TilerFront.Controllers
                             GoogleThirdPartyControl googleEvents = new GoogleThirdPartyControl(AllCalendarEvents, AllIndexedThirdParty.getTilerUser());
 
                             DB_Schedule NewSchedule = new DB_Schedule(retrievedUser, myUser.getRefNow());
+                            NewSchedule.CurrentLocation = myUser.getCurrentLocation();
                             await NewSchedule.updateDataSetWithThirdPartyDataAndTriggerNewAddition(new Tuple<ThirdPartyControl.CalendarTool, IEnumerable<CalendarEvent>>(ThirdPartyControl.CalendarTool.google, new List<CalendarEvent> { googleEvents.getThirdpartyCalendarEvent() })).ConfigureAwait(false);
 
                             retValue = new PostBackData("\"Success\"", 0);
@@ -234,7 +238,7 @@ namespace TilerFront.Controllers
                         {
                             
                             DB_Schedule NewSchedule = new DB_Schedule(retrievedUser, myUser.getRefNow());
-                            
+                            NewSchedule.CurrentLocation = myUser.getCurrentLocation();
                             DateTimeOffset newStart = TilerElementExtension.JSStartTime.AddMilliseconds(myUser.Start);
                             newStart = newStart.Add(myUser.getTimeSpan);
                             DateTimeOffset newEnd = TilerElementExtension.JSStartTime.AddMilliseconds(myUser.End);

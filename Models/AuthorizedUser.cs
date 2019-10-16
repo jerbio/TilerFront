@@ -68,6 +68,34 @@ namespace TilerFront.Models
             
         }
 
+        public Location getCurrentLocation ()
+        {
+            bool locationIsVerified = false;
+            Location retValue = null;
+            double longitude = 0;
+            double latitude = 0;
+            if (!string.IsNullOrEmpty(UserLocationVerified) && !string.IsNullOrWhiteSpace(UserLocationVerified)
+                &&!string.IsNullOrEmpty(UserLongitude) && !string.IsNullOrWhiteSpace(UserLongitude)
+                && !string.IsNullOrEmpty(UserLatitude) && !string.IsNullOrWhiteSpace(UserLatitude)
+                )
+            {
+                longitude = Convert.ToDouble(UserLongitude);
+                latitude = Convert.ToDouble(UserLatitude);
+                locationIsVerified = Convert.ToBoolean(UserLocationVerified);
+            }
+
+            if (locationIsVerified)
+            {
+                retValue = new Location(latitude, latitude);
+            }
+            else
+            {
+                retValue = Location.getDefaultLocation();
+            }
+
+            return retValue;
+        }
+
         //async public Task<UserAccountDebug> getUserAccountDebug(bool Passive = true)
         //{
         //    Controllers.UserController myUserController = new Controllers.UserController();

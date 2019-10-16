@@ -336,6 +336,7 @@ function RegisterUser(FullName, UserName, Password,PassWordConfirmation, Email)
     //var url="RootWagTap/time.top?WagCommand=3";
     //var url = global_refTIlerUrl + "User/New";
     var url = window.location.origin + "/Account/SignUp";
+    preSendRequestWithLocation(RegistrationCredentials);
     debugger;
     $.ajax({
         type: "POST",

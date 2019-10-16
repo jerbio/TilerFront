@@ -448,6 +448,7 @@ function generatePeek(CalEvent,Container)
         CalEvent.TimeZoneOffset = TimeZone;
 
         var url = global_refTIlerUrl + "Schedule/Peek";
+        preSendRequestWithLocation(CalEvent);
         getRefreshedData.disableDataRefresh();
         createPeekUI.Connection = $.ajax({
             type: "POST",
