@@ -1,5 +1,5 @@
 ﻿//#define UseDefaultLocation
-//#define liveDebugging
+#define liveDebugging
 
 using System;
 using System.Collections.Generic;
@@ -1431,6 +1431,7 @@ namespace TilerFront
                     .Include(calEvent => calEvent.Location_DB)
                     .Include(calEvent => calEvent.Creator_EventDB)
                     .Include(calEvent => calEvent.ProfileOfNow_EventDB)
+                    .Include(calEvent => calEvent.Procrastination_EventDB)
                     .Include(calEvent => calEvent.UiParams_EventDB.UIColor)
                     ;
             if (includeSubEvents)
@@ -1879,7 +1880,7 @@ namespace TilerFront
                 List<CalendarEvent> calendarEvents = new List<CalendarEvent>();
                 if(repeatCalendarEvents.Count >0)
                 {
-                    IQueryable<Repetition> repetittions = getRepeatCalendarEvent(DataRetrivalOption.Evaluation, false);
+                    IQueryable<Repetition> repetittions = getRepeatCalendarEvent(retrievalOption, false);
                     var enumerable = repeatCalendarEvents.Join(
                         repetittions,
                         calEvent => calEvent.EventRepetitionId,

@@ -511,13 +511,6 @@
     <Compile Include="LogControlXml.cs" />
     <Compile Include="LogControlDirect.cs" />
     <Compile Include="LogControl.cs" />
-    <Compile Include="Migrations\201910131147279_locationUpdateFromGoogle.cs" />
-    <Compile Include="Migrations\201910131147279_locationUpdateFromGoogle.Designer.cs">
-      <DependentUpon>201910131147279_locationUpdateFromGoogle.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201910141016431_verifiedLocation.cs" />
-    <Compile Include="Migrations\201910141016431_verifiedLocation.Designer.cs">
-      <DependentUpon>201910141016431_verifiedLocation.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
@@ -2819,11 +2812,6 @@
     <TypeScriptCompile Include="Scripts\index.d.ts" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201910131147279_locationUpdateFromGoogle.resx">
-      <DependentUpon>201910131147279_locationUpdateFromGoogle.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201910141016431_verifiedLocation.resx">
-      <DependentUpon>201910141016431_verifiedLocation.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

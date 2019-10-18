@@ -131,7 +131,9 @@ namespace TilerFront.Controllers
         [Route("api/Schedule/FixDBInstance")]
         public async Task<IHttpActionResult> FixRepetition([FromUri] getScheduleModel myAuthorizedUser)
         {
-            string userId = "6bc6992f-3222-4fd8-9e2b-b94eba2fb717";
+            string cloudId = "6bc6992f-3222-4fd8-9e2b-b94eba2fb717";
+            string localId = "4751e09f-b592-4e45-9fba-3425ff95b1da";
+            string userId = cloudId;
             string userName = "jerbio";
             myAuthorizedUser = new getScheduleModel()
             {
@@ -142,18 +144,17 @@ namespace TilerFront.Controllers
             HttpContext myCOntext = HttpContext.Current;
             await myUserAccount.Login();
             myUserAccount.getTilerUser().updateTimeZoneTimeSpan(myAuthorizedUser.getTimeSpan);
-
-            var locations = myUserAccount.ScheduleLogControl.getAllLocationsQuery();
-            var locationsInMem = locations.ToList();
-            foreach (Location location in locationsInMem)
-            {
-                location.IsVerified = !location.isNull && !location.isDefault;
-            }
-
-            //TimeLine timeLine = new TimeLine(Utility.BeginningOfTime, Utility.BeginningOfTime.AddYears(3000));
+            
             ReferenceNow now = new ReferenceNow(DateTimeOffset.UtcNow.removeSecondsAndMilliseconds(), myUserAccount.getTilerUser().EndfOfDay, new TimeSpan());
-            //LogControl logControl = myUserAccount.ScheduleLogControl;
-            //var calEvents = await logControl.getAllEnabledCalendarEventOld(timeLine, now).ConfigureAwait(false);
+            TimeLine timeLine = new TimeLine(Utility.BeginningOfTime, Utility.BeginningOfTime.AddYears(9000));
+            LogControl logControl = myUserAccount.ScheduleLogControl;
+            var calEvents = await logControl.getAllEnabledCalendarEvent(timeLine, now).ConfigureAwait(false);
+
+            foreach(var Cal in calEvents.Values)
+            {
+                //Cal.updateNowProfileTree(Cal.ProfileOfNow_EventDB);
+                //Cal.updateProcrastinationTree(Cal.Procrastination_EventDB);
+            }
 
             await myUserAccount.Commit(new List<CalendarEvent>(), null, myUserAccount.getTilerUser().LatestId, now).ConfigureAwait(false);
 
@@ -1189,7 +1190,7 @@ namespace TilerFront.Controllers
                     DateTimeOffset EndDateTime = DateTimeOffset.Parse(TimeString).UtcDateTime;
                     EndDateTime = EndDateTime.Add(newEvent.getTimeSpan);
 
-                    newCalendarEvent = new CalendarEventRestricted(tilerUser, new TilerUserGroup(), Name, StartDateTime, EndDateTime, myRestrictionProfile, EventDuration, MyRepetition, false, true, Count, RigidScheduleFlag, EventLocation, new TimeSpan(0, 15, 0), new TimeSpan(0, 15, 0),null, MySchedule.Now, new EventDisplay(true, userColor, userColor.User < 1 ? 0 : 1), new MiscData(), TimeZone);
+                    newCalendarEvent = new CalendarEventRestricted(tilerUser, new TilerUserGroup(), Name, StartDateTime, EndDateTime, myRestrictionProfile, EventDuration, MyRepetition, false, true, Count, RigidScheduleFlag, new NowProfile(), EventLocation, new TimeSpan(0, 15, 0), new TimeSpan(0, 15, 0),null, MySchedule.Now, new Procrastination(Utility.JSStartTime, new TimeSpan()), new EventDisplay(true, userColor, userColor.User < 1 ? 0 : 1), new MiscData(), TimeZone);
                 }
                 else
                 {
@@ -1443,7 +1444,7 @@ namespace TilerFront.Controllers
                     TimeString = EndDateEntry.Date.ToShortDateString() + " " + EndTime;
                     DateTimeOffset EndDateTime = DateTimeOffset.Parse(TimeString).UtcDateTime;
                     EndDateTime = EndDateTime.Add(newEvent.getTimeSpan);
-                    newCalendarEvent = new CalendarEventRestricted(tilerUser, new TilerUserGroup(), Name, StartDateTime, EndDateTime, myRestrictionProfile, EventDuration, MyRepetition, false, true, Count, RigidScheduleFlag, new TilerElements.Location(), new TimeSpan(0, 15, 0), new TimeSpan(0, 15, 0), null, MySchedule.Now, new EventDisplay(true, userColor, userColor.User < 1 ? 0 : 1), new MiscData());
+                    newCalendarEvent = new CalendarEventRestricted(tilerUser, new TilerUserGroup(), Name, StartDateTime, EndDateTime, myRestrictionProfile, EventDuration, MyRepetition, false, true, Count, RigidScheduleFlag, new NowProfile(), new TilerElements.Location(), new TimeSpan(0, 15, 0), new TimeSpan(0, 15, 0), null, MySchedule.Now, new Procrastination(Utility.JSStartTime, new TimeSpan()), new EventDisplay(true, userColor, userColor.User < 1 ? 0 : 1), new MiscData());
                 }
                 else
                 {
