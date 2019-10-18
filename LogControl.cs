@@ -1,5 +1,5 @@
 ﻿//#define UseDefaultLocation
-#define liveDebugging
+//#define liveDebugging
 
 using System;
 using System.Collections.Generic;
@@ -380,6 +380,7 @@ namespace TilerFront
         protected virtual async Task Commit(IEnumerable<CalendarEvent> calendarEvents, TilerUser tilerUser)
         {
 #if liveDebugging
+            Debug.WriteLine("********************************Check directive of #liveDebugging if test is failing********************************");
             return;
 #else
 
