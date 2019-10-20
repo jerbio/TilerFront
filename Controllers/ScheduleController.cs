@@ -150,10 +150,12 @@ namespace TilerFront.Controllers
             LogControl logControl = myUserAccount.ScheduleLogControl;
             var calEvents = await logControl.getAllEnabledCalendarEvent(timeLine, now).ConfigureAwait(false);
 
-            foreach(var Cal in calEvents.Values)
+            foreach(var cal in calEvents.Values)
             {
-                //Cal.updateNowProfileTree(Cal.ProfileOfNow_EventDB);
-                //Cal.updateProcrastinationTree(Cal.Procrastination_EventDB);
+                NowProfile nowProfile = cal.ProfileOfNow_EventDB ?? new NowProfile();
+                Procrastination procrastination = cal.Procrastination_EventDB ?? new Procrastination(Utility.BeginningOfTime, new TimeSpan());
+                cal.updatenowprofiletree(nowProfile);
+                cal.updateprocrastinationtree(procrastination);
             }
 
             await myUserAccount.Commit(new List<CalendarEvent>(), null, myUserAccount.getTilerUser().LatestId, now).ConfigureAwait(false);

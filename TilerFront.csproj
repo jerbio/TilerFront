@@ -415,9 +415,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\My24HourTimerWPF\TilerElements\bin\Debug\TilerElements.dll</HintPath>
     </Reference>
-    <Reference Include="TilerTests">
-      <HintPath>..\..\My24HourTimerWPF\TilerTests\bin\Debug\TilerTests.dll</HintPath>
-    </Reference>
     <Reference Include="WebGrease, Version=1.6.5135.21930, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\WebGrease.1.6.0\lib\WebGrease.dll</HintPath>
