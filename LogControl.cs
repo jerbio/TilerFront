@@ -646,7 +646,7 @@ namespace TilerFront
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Completed"));
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.getIsComplete.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("RepetitionFlag"));
-            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.IsRepeat.ToString();
+            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.IsRecurring.ToString();
 
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("EventSubSchedules"));
             //MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.Repetition.ToString();
@@ -713,7 +713,7 @@ namespace TilerFront
             }
 
 
-            if (MyEvent.IsRepeat)
+            if (MyEvent.IsRecurring)
             {
                 MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Recurrence"));
                 MyEventScheduleNode.ChildNodes[0].InnerXml = CreateRepetitionNode(MyEvent.Repeat).InnerXml;
@@ -1630,7 +1630,7 @@ namespace TilerFront
                 List<CalendarEvent> nonRepeatCalEvents = new List<CalendarEvent>();
                 foreach (var calEvent in allCalQuery)
                 {
-                    if (calEvent.IsRepeat)
+                    if (calEvent.IsRecurring)
                     {
                         repeatCalEvents.Add(calEvent);
                     }
@@ -1677,7 +1677,7 @@ namespace TilerFront
                     }
                     else
                     {
-                        if (!calEvent.IsRepeatsChildCalEvent || !calEvent.IsRepeat)
+                        if (!calEvent.IsRepeatsChildCalEvent || !calEvent.IsRecurring)
                         {
                             childCalEvents.Add(calEvent);
                         }
@@ -1692,7 +1692,7 @@ namespace TilerFront
 
                 Dictionary<string, Tuple<CalendarEvent, List<CalendarEvent>>> calToRepeatCalEvents = parentCalEvents.ToDictionary(obj => obj.Calendar_EventID.getCalendarEventComponent(), obj => new Tuple<CalendarEvent, List<CalendarEvent>>(obj, new List<CalendarEvent>()));
 
-                foreach (CalendarEvent calEvent in parentCalEvents.Where((calEvent) => calEvent.IsRepeat))
+                foreach (CalendarEvent calEvent in parentCalEvents.Where((calEvent) => calEvent.IsRecurring))
                 {
                     IEnumerable<CalendarEvent> exceptionList = calEvent.Repeat.RepeatingEvents.Where((repeatingEvent) => !(repeatingEvent.StartTime_EventDB < RangeOfLookUP.End
                         && repeatingEvent.EndTime_EventDB > RangeOfLookUP.Start));
@@ -1707,7 +1707,7 @@ namespace TilerFront
                     }
                 }
 
-                foreach (CalendarEvent calEvent in parentCalEvents.Where(calEvent => calEvent.IsRepeat))
+                foreach (CalendarEvent calEvent in parentCalEvents.Where(calEvent => calEvent.IsRecurring))
                 {
                     calEvent.DefaultCalendarEvent = defaultCalEvent;
                     string calComponentId = calEvent.getTilerID.getCalendarEventComponent();
@@ -1918,7 +1918,7 @@ namespace TilerFront
                     }
                     else
                     {
-                        if (!calEvent.IsRepeatsChildCalEvent || !calEvent.IsRepeat)
+                        if (!calEvent.IsRepeatsChildCalEvent || !calEvent.IsRecurring)
                         {
                             childCalEvents.Add(calEvent);
                         }
@@ -1942,7 +1942,7 @@ namespace TilerFront
                     }
                 }
 
-                foreach (CalendarEvent calEvent in parentCalEvents.Where(calEvent => calEvent.IsRepeat))
+                foreach (CalendarEvent calEvent in parentCalEvents.Where(calEvent => calEvent.IsRecurring))
                 {
                     calEvent.DefaultCalendarEvent = defaultCalEvent;
                     string calComponentId = calEvent.getTilerID.getCalendarEventComponent();
@@ -2136,7 +2136,7 @@ namespace TilerFront
                     }
                     else
                     {
-                        if (!calEvent.IsRepeatsChildCalEvent || !calEvent.IsRepeat)
+                        if (!calEvent.IsRepeatsChildCalEvent || !calEvent.IsRecurring)
                         {
                             childCalEvents.Add(calEvent);
                         }
@@ -2165,7 +2165,7 @@ namespace TilerFront
                     }
                 }
 
-                foreach (CalendarEvent calEvent in parentCalEvents.Where(calEvent => calEvent.IsRepeat))
+                foreach (CalendarEvent calEvent in parentCalEvents.Where(calEvent => calEvent.IsRecurring))
                 {
                     string calComponentId = calEvent.getTilerID.getCalendarEventComponent();
                     if (calToRepeatCalEvents.ContainsKey(calComponentId))
@@ -2264,7 +2264,7 @@ namespace TilerFront
                     if (RetrievedEvent != null)
                     {
                         RetrievedEvent.DefaultCalendarEvent = defaultCalendarEvent;
-                        if(RetrievedEvent.IsRepeat)
+                        if(RetrievedEvent.IsRecurring)
                         {
                             foreach(CalendarEvent calEvent in RetrievedEvent.Repeat.RecurringCalendarEvents())
                             {
@@ -3082,7 +3082,7 @@ namespace TilerFront
 
             ConcurrentBag<CalendarEvent> childCalEvents = new ConcurrentBag<CalendarEvent>();
             CalendarEvent retValue = await query.SingleOrDefaultAsync(calEvent => calEvent.Id == id).ConfigureAwait(false);
-            if (retValue.IsRepeat)
+            if (retValue.IsRecurring)
             {
                 query = getCalendarEventQuery(retrievalOption, includeSubEvents);
                 query = query.Include(calEvent => calEvent.Repetition_EventDB)

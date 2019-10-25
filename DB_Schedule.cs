@@ -114,7 +114,7 @@ namespace TilerFront
             calEvents.AsParallel()
                 .ForAll(async (eachCalendarEvent) =>
                 {
-                    if(!eachCalendarEvent.IsRepeat)
+                    if(!eachCalendarEvent.IsRecurring)
                     {
                         shiftSUbEventsByTimeAndId(eachCalendarEvent.ActiveSubEvents);
                     } else
