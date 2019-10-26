@@ -707,7 +707,7 @@ namespace TilerFront
             if (MyEvent.getIsEventRestricted)
             {
                 CalendarEventRestricted restrictedMyEvent = (CalendarEventRestricted)MyEvent;
-                XmlElement restrictionProfileData = generateXMLRestrictionProfile(restrictedMyEvent.RetrictionProfile);
+                XmlElement restrictionProfileData = generateXMLRestrictionProfile(restrictedMyEvent.RestrictionProfile);
                 MyEventScheduleNode.PrependChild(xmldoc.CreateElement("RestrictionProfile"));
                 MyEventScheduleNode.ChildNodes[0].InnerXml = restrictionProfileData.InnerXml;
             }
@@ -1402,7 +1402,7 @@ namespace TilerFront
                 .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Creator_EventDB))
                 .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Location_DB))
                 .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.DataBlob_EventDB))
-                .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.RetrictionProfile))
+                .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.RestrictionProfile))
                 .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Procrastination_EventDB))
                 .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.ProfileOfNow_EventDB));
             ;
@@ -1446,7 +1446,7 @@ namespace TilerFront
                     .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Creator_EventDB))
                     .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Location_DB))
                     .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.DataBlob_EventDB))
-                    .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.RetrictionProfile))
+                    .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.RestrictionProfile))
                     .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Procrastination_EventDB))
                     .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.ProfileOfNow_EventDB));
                 ;
@@ -1463,7 +1463,7 @@ namespace TilerFront
             else if (retrievalOption == DataRetrivalOption.Evaluation)
             {
                 calEVents = calEVents
-                    .Include(calEvent => calEvent.RetrictionProfile)
+                    .Include(calEvent => calEvent.RestrictionProfile)
                     .Include(calEvent => calEvent.Procrastination_EventDB)
                     .Include(calEvent => calEvent.DayPreference_DB);
 
@@ -1480,7 +1480,7 @@ namespace TilerFront
                     .Include(calEvent => calEvent.Repetition_EventDB.SubRepetitions)
                     .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Procrastination_EventDB))
                     .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.ProfileOfNow_EventDB))
-                    .Include(calEvent => calEvent.RetrictionProfile)
+                    .Include(calEvent => calEvent.RestrictionProfile)
                     ;
             }
 
@@ -1530,7 +1530,7 @@ namespace TilerFront
             else if (retrievalOption == DataRetrivalOption.Evaluation)
             {
                 subEvents = subEvents
-                    .Include(subEvent => subEvent.RetrictionProfile)
+                    .Include(subEvent => subEvent.RestrictionProfile)
                     .Include(subEvent => subEvent.Procrastination_EventDB)
                     .Include(subEvent => subEvent.ProfileOfNow_EventDB);
             }
@@ -1541,7 +1541,7 @@ namespace TilerFront
                     .Include(subEvent => subEvent.UiParams_EventDB.UIColor)
                     .Include(subEvent => subEvent.Procrastination_EventDB)
                     .Include(subEvent => subEvent.ProfileOfNow_EventDB)
-                    .Include(subEvent => subEvent.RetrictionProfile)
+                    .Include(subEvent => subEvent.RestrictionProfile)
                     .Include(subEvent => subEvent.Procrastination_EventDB)
                     .Include(subEvent => subEvent.ProfileOfNow_EventDB);
             }
@@ -1743,7 +1743,7 @@ namespace TilerFront
                     CalendarEventRestricted calAsRestricted = calEvent as CalendarEventRestricted;
                     if (retrievalOption != DataRetrivalOption.Ui)
                     {
-                        calAsRestricted.RetrictionProfile.InitializeOverLappingDictionary();
+                        calAsRestricted.RestrictionProfile.InitializeOverLappingDictionary();
                         if (Now != null)
                         {
                             if (retrievalOption == DataRetrivalOption.Evaluation)
@@ -1865,7 +1865,7 @@ namespace TilerFront
                     .Include(calendarEvent => calendarEvent.ProfileOfNow_EventDB)
                     .Include(calendarEvent => calendarEvent.DayPreference_DB)
                     .Include(calendarEvent => calendarEvent.Procrastination_EventDB)
-                    .Include(calendarEvent => calendarEvent.RetrictionProfile)
+                    .Include(calendarEvent => calendarEvent.RestrictionProfile)
                     ,
                     calEvent => calEvent.Id,
                     dbCalEvent => dbCalEvent.Id,
@@ -1986,7 +1986,7 @@ namespace TilerFront
                     calEvent.DefaultCalendarEvent = defaultCalEvent;
                     if (retrievalOption != DataRetrivalOption.Ui)
                     {
-                        calAsRestricted.RetrictionProfile.InitializeOverLappingDictionary();
+                        calAsRestricted.RestrictionProfile.InitializeOverLappingDictionary();
                         if (Now != null)
                         {
                             if (retrievalOption == DataRetrivalOption.Evaluation)
@@ -2198,7 +2198,7 @@ namespace TilerFront
                     CalendarEventRestricted calAsRestricted = calEvent as CalendarEventRestricted;
                     if (retrievalOption != DataRetrivalOption.Ui)
                     {
-                        calAsRestricted.RetrictionProfile.InitializeOverLappingDictionary();
+                        calAsRestricted.RestrictionProfile.InitializeOverLappingDictionary();
                         if (Now != null)
                         {
                             if (retrievalOption == DataRetrivalOption.Evaluation)
@@ -3131,7 +3131,7 @@ namespace TilerFront
             var sql = query.ToString();
             if (retValue != null && retValue.getIsEventRestricted)
             {
-                (retValue as CalendarEventRestricted).RetrictionProfile.InitializeOverLappingDictionary();
+                (retValue as CalendarEventRestricted).RestrictionProfile.InitializeOverLappingDictionary();
             }
             return retValue;
         }
@@ -3158,14 +3158,14 @@ namespace TilerFront
                 .Include(subEvent => subEvent.ProfileOfNow_EventDB)
                 .Include(subEvent => subEvent.ParentCalendarEvent)
                 .Include(subEvent => subEvent.Repetition_EventDB.RepeatingEvents)
-                .Include(subEvent => subEvent.RetrictionProfile)
+                .Include(subEvent => subEvent.RestrictionProfile)
                 //.Include(subEvent => subEvent.RetrictionProfile.DaySelection.Select(restrictedDay => restrictedDay.RestrictionTimeLine))
                 //.Include(subEvent => subEvent.RetrictionProfile.NoNull_DaySelections)
                 //.Include(subEvent => subEvent.RetrictionProfile.NoNull_DaySelections.Select(restrictedDay => restrictedDay.RestrictionTimeLine))
                 .SingleOrDefaultAsync(subEvent => subEvent.Id == ID);
             if (retValue.getIsEventRestricted)
             {
-                (retValue as SubCalendarEventRestricted).RetrictionProfile.InitializeOverLappingDictionary();
+                (retValue as SubCalendarEventRestricted).RestrictionProfile.InitializeOverLappingDictionary();
             }
             return retValue;
         }
