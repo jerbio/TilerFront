@@ -57,7 +57,6 @@ namespace TilerFront
             // a user. You might want to use "OpenID Connect".
             // You can read more about the protocol in the following link:
             // https://developers.google.com/accounts/docs/OAuth2Login.
-            ///*
             var user = controller.Session["user"];
             if (user == null)
             {

@@ -21,31 +21,36 @@ namespace TilerFront
     {
         static HashSet<string> GoogleIDs = new HashSet<string>();
         
-        public static SubCalEvent ToRepeatInstance(this Event myEvent, EventID CalendarID,uint CurrentCount)
+        public static SubCalEvent ToRepeatInstance(this Event googleEvent, EventID CalendarID,uint CurrentCount)
         {
             SubCalEvent retValue = new SubCalEvent();
-            retValue.ThirdPartyEventID = myEvent.Id;
+            retValue.ThirdPartyEventID = googleEvent.Id;
             retValue.ThirdPartyType = ThirdPartyControl.CalendarTool.google.ToString();
-            retValue.ThirdPartyUserID = myEvent.Organizer.Email;
+            retValue.ThirdPartyUserID = googleEvent.Organizer.Email;
             EventID SubEVentID = EventID.generateRepeatGoogleSubCalendarEventID(CalendarID, CurrentCount);
             retValue.ID = SubEVentID.ToString();
             retValue.CalendarID = SubEVentID.getRepeatCalendarEventID();
 
 
-            retValue.SubCalStartDate = (long)(new DateTimeOffset(myEvent.Start.DateTime.Value) - TilerElementExtension.JSStartTime).TotalMilliseconds;
-            retValue.SubCalEndDate = (long)(new DateTimeOffset(myEvent.End.DateTime.Value) - TilerElementExtension.JSStartTime).TotalMilliseconds;
+            retValue.SubCalStartDate = (long)(new DateTimeOffset(googleEvent.Start.DateTime.Value) - TilerElementExtension.JSStartTime).TotalMilliseconds;
+            retValue.SubCalEndDate = (long)(new DateTimeOffset(googleEvent.End.DateTime.Value) - TilerElementExtension.JSStartTime).TotalMilliseconds;
 
-            retValue.SubCalTotalDuration = (myEvent.End.DateTime.Value - myEvent.Start.DateTime.Value);
+            retValue.SubCalTotalDuration = (googleEvent.End.DateTime.Value - googleEvent.Start.DateTime.Value);
             retValue.SubCalRigid = true;
-            retValue.SubCalAddressDescription = myEvent.Location;// SubCalendarEventEntry.Location.Description;
-            retValue.SubCalAddress = myEvent.Location;
-            retValue.SubCalCalendarName = myEvent.Summary;
+            retValue.SubCalAddressDescription = googleEvent.Location;// SubCalendarEventEntry.Location.Description;
+            retValue.SubCalAddress = googleEvent.Location;
+            retValue.SubCalCalendarName = googleEvent.Summary;
 
             retValue.SubCalCalEventStart = retValue.SubCalStartDate;
             retValue.SubCalCalEventEnd = retValue.SubCalEndDate;
             retValue.isThirdParty = true;
-
+            retValue.isReadOnly = false;
+            if(googleEvent.ExtendedProperties!=null && googleEvent.ExtendedProperties.Private__!=null && googleEvent.ExtendedProperties.Private__.ContainsKey(GoogleTilerEventControl.tilerReadonlyKey))
+            {
+                retValue.isReadOnly = Convert.ToBoolean(googleEvent.ExtendedProperties.Private__[GoogleTilerEventControl.tilerReadonlyKey]);
+            }
             
+
 
             retValue.isComplete = false;
             retValue.isEnabled = true;
@@ -57,29 +62,34 @@ namespace TilerFront
             return retValue;
         }
         
-        public static SubCalEvent ToSubCal(this Event myEvent, EventID AuthenticationID, uint CurrentCount)
+        public static SubCalEvent ToSubCal(this Event googleEvent, EventID AuthenticationID, uint CurrentCount)
         {
             SubCalEvent retValue = new SubCalEvent();
-            retValue.ThirdPartyEventID = myEvent.Id;
+            retValue.ThirdPartyEventID = googleEvent.Id;
             retValue.ThirdPartyType = ThirdPartyControl.CalendarTool.google.ToString();
-            retValue.ThirdPartyUserID = myEvent.Organizer?.Email;
+            retValue.ThirdPartyUserID = googleEvent.Organizer?.Email;
 
 
             retValue.ID = AuthenticationID.getIDUpToRepeatDayCalendarEvent()+"_" + CurrentCount + "_1";
             retValue.CalendarID = AuthenticationID.getIDUpToRepeatDayCalendarEvent() + "_" + CurrentCount + "_0";
             retValue.isThirdParty = true;
-            retValue.SubCalAddressDescription = myEvent.Location;
+            retValue.SubCalAddressDescription = googleEvent.Location;
 
 
-            retValue.SubCalStartDate = (long)(new DateTimeOffset(myEvent.Start.DateTime.Value) - TilerElementExtension.JSStartTime).TotalMilliseconds;
-            retValue.SubCalEndDate = (long)(new DateTimeOffset(myEvent.End.DateTime.Value) - TilerElementExtension.JSStartTime).TotalMilliseconds;
+            retValue.SubCalStartDate = (long)(new DateTimeOffset(googleEvent.Start.DateTime.Value) - TilerElementExtension.JSStartTime).TotalMilliseconds;
+            retValue.SubCalEndDate = (long)(new DateTimeOffset(googleEvent.End.DateTime.Value) - TilerElementExtension.JSStartTime).TotalMilliseconds;
 
-            retValue.SubCalTotalDuration = (myEvent.End.DateTime.Value - myEvent.Start.DateTime.Value);
+            retValue.SubCalTotalDuration = (googleEvent.End.DateTime.Value - googleEvent.Start.DateTime.Value);
             retValue.SubCalRigid = true;
-            retValue.SubCalAddressDescription = myEvent.Location;// SubCalendarEventEntry.Location.Description;
-            retValue.SubCalAddress = myEvent.Location;
-            retValue.SubCalCalendarName = myEvent.Summary;
-            if(retValue.ThirdPartyUserID == null || retValue.SubCalCalendarName == null)
+            retValue.SubCalAddressDescription = googleEvent.Location;// SubCalendarEventEntry.Location.Description;
+            retValue.SubCalAddress = googleEvent.Location;
+            retValue.SubCalCalendarName = googleEvent.Summary;
+            retValue.isReadOnly = false;
+            if (googleEvent.ExtendedProperties != null && googleEvent.ExtendedProperties.Private__ != null && googleEvent.ExtendedProperties.Private__.ContainsKey(GoogleTilerEventControl.tilerReadonlyKey))
+            {
+                retValue.isReadOnly = Convert.ToBoolean(googleEvent.ExtendedProperties.Private__[GoogleTilerEventControl.tilerReadonlyKey]);
+            }
+            if (retValue.ThirdPartyUserID == null || retValue.SubCalCalendarName == null)
             {
                 retValue.SubCalCalendarName = "busy";
             }

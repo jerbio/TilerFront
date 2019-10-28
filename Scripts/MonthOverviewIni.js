@@ -926,17 +926,44 @@ function IconSet()
         return LocationIcon;
     }
 
+    this.hideLocationButton = function () {
+        $(LocationIcon).addClass("setAsDisplayNone");
+    }
+    this.showLocationButton = function () {
+        $(LocationIcon).removeClass("setAsDisplayNone");
+    }
 
     this.getDeleteButton = function () {
         return DeleteIcon;
+    }
+
+    this.hideDeleteButton = function () {
+        $(DeleteIcon).addClass("setAsDisplayNone");
+    }
+    this.showDeleteButton = function () {
+        $(DeleteIcon).removeClass("setAsDisplayNone");
     }
 
     this.getCompleteButton = function () {
         return CompleteIcon;
     }
 
+    this.hideCompleteButton = function () {
+        $(CompleteIcon).addClass("setAsDisplayNone");
+    }
+    this.showCompleteButton = function () {
+        $(CompleteIcon).removeClass("setAsDisplayNone");
+    }
+
     this.getProcrastinateButton = function () {
         return ProcrastinateIcon;
+    }
+
+    this.hideProcrastinateButton = function () {
+        $(ProcrastinateIcon).addClass("setAsDisplayNone");
+    }
+    this.showProcrastinateButton = function () {
+        $(ProcrastinateIcon).removeClass("setAsDisplayNone");
     }
 
     this.getIconSetContainer = function () {
@@ -3496,7 +3523,32 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
 
                 }
 
-                ControlPanelLocationButton.onclick = LauchLocation;
+                if (!SubEvent.SubCalAddress) {
+                    global_ControlPanelIconSet.hideLocationButton();
+                } else {
+                    ControlPanelLocationButton.onclick = LauchLocation;
+                    global_ControlPanelIconSet.showLocationButton();
+                }
+
+
+                if (!SubEvent.isReadOnly) {
+                    global_ControlPanelIconSet.showProcrastinateButton();
+                    global_ControlPanelIconSet.showCompleteButton();
+                    global_ControlPanelIconSet.showDeleteButton();
+                } else {
+                    global_ControlPanelIconSet.hideProcrastinateButton();
+                    global_ControlPanelIconSet.hideCompleteButton();
+                    global_ControlPanelIconSet.hideDeleteButton();
+                }
+
+                if (!SubEvent.SubCalRigid) {
+                    global_ControlPanelIconSet.showProcrastinateButton();
+                    global_ControlPanelIconSet.showCompleteButton();
+                } else {
+                    global_ControlPanelIconSet.hideProcrastinateButton();
+                    global_ControlPanelIconSet.hideCompleteButton();
+                }
+
 
                 ProcatinationButton.onclick = function () {
                     procrastinateEvent();
@@ -4127,7 +4179,19 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                 SubEventEndDateBinder.on('input', EditContainerData.RevealContainer)
                 SubEventEndDateBinder.on('changeDate', EditContainerData.RevealContainer);
             
-            
+                if (SubEvent.isReadOnly) {
+                    NameContanierInput.Dom.disabled = true;
+                    SubEventStartTime.Dom.disabled = true;
+                    SubEventEndTime.Dom.disabled = true;
+                    SubEventStartDate.Dom.disabled = true;
+                    SubEventEndDate.Dom.disabled = true;
+                } else {
+                    NameContanierInput.Dom.disabled = false;
+                    SubEventStartTime.Dom.disabled = false;
+                    SubEventEndTime.Dom.disabled = false;
+                    SubEventStartDate.Dom.disabled = false;
+                    SubEventEndDate.Dom.disabled = false;
+                }
             
 
 
@@ -4194,37 +4258,46 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                     var splitAndNoteContainer = getDomOrCreateNew("SplitCountAndNoteContainer");
                     var ContainerForExtraOptions = getDomOrCreateNew("ExtraOptionsContainer")
                     ContainerForExtraOptions.appendChild(splitAndNoteContainer)
-                    $(splitAndNoteContainer).addClass("SubEventInformationContainer");
-                    var splitInputBox = getDomOrCreateNew("InputSplitCount", "input");
-                    var splitInputBoxContainer = getDomOrCreateNew("InputSplitCountContainer");
-                    if (!Dictionary_OfCalendarData[SubEvent.CalendarID].Rigid) {
-                        splitInputBox.oninput = EditContainerData.RevealContainer;
-                        splitInputBox.setAttribute("type", "Number");
-                        splitInputBox.onkeydown = stopPropagationOfKeyDown;
-                        splitInputBox.value = Dictionary_OfCalendarData[SubEvent.CalendarID].TotalNumberOfEvents;
-                        var splitInputBoxLabel = getDomOrCreateNew("splitInputBoxLabel", "label");
-                        splitInputBoxLabel.innerHTML = "Splits"
-                        
-                        splitInputBoxContainer.appendChild(splitInputBoxLabel);
-                        splitInputBoxContainer.appendChild(splitInputBox);
-                        splitAndNoteContainer.appendChild(splitInputBoxContainer);
-                        var CompletionMap = getDomOrCreateNew("CompletionContainer");
-                        var CompletionMapDom = generateCompletionMap(SubEvent)
-                        CompletionMap.appendChild(CompletionMapDom);
-                        ContainerForExtraOptions.appendChild(CompletionMap)
+
+                    if (!SubEvent.isThirdParty) {
+                        $(ContainerForExtraOptions.Dom).removeClass("setAsDisplayNone");
+                        $(splitAndNoteContainer).addClass("SubEventInformationContainer");
+                        var splitInputBox = getDomOrCreateNew("InputSplitCount", "input");
+                        var splitInputBoxContainer = getDomOrCreateNew("InputSplitCountContainer");
+                        if (!Dictionary_OfCalendarData[SubEvent.CalendarID].Rigid) {
+                            splitInputBox.oninput = EditContainerData.RevealContainer;
+                            splitInputBox.setAttribute("type", "Number");
+                            splitInputBox.onkeydown = stopPropagationOfKeyDown;
+                            splitInputBox.value = Dictionary_OfCalendarData[SubEvent.CalendarID].TotalNumberOfEvents;
+                            var splitInputBoxLabel = getDomOrCreateNew("splitInputBoxLabel", "label");
+                            splitInputBoxLabel.innerHTML = "Splits"
+
+                            splitInputBoxContainer.appendChild(splitInputBoxLabel);
+                            splitInputBoxContainer.appendChild(splitInputBox);
+                            splitAndNoteContainer.appendChild(splitInputBoxContainer);
+                            let CompletionMap = getDomOrCreateNew("CompletionContainer");
+                            let CompletionMapDom = generateCompletionMap(SubEvent)
+                            CompletionMap.appendChild(CompletionMapDom);
+                            ContainerForExtraOptions.appendChild(CompletionMap)
+                            $(splitInputBoxContainer.Dom).removeClass("setAsDisplayNone");
+                            $(CompletionMap.Dom).removeClass("setAsDisplayNone");
+                        } else {
+                            splitInputBox.Dom.value = 1;
+                            splitInputBoxContainer.appendChild(splitInputBox);
+                            splitAndNoteContainer.appendChild(splitInputBoxContainer);
+                            let CompletionMap = getDomOrCreateNew("CompletionContainer");
+                            $(splitInputBoxContainer.Dom).addClass("setAsDisplayNone");
+                            $(CompletionMap.Dom).addClass("setAsDisplayNone");
+                        }
+
+
+                        let renderNoteResult = renderNotesUIData(null)
+
+
+                        splitAndNoteContainer.appendChild(renderNoteResult.button)
                     } else {
-                        splitInputBox.Dom.value = 1;
-                        splitInputBoxContainer.appendChild(splitInputBox);
-                        splitAndNoteContainer.appendChild(splitInputBoxContainer);
-                        $(splitInputBoxContainer.Dom).hide();
+                        $(ContainerForExtraOptions.Dom).addClass("setAsDisplayNone");
                     }
-                    
-
-                    let renderNoteResult = renderNotesUIData(null)
-
-
-                    splitAndNoteContainer.appendChild(renderNoteResult.button)
-                
                     return ContainerForExtraOptions;
                 }
 
@@ -4243,10 +4316,10 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                 var ControlPanelDeadlineOfSubevent=getDomOrCreateNew("ControlPanelDeadlineOfSubevent")
                 ControlPanelDeadlineOfSubeventInfo.appendChild(CalEndTime)
                 ControlPanelDeadlineOfSubeventInfo.appendChild(CalEndDate);
-                var optionData = extraOptionsData();
 
                 var InfoCOntainer = getDomOrCreateNew("InfoContainer")
-                InfoCOntainer.appendChild(optionData);      
+                let optionData = extraOptionsData();
+                InfoCOntainer.appendChild(optionData);
                 if (Dictionary_OfCalendarData[SubEvent.CalendarID].Rigid)
                 {
                     $(ControlPanelDeadlineOfSubevent).addClass("setAsDisplayNone");

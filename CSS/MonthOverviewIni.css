@@ -1287,12 +1287,14 @@ width: 100%;
 }
 
 #SplitCountAndNoteContainer {
-    display: block;
     margin-bottom: 8px;
+    display: flex;
+    justify-content: space-around;
 }
 
 #InputSplitCountContainer {
     display: inline-block;
+    margin-top: 10px;
 }
 
 #NotesModal {
