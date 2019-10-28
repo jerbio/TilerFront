@@ -23,6 +23,7 @@ namespace TilerFront
         CalendarService CalendarServiceInfo;
         TilerFront.Models.ThirdPartyCalendarAuthenticationModel AuthenticationInfo;
         const string applicationName = "Tiler Web App";
+        static public readonly string tilerReadonlyKey = "tilerKey_isreadOnly";
         string EmailID;
 
         public GoogleTilerEventControl(TilerFront.Models.ThirdPartyCalendarAuthenticationModel AuthenticationCredential, ApplicationDbContext db)
@@ -134,9 +135,21 @@ namespace TilerFront
                 eventsTask.Wait();
                 if (eventsTask.Result != null)
                 {
-                   foreach (var googleEvent in eventsTask.Result.Items)
+                    var calendar = eventsTask.Result;
+                    string accessrole = calendar.AccessRole;
+                    string readerString = "reader";
+                    string freeBusyReaderString = "freeBusyReader";
+                    bool isReadonly = (!string.IsNullOrEmpty(accessrole) && !string.IsNullOrWhiteSpace(accessrole) 
+                        && (accessrole.Contains(readerString) || accessrole.Contains(freeBusyReaderString)));
+                    foreach (var googleEvent in eventsTask.Result.Items)
                     {
                         DateTimeOffset start = new DateTimeOffset((DateTime)googleEvent.Start.DateTime);
+                        if(googleEvent.ExtendedProperties == null)
+                        {
+                            googleEvent.ExtendedProperties = new Event.ExtendedPropertiesData();
+                            googleEvent.ExtendedProperties.Private__ = new Dictionary<string, string>();
+                        }
+                        googleEvent.ExtendedProperties.Private__[tilerReadonlyKey] = isReadonly.ToString();
                         retValueBag.Add(googleEvent);
                     }
                 }
