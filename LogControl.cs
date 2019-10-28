@@ -671,7 +671,8 @@ namespace TilerFront
             MyEventScheduleNode.ChildNodes[0].InnerText = CreateEventPreference(MyEvent.DayPreference).InnerXml;
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("LastCompletionTimes"));
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.LastCompletionTime_DB;
-
+            MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Access_DB"));
+            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.Access_DB;
 
             if (MyEvent.getIsEventRestricted)
             {
@@ -896,6 +897,8 @@ namespace TilerFront
             MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.AutoDeleted_EventDB.ToString();
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("AutoDeletionReason"));
             MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.AutoDeletion_ReasonDB.ToString();
+            MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("RepetitionLock"));
+            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.RepetitionLock_DB.ToString();
 
             if (MySubEvent.getIsEventRestricted)
             {
@@ -2471,12 +2474,18 @@ namespace TilerFront
             {
                 RetrievedEvent.LastCompletionTime_DB = LastCompletionTimesNode.InnerText;
             }
+
+            XmlNode MyEventScheduleNode = EventScheduleNode.SelectSingleNode("Access_DB");
+            if(MyEventScheduleNode!=null)
+            {
+                RetrievedEvent.Access_DB = MyEventScheduleNode.InnerText;
+            }
+
             return RetrievedEvent;
         }
 
         public WeatherReason getWeatherReason(XmlNode ReasonNode)
         {
-            //DBWeatherReason retValue = new DBWeatherReason();
             MemoryStream stm = new MemoryStream();
 
             StreamWriter stw = new StreamWriter(stm);
@@ -2717,6 +2726,12 @@ namespace TilerFront
                 if (AutoDeletionReasonNode != null)
                 {
                     retrievedSubEvent.AutoDeletion_ReasonDB = AutoDeletionReasonNode.InnerText;
+                }
+
+                XmlNode RepetitionLockNode = MyXmlNode.ChildNodes[i].SelectSingleNode("RepetitionLock");
+                if (RepetitionLockNode != null)
+                {
+                    retrievedSubEvent.RepetitionLock_DB = Convert.ToBoolean(RepetitionLockNode.InnerText);
                 }
 
                 createReasonObjects(retrievedSubEvent, MyXmlNode.ChildNodes[i]);

@@ -209,7 +209,7 @@ namespace TilerFront.Controllers
                 string calId = cal.getTilerID.getCalendarEventComponent();
                 if (gymIds.Contains(calId))
                 {
-                    if (cal.IsRepeat)
+                    if (cal.IsRecurring)
                     {
                         foreach (var repCal in cal.Repeat.RecurringCalendarEvents())
                         {
