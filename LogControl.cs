@@ -125,37 +125,6 @@ namespace TilerFront
         public async Task Undo(string LogFile = "")
         {
             throw new NotImplementedException("Undo has not been fully implemented for RDBMS");
-            Task<bool> retValue;
-            retValue = new Task<bool>(() => { return true; });
-            retValue.Start();
-
-            int loopCounter = 0;
-            while (true)
-            {
-                try
-                {
-                    Task dbLatestChange = null;
-                    if (!string.IsNullOrEmpty(_TilerUser.PasswordHash))
-                    {
-                        dbLatestChange = TilerController.saveLatestChange(_Context, _TilerUser);
-                    }
-                    if (dbLatestChange != null)
-                    {
-                        await dbLatestChange;
-                    }
-                    break;
-                }
-                catch (Exception e)
-                {
-                    Thread.Sleep(160);
-
-                    if (++loopCounter > 3)
-                    {
-                        throw new TimeoutException("Failed to open files for undo");
-                    }
-                }
-            }
-
         }
 
 
@@ -2907,7 +2876,6 @@ namespace TilerFront
         TilerElements.Location getLocation(XmlNode Arg1)
         {
             XmlNode var1 = Arg1.SelectSingleNode("Location");
-            bool UninitializedLocation = false;
             return generateLocationObjectFromNode(var1);
         }
 

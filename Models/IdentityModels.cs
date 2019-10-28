@@ -29,5 +29,11 @@ namespace TilerFront.Models
         public System.Data.Entity.DbSet<ThirdPartyCalendarAuthenticationModel> ThirdPartyAuthentication { get; set; }
         public System.Data.Entity.DbSet<GoogleNotificationWatchResponseModel> GoogleNotificationCredentials { get; set; }
         public System.Data.Entity.DbSet<PausedEvent> PausedEvents { get; set; }
+
+
+        public new static ApplicationDbContext Create()
+        {
+            return new ApplicationDbContext();
+        }
     }
 }
