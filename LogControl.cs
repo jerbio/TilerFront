@@ -1,5 +1,5 @@
 ﻿//#define UseDefaultLocation
-//#define liveDebugging
+#define liveDebugging
 
 using System;
 using System.Collections.Generic;
@@ -2200,26 +2200,6 @@ namespace TilerFront
             XmlNode IdNode = doc.DocumentElement.SelectSingleNode("/ScheduleLog/LastIDCounter");
 
             XmlNode EventSchedulesNodes = doc.DocumentElement.SelectSingleNode("/ScheduleLog/EventSchedules");
-
-            DateTimeOffset userReferenceDay;
-            string ID;
-            string Deadline;
-            string Split;
-            string Completed;
-            string Rigid;
-            string Name;
-            string[] StartDateTime;
-            string StartDate;
-            string StartTime;
-            string[] EndDateTime;
-            string EndDate;
-            string EndTime;
-            string PreDeadline;
-            string CalendarEventDuration;
-            string PreDeadlineFlag;
-            string EventRepetitionflag;
-            string PrepTimeFlag;
-            string PrepTime;
             CalendarEvent defaultCalendarEvent = CalendarEvent.getEmptyCalendarEvent(EventID.GenerateCalendarEvent(), Now.constNow, Now.constNow.AddHours(1));
 
 
@@ -2592,7 +2572,6 @@ namespace TilerFront
             string ID = "";
             DateTimeOffset Start = new DateTimeOffset();
             DateTimeOffset End = new DateTimeOffset();
-            TimeSpan SubScheduleDuration = new TimeSpan();
             TimeSpan PrepTime = new TimeSpan();
             BusyTimeLine BusySlot = new BusyTimeLine();
             bool Enabled;
