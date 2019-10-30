@@ -680,7 +680,7 @@ namespace TilerFront.Controllers
                 {
                     location = TilerElements.Location.getDefaultLocation();
                 }
-                await MySchedule.FindMeSomethingToDo(location);
+                await MySchedule.FindMeSomethingToDo(location).ConfigureAwait(false);
                 await MySchedule.WriteFullScheduleToLog().ConfigureAwait(false);
 
                 List<SubCalendarEvent> allSubEvents = MySchedule.getAllCalendarEvents().Where(calEvent => calEvent.isActive).SelectMany(calEvent => calEvent.ActiveSubEvents).ToList();
@@ -728,7 +728,6 @@ namespace TilerFront.Controllers
                 DateTimeOffset myNow = myNow = myAuthorizedUser.getRefNow();
                 DB_Schedule MySchedule = new DB_Schedule(myUser, myNow, createDump: false);
                 MySchedule.CurrentLocation = myAuthorizedUser.getCurrentLocation();
-                DB_UserActivity activity = new DB_UserActivity(myNow, UserActivity.ActivityType.Shuffle);
                 await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, myUser.UserID, db).ConfigureAwait(false);
                 ScheduleDump scheduleDump = await MySchedule.CreateScheduleDump(notes: UserData.Notes).ConfigureAwait(false);
                 scheduleDump.Notes = UserData.Notes;
