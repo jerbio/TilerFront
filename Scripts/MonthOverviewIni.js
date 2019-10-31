@@ -3546,7 +3546,10 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                     global_ControlPanelIconSet.showCompleteButton();
                 } else {
                     global_ControlPanelIconSet.hideProcrastinateButton();
-                    global_ControlPanelIconSet.hideCompleteButton();
+                    if (Dictionary_OfCalendarData[SubEvent.CalendarID].Rigid) {
+                        global_ControlPanelIconSet.hideCompleteButton();
+                    }
+                    
                 }
 
 

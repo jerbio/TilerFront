@@ -344,17 +344,6 @@ function StructuralizeNewData(NewData)
 
 
     function PopulateDomForScheduleEvent(myEvent, Tiers, CalendarData) {
-        
-
-        //debugger;
-        /*
-        myEvent.SubCalStartDate = new Date(myEvent.SubCalStartDate + global_TimeZone_ms );
-        myEvent.SubCalEndDate = new Date(myEvent.SubCalEndDate + global_TimeZone_ms );
-        myEvent.SubCalCalEventStart = new Date(myEvent.SubCalCalEventStart + global_TimeZone_ms );
-        myEvent.SubCalCalEventEnd = new Date(myEvent.SubCalCalEventEnd + global_TimeZone_ms );
-        //*/
-
-        ///*
         myEvent.SubCalStartDate = new Date(myEvent.SubCalStartDate);// + global_TimeZone_ms);
         myEvent.SubCalEndDate = new Date(myEvent.SubCalEndDate);// + global_TimeZone_ms);
         myEvent.SubCalCalEventStart = new Date(myEvent.SubCalCalEventStart);//+ global_TimeZone_ms);
@@ -363,16 +352,6 @@ function StructuralizeNewData(NewData)
         myEvent.Split = CalendarData.TotalNumberOfEvents
         myEvent.DeletionCount = CalendarData.DeletedEvents
         myEvent.CompletionCount = CalendarData.CompletedEvents
-        //*/
-        /*myEvent.SubCalStartDate = !myEvent.SubCalStartDate.dst() ? new Date(Number(myEvent.SubCalStartDate.getTime()) + OneHourInMs) : myEvent.SubCalStartDate;
-        myEvent.SubCalEndDate =! myEvent.SubCalEndDate.dst() ? new Date(Number(myEvent.SubCalEndDate.getTime()) + OneHourInMs) : myEvent.SubCalEndDate;
-        myEvent.SubCalCalEventStart = !myEvent.SubCalCalEventStart.dst() ? new Date(Number(myEvent.SubCalCalEventStart.getTime()) + OneHourInMs) : myEvent.SubCalCalEventStart;
-        myEvent.SubCalCalEventEnd = !myEvent.SubCalCalEventEnd.dst() ? new Date(Number(myEvent.SubCalCalEventEnd.getTime()) + OneHourInMs) : myEvent.SubCalCalEventEnd;*/
-
-
-
-        //var MobileDom = genereateMobileDoms(myEvent);
-        //myEvent.Dom = MobileDom;
         return myEvent
     }
     return { TotalSubEventList: TotalSubEventList,ActiveSubEvents: ActiveSubEvents,Dictionary_OfCalendarData: Dictionary_OfCalendarData,Dictionary_OfSubEvents:Dictionary_OfSubEvents};
