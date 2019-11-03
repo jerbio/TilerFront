@@ -2278,19 +2278,22 @@ namespace TilerFront
             EventRepetitionflag = EventScheduleNode.SelectSingleNode("RepetitionFlag").InnerText;
 
 
-            DateTimeOffset StartDateTimeStruct = DateTimeOffset.Parse(EventScheduleNode.SelectSingleNode("StartTime").InnerText).UtcDateTime;
-            DateTimeOffset EndDateTimeStruct = DateTimeOffset.Parse(EventScheduleNode.SelectSingleNode("Deadline").InnerText).UtcDateTime;
-            DateTimeOffset start = DateTimeOffset.Parse(EventScheduleNode.SelectSingleNode("StartTime").InnerText);
+            //DateTimeOffset StartDateTimeStruct = DateTimeOffset.Parse(EventScheduleNode.SelectSingleNode("StartTime").InnerText).UtcDateTime;
+            //DateTimeOffset EndDateTimeStruct = DateTimeOffset.Parse(EventScheduleNode.SelectSingleNode("Deadline").InnerText).UtcDateTime;
+            //DateTimeOffset start = DateTimeOffset.Parse(EventScheduleNode.SelectSingleNode("StartTime").InnerText);
+            DateTimeOffset StartDateTimeStruct = Utility.ParseTime(EventScheduleNode.SelectSingleNode("StartTime").InnerText);
+            DateTimeOffset EndDateTimeStruct = Utility.ParseTime(EventScheduleNode.SelectSingleNode("Deadline").InnerText);
+            DateTimeOffset start = Utility.ParseTime(EventScheduleNode.SelectSingleNode("StartTime").InnerText);
             StartDateTime = EventScheduleNode.SelectSingleNode("StartTime").InnerText.Split(' ');
 
             StartDate = StartDateTime[0];
             StartTime = StartDateTime[1] + StartDateTime[2];
             EndDateTime = EventScheduleNode.SelectSingleNode("Deadline").InnerText.Split(' ');
-            DateTimeOffset end = DateTimeOffset.Parse(EventScheduleNode.SelectSingleNode("Deadline").InnerText);
+            DateTimeOffset end = Utility.ParseTime(EventScheduleNode.SelectSingleNode("Deadline").InnerText);
             EndDate = EndDateTime[0];
             EndTime = EndDateTime[1] + EndDateTime[2];
-            DateTimeOffset StartTimeConverted = DateTimeOffset.Parse(StartDate).UtcDateTime;// new DateTimeOffset(Convert.ToInt32(StartDate.Split('/')[2]), Convert.ToInt32(StartDate.Split('/')[0]), Convert.ToInt32(StartDate.Split('/')[1]));
-            DateTimeOffset EndTimeConverted = DateTimeOffset.Parse(EndDate).UtcDateTime; //new DateTimeOffset(Convert.ToInt32(EndDate.Split('/')[2]), Convert.ToInt32(EndDate.Split('/')[0]), Convert.ToInt32(EndDate.Split('/')[1]));
+            DateTimeOffset StartTimeConverted = Utility.ParseTime(StartDate);// new DateTimeOffset(Convert.ToInt32(StartDate.Split('/')[2]), Convert.ToInt32(StartDate.Split('/')[0]), Convert.ToInt32(StartDate.Split('/')[1]));
+            DateTimeOffset EndTimeConverted = Utility.ParseTime(EndDate); //new DateTimeOffset(Convert.ToInt32(EndDate.Split('/')[2]), Convert.ToInt32(EndDate.Split('/')[0]), Convert.ToInt32(EndDate.Split('/')[1]));
 
             Repetition Recurrence;
             if (Convert.ToBoolean(EventRepetitionflag))
@@ -2434,7 +2437,7 @@ namespace TilerFront
 
             if (timeCreatednode != null)
             {
-                timeCreated = DateTimeOffset.Parse(timeCreatednode.InnerText.ToString());
+                timeCreated = Utility.ParseTime(timeCreatednode.InnerText.ToString());
                 RetrievedEvent.TimeCreated = timeCreated;
             }
             EventPreference eventPreference = new EventPreference();
@@ -2581,8 +2584,8 @@ namespace TilerFront
                 XmlNode SubEventNode = MyXmlNode.ChildNodes[i];
                 BusyTimeLine SubEventActivePeriod = new BusyTimeLine(MyXmlNode.ChildNodes[i].SelectSingleNode("ID").InnerText, stringToDateTime(MyXmlNode.ChildNodes[i].SelectSingleNode("ActiveStartTime").InnerText), stringToDateTime(MyXmlNode.ChildNodes[i].SelectSingleNode("ActiveEndTime").InnerText));
                 ID = EventID.convertToSubcalendarEventID(MyXmlNode.ChildNodes[i].SelectSingleNode("ID").InnerText).ToString();
-                Start = DateTimeOffset.Parse(MyXmlNode.ChildNodes[i].SelectSingleNode("ActiveStartTime").InnerText).UtcDateTime;
-                End = DateTimeOffset.Parse(MyXmlNode.ChildNodes[i].SelectSingleNode("ActiveEndTime").InnerText).UtcDateTime;
+                Start = Utility.ParseTime(MyXmlNode.ChildNodes[i].SelectSingleNode("ActiveStartTime").InnerText);
+                End = Utility.ParseTime(MyXmlNode.ChildNodes[i].SelectSingleNode("ActiveEndTime").InnerText);
 
                 bool rigidFlag = MyParent.isRigid;
                 XmlNode rigidNode = MyXmlNode.ChildNodes[i].SelectSingleNode("Rigid");
@@ -2595,8 +2598,8 @@ namespace TilerFront
                 BusySlot = new BusyTimeLine(ID, Start, End);
                 PrepTime = new TimeSpan(ConvertToMinutes(MyXmlNode.ChildNodes[i].SelectSingleNode("PrepTime").InnerText) * 60 * 10000000);
                 //stringToDateTime();
-                Start = DateTimeOffset.Parse(MyXmlNode.ChildNodes[i].SelectSingleNode("StartTime").InnerText).UtcDateTime;
-                End = DateTimeOffset.Parse(MyXmlNode.ChildNodes[i].SelectSingleNode("EndTime").InnerText).UtcDateTime;
+                Start = Utility.ParseTime(MyXmlNode.ChildNodes[i].SelectSingleNode("StartTime").InnerText);
+                End = Utility.ParseTime(MyXmlNode.ChildNodes[i].SelectSingleNode("EndTime").InnerText);
                 Enabled = Convert.ToBoolean(MyXmlNode.ChildNodes[i].SelectSingleNode("Enabled").InnerText);
                 bool CompleteFlag = Convert.ToBoolean(MyXmlNode.ChildNodes[i].SelectSingleNode("Complete").InnerText);
                 TilerElements.Location var1 = getLocation(MyXmlNode.ChildNodes[i]);
@@ -2656,7 +2659,7 @@ namespace TilerFront
                 XmlNode timeCreatednode = MyXmlNode.ChildNodes[i].SelectSingleNode("TimeCreated");
                 if (timeCreatednode != null)
                 {
-                    timeCreated = DateTimeOffset.Parse(timeCreatednode.InnerText);
+                    timeCreated = Utility.ParseTime(timeCreatednode.InnerText);
                     retrievedSubEvent.TimeCreated = timeCreated;
                 }
 
@@ -2729,7 +2732,7 @@ namespace TilerFront
             if (PauseInformation != null)
             {
                 TimeSpan UsedUpTime = TimeSpan.Parse(PauseInformation.SelectSingleNode("UsedUpTime").InnerText);
-                DateTimeOffset PauseTime = DateTimeOffset.Parse(PauseInformation.SelectSingleNode("PauseTime").InnerText);
+                DateTimeOffset PauseTime = Utility.ParseTime(PauseInformation.SelectSingleNode("PauseTime").InnerText);
                 RetValue = new Tuple<TimeSpan, DateTimeOffset>(UsedUpTime, PauseTime);
             }
 
@@ -2747,7 +2750,7 @@ namespace TilerFront
             string innerText = NowProfileNode.SelectSingleNode("Initialized").InnerText;
             bool initializedFlag = string.IsNullOrEmpty(innerText) ? false : Convert.ToBoolean(NowProfileNode.SelectSingleNode("Initialized").InnerText);
             innerText = NowProfileNode.SelectSingleNode("PreferredStart").InnerText;
-            DateTimeOffset preferredTime = string.IsNullOrEmpty(innerText) ? new DateTimeOffset() : DateTimeOffset.Parse(innerText).UtcDateTime;
+            DateTimeOffset preferredTime = string.IsNullOrEmpty(innerText) ? new DateTimeOffset() : Utility.ParseTime(innerText);
             DB_NowProfile retValue = new DB_NowProfile(preferredTime, initializedFlag);
             return retValue;
         }
@@ -2792,8 +2795,8 @@ namespace TilerFront
         RestrictionTimeLine getRestrictionTimeLine(XmlNode RestrictionTimeLineNode)
         {
             RestrictionTimeLineNode = RestrictionTimeLineNode.SelectSingleNode("RestrictionTimeLineData");
-            DateTimeOffset Start = DateTimeOffset.Parse(RestrictionTimeLineNode.SelectSingleNode("StartTime").InnerText).UtcDateTime;
-            DateTimeOffset End = DateTimeOffset.Parse(RestrictionTimeLineNode.SelectSingleNode("EndTime").InnerText).UtcDateTime;
+            DateTimeOffset Start = Utility.ParseTime(RestrictionTimeLineNode.SelectSingleNode("StartTime").InnerText);
+            DateTimeOffset End = Utility.ParseTime(RestrictionTimeLineNode.SelectSingleNode("EndTime").InnerText);
             TimeSpan rangeSpan = TimeSpan.FromTicks(Convert.ToInt64(RestrictionTimeLineNode.SelectSingleNode("RangeSpan").InnerText));
             DB_RestrictionTimeLine retValue = new DB_RestrictionTimeLine(Start, End, rangeSpan);
             return retValue;
@@ -2824,7 +2827,7 @@ namespace TilerFront
                         repetitionNodes.Add(getRepetitionObject(eacXmlNode));
                     }
 
-                    RetValue = new Repetition(true, new TimeLine(DateTimeOffset.Parse(RepeatStart).UtcDateTime, DateTimeOffset.Parse(RepeatEnd).UtcDateTime), RepeatFrequency, repetitionNodes.ToArray(), repetitionDay);
+                    RetValue = new Repetition(true, new TimeLine(Utility.ParseTime(RepeatStart), Utility.ParseTime(RepeatEnd)), RepeatFrequency, repetitionNodes.ToArray(), repetitionDay);
                     return RetValue;
                 }
 
@@ -2832,7 +2835,7 @@ namespace TilerFront
 
 
 
-            RetValue = new Repetition(true, new TimeLine(DateTimeOffset.Parse(RepeatStart).UtcDateTime, DateTimeOffset.Parse(RepeatEnd).UtcDateTime), RepeatFrequency, getAllRepeatCalendarEvents(XmlNodeWithList), repetitionDay);
+            RetValue = new Repetition(true, new TimeLine(Utility.ParseTime(RepeatStart), Utility.ParseTime(RepeatEnd)), RepeatFrequency, getAllRepeatCalendarEvents(XmlNodeWithList), repetitionDay);
 
             return RetValue;
         }
