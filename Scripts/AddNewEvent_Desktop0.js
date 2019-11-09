@@ -3284,7 +3284,7 @@ function generateSubmitButton()
 
 function BindSubmitClick(Name, AddressDom, AddressNick, Splits, Start, End, EventNonRigidDurationHolder, RepetitionEnd, RigidFlag, CalendarColor,ExitAdditionScreen,EventRepetition)
 {
-    var EventLocation = new Location(AddressNick, AddressDom.Dom.value.AddressDom.Dom.LocationIsVerified, AddressDom.LocationId);
+    var EventLocation = new Location(AddressNick, AddressDom.Dom.value, AddressDom.Dom.LocationIsVerified, AddressDom.LocationId);
     var EventName = Name;
     var EventName = Name;
     /*
