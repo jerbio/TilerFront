@@ -1520,7 +1520,37 @@ namespace TilerFront
             return subEvents;
         }
 
+        /// <summary>
+        /// Function retrieves the travel cache of for a specific user
+        /// </summary>
+        /// <param name="tilerUser"></param>
+        /// <returns></returns>
+        async public virtual Task<TravelCache> getTravelCache(TilerUser tilerUser)
+        {
+            return await getTravelCache(tilerUser.Id).ConfigureAwait(false);
+        }
 
+        /// <summary>
+        /// Function retrieves the travel cache of for a specific user
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        async public virtual Task<TravelCache> getTravelCache(string userId)
+        {
+            var retValueQuery = _Context.TravelCaches.Where(travel => travel.TilerUserId == userId);
+            var retValue = await retValueQuery
+                .Include(cache => cache.LocationCombo_DB)
+                .SingleOrDefaultAsync().ConfigureAwait(false);
+            if (retValue == null)
+            {
+                retValue = new TravelCache
+                {
+                    TilerUserId = userId
+                };
+                _Context.TravelCaches.Add(retValue);
+            }
+            return retValue;
+        }
 
 
         async public virtual Task<IEnumerable<SubCalendarEvent>> getAllEnabledSubCalendarEvent(TimeLine RangeOfLookUP, ReferenceNow Now, bool includeOtherEntities = true, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation)
