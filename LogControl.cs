@@ -1537,7 +1537,7 @@ namespace TilerFront
         /// <returns></returns>
         async public virtual Task<TravelCache> getTravelCache(string userId)
         {
-            var retValueQuery = _Context.TravelCaches.Where(travel => travel.TilerUserId == userId);
+            var retValueQuery = _Context.TravelCaches.Where(travel => travel.Id == userId);
             var retValue = await retValueQuery
                 .Include(cache => cache.LocationCombo_DB)
                 .SingleOrDefaultAsync().ConfigureAwait(false);
@@ -1545,9 +1545,10 @@ namespace TilerFront
             {
                 retValue = new TravelCache
                 {
-                    TilerUserId = userId
+                    Id = userId
                 };
                 _Context.TravelCaches.Add(retValue);
+                _Context.SaveChanges();
             }
             return retValue;
         }

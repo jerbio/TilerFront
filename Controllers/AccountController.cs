@@ -315,7 +315,7 @@ namespace TilerFront.Controllers
                 DateTimeOffset EndOfDay = new DateTimeOffset(2014, 1, 1, 22, 0, 0, OffSet);
                 var travelCache = new TravelCache();
                 var user = new TilerUser { UserName = model.Username, Email = model.Email, FirstName = model.FirstName?? "", LastName = model.LastName?? "", EndfOfDay = EndOfDay.UtcDateTime, TravelCache = travelCache };
-                travelCache.TilerUserId = user.Id;
+                travelCache.Id = user.Id;
                 var result = await UserManager.CreateAsync(user, model.Password);
 
                 if (result.Succeeded)
@@ -363,7 +363,7 @@ namespace TilerFront.Controllers
                 DateTimeOffset EndOfDay = new DateTimeOffset(2014, 1, 1, 22, 0, 0, OffSet);
                 var travelCache = new TravelCache();
                 var user = new TilerUser { UserName = model.Username, Email = model.Email, FirstName = model.FirstName, LastName = model.LastName, EndfOfDay = EndOfDay.UtcDateTime, TravelCache = travelCache };
-                travelCache.TilerUserId = user.Id;
+                travelCache.Id = user.Id;
 
                 var result = await UserManager.CreateAsync(user, model.Password);
 
