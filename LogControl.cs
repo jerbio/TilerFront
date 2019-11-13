@@ -1550,6 +1550,10 @@ namespace TilerFront
                 _Context.TravelCaches.Add(retValue);
                 _Context.SaveChanges();
             }
+            if(retValue.Id == null)
+            {
+                retValue.Id = userId;
+            }
             return retValue;
         }
 
