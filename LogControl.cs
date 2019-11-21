@@ -2905,11 +2905,11 @@ namespace TilerFront
             }
             else
             {
-                string ID = var1.SelectSingleNode("Id").InnerText;
+                string ID = var1.SelectSingleNode("Id")?.InnerText?? Guid.NewGuid().ToString();
                 string XCoordinate_Str = var1.SelectSingleNode("XCoordinate").InnerText;
                 string YCoordinate_Str = var1.SelectSingleNode("YCoordinate").InnerText;
                 string Descripion = var1.SelectSingleNode("Description").InnerText;
-                string UserId = var1.SelectSingleNode("UserId").InnerText;
+                string UserId = var1.SelectSingleNode("UserId")?.InnerText;
                 Descripion = string.IsNullOrEmpty(Descripion) ? "" : Descripion;
                 string Address = var1.SelectSingleNode("Address").InnerText;
                 Address = string.IsNullOrEmpty(Address) ? "" : Address;
