@@ -344,7 +344,7 @@ namespace TilerFront.Controllers
 
         public async Task createProcrastinateCalendarEvent (TilerUser user)
         {
-            DateTimeOffset now = DateTimeOffset.UtcNow;
+            DateTimeOffset now = Utility.ProcrastinateStartTime;
             CalendarEvent procrastinateCalEvent = ProcrastinateCalendarEvent.generateProcrastinateAll(now, user, TimeSpan.FromSeconds(1), "UTC");
             dbContext.CalEvents.Add(procrastinateCalEvent);
             await dbContext.SaveChangesAsync().ConfigureAwait(false);

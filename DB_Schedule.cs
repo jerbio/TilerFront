@@ -31,7 +31,7 @@ namespace TilerFront
         {
             myAccount = AccountEntry;
             this.retrievalOption = retrievalOption;
-            this.RangeOfLookup = rangeOfLookup;
+            this.RangeOfLookup = rangeOfLookup ?? new TimeLine(referenceNow.AddDays(Utility.defaultBeginDay), referenceNow.AddDays(Utility.defaultEndDay));
             _CreateDump = createDump;
             Initialize(referenceNow, startOfDay).Wait();
             
@@ -40,7 +40,7 @@ namespace TilerFront
         {
             myAccount = AccountEntry;
             this.retrievalOption = retrievalOption;
-            this.RangeOfLookup = rangeOfLookup;
+            this.RangeOfLookup = rangeOfLookup?? new TimeLine(referenceNow.AddDays(Utility.defaultBeginDay), referenceNow.AddDays(Utility.defaultEndDay));
             _CreateDump = createDump;
             Initialize(referenceNow).Wait();
         }
