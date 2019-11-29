@@ -313,8 +313,9 @@ namespace TilerFront.Controllers
                 int Min=Convert.ToInt32(model.TimeZoneOffSet);
                 TimeSpan OffSet = TimeSpan.FromMinutes(Min);
                 DateTimeOffset EndOfDay = new DateTimeOffset(2014, 1, 1, 22, 0, 0, OffSet);
-                var user = new TilerUser { UserName = model.Username, Email = model.Email, FirstName = model.FirstName?? "", LastName = model.LastName?? "", EndfOfDay = EndOfDay.UtcDateTime};
-                
+                var travelCache = new TravelCache();
+                var user = new TilerUser { UserName = model.Username, Email = model.Email, FirstName = model.FirstName?? "", LastName = model.LastName?? "", EndfOfDay = EndOfDay.UtcDateTime, TravelCache = travelCache };
+                travelCache.Id = user.Id;
                 var result = await UserManager.CreateAsync(user, model.Password);
 
                 if (result.Succeeded)
@@ -343,7 +344,7 @@ namespace TilerFront.Controllers
 
         public async Task createProcrastinateCalendarEvent (TilerUser user)
         {
-            DateTimeOffset now = DateTimeOffset.UtcNow;
+            DateTimeOffset now = Utility.ProcrastinateStartTime;
             CalendarEvent procrastinateCalEvent = ProcrastinateCalendarEvent.generateProcrastinateAll(now, user, TimeSpan.FromSeconds(1), "UTC");
             dbContext.CalEvents.Add(procrastinateCalEvent);
             await dbContext.SaveChangesAsync().ConfigureAwait(false);
@@ -360,7 +361,9 @@ namespace TilerFront.Controllers
                 int Min = Convert.ToInt32(model.TimeZoneOffSet);
                 TimeSpan OffSet = TimeSpan.FromMinutes(Min);
                 DateTimeOffset EndOfDay = new DateTimeOffset(2014, 1, 1, 22, 0, 0, OffSet);
-                var user = new TilerUser { UserName = model.Username, Email = model.Email, FirstName = model.FirstName, LastName = model.LastName, EndfOfDay = EndOfDay.UtcDateTime };
+                var travelCache = new TravelCache();
+                var user = new TilerUser { UserName = model.Username, Email = model.Email, FirstName = model.FirstName, LastName = model.LastName, EndfOfDay = EndOfDay.UtcDateTime, TravelCache = travelCache };
+                travelCache.Id = user.Id;
 
                 var result = await UserManager.CreateAsync(user, model.Password);
 

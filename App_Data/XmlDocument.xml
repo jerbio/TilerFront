@@ -1276,6 +1276,20 @@
             <param name="NameOfFile"></param>
             <returns></returns>
         </member>
+        <member name="M:TilerFront.LogControl.getTravelCache(TilerElements.TilerUser)">
+            <summary>
+            Function retrieves the travel cache of for a specific user
+            </summary>
+            <param name="tilerUser"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.LogControl.getTravelCache(System.String)">
+            <summary>
+            Function retrieves the travel cache of for a specific user
+            </summary>
+            <param name="userId"></param>
+            <returns></returns>
+        </member>
         <member name="M:TilerFront.LogControl.getRestrictionTimeLine(System.Xml.XmlNode)">
             <summary>
             Funciton returns aall the possible active restriction timelines for the restriciton profile

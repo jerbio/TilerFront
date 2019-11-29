@@ -131,104 +131,104 @@ namespace TilerFront.Controllers
         [Route("api/Schedule/FixDBInstance")]
         public async Task<IHttpActionResult> FixRepetition([FromUri] getScheduleModel myAuthorizedUser)
         {
-            string cloudId = "6bc6992f-3222-4fd8-9e2b-b94eba2fb717";
-            string localId = "4751e09f-b592-4e45-9fba-3425ff95b1da";
-            string userId = cloudId;
-            string userName = "jerbio";
-            myAuthorizedUser = new getScheduleModel()
-            {
-                UserName = userName,
-                UserID = userId
-            };
-            UserAccount myUserAccount = await myAuthorizedUser.getUserAccount(db);
-            HttpContext myCOntext = HttpContext.Current;
-            await myUserAccount.Login();
-            myUserAccount.getTilerUser().updateTimeZoneTimeSpan(myAuthorizedUser.getTimeSpan);
+            //string cloudId = "6bc6992f-3222-4fd8-9e2b-b94eba2fb717";
+            //string localId = "4751e09f-b592-4e45-9fba-3425ff95b1da";
+            //string userId = cloudId;
+            //string userName = "jerbio";
+            //myAuthorizedUser = new getScheduleModel()
+            //{
+            //    UserName = userName,
+            //    UserID = userId
+            //};
+            //UserAccount myUserAccount = await myAuthorizedUser.getUserAccount(db);
+            //HttpContext myCOntext = HttpContext.Current;
+            //await myUserAccount.Login();
+            //myUserAccount.getTilerUser().updateTimeZoneTimeSpan(myAuthorizedUser.getTimeSpan);
             
-            ReferenceNow now = new ReferenceNow(DateTimeOffset.UtcNow.removeSecondsAndMilliseconds(), myUserAccount.getTilerUser().EndfOfDay, new TimeSpan());
-            TimeLine timeLine = new TimeLine(Utility.BeginningOfTime, Utility.BeginningOfTime.AddYears(9000));
-            LogControl logControl = myUserAccount.ScheduleLogControl;
-            var calEvents = await logControl.getAllEnabledCalendarEvent(timeLine, now).ConfigureAwait(false);
+            //ReferenceNow now = new ReferenceNow(DateTimeOffset.UtcNow.removeSecondsAndMilliseconds(), myUserAccount.getTilerUser().EndfOfDay, new TimeSpan());
+            //TimeLine timeLine = new TimeLine(Utility.BeginningOfTime, Utility.BeginningOfTime.AddYears(9000));
+            //LogControl logControl = myUserAccount.ScheduleLogControl;
+            //var calEvents = await logControl.getAllEnabledCalendarEvent(timeLine, now).ConfigureAwait(false);
 
-            string homeId = "c66b42a8-10c8-4feb-b4ce-47ad48b03b17";
-            string workId = "272c74fc-c50a-4b9f-bd41-9dfb2420ec03";
-            string gymId = "338733e6-6f44-4d65-a795-5badc3958109";
-            List<CalendarEvent> modifiedCalEvents = new List<CalendarEvent>();
+            //string homeId = "c66b42a8-10c8-4feb-b4ce-47ad48b03b17";
+            //string workId = "272c74fc-c50a-4b9f-bd41-9dfb2420ec03";
+            //string gymId = "338733e6-6f44-4d65-a795-5badc3958109";
+            //List<CalendarEvent> modifiedCalEvents = new List<CalendarEvent>();
 
-            HashSet<string> homeIds = new HashSet<string>()
-            {
-                "771846ce-f85e-4190-add7-8be5ac7c5e23",
-                "be281065-6445-4dff-b501-b8b901ea68ed",
-                "49cc4401-2832-4003-a7ab-bd572829c452",
-                "d8572865-d8f6-482d-9fd3-b4db5d32b4a7",
-                "16d194e7-e3cb-4c46-864a-25a99854ec2b",
-                "64011e46-93df-468c-a7fb-e697fb5461a4",
-                "13b7a23a-84b8-4cc5-8cb7-392bfc6d6703",
-                "7dc68e28-fa6c-4d85-8cfb-2c991f5ec488",
-                "502bd5ef-1087-456a-9f15-64331da3daf1",
-                "b0aa51ab-a482-4099-bf84-6df57220279d",
-                "6d9355e8-044d-44ca-9992-87c4d7023d42",
-                "17660321-aafe-4f57-86ee-8bfb8722890e",
-                "4e208a64-5f93-4a9b-9ca1-6e4165008775",
-                "6e377b75-6e01-488a-8952-b9b8c5218c40",
-                "6d9355e8-044d-44ca-9992-87c4d7023d42",
-                "046d1faf-13d9-4cf7-81b8-1a011ab21f4a",
-                "029ee655-8685-4080-bb93-089bc53e4326",
-                "de40bc2f-2eb1-4d6b-8c37-5e923b216923",
-                "64011e46-93df-468c-a7fb-e697fb5461a4",
-                "046d1faf-13d9-4cf7-81b8-1a011ab21f4a",
-                "7dc68e28-fa6c-4d85-8cfb-2c991f5ec488",
-                "23466912-b03c-4a30-9d42-d6ebea562a66",
-                "211dd173-319a-4bcd-b6b9-7c41a20dd7a6",
-                "d108219e-b5be-4d3c-babc-95832de58781",
-                "31dcf160-0de6-4613-beda-e7829965e4b6",
-                "3c06e628-0864-4613-bb46-98a1c56622b5",
-                "bc00d182-00c7-418f-bb02-b82232fd1101",
-                "d108219e-b5be-4d3c-babc-95832de58781",
-                "0ec72d36-fc9c-4c1e-a64f-20ddcc84ee39",
-                "a0c33778-2dce-419e-8879-ed7de9a5ee87",
-                "7cbdfcaf-fae1-4c65-97bc-ade69bb5762b"
-            };
+            //HashSet<string> homeIds = new HashSet<string>()
+            //{
+            //    "771846ce-f85e-4190-add7-8be5ac7c5e23",
+            //    "be281065-6445-4dff-b501-b8b901ea68ed",
+            //    "49cc4401-2832-4003-a7ab-bd572829c452",
+            //    "d8572865-d8f6-482d-9fd3-b4db5d32b4a7",
+            //    "16d194e7-e3cb-4c46-864a-25a99854ec2b",
+            //    "64011e46-93df-468c-a7fb-e697fb5461a4",
+            //    "13b7a23a-84b8-4cc5-8cb7-392bfc6d6703",
+            //    "7dc68e28-fa6c-4d85-8cfb-2c991f5ec488",
+            //    "502bd5ef-1087-456a-9f15-64331da3daf1",
+            //    "b0aa51ab-a482-4099-bf84-6df57220279d",
+            //    "6d9355e8-044d-44ca-9992-87c4d7023d42",
+            //    "17660321-aafe-4f57-86ee-8bfb8722890e",
+            //    "4e208a64-5f93-4a9b-9ca1-6e4165008775",
+            //    "6e377b75-6e01-488a-8952-b9b8c5218c40",
+            //    "6d9355e8-044d-44ca-9992-87c4d7023d42",
+            //    "046d1faf-13d9-4cf7-81b8-1a011ab21f4a",
+            //    "029ee655-8685-4080-bb93-089bc53e4326",
+            //    "de40bc2f-2eb1-4d6b-8c37-5e923b216923",
+            //    "64011e46-93df-468c-a7fb-e697fb5461a4",
+            //    "046d1faf-13d9-4cf7-81b8-1a011ab21f4a",
+            //    "7dc68e28-fa6c-4d85-8cfb-2c991f5ec488",
+            //    "23466912-b03c-4a30-9d42-d6ebea562a66",
+            //    "211dd173-319a-4bcd-b6b9-7c41a20dd7a6",
+            //    "d108219e-b5be-4d3c-babc-95832de58781",
+            //    "31dcf160-0de6-4613-beda-e7829965e4b6",
+            //    "3c06e628-0864-4613-bb46-98a1c56622b5",
+            //    "bc00d182-00c7-418f-bb02-b82232fd1101",
+            //    "d108219e-b5be-4d3c-babc-95832de58781",
+            //    "0ec72d36-fc9c-4c1e-a64f-20ddcc84ee39",
+            //    "a0c33778-2dce-419e-8879-ed7de9a5ee87",
+            //    "7cbdfcaf-fae1-4c65-97bc-ade69bb5762b"
+            //};
 
 
-            HashSet<string> workIds = new HashSet<string>()
-            {
-                "09733420-b4b2-44dd-babf-0a4bb6b7efb4",
-                "379de824-3f17-4163-b4d4-c3b248b89c5b",
-                "5796e858-0b19-41a4-8a92-1cb0285e7258",
-                "4e208a64-5f93-4a9b-9ca1-6e4165008775"
-            };
+            //HashSet<string> workIds = new HashSet<string>()
+            //{
+            //    "09733420-b4b2-44dd-babf-0a4bb6b7efb4",
+            //    "379de824-3f17-4163-b4d4-c3b248b89c5b",
+            //    "5796e858-0b19-41a4-8a92-1cb0285e7258",
+            //    "4e208a64-5f93-4a9b-9ca1-6e4165008775"
+            //};
 
-            HashSet<string> gymIds = new HashSet<string>()
-            {
-                "8de54f47-d81d-4d2f-8bf6-7e06d9081c7e"
-            };
+            //HashSet<string> gymIds = new HashSet<string>()
+            //{
+            //    "8de54f47-d81d-4d2f-8bf6-7e06d9081c7e"
+            //};
 
-            foreach (var cal in calEvents.Values)
-            {
-                string calId = cal.getTilerID.getCalendarEventComponent();
-                if (gymIds.Contains(calId))
-                {
-                    if (cal.IsRecurring)
-                    {
-                        foreach (var repCal in cal.Repeat.RecurringCalendarEvents())
-                        {
-                            repCal.LocationId = gymId;
-                        }
-                    }
-                    else
-                    {
-                        cal.LocationId = gymId;
-                    }
-                    cal.AllSubEvents.AsParallel().ForAll((subEvent) => subEvent.LocationId = gymId);
-                    modifiedCalEvents.Add(cal);
-                }
-            }
-            bool saveChanges = false;
-            if(saveChanges)
-            {
-                await myUserAccount.Commit(new List<CalendarEvent>(), null, myUserAccount.getTilerUser().LatestId, now).ConfigureAwait(false);
-            }
+            //foreach (var cal in calEvents.Values)
+            //{
+            //    string calId = cal.getTilerID.getCalendarEventComponent();
+            //    if (gymIds.Contains(calId))
+            //    {
+            //        if (cal.IsRepeat)
+            //        {
+            //            foreach (var repCal in cal.Repeat.RecurringCalendarEvents())
+            //            {
+            //                repCal.LocationId = gymId;
+            //            }
+            //        }
+            //        else
+            //        {
+            //            cal.LocationId = gymId;
+            //        }
+            //        cal.AllSubEvents.AsParallel().ForAll((subEvent) => subEvent.LocationId = gymId);
+            //        modifiedCalEvents.Add(cal);
+            //    }
+            //}
+            //bool saveChanges = false;
+            //if(saveChanges)
+            //{
+            //    await myUserAccount.Commit(new List<CalendarEvent>(), null, myUserAccount.getTilerUser().LatestId, now).ConfigureAwait(false);
+            //}
             
 
 
@@ -680,7 +680,7 @@ namespace TilerFront.Controllers
                 {
                     location = TilerElements.Location.getDefaultLocation();
                 }
-                await MySchedule.FindMeSomethingToDo(location);
+                await MySchedule.FindMeSomethingToDo(location).ConfigureAwait(false);
                 await MySchedule.WriteFullScheduleToLog().ConfigureAwait(false);
 
                 List<SubCalendarEvent> allSubEvents = MySchedule.getAllCalendarEvents().Where(calEvent => calEvent.isActive).SelectMany(calEvent => calEvent.ActiveSubEvents).ToList();
@@ -728,7 +728,6 @@ namespace TilerFront.Controllers
                 DateTimeOffset myNow = myNow = myAuthorizedUser.getRefNow();
                 DB_Schedule MySchedule = new DB_Schedule(myUser, myNow, createDump: false);
                 MySchedule.CurrentLocation = myAuthorizedUser.getCurrentLocation();
-                DB_UserActivity activity = new DB_UserActivity(myNow, UserActivity.ActivityType.Shuffle);
                 await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, myUser.UserID, db).ConfigureAwait(false);
                 ScheduleDump scheduleDump = await MySchedule.CreateScheduleDump(notes: UserData.Notes).ConfigureAwait(false);
                 scheduleDump.Notes = UserData.Notes;
