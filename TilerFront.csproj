@@ -508,6 +508,18 @@
     <Compile Include="LogControlXml.cs" />
     <Compile Include="LogControlDirect.cs" />
     <Compile Include="LogControl.cs" />
+    <None Include="Migrations\201911292149290_repeatFix.cs.old" />
+    <Compile Include="Migrations\201911292149290_repeatFix.Designer.cs">
+      <DependentUpon>201911292149290_repeatFix.cs.old</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201911292207526_repetitionFixLocal.cs" />
+    <Compile Include="Migrations\201911292207526_repetitionFixLocal.Designer.cs">
+      <DependentUpon>201911292207526_repetitionFixLocal.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201912020328033_repetitionFix.cs" />
+    <Compile Include="Migrations\201912020328033_repetitionFix.Designer.cs">
+      <DependentUpon>201912020328033_repetitionFix.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -2806,6 +2818,17 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="Scripts\index.d.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201911292149290_repeatFix.resx">
+      <DependentUpon>201911292149290_repeatFix.cs.old</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201911292207526_repetitionFixLocal.resx">
+      <DependentUpon>201911292207526_repetitionFixLocal.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201912020328033_repetitionFix.resx">
+      <DependentUpon>201912020328033_repetitionFix.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

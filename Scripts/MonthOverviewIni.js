@@ -913,6 +913,11 @@ function IconSet()
     var PauseResumeIcon = getDomOrCreateNew(PauseResumeIconID);
     $(PauseResumeIcon).addClass("ControlPanelButton");
 
+    var RepeatIconID = "ControlPanelRepeatButton" + myID;
+    var RepeatIcon = getDomOrCreateNew(RepeatIconID);
+    $(RepeatIcon).addClass("ControlPanelButton");
+    $(RepeatIcon).addClass("ControlPanelRepeatButton");
+
     this.getCloseButton = function ()
     {
         return CloseIcon;
@@ -970,6 +975,17 @@ function IconSet()
         return IconSetContainer;
     }
 
+    this.getRepeateButton = function () {
+        return RepeatIcon;
+    }
+
+    this.hideRepeatButton = function () {
+        $(RepeatIcon).addClass("setAsDisplayNone");
+    }
+    this.showRepeatButton = function () {
+        $(RepeatIcon).removeClass("setAsDisplayNone");
+    }
+
     this.HidePausePauseResumeButton = function () 
     {
         $(PauseResumeIcon).addClass("setAsDisplayNone");
@@ -996,7 +1012,9 @@ function IconSet()
     IconSetContainer.appendChild(DeleteIcon)
     IconSetContainer.appendChild(CompleteIcon)
     IconSetContainer.appendChild(PauseResumeIcon)
+    IconSetContainer.appendChild(RepeatIcon)
     IconSetContainer.appendChild(CloseIcon)
+    
 }
 
 IconSet.ID=0;
@@ -3474,6 +3492,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                 let NotesSubmit = getDomOrCreateNew("submitNotes");
                 var ControlPanelProcrastinateButton = global_ControlPanelIconSet.getProcrastinateButton();
                 var ControlPanelLocationButton = global_ControlPanelIconSet.getLocationButton();
+                var RepeatButton = global_ControlPanelIconSet.getRepeateButton();
                 var ModalDelete = getDomOrCreateNew("ConfirmDeleteModal")
                 var ControlPanelContainer = getDomOrCreateNew("ControlPanelContainer");
                 var MultiSelectPanel = getDomOrCreateNew("MultiSelectPanel");
@@ -3523,6 +3542,14 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
 
                 }
 
+                let now = Date.now();
+                let nowIsWithinSubevent = now < SubEvent.SubCalEndDate.getTime() && now >= SubEvent.SubCalStartDate.getTime();
+                if (nowIsWithinSubevent) {
+                    global_ControlPanelIconSet.showRepeatButton();
+                } else {
+                    global_ControlPanelIconSet.hideRepeatButton();
+                }
+
                 if (!SubEvent.SubCalAddress) {
                     global_ControlPanelIconSet.hideLocationButton();
                 } else {
@@ -3548,9 +3575,11 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                     global_ControlPanelIconSet.hideProcrastinateButton();
                     if (Dictionary_OfCalendarData[SubEvent.CalendarID].Rigid) {
                         global_ControlPanelIconSet.hideCompleteButton();
+                        global_ControlPanelIconSet.hideRepeatButton();
                     }
-                    
                 }
+
+
 
 
                 ProcatinationButton.onclick = function () {
@@ -3567,6 +3596,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                     ControlPanelProcrastinateButton.onclick = null;
                     ControlPanelCloseButton.onclick = null;
                     ControlPanelLocationButton.onclick = null;
+                    RepeatButton.onclick = null;
                 }
 
                 function generateBasePanel()
@@ -3682,6 +3712,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                     deleteButton.onclick = null;
                     completeButton.onclick = null;
                     PauseResumeButton.onclick = null;
+                    RepeatButton.onclick = null;
                     if (slideClose) {
                         $(ControlPanelContainer).slideUp(500);
                     } else {
@@ -4052,15 +4083,81 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                             debugger;
                             HandleNEwPage.Hide();
                             triggerUIUPdate();//hack alert
-                            //getRefreshedData();
                         });
-                }
-                    function triggerUIUPdate() {
-                        //resetButtons();
-                        global_ExitManager.triggerLastExitAndPop();
+                    }
+                        function triggerUIUPdate() {
+                            global_ExitManager.triggerLastExitAndPop();
+                    }
+
                 }
 
-            }
+                function repeatSubEventRequest() {
+                    let TimeZone = new Date().getTimezoneOffset();
+                    let Url = global_refTIlerUrl + "SubCalendarEvent/Repeat";
+                    let HandleNEwPage = new LoadingScreenControl("Tiler is configuring the repetition ...");
+                    HandleNEwPage.Launch();
+
+                    var RepetitionData = {
+                        UserName: UserCredentials.UserName,
+                        UserID: UserCredentials.ID,
+                        EventID: SubEvent.ID,
+                        TimeZoneOffset: TimeZone,
+                        ThirdPartyEventID: SubEvent.ThirdPartyEventID,
+                        ThirdPartyUserID: SubEvent.ThirdPartyUserID,
+                        ThirdPartyType: SubEvent.ThirdPartyType
+                    };
+                    RepetitionData.TimeZone = moment.tz.guess()
+                    preSendRequestWithLocation(RepetitionData);
+
+                    var exit = function (data) {
+                        HandleNEwPage.Hide();
+                        global_ExitManager.triggerLastExitAndPop();
+                    }
+
+                    $.ajax({
+                        type: "POST",
+                        url: Url,
+                        data: RepetitionData,
+                        // DO NOT SET CONTENT TYPE to json
+                        // contentType: "application/json; charset=utf-8", 
+                        // DataType needs to stay, otherwise the response object
+                        // will be treated as a single string
+                        //dataType: "json",
+                        success: function (response) {
+                            triggerUndoPanel("Undo Repeat");
+                            var myContainer = (response);
+                            if (myContainer.Error.code == 0) {
+                                HandleNEwPage.Hide();
+                            }
+                            else {
+                                let customError = myContainer.Error;
+                                let message = customError.Message || "Ooops Tiler is having updating your schedule."
+                                var ExitAfter = {
+                                    ExitNow: true, Delay: 3000
+                                };
+                                HandleNEwPage.UpdateMessage(message, ExitAfter, exit);
+                            }
+
+                        },
+                        error: function (err) {
+                            var myError = err;
+                            var step = "err";
+                            var NewMessage = "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
+                            var ExitAfter = {
+                                ExitNow: true, Delay: 1000
+                            };
+                            HandleNEwPage.UpdateMessage(NewMessage, ExitAfter, exit);
+                        }
+
+                    }).done(function (data) {
+                        debugger;
+                        triggerUIUPdate();//hack alert
+                    });
+
+                    function triggerUIUPdate() {
+                        global_ExitManager.triggerLastExitAndPop();
+                    }
+                }
 
                 function closeModalDelete(slidePanel = true) {
                     DeleteMessage.innerHTML = "Sure you want to delete ?"
@@ -4073,6 +4170,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                 }
                 deleteButton.onclick = deleteSubevent;
                 completeButton.onclick = markAsComplete;
+                RepeatButton.onclick = repeatSubEventRequest;
                 if (SubEvent.isPaused) {
                     global_eventIsPaused = true;
                     global_ControlPanelIconSet.switchToResumeButton();
@@ -4113,18 +4211,12 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                         deleteSubevent();
                     }
                 }
-                //debugger;
                 document.removeEventListener("keydown", containerKeyPress);//this is here just to avooid duplicate addition of the same keypress event
                 document.addEventListener("keydown", containerKeyPress);
 
                 global_UISetup.RenderOnSubEventClick.isRefListSubEventClicked = true;
                 global_UISetup.RenderOnSubEventClick.BottomPanelIsOpen = true;
 
-                /*
-                ControlPanelNameOfSubeventInfo.innerHTML = SubEvent.Name;
-                ControlPanelDeadlineOfSubeventInfo.innerHTML = Deadline.hour + ' ' + Deadline.minute + ' ' + Deadline.merid + ' // ' + Deadline.day + ', ' + Deadline.mon + ' ' + Deadline.date;
-                ControlPanelSubEventTimeInfo.innerHTML = StartDate.hour + ' ' + StartDate.minute + ' ' + StartDate.merid + ' &mdash; ' + EndDate.hour + ' ' + EndDate.minute + ' ' + EndDate.merid;
-                */
                 function stopPropagationOfKeyDown(e) {
                     if (e.which == 27)
                     {

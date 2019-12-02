@@ -112,5 +112,78 @@ namespace TilerFront.Controllers
             scheduleChangeSocket.triggerRefreshData(retrievedUser.getTilerUser());
             return Ok(retValue.getPostBack);
         }
+
+        /// <summary>
+        /// Function adds a repeated after the specified sub event 
+        /// </summary>
+        /// <param name="UserData"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [ResponseType(typeof(PostBackStruct))]
+        [Route("api/SubCalendarEvent/Repeat")]
+        public async Task<IHttpActionResult> RepeatSubCalendarEvent([FromBody]getEventModel UserData)
+        {
+            UserAccount retrievedUser = await UserData.getUserAccount(db);
+            await retrievedUser.Login();
+            retrievedUser.getTilerUser().updateTimeZoneTimeSpan(UserData.getTimeSpan);
+            PostBackData retValue = new PostBackData("", 1);
+            DateTimeOffset refNow = UserData.getRefNow();
+            DB_UserActivity activity = new DB_UserActivity(refNow, UserActivity.ActivityType.Repeat);
+            JObject json = JObject.FromObject(UserData);
+            activity.updateMiscelaneousInfo(json.ToString());
+            if (retrievedUser.Status)
+            {
+                string CalendarType = UserData.ThirdPartyType.ToLower();
+
+                switch (CalendarType)
+                {
+                    case "google":
+                        {
+                            Models.ThirdPartyCalendarAuthenticationModel AllIndexedThirdParty = await ScheduleController.getThirdPartyAuthentication(retrievedUser.UserID, UserData.ThirdPartyUserID, "Google", db);
+                            GoogleTilerEventControl googleControl = new GoogleTilerEventControl(AllIndexedThirdParty, db);
+                            await googleControl.deleteSubEvent(UserData).ConfigureAwait(false);
+                            retValue = new PostBackData("\"Success\"", 0);
+                        }
+                        break;
+                    case "tiler":
+                        {
+                            SubCalendarEvent subEvent = await retrievedUser.ScheduleLogControl.getSubEventWithID(UserData.EventID, false, false).ConfigureAwait(false);
+                            if (subEvent != null)
+                            {
+                                if (subEvent.IsDateTimeWithin(refNow))
+                                {
+                                    DB_Schedule MySchedule = new DB_Schedule(retrievedUser, refNow);
+                                    MySchedule.CurrentLocation = UserData.getCurrentLocation();
+                                    await ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, UserData.UserID, db).ConfigureAwait(false);
+                                    activity.eventIds.Add(UserData.EventID);
+                                    retrievedUser.ScheduleLogControl.updateUserActivty(activity);
+                                    MySchedule.RepeatEvent(UserData.EventID, MySchedule.CurrentLocation);
+                                    await MySchedule.WriteFullScheduleToLog().ConfigureAwait(false);
+                                    retValue = new PostBackData("\"Success\"", 0);
+                                }
+                                else
+                                {
+                                    retValue = new PostBackData(new CustomErrors(CustomErrors.Errors.Repeated_Tile_Is_Not_Current_Tile));
+                                    return Ok(retValue.getPostBack);
+                                }
+
+                            }
+                            else
+                            {
+                                retValue = new PostBackData(new CustomErrors(CustomErrors.Errors.Tile_Or_Event_ID_Cannot_Be_Found));
+                                return Ok(retValue.getPostBack);
+                            }
+
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
+            scheduleChangeSocket.triggerRefreshData(retrievedUser.getTilerUser());
+            return Ok(retValue.getPostBack);
+        }
     }
 }

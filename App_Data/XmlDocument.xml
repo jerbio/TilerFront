@@ -915,6 +915,13 @@
             <param name="DaySelection"></param>
             <returns></returns>
         </member>
+        <member name="M:TilerFront.Controllers.SubCalendarEventController.RepeatSubCalendarEvent(TilerFront.Models.getEventModel)">
+            <summary>
+            Function adds a repeated after the specified sub event 
+            </summary>
+            <param name="UserData"></param>
+            <returns></returns>
+        </member>
         <member name="T:TilerFront.TilerController">
             <summary>
             Tiler controller that provides custom tiler functionality
@@ -1295,6 +1302,16 @@
             Funciton returns aall the possible active restriction timelines for the restriciton profile
             </summary>
             <param name="RestrictionTimeLineNode"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.LogControl.getSubEventWithID(System.String,System.Boolean,System.Boolean)">
+            <summary>
+            Function returns a subcalendarevent  based on the provided ID. It checks if the userId is also valid.
+            set <paramref name="includeParentCalevent"/> to false if you don't want the subcalendarevent calendar event to include the parent calendar event of the subevent
+            </summary>
+            <param name="ID"></param>
+            <param name="includeParentCalevent"></param>
+            <param name="includeRepetition"></param>
             <returns></returns>
         </member>
         <member name="M:TilerFront.LogControl.deleteAllDatabaseData">

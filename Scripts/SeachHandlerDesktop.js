@@ -159,9 +159,6 @@ function CallBackFunctionForReturnedValuesDesktop(data, DomContainer) {
 
 
         TopPanelContainerContainer.Dom.appendChild(NameOfSearchedEventContainer.Dom);
-        //    NameOfSearchedEventContainer.Dom.style.width = "85%";//hack alert
-        //TopPanelContainerContainer.Dom.appendChild(RepetitionOfSearchedEventContainer.Dom);
-        //TopPanelContainerContainer.Dom.appendChild(CompletionGraphOfSearchedEventContainer.Dom);
         TopPanelContainerContainer.Dom.appendChild(DoNowButtonOfSearchedEventContainer.Dom);
 
 
@@ -231,9 +228,10 @@ function CallBackFunctionForReturnedValuesDesktop(data, DomContainer) {
         var IconSetContainer = MyIconSet.getIconSetContainer();
         $(IconSetContainer).addClass("IconSetSearch");
         $(MyIconSet.getCloseButton()).addClass("setAsDisplayNone");
-        $(MyIconSet.getLocationButton()).addClass("setAsDisplayNone");
-        $(MyIconSet.getProcrastinateButton()).addClass("setAsDisplayNone");
-        $(MyIconSet.getPauseResumeButton()).addClass("setAsDisplayNone");
+        MyIconSet.hideLocationButton();
+        MyIconSet.hideProcrastinateButton();
+        MyIconSet.HidePausePauseResumeButton();
+        MyIconSet.hideRepeatButton();
         
         var DeleteButton = MyIconSet.getDeleteButton();
         DeleteButton.onclick = function () { DeleteTrigger(DoNowButtonOfSearchedEventContainer, MyCalendarEVent, function () { }) }

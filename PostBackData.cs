@@ -54,6 +54,10 @@ namespace TilerFront
             Status = StatusEntry;
         }
 
+        public PostBackData(CustomErrors.Errors Error):this(new CustomErrors(Error))
+        {
+
+        }
         public PostBackData(CustomErrors Error)
         {
             Status = 0;
@@ -64,7 +68,6 @@ namespace TilerFront
                 Message = Error.Message;
                 Status = Error.Code;
             }
-            
         }
 
         public PostBackData(dynamic DataEntry, int StatusEntry)
@@ -77,7 +80,7 @@ namespace TilerFront
         {
             string retValue;
             string defaultMessage = "Tiler is having some issues please try again later";
-            if (errorCode > 20000000)
+            if (errorCode > 0 && errorCode < 20000000)
             {
                 retValue = defaultMessage;
                 return retValue;
@@ -112,27 +115,5 @@ namespace TilerFront
                 return PostBackData;
             }
         }
-
-        public string getPostBackData
-        {
-            get
-            {
-                JObject retValueJson = new JObject();
-                JObject error = new JObject();
-                error.Add("code", Status);
-                error.Add("Message", getErrorMessage(Status));
-                retValueJson.Add("Content", Data);
-                string retValue = "{\"Error\":{\"code\":\"" + Status + "\",\"Message\":\"" + getErrorMessage(Status) + "\"},\"Content\":" + Data + "}";
-                retValue = retValueJson.ToString();
-                return retValue;
-            }
-        }
-
-
-
-        
-
-        
-
     }
 }

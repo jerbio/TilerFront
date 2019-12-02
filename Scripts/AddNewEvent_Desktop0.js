@@ -25,7 +25,7 @@ function generateOfficeHours(Place)
 {
     var RetValue = { WeekDayData: [], IsTwentyFourHours: false,NoWeekData:true };
 
-    if (Place.opening_hours.weekday_text.length)
+    if (Place && Place.opening_hours && Place.opening_hours.weekday_text.length)
     {
         for (var i = 0; i < Place.opening_hours.weekday_text.length; i++)
         {

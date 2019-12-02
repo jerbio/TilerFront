@@ -860,9 +860,9 @@ namespace TilerFront
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("Complete"));
             MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.getIsComplete.ToString();
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("Name"));
-            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.getName.NameValue.ToString();
+            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.getName?.NameValue?.ToString();
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("NameId"));
-            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.getName.NameId.ToString();
+            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.getName?.NameId.ToString();
 
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("Location"));
             MyEventSubScheduleNode.ChildNodes[0].InnerXml = CreateLocationNode(MySubEvent.Location, "EventSubScheduleLocation").InnerXml;
@@ -3002,27 +3002,44 @@ namespace TilerFront
                 entity.Reload();
             }
         }
-        public async Task<SubCalendarEvent> getSubEventWithID(string ID)
+        /// <summary>
+        /// Function returns a subcalendarevent  based on the provided ID. It checks if the userId is also valid.
+        /// set <paramref name="includeParentCalevent"/> to false if you don't want the subcalendarevent calendar event to include the parent calendar event of the subevent
+        /// </summary>
+        /// <param name="ID"></param>
+        /// <param name="includeParentCalevent"></param>
+        /// <param name="includeRepetition"></param>
+        /// <returns></returns>
+        public async Task<SubCalendarEvent> getSubEventWithID(string ID, bool includeParentCalevent = true, bool includeRepetition = true)
         {
-            SubCalendarEvent retValue = await Database.SubEvents
-                .Include(subEvent => subEvent.UiParams_EventDB)
+            IQueryable<SubCalendarEvent> subEventQuery = Database.SubEvents
                 .Include(subEvent => subEvent.DataBlob_EventDB)
                 .Include(subEvent => subEvent.Name)
                 .Include(subEvent => subEvent.Name.Creator_EventDB)
                 .Include(subEvent => subEvent.Location_DB)
                 .Include(subEvent => subEvent.Creator_EventDB)
-                .Include(subEvent => subEvent.Repetition_EventDB)
                 .Include(subEvent => subEvent.DataBlob_EventDB)
                 .Include(subEvent => subEvent.Procrastination_EventDB)
                 .Include(subEvent => subEvent.ProfileOfNow_EventDB)
-                .Include(subEvent => subEvent.ParentCalendarEvent)
-                .Include(subEvent => subEvent.Repetition_EventDB.RepeatingEvents)
-                .Include(subEvent => subEvent.RestrictionProfile)
-                //.Include(subEvent => subEvent.RetrictionProfile.DaySelection.Select(restrictedDay => restrictedDay.RestrictionTimeLine))
-                //.Include(subEvent => subEvent.RetrictionProfile.NoNull_DaySelections)
-                //.Include(subEvent => subEvent.RetrictionProfile.NoNull_DaySelections.Select(restrictedDay => restrictedDay.RestrictionTimeLine))
-                .SingleOrDefaultAsync(subEvent => subEvent.Id == ID);
-            if (retValue.getIsEventRestricted)
+                .Include(subEvent => subEvent.RestrictionProfile);
+
+            if(includeParentCalevent)
+            {
+                subEventQuery = subEventQuery.Include(subEvent => subEvent.ParentCalendarEvent);
+            }
+
+            if(includeRepetition)
+            {
+                subEventQuery = subEventQuery
+                    .Include(subEvent => subEvent.Repetition_EventDB)
+                    .Include(subEvent => subEvent.Repetition_EventDB.RepeatingEvents);
+            }
+
+
+            SubCalendarEvent retValue = await subEventQuery
+                .Where(subEvent => subEvent.CreatorId == _TilerUser.Id)
+                .SingleOrDefaultAsync(subEvent => subEvent.Id == ID).ConfigureAwait(false);
+            if (retValue!= null && retValue.getIsEventRestricted)
             {
                 (retValue as SubCalendarEventRestricted).RestrictionProfile.InitializeOverLappingDictionary();
             }
