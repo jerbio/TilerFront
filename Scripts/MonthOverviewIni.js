@@ -619,7 +619,8 @@ function RevealControlPanelSection(SelectedEvents)
     $(ControlPanelCloseButton).removeClass("setAsDisplayNone")
     var ProcrastinateEventModalContainer = getDomOrCreateNew("ProcrastinateEventModal");
     var ControlPanelProcrastinateButton = RevealControlPanelSection.IconSet.getProcrastinateButton();
-    $(ControlPanelProcrastinateButton).addClass("setAsDisplayNone");
+    RevealControlPanelSection.IconSet.hideProcrastinateButton();
+    RevealControlPanelSection.IconSet.hideRepeatButton();
     $(RevealControlPanelSection.IconSet.getLocationButton()).addClass("setAsDisplayNone");
     var ModalDelete = getDomOrCreateNew("ConfirmDeleteModal")
     var MultiSelectPanel = getDomOrCreateNew("MultiSelectPanel")
