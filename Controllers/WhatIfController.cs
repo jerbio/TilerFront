@@ -31,7 +31,7 @@ namespace TilerFront.Controllers
                 DB_Schedule MySchedule = new DB_Schedule(myUserAccount, myAuthorizedUser.getRefNow());
                 MySchedule.CurrentLocation = myAuthorizedUser.getCurrentLocation();
                 Tuple<Health, Health> evaluation;
-                evaluation = await MySchedule.WhatIfPushedAll(UserData.Duration, null);
+                evaluation = await MySchedule.TimeStone.PushedAll(UserData.Duration, null);
 
                 JObject before = evaluation.Item1.ToJson();
                 JObject after = evaluation.Item2.ToJson();
@@ -73,11 +73,11 @@ namespace TilerFront.Controllers
                         var calEventAndSubEvent = MySchedule.getNearestEventToNow();
                         subEvent = calEventAndSubEvent.Item2;
                         EventID eventId = new EventID(calEventAndSubEvent.Item2.getId);
-                        evaluation = await MySchedule.WhatIfPushed(UserData.Duration, eventId, null);
+                        evaluation = await MySchedule.TimeStone.PushSingleEvent(UserData.Duration, eventId, null);
                     }
                     else
                     {
-                        evaluation = await MySchedule.WhatIfPushed(UserData.Duration, new EventID(UserData.EventId), null);
+                        evaluation = await MySchedule.TimeStone.PushSingleEvent(UserData.Duration, new EventID(UserData.EventId), null);
                     }
 
                     JObject before = evaluation.Item1.ToJson();
