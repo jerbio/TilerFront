@@ -10,6 +10,7 @@ using System.Web.Http;
 using System.Web.Http.Description;
 using System.Web.Mvc;
 using TilerElements;
+using ScheduleAnalysis;
 using TilerFront.Models;
 
 namespace TilerFront.Controllers
