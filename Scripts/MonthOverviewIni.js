@@ -23,6 +23,164 @@ var ClassicUIOptions = { Init: function () { }, RenderOnSubEventClick: renderCla
 var ListUIOptions = { Init: InitializeListUIEffects, RenderOnSubEventClick: renderSubEventsClickEvents, RenderSubEvent: renderSideBarEvents, RenderTimeInformation: RenderListTimeInformation, ConflictCalculation: DoSideBarsInterSect, ClearUIEffects: ResetListUIEffects,DisplayFullGrid:false, ButtonID: "ListViewButton" }
 
 var AllUIOptions = [ListUIOptions, ClassicUIOptions];
+let previewResp = {//delbepu
+    "Error": {
+        "code": "0",
+        "Message": ""
+    },
+    "Content": {
+        "before": {
+            "distance": {
+                "score": "Infinity",
+                "evaluation": [{
+                    "startOfDay": 1576373400000,
+                    "distances": [1.7976931348623157e+308, 1.7976931348623157e+308, 0, 8.586847476409437, 8.588472175068713]
+                }, {
+                    "startOfDay": 1576396800000,
+                    "distances": [0, 1.7976931348623157e+308, 1.7976931348623157e+308, 8.586847476409437, 8.588472175068713, 1.7976931348623157e+308, 1.7976931348623157e+308, 0]
+                }, {
+                    "startOfDay": 1576483200000,
+                    "distances": [13.694850979249546, 0, 13.6870659173699, 0, 0, 0, 0]
+                }, {
+                    "startOfDay": 1576569600000,
+                    "distances": [0, 13.694850979249546, 0, 1.7976931348623157e+308, 1.7976931348623157e+308, 0, 0, 0]
+                }, {
+                    "startOfDay": 1576656000000,
+                    "distances": [13.694850979249546, 0, 13.6870659173699, 0, 0]
+                }, {
+                    "startOfDay": 1576742400000,
+                    "distances": [13.694850979249546, 0, 13.6870659173699, 0, 0, 0]
+                }, {
+                    "startOfDay": 1576828800000,
+                    "distances": [0, 0, 13.694850979249546, 0, 1.7780954648552774, 1.7976931348623157e+308, 1.7976931348623157e+308, 0]
+                }, {
+                    "startOfDay": 1576915200000,
+                    "distances": [0, 1.7976931348623157e+308, 1.7976931348623157e+308, 1.7976931348623157e+308, 0, 0, 8.586847476409437]
+                }]
+            },
+            "position": 1.1434589122532868,
+            "conflict": 3,
+            "sleep": {
+                "Score": 0.06475795261113289,
+                "SleepTimeLines": {
+                    "1576396800000": {
+                        "start": 1576396440000,
+                        "end": 1576418040000,
+                        "duration": 21600000
+                    },
+                    "1576483200000": {
+                        "start": 1576477140000,
+                        "end": 1576498740000,
+                        "duration": 21600000
+                    },
+                    "1576569600000": {
+                        "start": 1576569540000,
+                        "end": 1576591140000,
+                        "duration": 21600000
+                    },
+                    "1576656000000": {
+                        "start": 1576655940000,
+                        "end": 1576677540000,
+                        "duration": 21600000
+                    },
+                    "1576742400000": {
+                        "start": 1576735140000,
+                        "end": 1576756740000,
+                        "duration": 21600000
+                    },
+                    "1576828800000": {
+                        "start": 1576825140000,
+                        "end": 1576846740000,
+                        "duration": 21600000
+                    },
+                    "1576915200000": {
+                        "start": 1576915140000,
+                        "end": 1576936740000,
+                        "duration": 21600000
+                    }
+                },
+                "UndesiredTimeLines": {}
+            },
+            "eventPerDayScore": 6.375,
+            "scheduleScore": "Infinity"
+        },
+        "after": {
+            "distance": {
+                "score": "Infinity",
+                "evaluation": [{
+                    "startOfDay": 1576373400000,
+                    "distances": [0, 0, 8.586847476409437, 8.588472175068713]
+                }, {
+                    "startOfDay": 1576396800000,
+                    "distances": [0, 1.7976931348623157e+308, 1.7976931348623157e+308, 8.586847476409437, 8.588472175068713]
+                }, {
+                    "startOfDay": 1576483200000,
+                    "distances": [0, 15.37252959039576, 1.7780524072106756, 0, 13.6870659173699]
+                }, {
+                    "startOfDay": 1576569600000,
+                    "distances": [0, 15.37252959039576, 1.7780524072106756, 0, 13.6870659173699]
+                }, {
+                    "startOfDay": 1576656000000,
+                    "distances": [0, 0, 13.694850979249546, 0, 13.6870659173699]
+                }, {
+                    "startOfDay": 1576742400000,
+                    "distances": [0, 0, 13.694850979249546, 0, 13.6870659173699, 0]
+                }, {
+                    "startOfDay": 1576828800000,
+                    "distances": [0, 13.694850979249546, 0, 13.6870659173699, 0]
+                }, {
+                    "startOfDay": 1576915200000,
+                    "distances": [0, 0, 0, 0]
+                }]
+            },
+            "position": 0.07771943235658915,
+            "conflict": 5,
+            "sleep": {
+                "Score": 0.04344685935937769,
+                "SleepTimeLines": {
+                    "1576396800000": {
+                        "start": 1576395000000,
+                        "end": 1576416600000,
+                        "duration": 21600000
+                    },
+                    "1576483200000": {
+                        "start": 1576447140000,
+                        "end": 1576468740000,
+                        "duration": 21600000
+                    },
+                    "1576569600000": {
+                        "start": 1576535040000,
+                        "end": 1576556640000,
+                        "duration": 21600000
+                    },
+                    "1576656000000": {
+                        "start": 1576621440000,
+                        "end": 1576643040000,
+                        "duration": 21600000
+                    },
+                    "1576742400000": {
+                        "start": 1576707840000,
+                        "end": 1576729440000,
+                        "duration": 21600000
+                    },
+                    "1576828800000": {
+                        "start": 1576814340000,
+                        "end": 1576835940000,
+                        "duration": 21600000
+                    },
+                    "1576915200000": {
+                        "start": 1576900740000,
+                        "end": 1576922340000,
+                        "duration": 21600000
+                    }
+                },
+                "UndesiredTimeLines": {}
+            },
+            "eventPerDayScore": 4.5,
+            "scheduleScore": "Infinity"
+        }
+    }
+}
 $(document).ready(function () {
     LaumchUIOPtion(0);
     $(document).tooltip({ track: true });
@@ -613,8 +771,9 @@ function RevealControlPanelSection(SelectedEvents)
     var completeButton = RevealControlPanelSection.IconSet.getCompleteButton();
     var deleteButton = RevealControlPanelSection.IconSet.getDeleteButton();
     var DeleteMessage = getDomOrCreateNew("DeleteMessage")
-    var ProcatinationButton = getDomOrCreateNew("submitProcatination");
-    var ProcatinationCancelButton = getDomOrCreateNew("cancelProcatination");
+    var ProcastinationButton = getDomOrCreateNew("submitProcastination");
+    var ProcastinationCancelButton = getDomOrCreateNew("cancelProcastination");
+    var PreviewButton = getDomOrCreateNew("previewProcastination");
     var ControlPanelCloseButton = RevealControlPanelSection.IconSet.getCloseButton();
     $(ControlPanelCloseButton).removeClass("setAsDisplayNone")
     var ProcrastinateEventModalContainer = getDomOrCreateNew("ProcrastinateEventModal");
@@ -3483,8 +3642,9 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                 var PauseResumeButton = global_ControlPanelIconSet.getPauseResumeButton()
                 var deleteButton = global_ControlPanelIconSet.getDeleteButton();
                 var DeleteMessage = getDomOrCreateNew("DeleteMessage")
-                var ProcatinationButton = getDomOrCreateNew("submitProcatination");
-                var ProcatinationCancelButton = getDomOrCreateNew("cancelProcatination");
+                var ProcastinationButton = getDomOrCreateNew("submitProcastination");
+                var ProcastinationCancelButton = getDomOrCreateNew("cancelProcastination");
+                var PreviewProcrastinationButton = getDomOrCreateNew("previewProcastination");
                 var ControlPanelCloseButton = global_ControlPanelIconSet.getCloseButton();
                 var ProcrastinateEventModalContainer = getDomOrCreateNew("ProcrastinateEventModal");
                 let NotesModal = getDomOrCreateNew("NotesModal");
@@ -3583,13 +3743,17 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
 
 
 
-                ProcatinationButton.onclick = function () {
+                ProcastinationButton.onclick = function () {
                     procrastinateEvent();
                     closeProcrastinatePanel();
                 }
 
+                PreviewProcrastinationButton.onclick = function () {
+                    previewProcrastinate();
+                }
 
-                ProcatinationCancelButton.onclick = closeProcrastinatePanel;
+
+                ProcastinationCancelButton.onclick = closeProcrastinatePanel;
 
                 function resetButtons() {
                     yeaButton.onclick = null;
@@ -4019,6 +4183,168 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                         global_ExitManager.triggerLastExitAndPop();
                     }
             }
+
+                function processPreview(previewData, isUpdate = false) {
+                    closeProcrastinatePanel();
+                    debugger
+
+                    let sleepPreviewDomId = "SleepEvaluationPreview"
+                    let PreviewModal = getDomOrCreateNew("PreviewModal")
+                    function cleanUpSleePreviewContainer() {
+                        let sleepEvaluationPreviewNode = getDomOrCreateNew(sleepPreviewDomId);
+                        while (sleepEvaluationPreviewNode.firstChild) {
+                            sleepEvaluationPreviewNode.removeChild(sleepEvaluationPreviewNode.firstChild);
+                        }
+                    }
+
+                    function createSleepDom(dayData, isUndesired) {
+                        let dayId = dayData.startOfDay;
+                        let dayDomId = dayId + "_sleep_dayDom"
+                        let retValue = getDomOrCreateNew(dayDomId)
+
+                        let dayDomContainerId = dayId + "_sleep_dayDom_container"
+                        let retValueContainer = getDomOrCreateNew(dayDomContainerId);
+                        let startOfDayDate = new Date(dayData.startOfDay);
+
+
+                        let weekDay = WeekDays[startOfDayDate.getDay()];
+                        let weekDayId = dayId + "_" + weekDay;
+                        let weekDayIdContainerName = weekDayId+"_container"
+
+                        //weekdayTitle
+                        let nameOfWeekDayDomContainer = getDomOrCreateNew(weekDayIdContainerName);
+                        let weekDayIdLabel = weekDayId + "_label"
+                        let weekDayLabel = getDomOrCreateNew(weekDayIdLabel, "span");
+                        weekDayLabel.innerHTML = weekDay;
+                        nameOfWeekDayDomContainer.Dom.appendChild(weekDayLabel);
+
+                        // duration Content
+                        let duration = dayData.duration;
+                        let durationString = moment.utc(duration).format("HH:mm");
+                        let durationContainerId = "durationContainerName" + dayId;
+                        let durationDomContainer = getDomOrCreateNew(durationContainerId);
+                        let durationDomNameId = durationContainerId+ "_label"
+                        let durationDom = getDomOrCreateNew(durationDomNameId, "span");
+                        durationDom.innerHTML = durationString;
+                        durationDomContainer.appendChild(durationDom);
+
+
+                        retValueContainer.appendChild(nameOfWeekDayDomContainer);
+                        retValueContainer.appendChild(durationDomContainer);
+                        retValue.appendChild(retValueContainer);
+
+                        return retValue;
+                    }
+
+                    function openPreview(previewData) {
+                        if (previewData) {
+                            function showSleepTimes() {
+                                cleanUpSleePreviewContainer()
+                                let sleepDoms = [];
+                                if (previewData.after && previewData.after.sleep) {
+                                    if (previewData.after.sleep.UndesiredTimeLines && previewData.after.sleep.UndesiredTimeLines.length > 0) {
+                                        let timeLines = previewData.after.sleep.UndesiredTimeLines;
+                                        
+                                        for (let key in timeLines)
+                                        {
+                                            let timeline = timeLines[key];
+                                            timeline.startOfDay = Number(key);
+                                            let sleepDom = createSleepDom(timeline, true)
+                                            sleepDoms.push(sleepDom)
+                                        }
+                                    } else {
+                                        let timeLines = previewData.after.sleep.SleepTimeLines;
+                                        for (let key in timeLines) {
+                                            let timeline = timeLines[key];
+                                            timeline.startOfDay = Number(key)
+                                            let sleepDom = createSleepDom(timeline, false);
+                                            sleepDoms.push(sleepDom);
+                                        }
+                                    }
+                                }
+                                let sleepEvaluationPreviewNode = getDomOrCreateNew(sleepPreviewDomId);
+                                sleepDoms.forEach((dom) => {
+                                    sleepEvaluationPreviewNode.appendChild(dom)
+                                })
+                                
+                            }
+
+                            let sleepDoms = showSleepTimes();
+                        }
+
+                        PreviewModal.focus();
+                        $(PreviewModal).slideDown(500);
+                        $(PreviewModal).addClass("active");
+                        $(PreviewModal).removeClass("setAsDisplayNone");
+                    }
+
+                    function closePreview() {
+                        $(PreviewModal).slideUp(500);
+                        $(PreviewModal).addClass("setAsDisplayNone");
+                    }
+                    let closePreviewButton = getDomOrCreateNew("closePreview");
+                    closePreviewButton.innerHTML = "Close"
+                    closePreviewButton.onclick = closePreview;
+                    openPreview(previewData);
+                }
+
+                processPreview.currentData = {}
+                
+                function previewProcrastinate() {
+                    //processPreview(previewResp.Content)
+                    var HourInput = getDomOrCreateNew("procrastinateHours").value == "" ? 0 : getDomOrCreateNew("procrastinateHours").value;
+                    var MinInput = getDomOrCreateNew("procrastinateMins").value == "" ? 0 : getDomOrCreateNew("procrastinateMins").value;
+                    var DayInput = getDomOrCreateNew("procrastinateDays").value == "" ? 0 : getDomOrCreateNew("procrastinateDays").value;
+                    let durationInMs = (OneHourInMs * HourInput) + (MinInput * OneMinInMs) + (DayInput * OneDayInMs);
+                    debugger;
+                    var TimeZone = new Date().getTimezoneOffset();
+                    var NowData = { UserName: UserCredentials.UserName, UserID: UserCredentials.ID, EventID: SubEvent.ID, DurationInMs: durationInMs , TimeZoneOffset: TimeZone };
+                    //var URL= "RootWagTap/time.top?WagCommand=2";
+                    var URL = global_refTIlerUrl + "WhatIf/PushedAll";
+                    NowData.TimeZone = moment.tz.guess()
+                    var HandleNEwPage = new LoadingScreenControl("Tiler is Previewing  :)");
+                    HandleNEwPage.Launch();
+                    preSendRequestWithLocation(NowData);
+
+                    var exit = function (data) {
+                        HandleNEwPage.Hide();
+                        //triggerUIUPdate();//hack alert
+                        global_ExitManager.triggerLastExitAndPop();
+                        //getRefreshedData();
+                    }
+                    $.ajax({
+                        type: "POST",
+                        url: URL,
+                        data: NowData,
+                        // DO NOT SET CONTENT TYPE to json
+                        // contentType: "application/json; charset=utf-8", 
+                        // DataType needs to stay, otherwise the response object
+                        // will be treated as a single string
+                        dataType: "json",
+                        success: function (response) {
+                            debugger
+                            triggerUndoPanel("Undo Procrastination");
+                            
+                            if (response.Error.code == 0) {
+                                processPreview(response.Content)
+                            }
+                            else {
+                                alert("error detected with marking as complete");
+                            }
+                            HandleNEwPage.Hide();
+                        },
+                        error: function () {
+                            var NewMessage = "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
+                            var ExitAfter = {
+                                ExitNow: true, Delay: 1000
+                            };
+                            HandleNEwPage.UpdateMessage(NewMessage, ExitAfter, exit);
+                        }
+                    })
+                }
+
+                previewProcrastinate = buildFunctionSubscription(previewProcrastinate)
+
 
                 function markAsComplete() {
                     SendMessage();

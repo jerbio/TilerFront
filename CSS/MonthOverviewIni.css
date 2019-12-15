@@ -1475,9 +1475,21 @@ width: auto;
     text-align:center;
 }
 
-.hideMultiSelectPanel 
-{
-    display:none;
+#PreviewModal {
+    display: block;
+    z-index: 79;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: white;
+}
+
+#PreviewModal.active {
+    position: absolute;
+}
+
+.hideMultiSelectPanel {
+    display: none;
 }
 
 
@@ -1487,14 +1499,13 @@ width: auto;
   display:none;
 }
 
-#InfoContainer span {
-    display:inline;
+#InfoContainer {
 }
 
-#InfoContainer div 
-{
 
-} 
+#InfoContainer span {
+    display:inline;/
+}
 
 #InfoContainer input 
 {
