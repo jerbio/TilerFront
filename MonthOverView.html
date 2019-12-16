@@ -142,35 +142,51 @@
     
     
     <div id="ControlPanelContainer" tabindex="1">
-      <div id="InfoContainer">
-          <div id="ControlPanelNameOfSubevent" class="SubEventInformationContainer">
-              <label id="SelectedSubEventLabel" class="InfoContainerLabel">Name</label>
-              <div class="InfoControlPanel" id="ControlPanelNameOfSubeventInfo"></div>
-          </div>
-          <div id="ControlPanelSubEventTime" class="SubEventInformationContainer">
-              <label id="SelectedSubEventLabel" class="InfoContainerLabel">Date &amp; Time</label>
-              <div class="InfoControlPanel" id="ControlPanelSubEventTimeInfo"></div>
-          </div>
-          <div id="ControlPanelDeadlineOfSubevent" class="SubEventInformationContainer">
-              <label class="InfoContainerLabel">Deadline</label>
-              <div class="InfoControlPanel" id="ControlPanelDeadlineOfSubeventInfo"></div>
-          </div>
+        <div id="InfoContainer">
+            <div id="ControlPanelNameOfSubevent" class="SubEventInformationContainer">
+                <label id="SelectedSubEventLabel" class="InfoContainerLabel">Name</label>
+                <div class="InfoControlPanel" id="ControlPanelNameOfSubeventInfo"></div>
+            </div>
+            <div id="ControlPanelSubEventTime" class="SubEventInformationContainer">
+                <label id="SelectedSubEventLabel" class="InfoContainerLabel">Date &amp; Time</label>
+                <div class="InfoControlPanel" id="ControlPanelSubEventTimeInfo"></div>
+            </div>
+            <div id="ControlPanelDeadlineOfSubevent" class="SubEventInformationContainer">
+                <label class="InfoContainerLabel">Deadline</label>
+                <div class="InfoControlPanel" id="ControlPanelDeadlineOfSubeventInfo"></div>
+            </div>
         </div>
         <div id="ProcrastinateEventModal" tabindex="1">
-          <div id="ProcrastinateEventInputContainer">
-            <div id="ProcrastinateHeading">Procrastinate this by</div>
-            <div id="ProcrastinateInputAndSubmit">
-              <input maxlength="2" id="procrastinateHours" autofocus type="number">
+            <div id="ProcrastinateEventInputContainer">
+                <div id="ProcrastinateHeading">Procrastinate this by</div>
+                <div id="ProcrastinateInputAndSubmit">
+                    <input maxlength="2" id="procrastinateHours" autofocus type="number">
 
-              <span>H</span>
-                <input maxlength="2" id="procrastinateMins" type="number">
-              <span>M</span>
-                <input maxlength="2" id="procrastinateDays" type="number">
-              <span>D</span>
-              <button id="submitProcatination" class="SubmitButton">Push It</button>
-              <button id="cancelProcatination" class="SubmitButton">Cancel</button>
+                    <span>H</span>
+                    <input maxlength="2" id="procrastinateMins" type="number">
+                    <span>M</span>
+                    <input maxlength="2" id="procrastinateDays" type="number">
+                    <span>D</span>
+                    <button id="submitProcastination" class="SubmitButton">Push It</button>
+                    <button id="cancelProcastination" class="SubmitButton">Cancel</button>
+                </div>
             </div>
-          </div>
+        </div>
+        <div id="PreviewModal" tabindex="1">
+            <div id="PreviewModalContainer">
+                <div id="ProcrastinateHeading">Procrastinate this by</div>
+                <div id="ProcrastinateInputAndSubmit">
+                    <input maxlength="2" id="procrastinateHours" autofocus type="number">
+
+                    <span>H</span>
+                    <input maxlength="2" id="procrastinateMins" type="number">
+                    <span>M</span>
+                    <input maxlength="2" id="procrastinateDays" type="number">
+                    <span>D</span>
+                    <button id="submitProcastination" class="SubmitButton">Push It</button>
+                    <button id="cancelProcastination" class="SubmitButton">Cancel</button>
+                </div>
+            </div>
         </div>
         <div id="ConfirmDeleteModal">
             <div id="ConfirmContent">
