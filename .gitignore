@@ -1,5 +1,6 @@
 App_Data/aspnet-TilerFront-ground.mdf
 App_Data/aspnet-TilerFront-ground_log.ldf
+TilerFront.csproj.user
 obj/*
 BigDataLogs/*
 obj

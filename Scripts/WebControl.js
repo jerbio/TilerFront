@@ -1820,7 +1820,7 @@ function Location(Tag, Address, LocationIsVerified, LocationId)
 
     function LoadingScreenControl(Message,CallBbackFunctionAfterExitingLoad)
     {
-        var LoadingScreenPanel = document.getElementById("LoadingScreenPanel");;
+        var LoadingScreenPanel = document.getElementById("LoadingScreenPanel");
         $(LoadingScreenPanel).empty();
         var CalBodyContainer = document.getElementById("CalBodyContainer");;
         this.Dom = LoadingScreenPanel;

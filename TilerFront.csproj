@@ -2807,6 +2807,12 @@
   <ItemGroup>
     <TypeScriptCompile Include="Scripts\index.d.ts" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\My24HourTimerWPF\ScheduleAnalysis\ScheduleAnalysis.csproj">
+      <Project>{bcb7ff8a-4b37-4ce2-9a41-4ccb7d616afd}</Project>
+      <Name>ScheduleAnalysis</Name>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

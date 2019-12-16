@@ -23,6 +23,7 @@ var ClassicUIOptions = { Init: function () { }, RenderOnSubEventClick: renderCla
 var ListUIOptions = { Init: InitializeListUIEffects, RenderOnSubEventClick: renderSubEventsClickEvents, RenderSubEvent: renderSideBarEvents, RenderTimeInformation: RenderListTimeInformation, ConflictCalculation: DoSideBarsInterSect, ClearUIEffects: ResetListUIEffects,DisplayFullGrid:false, ButtonID: "ListViewButton" }
 
 var AllUIOptions = [ListUIOptions, ClassicUIOptions];
+
 $(document).ready(function () {
     LaumchUIOPtion(0);
     $(document).tooltip({ track: true });
@@ -613,8 +614,9 @@ function RevealControlPanelSection(SelectedEvents)
     var completeButton = RevealControlPanelSection.IconSet.getCompleteButton();
     var deleteButton = RevealControlPanelSection.IconSet.getDeleteButton();
     var DeleteMessage = getDomOrCreateNew("DeleteMessage")
-    var ProcatinationButton = getDomOrCreateNew("submitProcatination");
-    var ProcatinationCancelButton = getDomOrCreateNew("cancelProcatination");
+    var ProcastinationButton = getDomOrCreateNew("submitProcastination");
+    var ProcastinationCancelButton = getDomOrCreateNew("cancelProcastination");
+    var PreviewButton = getDomOrCreateNew("previewProcastination");
     var ControlPanelCloseButton = RevealControlPanelSection.IconSet.getCloseButton();
     $(ControlPanelCloseButton).removeClass("setAsDisplayNone")
     var ProcrastinateEventModalContainer = getDomOrCreateNew("ProcrastinateEventModal");
@@ -3483,8 +3485,9 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                 var PauseResumeButton = global_ControlPanelIconSet.getPauseResumeButton()
                 var deleteButton = global_ControlPanelIconSet.getDeleteButton();
                 var DeleteMessage = getDomOrCreateNew("DeleteMessage")
-                var ProcatinationButton = getDomOrCreateNew("submitProcatination");
-                var ProcatinationCancelButton = getDomOrCreateNew("cancelProcatination");
+                var ProcastinationButton = getDomOrCreateNew("submitProcastination");
+                var ProcastinationCancelButton = getDomOrCreateNew("cancelProcastination");
+                var PreviewProcrastinationButton = getDomOrCreateNew("previewProcastination");
                 var ControlPanelCloseButton = global_ControlPanelIconSet.getCloseButton();
                 var ProcrastinateEventModalContainer = getDomOrCreateNew("ProcrastinateEventModal");
                 let NotesModal = getDomOrCreateNew("NotesModal");
@@ -3496,6 +3499,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                 var RepeatButton = global_ControlPanelIconSet.getRepeateButton();
                 var ModalDelete = getDomOrCreateNew("ConfirmDeleteModal")
                 var ControlPanelContainer = getDomOrCreateNew("ControlPanelContainer");
+                var PrimaryControlPanelContainer = getDomOrCreateNew("PrimaryControlPanelContainer");
                 var MultiSelectPanel = getDomOrCreateNew("MultiSelectPanel");
                 $(ControlPanelContainer).addClass("ControlPanelContainerModal");
                 /*if (renderSubEventsClickEvents.BottomPanelIsOpen) {
@@ -3521,7 +3525,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                 BasePanel.appendChild(IconSetContainer);
             
 
-                ControlPanelContainer.appendChild(BasePanel);
+                PrimaryControlPanelContainer.appendChild(BasePanel);
                 var EditContainerData = generateEditDoneCOntainer();
                 ControlPanelContainer.appendChild(EditContainerData.Container);
 
@@ -3583,13 +3587,17 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
 
 
 
-                ProcatinationButton.onclick = function () {
+                ProcastinationButton.onclick = function () {
                     procrastinateEvent();
                     closeProcrastinatePanel();
                 }
 
+                PreviewProcrastinationButton.onclick = function () {
+                    previewProcrastinate();
+                }
 
-                ProcatinationCancelButton.onclick = closeProcrastinatePanel;
+
+                ProcastinationCancelButton.onclick = closeProcrastinatePanel;
 
                 function resetButtons() {
                     yeaButton.onclick = null;
@@ -4019,6 +4027,254 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                         global_ExitManager.triggerLastExitAndPop();
                     }
             }
+
+                function processPreview(previewData, isUpdate = false) {
+                    let PreviewModal = getDomOrCreateNew("PreviewModal")
+                    
+                    function renderSleepDoughnutChart (pieChartDom, data) {
+                        let sleepTimeLine = data.SleepTimeline.duration
+                        let sleepTimelineLabel = {
+                            value: sleepTimeLine,
+                            color: "#7ed629",
+                            hoverColor: "#a1fb04",
+                            label: 'Current Sleep Hours'
+                        }
+                        let dataFormated = [sleepTimelineLabel];
+
+
+                        if (data.MaximumSleepTimeLine) {
+                            let excessSleep = data.MaximumSleepTimeLine.duration - data.SleepTimeline.duration
+                            let excessData ={
+                                value: excessSleep,
+                                color: "#aaaa00",
+                                hoverColor: "#dddd00",
+                                label: 'Extra sleep time :)'
+                            };
+                            dataFormated.push(excessData);
+                        }
+
+                        if (data.LostSleep) {
+                            let insufficientSleep = data.LostSleep;
+                            let undesiredData ={
+                                value: insufficientSleep,
+                                color: "#222222",
+                                hoverColor: "#444444",
+                                label: 'Need More :)'
+                            };
+                            sleepTimelineLabel.color = "#e64b19";
+                            sleepTimelineLabel.hoverColor = "#f75c2a";
+                            dataFormated.push(undesiredData);
+                        }
+
+                        let values = dataFormated.map(a => a.value);
+                        let labels = dataFormated.map(a => a.label);
+                        let backgroundColors = dataFormated.map(a => a.color);
+                        let hoverBackgroundColors = dataFormated.map(a => a.hoverColor);
+                        let dougnutData = {
+                            labels: labels,
+                            datasets: [
+                                {
+                                    data: values,
+                                    backgroundColor: backgroundColors,
+                                    hoverBackgroundColor: hoverBackgroundColors
+                                }]
+                        };
+                        let ctx = pieChartDom.Dom;
+                        ctx = ctx.getContext("2d");
+                
+                        var myDoughnutChart = new Chart(pieChartDom, {
+                            type: 'doughnut',
+                            data: dougnutData,
+                            options: {
+                                responsive: false,
+                                legend: { 
+                                    display: false,
+                                    position: 'right'
+                                }
+                            }
+                        });
+                    }
+
+                    function createSleepDom(dayData, isUndesired) {
+                        let dayId = dayData.startOfDay;
+                        let dayDomId = dayId + "_sleep_dayDom"
+                        let retValue = getDomOrCreateNew(dayDomId)
+                        $(retValue).addClass("PreviewSleepDay");
+                        let dayDomContainerId = dayId + "_sleep_dayDom_container"
+                        let retValueContainer = getDomOrCreateNew(dayDomContainerId);
+                        $(retValueContainer).addClass("SleepDayContainer");
+                        let startOfDayDate = new Date(dayData.startOfDay);
+
+
+                        let weekDay = WeekDays[startOfDayDate.getDay()];
+                        let weekDayId = dayId + "_" + weekDay;
+                        let weekDayIdContainerName = weekDayId+"_container"
+
+                        //weekdayTitle
+                        let nameOfWeekDayDomContainer = getDomOrCreateNew(weekDayIdContainerName);
+                        let weekDayIdLabel = weekDayId + "_label"
+                        let weekDayLabel = getDomOrCreateNew(weekDayIdLabel, "span");
+                        let WeekdayTitle = weekDay.substring(0, 3) + " " + moment(startOfDayDate).format("MM/DD")
+
+                        weekDayLabel.innerHTML = WeekdayTitle;
+                        nameOfWeekDayDomContainer.Dom.appendChild(weekDayLabel);
+                        $(nameOfWeekDayDomContainer).addClass("SleepWeekDayNameContainer");
+                        
+                        //Chart
+                        let ChartContainerId = "ChartContainer_"+dayId;
+                        let ChartContainer = getDomOrCreateNew(ChartContainerId);
+                        let ChartImgContainerId = "ChartImgContainer_"+dayId;
+                        let ChartImgContainer = getDomOrCreateNew(ChartImgContainerId, "canvas");
+                        $(ChartImgContainer).addClass("SleepDayChart");
+                        ChartContainer.appendChild(ChartImgContainer);
+
+                        // duration Content
+                        let duration = dayData.SleepTimeline.duration;
+                        let durationString = moment.utc(duration).format("HH:mm");
+                        let durationContainerId = "durationContainerName" + dayId;
+                        let durationDomContainer = getDomOrCreateNew(durationContainerId);
+                        let durationDomNameId = durationContainerId+ "_label"
+                        let durationDom = getDomOrCreateNew(durationDomNameId, "span");
+                        durationDom.innerHTML = durationString + " Hrs";
+                        $(durationDom).addClass("SleepDurationContent");
+                        durationDomContainer.appendChild(durationDom);
+                        $(durationDomContainer).addClass("SleepDurationContainer");
+
+
+                        retValueContainer.appendChild(nameOfWeekDayDomContainer);
+                        retValueContainer.appendChild(ChartContainer);
+                        retValueContainer.appendChild(durationDomContainer);
+
+                        retValue.appendChild(retValueContainer);
+
+                        return {
+                            dom: retValue,
+                            renderPiechart: function () {
+                                renderSleepDoughnutChart(ChartImgContainer, dayData);
+                            }
+                        };
+                    }
+
+                    function openPreview(previewData) {
+                        if (previewData) {
+                            function showSleepTimes() {
+                                let sleepPreviewDomId = "SleepPreview"
+                                let SleepEvaluationDomId = "SleepEvaluation"
+                                function cleanUpSleepPreviewContainer() {
+                                    let sleepEvaluationPreviewNode = getDomOrCreateNew(sleepPreviewDomId);
+                                    while (sleepEvaluationPreviewNode.firstChild) {
+                                        sleepEvaluationPreviewNode.removeChild(sleepEvaluationPreviewNode.firstChild);
+                                    }
+                                }
+
+                                cleanUpSleepPreviewContainer()
+                                let sleepResult = [];
+                                if (previewData.after && previewData.after.sleep) {
+                                    if (previewData.after.sleep.UndesiredTimeLines && previewData.after.sleep.UndesiredTimeLines.length > 0) {
+                                        let timeLines = previewData.after.sleep.UndesiredTimeLines;
+                                        
+                                        for (let key in timeLines)
+                                        {
+                                            let timeline = timeLines[key];
+                                            timeline.startOfDay = Number(key);
+                                            let sleepDom = createSleepDom(timeline, true)
+                                            sleepResult.push(sleepDom)
+                                        }
+                                    } else {
+                                        let timeLines = previewData.after.sleep.SleepTimeLines;
+                                        for (let key in timeLines) {
+                                            let timeline = timeLines[key];
+                                            timeline.startOfDay = Number(key)
+                                            let sleepDom = createSleepDom(timeline, false);
+                                            sleepResult.push(sleepDom);
+                                        }
+                                    }
+                                }
+                                let sleepEvaluationPreviewNode = getDomOrCreateNew(sleepPreviewDomId);
+                                let sleepEvaluationDom = getDomOrCreateNew(SleepEvaluationDomId);
+                                if(!sleepEvaluationDom.status) {
+                                    $(sleepEvaluationDom).addClass("SleepEvaluation");
+                                    sleepEvaluationPreviewNode.appendChild(sleepEvaluationDom);
+                                }
+
+                                sleepResult.forEach((sleepResponse) => {
+                                    sleepEvaluationDom.appendChild(sleepResponse.dom)
+                                    sleepResponse.renderPiechart()
+                                })
+                                
+                            }
+                            showSleepTimes();
+                        }
+                        $(PreviewModal).removeClass("inActive");
+                        $(PreviewModal).addClass("active");
+                        $(PreviewModal).removeClass("setAsDisplayNone");
+                    }
+
+                    function closePreview() {
+                        $(PreviewModal).removeClass("active");
+                        $(PreviewModal).addClass("inActive");
+                    }
+                    let closePreviewButton = getDomOrCreateNew("closePreview");
+                    closePreviewButton.innerHTML = "Close"
+                    closePreviewButton.onclick = closePreview;
+                    openPreview(previewData);
+                }
+
+                processPreview.currentData = {}
+                
+                function previewProcrastinate() {
+                    var HourInput = getDomOrCreateNew("procrastinateHours").value == "" ? 0 : getDomOrCreateNew("procrastinateHours").value;
+                    var MinInput = getDomOrCreateNew("procrastinateMins").value == "" ? 0 : getDomOrCreateNew("procrastinateMins").value;
+                    var DayInput = getDomOrCreateNew("procrastinateDays").value == "" ? 0 : getDomOrCreateNew("procrastinateDays").value;
+                    let durationInMs = (OneHourInMs * HourInput) + (MinInput * OneMinInMs) + (DayInput * OneDayInMs);
+                    var TimeZone = new Date().getTimezoneOffset();
+                    var NowData = { UserName: UserCredentials.UserName, UserID: UserCredentials.ID, EventID: SubEvent.ID, DurationInMs: durationInMs , TimeZoneOffset: TimeZone };
+                    //var URL= "RootWagTap/time.top?WagCommand=2";
+                    var URL = global_refTIlerUrl + "WhatIf/PushedAll";
+                    NowData.TimeZone = moment.tz.guess()
+                    var HandleNEwPage = new LoadingScreenControl("Tiler is Previewing  :)");
+                    HandleNEwPage.Launch();
+                    preSendRequestWithLocation(NowData);
+
+                    var exit = function (data) {
+                        HandleNEwPage.Hide();
+                        //triggerUIUPdate();//hack alert
+                        global_ExitManager.triggerLastExitAndPop();
+                        //getRefreshedData();
+                    }
+                    $.ajax({
+                        type: "POST",
+                        url: URL,
+                        data: NowData,
+                        // DO NOT SET CONTENT TYPE to json
+                        // contentType: "application/json; charset=utf-8", 
+                        // DataType needs to stay, otherwise the response object
+                        // will be treated as a single string
+                        dataType: "json",
+                        success: function (response) {
+                            debugger
+                            triggerUndoPanel("Undo Procrastination");
+                            
+                            if (response.Error.code == 0) {
+                                processPreview(response.Content)
+                            }
+                            else {
+                                alert("error detected with marking as complete");
+                            }
+                            HandleNEwPage.Hide();
+                        },
+                        error: function () {
+                            var NewMessage = "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
+                            var ExitAfter = {
+                                ExitNow: true, Delay: 1000
+                            };
+                            HandleNEwPage.UpdateMessage(NewMessage, ExitAfter, exit);
+                        }
+                    })
+                }
+
+                previewProcrastinate = buildFunctionSubscription(previewProcrastinate)
+
 
                 function markAsComplete() {
                     SendMessage();

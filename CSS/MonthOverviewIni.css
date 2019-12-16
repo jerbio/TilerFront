@@ -525,7 +525,7 @@ body {
 
 
 .ControlPanelContainerModal {
-    width:291px;
+    /* width:291px; */
     background-color:green;
     border:2px solid rgb(200,200,200);
     border-radius:3px;
@@ -535,6 +535,7 @@ body {
 
 #InfoContainer 
 {
+  width:360px;
   margin-top: calc((7% - 25px)/4);
   -webkit-margin-top: calc((7% - 25px)/4);
   -moz-margin-top: calc((7% - 25px)/4);
@@ -1424,7 +1425,14 @@ width: 100%;
     left: 10px;
     position: relative;
     top: 10px;
+    width: 46%;
 }
+
+#previewProcastination.SubmitButton {
+  width: 94%;
+  top: 20px;
+}
+
 #ProcrastinateEventInputContainer {
 width: auto;
   top: 50%;
@@ -1456,6 +1464,14 @@ width: auto;
     display: inline;
 }
 
+#ProcrastinateInputCollectionContainer{
+  width: 100%;
+}
+
+.ProcrastinateInputModal{
+  width: 32%;
+}
+
 #ProcrastinateHeading {
   font-family: 'texbold';
   font-size: 16px;
@@ -1475,9 +1491,36 @@ width: auto;
     text-align:center;
 }
 
-.hideMultiSelectPanel 
-{
-    display:none;
+#PrimaryControlPanelContainer{
+  background-color: white;
+  box-shadow: 4px 4px 10px 0px rgba(128,128,128,1);
+}
+
+#PreviewModal {
+    display: block;
+    position: absolute;
+    top: 0;
+    width: auto;
+    height: 100%;
+    left: 0px;
+    background-color: rgba(255,255, 0, 0.9);
+    z-index: -10;
+    transition: 1s;
+    border: solid 1px gray;
+    border-radius: 5px;
+}
+
+#PreviewModal.inActive {
+   /*display: none;*/ 
+}
+
+#PreviewModal.active {
+    left: 363px;
+}
+
+
+.hideMultiSelectPanel {
+    display: none;
 }
 
 
@@ -1487,18 +1530,17 @@ width: auto;
   display:none;
 }
 
+#InfoContainer {
+}
+
+
 #InfoContainer span {
     display:inline;
 }
 
-#InfoContainer div 
-{
-
-} 
-
 #InfoContainer input 
 {
-    width:10%;;
+    width: 10%;
     min-width:8em;
     border:none;
     display:inline;
@@ -1579,7 +1621,7 @@ width: auto;
 
 
 #InfoBasePanel {
-  width: 281px;
+  width: 350px;
   height: 49px;
   padding: 5px;
   background-color: yellow;
@@ -1776,4 +1818,43 @@ width: auto;
   transform: rotate(45deg);
   top: 0px;
   left: 5px;
+}
+
+.PreviewSleepDay {
+  margin: 10px;
+}
+
+.SleepDayContainer {
+  white-space: nowrap;
+}
+
+.SleepWeekDayNameContainer{
+
+}
+
+.SleepDurationContent{
+
+}
+
+.SleepDurationContainer {
+  text-align: center;
+}
+
+.SleepEvaluation{
+  display: inline-flex;
+}
+
+.SleepDayChart {
+  width: 84px;
+}
+
+#closePreview {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+}
+
+#PreviewModal.inActive .SleepEvaluation,
+#PreviewModal.inActive #closePreview {
+    display: none;
 }
