@@ -202,7 +202,7 @@ namespace TilerFront
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Completed"));
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.getIsComplete.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("RepetitionFlag"));
-            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.IsRecurring.ToString();
+            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.IsNotRecurringChildCalEVent.ToString();
 
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("EventSubSchedules"));
             //MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.Repetition.ToString();
@@ -237,7 +237,7 @@ namespace TilerFront
 
 
 
-            if (MyEvent.IsRecurring)
+            if (MyEvent.IsNotRecurringChildCalEVent)
             {
                 MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Recurrence"));
                 MyEventScheduleNode.ChildNodes[0].InnerXml = CreateRepetitionNode(MyEvent.Repeat).InnerXml;
@@ -462,30 +462,6 @@ namespace TilerFront
             {
                 retValue = AllScheduleData[ID];
             }
-            return retValue;
-        }
-
-        public async Task<IList<CalendarEvent>> getCalendarEventWithName(string Name)
-        {
-            IList<CalendarEvent> retValue = new CalendarEvent[0];
-#if ForceReadFromXml
-#else
-            if (useCassandra)
-            {
-                retValue = myCassandraAccess.SearchEventsByName(Name);
-                return retValue;
-            }
-#endif
-
-            TimeLine RangeOfLookup = new TimeLine(DateTimeOffset.UtcNow.AddYears(-1000), DateTimeOffset.UtcNow.AddYears(1000));
-            Dictionary<string, CalendarEvent> AllScheduleData = await getAllEnabledCalendarEvent(RangeOfLookup, null);// null for now object because for a name look up you don't need a now update
-            
-            Name = Name.ToLower();
-            if (AllScheduleData.Count > 0)
-            {
-                retValue = AllScheduleData.Values.Where(obj => obj.getName.NameValue.ToLower().Contains(Name)).ToList();
-            }
-
             return retValue;
         }
         #endregion

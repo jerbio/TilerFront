@@ -274,13 +274,13 @@ namespace TilerFront.Controllers
 
                 ScheduleData = ScheduleData.Concat(ProfileData.Item1.Values).ToList();
 
-                IEnumerable<CalendarEvent> NonRepeatingEvents = ScheduleData.Where(obj => !obj.IsRecurring);
+                IEnumerable<CalendarEvent> NonRepeatingEvents = ScheduleData.Where(obj => !obj.IsNotRecurringChildCalEVent);
 
 
 
 
                 //IEnumerable<CalendarEvent> RepeatingEvents = ScheduleData.Where(obj => obj.RepetitionStatus).SelectMany(obj => obj.Repeat.RecurringCalendarEvents);
-                IList<UserSchedule.repeatedEventData> RepeatingEvents = ScheduleData.AsParallel().Where(obj => obj.IsRecurring).
+                IList<UserSchedule.repeatedEventData> RepeatingEvents = ScheduleData.AsParallel().Where(obj => obj.IsNotRecurringChildCalEVent).
                     Select(obj => new UserSchedule.repeatedEventData
                     {
                         ID = obj.Calendar_EventID.ToString(),
@@ -1289,7 +1289,7 @@ namespace TilerFront.Controllers
                 await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, myUser.UserID, db).ConfigureAwait(false);
 
                 await DoInitializeClassification;
-                if (newCalendarEvent.IsRecurring)
+                if (newCalendarEvent.IsNotRecurringChildCalEVent)
                 {
                     if(newCalendarEvent.getIsEventRestricted)
                     {
@@ -1538,7 +1538,7 @@ namespace TilerFront.Controllers
                 }
                 Name.Creator_EventDB = newCalendarEvent.getCreator;
                 Name.AssociatedEvent = newCalendarEvent;
-                if (newCalendarEvent.IsRecurring)
+                if (newCalendarEvent.IsNotRecurringChildCalEVent)
                 {
                     if (newCalendarEvent.getIsEventRestricted)
                     {

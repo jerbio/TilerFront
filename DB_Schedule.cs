@@ -117,7 +117,7 @@ namespace TilerFront
             calEvents.AsParallel()
                 .ForAll(async (eachCalendarEvent) =>
                 {
-                    if(!eachCalendarEvent.IsRecurring)
+                    if(!eachCalendarEvent.IsNotRecurringChildCalEVent)
                     {
                         shiftSUbEventsByTimeAndId(eachCalendarEvent.ActiveSubEvents);
                     } else
@@ -146,7 +146,7 @@ namespace TilerFront
 
         async virtual public Task WriteFullScheduleToLog(CalendarEvent newCalendarEvent = null)
         {
-            await CleanUpForUI(AllEventDictionary.Values).ConfigureAwait(false);
+            await CleanUpForUI(getAllCalendarEvents()).ConfigureAwait(false);
             myAccount.UpdateReferenceDayTime(ReferenceDayTIime);
 
 
@@ -155,11 +155,11 @@ namespace TilerFront
             {
                 foreach (CalendarEvent THirpartyCalendarEvents in eachTuple)
                 {
-                    AllEventDictionary.Remove(THirpartyCalendarEvents.Calendar_EventID.getCalendarEventComponent());
+                    removeFromAllEventDictionary(THirpartyCalendarEvents.Calendar_EventID.getCalendarEventComponent());
                 }
             }
 
-            await myAccount.Commit(AllEventDictionary.Values, newCalendarEvent, EventID.LatestID.ToString(), this.Now).ConfigureAwait(false);
+            await myAccount.Commit(getAllCalendarEvents(), newCalendarEvent, EventID.LatestID.ToString(), this.Now).ConfigureAwait(false);
         }
 
         virtual public bool isScheduleLoadSuccessful
@@ -174,12 +174,12 @@ namespace TilerFront
         {
 
             TilerFront.OutLookConnector myOutlook = new OutLookConnector();
-            myOutlook.removeAllEventsFromOutLook(AllEventDictionary.Values);
+            myOutlook.removeAllEventsFromOutLook(getAllCalendarEvents());
         }
         virtual public void WriteFullScheduleToOutlook()
         {
             TilerFront.OutLookConnector myOutlook = new OutLookConnector();
-            foreach (CalendarEvent MyCalEvent in AllEventDictionary.Values)
+            foreach (CalendarEvent MyCalEvent in getAllCalendarEvents())
             {
                 myOutlook.WriteToOutlook(MyCalEvent);
             }
@@ -241,8 +241,8 @@ namespace TilerFront
             tempEventName.Creator_EventDB = TempEvent.getCreator;
             tempEventName.AssociatedEvent = TempEvent;
             AddToSchedule(TempEvent);
-            AllEventDictionary.Remove(TempEvent.Calendar_EventID.getCalendarEventComponent());
-            AllEventDictionary.Remove(TempEvent.Calendar_EventID.ToString());
+            removeFromAllEventDictionary(TempEvent.Calendar_EventID.getCalendarEventComponent());
+            removeFromAllEventDictionary(TempEvent.Calendar_EventID.ToString());
             await WriteFullScheduleToLog().ConfigureAwait(false);
             return;
         }
@@ -256,7 +256,7 @@ namespace TilerFront
                 await triggerNewlyAddedThirdparty().ConfigureAwait(false);
                 foreach (CalendarEvent ThirdPartyCalData in ThirdPartyData.Item2)
                 {
-                    AllEventDictionary.Remove(ThirdPartyCalData.Calendar_EventID.getCalendarEventComponent());
+                    removeFromAllEventDictionary(ThirdPartyCalData.Calendar_EventID.getCalendarEventComponent());
                 }
             }
             retrievedThirdParty = true;
@@ -277,8 +277,8 @@ namespace TilerFront
                 tempEventName.Creator_EventDB = TempEvent.getCreator;
                 tempEventName.AssociatedEvent = TempEvent;
                 AddToSchedule(TempEvent);
-                AllEventDictionary.Remove(TempEvent.Calendar_EventID.getCalendarEventComponent());
-                AllEventDictionary.Remove(TempEvent.Calendar_EventID.ToString());
+                removeFromAllEventDictionary(TempEvent.Calendar_EventID.getCalendarEventComponent());
+                removeFromAllEventDictionary(TempEvent.Calendar_EventID.ToString());
                 return;
             }
 

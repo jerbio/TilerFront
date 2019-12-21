@@ -5232,10 +5232,13 @@ function GlobaPauseResumeButtonManager(events) {
         $(pauseResumeButton).removeClass("ControlPanelPausePanelButton");
         ShowPauseResumeButton();
         var SubEvent = Dictionary_OfSubEvents[eventId];
-        pauseResumeButton.setAttribute("Title", "Resume \""+SubEvent.Name+"\"");
-        pauseResumeButton.onclick = function () {
-            continueEvent(SubEvent);
+        if (SubEvent) {
+            pauseResumeButton.setAttribute("Title", "Resume \"" + SubEvent.Name + "\"");
+            pauseResumeButton.onclick = function () {
+                continueEvent(SubEvent);
+            }
         }
+        
     }
 
     function SwitchToPause(eventId)
