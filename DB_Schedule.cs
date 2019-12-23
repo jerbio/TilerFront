@@ -23,33 +23,44 @@ namespace TilerFront
         }
 
 
-        protected DB_Schedule(Dictionary<string, CalendarEvent> allEventDictionary, DateTimeOffset starOfDay, Dictionary<string, Location> locations, DateTimeOffset referenceNow, TilerUser user, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation, TimeLine rangeOfLookup = null, bool createDump = true) : base(allEventDictionary, starOfDay, locations, referenceNow, user, rangeOfLookup)
+        protected DB_Schedule(Dictionary<string, CalendarEvent> allEventDictionary, DateTimeOffset starOfDay, Dictionary<string, Location> locations, DateTimeOffset referenceNow, TilerUser user, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation, TimeLine rangeOfLookup = null, bool createDump = true, HashSet<string> calendarIds = null) : base(allEventDictionary, starOfDay, locations, referenceNow, user, rangeOfLookup)
         {
             _CreateDump = createDump;
         }
-        public DB_Schedule(UserAccount AccountEntry, DateTimeOffset referenceNow, DateTimeOffset startOfDay, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation, TimeLine rangeOfLookup = null, bool createDump = true) : base()
+        public DB_Schedule(UserAccount AccountEntry, DateTimeOffset referenceNow, DateTimeOffset startOfDay, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation, TimeLine rangeOfLookup = null, bool createDump = true, HashSet<string> calendarIds = null) : base()
         {
             myAccount = AccountEntry;
             this.retrievalOption = retrievalOption;
             this.RangeOfLookup = rangeOfLookup ?? new TimeLine(referenceNow.AddDays(Utility.defaultBeginDay), referenceNow.AddDays(Utility.defaultEndDay));
             _CreateDump = createDump;
-            Initialize(referenceNow, startOfDay).Wait();
+            Initialize(referenceNow, startOfDay, calendarIds).Wait();
             
         }
-        public DB_Schedule(UserAccount AccountEntry, DateTimeOffset referenceNow, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation, TimeLine rangeOfLookup = null, bool createDump = true)
+        public DB_Schedule(UserAccount AccountEntry, DateTimeOffset referenceNow, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation, TimeLine rangeOfLookup = null, bool createDump = true, HashSet<string> calendarIds = null)
         {
             myAccount = AccountEntry;
             this.retrievalOption = retrievalOption;
             this.RangeOfLookup = rangeOfLookup?? new TimeLine(referenceNow.AddDays(Utility.defaultBeginDay), referenceNow.AddDays(Utility.defaultEndDay));
             _CreateDump = createDump;
-            Initialize(referenceNow).Wait();
+            Initialize(referenceNow, calendarIds).Wait();
         }
-        async virtual protected Task Initialize(DateTimeOffset referenceNow)
+        async virtual protected Task Initialize(DateTimeOffset referenceNow, HashSet<string> calendarIds = null)
         {
             DateTimeOffset StartOfDay = myAccount.ScheduleData.getDayReferenceTime();
+            await Initialize(referenceNow, StartOfDay, calendarIds).ConfigureAwait(false);
+            
+        }
+
+        async virtual protected Task Initialize(DateTimeOffset referenceNow, DateTimeOffset StartOfDay, HashSet<string> calendarIds = null)
+        {
+            if (!myAccount.Status)
+            {
+                throw new Exception("Using non verified tiler Account, try logging into account first.");
+            }
+
             _Now = new ReferenceNow(referenceNow, StartOfDay, myAccount.getTilerUser().TimeZoneDifference);
             this.RangeOfLookup = this.RangeOfLookup ?? new TimeLine(_Now.constNow.AddDays(Schedule.TimeLookUpDayStart), _Now.constNow.AddDays(Schedule.TimeLookUpDayEnd));
-            Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, Location>> profileData = await myAccount.ScheduleData.getProfileInfo(RangeOfLookup, _Now, retrievalOption, _CreateDump).ConfigureAwait(false);
+            Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, Location>> profileData = await myAccount.ScheduleData.getProfileInfo(RangeOfLookup, _Now, this.retrievalOption, calendarIds: calendarIds).ConfigureAwait(false);
             myAccount.Now = _Now;
             TravelCache travelCache = await myAccount.ScheduleData.getTravelCache(myAccount.UserID).ConfigureAwait(false);
             updateTravelCache(travelCache);
@@ -60,45 +71,14 @@ namespace TilerFront
                 AllEventDictionary = profileData.Item1;
                 if (AllEventDictionary != null)
                 {
-                    //setAsComplete();
                     EventID.Initialize((uint)(myAccount.LastEventTopNodeID));
                     initializeThirdPartyCalendars();
                     updateThirdPartyCalendars(ThirdPartyControl.CalendarTool.outlook, new List<CalendarEvent>() { });
                     CompleteSchedule = getTimeLine();
-
-                    //EventIDGenerator.Initialize((uint)(this.LastScheduleIDNumber));
                 }
                 Locations = profileData.Item3;
             }
             TilerUser = myAccount.getTilerUser();
-        }
-
-        async virtual protected Task Initialize(DateTimeOffset referenceNow, DateTimeOffset StartOfDay)
-        {
-            if (!myAccount.Status)
-            {
-                throw new Exception("Using non verified tiler Account, try logging into account first.");
-            }
-
-            _Now = new ReferenceNow(referenceNow, StartOfDay, myAccount.getTilerUser().TimeZoneDifference);
-            TimeLine RangeOfLookup = new TimeLine(_Now.constNow.AddYears(-10), _Now.constNow.AddYears(10));
-            Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, Location>> profileData = await myAccount.ScheduleData.getProfileInfo(RangeOfLookup, _Now, this.retrievalOption).ConfigureAwait(false);
-            TravelCache travelCache = await myAccount.ScheduleData.getTravelCache(myAccount.UserID).ConfigureAwait(false);
-            updateTravelCache(travelCache);
-            if (profileData != null)
-            {
-                DateTimeOffset referenceDayTimeNow = new DateTimeOffset(Now.calculationNow.Year, Now.calculationNow.Month, Now.calculationNow.Day, profileData.Item2.Hour, profileData.Item2.Minute, profileData.Item2.Second, new TimeSpan());// profileData.Item2;
-                ReferenceDayTIime = Now.calculationNow < referenceDayTimeNow ? referenceDayTimeNow.AddDays(-1) : referenceDayTimeNow;
-                AllEventDictionary = profileData.Item1;
-                if (AllEventDictionary != null)
-                {
-                    EventID.Initialize((uint)(myAccount.LastEventTopNodeID));
-                    initializeThirdPartyCalendars();
-                    updateThirdPartyCalendars(ThirdPartyControl.CalendarTool.outlook, new List<CalendarEvent>() { });
-                    CompleteSchedule = getTimeLine();
-                }
-                Locations = profileData.Item3;
-            }
         }
 
         public virtual void RemoveAllCalendarEventFromLogAndCalendar()//MyTemp Function for deleting all calendar events
@@ -117,12 +97,15 @@ namespace TilerFront
             calEvents.AsParallel()
                 .ForAll(async (eachCalendarEvent) =>
                 {
-                    if(!eachCalendarEvent.IsNotRecurringChildCalEVent)
+                    if(!eachCalendarEvent.IsFromRecurringAndNotChildRepeatCalEvent)
                     {
                         shiftSUbEventsByTimeAndId(eachCalendarEvent.ActiveSubEvents);
                     } else
                     {
-                        await CleanUpForUI(eachCalendarEvent.Repeat.RecurringCalendarEvents()).ConfigureAwait(false);
+                        if(eachCalendarEvent.isRepeatLoaded)
+                        {
+                            await CleanUpForUI(eachCalendarEvent.Repeat.RecurringCalendarEvents()).ConfigureAwait(false);
+                        }
                     }
                 }
             );

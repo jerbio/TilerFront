@@ -274,13 +274,13 @@ namespace TilerFront.Controllers
 
                 ScheduleData = ScheduleData.Concat(ProfileData.Item1.Values).ToList();
 
-                IEnumerable<CalendarEvent> NonRepeatingEvents = ScheduleData.Where(obj => !obj.IsNotRecurringChildCalEVent);
+                IEnumerable<CalendarEvent> NonRepeatingEvents = ScheduleData.Where(obj => !obj.IsFromRecurringAndNotChildRepeatCalEvent);
 
 
 
 
                 //IEnumerable<CalendarEvent> RepeatingEvents = ScheduleData.Where(obj => obj.RepetitionStatus).SelectMany(obj => obj.Repeat.RecurringCalendarEvents);
-                IList<UserSchedule.repeatedEventData> RepeatingEvents = ScheduleData.AsParallel().Where(obj => obj.IsNotRecurringChildCalEVent).
+                IList<UserSchedule.repeatedEventData> RepeatingEvents = ScheduleData.AsParallel().Where(obj => obj.IsFromRecurringAndNotChildRepeatCalEvent).
                     Select(obj => new UserSchedule.repeatedEventData
                     {
                         ID = obj.Calendar_EventID.ToString(),
@@ -632,7 +632,8 @@ namespace TilerFront.Controllers
             myUser.getTilerUser().updateTimeZoneTimeSpan(UserData.getTimeSpan);
 
             DateTimeOffset myNow = myAuthorizedUser.getRefNow();// myAuthorizedUser.getRefNow();
-            DB_Schedule MySchedule = new DB_Schedule(myUser,myNow);
+            HashSet<string> calendarIds = new HashSet<string>() { UserData.EventID };
+            DB_Schedule MySchedule = new DB_Schedule(myUser,myNow, calendarIds: calendarIds);
             MySchedule.CurrentLocation = myAuthorizedUser.getCurrentLocation();
             DB_UserActivity activity = new DB_UserActivity(myNow, UserActivity.ActivityType.ProcrastinateSingle);
             JObject json = JObject.FromObject(UserData);
@@ -830,7 +831,8 @@ namespace TilerFront.Controllers
                     case "tiler":
                         {
                             DateTimeOffset myNow = UserData.getRefNow();
-                            DB_Schedule MySchedule = new DB_Schedule(retrievedUser, myNow );
+                            HashSet<string> calendarIds = new HashSet<string>() { UserData.EventID };
+                            DB_Schedule MySchedule = new DB_Schedule(retrievedUser, myNow, calendarIds: calendarIds );
                             MySchedule.CurrentLocation = UserData.getCurrentLocation();
                             await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, UserData.UserID, db).ConfigureAwait(false);
                             activity.eventIds.Add(UserData.EventID);
@@ -864,7 +866,8 @@ namespace TilerFront.Controllers
             await myUser.Login();
             myUser.getTilerUser().updateTimeZoneTimeSpan(UserData.getTimeSpan);
             DateTimeOffset myNow = UserData.getRefNow();
-            DB_Schedule MySchedule = new DB_Schedule(myUser, myNow);
+            HashSet<string> calendarIds = new HashSet<string>() { UserData.EventID };
+            DB_Schedule MySchedule = new DB_Schedule(myUser, myNow, calendarIds: calendarIds);
             MySchedule.CurrentLocation = UserData.getCurrentLocation();
             IEnumerable<string> AllEventIDs = UserData.EventID.Split(',');
             DB_UserActivity activity = new DB_UserActivity(myNow, UserActivity.ActivityType.CompleteMultiple, AllEventIDs);
@@ -902,8 +905,8 @@ namespace TilerFront.Controllers
             if (retrievedUser.Status)
             {
                 DateTimeOffset myNow = myUser.getRefNow();
-
-                DB_Schedule MySchedule = new DB_Schedule(retrievedUser, myNow);
+                HashSet<string> calendarIds = new HashSet<string>() { myUser.EventID };
+                DB_Schedule MySchedule = new DB_Schedule(retrievedUser, myNow, calendarIds: calendarIds);
                 MySchedule.CurrentLocation = myUser.getCurrentLocation();
                 DB_UserActivity activity = new DB_UserActivity(myNow, UserActivity.ActivityType.SetAsNowSingle);
                 JObject json = JObject.FromObject(myUser);
@@ -991,7 +994,8 @@ namespace TilerFront.Controllers
                         break;
                     case "tiler":
                         {
-                            DB_Schedule MySchedule = new DB_Schedule(retrievedUser, myUser.getRefNow());
+                            HashSet<string> calendarIds = new HashSet<string>() { myUser.EventID };
+                            DB_Schedule MySchedule = new DB_Schedule(retrievedUser, myUser.getRefNow(), calendarIds: calendarIds);
                             MySchedule.CurrentLocation = myUser.getCurrentLocation();
                             DB_UserActivity activity = new DB_UserActivity(myUser.getRefNow(), UserActivity.ActivityType.DeleteSingle);
                             retrievedUser.ScheduleLogControl.updateUserActivty(activity);
@@ -1050,10 +1054,12 @@ namespace TilerFront.Controllers
             PostBackData retValue;
             if (retrievedUser.Status)
             {
-                DB_Schedule MySchedule = new DB_Schedule(retrievedUser, myUser.getRefNow());
+                IEnumerable<string> AllEventIDs = myUser.EventID.Split(',');
+                HashSet<string> calendarIds = new HashSet<string>(AllEventIDs);
+                DB_Schedule MySchedule = new DB_Schedule(retrievedUser, myUser.getRefNow(), calendarIds: calendarIds);
                 MySchedule.CurrentLocation = myUser.getCurrentLocation();
                 await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, myUser.UserID, db).ConfigureAwait(false);
-                IEnumerable<string> AllEventIDs = myUser.EventID.Split(',');
+                
                 DB_UserActivity activity = new DB_UserActivity(myUser.getRefNow(), UserActivity.ActivityType.DeleteMultiple, AllEventIDs);
                 retrievedUser.ScheduleLogControl.updateUserActivty(activity);
                 await MySchedule.deleteSubCalendarEvents(AllEventIDs);
@@ -1289,7 +1295,7 @@ namespace TilerFront.Controllers
                 await updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, myUser.UserID, db).ConfigureAwait(false);
 
                 await DoInitializeClassification;
-                if (newCalendarEvent.IsNotRecurringChildCalEVent)
+                if (newCalendarEvent.IsFromRecurringAndNotChildRepeatCalEvent)
                 {
                     if(newCalendarEvent.getIsEventRestricted)
                     {
@@ -1516,7 +1522,7 @@ namespace TilerFront.Controllers
                     TimeString = EndDateEntry.Date.ToShortDateString() + " " + EndTime;
                     DateTimeOffset EndDateTime = DateTimeOffset.Parse(TimeString).UtcDateTime;
                     EndDateTime = EndDateTime.Add(newEvent.getTimeSpan);
-                    newCalendarEvent = new CalendarEventRestricted(tilerUser, new TilerUserGroup(), Name, StartDateTime, EndDateTime, myRestrictionProfile, EventDuration, MyRepetition, false, true, Count, RigidScheduleFlag, new NowProfile(), new TilerElements.Location(), new TimeSpan(0, 15, 0), new TimeSpan(0, 15, 0), null, MySchedule.Now, new Procrastination(Utility.JSStartTime, new TimeSpan()), new EventDisplay(true, userColor, userColor.User < 1 ? 0 : 1), new MiscData());
+                    newCalendarEvent = new CalendarEventRestricted(tilerUser, new TilerUserGroup(), Name, StartDateTime, EndDateTime, myRestrictionProfile, EventDuration, MyRepetition, false, true, Count, RigidScheduleFlag, new NowProfile(), new TilerElements.Location(), new TimeSpan(0, 15, 0), new TimeSpan(0, 15, 0), null, MySchedule.Now, new Procrastination(Utility.BeginningOfTime, new TimeSpan()), new EventDisplay(true, userColor, userColor.User < 1 ? 0 : 1), new MiscData());
                 }
                 else
                 {
@@ -1538,7 +1544,7 @@ namespace TilerFront.Controllers
                 }
                 Name.Creator_EventDB = newCalendarEvent.getCreator;
                 Name.AssociatedEvent = newCalendarEvent;
-                if (newCalendarEvent.IsNotRecurringChildCalEVent)
+                if (newCalendarEvent.IsFromRecurringAndNotChildRepeatCalEvent)
                 {
                     if (newCalendarEvent.getIsEventRestricted)
                     {

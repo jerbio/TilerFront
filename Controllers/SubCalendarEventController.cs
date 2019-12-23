@@ -56,7 +56,8 @@ namespace TilerFront.Controllers
                         {
                             DateTimeOffset myNow = myUser.getRefNow();
                             myNow = myUser.getRefNow();
-                            DB_Schedule NewSchedule = new DB_Schedule(retrievedUser, myNow);
+                            HashSet<string> calendarIds = new HashSet<string>() { myUser.EventID };
+                            DB_Schedule NewSchedule = new DB_Schedule(retrievedUser, myNow, calendarIds: calendarIds);
                             NewSchedule.CurrentLocation = myUser.getCurrentLocation();
                             await ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(NewSchedule, retrievedUser.UserID, db).ConfigureAwait(false);
 
@@ -152,7 +153,8 @@ namespace TilerFront.Controllers
                             {
                                 if (subEvent.IsDateTimeWithin(refNow))
                                 {
-                                    DB_Schedule MySchedule = new DB_Schedule(retrievedUser, refNow);
+                                    HashSet<string> calendarIds = new HashSet<string>() { UserData.EventID };
+                                    DB_Schedule MySchedule = new DB_Schedule(retrievedUser, refNow, calendarIds: calendarIds);
                                     MySchedule.CurrentLocation = UserData.getCurrentLocation();
                                     await ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, UserData.UserID, db).ConfigureAwait(false);
                                     activity.eventIds.Add(UserData.EventID);
