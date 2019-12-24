@@ -668,7 +668,7 @@ namespace TilerFront
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("ThirdpartyType"));
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.ThirdpartyType.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("EventPreference"));
-            MyEventScheduleNode.ChildNodes[0].InnerText = CreateEventPreference(MyEvent.DayPreference).InnerXml;
+            MyEventScheduleNode.ChildNodes[0].InnerXml = CreateEventPreference(MyEvent.DayPreference)?.InnerXml;
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("LastCompletionTimes"));
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.LastCompletionTime_DB;
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Access_DB"));
@@ -953,15 +953,22 @@ namespace TilerFront
 
         public XmlElement CreateEventPreference(EventPreference preference, string ElementIdentifier = "EventPreference")
         {
-            XmlSerializer serializer = new XmlSerializer(typeof(EventPreference));
-            XmlDocument xmldoc = new XmlDocument();
-            XmlElement retValue = xmldoc.CreateElement(ElementIdentifier);
-            using (XmlWriter writer = xmldoc.CreateNavigator().AppendChild())
+            if(preference!=null)
             {
-                serializer.Serialize(writer, preference);
+                XmlSerializer serializer = new XmlSerializer(typeof(EventPreference));
+                XmlDocument xmldoc = new XmlDocument();
+                XmlElement retValue = xmldoc.CreateElement(ElementIdentifier);
+                using (XmlWriter writer = xmldoc.CreateNavigator().AppendChild())
+                {
+                    serializer.Serialize(writer, preference);
+                }
+                retValue.InnerXml = xmldoc.FirstChild.InnerXml;
+                return retValue;
+            } else
+            {
+                return null;
             }
-            retValue.InnerXml = xmldoc.FirstChild.InnerXml;
-            return retValue;
+            
         }
 
         public XmlElement CreateLocationNode(TilerElements.Location Arg1, string Identifier = "Location")
@@ -2116,17 +2123,26 @@ namespace TilerFront
                             }
                         }
                         string id = RetrievedEvent.Calendar_EventID.getAllEventDictionaryLookup;
-                        MyCalendarEventDictionary.Add(id, RetrievedEvent);
-                        if (googleId == id)
+                        
+                        string calendarComponent = RetrievedEvent.Calendar_EventID.getCalendarEventComponent();
+                        if (googleId == calendarComponent)
                         {
+                            googleCalendarEvents.AddRange(RetrievedEvent.Repeat.RecurringCalendarEvents());
                             googleCalendarEvents.Add(RetrievedEvent);
+                        } else
+                        {
+                            MyCalendarEventDictionary.Add(id, RetrievedEvent);
                         }
                     }
                 }
             }
 #region GoogleCalendarEvent
-            ThirdPartyCalendarEvent googleCalendarEvent = new GoogleCalendarEvent(googleCalendarEvents, _TilerUser);
-            thirdPartyCalendarEvent.Add(ThirdPartyControl.CalendarTool.google, new List<CalendarEvent>() { googleCalendarEvent });
+            if(googleCalendarEvents.Count > 0)
+            {
+                ThirdPartyCalendarEvent googleCalendarEvent = new GoogleCalendarEvent(googleCalendarEvents, _TilerUser);
+                thirdPartyCalendarEvent.Add(ThirdPartyControl.CalendarTool.google, new List<CalendarEvent>() { googleCalendarEvent });
+            }
+            
 #endregion
 
             Tuple<Dictionary<string, CalendarEvent>, Dictionary<ThirdPartyControl.CalendarTool, List<CalendarEvent>>> retValue = new Tuple<Dictionary<string, CalendarEvent>, Dictionary<ThirdPartyControl.CalendarTool, List<CalendarEvent>>>(
@@ -2336,9 +2352,13 @@ namespace TilerFront
                 RetrievedEvent.TimeCreated = timeCreated;
             }
             EventPreference eventPreference = null;
-            if (eventPreferenceNode!=null)
+            if (eventPreferenceNode!=null && !string.IsNullOrEmpty(eventPreferenceNode.InnerXml) && !string.IsNullOrWhiteSpace(eventPreferenceNode.InnerXml))
             {
                 eventPreference = getEventPreference(eventPreferenceNode);
+            }
+            else
+            {
+                eventPreference = EventPreference.NullInstance;
             }
             RetrievedEvent.DayPreference_DB = eventPreference;
 
@@ -2354,6 +2374,11 @@ namespace TilerFront
             if(MyEventScheduleNode!=null)
             {
                 RetrievedEvent.Access_DB = MyEventScheduleNode.InnerText;
+            }
+
+            foreach(CalendarEvent calEvent in Recurrence.RepeatingEvents)
+            {
+                calEvent.RepeatParent_DB = RetrievedEvent;
             }
 
             return RetrievedEvent;

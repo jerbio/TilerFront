@@ -48,7 +48,6 @@ namespace TilerFront
         {
             DateTimeOffset StartOfDay = myAccount.ScheduleData.getDayReferenceTime();
             await Initialize(referenceNow, StartOfDay, calendarIds).ConfigureAwait(false);
-            
         }
 
         async virtual protected Task Initialize(DateTimeOffset referenceNow, DateTimeOffset StartOfDay, HashSet<string> calendarIds = null)
@@ -68,7 +67,7 @@ namespace TilerFront
             {
                 DateTimeOffset referenceDayTimeNow = new DateTimeOffset(Now.calculationNow.Year, Now.calculationNow.Month, Now.calculationNow.Day, profileData.Item2.Hour, profileData.Item2.Minute, profileData.Item2.Second, new TimeSpan());// profileData.Item2;
                 ReferenceDayTIime = Now.calculationNow < referenceDayTimeNow ? referenceDayTimeNow.AddDays(-1) : referenceDayTimeNow;
-                AllEventDictionary = profileData.Item1;
+                initializeAllEventDictionary(profileData.Item1.Values);
                 if (AllEventDictionary != null)
                 {
                     EventID.Initialize((uint)(myAccount.LastEventTopNodeID));
