@@ -161,7 +161,7 @@ namespace TilerFront
         virtual public void WriteFullScheduleToOutlook()
         {
             TilerFront.OutLookConnector myOutlook = new OutLookConnector();
-            foreach (CalendarEvent MyCalEvent in getAllCalendarEvents())
+            foreach (CalendarEvent MyCalEvent in getAllActiveCalendarEvents())
             {
                 myOutlook.WriteToOutlook(MyCalEvent);
             }
