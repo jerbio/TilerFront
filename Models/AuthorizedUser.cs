@@ -32,7 +32,7 @@ namespace TilerFront.Models
         {
             get 
             {
-                int TimeSpanint = TimeZoneOffset;
+                int TimeSpanint = -TimeZoneOffset;// negating because the front end said the reverse polarity
                 TimeSpan TimeZoneSpan = TimeSpan.FromMinutes(TimeSpanint);
                 return TimeZoneSpan;
             }
@@ -40,7 +40,7 @@ namespace TilerFront.Models
 
         public DateTimeOffset getRefNow()
         {
-            //string timeInString = "11/25/2019 4:50:00 PM";
+            //string timeInString = "12/17/2019 7:12:00 AM +00:00";
             string timeInString = "";
 
             if (string.IsNullOrEmpty(timeInString))

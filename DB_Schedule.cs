@@ -23,57 +23,34 @@ namespace TilerFront
         }
 
 
-        protected DB_Schedule(Dictionary<string, CalendarEvent> allEventDictionary, DateTimeOffset starOfDay, Dictionary<string, Location> locations, DateTimeOffset referenceNow, TilerUser user, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation, TimeLine rangeOfLookup = null, bool createDump = true) : base(allEventDictionary, starOfDay, locations, referenceNow, user, rangeOfLookup)
+        protected DB_Schedule(Dictionary<string, CalendarEvent> allEventDictionary, DateTimeOffset starOfDay, Dictionary<string, Location> locations, DateTimeOffset referenceNow, TilerUser user, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation, TimeLine rangeOfLookup = null, bool createDump = true, HashSet<string> calendarIds = null) : base(allEventDictionary, starOfDay, locations, referenceNow, user, rangeOfLookup)
         {
             _CreateDump = createDump;
         }
-        public DB_Schedule(UserAccount AccountEntry, DateTimeOffset referenceNow, DateTimeOffset startOfDay, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation, TimeLine rangeOfLookup = null, bool createDump = true) : base()
+        public DB_Schedule(UserAccount AccountEntry, DateTimeOffset referenceNow, DateTimeOffset startOfDay, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation, TimeLine rangeOfLookup = null, bool createDump = true, HashSet<string> calendarIds = null) : base()
         {
             myAccount = AccountEntry;
             this.retrievalOption = retrievalOption;
             this.RangeOfLookup = rangeOfLookup ?? new TimeLine(referenceNow.AddDays(Utility.defaultBeginDay), referenceNow.AddDays(Utility.defaultEndDay));
             _CreateDump = createDump;
-            Initialize(referenceNow, startOfDay).Wait();
+            Initialize(referenceNow, startOfDay, calendarIds).Wait();
             
         }
-        public DB_Schedule(UserAccount AccountEntry, DateTimeOffset referenceNow, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation, TimeLine rangeOfLookup = null, bool createDump = true)
+        public DB_Schedule(UserAccount AccountEntry, DateTimeOffset referenceNow, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation, TimeLine rangeOfLookup = null, bool createDump = true, HashSet<string> calendarIds = null)
         {
             myAccount = AccountEntry;
             this.retrievalOption = retrievalOption;
             this.RangeOfLookup = rangeOfLookup?? new TimeLine(referenceNow.AddDays(Utility.defaultBeginDay), referenceNow.AddDays(Utility.defaultEndDay));
             _CreateDump = createDump;
-            Initialize(referenceNow).Wait();
+            Initialize(referenceNow, calendarIds).Wait();
         }
-        async virtual protected Task Initialize(DateTimeOffset referenceNow)
+        async virtual protected Task Initialize(DateTimeOffset referenceNow, HashSet<string> calendarIds = null)
         {
             DateTimeOffset StartOfDay = myAccount.ScheduleData.getDayReferenceTime();
-            _Now = new ReferenceNow(referenceNow, StartOfDay, myAccount.getTilerUser().TimeZoneDifference);
-            this.RangeOfLookup = this.RangeOfLookup ?? new TimeLine(_Now.constNow.AddDays(Schedule.TimeLookUpDayStart), _Now.constNow.AddDays(Schedule.TimeLookUpDayEnd));
-            Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, Location>> profileData = await myAccount.ScheduleData.getProfileInfo(RangeOfLookup, _Now, retrievalOption, _CreateDump).ConfigureAwait(false);
-            myAccount.Now = _Now;
-            TravelCache travelCache = await myAccount.ScheduleData.getTravelCache(myAccount.UserID).ConfigureAwait(false);
-            updateTravelCache(travelCache);
-            if (profileData != null)
-            {
-                DateTimeOffset referenceDayTimeNow = new DateTimeOffset(Now.calculationNow.Year, Now.calculationNow.Month, Now.calculationNow.Day, profileData.Item2.Hour, profileData.Item2.Minute, profileData.Item2.Second, new TimeSpan());// profileData.Item2;
-                ReferenceDayTIime = Now.calculationNow < referenceDayTimeNow ? referenceDayTimeNow.AddDays(-1) : referenceDayTimeNow;
-                AllEventDictionary = profileData.Item1;
-                if (AllEventDictionary != null)
-                {
-                    //setAsComplete();
-                    EventID.Initialize((uint)(myAccount.LastEventTopNodeID));
-                    initializeThirdPartyCalendars();
-                    updateThirdPartyCalendars(ThirdPartyControl.CalendarTool.outlook, new List<CalendarEvent>() { });
-                    CompleteSchedule = getTimeLine();
-
-                    //EventIDGenerator.Initialize((uint)(this.LastScheduleIDNumber));
-                }
-                Locations = profileData.Item3;
-            }
-            TilerUser = myAccount.getTilerUser();
+            await Initialize(referenceNow, StartOfDay, calendarIds).ConfigureAwait(false);
         }
 
-        async virtual protected Task Initialize(DateTimeOffset referenceNow, DateTimeOffset StartOfDay)
+        async virtual protected Task Initialize(DateTimeOffset referenceNow, DateTimeOffset StartOfDay, HashSet<string> calendarIds = null)
         {
             if (!myAccount.Status)
             {
@@ -81,15 +58,16 @@ namespace TilerFront
             }
 
             _Now = new ReferenceNow(referenceNow, StartOfDay, myAccount.getTilerUser().TimeZoneDifference);
-            TimeLine RangeOfLookup = new TimeLine(_Now.constNow.AddYears(-10), _Now.constNow.AddYears(10));
-            Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, Location>> profileData = await myAccount.ScheduleData.getProfileInfo(RangeOfLookup, _Now, this.retrievalOption).ConfigureAwait(false);
+            this.RangeOfLookup = this.RangeOfLookup ?? new TimeLine(_Now.constNow.AddDays(Schedule.TimeLookUpDayStart), _Now.constNow.AddDays(Schedule.TimeLookUpDayEnd));
+            Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, Location>> profileData = await myAccount.ScheduleData.getProfileInfo(RangeOfLookup, _Now, this.retrievalOption, calendarIds: calendarIds).ConfigureAwait(false);
+            myAccount.Now = _Now;
             TravelCache travelCache = await myAccount.ScheduleData.getTravelCache(myAccount.UserID).ConfigureAwait(false);
             updateTravelCache(travelCache);
             if (profileData != null)
             {
                 DateTimeOffset referenceDayTimeNow = new DateTimeOffset(Now.calculationNow.Year, Now.calculationNow.Month, Now.calculationNow.Day, profileData.Item2.Hour, profileData.Item2.Minute, profileData.Item2.Second, new TimeSpan());// profileData.Item2;
                 ReferenceDayTIime = Now.calculationNow < referenceDayTimeNow ? referenceDayTimeNow.AddDays(-1) : referenceDayTimeNow;
-                AllEventDictionary = profileData.Item1;
+                initializeAllEventDictionary(profileData.Item1.Values);
                 if (AllEventDictionary != null)
                 {
                     EventID.Initialize((uint)(myAccount.LastEventTopNodeID));
@@ -99,6 +77,7 @@ namespace TilerFront
                 }
                 Locations = profileData.Item3;
             }
+            TilerUser = myAccount.getTilerUser();
         }
 
         public virtual void RemoveAllCalendarEventFromLogAndCalendar()//MyTemp Function for deleting all calendar events
@@ -117,12 +96,15 @@ namespace TilerFront
             calEvents.AsParallel()
                 .ForAll(async (eachCalendarEvent) =>
                 {
-                    if(!eachCalendarEvent.IsRecurring)
+                    if(!eachCalendarEvent.IsFromRecurringAndNotChildRepeatCalEvent)
                     {
                         shiftSUbEventsByTimeAndId(eachCalendarEvent.ActiveSubEvents);
                     } else
                     {
-                        await CleanUpForUI(eachCalendarEvent.Repeat.RecurringCalendarEvents()).ConfigureAwait(false);
+                        if(eachCalendarEvent.isRepeatLoaded)
+                        {
+                            await CleanUpForUI(eachCalendarEvent.Repeat.RecurringCalendarEvents()).ConfigureAwait(false);
+                        }
                     }
                 }
             );
@@ -146,7 +128,7 @@ namespace TilerFront
 
         async virtual public Task WriteFullScheduleToLog(CalendarEvent newCalendarEvent = null)
         {
-            await CleanUpForUI(AllEventDictionary.Values).ConfigureAwait(false);
+            await CleanUpForUI(getAllCalendarEvents()).ConfigureAwait(false);
             myAccount.UpdateReferenceDayTime(ReferenceDayTIime);
 
 
@@ -155,11 +137,11 @@ namespace TilerFront
             {
                 foreach (CalendarEvent THirpartyCalendarEvents in eachTuple)
                 {
-                    AllEventDictionary.Remove(THirpartyCalendarEvents.Calendar_EventID.getCalendarEventComponent());
+                    removeFromAllEventDictionary(THirpartyCalendarEvents.Calendar_EventID.getCalendarEventComponent());
                 }
             }
 
-            await myAccount.Commit(AllEventDictionary.Values, newCalendarEvent, EventID.LatestID.ToString(), this.Now).ConfigureAwait(false);
+            await myAccount.Commit(getAllCalendarEvents(), newCalendarEvent, EventID.LatestID.ToString(), this.Now).ConfigureAwait(false);
         }
 
         virtual public bool isScheduleLoadSuccessful
@@ -174,12 +156,12 @@ namespace TilerFront
         {
 
             TilerFront.OutLookConnector myOutlook = new OutLookConnector();
-            myOutlook.removeAllEventsFromOutLook(AllEventDictionary.Values);
+            myOutlook.removeAllEventsFromOutLook(getAllCalendarEvents());
         }
         virtual public void WriteFullScheduleToOutlook()
         {
             TilerFront.OutLookConnector myOutlook = new OutLookConnector();
-            foreach (CalendarEvent MyCalEvent in AllEventDictionary.Values)
+            foreach (CalendarEvent MyCalEvent in getAllActiveCalendarEvents())
             {
                 myOutlook.WriteToOutlook(MyCalEvent);
             }
@@ -241,8 +223,8 @@ namespace TilerFront
             tempEventName.Creator_EventDB = TempEvent.getCreator;
             tempEventName.AssociatedEvent = TempEvent;
             AddToSchedule(TempEvent);
-            AllEventDictionary.Remove(TempEvent.Calendar_EventID.getCalendarEventComponent());
-            AllEventDictionary.Remove(TempEvent.Calendar_EventID.ToString());
+            removeFromAllEventDictionary(TempEvent.Calendar_EventID.getCalendarEventComponent());
+            removeFromAllEventDictionary(TempEvent.Calendar_EventID.ToString());
             await WriteFullScheduleToLog().ConfigureAwait(false);
             return;
         }
@@ -256,7 +238,7 @@ namespace TilerFront
                 await triggerNewlyAddedThirdparty().ConfigureAwait(false);
                 foreach (CalendarEvent ThirdPartyCalData in ThirdPartyData.Item2)
                 {
-                    AllEventDictionary.Remove(ThirdPartyCalData.Calendar_EventID.getCalendarEventComponent());
+                    removeFromAllEventDictionary(ThirdPartyCalData.Calendar_EventID.getCalendarEventComponent());
                 }
             }
             retrievedThirdParty = true;
@@ -277,8 +259,8 @@ namespace TilerFront
                 tempEventName.Creator_EventDB = TempEvent.getCreator;
                 tempEventName.AssociatedEvent = TempEvent;
                 AddToSchedule(TempEvent);
-                AllEventDictionary.Remove(TempEvent.Calendar_EventID.getCalendarEventComponent());
-                AllEventDictionary.Remove(TempEvent.Calendar_EventID.ToString());
+                removeFromAllEventDictionary(TempEvent.Calendar_EventID.getCalendarEventComponent());
+                removeFromAllEventDictionary(TempEvent.Calendar_EventID.ToString());
                 return;
             }
 
