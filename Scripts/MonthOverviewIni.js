@@ -4690,17 +4690,17 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                     var Url;
                     SubEventStartTime.value =formatTimePortionOfStringToRightFormat(SubEventStartTime.value )
                     var SubCalStartDateTimeString = SubEventStartTime.value + " " + $(SubEventStartDate).datepicker("getDate").toLocaleDateString();
-                    var SubCaStartDateInMS = Date.parse(SubCalStartDateTimeString) - (TimeZone * OneMinInMs)
+                    var SubCaStartDateInMS = Date.parse(SubCalStartDateTimeString);
 
 
                     SubEventEndTime.value = formatTimePortionOfStringToRightFormat(SubEventEndTime.value)
                     var SubCalEndDateTimeString = SubEventEndTime.value + " " + $(SubEventEndDate).datepicker("getDate").toLocaleDateString();
-                    var SubCaEndDateInMS = Date.parse(SubCalEndDateTimeString) - (TimeZone*OneMinInMs);//.getFullTime();
+                    var SubCaEndDateInMS = Date.parse(SubCalEndDateTimeString);
 
                     CalEndTime.value = formatTimePortionOfStringToRightFormat(CalEndTime.value)
 
                     var CalDateEndTimeString = CalEndTime.value + " " + $(CalEndDate).datepicker("getDate").toLocaleDateString();
-                    var CalEndDateInMS = Date.parse(CalDateEndTimeString) - (TimeZone * OneMinInMs);
+                    var CalEndDateInMS = Date.parse(CalDateEndTimeString);
                     var splitValue =  getDomOrCreateNew("InputSplitCount", "input").value;
                     Url = global_refTIlerUrl + "SubCalendarEvent/Update";
                     var HandleNEwPage = new LoadingScreenControl("Tiler is updating your schedule ...");

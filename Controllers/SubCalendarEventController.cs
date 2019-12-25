@@ -66,18 +66,14 @@ namespace TilerFront.Controllers
                             long LongBegin = Convert.ToInt64(myUser.CalStart);
                             long LongDeadline = Convert.ToInt64(myUser.CalEnd);
                             DateTimeOffset newStart = TilerElementExtension.JSStartTime.AddMilliseconds(StartLong);
-                            newStart = newStart.Add(myUser.getTimeSpan);
                             DateTimeOffset newEnd = TilerElementExtension.JSStartTime.AddMilliseconds(EndLong);
-                            newEnd = newEnd.Add(myUser.getTimeSpan);
                             DateTimeOffset Begin = TilerElementExtension.JSStartTime.AddMilliseconds(LongBegin);
-                            Begin = Begin.Add(myUser.getTimeSpan);
                             if(LongBegin == 0)
                             {
                                 Begin = Utility.BeginningOfTime;
                             }
 
                             DateTimeOffset Deadline = TilerElementExtension.JSStartTime.AddMilliseconds(LongDeadline);
-                            Deadline = Deadline.Add(myUser.getTimeSpan);
                             if (LongDeadline == 0)
                             {
                                 Deadline = Utility.BeginningOfTime;
