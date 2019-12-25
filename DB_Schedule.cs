@@ -296,7 +296,7 @@ namespace TilerFront
             ReferenceNow refNow = now ?? this.Now;
             scheduleDump = scheduleDump ?? await this.CreateScheduleDump(refNow).ConfigureAwait(false);
             scheduleDump.ReferenceNow = this.Now.constNow;
-            scheduleDump.StartOfDay = this.Now.StartOfDay;
+            scheduleDump.StartOfDay = this.Now.EndOfDay;
 
             myAccount.ScheduleLogControl.Database.ScheduleDumps.Add(scheduleDump);
             await persistToDB().ConfigureAwait(false);
