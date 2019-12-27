@@ -1,0 +1,1 @@
+//Object that is the same as response from server for simple testing

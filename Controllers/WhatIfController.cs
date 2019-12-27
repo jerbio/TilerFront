@@ -109,5 +109,37 @@ namespace TilerFront.Controllers
 
             return Ok(returnPostBack.getPostBack);
         }
+
+        [System.Web.Http.HttpPost]
+        [ResponseType(typeof(PostBackStruct))]
+        [System.Web.Http.Route("api/WhatIf/SetAsNow")]
+        public async Task<IHttpActionResult> SetAsNow([FromBody]WhatIfModel SetAsNowData)
+        {
+            AuthorizedUser myAuthorizedUser = SetAsNowData.User;
+            UserAccount myUserAccount = await SetAsNowData.getUserAccount(db);
+            await myUserAccount.Login();
+            myUserAccount.getTilerUser().updateTimeZoneTimeSpan(SetAsNowData.getTimeSpan);
+            PostBackData returnPostBack;
+            if (myUserAccount.Status)
+            {
+                DB_Schedule MySchedule = new DB_Schedule(myUserAccount, myAuthorizedUser.getRefNow());
+                MySchedule.CurrentLocation = myAuthorizedUser.getCurrentLocation();
+
+                var evaluation = await MySchedule.TimeStone.WhatIfSetAsNow(SetAsNowData.EventId);
+                JObject before = evaluation.Item1.ToJson();
+                JObject after = evaluation.Item2.ToJson();
+                JObject resultData = new JObject();
+                resultData.Add("before", before);
+                resultData.Add("after", after);
+                returnPostBack = new PostBackData(resultData, 0);
+                return Ok(returnPostBack.getPostBack);
+            }
+            else
+            {
+                returnPostBack = new PostBackData("", 1);
+            }
+
+            return Ok(returnPostBack.getPostBack);
+        }
     }
 }
