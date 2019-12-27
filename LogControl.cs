@@ -1624,7 +1624,16 @@ namespace TilerFront
             return retValue;
 
         }
-
+        /// <summary>
+        /// This gets all cal events within <paramref name="RangeOfLookUP"/>. Note: This uses the subcalendar event as the bases for the query. So if a sub event is not within the rangelookup it won't pull the calendar event, this is for performance reasons. Hence why the general default is to be generous.  If you want to pull a specific calendar event then you need to include the calendar id as part of <paramref name="calendarIds"/>.
+        /// <paramref name="retrievalOption"/> provides a way of stream lining whats pulled from the DB. Evaluation ignores the UI component and includes only data to compute the schedule. Information such as NowProfile, procrastination and location
+        /// </summary>
+        /// <param name="RangeOfLookUP"></param>
+        /// <param name="Now"></param>
+        /// <param name="includeSubEvents"></param>
+        /// <param name="retrievalOption"></param>
+        /// <param name="calendarIds"></param>
+        /// <returns></returns>
         async public virtual Task<Dictionary<string, CalendarEvent>> getAllEnabledCalendarEvent(TimeLine RangeOfLookUP, ReferenceNow Now, bool includeSubEvents = true, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation, HashSet<string> calendarIds = null)
         {
             if (retrievalOption == DataRetrivalOption.Evaluation)
@@ -1641,12 +1650,12 @@ namespace TilerFront
                         .Where(subEvent =>
                                 subEvent.IsEnabled_DB
                                 && !subEvent.Complete_EventDB
-                                && subEvent.StartTime_EventDB < RangeOfLookUP.End
-                                && subEvent.EndTime_EventDB > RangeOfLookUP.Start
                                 && subEvent.ParentCalendarEvent.IsEnabled_DB
                                 && !subEvent.ParentCalendarEvent.Complete_EventDB
                                 && subEvent.ParentCalendarEvent.StartTime_EventDB < RangeOfLookUP.End
                                 && subEvent.ParentCalendarEvent.EndTime_EventDB > RangeOfLookUP.Start
+                                && subEvent.StartTime_EventDB < RangeOfLookUP.End// for performance reasons we will ignore sub events outside two weeks that are not within the range
+                                && subEvent.EndTime_EventDB > RangeOfLookUP.Start// for performance reasons we will ignore sub events outside two weeks that are not within the specified range so the range has to be generous
                                 && (
                                         (subEvent.RepeatParentEventId == null) ||
                                         (
