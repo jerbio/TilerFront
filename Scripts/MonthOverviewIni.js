@@ -4647,6 +4647,15 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
 
 
                         splitAndNoteContainer.appendChild(renderNoteResult.button)
+                        let previewButon = getDomOrCreateNew("prview-button", "button")
+                        splitAndNoteContainer.appendChild(previewButon.Dom)
+                        previewButon.Dom.onclick = function () {
+                            let previewDom = getDomOrCreateNew("InlineDayPreviewContainer");
+                            let preview = new Preview(previewDom.Dom);
+                            let previewDays = preview.generateRandomPreviewDays();
+                            preview.processPreviewDays(previewDays);
+                            preview.show();
+                        }
                     } else {
                         $(ContainerForExtraOptions.Dom).addClass("setAsDisplayNone");
                     }

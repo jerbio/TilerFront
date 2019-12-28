@@ -110,7 +110,11 @@ namespace TilerFront
                     "~/Scripts/bootstrap-datepicker.js",
                     "~/Scripts/jquery.signalR-{version}.js",
                     "~/Scripts/moment.min.js",
-                    "~/Scripts/moment-timezone-with-data.min.js"
+                    "~/Scripts/moment-timezone-with-data.min.js",
+                    "~/Scripts/Preview/Index.js",
+                    "~/Scripts/Preview/PreviewDay.js",
+                    "~/Scripts/Preview/Sleep.js",
+                    "~/Scripts/Preview/Tardy.js"
                       ));
 
             bundles.Add(new ScriptBundle("~/Content/TilerMobileJS").Include(
@@ -186,7 +190,11 @@ namespace TilerFront
                     "~/Scripts/YuiCombo/3.18.1/selector-native/selector-native-min.js",
                     "~/Scripts/YuiCombo/3.18.1/selector/selector-min.js",
                     "~/Scripts/YuiCombo/3.18.1/node-core/node-core-min.js",
-                    "~/Scripts/YuiCombo/3.18.1/event-focus/event-focus-min.js"
+                    "~/Scripts/YuiCombo/3.18.1/event-focus/event-focus-min.js",
+                    "~/Scripts/Preview/Index.js",
+                    "~/Scripts/Preview/PreviewDay.js",
+                    "~/Scripts/Preview/Sleep.js",
+                    "~/Scripts/Preview/Tardy.js"
                       ));
 
 

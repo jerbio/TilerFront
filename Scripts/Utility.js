@@ -143,9 +143,9 @@ function buildFunctionSubscription (method) {
 
 function preSendRequestWithLocation(postData) {
     if (global_PositionCoordinate.isInitialized) {
-        postData.UserLongitude = global_PositionCoordinate.Longitude
-        postData.UserLatitude = global_PositionCoordinate.Latitude
-        postData.UserLocationVerified = global_PositionCoordinate.isInitialized
+        postData.UserLongitude = global_PositionCoordinate.Longitude;
+        postData.UserLatitude = global_PositionCoordinate.Latitude;
+        postData.UserLocationVerified = global_PositionCoordinate.isInitialized;
     } else {
         postData.UserLocationVerified = false
     }
@@ -162,4 +162,41 @@ function resetLocationInput(inputDom) {
     inputDom.LocationId = null;
     inputDom.LocationSource = null;
     inputDom.LocationIsVerified = false
+}
+
+function generateRandomEventName() {
+    let actions = ["run","drive","sit", "read", "play", "watch"];
+    let preposition = ["to","at","in", "on", "with", "of"];
+    let locations = ["home","work","chair", "table", "with", "library"];
+
+    let actionIndex = randomInteger(actions.length-1);
+    let prepositionIndex = randomInteger(preposition.length-1);
+    let locationsIndex = randomInteger(locations.length-1);
+
+    let name = actions[actionIndex] +" "+preposition[prepositionIndex] +" "+locations[locationsIndex]
+    return name;
+}
+
+function randomInteger(maxInt) {
+    return Math.round(Math.random(maxInt) * maxInt );
+}
+
+function generateTimeLine(dayStart) {
+    let maxSpan = 2 * OneHourInMs;
+    maxSpan = randomInteger(maxSpan);
+    let beginTimeSpan = randomInteger(OneDayInMs - maxSpan);
+    let timeLineStart = dayStart + beginTimeSpan;
+    let timeLineEnd = timeLineStart + maxSpan;
+    let retValue = {start: timeLineStart, end: timeLineEnd};
+    return retValue;
+}
+
+function globalCounter() {
+    if(globalCounter.count !== undefined) {
+        ++globalCounter.count;
+    } else {
+        globalCounter.count = 0;
+    }
+
+    return globalCounter.count;
 }

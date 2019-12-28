@@ -705,7 +705,10 @@
     <Content Include="Scripts\popper-utils.min.js" />
     <Content Include="Scripts\popper.js" />
     <Content Include="Scripts\popper.min.js" />
-    <Content Include="Scripts\Preview.js" />
+    <Content Include="Scripts\Preview\Index.js" />
+    <Content Include="Scripts\Preview\PreviewDay.js" />
+    <Content Include="Scripts\Preview\Sleep.js" />
+    <Content Include="Scripts\Preview\Tardy.js" />
     <Content Include="Scripts\umd\popper-utils.js" />
     <Content Include="Scripts\umd\popper-utils.min.js" />
     <Content Include="Scripts\umd\popper.js" />
