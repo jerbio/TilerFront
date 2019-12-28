@@ -133,9 +133,9 @@ function generateSubEventEditPage(subEvent) {
         postData.TimeZoneOffset = TimeZone;
         postData.TimeZone = moment.tz.guess()
 
-        postData.Start = postData.Start - (TimeZone * OneMinInMs);
-        postData.End = postData.End - (TimeZone * OneMinInMs);
-        postData.CalEnd = postData.CalEnd - (TimeZone * OneMinInMs);
+        postData.Start = postData.Start;
+        postData.End = postData.End;
+        postData.CalEnd = postData.CalEnd;
 
         postData.offset = new Date().getTimezoneOffset()
         postData.Split = numberOfEvents.input.value
