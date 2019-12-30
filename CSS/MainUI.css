@@ -1033,3 +1033,111 @@ width: 20px;
 .ListElementContainerCurrentSubevent .ListElementColorContainer {
     box-shadow: none;
 }
+
+#InlineDayPreviewContainer {
+    display: inline-flex;
+}
+
+.preview-day-whole-container {
+    width: 150px;
+    margin: 50px 25px 0 25px;
+    border: 1px solid rgb(170, 170, 170);
+    border-radius: 10px;
+}
+
+.preview-day-of-week-text-container {
+
+}
+
+.preview-day-of-week-text {
+    position: absolute;
+    border-bottom: solid 1px;
+    border-right: solid 1px;
+    padding: 0 5px 5px;
+    border-radius: 0 0 5px;
+}
+
+.day-preview-sleep-container {
+    /* height: 50px;
+    display: table-cell;
+    vertical-align: bottom; */
+}
+
+.day-preview-sleep-container {
+    vertical-align: bottom;
+    height: 70px;
+}
+
+.day-preview-sleep-color-container  {
+    background-color: red;
+    width: 100%;
+    height: 100%;
+    border-radius: 10px 10px 0px 0px;
+}
+
+.day-preview-sleep-text-container {
+    position: relative;
+    bottom: 30px;
+    text-align: center;
+}
+
+.day-preview-conflict-container {
+    height: 30px;
+    vertical-align: middle;
+    text-align: center;
+}
+
+.day-preview-conflict-icon-container {
+
+}
+
+.day-preview-conflict-text-container {
+    margin-top: 15PX;
+}
+
+.day-preview-conflict-text {
+
+}
+
+.day-preview-tardy-container {
+    text-align: center;
+    margin-bottom: 10PX;
+    margin-top: 10px;
+}
+
+.day-preview-tardy-icon-container {
+
+}
+
+.day-preview-tardy-text-container {
+
+}
+
+.day-preview-tardy-text {
+
+}
+
+#PreviewLoading {
+    width: 90%;
+    height: 5px;
+    bottom: 5px;
+    position: absolute;
+    display: none;
+}
+
+#PreviewLoading.active {
+    display: block;
+}
+
+#PreviewSliderLoadingBar {
+    border-top: 5px solid rgb(100, 100, 100);
+    width: 25%;
+    height: 5px;
+    -webkit-animation: slidingLoadingPreviewBar 2s linear infinite; /* Safari */
+    animation: slidingLoadingPreviewBar 2s linear infinite;
+}
+
+@keyframes slidingLoadingPreviewBar {
+    0% { transform: translateX(-50%); }
+    100% { transform: translateX(350%); }
+  }

@@ -3,15 +3,14 @@
 
 
 class Preview {
-    #aaa = function (params) {
-        
-    }
+    #renderLoading = 1221
     ddd = 8;
     
     constructor(domContainer) {
         this.UIContainer = domContainer;
         this.processedDay = {};
         this.previewDays = [];
+        this.isLoading = false;
     }
 
     setAsNow(subEventId) {
@@ -43,6 +42,20 @@ class Preview {
         return devDays;
     }
 
+    startLoading() {
+        this.isLoading = true;
+        let loadingBarId = "PreviewLoading";
+        let loadingBar = getDomOrCreateNew(loadingBarId);
+        $(loadingBar).addClass("active")
+    }
+
+    endLoading() {
+        this.isLoading = false;
+        let loadingBarId = "PreviewLoading";
+        let loadingBar = getDomOrCreateNew(loadingBarId);
+        $(loadingBar).removeClass("active")
+    }
+
     show() {
         $(this.UIContainer.parentNode).addClass('active');// this will be unnecessary. The goal is what ever container is provided as UIContainer, will append our generated preview node as the child node. If there is no container then this defaults to sliding out of the subevent infomration.
     }
@@ -63,17 +76,22 @@ class Preview {
             let sleepContainerDomId = "day-preview-sleep-container-" + daySleepInfo.id;
             let sleepContainer = getDomOrCreateNew(sleepContainerDomId);
             daySleepInfo.container = sleepContainer;
+            $(daySleepInfo.container).addClass("day-preview-sleep-container");
+
             let sleepColorContainerDomId = "day-preview-sleep-color-container-" + daySleepInfo.id;
             let sleepColorContainerDom = getDomOrCreateNew(sleepColorContainerDomId);
             daySleepInfo.colorContainer = sleepColorContainerDom;
+            $(daySleepInfo.colorContainer).addClass("day-preview-sleep-color-container");
 
             let sleepTextContainerDomId = "day-preview-sleep-text-container-" + daySleepInfo.id;
             let sleepTextContainerDom = getDomOrCreateNew(sleepTextContainerDomId);
             daySleepInfo.TextContainer = sleepTextContainerDom;
+            $(daySleepInfo.TextContainer).addClass("day-preview-sleep-text-container");
 
             let sleepTextDomId = "day-preview-sleep-text-" + daySleepInfo.id;
             let sleepTextDom = getDomOrCreateNew(sleepTextDomId, "span");
             daySleepInfo.TextDom = sleepTextDom;
+            $(daySleepInfo.TextDom).addClass("day-preview-sleep-text");
             
             daySleepInfo.TextContainer.Dom.appendChild(daySleepInfo.TextDom);
             daySleepInfo.container.Dom.appendChild(daySleepInfo.colorContainer.Dom);
@@ -108,18 +126,22 @@ class Preview {
             let dayConflictInfoContainerId = "day-preview-conflict-container-"+dayConflictInfo.id;
             let dayConflictInfoContainer = getDomOrCreateNew(dayConflictInfoContainerId);
             dayConflictInfo.conflictContainer = dayConflictInfoContainer;
+            $(dayConflictInfo.conflictContainer).addClass("day-preview-conflict-container");
 
-            let dayConflictInfoIconContainerId = "day-preview-conflict-icon-container"+dayConflictInfo.id;
+            let dayConflictInfoIconContainerId = "day-preview-conflict-icon-container-"+dayConflictInfo.id;
             let dayConflictInfoIconContainer = getDomOrCreateNew(dayConflictInfoIconContainerId);
             dayConflictInfo.iconContainer = dayConflictInfoIconContainer;
+            $(dayConflictInfo.iconContainer).addClass("day-preview-conflict-icon-container");
 
-            let dayConflictInfoTextContainerId = "day-preview-conflict-text-container"+dayConflictInfo.id;
+            let dayConflictInfoTextContainerId = "day-preview-conflict-text-container-"+dayConflictInfo.id;
             let dayConflictInfoTextContainer = getDomOrCreateNew(dayConflictInfoTextContainerId);
             dayConflictInfo.textContainer = dayConflictInfoTextContainer;
+            $(dayConflictInfo.textContainer).addClass("day-preview-conflict-text-container");
 
             let dayConflictInfoTextId = "day-preview-conflict-text-"+dayConflictInfo.id;
             let dayConflictInfoText = getDomOrCreateNew(dayConflictInfoTextId, "span");
             dayConflictInfo.textDom = dayConflictInfoText;
+            $(dayConflictInfo.textDom).addClass("day-preview-conflict-text");
 
             dayConflictInfoTextContainer.Dom.appendChild(dayConflictInfoText);
             dayConflictInfoContainer.Dom.appendChild(dayConflictInfoIconContainer);
@@ -129,7 +151,7 @@ class Preview {
         }
 
         if(previewDay.conflict && previewDay.conflict.length > 0) {
-            dayConflictInfo.textDom.innerHTML = previewDay.conflict.length;
+            dayConflictInfo.textDom.innerHTML = previewDay.conflict.length + " conflict" + (previewDay.conflict.length>1 ? "s" :"");
         } else {
             dayConflictInfo.textDom.innerHTML = "";
         }
@@ -161,18 +183,22 @@ class Preview {
             let dayTardyInfoContainerId = "day-preview-tardy-container-"+dayTardyInfo.id;
             let dayTardyInfoContainer = getDomOrCreateNew(dayTardyInfoContainerId);
             dayTardyInfo.tardyContainer = dayTardyInfoContainer;
+            $(dayTardyInfo.tardyContainer).addClass("day-preview-tardy-container");
 
-            let dayTardyInfoIconContainerId = "day-preview-tardy-icon-container"+dayTardyInfo.id;
+            let dayTardyInfoIconContainerId = "day-preview-tardy-icon-container-"+dayTardyInfo.id;
             let dayTardyInfoIconContainer = getDomOrCreateNew(dayTardyInfoIconContainerId);
             dayTardyInfo.iconContainer = dayTardyInfoIconContainer;
+            $(dayTardyInfo.iconContainer).addClass("day-preview-tardy-icon-container");
 
-            let dayTardyInfoTextContainerId = "day-preview-tardy-text-container"+dayTardyInfo.id;
+            let dayTardyInfoTextContainerId = "day-preview-tardy-text-container-"+dayTardyInfo.id;
             let dayTardyInfoTextContainer = getDomOrCreateNew(dayTardyInfoTextContainerId);
             dayTardyInfo.textContainer = dayTardyInfoTextContainer;
+            $(dayTardyInfo.textContainer).addClass("day-preview-tardy-text-container");
 
             let dayTardyInfoTextId = "day-preview-tardy-text-"+dayTardyInfo.id;
             let dayTardyInfoText = getDomOrCreateNew(dayTardyInfoTextId, "span");
             dayTardyInfo.textDom = dayTardyInfoText;
+            $(dayTardyInfo.textDom).addClass("day-preview-tardy-text");
 
             dayTardyInfoTextContainer.Dom.appendChild(dayTardyInfoText);
             dayTardyInfoContainer.Dom.appendChild(dayTardyInfoIconContainer);
@@ -182,7 +208,7 @@ class Preview {
         }
 
         if(previewDay.tardy && previewDay.tardy.length > 0) {
-            dayTardyInfo.textDom.innerHTML = previewDay.tardy.length;
+            dayTardyInfo.textDom.innerHTML = "Late to " + previewDay.tardy.length + " event" + (previewDay.tardy.length>1 ? "s" :"");
         } else {
             dayTardyInfo.textDom.innerHTML = "";
         }
@@ -204,22 +230,28 @@ class Preview {
                 id: globalCounter(),
             };
 
-            let dayContainerId = "day-preview-whole-container-"+dayInfo.id;
+            let dayContainerId = "preview-day-whole-container-"+dayInfo.id;
             let dayContainer = getDomOrCreateNew(dayContainerId);
             dayInfo.dayContainer = dayContainer;
+            $(dayInfo.dayContainer).addClass("preview-day-whole-container");
 
-            let dayOfWeekContainerId = "day-of-week-"+dayInfo.id;
+            let dayOfWeekContainerId = "preview-day-of-week-"+dayInfo.id;
             let dayOfWeekContainer = getDomOrCreateNew(dayOfWeekContainerId);
             dayInfo.dayOfWeekContainer = dayOfWeekContainer;
+            $(dayInfo.dayOfWeekContainer).addClass("preview-day-of-week");
 
-            let dayOfWeekTextContainerId = "day-of-week-text-container-"+dayInfo.id;
+            let dayOfWeekTextContainerId = "preview-day-of-week-text-container-"+dayInfo.id;
             let dayOfWeekTextContainer = getDomOrCreateNew(dayOfWeekTextContainerId);
             dayInfo.dayOfWeekTextContainer = dayOfWeekTextContainer;
+            $(dayInfo.dayOfWeekTextContainer).addClass("preview-day-of-week-text-container");
 
-            let dayOfWeekTextId = "day-of-week-text-"+dayInfo.id;
+            let dayOfWeekTextId = "preview-day-of-week-text-"+dayInfo.id;
             let dayOfWeekText = getDomOrCreateNew(dayOfWeekTextId, 'span');
+            $(dayInfo.dayOfWeekTextContainer).addClass("preview-day-of-week-text");
             dayOfWeekText.innerHTML = WeekDays[new Date(dayStart).getDay()]
             
+
+
             dayInfo.dayOfWeekText = dayOfWeekText;
             dayInfo.dayOfWeekTextContainer.Dom.appendChild(dayInfo.dayOfWeekText);
             dayInfo.dayOfWeekContainer.Dom.appendChild(dayInfo.dayOfWeekTextContainer);
@@ -271,6 +303,7 @@ class SetAsNowPreview {
         let dayId = day.Start
         let sleepDomId = "day-preview-sleep-container-" + dayId;
         let sleepDom = getDomOrCreateNew(sleepDomId);
+        $(sleepDom).addClass("day-preview-sleep-container");
         let retValue = {day: day, dom: sleepDom};
 
         return retValue;
