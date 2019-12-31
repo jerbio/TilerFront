@@ -508,6 +508,10 @@
     <Compile Include="LogControlXml.cs" />
     <Compile Include="LogControlDirect.cs" />
     <Compile Include="LogControl.cs" />
+    <Compile Include="Migrations\201912300743092_init.cs" />
+    <Compile Include="Migrations\201912300743092_init.Designer.cs">
+      <DependentUpon>201912300743092_init.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -2817,6 +2821,11 @@
       <Project>{bcb7ff8a-4b37-4ce2-9a41-4ccb7d616afd}</Project>
       <Name>ScheduleAnalysis</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201912300743092_init.resx">
+      <DependentUpon>201912300743092_init.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
