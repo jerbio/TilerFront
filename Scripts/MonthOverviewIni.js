@@ -3356,6 +3356,57 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
             }
             global_previousSelectedSubCalEvent = new Array();
         }
+
+        function getSubeventUpdateData(SubEvent) {
+            var TimeZone = new Date().getTimezoneOffset();
+            let SubEventStartTime = getDomOrCreateNew("StartTimeInput", "input");
+            let SubEventEndTime = getDomOrCreateNew("EndTimeInput", "input");
+            let SubEventStartDate = getDomOrCreateNew("SubEventStartDateInput", "input");
+            let SubEventEndDate = getDomOrCreateNew("SubEventEndDateInput", "input");
+
+            let CalEndTime = getDomOrCreateNew("CalEndTime", "input");
+            let CalEndDate = getDomOrCreateNew("CalEndDate", "input");
+
+            let NameContanierInput = getDomOrCreateNew("NameInputBox", "input");
+
+            SubEventStartTime.value =formatTimePortionOfStringToRightFormat(SubEventStartTime.value )
+            let SubCalStartDateTimeString = SubEventStartTime.value.trim() + " " + $(SubEventStartDate).datepicker("getDate").toLocaleDateString().trim();
+            let SubCalStartDateInMS = Date.parse(SubCalStartDateTimeString);
+
+
+            SubEventEndTime.value = formatTimePortionOfStringToRightFormat(SubEventEndTime.value)
+            let SubCalEndDateTimeString = SubEventEndTime.value.trim() + " " + $(SubEventEndDate).datepicker("getDate").toLocaleDateString().trim();
+            let SubCaEndDateInMS = Date.parse(SubCalEndDateTimeString);
+
+            CalEndTime.value = formatTimePortionOfStringToRightFormat(CalEndTime.value)
+
+            let CalDateEndTimeString = CalEndTime.value.trim() + " " + $(CalEndDate).datepicker("getDate").toLocaleDateString().trim();
+            let CalEndDateInMS = Date.parse(CalDateEndTimeString);
+            let splitValue = Number(getDomOrCreateNew("InputSplitCount", "input").value);
+            
+
+            let notesDom = getDomOrCreateNew("notesArea");
+            let Notes = notesDom.value || SubEvent.Notes
+            let retValue = {
+                UserName: UserCredentials.UserName,
+                UserID: UserCredentials.ID,
+                EventID: SubEvent.ID,
+                EventName: NameContanierInput.value,
+                TimeZoneOffset: TimeZone,
+                Start: SubCalStartDateInMS,
+                End: SubCaEndDateInMS,
+                CalStart: 0,
+                CalEnd: CalEndDateInMS,
+                Split: splitValue,
+                ThirdPartyEventID: SubEvent.ThirdPartyEventID,
+                ThirdPartyUserID: SubEvent.ThirdPartyUserID,
+                ThirdPartyType: SubEvent.ThirdPartyType,
+                Notes: Notes
+            };
+
+            return retValue;
+        }
+
         function prepOnClickOfCalendarElement(SubEvent, Dom) {
             return function () {
                 //event.stopPropagation();
@@ -3666,14 +3717,77 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                     var EditContainer = getDomOrCreateNew("EditCalEventContainer");
                     $(EditContainer).addClass("setAsDisplayNone");
                     EditContainer.appendChild(SaveButton);
+
+                    var previewButon = getDomOrCreateNew("PreviewButton", "button");
+                    previewButon.innerHTML = "Preview"
+                    EditContainer.appendChild(previewButon);
                     var EditContainerStatus = { isRevealed: false };
+
+
+                    previewButon.Dom.onclick = function () {
+
+                        let previewDom = getDomOrCreateNew("InlineDayPreviewContainer");
+                        let preview = new Preview(SubEvent.ID, previewDom.Dom);
+                        let previewDays = preview.generateRandomPreviewDays();
+                        preview.processPreviewDays(previewDays);
+                        preview.show();
+                        preview.editSubEvent();
+
+                        // let updateButon = getDomOrCreateNew("update-preview-button", "button");
+                        // EditContainer.appendChild(updateButon.Dom)
+                        // updateButon.Dom.style.backgroundColor = "red";
+                        // updateButon.Dom.onclick = function () {
+                        //     let previewDays = preview.generateRandomPreviewDays();
+                        //     preview.startLoading();
+                        //     setTimeout(function name(params) {
+                        //         preview.endLoading();
+                        //         preview.processPreviewDays(previewDays);    
+                        //     }, 5000)
+                            
+                        // }
+                    }
+
+                    function isSubEventPostDifferentFromSubevent(subEventPost, includeNameCheck = false) {
+                        let currentSubevent = Dictionary_OfSubEvents[subEventPost.EventID];
+
+                        let isSame = true;
+                        isSame = isSame && currentSubevent.SubCalStartDate.getTime() === subEventPost.Start;
+                        isSame = isSame && currentSubevent.SubCalEndDate.getTime() === subEventPost.End;
+                        isSame = isSame && currentSubevent.SubCalCalEventEnd.getTime() === subEventPost.CalEnd;
+                        isSame = isSame && !isNaN(subEventPost.Split) && currentSubevent.Split == subEventPost.Split;
+                        isSame = isSame && currentSubevent.SubCalCalEventEnd.getTime() === subEventPost.CalEnd;
+                        if (includeNameCheck) {
+                            isSame = isSame && currentSubevent.SubCalCalendarName === subEventPost.EventName;
+                        }
+
+                        let isValid = true;
+                        isValid = isValid && subEventPost.Split > 0;
+
+                        subEventPost.Split > 0
+
+                        let retValue = {
+                            isValid: isValid,
+                            inputIsChanged: !isSame
+                        }
+                        return retValue;
+
+                    }
+
                     function RevealEditContainer()
                     {
-                        if (!EditContainerStatus.isRevealed)
-                        {
-                            $(EditContainer).removeClass("setAsDisplayNone");
-                            EditContainerStatus.isRevealed = true;
+                        let subEventData = getSubeventUpdateData(SubEvent);
+                        let dataChange = isSubEventPostDifferentFromSubevent(subEventData, true);
+                        
+                        if(dataChange.isValid && dataChange.inputIsChanged) {
+                            if (!EditContainerStatus.isRevealed)
+                            {
+                                $(EditContainer).removeClass("setAsDisplayNone");
+                                EditContainerStatus.isRevealed = true;
+                            }
+                        } else {
+                            HideEditContainer();
                         }
+
                     }
 
                     
@@ -4647,28 +4761,6 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
 
 
                         splitAndNoteContainer.appendChild(renderNoteResult.button)
-                        let previewButon = getDomOrCreateNew("preview-button", "button");
-                        splitAndNoteContainer.appendChild(previewButon.Dom)
-                        previewButon.Dom.onclick = function () {
-                            let updateButon = getDomOrCreateNew("update-preview-button", "button");
-                            splitAndNoteContainer.appendChild(updateButon.Dom)
-                            updateButon.Dom.style.backgroundColor = "red";
-                            let previewDom = getDomOrCreateNew("InlineDayPreviewContainer");
-                            let preview = new Preview(previewDom.Dom);
-                            let previewDays = preview.generateRandomPreviewDays();
-                            preview.processPreviewDays(previewDays);
-                            preview.show();
-
-                            updateButon.Dom.onclick = function () {
-                                let previewDays = preview.generateRandomPreviewDays();
-                                preview.startLoading();
-                                setTimeout(function name(params) {
-                                    preview.endLoading();
-                                    preview.processPreviewDays(previewDays);    
-                                }, 5000)
-                                
-                            }
-                        }
                     } else {
                         $(ContainerForExtraOptions.Dom).addClass("setAsDisplayNone");
                     }
@@ -4708,43 +4800,12 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                 function SaveButtonClick()
                 {
                     debugger;
-                    var TimeZone = new Date().getTimezoneOffset();
-                    var Url;
-                    SubEventStartTime.value =formatTimePortionOfStringToRightFormat(SubEventStartTime.value )
-                    var SubCalStartDateTimeString = SubEventStartTime.value + " " + $(SubEventStartDate).datepicker("getDate").toLocaleDateString();
-                    var SubCaStartDateInMS = Date.parse(SubCalStartDateTimeString);
-
-
-                    SubEventEndTime.value = formatTimePortionOfStringToRightFormat(SubEventEndTime.value)
-                    var SubCalEndDateTimeString = SubEventEndTime.value + " " + $(SubEventEndDate).datepicker("getDate").toLocaleDateString();
-                    var SubCaEndDateInMS = Date.parse(SubCalEndDateTimeString);
-
-                    CalEndTime.value = formatTimePortionOfStringToRightFormat(CalEndTime.value)
-
-                    var CalDateEndTimeString = CalEndTime.value + " " + $(CalEndDate).datepicker("getDate").toLocaleDateString();
-                    var CalEndDateInMS = Date.parse(CalDateEndTimeString);
-                    var splitValue =  getDomOrCreateNew("InputSplitCount", "input").value;
-                    Url = global_refTIlerUrl + "SubCalendarEvent/Update";
-                    var HandleNEwPage = new LoadingScreenControl("Tiler is updating your schedule ...");
+                    SubEventEndTime
+                    let Url = global_refTIlerUrl + "SubCalendarEvent/Update";
+                    let HandleNEwPage = new LoadingScreenControl("Tiler is updating your schedule ...");
                     HandleNEwPage.Launch();
-                    let notesDom = getDomOrCreateNew("notesArea");
-                    let Notes = notesDom.value || SubEvent.Notes
-                    var SaveData = {
-                        UserName: UserCredentials.UserName,
-                        UserID: UserCredentials.ID,
-                        EventID: SubEvent.ID,
-                        EventName: NameContanierInput.value, TimeZoneOffset: TimeZone,
-                        Start: SubCaStartDateInMS,
-                        End: SubCaEndDateInMS,
-                        CalStart: 0,
-                        CalEnd: CalEndDateInMS,
-                        Split: splitValue,
-                        ThirdPartyEventID: SubEvent.ThirdPartyEventID,
-                        ThirdPartyUserID: SubEvent.ThirdPartyUserID,
-                        ThirdPartyType: SubEvent.ThirdPartyType,
-                        Notes: Notes
-                    };
-                    SaveData.TimeZone = moment.tz.guess()
+                    let SaveData = getSubeventUpdateData(SubEvent);
+                    SaveData.TimeZone = moment.tz.guess();
                     preSendRequestWithLocation(SaveData);
 
                     var exit= function (data) {

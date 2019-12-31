@@ -141,5 +141,101 @@ namespace TilerFront.Controllers
 
             return Ok(returnPostBack.getPostBack);
         }
+
+
+        [System.Web.Http.HttpPost]
+        [ResponseType(typeof(PostBackStruct))]
+        [System.Web.Http.Route("api/WhatIf/SubeventEdit")]
+        public async Task<IHttpActionResult> SubeventEdit([FromBody]EditSubEventWhatIfModel SubEventEdit)
+        {
+            UserAccount userAccount = await SubEventEdit.getUserAccount(db);
+            await userAccount.Login();
+            userAccount.getTilerUser().updateTimeZoneTimeSpan(SubEventEdit.getTimeSpan);
+            PostBackData returnPostBack;
+            if (userAccount.Status)
+            {
+                int SplitCount = (int)SubEventEdit.Split;
+                long StartLong = Convert.ToInt64(SubEventEdit.Start);
+                long EndLong = Convert.ToInt64(SubEventEdit.End);
+                long LongBegin = Convert.ToInt64(SubEventEdit.CalStart);
+                long LongDeadline = Convert.ToInt64(SubEventEdit.CalEnd);
+                DateTimeOffset newStart = TilerElementExtension.JSStartTime.AddMilliseconds(StartLong);
+                DateTimeOffset newEnd = TilerElementExtension.JSStartTime.AddMilliseconds(EndLong);
+                DateTimeOffset Begin = TilerElementExtension.JSStartTime.AddMilliseconds(LongBegin);
+                if (LongBegin == 0)
+                {
+                    Begin = Utility.BeginningOfTime;
+                }
+
+                DateTimeOffset Deadline = TilerElementExtension.JSStartTime.AddMilliseconds(LongDeadline);
+                if (LongDeadline == 0)
+                {
+                    Deadline = Utility.BeginningOfTime;
+                }
+
+
+                DateTimeOffset now = SubEventEdit.getRefNow();
+                DB_Schedule MySchedule;
+                Tuple<Health, Health> evaluation;
+
+                string CalendarType = SubEventEdit.ThirdPartyType.ToLower();
+                switch (CalendarType)
+                {
+                    case "google":
+                        {
+                            Models.ThirdPartyCalendarAuthenticationModel AllIndexedThirdParty = await ScheduleController.getThirdPartyAuthentication(userAccount.UserID, SubEventEdit.ThirdPartyUserID, "Google", db);
+                            GoogleTilerEventControl googleControl = new GoogleTilerEventControl(AllIndexedThirdParty, db);
+                            await googleControl.updateSubEvent(SubEventEdit).ConfigureAwait(false);
+                            Dictionary<string, CalendarEvent> AllCalendarEvents = (await googleControl.getCalendarEvents(null, true).ConfigureAwait(false)).ToDictionary(obj => obj.getId, obj => obj);
+                            GoogleThirdPartyControl googleEvents = new GoogleThirdPartyControl(AllCalendarEvents, AllIndexedThirdParty.getTilerUser());
+                            DB_UserActivity activity = new DB_UserActivity(now, UserActivity.ActivityType.ThirdPartyUpdate);
+                            userAccount.ScheduleLogControl.updateUserActivty(activity);
+
+                            MySchedule = new DB_Schedule(userAccount, now);
+                            evaluation = await MySchedule.TimeStone.EventUpdate().ConfigureAwait(false);
+                        }
+                        break;
+                    case "tiler":
+                        {
+                            HashSet<string> calendarIds = new HashSet<string>() { SubEventEdit.EventID };
+                            MySchedule = new DB_Schedule(userAccount, now, calendarIds: calendarIds);
+                            MySchedule.CurrentLocation = SubEventEdit.getCurrentLocation();
+                            evaluation = await MySchedule.TimeStone.EventUpdate(
+                                newStart,
+                                newEnd,
+                                Begin,
+                                Deadline,
+                                SplitCount,
+                                SubEventEdit.EventID
+                                ).ConfigureAwait(false);
+                        }
+                        break;
+                    default:
+                        CustomErrors error = new CustomErrors(CustomErrors.Errors.Preview_Calendar_Type_Not_Supported);
+                        returnPostBack = new PostBackData(error);
+                        return Ok(returnPostBack.getPostBack);
+                }
+
+
+
+
+                
+
+                
+                JObject before = evaluation.Item1.ToJson();
+                JObject after = evaluation.Item2.ToJson();
+                JObject resultData = new JObject();
+                resultData.Add("before", before);
+                resultData.Add("after", after);
+                returnPostBack = new PostBackData(resultData, 0);
+                return Ok(returnPostBack.getPostBack);
+            }
+            else
+            {
+                returnPostBack = new PostBackData("", 1);
+            }
+
+            return Ok(returnPostBack.getPostBack);
+        }
     }
 }

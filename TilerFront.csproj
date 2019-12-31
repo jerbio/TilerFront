@@ -515,6 +515,7 @@
     <Compile Include="Models\DumpModel.cs" />
     <Compile Include="Models\EditCalEventModel.cs" />
     <Compile Include="Models\EditSubCalEventModel.cs" />
+    <Compile Include="Models\EditSubEventWhatIfModel.cs" />
     <Compile Include="Models\getEventModel.cs" />
     <Compile Include="Models\getScheduleModel.cs" />
     <Compile Include="Models\GoogleNotificationRequestModel.cs" />

@@ -1,5 +1,5 @@
 ﻿//#define UseDefaultLocation
-//#define liveDebugging
+#define liveDebugging
 
 using System;
 using System.Collections.Generic;
@@ -906,6 +906,8 @@ namespace TilerFront
             MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.AutoDeletion_ReasonDB.ToString();
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("RepetitionLock"));
             MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.RepetitionLock_DB.ToString();
+            MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("isTardy"));
+            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.isTardy.ToString();
 
             if (MySubEvent.getIsEventRestricted)
             {
@@ -2604,12 +2606,14 @@ namespace TilerFront
                 TimeSpan.TryParse(MyXmlNode.ChildNodes[i].SelectSingleNode("TravelTimeAfter")?.InnerText ?? "", out TravelTimeAfter);
                 TimeSpan.TryParse(MyXmlNode.ChildNodes[i].SelectSingleNode("TravelTimeBefore")?.InnerText ?? "", out TravelTimeBefore);
 
-                bool isSleep, isWake;
+                bool isSleep, isWake, isTardy;
                 bool.TryParse(MyXmlNode.ChildNodes[i].SelectSingleNode("isSleep")?.InnerText ?? "", out isSleep);
                 bool.TryParse(MyXmlNode.ChildNodes[i].SelectSingleNode("isWake")?.InnerText ?? "", out isWake);
+                bool.TryParse(MyXmlNode.ChildNodes[i].SelectSingleNode("isTardy")?.InnerText ?? "", out isTardy);
 
                 retrievedSubEvent.isSleep = isSleep;
                 retrievedSubEvent.isWake = isWake;
+                retrievedSubEvent.IsTardy_DB = isTardy;
 
                 retrievedSubEvent.TravelTimeAfter = TravelTimeAfter;
                 retrievedSubEvent.TravelTimeBefore = TravelTimeBefore;

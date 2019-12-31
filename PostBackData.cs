@@ -82,7 +82,7 @@ namespace TilerFront
             string defaultMessage = "Tiler is having some issues please try again later";
             if (errorCode > 0 && errorCode < 20000000)
             {
-                retValue = defaultMessage;
+                retValue = string.IsNullOrEmpty(Message) || string.IsNullOrWhiteSpace(Message) ?  defaultMessage : Message;
                 return retValue;
             }
 

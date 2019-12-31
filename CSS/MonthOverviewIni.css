@@ -620,7 +620,7 @@ body {
 
 
 
-#SaveButton 
+#SaveButton, #PreviewButton
 {
     width:100%;
     height: 36px;

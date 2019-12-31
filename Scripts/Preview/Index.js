@@ -3,18 +3,84 @@
 
 
 class Preview {
-    #renderLoading = 1221
-    ddd = 8;
-    
-    constructor(domContainer) {
+
+    constructor(eventId, domContainer) {
         this.UIContainer = domContainer;
         this.processedDay = {};
         this.previewDays = [];
         this.isLoading = false;
+        this.previewEventId = eventId;
+        this.currentRequests = [];
+    }
+
+    _beforePreviewRequest () {
+        if(Array.isArray(this.currentRequests) && this.currentRequests.length > 0) {
+            let previousRequest = this.currentRequests.shift();
+            previousRequest.abort();
+        }
+        
+    }
+
+    _afterPreveiwRequestCompletes () {
+        this.currentRequests.pop();
     }
 
     setAsNow(subEventId) {
 
+    }
+
+    editSubEvent() {
+        this._beforePreviewRequest();
+        let Url = global_refTIlerUrl + "WhatIf/SubEventEdit";
+        let currentSubevent = Dictionary_OfSubEvents[this.previewEventId];
+        let postData = getSubeventUpdateData(currentSubevent);
+        postData.TimeZone = moment.tz.guess();
+        preSendRequestWithLocation(postData);
+
+
+        this._beforePreviewRequest();
+        this.startLoading();
+        let endLoading = this.endLoading;
+        endLoading.bind(this);
+
+        let request = $.ajax({
+            type: "POST",
+            url: Url,
+            data: postData,
+            // DO NOT SET CONTENT TYPE to json
+            // contentType: "application/json; charset=utf-8", 
+            // DataType needs to stay, otherwise the response object
+            // will be treated as a single string
+            //dataType: "json",
+            success: function (response) {
+                triggerUndoPanel("Undo Change to event on Tiler");
+                var myContainer = (response);
+                if (myContainer.Error.code == 0) {
+                    //exitSelectedEventScreen();
+                }
+                else {
+                    var NewMessage = myContainer.Error && myContainer.Error.code && myContainer.Error.Message ? myContainer.Error.Message : "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
+                    var ExitAfter = {
+                        ExitNow: true, Delay: 5000
+                    };
+                }
+                endLoading();
+            },
+            error: function (err) {
+                var myError = err;
+                var step = "err";
+                var NewMessage = err.Error && err.Error.code && err.Error.Message ? err.Error.Message : "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
+                var ExitAfter = {
+                    ExitNow: true, Delay: 1000
+                };
+                endLoading();
+            }
+
+        }).done(
+            () => {
+                this._afterPreveiwRequestCompletes();
+            }
+        );
     }
 
     procrastinateAll(timeSpan) {
