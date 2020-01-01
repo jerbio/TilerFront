@@ -138,7 +138,7 @@ class PreviewDay {
                 entry.conflicts = [];
             }
 
-            let conflictBlobs = data.after.tardy.days[key];
+            let conflictBlobs = data.after.tardy.days[dayStart];
             if(conflictBlobs) {
                 for (let i = 0; i<conflictBlobs.length; i++) {
                     let blobsubEvent =  conflictBlobs[i];
