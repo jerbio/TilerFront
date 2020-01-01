@@ -259,6 +259,130 @@ function SubmitTile(Name, AddressInput,AddressNick, Splits, Hour, Minutes, Deadl
     return NewEvent;
 }
 
+
+function generateProcrastinateAllDoms() {
+    let ProcrastinateAllDomId = "ProcrastinateAllDom";
+    let procrastinateAllDom = getDomOrCreateNew(ProcrastinateAllDomId);
+
+    let ProcrastinateAllUserInputContainerId = "ProcrastinateAllContainer";
+    let ProcrastinateAllUserInputContainer = getDomOrCreateNew(ProcrastinateAllUserInputContainerId);
+
+    let HourInput = getDomOrCreateNew("procrastinateHours", "input");
+    let MinInput = getDomOrCreateNew("procrastinateMins", "input");
+    let DayInput = getDomOrCreateNew("procrastinateDays", "input");
+
+
+    let ProcrastinateAllDomInputContainerId = "ProcrastinateAllInputContainer";
+    let ProcrastinateAllDomInputContainer = getDomOrCreateNew(ProcrastinateAllDomInputContainerId);
+    ProcrastinateAllUserInputContainer.Dom.appendChild(ProcrastinateAllDomInputContainer);
+
+
+    ProcrastinateAllDomInputContainer.Dom.appendChild(HourInput.Dom);
+    ProcrastinateAllDomInputContainer.Dom.appendChild(MinInput.Dom);
+    ProcrastinateAllDomInputContainer.Dom.appendChild(DayInput.Dom);
+
+
+    let ProcrastinateAllDomButtonContainerId = "ProcrastinateAllButtonContainer";
+    let ProcrastinateAllDomButtonContainer = getDomOrCreateNew(ProcrastinateAllDomButtonContainerId);
+
+    let submitButton = getDomOrCreateNew("submitButton", "button");
+    let cancelButton = getDomOrCreateNew("cancelButton", "button");
+    let previewProcrastinateAllButton = getDomOrCreateNew("previewProcrastinateAllButton", "button");
+
+    submitButton.Dom.innerHTML = "Submit";
+    cancelButton.Dom.innerHTML = "Cancel";
+    previewProcrastinateAllButton.Dom.innerHTML = "Preview";
+
+    ProcrastinateAllDomButtonContainer.Dom.appendChild(submitButton.Dom);
+    ProcrastinateAllDomButtonContainer.Dom.appendChild(cancelButton.Dom);
+    ProcrastinateAllDomButtonContainer.Dom.appendChild(previewProcrastinateAllButton.Dom);
+
+    $(submitButton.Dom).click(function (event) {//stops clicking of add event button from triggering a new modal dom
+        event.stopPropagation();
+    });
+
+    $(cancelButton.Dom).click(function (event) {//stops clicking of add event button from triggering a new modal dom
+        event.stopPropagation();
+    });
+
+    $(previewProcrastinateAllButton.Dom).click(function (event) {//stops clicking of add event button from triggering a new modal dom
+        event.stopPropagation();
+    });
+
+    let ProcrastinateAllDomPreviewContainerId = "ProcrastinateAllPreviewContainer";
+    let ProcrastinateAllDomPreviewContainer = getDomOrCreateNew(ProcrastinateAllDomPreviewContainerId);
+
+    ProcrastinateAllUserInputContainer.Dom.appendChild(ProcrastinateAllDomInputContainer);
+    ProcrastinateAllUserInputContainer.Dom.appendChild(ProcrastinateAllDomButtonContainer);
+    procrastinateAllDom.Dom.appendChild(ProcrastinateAllUserInputContainer);
+    procrastinateAllDom.Dom.appendChild(ProcrastinateAllDomPreviewContainer);
+
+    let retValue = {
+        container: procrastinateAllDom,
+        buttons: {
+            submitButton: submitButton,
+            cancelButton: cancelButton,
+            previewProcrastinateAllButton: previewProcrastinateAllButton
+        },
+        inputs: {
+            hour: HourInput,
+            minute: MinInput,
+            day: DayInput
+        }, 
+        preview: ProcrastinateAllDomPreviewContainer
+    };
+
+
+    $(previewProcrastinateAllButton.Dom).click(() => {
+        let preview = new Preview(null, ProcrastinateAllDomPreviewContainer);
+        preview.procrastinateAll();
+    });
+
+    return retValue;
+}
+
+
+function generateProcrastinateAll(x, y, height, width,WeekStart, RenderPlane) {
+    let procrastinateAllControls = generateProcrastinateAllDoms();
+    initializeUserLocation();
+
+    if (generateProcrastinateAll.isOn)
+    {
+        global_ExitManager.triggerLastExitAndPop();
+        generateProcrastinateAll.isOn = false;
+        return;
+    }
+
+    function closeProcrastinateModal()
+    {
+        setTimeout(function () { generateProcrastinateAll.isOn = false; }, 200);
+        let procrastinateAllDom = procrastinateAllControls.container;
+        if (procrastinateAllDom.Dom.parentElement != null)
+        {
+            procrastinateAllDom.Dom.parentElement.removeChild(procrastinateAllDom.Dom);
+        }
+    }
+    let procrastinateAllDom = procrastinateAllControls.container.Dom;
+    let modalHeight = ($(procrastinateAllDom).height());
+    let modalWidth= ($(procrastinateAllDom).width());
+    let MaxY = height -modalHeight;
+    let MaxX = width -modalWidth;
+    let modalXPos = x > MaxX?(x-modalWidth):x;
+    let modalYPos = y > MaxY ?(y-modalHeight):y;
+
+    procrastinateAllControls.container.Dom.style.left = modalXPos + "px";
+    procrastinateAllControls.container.Dom.style.top = modalYPos + "px";
+
+
+    RenderPlane.appendChild(procrastinateAllControls.container.Dom);
+
+
+    // global_ExitManager.triggerLastExitAndPop();
+}
+
+generateProcrastinateAll.isOn = false;
+
+
 /*generates modal "Add New Event & Add New Tile" for creating new item. Note: width is distance in pixels between left click and End of window */
 function generateModal(x, y, height, width,WeekStart, RenderPlane,UseCurrentTime)
 {
@@ -414,11 +538,11 @@ function generatePeek(CalEvent,Container)
     //var CalEvent = new CalEventData();
     var CalEndTime =null;
     var TotalDuration=null;
-    var peekValidityTest = isCalEvenValidForPeek(CalEvent)
+    var peekValidityTest = isCalEvenValidForPeek(CalEvent);
     if (peekValidityTest.isError)
     {
         //Container.innerHTML = "not peekable because " + peekValidityTest.ErrorMessage;
-        HidePeekUI(Container)
+        HidePeekUI(Container);
         return;
     }
 
@@ -427,12 +551,6 @@ function generatePeek(CalEvent,Container)
     //RevealPeekUI(Container, PeekData);
 
     return;
-    /*
-    if ((TotalDuration != null) && (CalEndTime != null))
-    {
-        createPeekUI(CalEvent, Container)
-    }
-    */
 
     function createPeekUI(CalEvent, Container)
     {
@@ -442,7 +560,7 @@ function generatePeek(CalEvent,Container)
             createPeekUI.Connection = null;
         }
 
-        CalEvent.UserName = UserCredentials.UserName
+        CalEvent.UserName = UserCredentials.UserName;
         CalEvent.UserID = UserCredentials.ID;
         var TimeZone = new Date().getTimezoneOffset();
         CalEvent.TimeZoneOffset = TimeZone;

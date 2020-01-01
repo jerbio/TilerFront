@@ -644,11 +644,20 @@ body {
 }
 #Header #AddEventButton 
 { 
-    background-position: -135px 0;
-    position: relative; 
-    margin-left:0;
+  background-position: -135px 0;
+  position: relative; 
+  margin-left:0;
 }
+
 #Header #AddEventButton:hover { background-position: -135px -45px; }
+
+#Header #ProcrastinateAll {
+  background-position: -540px 0;
+  position: relative; 
+  margin-left:0;
+}
+
+#Header #ProcrastinateAll:hover { background-position: -540px -45px; }
 
 #Header #ControlPanelSearchButton 
 { 
@@ -1516,6 +1525,7 @@ width: auto;
 
 #PreviewModal.active {
     left: 363px;
+    min-width: 300px;
 }
 
 

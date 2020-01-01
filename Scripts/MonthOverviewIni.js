@@ -1436,10 +1436,26 @@ function BindAddButton()
     }
 }
 
+function BindProcrastinateAllButton() {
+    let procrastinateAll = getDomOrCreateNew('ProcrastinateAll');
+    let newDate = new Date();
+    newDate.setSeconds(0);
+    newDate.setMinutes(0);
+    $(procrastinateAll).click(procrastinate);
+    function procrastinate()
+    {
+        var HeaderContainer = getDomOrCreateNew("Header")
+        var height = $(HeaderContainer).height();
+        var width = $(HeaderContainer).width();
+        generateProcrastinateAll(width/2, 0, 1, width, new Date(), HeaderContainer);
+    }
+}
+
 
 function InitializeMonthlyOverview()
 {
     BindAddButton();
+    BindProcrastinateAllButton();
     SomethingNewButton(document.getElementById('SomethingNew'))
     initializeUserLocation();
     var verifiedUser = GetCookieValue();
@@ -3352,9 +3368,34 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
             for (var i = 0; i < global_previousSelectedSubCalEvent.length; i++) {
                 var myDom = global_previousSelectedSubCalEvent[i];
                 $(myDom).removeClass("SelectedWeekGridSubcalEvent");
-                //global_previousSelectedSubCalEvent.pop();
             }
             global_previousSelectedSubCalEvent = new Array();
+        }
+
+        function getProcrastinateSingleEventData(SubEvent) {
+            var HourInput = getDomOrCreateNew("procrastinateHours").value == "" ? 0 : getDomOrCreateNew("procrastinateHours").value;
+            var MinInput = getDomOrCreateNew("procrastinateMins").value == "" ? 0 : getDomOrCreateNew("procrastinateMins").value;
+            var DayInput = getDomOrCreateNew("procrastinateDays").value == "" ? 0 : getDomOrCreateNew("procrastinateDays").value;
+            let durationInMs = (OneHourInMs * HourInput) + (MinInput * OneMinInMs) + (DayInput * OneDayInMs);
+            var TimeZone = new Date().getTimezoneOffset();
+            var retValue = { UserName: UserCredentials.UserName, UserID: UserCredentials.ID, EventID: SubEvent.ID, DurationInMs: durationInMs , TimeZoneOffset: TimeZone };
+            retValue.TimeZone = moment.tz.guess();
+            return retValue;
+        }
+
+        function getProcrastinateAllData() {
+            var HourInput = getDomOrCreateNew("procrastinateHours").value == "" ? 0 : getDomOrCreateNew("procrastinateHours").value;
+            var MinInput = getDomOrCreateNew("procrastinateMins").value == "" ? 0 : getDomOrCreateNew("procrastinateMins").value;
+            var DayInput = getDomOrCreateNew("procrastinateDays").value == "" ? 0 : getDomOrCreateNew("procrastinateDays").value;
+            let durationInMs = (OneHourInMs * HourInput) + (MinInput * OneMinInMs) + (DayInput * OneDayInMs);
+            var TimeZone = new Date().getTimezoneOffset();
+            var retValue = { 
+                UserName: UserCredentials.UserName, 
+                UserID: UserCredentials.ID,
+                DurationInMs: durationInMs, 
+                TimeZoneOffset: TimeZone };
+            retValue.TimeZone = moment.tz.guess();
+            return retValue;
         }
 
         function getSubeventUpdateData(SubEvent) {
@@ -3725,26 +3766,9 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
 
 
                     previewButon.Dom.onclick = function () {
-
                         let previewDom = getDomOrCreateNew("InlineDayPreviewContainer");
                         let preview = new Preview(SubEvent.ID, previewDom.Dom);
-                        let previewDays = preview.generateRandomPreviewDays();
-                        preview.processPreviewDays(previewDays);
-                        preview.show();
                         preview.editSubEvent();
-
-                        // let updateButon = getDomOrCreateNew("update-preview-button", "button");
-                        // EditContainer.appendChild(updateButon.Dom)
-                        // updateButon.Dom.style.backgroundColor = "red";
-                        // updateButon.Dom.onclick = function () {
-                        //     let previewDays = preview.generateRandomPreviewDays();
-                        //     preview.startLoading();
-                        //     setTimeout(function name(params) {
-                        //         preview.endLoading();
-                        //         preview.processPreviewDays(previewDays);    
-                        //     }, 5000)
-                            
-                        // }
                     }
 
                     function isSubEventPostDifferentFromSubevent(subEventPost, includeNameCheck = false) {
@@ -4337,54 +4361,9 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                 processPreview.currentData = {}
                 
                 function previewProcrastinate() {
-                    var HourInput = getDomOrCreateNew("procrastinateHours").value == "" ? 0 : getDomOrCreateNew("procrastinateHours").value;
-                    var MinInput = getDomOrCreateNew("procrastinateMins").value == "" ? 0 : getDomOrCreateNew("procrastinateMins").value;
-                    var DayInput = getDomOrCreateNew("procrastinateDays").value == "" ? 0 : getDomOrCreateNew("procrastinateDays").value;
-                    let durationInMs = (OneHourInMs * HourInput) + (MinInput * OneMinInMs) + (DayInput * OneDayInMs);
-                    var TimeZone = new Date().getTimezoneOffset();
-                    var NowData = { UserName: UserCredentials.UserName, UserID: UserCredentials.ID, EventID: SubEvent.ID, DurationInMs: durationInMs , TimeZoneOffset: TimeZone };
-                    //var URL= "RootWagTap/time.top?WagCommand=2";
-                    var URL = global_refTIlerUrl + "WhatIf/PushedAll";
-                    NowData.TimeZone = moment.tz.guess()
-                    var HandleNEwPage = new LoadingScreenControl("Tiler is Previewing  :)");
-                    HandleNEwPage.Launch();
-                    preSendRequestWithLocation(NowData);
-
-                    var exit = function (data) {
-                        HandleNEwPage.Hide();
-                        //triggerUIUPdate();//hack alert
-                        global_ExitManager.triggerLastExitAndPop();
-                        //getRefreshedData();
-                    }
-                    $.ajax({
-                        type: "POST",
-                        url: URL,
-                        data: NowData,
-                        // DO NOT SET CONTENT TYPE to json
-                        // contentType: "application/json; charset=utf-8", 
-                        // DataType needs to stay, otherwise the response object
-                        // will be treated as a single string
-                        dataType: "json",
-                        success: function (response) {
-                            debugger
-                            triggerUndoPanel("Undo Procrastination");
-                            
-                            if (response.Error.code == 0) {
-                                processPreview(response.Content)
-                            }
-                            else {
-                                alert("error detected with marking as complete");
-                            }
-                            HandleNEwPage.Hide();
-                        },
-                        error: function () {
-                            var NewMessage = "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
-                            var ExitAfter = {
-                                ExitNow: true, Delay: 1000
-                            };
-                            HandleNEwPage.UpdateMessage(NewMessage, ExitAfter, exit);
-                        }
-                    })
+                    let previewDom = getDomOrCreateNew("InlineDayPreviewContainer");
+                    let preview = new Preview(SubEvent.ID, previewDom.Dom);
+                    preview.procrastinateEvent();
                 }
 
                 previewProcrastinate = buildFunctionSubscription(previewProcrastinate)

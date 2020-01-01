@@ -52,8 +52,8 @@ namespace TilerFront.Controllers
 
         [System.Web.Http.HttpPost]
         [ResponseType(typeof(PostBackStruct))]
-        [System.Web.Http.Route("api/WhatIf/PushedNext")]
-        public async Task<IHttpActionResult> pushedNext([FromBody]WhatIfModel UserData)
+        [System.Web.Http.Route("api/WhatIf/PushedEvent")]
+        public async Task<IHttpActionResult> pushedEvent([FromBody]WhatIfModel UserData)
         {
             AuthorizedUser myAuthorizedUser = UserData.User;
             UserAccount myUserAccount = await UserData.getUserAccount(db);

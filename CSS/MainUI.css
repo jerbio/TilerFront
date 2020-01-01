@@ -1120,7 +1120,7 @@ width: 20px;
 #PreviewLoading {
     width: 90%;
     height: 5px;
-    bottom: 5px;
+    top: 5px;
     position: absolute;
     display: none;
 }

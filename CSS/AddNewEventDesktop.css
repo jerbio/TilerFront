@@ -150,7 +150,6 @@ input:focus:-ms-input-placeholder { color:rgba(0,0,0, 0.2); }
     height:80%;
     width:80%;
     border-radius:50%;
-    //background-color:yellow;
     box-sizing:border-box;
 }
 
@@ -178,9 +177,6 @@ input:focus:-ms-input-placeholder { color:rgba(0,0,0, 0.2); }
 {
     width: 300px !important;
     height: 33.3333333px !important;
-    
-    //margin-top:0 !important;
-    //margin-left:0 !important;
 }
 
 .HorizontalColorPickerContainerTiledEvent 
@@ -218,7 +214,7 @@ input:focus:-ms-input-placeholder { color:rgba(0,0,0, 0.2); }
     transform: translateY(-30%);
 }
 
-#AddModalDom {
+#AddModalDom, #ProcrastinateAllDom {
     position:absolute;
     height: 130px;
     width: 380px;
