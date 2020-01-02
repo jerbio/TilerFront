@@ -16,6 +16,7 @@ var global_GoToDay;
 var global_eventIsPaused = false;
 var global_pauseManager;
 var global_CurrentWeekArrangedData = [];
+let weeklyScheduleLoadingBar = "weeklyScheduleLoadingBar";
 var global_UISetup = { Init: function () { }, RenderOnSubEventClick: null, RenderSubEvent: null, RenderTimeInformation: null, ConflictCalculation: null, ClearUIEffects: function () { },DisplayFullGrid:false,  ButtonID: "", currentSubEvent: null, nextSubEvent: null }
 $(global_ControlPanelIconSet.getIconSetContainer()).addClass("ControlPanelIconSetContainer");
 
@@ -1807,6 +1808,7 @@ getRefreshedData.pauseUnEnroll = function (Id) {
         //var myurl = "RootWagTap/time.top?WagCommand=0";
         var myurl = global_refTIlerUrl + "Schedule";
         var TimeZone = new Date().getTimezoneOffset();
+        LoadingBar.showAllGroupings(weeklyScheduleLoadingBar);
         if (new Date().dst())
         {
             //TimeZone += 60;
@@ -1830,6 +1832,7 @@ getRefreshedData.pauseUnEnroll = function (Id) {
             }
         }).done(function (response)
         {
+            LoadingBar.hideAllGroupings(weeklyScheduleLoadingBar);
             //alert("done generating");
             if (CallBackAfterRefresh != null) {
                 CallBackAfterRefresh(response);
@@ -4961,10 +4964,18 @@ function genDivForEachWeek(RangeOfWeek, AllRanges)//generates each week containe
     var NameOfWeekDayRenderPlaneID = WeekID + "NameOfWeekDayRenderPlane"
     var NameOfWeekDayRenderPlane = getDomOrCreateNew(NameOfWeekDayRenderPlaneID);
     $(NameOfWeekDayRenderPlane.Dom).addClass("NameOfWeekDayRenderPlane");
+    
+
+    let loadingBarWrapperId = WeekID + "-LoadingPanel-wrapper"
+    let loadingBarWrapper = getDomOrCreateNew(loadingBarWrapperId);
+    $(loadingBarWrapper).addClass("LoadingPanel-wrapper");
+    let loadingBar = new LoadingBar(weeklyScheduleLoadingBar);
+    loadingBar.embed(loadingBarWrapper);
 
     $(SubEventRenderPlane.Dom).addClass("SubEventRenderPlane");
     RenderPlane.appendChild(NameOfWeekDayRenderPlane);
     RenderPlane.appendChild(SubEventRenderPlane);
+    RenderPlane.appendChild(loadingBarWrapper);
     var prev;
 
     

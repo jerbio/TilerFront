@@ -584,6 +584,7 @@
     <Content Include="CSS\jquery-ui.structure.min.css" />
     <Content Include="CSS\jquery-ui.theme.min.css" />
     <Content Include="CSS\jquery.mobile-1.4.4.min.css" />
+    <Content Include="CSS\loadingBar.css" />
     <Content Include="CSS\SearchMobile.css" />
     <Content Include="CSS\SettingsDesktop.css" />
     <Content Include="CSS\TilerMobile.css" />
@@ -690,6 +691,7 @@
     <Content Include="Scripts\jquery_mobile_datebox.js" />
     <Content Include="Scripts\knockout-3.5.0.debug.js" />
     <Content Include="Scripts\knockout-3.5.0.js" />
+    <Content Include="Scripts\loadingBar.js" />
     <Content Include="Scripts\ManageController.js" />
     <Content Include="Scripts\moment-timezone-utils.js" />
     <Content Include="Scripts\moment-timezone-with-data-2012-2022.js" />

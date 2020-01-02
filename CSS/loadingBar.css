@@ -1,0 +1,20 @@
+.loading-bar-slide {
+    border-top: 5px solid yellow;
+    -webkit-animation: loadingSlide 2s linear infinite; /* Safari */
+    animation: loadingSlide 2s linear infinite;
+}
+
+.loading-bar-container {
+    width: 100%;
+    height: 2px;
+
+}
+.LoadingPanel-wrapper{
+    position: relative;
+    top: -5px;
+}
+
+@keyframes loadingSlide {
+    0% { transform: translateX(-150%); }
+    100% { transform: translateX(150%); }
+  }

@@ -53,7 +53,8 @@ namespace TilerFront
                     "~/CSS/SubCalEventStyles.css",
                     "~/CSS/LoggedHomeUser.css",
                     "~/CSS/SelectedSubEvent.css",
-                    "~/CSS/bootstrap-datepicker.css"
+                    "~/CSS/bootstrap-datepicker.css",
+                    "~/CSS/loadingBar.css"
                     ));
 
             bundles.Add(new StyleBundle("~/Content/RegistrationJS").Include(
@@ -86,7 +87,8 @@ namespace TilerFront
                     "~/Scripts/SearchHandler.js",
                     "~/Scripts/jquery.timepicker.min.js",
                     "~/Scripts/datepair.js",
-                    "~/Scripts/heartcode-canvasloader-min-0.9.1.js"
+                    "~/Scripts/heartcode-canvasloader-min-0.9.1.js",
+                    "~/Scripts/loadingBar.js"
                       ));
 
             bundles.Add(new StyleBundle("~/Content/TilerDesktopCss").Include(
