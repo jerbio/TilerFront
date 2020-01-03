@@ -712,6 +712,7 @@
     <Content Include="Scripts\Preview\PreviewDay.js" />
     <Content Include="Scripts\Preview\Sleep.js" />
     <Content Include="Scripts\Preview\Tardy.js" />
+    <Content Include="Scripts\SearchHandlerDesktop.js" />
     <Content Include="Scripts\umd\popper-utils.js" />
     <Content Include="Scripts\umd\popper-utils.min.js" />
     <Content Include="Scripts\umd\popper.js" />
@@ -2708,7 +2709,6 @@
     <Content Include="Scripts\respond.matchmedia.addListener.js" />
     <Content Include="Scripts\respond.matchmedia.addListener.min.js" />
     <Content Include="Scripts\respond.min.js" />
-    <Content Include="Scripts\SeachHandlerDesktop.js" />
     <Content Include="Scripts\SearchHandler.js" />
     <Content Include="Scripts\SelectedEvent.js" />
     <Content Include="Scripts\site.js" />

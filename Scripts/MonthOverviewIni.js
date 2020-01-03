@@ -2070,7 +2070,7 @@ getRefreshedData.pauseUnEnroll = function (Id) {
     }
 
     function renderNowUi (subEvent) {
-        if(subEvent) {
+        if (subEvent && subEvent.ListRefElement) {
             let currentSubEventClassName = "ListElementContainerCurrentSubevent";
             let ListElementContainer = subEvent.ListRefElement
             $(ListElementContainer.Dom).addClass(currentSubEventClassName);

@@ -108,7 +108,7 @@ namespace TilerFront
                     "~/Scripts/MonthOverviewIni.js",
                     "~/Scripts/AddNewEvent_Desktop0.js",
                     "~/Scripts/jquery-ui.min.js",
-                    "~/Scripts/SeachHandlerDesktop.js",
+                    "~/Scripts/SearchHandlerDesktop.js",
                     "~/Scripts/bootstrap-datepicker.js",
                     "~/Scripts/jquery.signalR-{version}.js",
                     "~/Scripts/moment.min.js",

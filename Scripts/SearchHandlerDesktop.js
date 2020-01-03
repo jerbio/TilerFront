@@ -72,9 +72,17 @@ ActivateUserSearch.getSearch = function ()
 ActivateUserSearch.isSearchOn = true;
 ActivateUserSearch.isActive = false;
 $(document).on("keydown", ActivateUserSearch);
-setTimeout(function () {
-    document.getElementById("SearchBar").onclick = ActivateUserSearch;
-}, 1000);
+
+let assignSearchClick = function () {
+    let searchBar = document.getElementById("SearchBar")
+    if (!searchBar) {
+        setTimeout(assignSearchClick, 1000)
+    } else {
+        searchBar.onclick = ActivateUserSearch; 
+    }
+}
+
+assignSearchClick()
 
 
 
