@@ -100,7 +100,9 @@ namespace TilerFront
                     "~/CSS/fullcalendar.css",
                     "~/CSS/AddNewEventDesktop.css",
                     "~/CSS/bootstrap-datepicker.css",
-                    "~/CSS/SearchDesktop.css"
+                    "~/CSS/SearchDesktop.css",
+                    "~/CSS/fonts/texgyreadventor-bold-webfont.woff",
+                    "~/CSS/fonts/texgyreadventor-regular-webfont.woff"
                     ));
 
             bundles.Add(new ScriptBundle("~/Content/TilerDesktopJS").Include(

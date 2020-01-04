@@ -152,8 +152,8 @@ namespace TilerFront.Models
             {
                 if ((DateTimeOffset.TryParse(RestrictionStart, out RestrictStart)) && ((DateTimeOffset.TryParse(RestrictionEnd, out RestrictEnd))))
                 {
-                    RestrictStart = RestrictStart.Add(getTimeSpan);
-                    RestrictEnd = RestrictEnd.Add(getTimeSpan);
+                    RestrictStart = RestrictStart.Add(-getTimeSpan);
+                    RestrictEnd = RestrictEnd.Add(-getTimeSpan);
                     selectedDaysOftheweek = RestrictionProfile.AllDaysOfWeek.ToArray();
                     if (WorkWeek)
                     {

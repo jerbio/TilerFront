@@ -1163,8 +1163,8 @@ namespace TilerFront.Controllers
             {
                 DateTimeOffset FullStartTime = new DateTimeOffset(StartDateEntry.Year, StartDateEntry.Month, StartDateEntry.Day, Convert.ToInt32(StartTime.Split(':')[0]), Convert.ToInt32(StartTime.Split(':')[1]), 0, new TimeSpan());// DateTimeOffset.Parse(StartDateEntry + " " + StartTime);
                 DateTimeOffset FullEndTime = new DateTimeOffset(EndDateEntry.Year, EndDateEntry.Month, EndDateEntry.Day, Convert.ToInt32(EndTime.Split(':')[0]), Convert.ToInt32(EndTime.Split(':')[1]), 0, new TimeSpan());// DateTimeOffset.Parse(EndDateEntry + " " + EndTime);
-                FullStartTime = FullStartTime.Add(newEvent.getTimeSpan);
-                FullEndTime = FullEndTime.Add(newEvent.getTimeSpan);
+                FullStartTime = FullStartTime.Add(-newEvent.getTimeSpan);
+                FullEndTime = FullEndTime.Add(-newEvent.getTimeSpan);
                 EventDuration = (FullEndTime - FullStartTime);
                 restrictionFlag = false;
             }
@@ -1177,11 +1177,11 @@ namespace TilerFront.Controllers
                 DateTimeOffset FullStartTime = new DateTimeOffset(StartDateEntry.Year, StartDateEntry.Month, StartDateEntry.Day, Convert.ToInt32(StartTime.Split(':')[0]), Convert.ToInt32(StartTime.Split(':')[1]), 0, new TimeSpan());// DateTimeOffset.Parse(StartDateEntry + " " + StartTime);
                 DateTimeOffset FullEndTime = new DateTimeOffset(EndDateEntry.Year, EndDateEntry.Month, EndDateEntry.Day, Convert.ToInt32(EndTime.Split(':')[0]), Convert.ToInt32(EndTime.Split(':')[1]), 0, new TimeSpan());// DateTimeOffset.Parse(EndDateEntry + " " + EndTime);
 
-                FullStartTime = FullStartTime.Add(newEvent.getTimeSpan);
-                FullEndTime = FullEndTime.Add(newEvent.getTimeSpan);
+                FullStartTime = FullStartTime.Add(-newEvent.getTimeSpan);
+                FullEndTime = FullEndTime.Add(-newEvent.getTimeSpan);
 
                 RepeatEnd = new DateTimeOffset(Convert.ToInt32(RepeatEndYear), Convert.ToInt32(RepeatEndMonth), Convert.ToInt32(RepeatEndDay), 23, 59, 0, new TimeSpan());
-                RepeatEnd = RepeatEnd.Add(newEvent.getTimeSpan);
+                RepeatEnd = RepeatEnd.Add(-newEvent.getTimeSpan);
                 if (!RigidScheduleFlag)
                 {
                     //DateTimeOffset newEndTime = FullEndTime;
@@ -1211,7 +1211,7 @@ namespace TilerFront.Controllers
 
                 
 
-                RepeatStart = StartDateEntry.Add(newEvent.getTimeSpan);
+                RepeatStart = StartDateEntry.Add(-newEvent.getTimeSpan);
                 DayOfWeek[] selectedDaysOftheweek={};
                 RepeatWeeklyData = string.IsNullOrEmpty( RepeatWeeklyData )?"":RepeatWeeklyData.Trim();
                 if (!string.IsNullOrEmpty(RepeatWeeklyData))
@@ -1243,19 +1243,19 @@ namespace TilerFront.Controllers
                 {
                     string TimeString = StartDateEntry.Date.ToShortDateString() + " " + StartTime;
                     DateTimeOffset StartDateTime = DateTimeOffset.Parse(TimeString).UtcDateTime;
-                    StartDateTime = StartDateTime.Add(newEvent.getTimeSpan);
+                    StartDateTime = StartDateTime.Add(-newEvent.getTimeSpan);
                     TimeString = EndDateEntry.Date.ToShortDateString() + " " + EndTime;
                     DateTimeOffset EndDateTime = DateTimeOffset.Parse(TimeString).UtcDateTime;
-                    EndDateTime = EndDateTime.Add(newEvent.getTimeSpan);
+                    EndDateTime = EndDateTime.Add(-newEvent.getTimeSpan);
 
                     newCalendarEvent = new CalendarEventRestricted(tilerUser, new TilerUserGroup(), Name, StartDateTime, EndDateTime, myRestrictionProfile, EventDuration, MyRepetition, false, true, Count, RigidScheduleFlag, new NowProfile(), EventLocation, new TimeSpan(0, 15, 0), new TimeSpan(0, 15, 0),null, MySchedule.Now, new Procrastination(Utility.JSStartTime, new TimeSpan()), new EventDisplay(true, userColor, userColor.User < 1 ? 0 : 1), new MiscData(), TimeZone);
                 }
                 else
                 {
                     DateTimeOffset StartData = DateTimeOffset.Parse(StartTime+" "+StartDateEntry.Date.ToShortDateString()).UtcDateTime;
-                    StartData = StartData.Add(newEvent.getTimeSpan);
+                    StartData = StartData.Add(-newEvent.getTimeSpan);
                     DateTimeOffset EndData = DateTimeOffset.Parse(EndTime + " " + EndDateEntry.Date.ToShortDateString()).UtcDateTime;
-                    EndData = EndData.Add(newEvent.getTimeSpan);
+                    EndData = EndData.Add(-newEvent.getTimeSpan);
                     if (RigidScheduleFlag) {
                         newCalendarEvent = new RigidCalendarEvent(
                             Name, StartData, EndData, EventDuration,new TimeSpan(), new TimeSpan(), MyRepetition, EventLocation,  new EventDisplay(true, userColor, userColor.User < 1 ? 0 : 1), new MiscData(), true,false, tilerUser, new TilerUserGroup(), TimeZone, null);
@@ -1435,8 +1435,8 @@ namespace TilerFront.Controllers
             {
                 DateTimeOffset FullStartTime = new DateTimeOffset(StartDateEntry.Year, StartDateEntry.Month, StartDateEntry.Day, Convert.ToInt32(StartTime.Split(':')[0]), Convert.ToInt32(StartTime.Split(':')[1]), 0, new TimeSpan());// DateTimeOffset.Parse(StartDateEntry + " " + StartTime);
                 DateTimeOffset FullEndTime = new DateTimeOffset(EndDateEntry.Year, EndDateEntry.Month, EndDateEntry.Day, Convert.ToInt32(EndTime.Split(':')[0]), Convert.ToInt32(EndTime.Split(':')[1]), 0, new TimeSpan());// DateTimeOffset.Parse(EndDateEntry + " " + EndTime);
-                FullStartTime = FullStartTime.Add(newEvent.getTimeSpan);
-                FullEndTime = FullEndTime.Add(newEvent.getTimeSpan);
+                FullStartTime = FullStartTime.Add(-newEvent.getTimeSpan);
+                FullEndTime = FullEndTime.Add(-newEvent.getTimeSpan);
                 EventDuration = (FullEndTime - FullStartTime);
             }
 
@@ -1446,11 +1446,11 @@ namespace TilerFront.Controllers
                 DateTimeOffset FullStartTime = new DateTimeOffset(StartDateEntry.Year, StartDateEntry.Month, StartDateEntry.Day, Convert.ToInt32(StartTime.Split(':')[0]), Convert.ToInt32(StartTime.Split(':')[1]), 0, new TimeSpan());// DateTimeOffset.Parse(StartDateEntry + " " + StartTime);
                 DateTimeOffset FullEndTime = new DateTimeOffset(EndDateEntry.Year, EndDateEntry.Month, EndDateEntry.Day, Convert.ToInt32(EndTime.Split(':')[0]), Convert.ToInt32(EndTime.Split(':')[1]), 0, new TimeSpan());// DateTimeOffset.Parse(EndDateEntry + " " + EndTime);
 
-                FullStartTime = FullStartTime.Add(newEvent.getTimeSpan);
-                FullEndTime = FullEndTime.Add(newEvent.getTimeSpan);
+                FullStartTime = FullStartTime.Add(-newEvent.getTimeSpan);
+                FullEndTime = FullEndTime.Add(-newEvent.getTimeSpan);
 
                 RepeatEnd = new DateTimeOffset(Convert.ToInt32(RepeatEndYear), Convert.ToInt32(RepeatEndMonth), Convert.ToInt32(RepeatEndDay), 23, 59, 0, new TimeSpan());
-                RepeatEnd = RepeatEnd.Add(newEvent.getTimeSpan);
+                RepeatEnd = RepeatEnd.Add(-newEvent.getTimeSpan);
                 if (!RigidScheduleFlag)
                 {
                     DateTimeOffset newEndTime = FullEndTime;
@@ -1498,19 +1498,19 @@ namespace TilerFront.Controllers
                 {
                     string TimeString = StartDateEntry.Date.ToShortDateString() + " " + StartTime;
                     DateTimeOffset StartDateTime = DateTimeOffset.Parse(TimeString).UtcDateTime;
-                    StartDateTime = StartDateTime.Add(newEvent.getTimeSpan);
+                    StartDateTime = StartDateTime.Add(-newEvent.getTimeSpan);
                     TimeString = EndDateEntry.Date.ToShortDateString() + " " + EndTime;
                     DateTimeOffset EndDateTime = DateTimeOffset.Parse(TimeString).UtcDateTime;
-                    EndDateTime = EndDateTime.Add(newEvent.getTimeSpan);
+                    EndDateTime = EndDateTime.Add(-newEvent.getTimeSpan);
                     newCalendarEvent = new CalendarEventRestricted(tilerUser, new TilerUserGroup(), Name, StartDateTime, EndDateTime, myRestrictionProfile, EventDuration, MyRepetition, false, true, Count, RigidScheduleFlag, new NowProfile(), new TilerElements.Location(), new TimeSpan(0, 15, 0), new TimeSpan(0, 15, 0), null, MySchedule.Now, new Procrastination(Utility.BeginningOfTime, new TimeSpan()), new EventDisplay(true, userColor, userColor.User < 1 ? 0 : 1), new MiscData());
                 }
                 else
                 {
                     DateTimeOffset StartData = DateTimeOffset.Parse(StartTime + " " + StartDateEntry.Date.ToShortDateString()).UtcDateTime;
-                    StartData = StartData.Add(newEvent.getTimeSpan);
+                    StartData = StartData.Add(-newEvent.getTimeSpan);
                     StartData = newEvent.getRefNow();
                     DateTimeOffset EndData = DateTimeOffset.Parse(EndTime + " " + EndDateEntry.Date.ToShortDateString()).UtcDateTime;
-                    EndData = EndData.Add(newEvent.getTimeSpan);
+                    EndData = EndData.Add(-newEvent.getTimeSpan);
                     if (RigidScheduleFlag)
                     {
                         newCalendarEvent = new RigidCalendarEvent(//EventID.GenerateCalendarEvent(), 
