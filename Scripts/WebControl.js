@@ -901,7 +901,9 @@ function formatTimePortionOfStringToRightFormat(TimeString)
     var i = 0;
     for (; i < myIndex; i++)
     {
-        retValue+=TimeString[i]
+        if(TimeString[i]!=" ") {
+            retValue+=TimeString[i]
+        }
     }
     retValue += (" " + TimeString[i] + "m");
     return retValue;
