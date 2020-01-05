@@ -216,7 +216,7 @@ namespace TilerFront
                         GoogleIDs.Add(GoogleEvent.Id);
                         CalendarEvent calEvent = GoogleCalendarEvent.convertFromGoogleToCalendarEvent(GoogleEvent.ToSubCal(AuthenticationID, i));
                         RetValue.Add(calEvent);
-                        locations.Add(calEvent.Location);
+                        locations.Add(calEvent.LocationObj);
                     }
                 }
             }
@@ -224,6 +224,12 @@ namespace TilerFront
             if (retrieveLocationFromGoogle)
             {
                 batchValidateLocations(locations);
+            } else
+            {
+                foreach(TilerElements.Location location in locations)
+                {
+                    location.IsVerified = true;
+                }
             }
             return RetValue;
         }
