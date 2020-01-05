@@ -2022,8 +2022,21 @@ function Location(Tag, Address, LocationIsVerified, LocationId)
             $(InputBarContainer.Dom).removeClass("setAsDisplayNone");
             IsContentOn = true;
         }
+
+        function HideAutoSuggestResult() {
+            $(DomAndContainer.returnedValue).addClass("setAsDisplayNone");
+        }
+
+        
+        function ShowAutoSuggestResult() {
+            $(DomAndContainer.returnedValue).removeClass("setAsDisplayNone");
+        }
+
         this.HideContainer = HideContainer;
         this.ShowContainer = ShowContainer;
+
+        this.HideAutoSuggestResult = HideAutoSuggestResult;
+        this.ShowAutoSuggestResult = ShowAutoSuggestResult;
 
         var IsTilerAutoContentOn = function ()
         {

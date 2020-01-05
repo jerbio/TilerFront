@@ -350,11 +350,11 @@ function createCalEventNameTab(isTIle)
             return;
         }
 
-        data.forEach(resolveEachRetrievedEvent);
+        data.forEach(resolveEachRetrievedLocation);
 
-        function resolveEachRetrievedEvent(CalendarEvent)
+        function resolveEachRetrievedLocation(locationData)
         {
-            var CalendarEventDom = generateDOM(CalendarEvent);
+            var CalendarEventDom = generateLocationAutoSuggestDom(locationData);
             CalendarEventDom.Dom.style.top = (EventIndex * HeightOfDom) + "px";
             CalendarEventDom.Dom.style.height = HeightOfDom + "px"
             DomContainer.Dom.appendChild(CalendarEventDom.Dom);
@@ -362,8 +362,9 @@ function createCalEventNameTab(isTIle)
             
         }
 
-        function generateDOM(LocationData)
+        function generateLocationAutoSuggestDom(LocationData)
         {
+            myAutoSuggestControl.ShowAutoSuggestResult();
             var CacheLocationContainerID = "CacheLocationContainer" + EventIndex;
             var CacheLocationContainer=getDomOrCreateNew(CacheLocationContainerID)
             var CacheLocationContainerTagContainerID = "CacheLocationContainerTagContainer" + EventIndex;
@@ -375,7 +376,7 @@ function createCalEventNameTab(isTIle)
             CacheLocationAddressTagAddress.Dom.innerHTML = LocationData.Address;
             $(CacheLocationAddressTagAddress.Dom).addClass("LocationAddress");
             $(CacheLocationContainer.Dom).click(OnClickOfDiv(LocationData, InputContainer));
-
+            $(InputContainer).blur(hideLocationAutoSuggest);
 
             CacheLocationContainer.Dom.appendChild(CacheLocationContainerTagContainer.Dom);
             CacheLocationContainer.Dom.appendChild(CacheLocationAddressTagAddress.Dom);
@@ -389,13 +390,17 @@ function createCalEventNameTab(isTIle)
             {
                 var TagInputDom = CalEventAddressTagInputDom.Input.Dom;
                 TagInputDom.value = LocationData.Tag;
-                updateLocationInputWithClickData(AddressInputDom, LocationData.Address, "tiler", LocationData.LocationId)
+                updateLocationInputWithClickData(AddressInputDom, LocationData.Address, "tiler", LocationData.LocationId);
                 if (LocationData.isVerified !== undefined && LocationData.isVerified !== null) {
                     AddressInputDom.LocationIsVerified = LocationData.isVerified;
                 }
                 (DomContainer.Dom).style.height = 0;
                 $(DomContainer.Dom).empty();
-            }
+            };
+        }
+
+        function hideLocationAutoSuggest() {
+            myAutoSuggestControl.HideAutoSuggestResult();
         }
     }
 
