@@ -30,6 +30,7 @@ namespace TilerFront.Controllers
             if (myUserAccount.Status)
             {
                 DB_Schedule MySchedule = new DB_Schedule(myUserAccount, myAuthorizedUser.getRefNow());
+                await ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, myUserAccount.UserID, db).ConfigureAwait(false);
                 MySchedule.CurrentLocation = myAuthorizedUser.getCurrentLocation();
                 Tuple<Health, Health> evaluation;
                 evaluation = await MySchedule.TimeStone.PushedAll(UserData.Duration, null);
@@ -63,6 +64,7 @@ namespace TilerFront.Controllers
             if (myUserAccount.Status)
             {
                 DB_Schedule MySchedule = new DB_Schedule(myUserAccount, myAuthorizedUser.getRefNow());
+                await ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, myUserAccount.UserID, db).ConfigureAwait(false);
                 MySchedule.CurrentLocation = myAuthorizedUser.getCurrentLocation();
                 Tuple<Health, Health> evaluation;
 
@@ -123,6 +125,7 @@ namespace TilerFront.Controllers
             if (myUserAccount.Status)
             {
                 DB_Schedule MySchedule = new DB_Schedule(myUserAccount, myAuthorizedUser.getRefNow());
+                await ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, myUserAccount.UserID, db).ConfigureAwait(false);
                 MySchedule.CurrentLocation = myAuthorizedUser.getCurrentLocation();
 
                 var evaluation = await MySchedule.TimeStone.WhatIfSetAsNow(SetAsNowData.EventId);
@@ -192,6 +195,7 @@ namespace TilerFront.Controllers
                             userAccount.ScheduleLogControl.updateUserActivty(activity);
 
                             MySchedule = new DB_Schedule(userAccount, now);
+                            await ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, userAccount.UserID, db).ConfigureAwait(false);
                             evaluation = await MySchedule.TimeStone.EventUpdate().ConfigureAwait(false);
                         }
                         break;
@@ -199,6 +203,7 @@ namespace TilerFront.Controllers
                         {
                             HashSet<string> calendarIds = new HashSet<string>() { SubEventEdit.EventID };
                             MySchedule = new DB_Schedule(userAccount, now, calendarIds: calendarIds);
+                            await ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(MySchedule, userAccount.UserID, db).ConfigureAwait(false);
                             MySchedule.CurrentLocation = SubEventEdit.getCurrentLocation();
                             evaluation = await MySchedule.TimeStone.EventUpdate(
                                 newStart,

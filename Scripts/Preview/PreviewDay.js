@@ -178,6 +178,7 @@ class PreviewDay {
             previewDay.start = dayStart;
             previewDay.tardy = dayData.tardy;
             previewDay.sleep = dayData.sleep;
+            previewDay.conflict = dayData.conflicts;
             retValue.push(previewDay);
         }
 
