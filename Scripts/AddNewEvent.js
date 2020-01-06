@@ -400,7 +400,9 @@ function createCalEventNameTab(isTIle)
         }
 
         function hideLocationAutoSuggest() {
-            myAutoSuggestControl.HideAutoSuggestResult();
+            setTimeout( function () {
+                myAutoSuggestControl.HideAutoSuggestResult();
+            }, 300);
         }
     }
 
