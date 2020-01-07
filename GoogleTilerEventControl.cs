@@ -143,14 +143,17 @@ namespace TilerFront
                         && (accessrole.Contains(readerString) || accessrole.Contains(freeBusyReaderString)));
                     foreach (var googleEvent in eventsTask.Result.Items)
                     {
-                        DateTimeOffset start = new DateTimeOffset((DateTime)googleEvent.Start.DateTime);
-                        if(googleEvent.ExtendedProperties == null)
+                        if(googleEvent.Start.DateTime!=null )// this is needed because of single day reminders. Think birthdays reminders and all day reminders. These don't have a date time and temporarily don have to be part of the schedule analysis
                         {
-                            googleEvent.ExtendedProperties = new Event.ExtendedPropertiesData();
-                            googleEvent.ExtendedProperties.Private__ = new Dictionary<string, string>();
+                            DateTimeOffset start = new DateTimeOffset((DateTime)googleEvent.Start.DateTime);
+                            if (googleEvent.ExtendedProperties == null)
+                            {
+                                googleEvent.ExtendedProperties = new Event.ExtendedPropertiesData();
+                                googleEvent.ExtendedProperties.Private__ = new Dictionary<string, string>();
+                            }
+                            googleEvent.ExtendedProperties.Private__[tilerReadonlyKey] = isReadonly.ToString();
+                            retValueBag.Add(googleEvent);
                         }
-                        googleEvent.ExtendedProperties.Private__[tilerReadonlyKey] = isReadonly.ToString();
-                        retValueBag.Add(googleEvent);
                     }
                 }
             }
