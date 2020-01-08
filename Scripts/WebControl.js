@@ -2852,7 +2852,7 @@ function isUndefinedOrNull(data) {
     /*
     Function handles the call back for the autoSuggest Box of location
     */
-   function LocationSearchCallBack(ExitCallBack, InputBox, processRestrictedTime)
+   function LocationSearchCallBack(ExitCallBack, InputBox, onSelctionMade)
    {
        $(InputBox).off();
        var AutoSuggestEndPoint = global_refTIlerUrl + "User/Location";
@@ -3081,10 +3081,10 @@ function isUndefinedOrNull(data) {
                    //InputCOntainer.value = LocationData.Address;
                    InsertIntoInput();
                    LocationAutoSuggestControl.HideContainer();
-                   NickNameSlider.turnOnSlide();
-                   
-                   var NickElements = NickNameSlider.getAllElements()
-                   NickElements[0].TileInput.getInputDom().value = LocationData.Tag;
+
+                   if(isFunction(onSelctionMade)) {
+                    onSelctionMade(LocationData)
+                   }
                    setTimeout(function () { InputBox.focus(), 200 });
                }
 
@@ -3127,8 +3127,7 @@ function isUndefinedOrNull(data) {
                
                if (status == google.maps.places.PlacesServiceStatus.OK) {
                    for (var i = 0; ((i < results.length)&&(i<5)); i++) {
-                       
-                       resolveEachRetrievedEvent(results[i], processRestrictedTime);
+                       resolveEachRetrievedEvent(results[i], onSelctionMade);
                    }
                }
 
@@ -3148,9 +3147,9 @@ function isUndefinedOrNull(data) {
                //LocationAutoSuggestControl.HideContainer();
            }
 
-           function resolveEachRetrievedEvent(LocationData, processRestrictedTime)//, Index)
+           function resolveEachRetrievedEvent(LocationData, onSelctionMade)//, Index)
            {
-               var CalendarEventDom = generateDomForEach(LocationData, processRestrictedTime)//, Index);
+               var CalendarEventDom = generateDomForEach(LocationData, onSelctionMade)//, Index);
                $(CalendarEventDom.Container).addClass("LocationCacheContainer");
                //DomContainer.Dom.appendChild(CalendarEventDom.Container);
                GoogleDataContainer.AllData.push(CalendarEventDom);
@@ -3159,7 +3158,7 @@ function isUndefinedOrNull(data) {
            resolveEachRetrievedEvent.ID = 0;
            //GoogleDataContainer.AllData[0].Hover();
 
-           function generateDomForEach(LocationData, processRestrictedTime)//, Index)
+           function generateDomForEach(LocationData, onSelctionMade)//, Index)
            {
                var TagSpan = getDomOrCreateNew(("GoogleTagSpan" + resolveEachRetrievedEvent.ID), "span");
                TagSpan.innerHTML = LocationData.name + " &mdash; ";
@@ -3200,51 +3199,12 @@ function isUndefinedOrNull(data) {
                    //InputCOntainer.value = LocationData.Address;
                    InsertIntoInput();
                    LocationAutoSuggestControl.HideContainer();
-                   NickNameSlider.turnOnSlide();
-                   
-                   var NickElements = NickNameSlider.getAllElements();
-                //    getBusinessHourData(LocationData);
-                   NickElements[0].TileInput.getInputDom().value = LocationData.name;
+                   if(isFunction(onSelctionMade)) {
+                        onSelctionMade(LocationData)
+                   }
+
                    setTimeout(function () { InputBox.focus(), 200 });
                }
-
-            //    function getBusinessHourData(LocationData)
-            //    {
-            //         var RestrictiveWeekSlider = TimeRestrictionSlider;
-            //         var request = {
-            //             placeId: LocationData.place_id
-            //         };
-            //         var service = new google.maps.places.PlacesService(DomContainer);
-            //         service.getDetails(request, LocationUpdateCallBack);
-            //         function LocationUpdateCallBack(place, status)
-            //         {
-            //             if (status == google.maps.places.PlacesServiceStatus.OK) {
-            //                 var RestrictedTimeData = generateOfficeHours(place);
-            //                 if((!RestrictedTimeData.IsTwentyFourHours)&&(!RestrictedTimeData.NoWeekData))
-            //                 {
-            //                     RestrictiveWeekSlider .turnOnSlide();
-            //                     RestrictiveWeekSlider.EnableWeekDayCheckBox();
-            //                     var RestrictiveWeek = RestrictiveWeekSlider.getRestrictiveWeek();
-            //                     for (var i=0;i<RestrictedTimeData.WeekDayData.length;i++)
-            //                     {
-            //                         var myDay = RestrictedTimeData.WeekDayData[i];
-            //                         if (!myDay.IsClosed)
-            //                         {
-            //                             var myButton = RestrictiveWeek.getWeekDayButton(myDay.DayIndex);
-            //                             var Start = myDay.Start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            //                             var End = myDay.End.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            //                             myButton.UIElement.TurnOnButton();
-            //                             myButton.WeekDayButton.getStartDom().value = Start;
-            //                             myButton.WeekDayButton.setStart(Start);
-            //                             myButton.WeekDayButton.getEndDom().value = End;
-            //                             myButton.WeekDayButton.setEnd(End);
-            //                         }
-            //                     }
-            //                     setTimeout(function () { InputCOntainer.focus(); });//need to return focus to auto suggest input box. After selecting element system seems to shift focus to checkbox. 
-            //                 }
-            //             }
-            //         }
-            //    }
 
                function InsertIntoInput() {
                    updateLocationInputWithClickData(InputCOntainer, LocationData.formatted_address, "google")
@@ -3273,7 +3233,6 @@ function isUndefinedOrNull(data) {
            {
                if (LocationAutoSuggestControl.isContentOn() || GoogleAutoSuggestControl.isContentOn())
                {
-                   ;
                    combinedCallBack.clear();
                    return;
                }
