@@ -95,8 +95,9 @@ namespace TilerFront.Controllers
                 ReferenceNow now = new ReferenceNow(myAuthorizedUser.getRefNow(), tilerUser.EndfOfDay, tilerUser.TimeZoneDifference);
 
                 IEnumerable<SubCalendarEvent> subEvents = await LogAccess.getAllEnabledSubCalendarEvent(TimelineForData, now, true, DataRetrivalOption.Ui).ConfigureAwait(false);
-                //Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location>> ProfileData = await LogAccess.getProfileInfo(TimelineForData, null, retrievalOption: DataRetrivalOption.Ui);
-                //IEnumerable<CalendarEvent> calEvents = ProfileData.Item1.Values;
+                IEnumerable<CalendarEvent> GoogleCalEvents = await GoogleCalEventsTask.ConfigureAwait(false);
+                subEvents = subEvents.Concat(GoogleCalEvents.SelectMany(subEvent => subEvent.AllSubEvents)).Where(subEvent => subEvent.StartToEnd.doesTimeLineInterfere(TimelineForData));
+
 #if loadFromXml
                 if (!string.IsNullOrEmpty(xmlFileId) && !string.IsNullOrWhiteSpace(xmlFileId))
                 {
@@ -105,10 +106,7 @@ namespace TilerFront.Controllers
                     subEvents = MySchedule.getAllCalendarEvents().SelectMany(obj => obj.ActiveSubEvents);
                 }
 #endif
-                IEnumerable<CalendarEvent> GoogleCalEvents = await GoogleCalEventsTask.ConfigureAwait(false);
 
-
-                subEvents = subEvents.Concat(GoogleCalEvents.SelectMany(subEvent => subEvent.AllSubEvents)).Where(subEvent => subEvent.StartToEnd.doesTimeLineInterfere(TimelineForData));
                 UserSchedule currUserSchedule = new UserSchedule {
                     //NonRepeatCalendarEvent = NonRepeatingEvents.Select(obj => obj.ToCalEvent(TimelineForData)).ToArray(),
                     //RepeatCalendarEvent = RepeatingEvents,
