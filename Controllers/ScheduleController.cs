@@ -205,7 +205,8 @@ namespace TilerFront.Controllers
             bool saveChanges = false;
             if (saveChanges)
             {
-                await myUserAccount.Commit(new List<CalendarEvent>(), null, myUserAccount.getTilerUser().LatestId, now).ConfigureAwait(false);
+                TilerUser tilerUser = myUserAccount.getTilerUser();
+                await myUserAccount.Commit(new List<CalendarEvent>(), null, tilerUser.LatestId, now, tilerUser.TravelCache).ConfigureAwait(false);
             }
 
 

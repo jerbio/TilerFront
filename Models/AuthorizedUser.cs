@@ -40,7 +40,7 @@ namespace TilerFront.Models
 
         public DateTimeOffset getRefNow()
         {
-            //string timeInString = "12/17/2019 7:12:00 AM +00:00";
+            //string timeInString = "1/09/2020 6:20:00 AM +00:00";
             string timeInString = "";
 
             if (string.IsNullOrEmpty(timeInString))

@@ -346,7 +346,7 @@ namespace TilerFront
         }
 
 
-        protected virtual async Task Commit(IEnumerable<CalendarEvent> calendarEvents, TilerUser tilerUser)
+        protected virtual async Task Commit(IEnumerable<CalendarEvent> calendarEvents, TilerUser tilerUser, TravelCache travelCache)
         {
 #if liveDebugging
             Debug.WriteLine("********************************Check directive of #liveDebugging if test is failing********************************");
@@ -358,6 +358,16 @@ namespace TilerFront
             {
                 _Context.Entry(subEvent).State = EntityState.Deleted;
             }
+
+            if(travelCache!=null)
+            {
+                foreach (var cacheEntry in travelCache.purgedLocations)
+                {
+                    _Context.Entry(cacheEntry).State = EntityState.Deleted;
+                }
+            }
+            
+
             Task saveDbChangesTask = _Context.SaveChangesAsync();
             if(_TempDump!= null && _UpdateBigData)
             {
@@ -374,7 +384,7 @@ namespace TilerFront
 #endif
         }
 
-        public async Task Commit(IEnumerable<CalendarEvent> calendarEvents, CalendarEvent calendarEvent, String LatestId, ReferenceNow now)
+        public async Task Commit(IEnumerable<CalendarEvent> calendarEvents, CalendarEvent calendarEvent, String LatestId, ReferenceNow now, TravelCache travelCache)
         {
             _TilerUser.LatestId = LatestId;
             _TilerUser.LastScheduleModification = now.constNow;
@@ -382,7 +392,9 @@ namespace TilerFront
             {
                 _Context.CalEvents.Add(calendarEvent);
             }
-            await Commit(calendarEvents, _TilerUser).ConfigureAwait(false);
+
+
+            await Commit(calendarEvents, _TilerUser, travelCache).ConfigureAwait(false);
         }
 
         public async Task DiscardChanges()
@@ -1647,46 +1659,76 @@ namespace TilerFront
                 CalendarEvent defaultCalEvent = CalendarEvent.getEmptyCalendarEvent(EventID.GenerateCalendarEvent(), Now.constNow, Now.constNow.AddHours(1));
                 if (RangeOfLookUP != null)
                 {
+                    if (calendarIds == null)
+                    {
+                        calendarIds = new HashSet<string>();
+                    }
+                    var calIds = calendarIds.ToArray();
                     IQueryable<SubCalendarEvent> subCalendarEvents = getSubCalendarEventQuery(retrievalOption, includeOtherEntities: true);
                     subCalendarEvents = subCalendarEvents
                         .Where(subEvent =>
-                                subEvent.IsEnabled_DB
-                                && !subEvent.Complete_EventDB
-                                && subEvent.ParentCalendarEvent.IsEnabled_DB
-                                && !subEvent.ParentCalendarEvent.Complete_EventDB
-                                && subEvent.ParentCalendarEvent.StartTime_EventDB < RangeOfLookUP.End
-                                && subEvent.ParentCalendarEvent.EndTime_EventDB > RangeOfLookUP.Start
-                                && subEvent.StartTime_EventDB < RangeOfLookUP.End// for performance reasons we will ignore sub events outside two weeks that are not within the range
-                                && subEvent.EndTime_EventDB > RangeOfLookUP.Start// for performance reasons we will ignore sub events outside two weeks that are not within the specified range so the range has to be generous
-                                && (
-                                        (subEvent.RepeatParentEventId == null) ||
-                                        (
+                                (
+                                    subEvent.IsEnabled_DB
+                                    && !subEvent.Complete_EventDB
+                                    && subEvent.ParentCalendarEvent.IsEnabled_DB
+                                    && !subEvent.ParentCalendarEvent.Complete_EventDB
+                                    && subEvent.ParentCalendarEvent.StartTime_EventDB < RangeOfLookUP.End
+                                    && subEvent.ParentCalendarEvent.EndTime_EventDB > RangeOfLookUP.Start
+                                    && subEvent.StartTime_EventDB < RangeOfLookUP.End// for performance reasons we will ignore sub events outside two weeks that are not within the range
+                                    && subEvent.EndTime_EventDB > RangeOfLookUP.Start// for performance reasons we will ignore sub events outside two weeks that are not within the specified range so the range has to be generous
+                                    && (
+                                            (subEvent.RepeatParentEventId == null) ||
                                             (
                                                 (
-                                                    subEvent.RepeatParentEventId != null && subEvent.RepeatParentEvent.IsEnabled_DB
-                                                    && !subEvent.RepeatParentEvent.Complete_EventDB
-                                                    && subEvent.RepeatParentEvent.StartTime_EventDB < RangeOfLookUP.End
-                                                    && subEvent.RepeatParentEvent.EndTime_EventDB > RangeOfLookUP.Start
-                                                ) &&
-                                                (subEvent.RepeatParentEvent != null && subEvent.RepeatParentEvent.IsEnabled_DB)
-                                            )
-                                            && (
-                                                (
-                                                    (subEvent.RepeatParentEvent.RepeatParentEventId == null) ||
                                                     (
+                                                        subEvent.RepeatParentEventId != null && subEvent.RepeatParentEvent.IsEnabled_DB
+                                                        && !subEvent.RepeatParentEvent.Complete_EventDB
+                                                        && subEvent.RepeatParentEvent.StartTime_EventDB < RangeOfLookUP.End
+                                                        && subEvent.RepeatParentEvent.EndTime_EventDB > RangeOfLookUP.Start
+                                                    ) &&
+                                                    (subEvent.RepeatParentEvent != null && subEvent.RepeatParentEvent.IsEnabled_DB)
+                                                )
+                                                && (
+                                                    (
+                                                        (subEvent.RepeatParentEvent.RepeatParentEventId == null) ||
                                                         (
-                                                            subEvent.RepeatParentEvent.RepeatParentEventId != null && subEvent.RepeatParentEvent.RepeatParentEvent.IsEnabled_DB
-                                                            && !subEvent.RepeatParentEvent.RepeatParentEvent.Complete_EventDB
-                                                            && subEvent.RepeatParentEvent.RepeatParentEvent.StartTime_EventDB < RangeOfLookUP.End
-                                                            && subEvent.RepeatParentEvent.RepeatParentEvent.EndTime_EventDB > RangeOfLookUP.Start
-                                                        ) &&
-                                                        (subEvent.RepeatParentEvent.RepeatParentEvent != null && subEvent.RepeatParentEvent.RepeatParentEvent.IsEnabled_DB)
+                                                            (
+                                                                subEvent.RepeatParentEvent.RepeatParentEventId != null && subEvent.RepeatParentEvent.RepeatParentEvent.IsEnabled_DB
+                                                                && !subEvent.RepeatParentEvent.RepeatParentEvent.Complete_EventDB
+                                                                && subEvent.RepeatParentEvent.RepeatParentEvent.StartTime_EventDB < RangeOfLookUP.End
+                                                                && subEvent.RepeatParentEvent.RepeatParentEvent.EndTime_EventDB > RangeOfLookUP.Start
+                                                            ) &&
+                                                            (subEvent.RepeatParentEvent.RepeatParentEvent != null && subEvent.RepeatParentEvent.RepeatParentEvent.IsEnabled_DB)
+                                                        )
                                                     )
                                                 )
                                             )
                                         )
-                                    )
-
+                                    ) || ((calIds.Contains(subEvent.RepeatParentEventId) || calIds.Contains(subEvent.CalendarEventId)) 
+                                        && (
+                                            (subEvent.RepeatParentEventId == null) ||
+                                            (
+                                                (
+                                                    (
+                                                        subEvent.RepeatParentEventId != null && subEvent.RepeatParentEvent.IsEnabled_DB
+                                                        && !subEvent.RepeatParentEvent.Complete_EventDB
+                                                    ) &&
+                                                    (subEvent.RepeatParentEvent != null && subEvent.RepeatParentEvent.IsEnabled_DB)
+                                                )
+                                                && (
+                                                    (
+                                                        (subEvent.RepeatParentEvent.RepeatParentEventId == null) ||
+                                                        (
+                                                            (
+                                                                subEvent.RepeatParentEvent.RepeatParentEventId != null && subEvent.RepeatParentEvent.RepeatParentEvent.IsEnabled_DB
+                                                                && !subEvent.RepeatParentEvent.RepeatParentEvent.Complete_EventDB
+                                                            ) &&
+                                                            (subEvent.RepeatParentEvent.RepeatParentEvent != null && subEvent.RepeatParentEvent.RepeatParentEvent.IsEnabled_DB)
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        ))
 
                             );
 
@@ -1750,7 +1792,10 @@ namespace TilerFront
                         foreach(string calendarId in calendarIds)
                         {
                             EventID eventId = new EventID(calendarId);
-                            parentIds.Add(eventId.getAllEventDictionaryLookup);
+                            if(!allIds.Contains(eventId.getAllEventDictionaryLookup))
+                            {
+                                parentIds.Add(eventId.getAllEventDictionaryLookup);
+                            }
                         }
                         rightOfJoin = rightOfJoin
                             .Include(calEvent => calEvent.RepeatParentEvent)
@@ -1832,9 +1877,10 @@ namespace TilerFront
                 }
 
                 throw new NullReferenceException("You have to provide the range to lookup in the user calelndar");
-            } else
+            }
+            else
             {
-                return await getAllNonEvaluationEnabledCalendarEvent(RangeOfLookUP, Now, includeSubEvents , retrievalOption ).ConfigureAwait(false);
+                return await getAllNonEvaluationEnabledCalendarEvent(RangeOfLookUP, Now, includeSubEvents, retrievalOption).ConfigureAwait(false);
             }
         }
 
