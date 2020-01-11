@@ -26,7 +26,7 @@ class PageNotification {
     processNotifications(subEvents) {
         if(this.isCapable && this.isGranted) {
             this.activeTimers.forEach((timeOutHandler) => {
-                cleartimeout(timeOutHandler);
+                clearTimeout(timeOutHandler);
             });
             this.dictOfSubEvents = {};
             this.subEventList = subEvents;
