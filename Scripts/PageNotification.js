@@ -33,6 +33,10 @@ class PageNotification {
         this.activeTimers.forEach((timeOutHandler) => {
             clearTimeout(timeOutHandler);
         });
+        this.nextSubEventNotification = {
+            subEvent: null,
+            time: null
+        };
     }
 
     processNotifications(subEvents) {
