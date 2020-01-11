@@ -798,11 +798,10 @@
             <param name="GoogleNotificationID"></param>
             <returns></returns>
         </member>
-        <member name="M:TilerFront.Controllers.ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(TilerCore.Schedule,System.String,TilerFront.Models.ApplicationDbContext,TilerElements.TimeLine,System.Boolean)">
+        <member name="M:TilerFront.Controllers.ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(System.String,TilerFront.Models.ApplicationDbContext,TilerElements.TimeLine,System.Boolean)">
             <summary>
             Function retrives the third party credential. Credential are used to retrieve calendar event. The retrieved events are used to populate mySchedule
             </summary>
-            <param name="mySchedule"></param>
             <param name="TilerUserID"></param>
             <returns></returns>
         </member>

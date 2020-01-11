@@ -93,15 +93,17 @@ namespace TilerFront.Controllers
             if (retrievedUser.Status)
             {
                 HashSet<string> calendarIds = new HashSet<string>() { myUser.EventID };
-                DB_Schedule NewSchedule = new DB_Schedule(retrievedUser, myUser.getRefNow(), calendarIds: calendarIds);
-                NewSchedule.CurrentLocation = myUser.getCurrentLocation();
-                await ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(NewSchedule, retrievedUser.UserID, db).ConfigureAwait(false);
+                Task<Tuple<ThirdPartyControl.CalendarTool, IEnumerable<CalendarEvent>>> thirdPartyDataTask = ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(retrievedUser.UserID, db);
+                DB_Schedule schedule = new DB_Schedule(retrievedUser, myUser.getRefNow(), calendarIds: calendarIds);
+                schedule.CurrentLocation = myUser.getCurrentLocation();
+                var thirdPartyData = await thirdPartyDataTask.ConfigureAwait(false);
+                schedule.updateDataSetWithThirdPartyData(thirdPartyData);
                 DB_UserActivity activity = new DB_UserActivity(myUser.getRefNow(), UserActivity.ActivityType.DeleteCalendarEvent, new List<String>() { myUser.EventID });
                 JObject json = JObject.FromObject(myUser);
                 activity.updateMiscelaneousInfo(json.ToString());
                 retrievedUser.ScheduleLogControl.updateUserActivty(activity);
-                CustomErrors messageReturned = await NewSchedule.deleteCalendarEventAndReadjust(myUser.EventID).ConfigureAwait(false);
-                await NewSchedule.WriteFullScheduleToLog().ConfigureAwait(false);
+                CustomErrors messageReturned = await schedule.deleteCalendarEventAndReadjust(myUser.EventID).ConfigureAwait(false);
+                await schedule.WriteFullScheduleToLog().ConfigureAwait(false);
                 int errorCode = messageReturned?.Code ?? 0;
                 retValue = new PostBackData(messageReturned, errorCode);
             }
@@ -141,15 +143,17 @@ namespace TilerFront.Controllers
             if (retrievedUser.Status)
             {
                 HashSet<string> calendarIds = new HashSet<string>() { myUser.EventID };
-                DB_Schedule NewSchedule = new DB_Schedule(retrievedUser, myUser.getRefNow(), calendarIds: calendarIds);
-                NewSchedule.CurrentLocation = myUser.getCurrentLocation();
-                await ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(NewSchedule, retrievedUser.UserID, db).ConfigureAwait(false);
+
+                Task<Tuple<ThirdPartyControl.CalendarTool, IEnumerable<CalendarEvent>>> thirdPartyDataTask = ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(retrievedUser.UserID, db);
+                DB_Schedule schedule = new DB_Schedule(retrievedUser, myUser.getRefNow(), calendarIds: calendarIds);
+                schedule.CurrentLocation = myUser.getCurrentLocation();
+                var thirdPartyData = await thirdPartyDataTask.ConfigureAwait(false);
                 DB_UserActivity activity = new DB_UserActivity(myUser.getRefNow(), UserActivity.ActivityType.CompleteCalendarEvent, new List<String>(){myUser.EventID});
                 JObject json = JObject.FromObject(myUser);
                 activity.updateMiscelaneousInfo(json.ToString());
                 retrievedUser.ScheduleLogControl.updateUserActivty(activity);
-                CustomErrors messageReturned = await NewSchedule.markAsCompleteCalendarEventAndReadjust(myUser.EventID).ConfigureAwait(false);
-                await NewSchedule.WriteFullScheduleToLog().ConfigureAwait(false);
+                CustomErrors messageReturned = await schedule.markAsCompleteCalendarEventAndReadjust(myUser.EventID).ConfigureAwait(false);
+                await schedule.WriteFullScheduleToLog().ConfigureAwait(false);
                 int errorCode = messageReturned?.Code ?? 0;
                 retValue = new PostBackData(messageReturned, errorCode);
             }
@@ -178,15 +182,17 @@ namespace TilerFront.Controllers
             if (retrievedUser.Status)
             {
                 HashSet<string> calendarIds = new HashSet<string>() { nowEvent.ID };
-                DB_Schedule NewSchedule = new DB_Schedule(retrievedUser, nowEvent.getRefNow(), calendarIds: calendarIds);
-                NewSchedule.CurrentLocation = nowEvent.getCurrentLocation();
-                await ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(NewSchedule, nowEvent.UserID, db).ConfigureAwait(false);
-                var ScheduleUpdateMessage = NewSchedule.SetCalendarEventAsNow(nowEvent.ID);
+                Task<Tuple<ThirdPartyControl.CalendarTool, IEnumerable<CalendarEvent>>> thirdPartyDataTask = ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(retrievedUser.UserID, db);
+                DB_Schedule schedule = new DB_Schedule(retrievedUser, nowEvent.getRefNow(), calendarIds: calendarIds);
+                schedule.CurrentLocation = nowEvent.getCurrentLocation();
+                var thirdPartyData = await thirdPartyDataTask.ConfigureAwait(false);
+                schedule.updateDataSetWithThirdPartyData(thirdPartyData);
+                var ScheduleUpdateMessage = schedule.SetCalendarEventAsNow(nowEvent.ID);
                 DB_UserActivity activity = new DB_UserActivity(nowEvent.getRefNow(), UserActivity.ActivityType.SetAsNowCalendarEvent, new List<String>() { nowEvent.ID });
                 JObject json = JObject.FromObject(nowEvent);
                 activity.updateMiscelaneousInfo(json.ToString());
                 retrievedUser.ScheduleLogControl.updateUserActivty(activity);
-                await NewSchedule.persistToDB().ConfigureAwait(false);
+                await schedule.persistToDB().ConfigureAwait(false);
                 retValue = new PostBackData(ScheduleUpdateMessage.Item1);
             }
             else
