@@ -11,6 +11,10 @@ class PageNotification {
         this.dispachedNotifications = [];
         this.userId = userId;
         this.activeTimers = [];
+        this.nextSubEventNotification = {
+            subEvent: null,
+            time: null
+        };
     }
 
     get isGranted() {
@@ -23,12 +27,17 @@ class PageNotification {
         return retValue;
     }
 
+    resetAllNotifications() {
+        this.dictOfSubEvents = {};
+        this.subEventList = [];
+        this.activeTimers.forEach((timeOutHandler) => {
+            clearTimeout(timeOutHandler);
+        });
+    }
+
     processNotifications(subEvents) {
+        this.resetAllNotifications();
         if(this.isCapable && this.isGranted) {
-            this.activeTimers.forEach((timeOutHandler) => {
-                clearTimeout(timeOutHandler);
-            });
-            this.dictOfSubEvents = {};
             this.subEventList = subEvents;
             this.processListOfSubEvents();
         }
@@ -57,11 +66,14 @@ class PageNotification {
         let notificationStart = (subEventStart - TenMinInMs) - currentTimeInMS;
         if(notificationStart > 0) {
             let durationString = moment.duration(TenMinInMs, 'milliseconds').humanize();
+            this.nextSubEventNotification.subEvent = subEvent;
+            this.nextSubEventNotification.time = currentTimeInMS + notificationStart;
             let currentTimeOut = setTimeout(() => {
                 let notificationTitle = subEvent.Name + " starts in " + durationString;
                 let notification = new Notification(notificationTitle);
                 this.dispachedNotifications.push(notification);
                 this.processListOfSubEvents();
+
             }, notificationStart);
             this.activeTimers.push(currentTimeOut);
             return true;
