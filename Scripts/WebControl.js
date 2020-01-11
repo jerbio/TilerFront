@@ -21,7 +21,7 @@ catch(e)
 }
 
 let pageNotifications = new PageNotification(UserCredentials.ID);
-pageNotifications.verifyNotification();
+pageNotifications.authenticateNotification();
 
 var global_DictionaryOfSubEvents = {};
 var global_RemovedElemnts = {};
@@ -348,6 +348,8 @@ function StructuralizeNewData(NewData)
 
 
     function PopulateDomForScheduleEvent(myEvent, Tiers, CalendarData) {
+        myEvent.Start = myEvent.SubCalStartDate;
+        myEvent.End = myEvent.SubCalEndDate;
         myEvent.SubCalStartDate = new Date(myEvent.SubCalStartDate);// + global_TimeZone_ms);
         myEvent.SubCalEndDate = new Date(myEvent.SubCalEndDate);// + global_TimeZone_ms);
         myEvent.SubCalCalEventStart = new Date(myEvent.SubCalCalEventStart);//+ global_TimeZone_ms);

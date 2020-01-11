@@ -7,8 +7,10 @@ class PageNotification {
     constructor(userId, notificationType=notificationTypes.START) {
         this.type = notificationType;
         this.dictOfSubEvents = {};
+        this.subEventList = [];
         this.dispachedNotifications = [];
         this.userId = userId;
+        this.activeTimers = [];
     }
 
     get isGranted() {
@@ -23,41 +25,62 @@ class PageNotification {
 
     processNotifications(subEvents) {
         if(this.isCapable && this.isGranted) {
-            this.dictOfSubEvents = {}
-            let currentTime = new Date().getTime();
-            let subEventsAfterNow = subEvents.every((subEvent) => subEvent.End > currentTime );
-            subEventsAfterNow.sort((subEventA, subEventB) => { return subEventA.start - subEventB.start})
-            subEventsAfterNow.forEach((subEvent) => {
-                this.dictOfSubEvents[subEvent.Id] = subEvent;
+            this.activeTimers.forEach((timeOutHandler) => {
+                cleartimeout(timeOutHandler);
             });
-            if(subEventsAfterNow.length > 0) {
-                this.dispatchNotification(subEventsAfterNow[0])
+            this.dictOfSubEvents = {};
+            this.subEventList = subEvents;
+            this.processListOfSubEvents();
+        }
+    }
+
+    processListOfSubEvents() {
+        let currentTime = Date.now();
+        let subEventsAfterNow = this.subEventList.filter((subEvent) => subEvent.Start > currentTime );
+        subEventsAfterNow.sort((subEventA, subEventB) => { return subEventA.Start - subEventB.Start;});
+        subEventsAfterNow.forEach((subEvent) => {
+            this.dictOfSubEvents[subEvent.Id] = subEvent;
+        });
+        if(subEventsAfterNow.length > 0) {
+            for(let i =0; i < subEventsAfterNow.length; i++) {
+                let successDispatch = this.dispatchNotification(subEventsAfterNow[i]);
+                if(successDispatch) {
+                    break;
+                }
             }
         }
     }
 
     dispatchNotification(subEvent) {
         let currentTimeInMS = Date.now();
-        let subEventStart = subEvent.start;
-        let notificationStart = subEventStart - TenMinInMs;
+        let subEventStart = subEvent.SubCalStartDate.getTime();
+        let notificationStart = (subEventStart - TenMinInMs) - currentTimeInMS;
         if(notificationStart > 0) {
             let durationString = moment.duration(TenMinInMs, 'milliseconds').humanize();
-            setTimeout(() => {
+            let currentTimeOut = setTimeout(() => {
                 let notificationTitle = subEvent.Name + " starts in " + durationString;
                 let notification = new Notification(notificationTitle);
                 this.dispachedNotifications.push(notification);
+                this.processListOfSubEvents();
             }, notificationStart);
-            
+            this.activeTimers.push(currentTimeOut);
+            return true;
         }
+        return false;
     }
 
-    verifyNotification() {
-        //if (Notification.permission !== "denied") 
+    authenticateNotification() {
+        let permissionType = {
+            DENIED: "denied",
+            GRANTED: "granted"
+        }
+        if (Notification.permission !== permissionType.DENIED) 
         {
+            let initialStatus = Notification.permission;
             Notification.requestPermission().then(function (permission) {
               // If the user accepts, let's create a notification
-              if (permission === "granted") {
-                var notification = new Notification("Welcome to Tiler!");
+              if (permission === permissionType.GRANTED && permissionType.GRANTED !== initialStatus) {
+                var notification = new Notification("Thanks for enabling Tiler notifications! Now let's optimize the future");
               }
             });
         }

@@ -94,7 +94,7 @@ function retrieveUserSchedule(myurl, UserEntry,SuccessCallBack)
         //dataType: "json",
         success: function(response) {
             SuccessCallBack(response)
-            retrieveUserSchedule.callAllCallbacks(response)
+            retrieveUserSchedule.callAllCallbacks(response);
         },
         error: function (err) {
             var myError = err;
@@ -1786,6 +1786,7 @@ function generateModalForTIleOrModal()
         var UserSchedule = PostData.Content;
         var StructuredData = StructuralizeNewData(UserSchedule)
         TotalSubEventList = StructuredData.TotalSubEventList;
+        pageNotifications.processNotifications(TotalSubEventList);
         ActiveSubEvents = StructuredData.ActiveSubEvents;
         Dictionary_OfCalendarData = StructuredData.Dictionary_OfCalendarData;
         Dictionary_OfSubEvents = StructuredData.Dictionary_OfSubEvents;
