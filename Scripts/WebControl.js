@@ -20,6 +20,9 @@ catch(e)
     UserCredentials= { UserName: "", ID: "", Name: "" };
 }
 
+let pageNotifications = new PageNotification(UserCredentials.ID);
+pageNotifications.verifyNotification();
+
 var global_DictionaryOfSubEvents = {};
 var global_RemovedElemnts = {};
 
@@ -30,6 +33,7 @@ var OneHourInMs = 3600000;
 var OneYearInMs = 365 * OneDayInMs;
 var OneMinInMs = 60000;
 var OneSecondInMs = 1000;
+var TenMinInMs = 600000;
 
 
 var HeightOfCalendar = 720;

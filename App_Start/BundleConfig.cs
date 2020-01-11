@@ -81,6 +81,7 @@ namespace TilerFront
                     "~/Scripts/fullcalendar.min.js",
                     "~/Scripts/highcharts.js",
                     "~/Scripts/exporting.js",
+                    "~/Scripts/PageNotification.js",
                     "~/Scripts/WebControl.js",
                     "~/Scripts/HomePageControl.js",
                     "~/Scripts/SelectedEvent.js",
