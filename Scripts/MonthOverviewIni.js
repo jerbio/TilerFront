@@ -1857,6 +1857,7 @@ getRefreshedData.pauseUnEnroll = function (Id) {
             ActiveSubEvents = new Array();
             var StructuredData = StructuralizeNewData(NewData)
             TotalSubEventList = StructuredData.TotalSubEventList;
+            pageNotifications.processNotifications(TotalSubEventList);
             ActiveSubEvents = StructuredData.ActiveSubEvents;
             Dictionary_OfCalendarData = StructuredData.Dictionary_OfCalendarData;
             Dictionary_OfSubEvents = StructuredData.Dictionary_OfSubEvents;
