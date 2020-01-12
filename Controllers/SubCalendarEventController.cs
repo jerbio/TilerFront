@@ -138,10 +138,8 @@ namespace TilerFront.Controllers
                 {
                     case "google":
                         {
-                            Models.ThirdPartyCalendarAuthenticationModel AllIndexedThirdParty = await ScheduleController.getThirdPartyAuthentication(retrievedUser.UserID, UserData.ThirdPartyUserID, "Google", db);
-                            GoogleTilerEventControl googleControl = new GoogleTilerEventControl(AllIndexedThirdParty, db);
-                            await googleControl.deleteSubEvent(UserData).ConfigureAwait(false);
-                            retValue = new PostBackData("\"Success\"", 0);
+                            CustomErrors error = new CustomErrors(CustomErrors.Errors.TilerConfig_Repeat_Third_Party);
+                            retValue = new PostBackData(error);
                         }
                         break;
                     case "tiler":
