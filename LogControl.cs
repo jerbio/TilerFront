@@ -1652,8 +1652,6 @@ namespace TilerFront
         {
             if (retrievalOption == DataRetrivalOption.Evaluation)
             {
-
-
                 Stopwatch watch = new Stopwatch();
                 watch.Start();
                 CalendarEvent defaultCalEvent = CalendarEvent.getEmptyCalendarEvent(EventID.GenerateCalendarEvent(), Now.constNow, Now.constNow.AddHours(1));
@@ -1751,13 +1749,10 @@ namespace TilerFront
 
 
                     HashSet<CalendarEvent> parentCals = new HashSet<CalendarEvent>();
-                    HashSet<CalendarEvent> repeatCalendarEvents = new HashSet<CalendarEvent>();
                     HashSet<CalendarEvent> calendarEventsFromSubCalquery = new HashSet<CalendarEvent>();
-                    HashSet<CalendarEvent> allParentCalendarEvents = new HashSet<CalendarEvent>();
                     HashSet<string> allIds = new HashSet<string>();
                     HashSet<string> repeatParentIds = new HashSet<string>();
                     HashSet<string> parentIds = new HashSet<string>();
-                    HashSet<string> repeatIds = new HashSet<string>();
                     Dictionary<string, List<TilerEvent>> procrastinationToTilerEvents = new Dictionary<string, List<TilerEvent>>();
                     Dictionary<string, List<TilerEvent>> ProfileOfNowToTilerEvents = new Dictionary<string, List<TilerEvent>>();
                     List<SubCalendarEvent> subEventsRetrieved = subCalendarEvents.ToList();
@@ -2148,7 +2143,71 @@ namespace TilerFront
 
         }
 
-        
+        async public virtual Task<Dictionary<string, CalendarEvent>> getAllCalendarEventsInPredictionMode(TimeLine RangeOfLookUP, ReferenceNow Now, bool includeSubEvents = true, DataRetrivalOption retrievalOption = DataRetrivalOption.Prediction, HashSet<string> calendarIds = null)
+        {
+            if(RangeOfLookUP!=null) {
+                if (calendarIds == null)
+                {
+                    calendarIds = new HashSet<string>();
+                }
+                var calIds = calendarIds.ToArray();
+                IQueryable<SubCalendarEvent> subCalendarEvents = getSubCalendarEventQuery(retrievalOption, includeOtherEntities: true);
+                subCalendarEvents = subCalendarEvents
+                    .Where(subEvent =>
+                            (
+                                subEvent.ParentCalendarEvent.IsEnabled_DB
+                                && !subEvent.ParentCalendarEvent.Complete_EventDB
+                                && subEvent.ParentCalendarEvent.StartTime_EventDB < RangeOfLookUP.End
+                                && subEvent.ParentCalendarEvent.EndTime_EventDB > RangeOfLookUP.Start
+                                && subEvent.StartTime_EventDB < RangeOfLookUP.End// for performance reasons we will ignore sub events outside two weeks that are not within the range
+                                && subEvent.EndTime_EventDB > RangeOfLookUP.Start// for performance reasons we will ignore sub events outside two weeks that are not within the specified range so the range has to be generous
+                                && (
+                                        (subEvent.RepeatParentEventId == null) ||
+                                        (
+                                            (
+                                                (
+                                                    subEvent.RepeatParentEventId != null && subEvent.RepeatParentEvent.IsEnabled_DB
+                                                    && !subEvent.RepeatParentEvent.Complete_EventDB
+                                                    && subEvent.RepeatParentEvent.StartTime_EventDB < RangeOfLookUP.End
+                                                    && subEvent.RepeatParentEvent.EndTime_EventDB > RangeOfLookUP.Start
+                                                ) &&
+                                                (subEvent.RepeatParentEvent != null && subEvent.RepeatParentEvent.IsEnabled_DB)
+                                            )
+                                            && (
+                                                (
+                                                    (subEvent.RepeatParentEvent.RepeatParentEventId == null) ||
+                                                    (
+                                                        (
+                                                            subEvent.RepeatParentEvent.RepeatParentEventId != null && subEvent.RepeatParentEvent.RepeatParentEvent.IsEnabled_DB
+                                                            && !subEvent.RepeatParentEvent.RepeatParentEvent.Complete_EventDB
+                                                            && subEvent.RepeatParentEvent.RepeatParentEvent.StartTime_EventDB < RangeOfLookUP.End
+                                                            && subEvent.RepeatParentEvent.RepeatParentEvent.EndTime_EventDB > RangeOfLookUP.Start
+                                                        ) &&
+                                                        (subEvent.RepeatParentEvent.RepeatParentEvent != null && subEvent.RepeatParentEvent.RepeatParentEvent.IsEnabled_DB)
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                        );
+
+                #region includeCalendarEvents 
+                subCalendarEvents = subCalendarEvents
+                    .Include(subEvent => subEvent.ParentCalendarEvent)
+                    .Include(subEvent => subEvent.ParentCalendarEvent.RepeatParentEvent)
+                    .Include(subEvent => subEvent.RepeatParentEvent)
+                    .Include(subEvent => subEvent.ParentCalendarEvent.RestrictionProfile)
+                    .Include(subEvent => subEvent.RepeatParentEvent.RestrictionProfile)
+                    .Include(subEvent => subEvent.ProfileOfNow_EventDB)
+                    .Include(subEvent => subEvent.Procrastination_EventDB)
+                    .Include(subEvent => subEvent.Location_DB)
+                    .Include(subEvent => subEvent.ParentCalendarEvent.DayPreference_DB)
+                    ;
+                #endregion
+            }
+        }
+
 
         public virtual Tuple<Dictionary<string, CalendarEvent>, Dictionary<ThirdPartyControl.CalendarTool, List<CalendarEvent>>> getAllCalendarFromXml(ScheduleDump scheduleDump, ReferenceNow now)
         {
