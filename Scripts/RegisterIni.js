@@ -61,6 +61,7 @@ function InitializeSignInReg()
             let passwordNeedsUpperCaseDom = getDomOrCreateNew("passwordNeedsUpperCase");
             let passwordNeedsLowerCaseDom = getDomOrCreateNew("passwordNeedsLowerCase");
             let passwordNeedsNumberDom = getDomOrCreateNew("passwordNeedsNumber");
+            let passwordNeedsNoneLetterAndNoneNumberDom = getDomOrCreateNew("passwordNeedsNoneLetterAndNoneNumber");
             if (passwordEntry.isValid) {
                 $(PasswordInstructionDom).addClass('setAsDisplayNone');
             } else {
@@ -87,6 +88,12 @@ function InitializeSignInReg()
                     $(passwordMinLengthDom).addClass('setAsDisplayNone');
                 } else {
                     $(passwordMinLengthDom).removeClass('setAsDisplayNone');
+                }
+
+                if(passwordEntry.isNoneLetterAndNoneNumber) {
+                    $(passwordNeedsNoneLetterAndNoneNumberDom).addClass('setAsDisplayNone');
+                } else {
+                    $(passwordNeedsNoneLetterAndNoneNumberDom).removeClass('setAsDisplayNone');
                 }
             }
         }
@@ -178,13 +185,21 @@ function onPasswordEntry(passwordString) {
         return retValue;
     }
 
-    let passwordIsValid = isPasswordLongEnough(passwordString) && passwordHasUpperCase(passwordString) && passwordHasLowerCase(passwordString) && passwordHasNumber(passwordString);
+    function isNoneLetterAndNoneNumber(passwordString) {
+        let hasNumber = /[^a-zA-Z0-9]/;
+        let retValue = hasNumber.test(passwordString);
+        return retValue;
+    }
+
+    let passwordIsValid = isPasswordLongEnough(passwordString) && passwordHasUpperCase(passwordString) && passwordHasLowerCase(passwordString) && passwordHasNumber(passwordString) && isNoneLetterAndNoneNumber(passwordString);
 
     let retValue = {
         isLongEnough: isPasswordLongEnough(passwordString),
         hasUpperCase: passwordHasUpperCase(passwordString),
         hasLowerCase: passwordHasLowerCase(passwordString),
         hasNumber: passwordHasNumber(passwordString),
+        hasNonNumberAndNonLetter: passwordHasNumber(passwordString),
+        isNoneLetterAndNoneNumber: isNoneLetterAndNoneNumber(passwordString),
         isValid: passwordIsValid
     };
 
