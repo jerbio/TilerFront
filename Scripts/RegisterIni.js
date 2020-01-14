@@ -53,13 +53,47 @@ function InitializeSignInReg()
             callBackprepSignInFunc();
         }
     });
-    //$(SignInButton).click();
-    //$(RegisterButton).click();
+    $(PasswordReginDom).keyup(function (e) {//catches enter key press
+        if(e.target.value) {
+            let passwordEntry = onPasswordEntry(e.target.value);
+            let PasswordInstructionDom = getDomOrCreateNew("PasswordInstruction");
+            let passwordMinLengthDom = getDomOrCreateNew("passwordMinLength");
+            let passwordNeedsUpperCaseDom = getDomOrCreateNew("passwordNeedsUpperCase");
+            let passwordNeedsLowerCaseDom = getDomOrCreateNew("passwordNeedsLowerCase");
+            let passwordNeedsNumberDom = getDomOrCreateNew("passwordNeedsNumber");
+            if (passwordEntry.isValid) {
+                $(PasswordInstructionDom).addClass('setAsDisplayNone');
+            } else {
+                $(PasswordInstructionDom).removeClass('setAsDisplayNone');
+                if(passwordEntry.hasLowerCase) {
+                    $(passwordNeedsLowerCaseDom).addClass('setAsDisplayNone');
+                } else {
+                    $(passwordNeedsLowerCaseDom).removeClass('setAsDisplayNone');
+                }
+    
+                if(passwordEntry.hasUpperCase) {
+                    $(passwordNeedsUpperCaseDom).addClass('setAsDisplayNone');
+                } else {
+                    $(passwordNeedsUpperCaseDom).removeClass('setAsDisplayNone');
+                }
+    
+                if(passwordEntry.hasNumber) {
+                    $(passwordNeedsNumberDom).addClass('setAsDisplayNone');
+                } else {
+                    $(passwordNeedsNumberDom).removeClass('setAsDisplayNone');
+                }
+    
+                if(passwordEntry.isLongEnough) {
+                    $(passwordMinLengthDom).addClass('setAsDisplayNone');
+                } else {
+                    $(passwordMinLengthDom).removeClass('setAsDisplayNone');
+                }
+            }
+        }
 
+    });
 
     var TitleText = getDomOrCreateNew("BigBackGroundText");
-    //addEventgotoScreenButton(gotoSignInScreenButton, SignInFormContainer, TitleText);
-    //addEventgotoScreenButton(gotToRegisterScreenButton, RegPageFormContainer, TitleText);
 }
 
 
@@ -114,7 +148,48 @@ function checkIfEmailIsValid()
     }
 }
 
+function onPasswordEntry(passwordString) {
+    let minPasswordLength = 6;
 
+    function isPasswordLongEnough(passwordString) {
+        let retValue = false;
+        
+        if(isString(passwordString) && passwordString.length > minPasswordLength) {
+            retValue = true;
+        }
+        return retValue;
+    }
+
+    function passwordHasUpperCase(passwordString) {
+        let hasUpperCase = /[A-Z]+/;
+        let retValue = hasUpperCase.test(passwordString);
+        return retValue;
+    }
+
+    function passwordHasLowerCase(passwordString) {
+        let hasLowerCase = /[a-z]+/;
+        let retValue = hasLowerCase.test(passwordString);
+        return retValue;
+    }
+
+    function passwordHasNumber(passwordString) {
+        let hasNumber = /[0-9]+/;
+        let retValue = hasNumber.test(passwordString);
+        return retValue;
+    }
+
+    let passwordIsValid = isPasswordLongEnough(passwordString) && passwordHasUpperCase(passwordString) && passwordHasLowerCase(passwordString) && passwordHasNumber(passwordString);
+
+    let retValue = {
+        isLongEnough: isPasswordLongEnough(passwordString),
+        hasUpperCase: passwordHasUpperCase(passwordString),
+        hasLowerCase: passwordHasLowerCase(passwordString),
+        hasNumber: passwordHasNumber(passwordString),
+        isValid: passwordIsValid
+    };
+
+    return retValue;
+}
 
 
 function checkIfPasswordIsValid()
@@ -140,7 +215,7 @@ function checkIfPasswordIsValid()
 }
 function checkIfBothPasswordsAreSame(PasswordDom1,PasswordDom2)
 {
-    return PasswordDom1.value === PasswordDom2.value
+    return PasswordDom1.value === PasswordDom2.value;
 }
 
 function prepSignInFunc(UserNameDom, PasswordDom)
@@ -156,10 +231,9 @@ function prepSignInFunc(UserNameDom, PasswordDom)
 //RegisterUser(FullName, UserName, Password, Email)
 
 function prepRegisterFunc(FullNameDom, UserNameDom, PasswordDom, EmailDom, ConfirmPasswordDOm) {
-    return function () 
-    {
+    return function () {
         RegisterUser(FullNameDom.value, UserNameDom.value, PasswordDom.value,ConfirmPasswordDOm.value, EmailDom.value);
-    }
+    };
 }
 //*/
 
