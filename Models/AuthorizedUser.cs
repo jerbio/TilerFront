@@ -40,7 +40,7 @@ namespace TilerFront.Models
 
         public DateTimeOffset getRefNow()
         {
-            //string timeInString = "1/09/2020 6:20:00 AM +00:00";
+            //string timeInString = "1/15/2020 9:54:00 PM +00:00";
             string timeInString = "";
 
             if (string.IsNullOrEmpty(timeInString))
@@ -84,6 +84,9 @@ namespace TilerFront.Models
                 latitude = Convert.ToDouble(UserLatitude);
                 locationIsVerified = Convert.ToBoolean(UserLocationVerified);
             }
+
+            //latitude = 40.0202094;
+            //longitude = -105.2511571;
 
             if (locationIsVerified)
             {
