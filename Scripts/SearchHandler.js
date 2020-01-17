@@ -122,9 +122,11 @@ function CallBackFunctionForReturnedValues(data, DomContainer) {
         $(DoNowButtonOfSearchedEventImage.Dom).addClass("NowIcon");
         
         //$(DoNowButtonOfSearchedEventImage.Dom).addClass("SearchIcon");
+        if(MyCalendarEVent.canDoNow) {
+            DoNowButtonOfSearchedEventContainer.Dom.appendChild(DoNowButtonOfSearchedEventImage.Dom);
+        }
 
-
-        DoNowButtonOfSearchedEventContainer.Dom.appendChild(DoNowButtonOfSearchedEventImage.Dom)
+        
 
         setTimeout(function() {(DoNowButtonOfSearchedEventContainer.Dom).onclick=(genFunctionCallForCalendarEventNow(MyCalendarEVent.ID))}, 500)
 
