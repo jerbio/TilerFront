@@ -628,6 +628,8 @@ namespace TilerFront
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.getIsComplete.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("RepetitionFlag"));
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.IsFromRecurringAndNotChildRepeatCalEvent.ToString();
+            MyEventScheduleNode.PrependChild(xmldoc.CreateElement("IsRepeatsChildCalEvent"));
+            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.IsRepeatsChildCalEvent.ToString();
 
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("EventSubSchedules"));
             //MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.Repetition.ToString();
@@ -695,7 +697,7 @@ namespace TilerFront
             }
 
 
-            if (MyEvent.IsFromRecurringAndNotChildRepeatCalEvent)
+            if (MyEvent.IsFromRecurringAndNotChildRepeatCalEvent && MyEvent.isRepeatLoaded)
             {
                 MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Recurrence"));
                 MyEventScheduleNode.ChildNodes[0].InnerXml = CreateRepetitionNode(MyEvent.Repeat).InnerXml;
@@ -1663,7 +1665,7 @@ namespace TilerFront
                     {
                         calendarIds = new HashSet<string>();
                     }
-                    var calIds = calendarIds.ToArray();
+                    var calIds = calendarIds.Select(o=> new EventID(o).getAllEventDictionaryLookup).ToArray();
                     IQueryable<SubCalendarEvent> subCalendarEvents = getSubCalendarEventQuery(retrievalOption, includeOtherEntities: true);
                     subCalendarEvents = subCalendarEvents
                         .Where(subEvent =>
@@ -1704,31 +1706,22 @@ namespace TilerFront
                                                 )
                                             )
                                         )
-                                    ) || ((calIds.Contains(subEvent.RepeatParentEventId) || calIds.Contains(subEvent.CalendarEventId)) 
-                                        && (
-                                            (subEvent.RepeatParentEventId == null) ||
-                                            (
+                                    ) || (((calIds.Contains(subEvent.RepeatParentEventId) || calIds.Contains(subEvent.CalendarEventId)) 
+                                            && (
+                                                (subEvent.ParentCalendarEvent.IsEnabled_DB && !subEvent.ParentCalendarEvent.Complete_EventDB) &&
+                                                (subEvent.RepeatParentEvent.IsEnabled_DB && !subEvent.RepeatParentEvent.Complete_EventDB)
+                                            ))
+                                        || (
                                                 (
                                                     (
-                                                        subEvent.RepeatParentEventId != null && subEvent.RepeatParentEvent.IsEnabled_DB
-                                                        && !subEvent.RepeatParentEvent.Complete_EventDB
+                                                        subEvent.RepeatParentEvent.RepeatParentEventId != null
+                                                        && subEvent.RepeatParentEvent.RepeatParentEvent.IsEnabled_DB
+                                                        && !subEvent.RepeatParentEvent.RepeatParentEvent.Complete_EventDB
                                                     ) &&
-                                                    (subEvent.RepeatParentEvent != null && subEvent.RepeatParentEvent.IsEnabled_DB)
-                                                )
-                                                && (
-                                                    (
-                                                        (subEvent.RepeatParentEvent.RepeatParentEventId == null) ||
-                                                        (
-                                                            (
-                                                                subEvent.RepeatParentEvent.RepeatParentEventId != null && subEvent.RepeatParentEvent.RepeatParentEvent.IsEnabled_DB
-                                                                && !subEvent.RepeatParentEvent.RepeatParentEvent.Complete_EventDB
-                                                            ) &&
-                                                            (subEvent.RepeatParentEvent.RepeatParentEvent != null && subEvent.RepeatParentEvent.RepeatParentEvent.IsEnabled_DB)
-                                                        )
-                                                    )
+                                                    (calIds.Contains(subEvent.RepeatParentEvent.RepeatParentEventId))
                                                 )
                                             )
-                                        ))
+                                        )
 
                             );
 
@@ -1769,9 +1762,18 @@ namespace TilerFront
                     foreach (SubCalendarEvent subEvent in subEventsRetrieved)
                     {
                         CalendarEvent parentCalEvent = subEvent.ParentCalendarEvent;
+                        parentCalEvent.isRepeatLoaded_DB = false;
                         parentCalEvent.DefaultCalendarEvent = defaultCalEvent;
                         calendarEventsFromSubCalquery.Add(parentCalEvent);
                         allIds.Add(parentCalEvent.Id);
+
+                        if (parentCalEvent.RepeatParentEvent != null)
+                        {
+                            CalendarEvent repeatParent = parentCalEvent.RepeatParentEvent as CalendarEvent;
+                            calendarEventsFromSubCalquery.Add(repeatParent);
+                            allIds.Add(parentCalEvent.RepeatParentId);
+                            repeatParent.isRepeatLoaded_DB = false;
+                        }
                     }
 
                     watch.Stop();
@@ -1834,8 +1836,6 @@ namespace TilerFront
                     watch.Reset();
                     watch.Start();
                     Dictionary<string, CalendarEvent> MyCalendarEventDictionary = calendarEvents
-                        //.Where(calEvent => (!calEvent.IsRecurring || calEvent.IsRecurringChildCalEVent)
-                        //)
                         .ToDictionary(calEvent => calEvent.Calendar_EventID.getAllEventDictionaryLookup, calEvent => calEvent);
                     foreach (CalendarEvent calEvent in MyCalendarEventDictionary.Values.Where(calEvent => calEvent.getIsEventRestricted))
                     {
@@ -1856,7 +1856,6 @@ namespace TilerFront
                                 }
                             }
                         }
-
                     }
 
                     if (!procrastinateubEventPresent)
@@ -2172,7 +2171,7 @@ namespace TilerFront
                     if (RetrievedEvent != null)
                     {
                         RetrievedEvent.DefaultCalendarEvent = defaultCalendarEvent;
-                        if(RetrievedEvent.IsFromRecurringAndNotChildRepeatCalEvent)
+                        if(RetrievedEvent.IsFromRecurringAndNotChildRepeatCalEvent && RetrievedEvent.isRepeatLoaded)
                         {
                             foreach(CalendarEvent calEvent in RetrievedEvent.Repeat.RecurringCalendarEvents())
                             {
@@ -2244,6 +2243,7 @@ namespace TilerFront
             Rigid = EventScheduleNode.SelectSingleNode("RigidFlag").InnerText;
             XmlNode RecurrenceXmlNode = EventScheduleNode.SelectSingleNode("Recurrence");
             EventRepetitionflag = EventScheduleNode.SelectSingleNode("RepetitionFlag").InnerText;
+            string IsRepeatsChildCalEventString = EventScheduleNode.SelectSingleNode("IsRepeatsChildCalEvent")?.InnerText;
 
 
             //DateTimeOffset StartDateTimeStruct = DateTimeOffset.Parse(EventScheduleNode.SelectSingleNode("StartTime").InnerText).UtcDateTime;
@@ -2266,10 +2266,12 @@ namespace TilerFront
             Repetition Recurrence;
             if (Convert.ToBoolean(EventRepetitionflag))
             {
-                Recurrence = getRepetitionObject(RecurrenceXmlNode); ;
-
-                StartTimeConverted = (Recurrence.Range.Start);
-                EndTimeConverted = (Recurrence.Range.End);
+                Recurrence = getRepetitionObject(RecurrenceXmlNode);
+                if(Recurrence!=null)
+                {
+                    StartTimeConverted = (Recurrence.Range.Start);
+                    EndTimeConverted = (Recurrence.Range.End);
+                }
             }
             else
             {
@@ -2319,7 +2321,7 @@ namespace TilerFront
                 if (!procrastinationEventFlag)
                 {
                     RetrievedEvent = new RigidCalendarEvent(//new EventID(ID), 
-                    Name, start, end, CalendarEventDuration, PreDeadline, PrepTime, Recurrence, location, UiData, noteData, EVentEnableFlag, completedFlag, creator, userGroup, timeZone, new EventID(ID));
+                    Name, start, end, CalendarEventDuration, PreDeadline, PrepTime, Recurrence, location, UiData, noteData, EVentEnableFlag, completedFlag, creator, userGroup, timeZone, new EventID(ID), NowProfileData);
                 }
 
 
@@ -2334,7 +2336,7 @@ namespace TilerFront
             if (rigidFlag && procrastinationEventFlag)
             {
                 creator.ClearAllId = ID;
-                RetrievedEvent = new DB_ProcrastinateCalendarEvent(new EventID(creator.getClearAllEventsId()), Name, start, end, CalendarEventDuration, PreDeadline, PrepTime, Recurrence, location, UiData, noteData, EVentEnableFlag, completedFlag, creator, userGroup, timeZone, Split);
+                RetrievedEvent = new DB_ProcrastinateCalendarEvent(new EventID(creator.getClearAllEventsId()), Name, start, end, CalendarEventDuration, PreDeadline, PrepTime, Recurrence, location, UiData, noteData, EVentEnableFlag, completedFlag, creator, userGroup, timeZone, Split, NowProfileData);
             }
             else
             {
@@ -2432,11 +2434,24 @@ namespace TilerFront
             {
                 RetrievedEvent.Access_DB = MyEventScheduleNode.InnerText;
             }
-
-            foreach(CalendarEvent calEvent in Recurrence.RepeatingEvents)
+            if(Recurrence!=null)
             {
-                calEvent.RepeatParent_DB = RetrievedEvent;
+                foreach (CalendarEvent calEvent in Recurrence.RepeatingEvents)
+                {
+                    calEvent.RepeatParent_DB = RetrievedEvent;
+                }
+            } else
+            {
+                RetrievedEvent.IsRecurring = Convert.ToBoolean(EventRepetitionflag);
+                RetrievedEvent.isRepeatLoaded_DB = false;
             }
+
+            if(!string.IsNullOrEmpty(IsRepeatsChildCalEventString) && !string.IsNullOrWhiteSpace(IsRepeatsChildCalEventString))
+            {
+                RetrievedEvent.IsRepeatsChildCalEvent = Convert.ToBoolean(IsRepeatsChildCalEventString);
+            }
+            
+
 
             return RetrievedEvent;
         }
@@ -2796,40 +2811,46 @@ namespace TilerFront
 
         Repetition getRepetitionObject(XmlNode RecurrenceXmlNode)
         {
-            Repetition RetValue = new Repetition();
-            string RepeatStart = RecurrenceXmlNode.SelectSingleNode("RepeatStartDate").InnerText;
-            string RepeatEnd = RecurrenceXmlNode.SelectSingleNode("RepeatEndDate").InnerText;
-            string RepeatFrequency = RecurrenceXmlNode.SelectSingleNode("RepeatFrequency").InnerText;
-            XmlNode XmlNodeWithList = RecurrenceXmlNode.SelectSingleNode("RepeatCalendarEvents");
-            int repetitionDay = 7;
-            XmlNode RepetitionDayNode = RecurrenceXmlNode.SelectSingleNode("RepeatDay");
-            if (RepetitionDayNode != null)
+            
+            if(!string.IsNullOrEmpty( RecurrenceXmlNode.InnerXml) && !string.IsNullOrEmpty(RecurrenceXmlNode.InnerXml))
             {
-                repetitionDay = Convert.ToInt32(RepetitionDayNode.InnerText);
-            }
-            XmlNode RepetitionDayNodes = RecurrenceXmlNode.SelectSingleNode("RepeatDays");
-            if (RepetitionDayNodes != null)
-            {
-                XmlNodeList AllRepeatingDays = RecurrenceXmlNode.SelectNodes("Recurrence");
-                if (AllRepeatingDays.Count > 0)
+                Repetition RetValue = new Repetition();
+                string RepeatStart = RecurrenceXmlNode.SelectSingleNode("RepeatStartDate").InnerText;
+                string RepeatEnd = RecurrenceXmlNode.SelectSingleNode("RepeatEndDate").InnerText;
+                string RepeatFrequency = RecurrenceXmlNode.SelectSingleNode("RepeatFrequency").InnerText;
+                XmlNode XmlNodeWithList = RecurrenceXmlNode.SelectSingleNode("RepeatCalendarEvents");
+                int repetitionDay = 7;
+                XmlNode RepetitionDayNode = RecurrenceXmlNode.SelectSingleNode("RepeatDay");
+                if (RepetitionDayNode != null)
                 {
-                    List<Repetition> repetitionNodes = new List<Repetition>();
-                    foreach (XmlNode eacXmlNode in AllRepeatingDays)
+                    repetitionDay = Convert.ToInt32(RepetitionDayNode.InnerText);
+                }
+                XmlNode RepetitionDayNodes = RecurrenceXmlNode.SelectSingleNode("RepeatDays");
+                if (RepetitionDayNodes != null)
+                {
+                    XmlNodeList AllRepeatingDays = RecurrenceXmlNode.SelectNodes("Recurrence");
+                    if (AllRepeatingDays.Count > 0)
                     {
-                        repetitionNodes.Add(getRepetitionObject(eacXmlNode));
+                        List<Repetition> repetitionNodes = new List<Repetition>();
+                        foreach (XmlNode eacXmlNode in AllRepeatingDays)
+                        {
+                            repetitionNodes.Add(getRepetitionObject(eacXmlNode));
+                        }
+
+                        RetValue = new Repetition(true, new TimeLine(Utility.ParseTime(RepeatStart), Utility.ParseTime(RepeatEnd)), RepeatFrequency, repetitionNodes.ToArray(), repetitionDay);
+                        return RetValue;
                     }
 
-                    RetValue = new Repetition(true, new TimeLine(Utility.ParseTime(RepeatStart), Utility.ParseTime(RepeatEnd)), RepeatFrequency, repetitionNodes.ToArray(), repetitionDay);
-                    return RetValue;
                 }
 
+
+
+                RetValue = new Repetition(true, new TimeLine(Utility.ParseTime(RepeatStart), Utility.ParseTime(RepeatEnd)), RepeatFrequency, getAllRepeatCalendarEvents(XmlNodeWithList), repetitionDay);
+
+                return RetValue;
             }
-
-
-
-            RetValue = new Repetition(true, new TimeLine(Utility.ParseTime(RepeatStart), Utility.ParseTime(RepeatEnd)), RepeatFrequency, getAllRepeatCalendarEvents(XmlNodeWithList), repetitionDay);
-
-            return RetValue;
+            return null;
+            
         }
 
         CalendarEvent[] getAllRepeatCalendarEvents(XmlNode RepeatEventSchedulesNode)

@@ -99,6 +99,7 @@ function retrieveUserSchedule(myurl, UserEntry,SuccessCallBack)
         error: function (err) {
             var myError = err;
             var step = "err";
+            HandleNewPage.Hide();
         }
 
     }).done(function (data) {

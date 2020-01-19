@@ -1297,7 +1297,7 @@ namespace TilerFront.Controllers
                     EndData = EndData.Add(-newEvent.getTimeSpan);
                     if (RigidScheduleFlag) {
                         newCalendarEvent = new RigidCalendarEvent(
-                            Name, StartData, EndData, EventDuration,new TimeSpan(), new TimeSpan(), MyRepetition, EventLocation,  new EventDisplay(true, userColor, userColor.User < 1 ? 0 : 1), new MiscData(), true,false, tilerUser, new TilerUserGroup(), TimeZone, null);
+                            Name, StartData, EndData, EventDuration,new TimeSpan(), new TimeSpan(), MyRepetition, EventLocation,  new EventDisplay(true, userColor, userColor.User < 1 ? 0 : 1), new MiscData(), true,false, tilerUser, new TilerUserGroup(), TimeZone, null, new NowProfile());
                     }
                     else
                     {
@@ -1565,7 +1565,7 @@ namespace TilerFront.Controllers
                     if (RigidScheduleFlag)
                     {
                         newCalendarEvent = new RigidCalendarEvent(//EventID.GenerateCalendarEvent(), 
-                            Name, StartData, EndData, EventDuration, new TimeSpan(), new TimeSpan(), MyRepetition, EventLocation, new EventDisplay(true, userColor, userColor.User < 1 ? 0 : 1), new MiscData(), true, false, tilerUser, new TilerUserGroup(), TimeZone, null);
+                            Name, StartData, EndData, EventDuration, new TimeSpan(), new TimeSpan(), MyRepetition, EventLocation, new EventDisplay(true, userColor, userColor.User < 1 ? 0 : 1), new MiscData(), true, false, tilerUser, new TilerUserGroup(), TimeZone, null, new NowProfile());
                     }
                     else
                     {
