@@ -1781,28 +1781,21 @@ namespace TilerFront
                     watch.Reset();
                     watch.Start();
                     bool procrastinateubEventPresent = true;
-                    if (!allIds.Contains(_TilerUser.ClearAllId))// if a procrastinate sub event wasn't pulled then add it to the list of sub events to be pulled later
-                    {
-                        parentIds.Add(_TilerUser.ClearAllId);
-                        procrastinateubEventPresent = false;
-                    }
 
 
                     var rightOfJoin = _Context.CalEvents.Include(calendarEvent => calendarEvent.Name);
                     if (calendarIds!=null && calendarIds.Count > 0)
                     {
-                        foreach(string calendarId in calendarIds)
+                        foreach(string calendarId in calendarIds)// this is needed just in case a subevent within the regular range is acted upon. Take for exaple There is a calEvent of with subeventA, subeventB and subeventC. However the schedule performed a delete on subeventA and subeventA is out side the timeRange but subeventB and subeventC are within range. You still need to include subeventA because it is being deleted.
                         {
                             EventID eventId = new EventID(calendarId);
-                            if(!allIds.Contains(eventId.getAllEventDictionaryLookup))
-                            {
-                                parentIds.Add(eventId.getAllEventDictionaryLookup);
-                            }
+                            parentIds.Add(eventId.getAllEventDictionaryLookup);
                         }
                         rightOfJoin = rightOfJoin
                             .Include(calEvent => calEvent.RepeatParentEvent)
                             .Include(calEvent => calEvent.Location_DB)
                             .Include(calEvent => calEvent.AllSubEvents_DB)
+                            .Where(calEvent => calEvent.IsEnabled_DB && !calEvent.Complete_EventDB)
                         ;
                     }
 

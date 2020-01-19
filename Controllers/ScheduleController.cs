@@ -547,7 +547,8 @@ namespace TilerFront.Controllers
             AuthorizedUser myAuthorizedUser = UserData.User;
             UserAccount retrievedUser = await UserData.getUserAccount(db);
             await retrievedUser.Login();
-            retrievedUser.getTilerUser().updateTimeZoneTimeSpan(UserData.getTimeSpan);
+            TilerUser tilerUser = retrievedUser.getTilerUser();
+            tilerUser.updateTimeZoneTimeSpan(UserData.getTimeSpan);
             if (retrievedUser.Status)
             {
                 TimeDuration ProcrastinateDuration = UserData.ProcrastinateDuration;
@@ -563,7 +564,9 @@ namespace TilerFront.Controllers
                 DateTimeOffset nowTime = myAuthorizedUser.getRefNow();
 
                 Task<Tuple<ThirdPartyControl.CalendarTool, IEnumerable<CalendarEvent>>> thirdPartyDataTask = ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(retrievedUser.UserID, db);
-                DB_Schedule schedule = new DB_Schedule(retrievedUser, nowTime);
+
+                HashSet<string> calendarIds = new HashSet<string>() { tilerUser.ClearAllId };
+                DB_Schedule schedule = new DB_Schedule(retrievedUser, nowTime, calendarIds: calendarIds);
                 schedule.CurrentLocation = myAuthorizedUser.getCurrentLocation();
                 var thirdPartyData = await thirdPartyDataTask.ConfigureAwait(false);
                 schedule.updateDataSetWithThirdPartyData(thirdPartyData);
