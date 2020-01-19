@@ -1641,16 +1641,16 @@ namespace TilerFront
 
         }
         /// <summary>
-        /// This gets all cal events within <paramref name="RangeOfLookUP"/>. Note: This uses the subcalendar event as the bases for the query. So if a sub event is not within the rangelookup it won't pull the calendar event, this is for performance reasons. Hence why the general default is to be generous.  If you want to pull a specific calendar event then you need to include the calendar id as part of <paramref name="calendarIds"/>.
+        /// This gets all cal events within <paramref name="RangeOfLookUP"/>. Note: This uses the subcalendar event as the bases for the query. So if a sub event is not within the rangelookup it won't pull the calendar event, this is for performance reasons. Hence why the general default is to be generous.  If you want to pull a specific calendar event then you need to include the calendar id as part of <paramref name="tilerIds"/>.
         /// <paramref name="retrievalOption"/> provides a way of stream lining whats pulled from the DB. Evaluation ignores the UI component and includes only data to compute the schedule. Information such as NowProfile, procrastination and location
         /// </summary>
         /// <param name="RangeOfLookUP"></param>
         /// <param name="Now"></param>
         /// <param name="includeSubEvents"></param>
         /// <param name="retrievalOption"></param>
-        /// <param name="calendarIds"></param>
+        /// <param name="tilerIds"></param>
         /// <returns></returns>
-        async public virtual Task<Dictionary<string, CalendarEvent>> getAllEnabledCalendarEvent(TimeLine RangeOfLookUP, ReferenceNow Now, bool includeSubEvents = true, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation, HashSet<string> calendarIds = null)
+        async public virtual Task<Dictionary<string, CalendarEvent>> getAllEnabledCalendarEvent(TimeLine RangeOfLookUP, ReferenceNow Now, bool includeSubEvents = true, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation, HashSet<string> tilerIds = null)
         {
             if (retrievalOption == DataRetrivalOption.Evaluation)
             {
@@ -1661,11 +1661,11 @@ namespace TilerFront
                 CalendarEvent defaultCalEvent = CalendarEvent.getEmptyCalendarEvent(EventID.GenerateCalendarEvent(), Now.constNow, Now.constNow.AddHours(1));
                 if (RangeOfLookUP != null)
                 {
-                    if (calendarIds == null)
+                    if (tilerIds == null)
                     {
-                        calendarIds = new HashSet<string>();
+                        tilerIds = new HashSet<string>();
                     }
-                    var calIds = calendarIds.Select(o=> new EventID(o).getAllEventDictionaryLookup).ToArray();
+                    var calIds = tilerIds.Select(o=> new EventID(o).getAllEventDictionaryLookup).ToArray();
                     IQueryable<SubCalendarEvent> subCalendarEvents = getSubCalendarEventQuery(retrievalOption, includeOtherEntities: true);
                     subCalendarEvents = subCalendarEvents
                         .Where(subEvent =>
@@ -1748,6 +1748,7 @@ namespace TilerFront
                     HashSet<CalendarEvent> calendarEventsFromSubCalquery = new HashSet<CalendarEvent>();
                     HashSet<CalendarEvent> allParentCalendarEvents = new HashSet<CalendarEvent>();
                     HashSet<string> allIds = new HashSet<string>();
+                    HashSet<string> subEventIds = new HashSet<string>();
                     HashSet<string> repeatParentIds = new HashSet<string>();
                     HashSet<string> parentIds = new HashSet<string>();
                     HashSet<string> repeatIds = new HashSet<string>();
@@ -1766,6 +1767,8 @@ namespace TilerFront
                         parentCalEvent.DefaultCalendarEvent = defaultCalEvent;
                         calendarEventsFromSubCalquery.Add(parentCalEvent);
                         allIds.Add(parentCalEvent.Id);
+                        allIds.Add(subEvent.Id);
+                        subEventIds.Add(subEvent.Id);
 
                         if (parentCalEvent.RepeatParentEvent != null)
                         {
@@ -1784,12 +1787,16 @@ namespace TilerFront
 
 
                     var rightOfJoin = _Context.CalEvents.Include(calendarEvent => calendarEvent.Name);
-                    if (calendarIds!=null && calendarIds.Count > 0)
+                    if (tilerIds!=null && tilerIds.Count > 0)
                     {
-                        foreach(string calendarId in calendarIds)// this is needed just in case a subevent within the regular range is acted upon. Take for exaple There is a calEvent of with subeventA, subeventB and subeventC. However the schedule performed a delete on subeventA and subeventA is out side the timeRange but subeventB and subeventC are within range. You still need to include subeventA because it is being deleted.
+                        foreach(string tilerId in tilerIds)// this is needed just in case a subevent within the regular range is acted upon. Take for exaple There is a calEvent of with subeventA, subeventB and subeventC. However the schedule performed a delete on subeventA and subeventA is out side the timeRange but subeventB and subeventC are within range. You still need to include subeventA because it is being deleted.
                         {
-                            EventID eventId = new EventID(calendarId);
-                            parentIds.Add(eventId.getAllEventDictionaryLookup);
+                            EventID eventId = new EventID(tilerId);
+                            if(!subEventIds.Contains(tilerId))
+                            {
+                                parentIds.Add(eventId.getAllEventDictionaryLookup);
+                            }
+                            
                         }
                         rightOfJoin = rightOfJoin
                             .Include(calEvent => calEvent.RepeatParentEvent)
@@ -3257,7 +3264,7 @@ namespace TilerFront
                 RangeOfLookup  = RangeOfLookup == null ? new TimeLine(Now.constNow.AddYears(-200), Now.constNow.AddYears(200)) : RangeOfLookup;
                 Stopwatch scheduleLoadWatch = new Stopwatch();
                 scheduleLoadWatch.Start();
-                Dictionary<string, CalendarEvent> AllScheduleData = await this.getAllEnabledCalendarEvent(RangeOfLookup, Now, retrievalOption: retrievalOption, calendarIds: calendarIds);
+                Dictionary<string, CalendarEvent> AllScheduleData = await this.getAllEnabledCalendarEvent(RangeOfLookup, Now, retrievalOption: retrievalOption, tilerIds: calendarIds);
                 scheduleLoadWatch.Stop();
                 Debug.WriteLine("Total DB Lookup took " + scheduleLoadWatch.Elapsed.ToString());
                 if (createDump && _UpdateBigData)
