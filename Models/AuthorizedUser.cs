@@ -91,6 +91,7 @@ namespace TilerFront.Models
             if (locationIsVerified)
             {
                 retValue = new Location(latitude, longitude);
+                retValue.IsVerified = true;
             }
             else
             {

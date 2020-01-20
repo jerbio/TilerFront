@@ -674,15 +674,7 @@ namespace TilerFront.Controllers
                 var thirdPartyData = await thirdPartyDataTask.ConfigureAwait(false);
                 schedule.updateDataSetWithThirdPartyData(thirdPartyData);
 
-                TilerElements.Location location;
-                if (UserData.IsInitialized)
-                {
-                    location = new TilerElements.Location(UserData.Latitude, UserData.Longitude, "", "", false, false);
-                }
-                else
-                {
-                    location = TilerElements.Location.getDefaultLocation();
-                }
+                TilerElements.Location location = myAuthorizedUser.getCurrentLocation();
                 await schedule.FindMeSomethingToDo(location).ConfigureAwait(false);
                 await schedule.WriteFullScheduleToLog().ConfigureAwait(false);
 
