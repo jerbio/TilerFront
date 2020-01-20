@@ -685,6 +685,12 @@ namespace TilerFront
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.LastCompletionTime_DB;
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Access_DB"));
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.Access_DB;
+            MyEventScheduleNode.PrependChild(xmldoc.CreateElement("IniStartTime"));
+            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.Ini_StartTime_EventDB.ToString();
+            MyEventScheduleNode.PrependChild(xmldoc.CreateElement("IniEndTime"));
+            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.Ini_EndTime_EventDB.ToString();
+            MyEventScheduleNode.PrependChild(xmldoc.CreateElement("TimeLineUpdates"));
+            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.TimeLineUpdates_DB.ToString();
 
             if (MyEvent.getIsEventRestricted)
             {
@@ -920,6 +926,11 @@ namespace TilerFront
             MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.RepetitionLock_DB.ToString();
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("isTardy"));
             MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.isTardy.ToString();
+            MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("IniStartTime"));
+            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.Ini_StartTime_EventDB.ToString();
+            MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("IniEndTime"));
+            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.Ini_EndTime_EventDB.ToString();
+
 
             if (MySubEvent.getIsEventRestricted)
             {
@@ -2142,72 +2153,7 @@ namespace TilerFront
             throw new NullReferenceException("You have to provide the range to lookup in the user calelndar");
 
         }
-
-        async public virtual Task<Dictionary<string, CalendarEvent>> getAllCalendarEventsInPredictionMode(TimeLine RangeOfLookUP, ReferenceNow Now, bool includeSubEvents = true, DataRetrivalOption retrievalOption = DataRetrivalOption.Prediction, HashSet<string> calendarIds = null)
-        {
-            if(RangeOfLookUP!=null) {
-                if (calendarIds == null)
-                {
-                    calendarIds = new HashSet<string>();
-                }
-                var calIds = calendarIds.ToArray();
-                IQueryable<SubCalendarEvent> subCalendarEvents = getSubCalendarEventQuery(retrievalOption, includeOtherEntities: true);
-                subCalendarEvents = subCalendarEvents
-                    .Where(subEvent =>
-                            (
-                                subEvent.ParentCalendarEvent.IsEnabled_DB
-                                && !subEvent.ParentCalendarEvent.Complete_EventDB
-                                && subEvent.ParentCalendarEvent.StartTime_EventDB < RangeOfLookUP.End
-                                && subEvent.ParentCalendarEvent.EndTime_EventDB > RangeOfLookUP.Start
-                                && subEvent.StartTime_EventDB < RangeOfLookUP.End// for performance reasons we will ignore sub events outside two weeks that are not within the range
-                                && subEvent.EndTime_EventDB > RangeOfLookUP.Start// for performance reasons we will ignore sub events outside two weeks that are not within the specified range so the range has to be generous
-                                && (
-                                        (subEvent.RepeatParentEventId == null) ||
-                                        (
-                                            (
-                                                (
-                                                    subEvent.RepeatParentEventId != null && subEvent.RepeatParentEvent.IsEnabled_DB
-                                                    && !subEvent.RepeatParentEvent.Complete_EventDB
-                                                    && subEvent.RepeatParentEvent.StartTime_EventDB < RangeOfLookUP.End
-                                                    && subEvent.RepeatParentEvent.EndTime_EventDB > RangeOfLookUP.Start
-                                                ) &&
-                                                (subEvent.RepeatParentEvent != null && subEvent.RepeatParentEvent.IsEnabled_DB)
-                                            )
-                                            && (
-                                                (
-                                                    (subEvent.RepeatParentEvent.RepeatParentEventId == null) ||
-                                                    (
-                                                        (
-                                                            subEvent.RepeatParentEvent.RepeatParentEventId != null && subEvent.RepeatParentEvent.RepeatParentEvent.IsEnabled_DB
-                                                            && !subEvent.RepeatParentEvent.RepeatParentEvent.Complete_EventDB
-                                                            && subEvent.RepeatParentEvent.RepeatParentEvent.StartTime_EventDB < RangeOfLookUP.End
-                                                            && subEvent.RepeatParentEvent.RepeatParentEvent.EndTime_EventDB > RangeOfLookUP.Start
-                                                        ) &&
-                                                        (subEvent.RepeatParentEvent.RepeatParentEvent != null && subEvent.RepeatParentEvent.RepeatParentEvent.IsEnabled_DB)
-                                                    )
-                                                )
-                                            )
-                                        )
-                                    )
-                                )
-                        );
-
-                #region includeCalendarEvents 
-                subCalendarEvents = subCalendarEvents
-                    .Include(subEvent => subEvent.ParentCalendarEvent)
-                    .Include(subEvent => subEvent.ParentCalendarEvent.RepeatParentEvent)
-                    .Include(subEvent => subEvent.RepeatParentEvent)
-                    .Include(subEvent => subEvent.ParentCalendarEvent.RestrictionProfile)
-                    .Include(subEvent => subEvent.RepeatParentEvent.RestrictionProfile)
-                    .Include(subEvent => subEvent.ProfileOfNow_EventDB)
-                    .Include(subEvent => subEvent.Procrastination_EventDB)
-                    .Include(subEvent => subEvent.Location_DB)
-                    .Include(subEvent => subEvent.ParentCalendarEvent.DayPreference_DB)
-                    ;
-                #endregion
-            }
-        }
-
+        
 
         public virtual Tuple<Dictionary<string, CalendarEvent>, Dictionary<ThirdPartyControl.CalendarTool, List<CalendarEvent>>> getAllCalendarFromXml(ScheduleDump scheduleDump, ReferenceNow now)
         {
@@ -2340,6 +2286,11 @@ namespace TilerFront
             PrepTime = TimeSpan.Parse(EventScheduleNode.SelectSingleNode("PrepTime").InnerText);
             Completed = EventScheduleNode.SelectSingleNode("Completed").InnerText;
             EnableFlag = EventScheduleNode.SelectSingleNode("Enabled").InnerText;
+            DateTimeOffset iniStartTime = Utility.ParseTime(EventScheduleNode.SelectSingleNode("IniStartTime")?.InnerText);
+            DateTimeOffset iniEndTime = Utility.ParseTime(EventScheduleNode.SelectSingleNode("IniEndTime")?.InnerText);
+            string timeLineUpdates = EventScheduleNode.SelectSingleNode("TimeLineUpdates")?.InnerText;
+
+
             bool EVentEnableFlag = Convert.ToBoolean(EnableFlag);
             bool completedFlag = Convert.ToBoolean(Completed);
 
@@ -2497,6 +2448,10 @@ namespace TilerFront
                 calEvent.RepeatParent_DB = RetrievedEvent;
             }
 
+            RetrievedEvent.Ini_StartTime_EventDB = iniStartTime;
+            RetrievedEvent.Ini_EndTime_EventDB= iniEndTime;
+            RetrievedEvent.TimeLineUpdates_DB = timeLineUpdates;
+
             return RetrievedEvent;
         }
 
@@ -2629,6 +2584,8 @@ namespace TilerFront
                 ID = EventID.convertToSubcalendarEventID(MyXmlNode.ChildNodes[i].SelectSingleNode("ID").InnerText).ToString();
                 Start = Utility.ParseTime(MyXmlNode.ChildNodes[i].SelectSingleNode("ActiveStartTime").InnerText);
                 End = Utility.ParseTime(MyXmlNode.ChildNodes[i].SelectSingleNode("ActiveEndTime").InnerText);
+                DateTimeOffset iniStartTime = Utility.ParseTime(MyXmlNode.ChildNodes[i].SelectSingleNode("IniStartTime").InnerText);
+                DateTimeOffset iniEndTime = Utility.ParseTime(MyXmlNode.ChildNodes[i].SelectSingleNode("IniEndTime").InnerText);
 
                 bool rigidFlag = MyParent.isRigid;
                 XmlNode rigidNode = MyXmlNode.ChildNodes[i].SelectSingleNode("Rigid");
