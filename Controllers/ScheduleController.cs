@@ -861,38 +861,109 @@ namespace TilerFront.Controllers
         /// <summary>
         /// Marks a series of Event as complete. It takes a collection of IDs and then marks them as complete
         /// </summary>
-        /// <param name="UserData"></param>
+        /// <param name="requestData"></param>
         /// <returns></returns>
         [HttpPost]
         [ResponseType(typeof(PostBackStruct))]
         [Route("api/Schedule/Events/Complete")]
-        public async Task<IHttpActionResult> CompleteSubCalendarEvents([FromBody]getEventModel UserData)
+        public async Task<IHttpActionResult> CompleteSubCalendarEvents([FromBody]getEventModel requestData)
         {
-            UserAccount retrievedUser = await UserData.getUserAccount(db);
+            UserAccount retrievedUser = await requestData.getUserAccount(db);
             await retrievedUser.Login();
-            retrievedUser.getTilerUser().updateTimeZoneTimeSpan(UserData.getTimeSpan);
-            DateTimeOffset myNow = UserData.getRefNow();
-            HashSet<string> calendarIds = new HashSet<string>(UserData.EventID.Split(','));
+            retrievedUser.getTilerUser().updateTimeZoneTimeSpan(requestData.getTimeSpan);
+            DateTimeOffset myNow = requestData.getRefNow();
             PostBackData retValue;
-            await retrievedUser.Login();
             if (retrievedUser.Status)
             {
-                Task<Tuple<ThirdPartyControl.CalendarTool, IEnumerable<CalendarEvent>>> thirdPartyDataTask = ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(retrievedUser.UserID, db);
-                DB_Schedule schedule = new DB_Schedule(retrievedUser, myNow, calendarIds: calendarIds);
-                schedule.CurrentLocation = UserData.getCurrentLocation();
-                IEnumerable<string> AllEventIDs = UserData.EventID.Split(',');
-                DB_UserActivity activity = new DB_UserActivity(myNow, UserActivity.ActivityType.CompleteMultiple, AllEventIDs);
-                JObject json = JObject.FromObject(UserData);
-                activity.updateMiscelaneousInfo(json.ToString());
-                activity.eventIds.AddRange(AllEventIDs);
-                retrievedUser.ScheduleLogControl.updateUserActivty(activity);
-                var thirdPartyData = await thirdPartyDataTask.ConfigureAwait(false);
-                schedule.updateDataSetWithThirdPartyData(thirdPartyData);
+                string notValidUserId = "not_valid_user@mytiler.com";
+                List<string> AllEventIDs = requestData.EventID.Split(',').ToList();
+                List<string> thirdPartyEmailIds = requestData.ThirdPartyUserID.Split(',').ToList();
+                string tilerCalendartype = ThirdPartyControl.CalendarTool.tiler.ToString();
+                List<string> thirdPartyTypes = requestData.ThirdPartyType.Split(',').ToList();
+                HashSet<string> calendarIds = new HashSet<string>(AllEventIDs);
+
+                if (calendarIds.Count > 0)
+                {
+                    HashSet<string> tilerIds = new HashSet<string>();
 
 
-                await schedule.markSubEventsAsComplete(AllEventIDs).ConfigureAwait(false);
-                schedule.WriteFullScheduleToLog().Wait();
-                retValue = new PostBackData("\"Success\"", 0);
+                    if (AllEventIDs.Count == thirdPartyEmailIds.Count && thirdPartyEmailIds.Count == thirdPartyTypes.Count)
+                    {
+                        Dictionary<string, List<string>> thirdPartyUserToeventId = new Dictionary<string, List<string>>();
+
+                        for (int i = 0; i < AllEventIDs.Count; i++)
+                        {
+                            string eventId = AllEventIDs[i];
+                            string userId = thirdPartyEmailIds[i];
+                            string thirdPartyType = thirdPartyTypes[i];
+                            if (EventID.isLikeTilerId(eventId) || tilerCalendartype == thirdPartyType)
+                            {
+                                tilerIds.Add(eventId);
+                            }
+                            else
+                            {
+                                if (notValidUserId != userId)
+                                {
+                                    List<string> thirdPartyIds = new List<string>();
+                                    if (!thirdPartyUserToeventId.ContainsKey(userId))
+                                    {
+                                        thirdPartyUserToeventId.Add(userId, thirdPartyIds);
+                                    }
+                                    else
+                                    {
+                                        thirdPartyIds = thirdPartyUserToeventId[userId];
+                                    }
+                                    thirdPartyIds.Add(eventId);
+                                }
+                            }
+                        }
+
+                        if (thirdPartyUserToeventId.Count > 0)
+                        {
+                            List<Task> waitForAllDeletions = new List<Task>();
+                            foreach (var eachUserIdToList in thirdPartyUserToeventId)
+                            {
+                                Models.ThirdPartyCalendarAuthenticationModel AllIndexedThirdParty = await getThirdPartyAuthentication(retrievedUser.UserID, eachUserIdToList.Key, "Google", db);
+                                GoogleTilerEventControl googleControl = new GoogleTilerEventControl(AllIndexedThirdParty, db);
+                                var waitTask = googleControl.deleteSubEvents(eachUserIdToList.Value);
+                                waitForAllDeletions.Add(waitTask);
+                            }
+
+                            foreach (var waitDeletion in waitForAllDeletions)
+                            {
+                                await waitDeletion.ConfigureAwait(false);
+                            }
+                        }
+
+                        if (tilerIds.Count > 0)
+                        {
+                            var tilerIdSet = new HashSet<string>(tilerIds);
+                            Task<Tuple<ThirdPartyControl.CalendarTool, IEnumerable<CalendarEvent>>> thirdPartyDataTask = ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(retrievedUser.UserID, db);
+                            DB_Schedule schedule = new DB_Schedule(retrievedUser, myNow, calendarIds: tilerIdSet);
+                            schedule.CurrentLocation = requestData.getCurrentLocation();
+                            DB_UserActivity activity = new DB_UserActivity(myNow, UserActivity.ActivityType.CompleteMultiple, AllEventIDs);
+                            JObject json = JObject.FromObject(requestData);
+                            activity.updateMiscelaneousInfo(json.ToString());
+                            activity.eventIds.AddRange(AllEventIDs);
+                            retrievedUser.ScheduleLogControl.updateUserActivty(activity);
+                            var thirdPartyData = await thirdPartyDataTask.ConfigureAwait(false);
+                            schedule.updateDataSetWithThirdPartyData(thirdPartyData);
+
+                            await schedule.markSubEventsAsComplete(tilerIdSet).ConfigureAwait(false);
+                            await schedule.WriteFullScheduleToLog().ConfigureAwait(false);
+                            retValue = new PostBackData("\"Success\"", 0);
+                        }
+                        retValue = new PostBackData("\"Success\"", 0);
+                    }
+                    else
+                    {
+                        retValue = new PostBackData(CustomErrors.Errors.UserEmailNotMatchingSubEvent);
+                    }
+                }
+                else
+                {
+                    retValue = new PostBackData("\"Success\"", 0);
+                }
             }
             else
             {
@@ -984,48 +1055,48 @@ namespace TilerFront.Controllers
         /// <summary>
         /// Deletes a Sub event from Tiler. The deletion does not trigger a schedule readjustment.
         /// </summary>
-        /// <param name="myUser"></param>
+        /// <param name="eventModel"></param>
         /// <returns></returns>
         [HttpDelete]
         [ResponseType(typeof(PostBackStruct))]
         [Route("api/Schedule/Event")]
-        public async Task<IHttpActionResult> DeleteEvent([FromBody]getEventModel myUser)
+        public async Task<IHttpActionResult> DeleteEvent([FromBody]getEventModel eventModel)
         {
-            UserAccount retrievedUser = await myUser.getUserAccount(db);
+            UserAccount retrievedUser = await eventModel.getUserAccount(db);
             await retrievedUser.Login();
-            retrievedUser.getTilerUser().updateTimeZoneTimeSpan(myUser.getTimeSpan);
+            retrievedUser.getTilerUser().updateTimeZoneTimeSpan(eventModel.getTimeSpan);
             PostBackData retValue= new PostBackData("", 1);
             if (retrievedUser.Status)
             {
-                string CalendarType = myUser.ThirdPartyType.ToLower();
+                string CalendarType = eventModel.ThirdPartyType.ToLower();
 
                 switch(CalendarType )
                 {
                     case "google":
                         {
-                            Models.ThirdPartyCalendarAuthenticationModel AllIndexedThirdParty = await getThirdPartyAuthentication(retrievedUser.UserID, myUser.ThirdPartyUserID, "Google", db);
+                            Models.ThirdPartyCalendarAuthenticationModel AllIndexedThirdParty = await getThirdPartyAuthentication(retrievedUser.UserID, eventModel.ThirdPartyUserID, "Google", db);
                             GoogleTilerEventControl googleControl = new GoogleTilerEventControl(AllIndexedThirdParty, db);
-                            await googleControl.deleteSubEvent(myUser).ConfigureAwait(false);
+                            await googleControl.deleteSubEvent(eventModel).ConfigureAwait(false);
                             retValue = new PostBackData("\"Success\"", 0);   
                         }
                         break;
                     case "tiler":
                         {
-                            HashSet<string> calendarIds = new HashSet<string>() { myUser.EventID };
+                            HashSet<string> calendarIds = new HashSet<string>() { eventModel.EventID };
                             Task<Tuple<ThirdPartyControl.CalendarTool, IEnumerable<CalendarEvent>>> thirdPartyDataTask = ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(retrievedUser.UserID, db);
-                            DB_Schedule schedule = new DB_Schedule(retrievedUser, myUser.getRefNow(), calendarIds: calendarIds);
-                            schedule.CurrentLocation = myUser.getCurrentLocation();
-                            DB_UserActivity activity = new DB_UserActivity(myUser.getRefNow(), UserActivity.ActivityType.DeleteSingle);
+                            DB_Schedule schedule = new DB_Schedule(retrievedUser, eventModel.getRefNow(), calendarIds: calendarIds);
+                            schedule.CurrentLocation = eventModel.getCurrentLocation();
+                            DB_UserActivity activity = new DB_UserActivity(eventModel.getRefNow(), UserActivity.ActivityType.DeleteSingle);
                             retrievedUser.ScheduleLogControl.updateUserActivty(activity);
-                            JObject json = JObject.FromObject(myUser);
+                            JObject json = JObject.FromObject(eventModel);
                             activity.updateMiscelaneousInfo(json.ToString());
-                            activity.eventIds.Add(myUser.EventID);
+                            activity.eventIds.Add(eventModel.EventID);
                             retrievedUser.ScheduleLogControl.updateUserActivty(activity);
 
                             var thirdPartyData = await thirdPartyDataTask.ConfigureAwait(false);
                             schedule.updateDataSetWithThirdPartyData(thirdPartyData);
 
-                            await schedule.deleteSubCalendarEvent(myUser.EventID).ConfigureAwait(false);
+                            await schedule.deleteSubCalendarEvent(eventModel.EventID).ConfigureAwait(false);
                             await schedule.WriteFullScheduleToLog().ConfigureAwait(false);
                             retValue = new PostBackData("\"Success\"", 0);   
                         }
@@ -1060,32 +1131,106 @@ namespace TilerFront.Controllers
         /// <summary>
         /// Deletes multiple subevents.
         /// </summary>
-        /// <param name="myUser"></param>
+        /// <param name="requestData"></param>
         /// <returns></returns>
         [HttpDelete]
         [ResponseType(typeof(PostBackStruct))]
         [Route("api/Schedule/Events")]
-        public async Task<IHttpActionResult> DeleteEvents([FromBody]getEventModel myUser)
+        public async Task<IHttpActionResult> DeleteEvents([FromBody]getEventModel requestData)
         {
-            UserAccount retrievedUser = await myUser.getUserAccount(db);
+            UserAccount retrievedUser = await requestData.getUserAccount(db);
             await retrievedUser.Login();
-            retrievedUser.getTilerUser().updateTimeZoneTimeSpan(myUser.getTimeSpan);
+            retrievedUser.getTilerUser().updateTimeZoneTimeSpan(requestData.getTimeSpan);
             PostBackData retValue;
             if (retrievedUser.Status)
             {
-                IEnumerable<string> AllEventIDs = myUser.EventID.Split(',');
+                string notValidUserId = "not_valid_user@mytiler.com";
+                List<string> AllEventIDs = requestData.EventID.Split(',').ToList();
+                List<string> thirdPartyEmailIds = requestData.ThirdPartyUserID.Split(',').ToList();
+                string tilerCalendartype = ThirdPartyControl.CalendarTool.tiler.ToString();
+                List<string> thirdPartyTypes = requestData.ThirdPartyType.Split(',').ToList();
                 HashSet<string> calendarIds = new HashSet<string>(AllEventIDs);
-                Task<Tuple<ThirdPartyControl.CalendarTool, IEnumerable<CalendarEvent>>> thirdPartyDataTask = ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(retrievedUser.UserID, db);
-                DB_Schedule schedule = new DB_Schedule(retrievedUser, myUser.getRefNow(), calendarIds: calendarIds);
-                schedule.CurrentLocation = myUser.getCurrentLocation();
-                var thirdPartyData = await thirdPartyDataTask.ConfigureAwait(false);
-                schedule.updateDataSetWithThirdPartyData(thirdPartyData);
 
-                DB_UserActivity activity = new DB_UserActivity(myUser.getRefNow(), UserActivity.ActivityType.DeleteMultiple, AllEventIDs);
-                retrievedUser.ScheduleLogControl.updateUserActivty(activity);
-                await schedule.deleteSubCalendarEvents(AllEventIDs);
-                await schedule.WriteFullScheduleToLog().ConfigureAwait(false);
-                retValue = new PostBackData("\"Success\"", 0);
+                if(calendarIds.Count >0)
+                {
+                    HashSet<string> tilerIds = new HashSet<string>();
+                    
+                    
+                    if(AllEventIDs.Count == thirdPartyEmailIds.Count && thirdPartyEmailIds.Count == thirdPartyTypes.Count)
+                    {
+                        Dictionary<string, List<string>> thirdPartyUserToeventId = new Dictionary<string, List<string>>();
+
+                        for (int i = 0; i < AllEventIDs.Count; i++)
+                        {
+                            string eventId = AllEventIDs[i];
+                            string userId = thirdPartyEmailIds[i];
+                            string thirdPartyType = thirdPartyTypes[i];
+                            if (EventID.isLikeTilerId(eventId)|| tilerCalendartype == thirdPartyType)
+                            {
+                                tilerIds.Add(eventId);
+                            }
+                            else
+                            {
+                                if(notValidUserId!=userId)
+                                {
+                                    List<string> thirdPartyIds = new List<string>();
+                                    if (!thirdPartyUserToeventId.ContainsKey(userId))
+                                    {
+                                        thirdPartyUserToeventId.Add(userId, thirdPartyIds);
+                                    }
+                                    else
+                                    {
+                                        thirdPartyIds = thirdPartyUserToeventId[userId];
+                                    }
+                                    thirdPartyIds.Add(eventId);
+                                }
+                            }
+                        }
+
+                        if (thirdPartyUserToeventId.Count > 0)
+                        {
+                            List<Task> waitForAllDeletions = new List<Task>();
+                            foreach (var eachUserIdToList in thirdPartyUserToeventId)
+                            {
+                                Models.ThirdPartyCalendarAuthenticationModel AllIndexedThirdParty = await getThirdPartyAuthentication(retrievedUser.UserID, eachUserIdToList.Key, "Google", db);
+                                GoogleTilerEventControl googleControl = new GoogleTilerEventControl(AllIndexedThirdParty, db);
+                                var waitTask = googleControl.deleteSubEvents(eachUserIdToList.Value);
+                                waitForAllDeletions.Add(waitTask);
+                            }
+
+                            foreach (var waitDeletion in waitForAllDeletions)
+                            {
+                                await waitDeletion.ConfigureAwait(false);
+                            }
+                        }
+
+                        if (tilerIds.Count > 0)
+                        {
+                            var tilerIdSet = new HashSet<string>(tilerIds);
+                            Task<Tuple<ThirdPartyControl.CalendarTool, IEnumerable<CalendarEvent>>> thirdPartyDataTask = ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(retrievedUser.UserID, db);
+                            DB_Schedule schedule = new DB_Schedule(retrievedUser, requestData.getRefNow(), calendarIds: tilerIdSet);
+                            schedule.CurrentLocation = requestData.getCurrentLocation();
+                            var thirdPartyData = await thirdPartyDataTask.ConfigureAwait(false);
+                            schedule.updateDataSetWithThirdPartyData(thirdPartyData);
+
+                            DB_UserActivity activity = new DB_UserActivity(requestData.getRefNow(), UserActivity.ActivityType.DeleteMultiple, AllEventIDs);
+                            JObject json = JObject.FromObject(requestData);
+                            activity.updateMiscelaneousInfo(json.ToString());
+                            activity.eventIds.AddRange(AllEventIDs);
+                            retrievedUser.ScheduleLogControl.updateUserActivty(activity);
+                            await schedule.deleteSubCalendarEvents(tilerIdSet);
+                            await schedule.WriteFullScheduleToLog().ConfigureAwait(false);
+                        }
+                        retValue = new PostBackData("\"Success\"", 0);
+                    } else
+                    {
+                        retValue = new PostBackData(CustomErrors.Errors.UserEmailNotMatchingSubEvent);
+                    }
+                }
+                else
+                {
+                    retValue = new PostBackData("\"Success\"", 0);
+                }
             }
             else
             {

@@ -837,7 +837,7 @@
             <summary>
             Marks a series of Event as complete. It takes a collection of IDs and then marks them as complete
             </summary>
-            <param name="UserData"></param>
+            <param name="requestData"></param>
             <returns></returns>
         </member>
         <member name="M:TilerFront.Controllers.ScheduleController.Now(TilerFront.Models.getEventModel)">
@@ -858,7 +858,7 @@
             <summary>
             Deletes a Sub event from Tiler. The deletion does not trigger a schedule readjustment.
             </summary>
-            <param name="myUser"></param>
+            <param name="eventModel"></param>
             <returns></returns>
         </member>
         <member name="M:TilerFront.Controllers.ScheduleController.HandleOptionsEvent(TilerFront.Models.getEventModel)">
@@ -872,7 +872,7 @@
             <summary>
             Deletes multiple subevents.
             </summary>
-            <param name="myUser"></param>
+            <param name="requestData"></param>
             <returns></returns>
         </member>
         <member name="M:TilerFront.Controllers.ScheduleController.HandleOptionsEvents(TilerFront.Models.getEventModel)">
