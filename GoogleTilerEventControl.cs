@@ -257,6 +257,21 @@ namespace TilerFront
             await CalendarServiceInfo.Events.Delete(EmailID, mySubEvent.ThirdPartyEventID).ExecuteAsync().ConfigureAwait(false);
         }
 
+        async public Task deleteSubEvents(IEnumerable<string> eventIds)
+        {
+            List<Task> deletionTasks = new List<Task>();
+            foreach(string eventId in eventIds)
+            {
+                var deletionTask = CalendarServiceInfo.Events.Delete(EmailID, eventId).ExecuteAsync();
+                deletionTasks.Add(deletionTask);
+            }
+
+            foreach(Task task in deletionTasks)
+            {
+                await task.ConfigureAwait(false);
+            }
+        }
+
         async public Task updateSubEvent(TilerFront.Models.EditCalEventModel mySubEvent)
         {
             Event googleEvent = CalendarServiceInfo.Events.Get(EmailID,mySubEvent.ThirdPartyEventID).Execute();

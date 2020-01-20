@@ -732,10 +732,27 @@ function RevealControlPanelSection(SelectedEvents)
         SendMessage();
         function SendMessage() {
             var TimeZone = new Date().getTimezoneOffset();
-            var AllIds = Object.keys(SelectedEvents).join(',');
+            let keyArray = [];
+            let thirdPartyUserIdArray = [];
+            let ThirdPartyTypeArray = [];
+            for(let key in SelectedEvents) {
+                keyArray.push(key);
+                let subEvent = SelectedEvents[key];
+                let userId = subEvent.ThirdPartyUserID;
+                let ThirdPartyType = subEvent.ThirdPartyType;
+                if(userId === null && ThirdPartyType !== "tiler") {
+                    userId = "not_valid_user@mytiler.com";
+                }
+                thirdPartyUserIdArray.push(userId);
+                ThirdPartyTypeArray.push(ThirdPartyType);
+            }
+            var AllIds = keyArray.join(',');
+            let thirdPartyUserIds= thirdPartyUserIdArray.join(',');
+            let ThirdPartyType = ThirdPartyTypeArray.join(',');
+            
 
             var DeletionEvent = {
-                UserName: UserCredentials.UserName, UserID: UserCredentials.ID, EventID: AllIds, TimeZoneOffset: TimeZone
+                UserName: UserCredentials.UserName, UserID: UserCredentials.ID, EventID: AllIds, TimeZoneOffset: TimeZone, thirdPartyUserId:thirdPartyUserIds, ThirdPartyType: ThirdPartyType
             };
             //var URL = "RootWagTap/time.top?WagCommand=6"
             var URL = global_refTIlerUrl + "Schedule/Events";
@@ -800,9 +817,29 @@ function RevealControlPanelSection(SelectedEvents)
             Url = global_refTIlerUrl + "Schedule/Events/Complete";
             var HandleNEwPage = new LoadingScreenControl("Tiler is updating your schedule ...");
             HandleNEwPage.Launch();
-            var AllIds = Object.keys(SelectedEvents).join(',');
+
+            let keyArray = [];
+            let thirdPartyUserIdArray = [];
+            let ThirdPartyTypeArray = [];
+
+
+            for(let key in SelectedEvents) {
+                keyArray.push(key);
+                let subEvent = SelectedEvents[key];
+                let userId = subEvent.ThirdPartyUserID;
+                let ThirdPartyType = subEvent.ThirdPartyType;
+                if(userId === null && ThirdPartyType !== "tiler") {
+                    userId = "not_valid_user@mytiler.com";
+                }
+                thirdPartyUserIdArray.push(userId);
+                ThirdPartyTypeArray.push(ThirdPartyType);
+            }
+            var AllIds = keyArray.join(',');
+            let thirdPartyUserIds= thirdPartyUserIdArray.join(',');
+            let ThirdPartyType = ThirdPartyTypeArray.join(',');
+
             var MarkAsCompleteData = {
-                UserName: UserCredentials.UserName, UserID: UserCredentials.ID, EventID: AllIds, TimeZoneOffset: TimeZone
+                UserName: UserCredentials.UserName, UserID: UserCredentials.ID, EventID: AllIds, TimeZoneOffset: TimeZone, thirdPartyUserId:thirdPartyUserIds, ThirdPartyType: ThirdPartyType
             };
             MarkAsCompleteData.TimeZone = moment.tz.guess()
             preSendRequestWithLocation(MarkAsCompleteData);
