@@ -162,12 +162,15 @@ function CallBackFunctionForReturnedValuesDesktop(data, DomContainer) {
         $(CompletionGraphOfSearchedEventContainer.Dom).addClass("CompletionGraphOfSearchedEventContainer");
 
         //var DoNowButtonOfSearchedEventContainerID = "DoNowButtonOfSearchedEventContainer" + CallBackFunctionForReturnedValuesDesktop.counter
-        var DoNowButtonOfSearchedEventContainer = PopulateDoNowButtonDom(myCalendarEvent)
+        
         //$(DoNowButtonOfSearchedEventContainer.Dom).addClass("DoNowButtonOfSearchedEventContainer");
 
 
         TopPanelContainerContainer.Dom.appendChild(NameOfSearchedEventContainer.Dom);
+        var DoNowButtonOfSearchedEventContainer = PopulateDoNowButtonDom(myCalendarEvent);
         TopPanelContainerContainer.Dom.appendChild(DoNowButtonOfSearchedEventContainer.Dom);
+        
+        
 
 
         //var DeadlineOfSearchedEventContainerID = "DeadlineOfSearchedEventContainer" + CallBackFunctionForReturnedValuesDesktop.counter
@@ -246,10 +249,13 @@ function CallBackFunctionForReturnedValuesDesktop(data, DomContainer) {
         var CompletionButton = MyIconSet.getCompleteButton();
         CompletionButton.onclick = function () {
             prepCompletion(MyCalendarEVent)();
+        };
+
+
+        if(MyCalendarEVent.canDoNow) {
+            DoNowButtonOfSearchedEventContainer.Dom.appendChild(DoNowButtonOfSearchedEventImage.Dom)
         }
-
-
-        DoNowButtonOfSearchedEventContainer.Dom.appendChild(DoNowButtonOfSearchedEventImage.Dom)
+        
         DoNowButtonOfSearchedEventContainer.Dom.appendChild(MyIconSet.getIconSetContainer());
 
         

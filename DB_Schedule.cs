@@ -141,7 +141,7 @@ namespace TilerFront
                 }
             }
 
-            await myAccount.Commit(getAllCalendarEvents(), newCalendarEvent, EventID.LatestID.ToString(), this.Now, myAccount.getTilerUser().TravelCache).ConfigureAwait(false);
+            await myAccount.Commit(getAllCalendarEvents(), newCalendarEvent, EventID.LatestID.ToString(), this.Now, this.TravelCache ?? myAccount.getTilerUser().TravelCache).ConfigureAwait(false);
         }
 
         virtual public bool isScheduleLoadSuccessful
