@@ -1,5 +1,5 @@
 ﻿//#define UseDefaultLocation
-#define liveDebugging
+//#define liveDebugging
 
 using System;
 using System.Collections.Generic;
@@ -688,11 +688,11 @@ namespace TilerFront
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Access_DB"));
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.Access_DB;
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("IniStartTime"));
-            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.Ini_StartTime_EventDB.ToString();
+            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.InitialStartTime_DB.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("IniEndTime"));
-            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.Ini_EndTime_EventDB.ToString();
-            MyEventScheduleNode.PrependChild(xmldoc.CreateElement("TimeLineUpdates"));
-            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.TimeLineUpdates_DB.ToString();
+            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.InitialEndTime_DB.ToString();
+            MyEventScheduleNode.PrependChild(xmldoc.CreateElement("UpdateHistory"));
+            MyEventScheduleNode.ChildNodes[0].InnerText = CreateUpdateHistory(MyEvent.UpdateHistory)?.InnerXml;
 
             if (MyEvent.getIsEventRestricted)
             {
@@ -929,9 +929,9 @@ namespace TilerFront
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("isTardy"));
             MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.isTardy.ToString();
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("IniStartTime"));
-            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.Ini_StartTime_EventDB.ToString();
+            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.InitialStartTime_DB.ToString();
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("IniEndTime"));
-            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.Ini_EndTime_EventDB.ToString();
+            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.InitialEndTime_DB.ToString();
 
 
             if (MySubEvent.getIsEventRestricted)
@@ -995,7 +995,26 @@ namespace TilerFront
             {
                 return null;
             }
-            
+        }
+
+        public XmlElement CreateUpdateHistory(UpdateHistory updateHistory, string ElementIdentifier = "UpdateHistory")
+        {
+            if (updateHistory != null)
+            {
+                XmlSerializer serializer = new XmlSerializer(typeof(UpdateHistory));
+                XmlDocument xmldoc = new XmlDocument();
+                XmlElement retValue = xmldoc.CreateElement(ElementIdentifier);
+                using (XmlWriter writer = xmldoc.CreateNavigator().AppendChild())
+                {
+                    serializer.Serialize(writer, updateHistory);
+                }
+                retValue.InnerXml = xmldoc.FirstChild.InnerXml;
+                return retValue;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         public XmlElement CreateLocationNode(TilerElements.Location Arg1, string Identifier = "Location")
@@ -1745,6 +1764,7 @@ namespace TilerFront
                         .Include(subEvent => subEvent.Procrastination_EventDB)
                         .Include(subEvent => subEvent.Location_DB)
                         .Include(subEvent => subEvent.ParentCalendarEvent.DayPreference_DB)
+                        .Include(subEvent => subEvent.ParentCalendarEvent.UpdateHistory_DB)
                         //.Include(subEvent => subEvent.ParentCalendarEvent.ProfileOfNow_EventDB)
                         //.Include(subEvent => subEvent.ParentCalendarEvent.Procrastination_EventDB)
                         //.Include(subEvent => subEvent.ParentCalendarEvent.Location_DB)
@@ -2288,8 +2308,10 @@ namespace TilerFront
             PrepTime = TimeSpan.Parse(EventScheduleNode.SelectSingleNode("PrepTime").InnerText);
             Completed = EventScheduleNode.SelectSingleNode("Completed").InnerText;
             EnableFlag = EventScheduleNode.SelectSingleNode("Enabled").InnerText;
-            DateTimeOffset iniStartTime = Utility.ParseTime(EventScheduleNode.SelectSingleNode("IniStartTime")?.InnerText);
-            DateTimeOffset iniEndTime = Utility.ParseTime(EventScheduleNode.SelectSingleNode("IniEndTime")?.InnerText);
+            string iniStartTimeString = EventScheduleNode.SelectSingleNode("IniStartTime")?.InnerText;
+            string iniEndTimeString = EventScheduleNode.SelectSingleNode("IniEndTime")?.InnerText;
+            long iniStartTime = iniStartTimeString.isNot_NullEmptyOrWhiteSpace() ? Convert.ToInt64(iniStartTimeString) : -1;
+            long iniEndTime = iniEndTimeString.isNot_NullEmptyOrWhiteSpace() ? Convert.ToInt64(iniEndTimeString) : -1;
             string timeLineUpdates = EventScheduleNode.SelectSingleNode("TimeLineUpdates")?.InnerText;
 
 
@@ -2357,6 +2379,7 @@ namespace TilerFront
             SubCalendarEvent[] AllSubCalEvents = ReadSubSchedulesFromXMLNode(EventScheduleNode.SelectSingleNode("EventSubSchedules"), RetrievedEvent).ToArray();
             XmlNode restrictedNode = EventScheduleNode.SelectSingleNode("Restricted");
             XmlNode eventPreferenceNode = EventScheduleNode.SelectSingleNode("EventPreference");
+            XmlNode updateHistoryNode = EventScheduleNode.SelectSingleNode("UpdateHistory");
 
             XmlNode calendarTypeNode = EventScheduleNode.SelectSingleNode("ThirdpartyType");
             if (calendarTypeNode != null)
@@ -2429,7 +2452,20 @@ namespace TilerFront
             {
                 eventPreference = EventPreference.NullInstance;
             }
+
+            UpdateHistory updateHistory = null;
+            if (updateHistoryNode != null && !string.IsNullOrEmpty(updateHistoryNode.InnerXml) && !string.IsNullOrWhiteSpace(updateHistoryNode.InnerXml))
+            {
+                updateHistory = getupdateHistory(updateHistoryNode);
+            }
+            else
+            {
+                eventPreference = EventPreference.NullInstance;
+            }
+            
             RetrievedEvent.DayPreference_DB = eventPreference;
+
+            RetrievedEvent.UpdateHistory_DB = updateHistory;
 
             RetrievedEvent.InitializeCounts(DeleteCount, CompleteCount);
 
@@ -2463,9 +2499,8 @@ namespace TilerFront
             
 
 
-            RetrievedEvent.Ini_StartTime_EventDB = iniStartTime;
-            RetrievedEvent.Ini_EndTime_EventDB= iniEndTime;
-            RetrievedEvent.TimeLineUpdates_DB = timeLineUpdates;
+            RetrievedEvent.InitialStartTime_DB = iniStartTime;
+            RetrievedEvent.InitialEndTime_DB= iniEndTime;
 
             return RetrievedEvent;
         }
@@ -2518,6 +2553,23 @@ namespace TilerFront
             xRoot.IsNullable = true;
             XmlSerializer ser = new XmlSerializer(typeof(EventPreference), xRoot);
             EventPreference result = (ser.Deserialize(stm) as EventPreference);
+
+            return result;
+        }
+
+        public UpdateHistory getupdateHistory(XmlNode UpdateHistoryNode)
+        {
+            MemoryStream stm = new MemoryStream();
+            StreamWriter stw = new StreamWriter(stm);
+            stw.Write(UpdateHistoryNode.OuterXml);
+            stw.Flush();
+
+            stm.Position = 0;
+            XmlRootAttribute xRoot = new XmlRootAttribute();
+            xRoot.ElementName = UpdateHistoryNode.Name;
+            xRoot.IsNullable = true;
+            XmlSerializer ser = new XmlSerializer(typeof(EventPreference), xRoot);
+            UpdateHistory result = (ser.Deserialize(stm) as UpdateHistory);
 
             return result;
         }
