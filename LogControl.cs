@@ -1765,6 +1765,7 @@ namespace TilerFront
                         .Include(subEvent => subEvent.Location_DB)
                         .Include(subEvent => subEvent.ParentCalendarEvent.DayPreference_DB)
                         .Include(subEvent => subEvent.ParentCalendarEvent.UpdateHistory_DB)
+                        .Include(subEvent => subEvent.ParentCalendarEvent.UpdateHistory_DB.TimeLines_DB)
                         //.Include(subEvent => subEvent.ParentCalendarEvent.ProfileOfNow_EventDB)
                         //.Include(subEvent => subEvent.ParentCalendarEvent.Procrastination_EventDB)
                         //.Include(subEvent => subEvent.ParentCalendarEvent.Location_DB)
@@ -1828,6 +1829,8 @@ namespace TilerFront
                             .Include(calEvent => calEvent.RepeatParentEvent)
                             .Include(calEvent => calEvent.Location_DB)
                             .Include(calEvent => calEvent.AllSubEvents_DB)
+                            .Include(calEvent => calEvent.UpdateHistory_DB)
+                            .Include(calEvent => calEvent.UpdateHistory_DB.TimeLines_DB)
                             .Where(calEvent => calEvent.IsEnabled_DB && !calEvent.Complete_EventDB)
                         ;
                     }
@@ -2352,8 +2355,8 @@ namespace TilerFront
             {
                 if (!procrastinationEventFlag)
                 {
-                    RetrievedEvent = new RigidCalendarEvent(//new EventID(ID), 
-                    Name, start, end, CalendarEventDuration, PreDeadline, PrepTime, Recurrence, location, UiData, noteData, EVentEnableFlag, completedFlag, creator, userGroup, timeZone, new EventID(ID), NowProfileData);
+                    RetrievedEvent = new RigidCalendarEvent(
+                    Name, start, end, CalendarEventDuration, PreDeadline, PrepTime, Recurrence, location, UiData, noteData, EVentEnableFlag, completedFlag, creator, userGroup, timeZone, new EventID(ID), NowProfileData, null);
                 }
 
 
@@ -2362,7 +2365,7 @@ namespace TilerFront
             }
             else
             {
-                RetrievedEvent = new CalendarEvent(Name, start, end, CalendarEventDuration, PreDeadline, PrepTime, Split, Recurrence, location, UiData, noteData, procrastinationData, NowProfileData, EVentEnableFlag, completedFlag, creator, userGroup, timeZone, new EventID(ID));
+                RetrievedEvent = new CalendarEvent(Name, start, end, CalendarEventDuration, PreDeadline, PrepTime, Split, Recurrence, location, UiData, noteData, procrastinationData, NowProfileData, EVentEnableFlag, completedFlag, creator, userGroup, timeZone, new EventID(ID), null);
             }
 
             if (rigidFlag && procrastinationEventFlag)

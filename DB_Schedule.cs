@@ -218,8 +218,7 @@ namespace TilerFront
             EventName tempEventName = new EventName(null, null, "TempEvent");
             TilerUser user = this.TilerUser;
             CalendarEvent TempEvent = new CalendarEvent(
-                //EventID.GenerateCalendarEvent(), 
-                tempEventName, newSubeEvent.Start, newSubeEvent.End, fiveMinSpan, new TimeSpan(), new TimeSpan(), 1, new Repetition(), new Location(), new EventDisplay(), new MiscData(), null, new NowProfile(), true, false, user, new TilerUserGroup(), user.TimeZone, null);
+                tempEventName, newSubeEvent.Start, newSubeEvent.End, fiveMinSpan, new TimeSpan(), new TimeSpan(), 1, new Repetition(), new Location(), new EventDisplay(), new MiscData(), null, new NowProfile(), true, false, user, new TilerUserGroup(), user.TimeZone, null, null);
             tempEventName.Creator_EventDB = TempEvent.getCreator;
             tempEventName.AssociatedEvent = TempEvent;
             AddToSchedule(TempEvent);
@@ -255,7 +254,7 @@ namespace TilerFront
                 EventName tempEventName = new EventName(null, null, "TempEvent");
                 TilerUser user = TilerUser;
                 CalendarEvent TempEvent = new CalendarEvent(
-                    tempEventName, newSubeEvent.Start, newSubeEvent.End, fiveMinSpan, new TimeSpan(), new TimeSpan(), 1, new Repetition(), new Location(), new EventDisplay(), new MiscData(), null, new NowProfile(), true, false, user, new TilerUserGroup(), user.TimeZone, null);
+                    tempEventName, newSubeEvent.Start, newSubeEvent.End, fiveMinSpan, new TimeSpan(), new TimeSpan(), 1, new Repetition(), new Location(), new EventDisplay(), new MiscData(), null, new NowProfile(), true, false, user, new TilerUserGroup(), user.TimeZone, null, null);
                 tempEventName.Creator_EventDB = TempEvent.getCreator;
                 tempEventName.AssociatedEvent = TempEvent;
                 AddToSchedule(TempEvent);
