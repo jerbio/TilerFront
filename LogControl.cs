@@ -692,7 +692,7 @@ namespace TilerFront
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("IniEndTime"));
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.InitialEndTime_DB.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("UpdateHistory"));
-            MyEventScheduleNode.ChildNodes[0].InnerText = CreateUpdateHistory(MyEvent.UpdateHistory)?.InnerXml;
+            MyEventScheduleNode.ChildNodes[0].InnerText = CreateUpdateHistory(MyEvent.TimeLineHistory)?.InnerXml;
 
             if (MyEvent.getIsEventRestricted)
             {
@@ -997,11 +997,11 @@ namespace TilerFront
             }
         }
 
-        public XmlElement CreateUpdateHistory(UpdateHistory updateHistory, string ElementIdentifier = "UpdateHistory")
+        public XmlElement CreateUpdateHistory(TimeLineHistory updateHistory, string ElementIdentifier = "UpdateHistory")
         {
             if (updateHistory != null)
             {
-                XmlSerializer serializer = new XmlSerializer(typeof(UpdateHistory));
+                XmlSerializer serializer = new XmlSerializer(typeof(TimeLineHistory));
                 XmlDocument xmldoc = new XmlDocument();
                 XmlElement retValue = xmldoc.CreateElement(ElementIdentifier);
                 using (XmlWriter writer = xmldoc.CreateNavigator().AppendChild())
@@ -1764,8 +1764,8 @@ namespace TilerFront
                         .Include(subEvent => subEvent.Procrastination_EventDB)
                         .Include(subEvent => subEvent.Location_DB)
                         .Include(subEvent => subEvent.ParentCalendarEvent.DayPreference_DB)
-                        .Include(subEvent => subEvent.ParentCalendarEvent.UpdateHistory_DB)
-                        .Include(subEvent => subEvent.ParentCalendarEvent.UpdateHistory_DB.TimeLines_DB)
+                        .Include(subEvent => subEvent.ParentCalendarEvent.TimeLineHistory_DB)
+                        .Include(subEvent => subEvent.ParentCalendarEvent.TimeLineHistory_DB.TimeLines_DB)
                         //.Include(subEvent => subEvent.ParentCalendarEvent.ProfileOfNow_EventDB)
                         //.Include(subEvent => subEvent.ParentCalendarEvent.Procrastination_EventDB)
                         //.Include(subEvent => subEvent.ParentCalendarEvent.Location_DB)
@@ -1829,8 +1829,8 @@ namespace TilerFront
                             .Include(calEvent => calEvent.RepeatParentEvent)
                             .Include(calEvent => calEvent.Location_DB)
                             .Include(calEvent => calEvent.AllSubEvents_DB)
-                            .Include(calEvent => calEvent.UpdateHistory_DB)
-                            .Include(calEvent => calEvent.UpdateHistory_DB.TimeLines_DB)
+                            .Include(calEvent => calEvent.TimeLineHistory_DB)
+                            .Include(calEvent => calEvent.TimeLineHistory_DB.TimeLines_DB)
                             .Where(calEvent => calEvent.IsEnabled_DB && !calEvent.Complete_EventDB)
                         ;
                     }
@@ -2456,7 +2456,7 @@ namespace TilerFront
                 eventPreference = EventPreference.NullInstance;
             }
 
-            UpdateHistory updateHistory = null;
+            TimeLineHistory updateHistory = null;
             if (updateHistoryNode != null && !string.IsNullOrEmpty(updateHistoryNode.InnerXml) && !string.IsNullOrWhiteSpace(updateHistoryNode.InnerXml))
             {
                 updateHistory = getupdateHistory(updateHistoryNode);
@@ -2468,7 +2468,7 @@ namespace TilerFront
             
             RetrievedEvent.DayPreference_DB = eventPreference;
 
-            RetrievedEvent.UpdateHistory_DB = updateHistory;
+            RetrievedEvent.TimeLineHistory_DB = updateHistory;
 
             RetrievedEvent.InitializeCounts(DeleteCount, CompleteCount);
 
@@ -2560,7 +2560,7 @@ namespace TilerFront
             return result;
         }
 
-        public UpdateHistory getupdateHistory(XmlNode UpdateHistoryNode)
+        public TimeLineHistory getupdateHistory(XmlNode UpdateHistoryNode)
         {
             MemoryStream stm = new MemoryStream();
             StreamWriter stw = new StreamWriter(stm);
@@ -2572,7 +2572,7 @@ namespace TilerFront
             xRoot.ElementName = UpdateHistoryNode.Name;
             xRoot.IsNullable = true;
             XmlSerializer ser = new XmlSerializer(typeof(EventPreference), xRoot);
-            UpdateHistory result = (ser.Deserialize(stm) as UpdateHistory);
+            TimeLineHistory result = (ser.Deserialize(stm) as TimeLineHistory);
 
             return result;
         }
