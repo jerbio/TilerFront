@@ -691,8 +691,12 @@ namespace TilerFront
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.InitialStartTime_DB.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("IniEndTime"));
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.InitialEndTime_DB.ToString();
-            MyEventScheduleNode.PrependChild(xmldoc.CreateElement("UpdateHistory"));
-            MyEventScheduleNode.ChildNodes[0].InnerText = CreateUpdateHistory(MyEvent.TimeLineHistory)?.InnerXml;
+            if(!MyEvent.isThirdParty)
+            {
+                MyEventScheduleNode.PrependChild(xmldoc.CreateElement("UpdateHistory"));
+                MyEventScheduleNode.ChildNodes[0].InnerText = CreateUpdateHistory(MyEvent.TimeLineHistory)?.InnerXml;
+            }
+            
 
             if (MyEvent.getIsEventRestricted)
             {
@@ -999,14 +1003,15 @@ namespace TilerFront
 
         public XmlElement CreateUpdateHistory(TimeLineHistory updateHistory, string ElementIdentifier = "UpdateHistory")
         {
-            if (updateHistory != null)
+            var updateHistory_copy = updateHistory.CreateCopy();
+            if (updateHistory_copy != null)
             {
                 XmlSerializer serializer = new XmlSerializer(typeof(TimeLineHistory));
                 XmlDocument xmldoc = new XmlDocument();
                 XmlElement retValue = xmldoc.CreateElement(ElementIdentifier);
                 using (XmlWriter writer = xmldoc.CreateNavigator().AppendChild())
                 {
-                    serializer.Serialize(writer, updateHistory);
+                    serializer.Serialize(writer, updateHistory_copy);
                 }
                 retValue.InnerXml = xmldoc.FirstChild.InnerXml;
                 return retValue;
@@ -1962,6 +1967,8 @@ namespace TilerFront
                                 )
                         )
                         .Include(subEvent => subEvent.ParentCalendarEvent.RepeatParentEvent)
+                        .Include(subEvent => subEvent.ParentCalendarEvent.TimeLineHistory_DB)
+                        .Include(subEvent => subEvent.ParentCalendarEvent.TimeLineHistory_DB.TimeLines_DB)
                         .Include(subEvent => subEvent.RepeatParentEvent)
                         ;
 
@@ -2019,6 +2026,8 @@ namespace TilerFront
                     .Include(calendarEvent => calendarEvent.DayPreference_DB)
                     .Include(calendarEvent => calendarEvent.Procrastination_EventDB)
                     .Include(calendarEvent => calendarEvent.RestrictionProfile_DB)
+                    .Include(calendarEvent => calendarEvent.TimeLineHistory_DB)
+                    .Include(calendarEvent => calendarEvent.TimeLineHistory_DB.TimeLines_DB)
                     ,
                     calEventId => calEventId,
                     dbCalEvent => dbCalEvent.Id,
@@ -2461,10 +2470,6 @@ namespace TilerFront
             {
                 updateHistory = getupdateHistory(updateHistoryNode);
             }
-            else
-            {
-                eventPreference = EventPreference.NullInstance;
-            }
             
             RetrievedEvent.DayPreference_DB = eventPreference;
 
@@ -2571,7 +2576,7 @@ namespace TilerFront
             XmlRootAttribute xRoot = new XmlRootAttribute();
             xRoot.ElementName = UpdateHistoryNode.Name;
             xRoot.IsNullable = true;
-            XmlSerializer ser = new XmlSerializer(typeof(EventPreference), xRoot);
+            XmlSerializer ser = new XmlSerializer(typeof(TimeLineHistory), xRoot);
             TimeLineHistory result = (ser.Deserialize(stm) as TimeLineHistory);
 
             return result;
@@ -2654,8 +2659,17 @@ namespace TilerFront
                 ID = EventID.convertToSubcalendarEventID(MyXmlNode.ChildNodes[i].SelectSingleNode("ID").InnerText).ToString();
                 Start = Utility.ParseTime(MyXmlNode.ChildNodes[i].SelectSingleNode("ActiveStartTime").InnerText);
                 End = Utility.ParseTime(MyXmlNode.ChildNodes[i].SelectSingleNode("ActiveEndTime").InnerText);
-                DateTimeOffset iniStartTime = Utility.ParseTime(MyXmlNode.ChildNodes[i].SelectSingleNode("IniStartTime").InnerText);
-                DateTimeOffset iniEndTime = Utility.ParseTime(MyXmlNode.ChildNodes[i].SelectSingleNode("IniEndTime").InnerText);
+
+                string iniStartTimeString = MyXmlNode.ChildNodes[i].SelectSingleNode("IniStartTime")?.InnerText;
+                string iniEndTimeString = MyXmlNode.ChildNodes[i].SelectSingleNode("IniEndTime")?.InnerText;
+
+
+                long iniStartTimeInMs = iniStartTimeString.isNot_NullEmptyOrWhiteSpace() ? Convert.ToInt64(iniStartTimeString) : -1;
+                long iniEndTimeInMS = iniEndTimeString.isNot_NullEmptyOrWhiteSpace() ? Convert.ToInt64(iniEndTimeString) : -1;
+
+
+                DateTimeOffset iniStartTime = DateTimeOffset.FromUnixTimeMilliseconds(iniStartTimeInMs);
+                DateTimeOffset iniEndTime = DateTimeOffset.FromUnixTimeMilliseconds(iniEndTimeInMS);
 
                 bool rigidFlag = MyParent.isRigid;
                 XmlNode rigidNode = MyXmlNode.ChildNodes[i].SelectSingleNode("Rigid");
@@ -2778,6 +2792,9 @@ namespace TilerFront
                 {
                     retrievedSubEvent.RepetitionLock_DB = Convert.ToBoolean(RepetitionLockNode.InnerText);
                 }
+
+                retrievedSubEvent.InitialStartTime_DB = iniStartTimeInMs;
+                retrievedSubEvent.InitialEndTime_DB = iniEndTimeInMS;
 
                 createReasonObjects(retrievedSubEvent, MyXmlNode.ChildNodes[i]);
             }
@@ -3119,6 +3136,8 @@ namespace TilerFront
                     .Include(calEvent => calEvent.ProfileOfNow_EventDB)
                     .Include(calEvent => calEvent.Procrastination_EventDB)
                     .Include(calEvent => calEvent.DayPreference_DB)
+                    .Include(calEvent => calEvent.TimeLineHistory_DB)
+                    .Include(calEvent => calEvent.TimeLineHistory_DB.TimeLines_DB)
                     .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents)
                     .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB))
                     .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.ProfileOfNow_EventDB))
