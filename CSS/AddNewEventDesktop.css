@@ -99,6 +99,14 @@ p { margin: 0}
 }
 
 
+.SubmitButton:focus[disabled="disabled"],
+  .SubmitButton:hover[disabled="disabled"] {
+  border: 1px transparent solid;
+  outline: none;
+  background-color: gray;
+}
+
+
 /* Placeholder CSS */
 ::-webkit-input-placeholder {
   color: black;

@@ -24,6 +24,7 @@ var ClassicUIOptions = { Init: function () { }, RenderOnSubEventClick: renderCla
 var ListUIOptions = { Init: InitializeListUIEffects, RenderOnSubEventClick: renderSubEventsClickEvents, RenderSubEvent: renderSideBarEvents, RenderTimeInformation: RenderListTimeInformation, ConflictCalculation: DoSideBarsInterSect, ClearUIEffects: ResetListUIEffects,DisplayFullGrid:false, ButtonID: "ListViewButton" }
 
 var AllUIOptions = [ListUIOptions, ClassicUIOptions];
+let PreviewtDataDict = {}
 
 $(document).ready(function () {
     LaumchUIOPtion(0);
@@ -652,6 +653,11 @@ function RevealControlPanelSection(SelectedEvents)
     $(global_ControlPanelIconSet.getIconSetContainer())
 
     $('#ControlPanelContainer').slideDown(500);
+
+    Object.keys(PreviewtDataDict).forEach((key) => {
+        let preview = PreviewtDataDict[key];
+        preview.hide();
+    })
 
     function resetButtons() {
         yeaButton.onclick = null;
@@ -3413,13 +3419,30 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
             global_previousSelectedSubCalEvent = new Array();
         }
 
+
+        function isProcrastinateInputValueVallid () {
+            var HourInput = getDomOrCreateNew("procrastinateHours").value == "" ? 0 : getDomOrCreateNew("procrastinateHours").value;
+            var MinInput = getDomOrCreateNew("procrastinateMins").value == "" ? 0 : getDomOrCreateNew("procrastinateMins").value;
+            var DayInput = getDomOrCreateNew("procrastinateDays").value == "" ? 0 : getDomOrCreateNew("procrastinateDays").value;
+            let durationInMs = (OneHourInMs * HourInput) + (MinInput * OneMinInMs) + (DayInput * OneDayInMs);
+            let retValue = durationInMs > 0;
+            return retValue;
+        }
+
         function getProcrastinateSingleEventData(SubEvent) {
             var HourInput = getDomOrCreateNew("procrastinateHours").value == "" ? 0 : getDomOrCreateNew("procrastinateHours").value;
             var MinInput = getDomOrCreateNew("procrastinateMins").value == "" ? 0 : getDomOrCreateNew("procrastinateMins").value;
             var DayInput = getDomOrCreateNew("procrastinateDays").value == "" ? 0 : getDomOrCreateNew("procrastinateDays").value;
             let durationInMs = (OneHourInMs * HourInput) + (MinInput * OneMinInMs) + (DayInput * OneDayInMs);
+            let isValid = durationInMs > 0
             var TimeZone = new Date().getTimezoneOffset();
-            var retValue = { UserName: UserCredentials.UserName, UserID: UserCredentials.ID, EventID: SubEvent.ID, DurationInMs: durationInMs , TimeZoneOffset: TimeZone };
+            var retValue = { UserName: UserCredentials.UserName, 
+                UserID: UserCredentials.ID,
+                EventID: SubEvent.ID, 
+                DurationInMs: durationInMs, 
+                TimeZoneOffset: TimeZone,
+                isValid: isValid
+            };
             retValue.TimeZone = moment.tz.guess();
             return retValue;
         }
@@ -3429,12 +3452,15 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
             var MinInput = getDomOrCreateNew("procrastinateMins").value == "" ? 0 : getDomOrCreateNew("procrastinateMins").value;
             var DayInput = getDomOrCreateNew("procrastinateDays").value == "" ? 0 : getDomOrCreateNew("procrastinateDays").value;
             let durationInMs = (OneHourInMs * HourInput) + (MinInput * OneMinInMs) + (DayInput * OneDayInMs);
+            let isValid = durationInMs > 0
             var TimeZone = new Date().getTimezoneOffset();
             var retValue = { 
                 UserName: UserCredentials.UserName, 
                 UserID: UserCredentials.ID,
                 DurationInMs: durationInMs, 
-                TimeZoneOffset: TimeZone };
+                TimeZoneOffset: TimeZone,
+                isValid: isValid
+            };
             retValue.TimeZone = moment.tz.guess();
             return retValue;
         }
@@ -3639,9 +3665,20 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                     closeControlPanel();
                 }*/
 
+
+
                 var InfoPanelOverLay = getDomOrCreateNew("InfoPanelOverLay")
                 removeLowerBarIconSetCOntainer();
                 revealControlInfoContainer()
+
+                Object.keys(PreviewtDataDict).forEach((key) => {
+                    let preview = PreviewtDataDict[key];
+                    preview.hide();
+                })
+
+                closeProcrastinatePanel()
+
+
                 var BasePanel = generateBasePanel();
             
 
@@ -3719,6 +3756,50 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
 
 
 
+                let HourInputDom = getDomOrCreateNew("procrastinateHours");
+                let MinInput = getDomOrCreateNew("procrastinateMins");
+                let DayInput = getDomOrCreateNew("procrastinateDays");
+
+
+                function processProcrastinateButton() {
+                    let isValid = isProcrastinateInputValueVallid();
+                    if(isValid) {
+                        $(ProcastinationButton).attr("disabled", false);
+                    } else {
+                        $(ProcastinationButton).attr("disabled", true);
+                    }
+                }
+
+                function processPreviewButton() {
+                    let isValid = isProcrastinateInputValueVallid();
+                    if(isValid) {
+                        $(PreviewProcrastinationButton).attr("disabled", false);
+                    } else {
+                        $(PreviewProcrastinationButton).attr("disabled", true);
+                    }
+                }
+
+                processProcrastinateButton();
+                processPreviewButton();
+
+
+                $(HourInputDom).change(() => {
+                    processProcrastinateButton();
+                    processPreviewButton();
+                })
+
+                $(MinInput).change(() => {
+                    processProcrastinateButton();
+                    processPreviewButton();
+                })
+
+                $(DayInput).change(() => {
+                    processProcrastinateButton();
+                    processPreviewButton();
+                })
+
+
+                
 
                 ProcastinationButton.onclick = function () {
                     procrastinateEvent();
@@ -3808,7 +3889,11 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
 
                     previewButon.Dom.onclick = function () {
                         let previewDom = getDomOrCreateNew("InlineDayPreviewContainer");
-                        let preview = new Preview(SubEvent.ID, previewDom.Dom);
+                        let preview = PreviewtDataDict [SubEvent.ID];
+                        if(!preview) {
+                            let preview = new Preview(SubEvent.ID, previewDom.Dom);
+                            PreviewtDataDict[SubEvent.ID] = preview;
+                        }
                         preview.editSubEvent();
                     }
 
@@ -4399,11 +4484,15 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                     openPreview(previewData);
                 }
 
-                processPreview.currentData = {}
+                
                 
                 function previewProcrastinate() {
                     let previewDom = getDomOrCreateNew("InlineDayPreviewContainer");
-                    let preview = new Preview(SubEvent.ID, previewDom.Dom);
+                    let preview = PreviewtDataDict [SubEvent.ID];
+                    if(!preview) {
+                        preview = new Preview(SubEvent.ID, previewDom.Dom);
+                        PreviewtDataDict [SubEvent.ID] = preview;
+                    }
                     preview.procrastinateEvent();
                 }
 

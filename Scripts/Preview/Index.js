@@ -83,47 +83,58 @@
         this.startLoading();
         let endLoading = this.endLoading;
 
-        let request = $.ajax({
-            type: "POST",
-            url: Url,
-            data: postData,
-            // DO NOT SET CONTENT TYPE to json
-            // contentType: "application/json; charset=utf-8", 
-            // DataType needs to stay, otherwise the response object
-            // will be treated as a single string
-            //dataType: "json",
-            success: (response) => {
-                //PreviewDay.processPreviewRequest(response.Content);
-                let previewDays = PreviewDay.convertPreviewResponseToPreviewDays(response.Content);
-                this.processPreviewDays(previewDays);    
-                this.show();
-                var myContainer = (response);
-                if (myContainer.Error.code == 0) {
-                    //exitSelectedEventScreen();
-                }
-                else {
-                    var NewMessage = myContainer.Error && myContainer.Error.code && myContainer.Error.Message ? myContainer.Error.Message : "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
-                    var ExitAfter = {
-                        ExitNow: true, Delay: 5000
-                    };
-                }
-                this.endLoading();
-            },
-            error: (err) => {
-                var myError = err;
-                var step = "err";
-                var NewMessage = err.Error && err.Error.code && err.Error.Message ? err.Error.Message : "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
-                var ExitAfter = {
-                    ExitNow: true, Delay: 1000
-                };
-                this.endLoading();
-            }
 
-        }).done(
-            () => {
-                this._afterPreveiwRequestCompletes();
-            }
-        );
+        
+
+        setTimeout(() => {
+            let previewDays = Preview.generateRandomPreviewDays();
+            this.processPreviewDays(previewDays);
+            this.show();
+            this.endLoading();
+        }, 500);
+        
+
+        // let request = $.ajax({
+        //     type: "POST",
+        //     url: Url,
+        //     data: postData,
+        //     // DO NOT SET CONTENT TYPE to json
+        //     // contentType: "application/json; charset=utf-8", 
+        //     // DataType needs to stay, otherwise the response object
+        //     // will be treated as a single string
+        //     //dataType: "json",
+        //     success: (response) => {
+        //         //PreviewDay.processPreviewRequest(response.Content);
+        //         let previewDays = PreviewDay.convertPreviewResponseToPreviewDays(response.Content);
+        //         this.processPreviewDays(previewDays);    
+        //         this.show();
+        //         var myContainer = (response);
+        //         if (myContainer.Error.code == 0) {
+        //             //exitSelectedEventScreen();
+        //         }
+        //         else {
+        //             var NewMessage = myContainer.Error && myContainer.Error.code && myContainer.Error.Message ? myContainer.Error.Message : "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
+        //             var ExitAfter = {
+        //                 ExitNow: true, Delay: 5000
+        //             };
+        //         }
+        //         this.endLoading();
+        //     },
+        //     error: (err) => {
+        //         var myError = err;
+        //         var step = "err";
+        //         var NewMessage = err.Error && err.Error.code && err.Error.Message ? err.Error.Message : "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
+        //         var ExitAfter = {
+        //             ExitNow: true, Delay: 1000
+        //         };
+        //         this.endLoading();
+        //     }
+
+        // }).done(
+        //     () => {
+        //         this._afterPreveiwRequestCompletes();
+        //     }
+        // );
     }
 
     procrastinateAll() {
@@ -187,7 +198,7 @@
 
     }
 
-    generateRandomPreviewDays() {
+    static generateRandomPreviewDays() {
         let today = new PreviewDay();
         today.start = (new Date().setHours(0,0,0,0));
         let tomorrow  = new PreviewDay();
@@ -215,11 +226,21 @@
         this.isLoading = false;
         let loadingBarId = "PreviewLoading";
         let loadingBar = getDomOrCreateNew(loadingBarId);
-        $(loadingBar).removeClass("active")
+        $(loadingBar).removeClass("active");
     }
 
     show() {
         $(this.UIContainer.parentNode).addClass('active');// this will be unnecessary. The goal is what ever container is provided as UIContainer, will append our generated preview node as the child node. If there is no container then this defaults to sliding out of the subevent infomration.
+        $(this.UIContainer.parentNode).removeClass('inActive');
+        let closePreviewButton = getDomOrCreateNew("closePreview");
+        closePreviewButton.innerHTML = "Close"
+        closePreviewButton.onclick = this.hide.bind(this);
+    }
+
+    hide() {
+        $(this.UIContainer.parentNode).removeClass('active');// this will be unnecessary. The goal is what ever container is provided as UIContainer, will append our generated preview node as the child node. If there is no container then this defaults to sliding out of the subevent infomration.
+        $(this.UIContainer.parentNode).addClass("inActive");
+        $(this.UIContainer).empty();
     }
 
     sleepRendering(previewDay) {
