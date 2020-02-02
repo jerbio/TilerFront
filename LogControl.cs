@@ -1003,9 +1003,9 @@ namespace TilerFront
 
         public XmlElement CreateUpdateHistory(TimeLineHistory updateHistory, string ElementIdentifier = "UpdateHistory")
         {
-            var updateHistory_copy = updateHistory.CreateCopy();
-            if (updateHistory_copy != null)
+            if (updateHistory != null)
             {
+                var updateHistory_copy = updateHistory.CreateCopy();
                 XmlSerializer serializer = new XmlSerializer(typeof(TimeLineHistory));
                 XmlDocument xmldoc = new XmlDocument();
                 XmlElement retValue = xmldoc.CreateElement(ElementIdentifier);
@@ -1739,17 +1739,13 @@ namespace TilerFront
                                                 )
                                             )
                                         )
-                                    ) || (((calIds.Contains(subEvent.RepeatParentEventId) || calIds.Contains(subEvent.CalendarEventId)) 
-                                            && (
-                                                (subEvent.ParentCalendarEvent.IsEnabled_DB && !subEvent.ParentCalendarEvent.Complete_EventDB) &&
-                                                (subEvent.RepeatParentEvent.IsEnabled_DB && !subEvent.RepeatParentEvent.Complete_EventDB)
-                                            ))
+                                    ) || ((
+                                            (calIds.Contains(subEvent.RepeatParentEventId) || calIds.Contains(subEvent.CalendarEventId))
+                                            )
                                         || (
                                                 (
                                                     (
                                                         subEvent.RepeatParentEvent.RepeatParentEventId != null
-                                                        && subEvent.RepeatParentEvent.RepeatParentEvent.IsEnabled_DB
-                                                        && !subEvent.RepeatParentEvent.RepeatParentEvent.Complete_EventDB
                                                     ) &&
                                                     (calIds.Contains(subEvent.RepeatParentEvent.RepeatParentEventId))
                                                 )
@@ -1835,6 +1831,10 @@ namespace TilerFront
                             .Include(calEvent => calEvent.Location_DB)
                             .Include(calEvent => calEvent.AllSubEvents_DB)
                             .Include(calEvent => calEvent.TimeLineHistory_DB)
+                            .Include(calEvent => calEvent.RestrictionProfile_DB)
+                            .Include(calEvent => calEvent.ProfileOfNow_EventDB)
+                            .Include(calEvent => calEvent.Procrastination_EventDB)
+                            .Include(calEvent => calEvent.DayPreference_DB)
                             .Include(calEvent => calEvent.TimeLineHistory_DB.TimeLines_DB)
                             .Where(calEvent => calEvent.IsEnabled_DB && !calEvent.Complete_EventDB)
                         ;
