@@ -129,7 +129,7 @@ namespace TilerFront.Controllers
             if (retrievedUser.Status)
             {
                 Task<Tuple<ThirdPartyControl.CalendarTool, IEnumerable<CalendarEvent>>> thirdPartyDataTask = ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(retrievedUser.UserID, db);
-                DB_Schedule schedule = new DB_Schedule(retrievedUser, myAuthorizedUser.getRefNow());
+                DB_Schedule schedule = new DB_Schedule(retrievedUser, myAuthorizedUser.getRefNow(), includeUpdateHistory: true);
                 var thirdPartyData = await thirdPartyDataTask.ConfigureAwait(false);
                 schedule.updateDataSetWithThirdPartyData(thirdPartyData);
                 schedule.CurrentLocation = myAuthorizedUser.getCurrentLocation();
