@@ -1039,9 +1039,12 @@ width: 20px;
 }
 
 .preview-day-whole-container {
-    width: 150px;
+    width: 215px;
     margin: 50px 25px 0 25px;
-    border: 1px solid rgb(170, 170, 170);
+    border-radius: 10px;
+    text-align: center;
+    background: #FFFF00;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
     border-radius: 10px;
 }
 
@@ -1051,10 +1054,12 @@ width: 20px;
 
 .preview-day-of-week-text {
     position: absolute;
-    border-bottom: solid 1px;
-    border-right: solid 1px;
+    background-color: yellow;
     padding: 0 5px 5px;
-    border-radius: 0 0 5px;
+    border-radius: 5px;
+    width: 205px;
+    text-align: center;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
 }
 
 .day-preview-sleep-container {
@@ -1064,12 +1069,19 @@ width: 20px;
 }
 
 .day-preview-sleep-container {
-    vertical-align: bottom;
-    height: 70px;
+    vertical-align: middle;
+    height: 40px;
+    width: 40px;
+    background: green;
+    border-radius: 20px;
+    right: 0;
+    position: relative;
+    left: 100%;
+    margin-left: -20px;
+    margin-top: -20px;
 }
 
 .day-preview-sleep-color-container  {
-    background-color: red;
     width: 100%;
     height: 100%;
     border-radius: 10px 10px 0px 0px;
@@ -1079,6 +1091,8 @@ width: 20px;
     position: relative;
     bottom: 30px;
     text-align: center;
+    font-size: 20px;
+    line-height: 20px;
 }
 
 .day-preview-conflict-container {

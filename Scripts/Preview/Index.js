@@ -283,7 +283,8 @@
                 daySleepInfo.container.Dom.appendChild(daySleepInfo.TextContainer.Dom);
             }
 
-            daySleepInfo.TextDom.innerHTML = moment.duration(previewDay.sleep.duration, 'milliseconds').humanize();
+            // daySleepInfo.TextDom.innerHTML = moment.duration(previewDay.sleep.duration, 'milliseconds').humanize();
+            daySleepInfo.TextDom.innerHTML = Math.round(previewDay.sleep.duration/OneHourInMs);
             
             let retValue = {
                 dom: daySleepInfo.container.Dom,
@@ -441,14 +442,13 @@
             dayInfo.dayOfWeekText = dayOfWeekText;
             dayInfo.dayOfWeekTextContainer.Dom.appendChild(dayInfo.dayOfWeekText);
             dayInfo.dayOfWeekContainer.Dom.appendChild(dayInfo.dayOfWeekTextContainer);
+
+            let previewAttributeWrapperId = "day-preview-attribute-wrapper-"+dayInfo.id;
+            let previewAttributeWrapper = getDomOrCreateNew(previewAttributeWrapperId);
+            dayInfo.previewAttributeDom = previewAttributeWrapper;
+
+            dayInfo.dayContainer.Dom.appendChild(dayInfo.previewAttributeDom.Dom);
             dayInfo.dayContainer.Dom.appendChild(dayInfo.dayOfWeekContainer);
-            
-
-            let dayDomSleepWrapperId = "day-preview-whole-sleep-wrapper-"+dayInfo.id;
-            let dayDomSleepWrapper = getDomOrCreateNew(dayDomSleepWrapperId);
-            dayInfo.sleepDayDom = dayDomSleepWrapper;
-
-            dayInfo.dayContainer.Dom.appendChild(dayInfo.sleepDayDom.Dom);
 
             this.processedDay[dayStart] = dayInfo;
         }
@@ -457,10 +457,10 @@
         let conflictInfo = this.conflictRendering(previewDay);
         let tardyInfo = this.tardyRendering(previewDay);
         if(sleepInfo.dom) {
-            dayInfo.sleepDayDom.Dom.appendChild(sleepInfo.dom);
+            dayInfo.previewAttributeDom.Dom.appendChild(sleepInfo.dom);
         }
-        dayInfo.sleepDayDom.Dom.appendChild(conflictInfo.dom);
-        dayInfo.sleepDayDom.Dom.appendChild(tardyInfo.dom);
+        dayInfo.previewAttributeDom.Dom.appendChild(conflictInfo.dom);
+        dayInfo.previewAttributeDom.Dom.appendChild(tardyInfo.dom);
         return dayInfo.dayContainer.Dom;
     }
 
