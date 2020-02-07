@@ -1618,6 +1618,37 @@ namespace TilerFront
             return retValue;
         }
 
+        async public virtual Task<IEnumerable<SubCalendarEvent>> getAllSubCalendarEvents(TimeLine RangeOfLookUP, ReferenceNow Now, bool includeOtherEntities = false, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation) {
+#if liveDebugging
+            includeOtherEntities = true;
+#else
+#endif
+            long rangeStart = RangeOfLookUP.Start.ToUnixTimeMilliseconds();
+            long rangeEnd = RangeOfLookUP.End.ToUnixTimeMilliseconds();
+            IQueryable<SubCalendarEvent> allSubCalQuery = getSubCalendarEventQuery(retrievalOption, includeOtherEntities: includeOtherEntities);
+            allSubCalQuery = allSubCalQuery
+                .Where(subEvent =>
+                        subEvent.IsEnabled_DB
+                        && !subEvent.Complete_EventDB
+                        && subEvent.StartTime_EventDB < RangeOfLookUP.End
+                        && subEvent.EndTime_EventDB > RangeOfLookUP.Start
+                        && subEvent.CompletionTime_EventDB< rangeEnd
+                        && subEvent.CompletionTime_EventDB > rangeStart
+                        && subEvent.ParentCalendarEvent.IsEnabled_DB
+                        && !subEvent.ParentCalendarEvent.Complete_EventDB
+                        && subEvent.ParentCalendarEvent.StartTime_EventDB < RangeOfLookUP.End
+                        && subEvent.ParentCalendarEvent.EndTime_EventDB > RangeOfLookUP.Start);
+            allSubCalQuery = allSubCalQuery
+                .Include(subEvent => subEvent.ParentCalendarEvent)
+                .Include(subEvent => subEvent.ParentCalendarEvent.AllSubEvents_DB)
+                .Include(subEvent => subEvent.RepeatParentEvent)
+                .Include(subEvent => subEvent.ParentCalendarEvent.TimeLineHistory_DB)
+                ;
+
+            List<SubCalendarEvent> retValue = await allSubCalQuery.ToListAsync().ConfigureAwait(false);
+            return retValue;
+        }
+
 
         async public virtual Task<IEnumerable<SubCalendarEvent>> getAllEnabledSubCalendarEvent(TimeLine RangeOfLookUP, ReferenceNow Now, bool includeOtherEntities = true, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation)
         {
