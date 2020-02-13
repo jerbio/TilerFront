@@ -18,8 +18,16 @@ class PageNotification {
     }
 
     get isGranted() {
-        let retValue = Notification.permission === 'granted';
-        return retValue;
+        let retValue = false;
+        try {
+            retValue = Notification.permission === 'granted';
+            return retValue;
+        } catch (e) {
+            retValue = false;
+        } finally {
+            retValue = false;
+        }
+        
     }
 
     get isCapable() {
@@ -74,9 +82,12 @@ class PageNotification {
             this.nextSubEventNotification.time = currentTimeInMS + notificationStart;
             let currentTimeOut = setTimeout(() => {
                 let notificationTitle = subEvent.Name + " starts in " + durationString;
-                let notification = new Notification(notificationTitle);
-                this.dispachedNotifications.push(notification);
-                this.processListOfSubEvents();
+                if (this.isGranted) {
+                    let notification = new Notification(notificationTitle);
+                    this.dispachedNotifications.push(notification);
+                    this.processListOfSubEvents();
+                }
+                
 
             }, notificationStart);
             this.activeTimers.push(currentTimeOut);
@@ -90,15 +101,19 @@ class PageNotification {
             DENIED: "denied",
             GRANTED: "granted"
         };
-        if (Notification.permission !== permissionType.DENIED) 
-        {
-            let initialStatus = Notification.permission;
-            Notification.requestPermission().then(function (permission) {
-              // If the user accepts, let's create a notification
-              if (permission === permissionType.GRANTED && permissionType.GRANTED !== initialStatus) {
-                var notification = new Notification("Thanks for enabling Tiler notifications! Now let's optimize the future");
-              }
-            });
+        try {
+            if (Notification && Notification.permission !== permissionType.DENIED) {
+                let initialStatus = Notification.permission;
+                Notification.requestPermission().then(function (permission) {
+                    // If the user accepts, let's create a notification
+                    if (permission === permissionType.GRANTED && permissionType.GRANTED !== initialStatus) {
+                        var notification = new Notification("Thanks for enabling Tiler notifications! Now let's optimize the future");
+                    }
+                });
+            }
+        } catch (e){
+            console.log(e);
         }
+        
     }
 }

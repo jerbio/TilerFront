@@ -150,7 +150,7 @@ namespace TilerFront.Controllers
             ReferenceNow now = new ReferenceNow(DateTimeOffset.UtcNow.removeSecondsAndMilliseconds(), myUserAccount.getTilerUser().EndfOfDay, new TimeSpan());
             TimeLine timeLine = new TimeLine(Utility.BeginningOfTime, Utility.BeginningOfTime.AddYears(9000));
             LogControl logControl = myUserAccount.ScheduleLogControl;
-            var calEvents = await logControl.getAllEnabledCalendarEvent(timeLine, now, retrievalOption: DataRetrivalOption.All).ConfigureAwait(false);
+            var calEvents = await logControl.getAllEnabledCalendarEvent(timeLine, now, false, retrievalOption: DataRetrivalOption.All).ConfigureAwait(false);
 
             foreach (var cal in calEvents.Values)
             {
@@ -249,7 +249,7 @@ namespace TilerFront.Controllers
                 LogControl LogAccess = myUserAccount.ScheduleLogControl;
                 List<CalendarEvent> ScheduleData = new List<CalendarEvent>();
 
-                Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location>> ProfileData = await LogAccess.getProfileInfo(TimelineForData, null);
+                Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location>> ProfileData = await LogAccess.getProfileInfo(TimelineForData, null, true);
 
                 ScheduleData = ScheduleData.Concat(ProfileData.Item1.Values).ToList();
 
@@ -987,7 +987,7 @@ namespace TilerFront.Controllers
                 HashSet<string> calendarIds = new HashSet<string>() { myUser.EventID };
 
                 Task<Tuple<ThirdPartyControl.CalendarTool, IEnumerable<CalendarEvent>>> thirdPartyDataTask = ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(retrievedUser.UserID, db);
-                DB_Schedule schedule = new DB_Schedule(retrievedUser, myNow, calendarIds: calendarIds);
+                DB_Schedule schedule = new DB_Schedule(retrievedUser, myNow, calendarIds: calendarIds, includeUpdateHistory: true);
                 schedule.CurrentLocation = myUser.getCurrentLocation();
                 DB_UserActivity activity = new DB_UserActivity(myNow, UserActivity.ActivityType.SetAsNowSingle);
                 JObject json = JObject.FromObject(myUser);

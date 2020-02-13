@@ -1003,9 +1003,9 @@ namespace TilerFront
 
         public XmlElement CreateUpdateHistory(TimeLineHistory updateHistory, string ElementIdentifier = "UpdateHistory")
         {
-            var updateHistory_copy = updateHistory.CreateCopy();
-            if (updateHistory_copy != null)
+            if (updateHistory != null)
             {
+                var updateHistory_copy = updateHistory.CreateCopy();
                 XmlSerializer serializer = new XmlSerializer(typeof(TimeLineHistory));
                 XmlDocument xmldoc = new XmlDocument();
                 XmlElement retValue = xmldoc.CreateElement(ElementIdentifier);
@@ -1685,7 +1685,7 @@ namespace TilerFront
         /// <param name="retrievalOption"></param>
         /// <param name="tilerIds"></param>
         /// <returns></returns>
-        async public virtual Task<Dictionary<string, CalendarEvent>> getAllEnabledCalendarEvent(TimeLine RangeOfLookUP, ReferenceNow Now, bool includeSubEvents = true, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation, HashSet<string> tilerIds = null)
+        async public virtual Task<Dictionary<string, CalendarEvent>> getAllEnabledCalendarEvent(TimeLine RangeOfLookUP, ReferenceNow Now, bool includeUpdateHistory, bool includeSubEvents = true, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation, HashSet<string> tilerIds = null)
         {
             if (retrievalOption == DataRetrivalOption.Evaluation)
             {
@@ -1739,17 +1739,13 @@ namespace TilerFront
                                                 )
                                             )
                                         )
-                                    ) || (((calIds.Contains(subEvent.RepeatParentEventId) || calIds.Contains(subEvent.CalendarEventId)) 
-                                            && (
-                                                (subEvent.ParentCalendarEvent.IsEnabled_DB && !subEvent.ParentCalendarEvent.Complete_EventDB) &&
-                                                (subEvent.RepeatParentEvent.IsEnabled_DB && !subEvent.RepeatParentEvent.Complete_EventDB)
-                                            ))
+                                    ) || ((
+                                            (calIds.Contains(subEvent.RepeatParentEventId) || calIds.Contains(subEvent.CalendarEventId))
+                                            )
                                         || (
                                                 (
                                                     (
                                                         subEvent.RepeatParentEvent.RepeatParentEventId != null
-                                                        && subEvent.RepeatParentEvent.RepeatParentEvent.IsEnabled_DB
-                                                        && !subEvent.RepeatParentEvent.RepeatParentEvent.Complete_EventDB
                                                     ) &&
                                                     (calIds.Contains(subEvent.RepeatParentEvent.RepeatParentEventId))
                                                 )
@@ -1769,12 +1765,18 @@ namespace TilerFront
                         .Include(subEvent => subEvent.Procrastination_EventDB)
                         .Include(subEvent => subEvent.Location_DB)
                         .Include(subEvent => subEvent.ParentCalendarEvent.DayPreference_DB)
-                        .Include(subEvent => subEvent.ParentCalendarEvent.TimeLineHistory_DB)
-                        .Include(subEvent => subEvent.ParentCalendarEvent.TimeLineHistory_DB.TimeLines_DB)
                         //.Include(subEvent => subEvent.ParentCalendarEvent.ProfileOfNow_EventDB)
                         //.Include(subEvent => subEvent.ParentCalendarEvent.Procrastination_EventDB)
                         //.Include(subEvent => subEvent.ParentCalendarEvent.Location_DB)
                         ;
+
+                    if(includeUpdateHistory)
+                    {
+                        subCalendarEvents = subCalendarEvents
+                            .Include(subEvent => subEvent.ParentCalendarEvent.TimeLineHistory_DB)
+                            .Include(subEvent => subEvent.ParentCalendarEvent.TimeLineHistory_DB.TimeLines_DB)
+                            ;
+                    }
                     #endregion
 
 
@@ -1835,6 +1837,10 @@ namespace TilerFront
                             .Include(calEvent => calEvent.Location_DB)
                             .Include(calEvent => calEvent.AllSubEvents_DB)
                             .Include(calEvent => calEvent.TimeLineHistory_DB)
+                            .Include(calEvent => calEvent.RestrictionProfile_DB)
+                            .Include(calEvent => calEvent.ProfileOfNow_EventDB)
+                            .Include(calEvent => calEvent.Procrastination_EventDB)
+                            .Include(calEvent => calEvent.DayPreference_DB)
                             .Include(calEvent => calEvent.TimeLineHistory_DB.TimeLines_DB)
                             .Where(calEvent => calEvent.IsEnabled_DB && !calEvent.Complete_EventDB)
                         ;
@@ -3344,7 +3350,7 @@ namespace TilerFront
 
         }
 
-        async virtual public Task<Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location>>> getProfileInfo(TimeLine RangeOfLookup, ReferenceNow Now, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation, bool createDump = true, HashSet<string> calendarIds = null)
+        async virtual public Task<Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location>>> getProfileInfo(TimeLine RangeOfLookup, ReferenceNow Now, bool includeUpdateHistory, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation, bool createDump = true, HashSet<string> calendarIds = null)
         {
             Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location>> retValue;
             if (this.Status)
@@ -3354,7 +3360,7 @@ namespace TilerFront
                 RangeOfLookup  = RangeOfLookup == null ? new TimeLine(Now.constNow.AddYears(-200), Now.constNow.AddYears(200)) : RangeOfLookup;
                 Stopwatch scheduleLoadWatch = new Stopwatch();
                 scheduleLoadWatch.Start();
-                Dictionary<string, CalendarEvent> AllScheduleData = await this.getAllEnabledCalendarEvent(RangeOfLookup, Now, retrievalOption: retrievalOption, tilerIds: calendarIds);
+                Dictionary<string, CalendarEvent> AllScheduleData = await this.getAllEnabledCalendarEvent(RangeOfLookup, Now, includeUpdateHistory, retrievalOption: retrievalOption, tilerIds: calendarIds);
                 scheduleLoadWatch.Stop();
                 Debug.WriteLine("Total DB Lookup took " + scheduleLoadWatch.Elapsed.ToString());
                 if (createDump && _UpdateBigData)
