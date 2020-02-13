@@ -284,7 +284,36 @@
             }
 
             // daySleepInfo.TextDom.innerHTML = moment.duration(previewDay.sleep.duration, 'milliseconds').humanize();
-            daySleepInfo.TextDom.innerHTML = Math.round(previewDay.sleep.duration/OneHourInMs);
+
+            let sleepDuration = previewDay.sleep.duration/OneHourInMs;
+
+            let goodSleep = 6;
+            let needMoreSleep = 4;
+            let badSleep = 2;
+
+            let goodSleepClass="good-sleep";
+            let badSleepClass = "bad-sleep";
+            let needMoreSleepClass="need-more-sleep";
+
+
+            $(daySleepInfo.container).removeClass(goodSleepClass);
+            $(daySleepInfo.container).removeClass(badSleepClass);
+            $(daySleepInfo.container).removeClass(needMoreSleepClass);
+
+            let sleepClass = goodSleepClass
+            if(sleepDuration < goodSleep) {
+                if(sleepDuration > badSleep) {
+                    sleepClass = needMoreSleepClass
+                }
+                else {
+                    sleepClass = badSleepClass;
+                }
+            }
+            
+
+            $(daySleepInfo.container).addClass(sleepClass);
+
+            daySleepInfo.TextDom.innerHTML = Math.round(sleepDuration);
             
             let retValue = {
                 dom: daySleepInfo.container.Dom,
@@ -345,7 +374,7 @@
         if(previewDay.conflict && previewDay.conflict.length > 0) {
             dayConflictInfo.textDom.innerHTML = previewDay.conflict.length + " conflict" + (previewDay.conflict.length>1 ? "s" :"");
         } else {
-            dayConflictInfo.textDom.innerHTML = "";
+            dayConflictInfo.textDom.innerHTML = "No conflicts";
         }
         let retValue = {
             dom: dayConflictInfo.conflictContainer
@@ -380,15 +409,36 @@
             dayTardyInfo.iconContainer = dayTardyInfoIconContainer;
             $(dayTardyInfo.iconContainer).addClass("day-preview-tardy-icon-container");
 
+            let dayTardyInfoIconId = "day-preview-tardy-icon-"+dayTardyInfo.id;
+            let dayTardyInfoIcon = getDomOrCreateNew(dayTardyInfoIconId);
+            dayTardyInfo.icon = dayTardyInfoIcon;
+            $(dayTardyInfo.icon).addClass("day-preview-tardy-icon");
+            dayTardyInfoIconContainer.appendChild(dayTardyInfoIcon);
+
+
             let dayTardyInfoTextContainerId = "day-preview-tardy-text-container-"+dayTardyInfo.id;
             let dayTardyInfoTextContainer = getDomOrCreateNew(dayTardyInfoTextContainerId);
             dayTardyInfo.textContainer = dayTardyInfoTextContainer;
             $(dayTardyInfo.textContainer).addClass("day-preview-tardy-text-container");
 
             let dayTardyInfoTextId = "day-preview-tardy-text-"+dayTardyInfo.id;
-            let dayTardyInfoText = getDomOrCreateNew(dayTardyInfoTextId, "span");
+            let dayTardyInfoText = getDomOrCreateNew(dayTardyInfoTextId);
             dayTardyInfo.textDom = dayTardyInfoText;
             $(dayTardyInfo.textDom).addClass("day-preview-tardy-text");
+
+            let dayTardyInfoCountId = "day-preview-tardy-count-"+dayTardyInfo.id;
+            let dayTardyInfoCount = getDomOrCreateNew(dayTardyInfoCountId);
+            dayTardyInfo.infoCount = dayTardyInfoCount;
+            $(dayTardyInfo.infoCount).addClass("day-preview-tardy-count");
+
+            let dayTardyInfoDescId = "day-preview-tardy-desc-"+dayTardyInfo.id;
+            let dayTardyInfoDesc = getDomOrCreateNew(dayTardyInfoDescId);
+            dayTardyInfo.infoDesc = dayTardyInfoDesc;
+            $(dayTardyInfo.infoDesc).addClass("day-preview-tardy-desc");
+
+            dayTardyInfoText.Dom.appendChild(dayTardyInfoCount);
+            dayTardyInfoText.Dom.appendChild(dayTardyInfoDesc);
+
 
             dayTardyInfoTextContainer.Dom.appendChild(dayTardyInfoText);
             dayTardyInfoContainer.Dom.appendChild(dayTardyInfoIconContainer);
@@ -398,9 +448,17 @@
         }
 
         if(previewDay.tardy && previewDay.tardy.length > 0) {
-            dayTardyInfo.textDom.innerHTML = "Late to " + previewDay.tardy.length + " event" + (previewDay.tardy.length>1 ? "s" :"");
+            dayTardyInfo.infoCount.innerHTML = previewDay.tardy.length;
+            dayTardyInfo.infoDesc.innerHTML = "Late";
+            $(dayTardyInfo.infoCount).removeClass("setAsDisplayNone");
+            $(dayTardyInfo.tardyContainer).addClass("not-on-time");
+            $(dayTardyInfo.tardyContainer).removeClass("on-time");
         } else {
-            dayTardyInfo.textDom.innerHTML = "On Time";
+            dayTardyInfo.infoCount.innerHTML = "";
+            $(dayTardyInfo.infoCount).addClass("setAsDisplayNone");
+            dayTardyInfo.infoDesc.innerHTML = "On Time";
+            $(dayTardyInfo.tardyContainer).addClass("on-time");
+            $(dayTardyInfo.tardyContainer).removeClass("not-on-time");
         }
         let retValue = {
             dom: dayTardyInfo.tardyContainer
@@ -435,7 +493,21 @@
             let dayOfWeekTextId = "preview-day-of-week-text-"+dayInfo.id;
             let dayOfWeekText = getDomOrCreateNew(dayOfWeekTextId, 'span');
             $(dayInfo.dayOfWeekTextContainer).addClass("preview-day-of-week-text");
-            dayOfWeekText.innerHTML = WeekDays[new Date(dayStart).getDay()]
+            let dayDate = new Date(dayStart);
+            let beginningOfDay =new Date(dayDate.setHours(0,0,0,0));
+            let toDayBeginning = new Date().setHours(0,0,0,0);
+            let tomorrow = toDayBeginning + OneDayInMs;
+            let dayOfWeekString = WeekDays[new Date(dayStart).getDay()];
+            dayOfWeekString = dayOfWeekString.substring(0, 3) +"  "+ (new Date(dayStart).getMonth()+1) +"/"+ (new Date(dayStart).getDate()+1)
+            if(tomorrow ===  dayStart) {
+                dayOfWeekString = "Tomorrow";
+            }
+
+            if(toDayBeginning ===  dayStart) {
+                dayOfWeekString = "Today";
+            }
+
+            dayOfWeekText.innerHTML = dayOfWeekString;
             
 
 
@@ -459,8 +531,8 @@
         if(sleepInfo.dom) {
             dayInfo.previewAttributeDom.Dom.appendChild(sleepInfo.dom);
         }
-        dayInfo.previewAttributeDom.Dom.appendChild(conflictInfo.dom);
         dayInfo.previewAttributeDom.Dom.appendChild(tardyInfo.dom);
+        dayInfo.previewAttributeDom.Dom.appendChild(conflictInfo.dom);
         return dayInfo.dayContainer.Dom;
     }
 
