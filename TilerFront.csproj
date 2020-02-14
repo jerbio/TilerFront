@@ -595,6 +595,7 @@
     <Content Include="google30a8eacf5f2892b7.html" />
     <Content Include="img\ClassicColored.png" />
     <Content Include="img\ClassicHiglight.png" />
+    <Content Include="img\Icons\ConflctIcon.svg" />
     <Content Include="img\Icons\googleSearchIcon.png" />
     <Content Include="img\Icons\locked2.svg" />
     <Content Include="img\Icons\TardyIcon.svg" />
