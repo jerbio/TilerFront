@@ -1713,6 +1713,7 @@ namespace TilerFront
         /// <param name="RangeOfLookUP"></param>
         /// <param name="Now"></param>
         /// <param name="includeSubEvents"></param>
+        /// <param name="includeUpdateHistory"></param>
         /// <param name="retrievalOption"></param>
         /// <param name="tilerIds"></param>
         /// <returns></returns>
@@ -1837,7 +1838,7 @@ namespace TilerFront
 
                         if (parentCalEvent.RepeatParentEvent != null)
                         {
-                            CalendarEvent repeatParent = parentCalEvent.RepeatParentEvent as CalendarEvent;
+                            CalendarEvent repeatParent = parentCalEvent.RepeatParentEvent as CalendarEvent;     
                             calendarEventsFromSubCalquery.Add(repeatParent);
                             allIds.Add(parentCalEvent.RepeatParentId);
                             repeatParent.isRepeatLoaded_DB = false;
