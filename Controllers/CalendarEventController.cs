@@ -183,7 +183,7 @@ namespace TilerFront.Controllers
             {
                 HashSet<string> calendarIds = new HashSet<string>() { nowEvent.ID };
                 Task<Tuple<ThirdPartyControl.CalendarTool, IEnumerable<CalendarEvent>>> thirdPartyDataTask = ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(retrievedUser.UserID, db);
-                DB_Schedule schedule = new DB_Schedule(retrievedUser, nowEvent.getRefNow(), true, calendarIds: calendarIds);
+                DB_Schedule schedule = new DB_Schedule(retrievedUser, nowEvent.getRefNow(), includeUpdateHistory: true, calendarIds: calendarIds);
                 schedule.CurrentLocation = nowEvent.getCurrentLocation();
                 var thirdPartyData = await thirdPartyDataTask.ConfigureAwait(false);
                 schedule.updateDataSetWithThirdPartyData(thirdPartyData);
