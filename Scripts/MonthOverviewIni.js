@@ -2776,7 +2776,8 @@ function PopulateUI(ParentDom, refDate)// draws up the container and gathers all
     StartOfWeekDay = 0 -StartOfWeekDay;
     var StartOfRange = new Date((StartWeekDateInMS.getTime() + (StartOfWeekDay * OneDayInMs)));
     StartOfRange.setHours(0, 0, 0, 0);
-    var EndOfRange = new Date(StartOfRange.getTime() + (OneWeekInMs * global_RangeMultiplier));//sets the range to be used for query
+    var EndOfRange = new Date(StartOfRange.getTime());
+    EndOfRange.setDate(EndOfRange.getDate() + (7  * global_RangeMultiplier));//sets the range to be used for query
     global_CurrentRange = { Start: StartOfRange, End: EndOfRange
         };
 
@@ -2796,7 +2797,9 @@ function PopulateUI(ParentDom, refDate)// draws up the container and gathers all
     {
         //debugger;
         //CurrentWeek = CurrentWeek.dst() ? new Date(Number(CurrentWeek.getTime()) +OneHourInMs) : CurrentWeek;
-        var MyRange = { Start: CurrentWeek, End: new Date(Number(CurrentWeek) + Number(OneWeekInMs))};
+        let endTime = new Date(Number(CurrentWeek));
+        endTime.setDate(endTime.getDate() + 7);
+        var MyRange = { Start: CurrentWeek, End: endTime};
 
 
         var WeekGird = genDivForEachWeek(MyRange, AllRanges);
@@ -5019,6 +5022,7 @@ function genDivForEachWeek(RangeOfWeek, AllRanges)//generates each week containe
     
 
     var StartOfDay = new Date(RangeOfWeek.Start);
+    let NextStartOfDay = StartOfDay;
     //StartOfDay = StartOfDay.dst() ? new Date(Number(StartOfDay.getTime())) : StartOfDay +OneHourInMs;
     var TodayStart = new Date(Date.now());
     TodayStart.setHours(0);
@@ -5033,24 +5037,19 @@ function genDivForEachWeek(RangeOfWeek, AllRanges)//generates each week containe
         WeekDays.forEach(
             function (DayOfWeek) {
                 var myDay = generateDayContainer();
-                //myDay.renderPlane = RenderPlane;
+                StartOfDay = NextStartOfDay;
                 myDay.widtPct = widthPercent;
                 myDay.Start = new Date(StartOfDay);//set start of day property
-                var TotalMilliseconds = myDay.Start.getTime();
-                TotalMilliseconds += OneDayInMs
-                StartOfDay = new Date(TotalMilliseconds);
-                if (StartOfDay.getHours() != 0)
-                {
-                    TotalMilliseconds += OneHourInMs;
-                    StartOfDay = new Date(TotalMilliseconds);
-                }
-                myDay.End = new Date(TotalMilliseconds -1);
+                NextStartOfDay = new Date(StartOfDay);// this gets updated for the next loop
+                NextStartOfDay.setDate(StartOfDay.getDate() + 1);
+                let endTime = new Date(myDay.Start);
+                endTime.setDate(endTime.getDate() + 1);
+
+                myDay.End = new Date(endTime.getTime() - 1);
                 var isToday = myDay.Start.getTime() == TodayInMS;
-                var currDate = new Date(Number(refDate.getTime()) + Number(DayIndex * OneDayInMs))
-                if (new Date().dst()) {
-                    currDate = new Date(Number(currDate.getTime()) +OneHourInMs);
-                    // myDay.End = new Date(Number(myDay.End.getTime()) + OneHourInMs);
-                }
+                var currDate = new Date(Number(refDate.getTime()));
+                currDate.setDate(currDate.getDate() + DayIndex);
+
                 
                 prev = currDate;
                 var Month = currDate.getMonth() +1;
