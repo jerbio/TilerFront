@@ -7,6 +7,10 @@ function iniManager() {
     submitButton.Dom.addEventListener("click", createScheduleDumpequest);
     let dumpRequestId = "DumpReferenceId"
     let dumpButton = getDomOrCreateNew(dumpRequestId)
+
+    let submitLogHistoryButtonId = "submitLogHistoryDump"
+    let submitLogHistoryButton = getDomOrCreateNew(submitLogHistoryButtonId);
+    createSubmitLogHistory(submitLogHistoryButton);
 }
 
 function getDumpRequest(e, callBackSuccess, callBackFailure, callBackDone) {
@@ -54,6 +58,83 @@ function getDumpRequest(e, callBackSuccess, callBackFailure, callBackDone) {
 
 
     sendGetRequest()
+}
+
+function createSubmitLogHistory(dowloadButton) {
+    function bindDataHistoryLogClick() {
+        let dayCount = 14;
+        let TimeZone = new Date().getTimezoneOffset();
+        let end = new Date();
+        end.setHours(0,0,0,0);
+        end.setDate(end.getDate() + (1));
+        
+        
+        let start = new Date(end.getTime());
+        start.setDate(start.getDate() - (dayCount));
+        
+        let dataHistoryDumpData = {
+            UserName: UserCredentials.UserName,
+            UserID: UserCredentials.ID,
+            TimeZoneOffset: TimeZone,
+            UserActivityType: "InternalUpdate",
+            start: start.getTime(),
+            end: end.getTime()
+
+        };
+
+
+        var URL = global_refTIlerUrl + "DataHistory/User";
+        preSendRequestWithLocation(dataHistoryDumpData);
+
+        let params = jQuery.param(dataHistoryDumpData);
+        let fullUrl = URL + "?" + params
+        dowloadButton.setAttribute("href", fullUrl);
+
+
+
+        // var HandleNEwPage = new LoadingScreenControl("Tiler is generating the data histoy dump:)");
+        // dataHistoryDumpData.TimeZone = moment.tz.guess()
+        // preSendRequestWithLocation(dataHistoryDumpData);
+        // HandleNEwPage.Launch();
+
+        // var exitSendMessage = function (data) {
+        //     HandleNEwPage.Hide();
+        //     //triggerUIUPdate();//hack alert
+        //     global_ExitManager.triggerLastExitAndPop();
+        //     //getRefreshedData();
+        // }
+
+        // var scheduleDumpRequest = $.ajax({
+        //     type: "GET",
+        //     url: URL,
+        //     data: dataHistoryDumpData,
+        //     dataType: "json",
+        //     success: function (data) {
+        //         successDump(data)
+        //         exitSendMessage()
+        //         if (callBackSuccess) {
+        //             callBackSuccess(data)
+        //         }
+        //     },
+        //     error: function (data) {
+        //         failureDump(data)
+        //         if (callBackFailure) {
+        //             callBackFailure(data)
+        //         }
+        //         var NewMessage = "Ooops Tiler is having issues dumping your schedule. Please try again Later:X";
+        //         var ExitAfter = {
+        //             ExitNow: true, Delay: 1000
+        //         };
+        //         HandleNEwPage.UpdateMessage(NewMessage, ExitAfter, exitSendMessage);
+        //     }
+        // })
+
+        // if (callBackDone != undefined) {
+        //     scheduleDumpRequest.done(callBackDone);
+        // }
+    }
+
+    bindDataHistoryLogClick();
 }
 
 function createScheduleDumpequest(e, callBackSuccess, callBackFailure, callBackDone) {

@@ -1304,6 +1304,7 @@
             <param name="RangeOfLookUP"></param>
             <param name="Now"></param>
             <param name="includeSubEvents"></param>
+            <param name="includeUpdateHistory"></param>
             <param name="retrievalOption"></param>
             <param name="tilerIds"></param>
             <returns></returns>
