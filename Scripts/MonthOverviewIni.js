@@ -3767,7 +3767,13 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                 function slideOpenNotesModal() {
                     NotesModal.focus();
                     let noteText = SubEvent.Notes || ""
-                    NotesTextArea.value = decodeURI(noteText)
+                    try {
+                        NotesTextArea.value = decodeURI(noteText)
+                    } catch (e) {
+                        console.error("Failed to decode note text")
+                        NotesTextArea.value = noteText
+                    }
+                    
                     $(NotesModal).slideDown(500);
                     NotesModal.onkeydown = notesContainerKeyPress;
                     function notesContainerKeyPress(e) {
