@@ -3163,7 +3163,7 @@ namespace TilerFront
                     .Include(calEvent => calEvent.Repetition_EventDB.SubRepetitions.Select(repetition => repetition.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB)))
                     .Include(calEvent => calEvent.Repetition_EventDB.SubRepetitions.Select(repetition => repetition.RepeatingEvents.Select(repCalEvent => repCalEvent.Procrastination_EventDB)))
                     .Include(calEvent => calEvent.Repetition_EventDB.SubRepetitions.Select(repetition => repetition.RepeatingEvents.Select(repCalEvent => repCalEvent.ProfileOfNow_EventDB)))
-                    .Where(calEvent => calEvent.Id == id).SingleOrDefault();
+                    .SingleOrDefault(calEvent => calEvent.Id == id);
 
             if (retValue != null && retValue.getIsEventRestricted)
             {
@@ -3215,8 +3215,7 @@ namespace TilerFront
 
 
             SubCalendarEvent retValue = await subEventQuery
-                .Where(subEvent => subEvent.CreatorId == _TilerUser.Id)
-                .SingleOrDefaultAsync(subEvent => subEvent.Id == ID).ConfigureAwait(false);
+                .SingleOrDefaultAsync(subEvent => subEvent.CreatorId == _TilerUser.Id && subEvent.Id == ID).ConfigureAwait(false);
             if (retValue!= null && retValue.getIsEventRestricted)
             {
                 (retValue as SubCalendarEventRestricted).RestrictionProfile_DB.InitializeOverLappingDictionary();

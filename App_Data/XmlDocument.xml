@@ -934,6 +934,11 @@
             <param name="user">The referemce tiler user</param>
             <returns></returns>
         </member>
+        <member name="M:TilerFront.DB_Schedule.RemoveAllCalendarEventFromLogAndCalendar">
+            <summary>
+            Function sets all calendar events in as disabled and then deletes them from the UI
+            </summary>
+        </member>
         <member name="M:TilerFront.DB_Schedule.CleanUpForUI(System.Collections.Generic.IEnumerable{TilerElements.CalendarEvent})">
             <summary>
             Function rearranges the sub events by Id to be associated with the order of time
