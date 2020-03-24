@@ -342,7 +342,6 @@ function generateProcrastinateAllFunction(TimeData,CallBack)
     var NowData = { DurationDays: TimeData.Days, DurationHours: TimeData.Hours, DurationMins: TimeData.Mins, UserName: UserCredentials.UserName, UserID: UserCredentials.ID, TimeZoneOffset: TimeZone };
     NowData.TimeZone = moment.tz.guess()
     var HandleNEwPage = new LoadingScreenControl("Tiler is Freeing up Some time :)");
-    TimeData.Hours
     HandleNEwPage.Launch();
     var URL = global_refTIlerUrl + "Schedule/ProcrastinateAll";
     preSendRequestWithLocation(NowData);
@@ -361,7 +360,7 @@ function generateProcrastinateAllFunction(TimeData,CallBack)
                 //exitSelectedEventScreen();
             }
             else {
-                alert("error detected with marking as complete");
+                alert("error detected with clearing your schedule");
             }
 
         },

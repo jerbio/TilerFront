@@ -1482,6 +1482,7 @@ function BindProcrastinateAllButton() {
     $(procrastinateAll).click(procrastinate);
     function procrastinate()
     {
+        ActivateUserSearch.setSearchAsOff();
         var HeaderContainer = getDomOrCreateNew("Header")
         var height = $(HeaderContainer).height();
         var width = $(HeaderContainer).width();
