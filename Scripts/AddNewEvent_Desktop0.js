@@ -95,7 +95,6 @@ function generateOfficeHours(Place)
                 {
                     RetValue.IsTwentyFourHours = true;
                     return RetValue;
-                    break;
                 }
             }
             AllTimeDataStart.sort(function (a, b) { return (a) - (b) });
@@ -270,16 +269,34 @@ function generateProcrastinateAllDoms() {
     let HourInput = getDomOrCreateNew("procrastinateHours", "input");
     let MinInput = getDomOrCreateNew("procrastinateMins", "input");
     let DayInput = getDomOrCreateNew("procrastinateDays", "input");
+    HourInput.value = "";
+    MinInput.value = "";
+    DayInput.value = "";
+
+    let HourInputParent = HourInput.Dom.parentNode;
+    let MinInputParent = MinInput.Dom.parentNode;
+    let DayInputParent = DayInput.Dom.parentNode;
+
+
+    let procrastinateAllheaderContainerId = "ProcrastinateAllHeaderContainer";
+    let ProcrastinateAllDomHeaderContainer = getDomOrCreateNew(procrastinateAllheaderContainerId);
+    ProcrastinateAllDomHeaderContainer.innerHTML = "Clear all Events";
+    ProcrastinateAllUserInputContainer.appendChild(ProcrastinateAllDomHeaderContainer);
+
 
 
     let ProcrastinateAllDomInputContainerId = "ProcrastinateAllInputContainer";
     let ProcrastinateAllDomInputContainer = getDomOrCreateNew(ProcrastinateAllDomInputContainerId);
-    ProcrastinateAllUserInputContainer.Dom.appendChild(ProcrastinateAllDomInputContainer);
+    ProcrastinateAllUserInputContainer.Dom.appendChild(ProcrastinateAllDomInputContainer.Dom);
 
-
-    ProcrastinateAllDomInputContainer.Dom.appendChild(HourInput.Dom);
-    ProcrastinateAllDomInputContainer.Dom.appendChild(MinInput.Dom);
-    ProcrastinateAllDomInputContainer.Dom.appendChild(DayInput.Dom);
+    let ProcrastinateInputCollectionContainerId = "ProcrastinateInputCollectionContainer";
+    let ProcrastinateInputCollectionContainer = getDomOrCreateNew(ProcrastinateInputCollectionContainerId);
+    let ProcrastinateInputCollectionContainerParent = ProcrastinateInputCollectionContainer.Dom.parentNode;
+    ProcrastinateAllDomInputContainer.Dom.appendChild(ProcrastinateInputCollectionContainer.Dom);
+    
+    // ProcrastinateAllDomInputContainer.Dom.appendChild(HourInput.Dom);
+    // ProcrastinateAllDomInputContainer.Dom.appendChild(MinInput.Dom);
+    // ProcrastinateAllDomInputContainer.Dom.appendChild(DayInput.Dom);
 
 
     let ProcrastinateAllDomButtonContainerId = "ProcrastinateAllButtonContainer";
@@ -295,7 +312,7 @@ function generateProcrastinateAllDoms() {
 
     ProcrastinateAllDomButtonContainer.Dom.appendChild(submitButton.Dom);
     ProcrastinateAllDomButtonContainer.Dom.appendChild(cancelButton.Dom);
-    ProcrastinateAllDomButtonContainer.Dom.appendChild(previewProcrastinateAllButton.Dom);
+    // ProcrastinateAllDomButtonContainer.Dom.appendChild(previewProcrastinateAllButton.Dom);
 
     $(submitButton.Dom).click(function (event) {//stops clicking of add event button from triggering a new modal dom
         event.stopPropagation();
@@ -327,8 +344,15 @@ function generateProcrastinateAllDoms() {
         inputs: {
             hour: HourInput,
             minute: MinInput,
-            day: DayInput
+            day: DayInput,
+            collection: ProcrastinateInputCollectionContainer,
         }, 
+        parentNodes: {
+            collection: ProcrastinateInputCollectionContainerParent,
+            hour: HourInputParent,
+            minute: MinInputParent,
+            day: DayInputParent
+        },
         preview: ProcrastinateAllDomPreviewContainer
     };
 
@@ -343,9 +367,10 @@ function generateProcrastinateAllDoms() {
 
 
 function generateProcrastinateAll(x, y, height, width,WeekStart, RenderPlane) {
+    global_ExitManager.triggerLastExitAndPop();
     let procrastinateAllControls = generateProcrastinateAllDoms();
     initializeUserLocation();
-
+    getRefreshedData.disableDataRefresh();
     if (generateProcrastinateAll.isOn)
     {
         global_ExitManager.triggerLastExitAndPop();
@@ -353,15 +378,68 @@ function generateProcrastinateAll(x, y, height, width,WeekStart, RenderPlane) {
         return;
     }
 
+    function sendProcrastinateAllRequest(CallBack) {
+        let TimeData = getProcrastinateAllData();
+        var HandleNEwPage = new LoadingScreenControl("Tiler is Freeing up Some time :)");
+        HandleNEwPage.Launch();
+        var URL = global_refTIlerUrl + "Schedule/ProcrastinateAll";
+        preSendRequestWithLocation(TimeData);
+        $.ajax({
+            type: "POST",
+            url: URL,
+            data: TimeData,
+            // DO NOT SET CONTENT TYPE to json
+            // contentType: "application/json; charset=utf-8", 
+            // DataType needs to stay, otherwise the response object
+            // will be treated as a single string
+            success: function (response) {
+                //alert(response);
+                var myContainer = (response);
+                if (myContainer.Error.code == 0) {
+                    //exitSelectedEventScreen();
+                }
+                else {
+                    alert("error clearing out your schedule");
+                }
+    
+            },
+    
+            error: function (err) {
+                var myError = err;
+                var step = "err";
+                var NewMessage = "Ooops Tiler is having issues updating your schedule. Please try again Later:X";
+                var ExitAfter = { ExitNow: true, Delay: 1000 };
+                HandleNEwPage.UpdateMessage(NewMessage, ExitAfter, CallBack);
+                //InitializeHomePage();
+    
+    
+            }
+        }).done(function (data) {
+            getRefreshedData.enableDataRefresh();
+            HandleNEwPage.Hide();
+            getRefreshedData();
+            if(isFunction(CallBack)) {
+                CallBack();
+            }
+        });
+    }
+
     function closeProcrastinateModal()
     {
+        getRefreshedData.enableDataRefresh();
         setTimeout(function () { generateProcrastinateAll.isOn = false; }, 200);
         let procrastinateAllDom = procrastinateAllControls.container;
         if (procrastinateAllDom.Dom.parentElement != null)
         {
             procrastinateAllDom.Dom.parentElement.removeChild(procrastinateAllDom.Dom);
         }
+        procrastinateAllControls.parentNodes.collection.prepend(procrastinateAllControls.inputs.collection);
+        // procrastinateAllControls.parentNodes.minute.prepend(procrastinateAllControls.inputs.minute.Dom);
+        // procrastinateAllControls.parentNodes.day.prepend(procrastinateAllControls.inputs.day.Dom);
+
+        ActivateUserSearch.setSearchAsOn();
     }
+    global_ExitManager.addNewExit(closeProcrastinateModal);
     let procrastinateAllDom = procrastinateAllControls.container.Dom;
     let modalHeight = ($(procrastinateAllDom).height());
     let modalWidth= ($(procrastinateAllDom).width());
@@ -375,6 +453,8 @@ function generateProcrastinateAll(x, y, height, width,WeekStart, RenderPlane) {
 
 
     RenderPlane.appendChild(procrastinateAllControls.container.Dom);
+    $(procrastinateAllControls.buttons.cancelButton.Dom).click(closeProcrastinateModal);
+    $(procrastinateAllControls.buttons.submitButton.Dom).click(sendProcrastinateAllRequest);
 
 
     // global_ExitManager.triggerLastExitAndPop();
@@ -3112,7 +3192,6 @@ function SendScheduleInformation(NewEvent, CallBack)
     }).done(function (response) {
         HandleNEwPage.Hide();
         getRefreshedData.enableDataRefresh();
-        ;
         var AffirmCallBack = affirmNewEvent(response);
         
         getRefreshedData(AffirmCallBack);

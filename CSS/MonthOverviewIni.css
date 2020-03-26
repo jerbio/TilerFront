@@ -1477,8 +1477,73 @@ width: auto;
   width: 100%;
 }
 
+#ProcrastinateAllInputContainer {
+  padding: 10px 0px;
+}
+
+#ProcrastinateAllContainer {
+  padding: 30px 30px 50px 30px;
+}
+
+#ProcrastinateAllDom {
+  position:absolute;
+  height: 205px;
+  width: 380px;
+  background-color: #fff;
+  border: 1px solid #eee;
+  z-index: 1;
+  -webkit-box-shadow: 10px 10px 30px 0px rgba(128,128,128,1);
+  -moz-box-shadow: 10px 10px 30px 0px rgba(128,128,128,1);
+  box-shadow: 10px 10px 30px 0px rgba(128,128,128,1);
+}
+
+
+#ProcrastinateAllDom button {
+  left: 10px;
+  position: relative;
+  top: 10px;
+  width: 46%;
+  border: 1px #ccc solid;
+  color: black;
+  background-color: white;
+  font-size: 16px;
+  font-family: 'texbold';
+  padding: 15px 40px;
+  -webkit-transition: all .2s ease-in-out;
+  -o-transition: all .2s ease-in-out;
+  -moz-transition: all .2s ease-in-out;
+  transition: all .2s ease-in-out;
+  cursor: pointer;
+}
+
+
+#ProcrastinateAllDom button:focus, #ProcrastinateAllDom button:hover {
+  border: 1px transparent solid;
+  outline: none;
+  background-color: yellow;
+}
+
+
 .ProcrastinateInputModal{
-  width: 32%;
+  width: 100px;
+  display: inline-block;
+}
+
+.ProcrastinateInputModal span {
+  font-size: 25px;
+  font-family: 'texbold';
+  color: #ccc;
+  display: inline;
+}
+
+.ProcrastinateInputModal input {
+  font-size: 22px;
+  width: 45px;
+  color: black;
+  border: none;
+  border-bottom: 1px solid #ccc;
+  font-family: 'texbold';
+  margin-left: 20px;
 }
 
 #ProcrastinateHeading {
