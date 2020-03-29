@@ -584,8 +584,8 @@ namespace TilerFront.Controllers
                 BusyTimeLine nextBusySchedule = schedule.NextActivity;
                 if (nextBusySchedule != null)
                 {
-                    SubCalendarEvent subEvent = schedule.getSubCalendarEvent(nextBusySchedule.ID);
-                    CalendarEvent calEvent = schedule.getCalendarEvent(nextBusySchedule.ID);
+                    SubCalendarEvent subEvent = schedule.getSubCalendarEvent(nextBusySchedule.Id);
+                    CalendarEvent calEvent = schedule.getCalendarEvent(nextBusySchedule.Id);
                     myPostData = new PostBackData(subEvent.ToSubCalEvent(calEvent), 0);
                 }
                 else
@@ -687,8 +687,8 @@ namespace TilerFront.Controllers
                 PostBackData myPostData;
                 if (nextBusySchedule != null)
                 {
-                    SubCalendarEvent subEvent = schedule.getSubCalendarEvent(nextBusySchedule.ID);
-                    CalendarEvent calEvent = schedule.getCalendarEvent(nextBusySchedule.ID);
+                    SubCalendarEvent subEvent = schedule.getSubCalendarEvent(nextBusySchedule.Id);
+                    CalendarEvent calEvent = schedule.getCalendarEvent(nextBusySchedule.Id);
                     myPostData = new PostBackData(subEvent.ToSubCalEvent(calEvent), 0);
                 }
                 else
