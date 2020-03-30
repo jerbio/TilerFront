@@ -1397,8 +1397,6 @@ namespace TilerFront.Controllers
                     selectedDaysOftheweek = RepeatWeeklyData.Split(',').Where(obj => !String.IsNullOrEmpty(obj)).Select(obj => Convert.ToInt32(obj)).Select(num => (DayOfWeek)num).ToArray();
                 }
 
-                
-                //RepeatEnd = (DateTimeOffset.UtcNow).AddDays(7);
                 RepetitionFlag = true;
                 MyRepetition = new Repetition(new TimeLine(RepeatStart, RepeatEnd), Utility.ParseEnum<Repetition.Frequency> (RepeatFrequency.ToUpper()), new TimeLine(FullStartTime, FullEndTime), selectedDaysOftheweek);
                 EndDateEntry = MyRepetition.Range.End > EndDateEntry ? MyRepetition.Range.End : EndDateEntry;
@@ -1408,8 +1406,6 @@ namespace TilerFront.Controllers
             await retrievedUser.Login();
             TilerUser tilerUser = retrievedUser.getTilerUser();
             retrievedUser.getTilerUser().updateTimeZoneTimeSpan(newEvent.getTimeSpan);
-            Task HoldUpForWriteNewEvent;
-            Task CommitChangesToSchedule;
             if (retrievedUser.Status)
             {
                 DateTimeOffset myNow = newEvent.getRefNow();
@@ -1672,8 +1668,6 @@ namespace TilerFront.Controllers
             retrievedUser.getTilerUser().updateTimeZoneTimeSpan(newEvent.getTimeSpan);
             TilerUser tilerUser = retrievedUser.getTilerUser();
 
-            Task HoldUpForWriteNewEvent;
-            Task CommitChangesToSchedule;
             if (retrievedUser.Status)
             {
                 DateTimeOffset myNow = newEvent.getRefNow();

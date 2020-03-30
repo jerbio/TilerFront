@@ -19,12 +19,6 @@ using BigDataTiler;
 using System.Data.Entity.Core.Objects;
 using System.Collections.Concurrent;
 using System.Diagnostics;
-#if ForceReadFromXml
-#else
-using CassandraUserLog;
-using TilerSearch;
-#endif
-
 
 
 namespace TilerFront
@@ -48,19 +42,7 @@ namespace TilerFront
         protected ScheduleDump _TempDump;
         protected TilerUser _TilerUser;
         protected bool _UpdateBigData = true;
-
-#if ForceReadFromXml
-#else
-        protected CassandraUserLog.CassandraLog myCassandraAccess;
-        protected TilerSearch.EventNameSearchHandler NameSearcher;
-        protected LocationSearchHandler LocationSearcher;
-#endif
         Tuple<bool, string, DateTimeOffset, long> ScheduleMetadata;
-
-#if ForceReadFromXml
-#else
-        public static bool useCassandra=true;
-#endif
 
         protected LogControl()
         {
@@ -68,11 +50,6 @@ namespace TilerFront
             UserName = "";
             NameOfUser = "";
             LogStatus = false;
-#if ForceReadFromXml
-#else
-            NameSearcher = new EventNameSearchHandler();
-            LocationSearcher = new LocationSearchHandler();
-#endif
             Dictionary<string, TilerElements.Location> CachedLocation = new Dictionary<string, TilerElements.Location>();
 
             createDictionaryOfOPtionToFunction = new Dictionary<string, Func<XmlNode, Reason>>
@@ -691,7 +668,9 @@ namespace TilerFront
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.InitialStartTime_DB.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("IniEndTime"));
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.InitialEndTime_DB.ToString();
-            if(!MyEvent.isThirdParty)
+            MyEventScheduleNode.PrependChild(xmldoc.CreateElement("DeadlineSuggestion"));
+            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.DeadlineSuggestion_DB.ToString();
+            if (!MyEvent.isThirdParty)
             {
                 MyEventScheduleNode.PrependChild(xmldoc.CreateElement("UpdateHistory"));
                 MyEventScheduleNode.ChildNodes[0].InnerText = CreateUpdateHistory(MyEvent.TimeLineHistory)?.InnerXml;
@@ -2522,7 +2501,14 @@ namespace TilerFront
             }
 
             XmlNode MyEventScheduleNode = EventScheduleNode.SelectSingleNode("Access_DB");
-            if(MyEventScheduleNode!=null)
+
+            XmlNode DeadlineSuggestionNode = EventScheduleNode.SelectSingleNode("DeadlineSuggestion");
+            if (DeadlineSuggestionNode != null)
+            {
+                RetrievedEvent.DeadlineSuggestion_DB =long.Parse(DeadlineSuggestionNode.InnerText);
+            }
+            
+            if (MyEventScheduleNode!=null)
             {
                 RetrievedEvent.Access_DB = MyEventScheduleNode.InnerText;
             }
