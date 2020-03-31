@@ -1327,7 +1327,6 @@ function generateDayContainer()
     $(MoreInfoPanel).addClass("MoreInfoPanel");
     $(DayContextContainer).addClass("DayContextContainer");
     DayContainer.appendChild(DayContextContainer);
-    //DayContainer
     DayContainer.onmouseover = onMouseIn;
     DayContainer.onmouseout = onMouseOut;
     
@@ -1342,14 +1341,18 @@ function generateDayContainer()
     FullGridContainer.isEnabled = false;
     $(FullGridContainer).addClass("setAsDisplayNone");
 
+    let SleepContainer = getDomOrCreateNew("SleepContainer" + myID);//Bar grid for classic view
+    $(SleepContainer.Dom).addClass("SleepContainer");
+
     $(DayTimeContainer).addClass("setAsDisplayNone");
     $(NameOfDayContainer.Dom).addClass("NameOfDayContainer");
     DayContainer.Dom.appendChild(NameOfDayContainer.Dom);
     DayContextContainer.Dom.appendChild(FullGridContainer.Dom);//Full grid
     DayContextContainer.Dom.appendChild(DayTimeContainer.Dom);
+    DayContextContainer.Dom.appendChild(SleepContainer.Dom);
     DayContextContainer.Dom.appendChild(MoreInfoPanel.Dom);
     DayContextContainer.Dom.appendChild(SubEventListContainer.Dom);
-    //DayContainer.Dom.appendChild(DayTimeContainer.Dom);
+
     $(DayTimeContainer.Dom).addClass("DayTimeContainer");
     var NumberOfShaders = 24;
     var TotalTopElement = 0;
@@ -1842,8 +1845,6 @@ getRefreshedData.pauseUnEnroll = function (Id) {
     {
         ///Gets the data from tiler back end. Also sucks out the subcalendar events
 
-
-        //var myurl = "RootWagTap/time.top?WagCommand=0";
         var myurl = global_refTIlerUrl + "Schedule";
         var TimeZone = new Date().getTimezoneOffset();
         LoadingBar.showAllGroupings(weeklyScheduleLoadingBar);
@@ -2630,6 +2631,9 @@ function renderClassicSubEventLook(DayOfWeek, ID, MyArray, Index, TabCount)
 }
 renderClassicSubEventLook.PercentWidthOfDay = (100 / 7) -1.5;
 
+function renderSleepTimeSlot(DayOfWeek) {
+
+}
 
 function renderSideBarEvents(DayOfWeek, ID, MyArray, Index, TabCount)
 {

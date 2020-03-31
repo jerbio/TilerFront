@@ -14,6 +14,7 @@ namespace TilerFront.Models
         public IList<CalEvent> NonRepeatCalendarEvent { get; set; }
         public IList<SubCalEvent> SubCalendarEvents { get; set; }
         public JObject PauseData { get; set; } = new JObject();
+        public JObject SleepTimeline { get; set; } = new JObject();
         public class repeatedEventData
         {
             public string ID { get; set; }
