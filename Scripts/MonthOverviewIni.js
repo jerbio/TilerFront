@@ -209,6 +209,16 @@ function MenuManger()
     }
 }
 
+function RenderSleep() {
+    if(global_CurrentWeekArrangedData && global_CurrentWeekArrangedData.length > 0 && global_sleepTimeline) {
+        global_CurrentWeekArrangedData.forEach((weekRange) => {
+            weekRange.DaysOfWeek.forEach((day) => {
+                day.RenderSleepSection(day.Start, global_sleepTimeline);
+            });
+        });
+    }
+}
+
 function RenderTimeInformationClassic(DayOfWeek, ID) {
     var RefSubEvent = global_DictionaryOfSubEvents[ID];
     var TopPixels = ((DayOfWeek.UISpecs[ID].css.top / 100) * global_DayHeight) + global_DayTop;
@@ -216,9 +226,6 @@ function RenderTimeInformationClassic(DayOfWeek, ID) {
     var ListElementContainer = getDomOrCreateNew("SubEventReference" + ID);
     ListElementContainer.setAttribute("draggable", true);
     ListElementContainer.ondragstart = OnDragStartOfSubEvent;
-    //ListElementContainer.ondrop = OnDropOfSubEvent;
-    //ListElementContainer.ondragstart = OnDragStartOfSubEvent;
-    //ListElementContainer.ondragstart = OnDragStartOfSubEvent;
     $(ListElementContainer.Dom).addClass("TimeDataFormat");
     
     RefSubEvent.gridDoms.push(ListElementContainer.Dom)//Adds the List element as list of candidates to be deleted
@@ -1401,7 +1408,6 @@ function generateDayContainer()
     }
 
     function unRevealMoreOptions() {
-        
         $(MoreInfoPanel).addClass("setAsDisplayNone");
         $(MoreInfoPanel).removeClass("RevealMoreInfoPanel")
         $(MoreInfoPanel).empty();
@@ -1435,22 +1441,79 @@ function generateDayContainer()
             }
             $(DayTimeContainer).addClass("setAsDisplayNone");
         })
-        
     }
 
-    ///*
-    
-    //*/
+    function generateSleepRenderFunction(sleepContainer) {
+        return function(dayStart, timeLines) {
+            let createSleepDom = () => {
+                let domId = dayStart.getTime()+"_"+ generateUUID();
+                let sleepDom = getDomOrCreateNew(domId).Dom
+                sleepDom.classList.add('sleep-time-grid');
+
+                return sleepDom;
+            };
+            if(timeLines) {
+                let sleepDoms = new Set();
+                let allTimes = [];
+                timeLines.forEach((timeline) => {
+                    allTimes.push(timeline.start.getTime());
+                    allTimes.push(timeline.end.getTime());
+                });
+                allTimes.sort((a, b) => {return a - b});
+                let hoverDaySleepStartString = new Date(allTimes[0]).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); 
+                let hoverDaySleepEndString = new Date(allTimes[allTimes.length - 1]).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) ;
+                timeLines.forEach((timeLine, index) => {
+                    let sleepStart = new Date(timeLine.start.getTime());
+                    let sleepEnd = new Date(timeLine.end.getTime());
+                    
+                    sleepStart.setFullYear(dayStart.getFullYear());
+                    sleepStart.setMonth(dayStart.getMonth(), dayStart.getDate());
+
+                    sleepEnd.setFullYear(dayStart.getFullYear());
+                    sleepEnd.setMonth(dayStart.getMonth(), dayStart.getDate());
+
+                    let topPercent = ((sleepStart - dayStart)/OneDayInMs) * 100;
+                    let heightPercent = ((sleepEnd - sleepStart)/OneDayInMs) * 100;
+                    let sleepDom = sleepContainer.children[index];
+                    if(!sleepDom) {
+                        sleepDom = createSleepDom();
+                        sleepContainer.appendChild(sleepDom);
+                    }
+                    sleepDom.style.height = heightPercent+"%";
+                    sleepDom.style.top = topPercent+"%";
+
+                    sleepDom.setAttribute("Title", "Snooze " + hoverDaySleepStartString+ " - " + hoverDaySleepEndString);
+
+                    sleepDoms.add(sleepDom);
+                })
+            
+                for(let i = 0; i < sleepContainer.children.length; i++) {
+                    let nolongerValidSleepDom = sleepContainer.children[i];
+                    if(!sleepDoms.has(nolongerValidSleepDom)) {
+                        nolongerValidSleepDom.remove();
+                    }
+                }
+                
+            }
+        }
+    }
 
     var EventDayContainer = getDomOrCreateNew("EventDayContainer" + generateDayContainer.id);
-    //DayContainer.onmou = function () { alert("Hey Jay") };
-    
     $(EventDayContainer.Dom).addClass("EventDayContainer");
-    
     DayTimeContainer.Dom.appendChild(EventDayContainer.Dom);
-    
 
-    return { renderPlane: SubEventListContainer, FullDayContext: DayContextContainer, Parent: DayContainer, EventDayContainer: EventDayContainer, NameOfDayContainer: NameOfDayContainer, DayID: myID,MoreInfoPanel:MoreInfoPanel, RevealMoreOptions: revealMoreOptions, UnRevealMoreOptions: unRevealMoreOptions }
+    return {
+        renderPlane: SubEventListContainer,
+        FullDayContext: DayContextContainer,
+        Parent: DayContainer,
+        EventDayContainer: EventDayContainer,
+        NameOfDayContainer: NameOfDayContainer,
+        DayID: myID,
+        MoreInfoPanel:MoreInfoPanel,
+        RevealMoreOptions: revealMoreOptions,
+        UnRevealMoreOptions: unRevealMoreOptions,
+        RenderSleepSection: generateSleepRenderFunction(SleepContainer)
+    };
 }
 
 
@@ -2076,6 +2139,7 @@ getRefreshedData.pauseUnEnroll = function (Id) {
                 WeekRange.DaysOfWeek.forEach(triggerSubEventRenderOnMonth);
 
             });
+        RenderSleep();
     }
 
 
@@ -2783,12 +2847,15 @@ function PopulateUI(ParentDom, refDate)// draws up the container and gathers all
     StartOfRange.setHours(0, 0, 0, 0);
     var EndOfRange = new Date(StartOfRange.getTime());
     EndOfRange.setDate(EndOfRange.getDate() + (7  * global_RangeMultiplier));//sets the range to be used for query
-    global_CurrentRange = { Start: StartOfRange, End: EndOfRange
-        };
+    global_CurrentRange = {
+        Start: StartOfRange,
+        End: EndOfRange
+    };
 
-    var ScheduleRange = { Start: StartOfRange, End: EndOfRange
-        };
-            //getRangeofSchedule();
+    var ScheduleRange = { 
+        Start: StartOfRange, 
+        End: EndOfRange
+    };
     var CurrentWeek = ScheduleRange.Start;
     var AllRanges = new Array();
     var HorizontalScrollPlane = getDomOrCreateNew("HorizontalScrollPlane");
@@ -2839,19 +2906,19 @@ function PopulateUI(ParentDom, refDate)// draws up the container and gathers all
     return AllRanges;
 }
 
-        function LaunchMonthTicker(CurrDate)
+function LaunchMonthTicker(CurrDate)
+{
+    if (CurrDate == null)
     {
-        if (CurrDate == null)
-        {
-            CurrDate = Date.now();
-        }
-
-         
-        CurrDate = new Date(CurrDate.getFullYear(), CurrDate.getMonth(), 1);
-        var MonthTickerData = generateAMonthBar(CurrDate);
-        var MonthBarContainer = getDomOrCreateNew("MonthBar");
-        MonthBarContainer.Dom.appendChild(MonthTickerData.Month.Dom);
+        CurrDate = Date.now();
     }
+
+        
+    CurrDate = new Date(CurrDate.getFullYear(), CurrDate.getMonth(), 1);
+    var MonthTickerData = generateAMonthBar(CurrDate);
+    var MonthBarContainer = getDomOrCreateNew("MonthBar");
+    MonthBarContainer.Dom.appendChild(MonthTickerData.Month.Dom);
+}
 
 function generateAMonthBar(MonthStart)
 {
@@ -5034,7 +5101,6 @@ function genDivForEachWeek(RangeOfWeek, AllRanges)//generates each week containe
 
     var StartOfDay = new Date(RangeOfWeek.Start);
     let NextStartOfDay = StartOfDay;
-    //StartOfDay = StartOfDay.dst() ? new Date(Number(StartOfDay.getTime())) : StartOfDay +OneHourInMs;
     var TodayStart = new Date(Date.now());
     TodayStart.setHours(0);
     TodayStart.setMinutes(0);
@@ -5160,12 +5226,7 @@ function genDivForEachWeek(RangeOfWeek, AllRanges)//generates each week containe
                     PreviousDay.removeClass("CurrentDay");
                     $(myDay.NameOfDayContainer).addClass("CurrentDay");
                 }
-                ;;
-                //   + "<br/><span>" + Month + "/" + Day + "</span></p>";;
-
-
-                myDay.SubEventsCollection = {
-            };
+                myDay.SubEventsCollection = {};
                 BindClickTOStartOfDay(myDay);
                 myDay.UISpecs = {
                 };
@@ -5179,7 +5240,8 @@ function genDivForEachWeek(RangeOfWeek, AllRanges)//generates each week containe
 
                 DayIndex += 1;
                 DaysOfWeekDoms.push(myDay);
-            });
+            }
+        );
         SubEventRenderPlane.Start = RangeOfWeek.Start;
         SubEventRenderPlane.End = RangeOfWeek.End;
         BindAddNewEventToClick(SubEventRenderPlane);
@@ -5188,21 +5250,17 @@ function genDivForEachWeek(RangeOfWeek, AllRanges)//generates each week containe
         AllRanges.push(WeekRange);
         AllRanges[Index].Start = RangeOfWeek.Start;
         AllRanges[Index].End = RangeOfWeek.End;
-        AllRanges[Index].UISpecs = {
-    };
-        AllRanges[Index].SubEventsCollection = {
-    };
-        }
+        AllRanges[Index].UISpecs = {};
+        AllRanges[Index].SubEventsCollection = {};
+    }
     WeekRange.renderPlane = SubEventRenderPlane;
-
-            //binds click event to creation of new event
 
 
     WeekRange.Dom.appendChild(RenderPlane.Dom);
 
     var RetValue = { NameOfWeek: NameOfWeekDayRenderPlane, WeekTwentyFourHourGrid: RenderPlane }
     return RetValue;
-    }
+}
 
         //function creates Bind a click event to the render plane to enable addition of new events
         function BindAddNewEventToClick(Week) {
