@@ -3150,6 +3150,7 @@ function SendScheduleInformation(NewEvent, CallBack)
         //dataType: "json",
         success: function (response) {
             if(response && response.Error && response.Error.code !== 0 || response.Error.code !== "0") {
+                alert(response.Error.Message);
                 var NewMessage = "Oh No!!! Tiler is having issues creating a new schedule.<br>" + response.Error.Message+ ".<br>Please the changes and try again"
                 var ExitAfter = { ExitNow: true, Delay: 5000 };
                 HandleNEwPage.UpdateMessage(NewMessage, ExitAfter, function () { });
