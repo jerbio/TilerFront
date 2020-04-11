@@ -1401,7 +1401,12 @@ namespace TilerFront.Controllers
                 }
 
                 
-                //RepeatEnd = (DateTimeOffset.UtcNow).AddDays(7);
+                if(RepeatStart>=RepeatEnd)
+                {
+                    var postResult = new PostBackData(CustomErrors.Errors.Creation_Config_RepeatEnd_Earlier_Than_RepeatStart);
+                    return Ok(postResult.getPostBack);
+                }
+
                 RepetitionFlag = true;
                 MyRepetition = new Repetition(new TimeLine(RepeatStart, RepeatEnd), Utility.ParseEnum<Repetition.Frequency> (RepeatFrequency.ToUpper()), new TimeLine(FullStartTime, FullEndTime), selectedDaysOftheweek);
                 EndDateEntry = MyRepetition.Range.End > EndDateEntry ? MyRepetition.Range.End : EndDateEntry;
@@ -1438,6 +1443,12 @@ namespace TilerFront.Controllers
                     StartData = StartData.Add(-newEvent.getTimeSpan);
                     DateTimeOffset EndData = DateTimeOffset.Parse(EndTime + " " + EndDateEntry.Date.ToShortDateString()).UtcDateTime;
                     EndData = EndData.Add(-newEvent.getTimeSpan);
+                    if (StartData >= EndData)
+                    {
+                        var postResult = new PostBackData(CustomErrors.Errors.Creation_Config_End_Earlier_Than_Start);
+                        return Ok(postResult.getPostBack);
+                    }
+
                     if (RigidScheduleFlag) {
                         newCalendarEvent = new RigidCalendarEvent(
                             Name, StartData, EndData, EventDuration,new TimeSpan(), new TimeSpan(), MyRepetition, EventLocation,  new EventDisplay(true, userColor, userColor.User < 1 ? 0 : 1), new MiscData(), true,false, tilerUser, new TilerUserGroup(), TimeZone, null, new NowProfile(), null);
