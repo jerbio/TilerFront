@@ -55,16 +55,26 @@
                 <input id="PasswordSignin" name="Password" type="password" placeholder="Password" class="SignRegInput" />
             </div>
             <div id="RegPageFormContainer" class="regSignInFormContainer">
-                <div id="ConfirmPasswordReginContainer">
-                    <span id="PassWordConfirmErrorContainer" class="regformError"></span>
-                    <input id="ConfirmPasswordRegin" name="ConfirmPasswordReg" type="password" placeholder="Verify Password" class="SignRegInput" />
+                <div id="PasswordInstruction" class="setAsDisplayNone">
+                    <div>Password</div>
+                    <div id="passwordMinLength" class="setAsDisplayNone"> - needs to be at least 6 characters</div>
+                    <div id="passwordNeedsUpperCase" class="setAsDisplayNone"> - needs to include an upper case character</div>
+                    <div id="passwordNeedsLowerCase" class="setAsDisplayNone"> - needs to include a lower case character</div>
+                    <div id="passwordNeedsNumber" class="setAsDisplayNone"> - needs to include at least a number</div>
+                    <div id="passwordNeedsNoneLetterAndNoneNumber" class="setAsDisplayNone"> - needs to include at least one none-letter and non-number</div>
                 </div>
+                <div id="PasswordRegistrationInputContainer">
+                    <div id="ConfirmPasswordReginContainer">
+                        <span id="PassWordConfirmErrorContainer" class="regformError"></span>
+                        <input id="ConfirmPasswordRegin" name="ConfirmPasswordReg" type="password" placeholder="Verify Password" class="SignRegInput" />
+                    </div>
 
-                <input id="FullNameRegin" name="FullNameReg" type="text" placeholder="Your Name" class="SignRegInput" />
+                    <input id="FullNameRegin" name="FullNameReg" type="text" placeholder="Your Name" class="SignRegInput" />
 
-                <div id="EmailReginContainer">
-                    <span id="EmailError" class="regformError"></span>
-                    <input id="EmailRegin" name="UserNameReg" type="text" placeholder="Email" class="SignRegInput" />
+                    <div id="EmailReginContainer">
+                        <span id="EmailError" class="regformError"></span>
+                        <input id="EmailRegin" name="UserNameReg" type="text" placeholder="Email" class="SignRegInput" />
+                    </div>
                 </div>
                 
             </div>

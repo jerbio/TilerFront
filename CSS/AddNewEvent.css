@@ -800,12 +800,10 @@ input:focus {
 .LocationAddress 
 {
     position:absolute;
-    //font-weight:900;
     left:30%;
     width:65%;
     overflow:hidden;
     text-overflow:ellipsis;
-    //line-height:100%;
 }
 
 #ContainerDateElement 
@@ -814,7 +812,7 @@ input:focus {
     display:none;
     width:100%;
     height:100%;
-    //background-color:red;
+    top: 0;
     z-index:10;
 }
 

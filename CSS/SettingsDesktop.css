@@ -47,8 +47,28 @@ body
     padding:10px;
 }
 
-@media only screen and (max-device-width: 500px)
-{
+.SettingSection.ScheduleDump {
+    height: 150px;
+    padding: 0 0 70px 0;
+}
+
+#submitDumpButtonContainer {
+    padding: 0% 0% 0% 5%;
+}
+
+#DumpReferenceId {
+    padding: 0% 0% 5% 5%;
+}
+
+
+.SettingSection.ScheduleDump #scheduleDumpNotes {
+        width: 90%;
+        box-sizing: border-box;
+        margin: 5%;
+        position: relative;
+    }
+
+@media only screen and (max-device-width: 500px) {
     .SettingSectionContainer
     {
         position:relative;

@@ -4,19 +4,20 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Web;
+using TilerElements;
 
 namespace TilerFront.Models
 {
     [Table("PausedEvent")]
     public class PausedEvent
     {
-        [Column(Order = 0), ForeignKey("User"), Index("UserIdAndSubEventIdClustering",Order =0, IsUnique = true, IsClustered = false), Index("UserIdAndPauseStatus", Order = 0, IsClustered = true)]
+        [Column(Order = 0),Key, ForeignKey("User"), Index("UserIdAndSubEventIdClustering",Order =0, IsUnique = true, IsClustered = false), Index("UserIdAndPauseStatus", Order = 0)]
         public string UserId { get; set; }
-        ApplicationUser _User;
+        TilerUser _User;
         /// <summary>
         /// User for which the event is associated
         /// </summary>
-        public ApplicationUser User {
+        public TilerUser User {
             get {
                 return _User;
             }
@@ -37,7 +38,7 @@ namespace TilerFront.Models
         /// <summary>
         /// Is the current event paused
         /// </summary>
-        [Index("UserIdAndPauseStatus", Order = 1, IsClustered = true)]
+        [Index("UserIdAndPauseStatus", Order = 1)]
         public bool isPauseDeleted { get; set; } = false;
     }
 }

@@ -14,30 +14,31 @@ using System.Web.Http;
 using System.Web.Configuration;
 using System.Web.Http.Description;
 using TilerFront.Models;
+using TilerElements;
 using DBTilerElement;
 //using System.Web.Http.Cors;
 
 namespace TilerFront.Controllers
 {
     //[EnableCors(origins: "*", headers: "accept, authorization, origin", methods: "DELETE,PUT,POST,GET")]
-    public class UserController : ApiController
+    public class UserController : TilerApiController
     {
         //private TilerFrontContext db = new TilerFrontContext();
-        private ApplicationDbContext db = new ApplicationDbContext();
+        //private ApplicationDbContext db = new ApplicationDbContext();
         
         // GET api/User
         [NonAction]
-        public IQueryable<ApplicationUser> GetUsers()
+        public IQueryable<TilerUser> GetUsers()
         {   
             return db.Users;
         }
         /*
         // GET api/User/5
         [NonAction]
-        [ResponseType(typeof(ApplicationUser))]
+        [ResponseType(typeof(TilerUser))]
         public async Task<IHttpActionResult> GetUser(string id)
         {
-            ApplicationUser user = await db.Users.SingleAsync(obj => obj.UserID == id); //.Asy(id); //await db.Users.Where(obj=>obj.UserID.FindAsync(id);
+            TilerUser user = await db.Users.SingleAsync(obj => obj.UserID == id); //.Asy(id); //await db.Users.Where(obj=>obj.UserID.FindAsync(id);
             if (user == null)
             {
                 return NotFound();
@@ -48,11 +49,11 @@ namespace TilerFront.Controllers
         */
 
 
-        async public Task<ApplicationUser> GetUser(string ID,string userName)
+        async public Task<TilerUser> GetUser(string ID,string userName)
         {
-            List<ApplicationUser> AllUsers = await db.Users.Where(obj => obj.Id == ID).ToListAsync();
+            List<TilerUser> AllUsers = await db.Users.Where(obj => obj.Id == ID).ToListAsync();
 
-            ApplicationUser user = null;
+            TilerUser user = null;
             if (AllUsers.Count > 0)
             {
                 if (user != null)
@@ -68,10 +69,10 @@ namespace TilerFront.Controllers
         }
 
 
-        public async Task SaveUser(ApplicationUser user)
+        public async Task SaveUser(TilerUser user)
         {
             
-            var store = new UserStore<ApplicationUser>(db);
+            var store = new UserStore<TilerUser>(db);
 
             var manager = new ApplicationUserManager(store);
             await manager.UpdateAsync(user);
@@ -161,13 +162,13 @@ namespace TilerFront.Controllers
         [Route("api/User/Location")]
         public async Task<IHttpActionResult> Location([FromUri]NameSearchModel SearchData)
         {
-            UserAccountDirect retrievedUser = await SearchData.getUserAccountDirect();
+            UserAccount retrievedUser = await SearchData.getUserAccount(db);
             await retrievedUser.Login();
 
             PostBackData retValue = new PostBackData("", 4);
             if (retrievedUser.Status)
             {
-                IEnumerable<TilerElements.Location_Elements> retrievedCalendarEvents = await retrievedUser.ScheduleLogControl.getCachedLocationByName(SearchData.Data);
+                IEnumerable<TilerElements.Location> retrievedCalendarEvents = retrievedUser.ScheduleLogControl.getLocationsByDescription(SearchData.Data).ToList();
                 retValue = new PostBackData(retrievedCalendarEvents.Select(obj => obj.ToLocationModel()).ToList(), 0);
             }
 

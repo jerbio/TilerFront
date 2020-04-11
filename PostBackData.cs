@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -33,13 +34,14 @@ namespace TilerFront
             {10001000,"User Already exists"},
             {30001000,"Registration exception. Check DB control with user credentials"},
             {40001000,"Publication Error."},//Just testing
+            {50005000,"Pause/Resume Bug."},
             {100,"I have no idea"}
         };
         dynamic Data;
         int Status=0;
         string Message;
 
-        public PostBackData(int StatusEntry)
+        public PostBackData(int StatusEntry=0)
         {
             Message = "";
             Status = StatusEntry;
@@ -52,10 +54,20 @@ namespace TilerFront
             Status = StatusEntry;
         }
 
+        public PostBackData(CustomErrors.Errors Error):this(new CustomErrors(Error))
+        {
+
+        }
         public PostBackData(CustomErrors Error)
         {
-            Data = Error.Message;
-            Status = Error.Code;
+            Status = 0;
+            Data = "Success";
+            if (Error != null)
+            {
+                Data = Error.Message;
+                Message = Error.Message;
+                Status = Error.Code;
+            }
         }
 
         public PostBackData(dynamic DataEntry, int StatusEntry)
@@ -67,15 +79,22 @@ namespace TilerFront
         string getErrorMessage(int errorCode)
         {
             string retValue;
-            if (errorCode >= 20000000)
+            string defaultMessage = "Tiler is having some issues please try again later";
+            if (errorCode > 0 && errorCode < 20000000)
             {
-                retValue = "Tiler is having some issues please try again later";
+                retValue = string.IsNullOrEmpty(Message) || string.IsNullOrWhiteSpace(Message) ?  defaultMessage : Message;
                 return retValue;
             }
 
             if (string.IsNullOrEmpty(Message))
             {
-                retValue = errorDictionary[errorCode];
+                if(errorDictionary.ContainsKey(errorCode))
+                {
+                    retValue = errorDictionary[errorCode];
+                } else {
+                    retValue = defaultMessage;
+                }
+                
             }
             else
             {
@@ -89,27 +108,12 @@ namespace TilerFront
         { 
             get
             {
+                
                 TilerFront.Models.PostError retPostError = new TilerFront.Models.PostError() { code = this.Status.ToString(), Message = getErrorMessage(Status) };
                 TilerFront.Models.PostBackStruct PostBackData = new TilerFront.Models.PostBackStruct { Error = retPostError, Content = this.Data };
+
                 return PostBackData;
             }
         }
-
-        public string getPostBackData
-        {
-            get
-            {
-
-                string retValue = "{\"Error\":{\"code\":\"" + Status + "\",\"Message\":\"" + getErrorMessage(Status) + "\"},\"Content\":" + Data + "}";
-                return retValue;
-            }
-        }
-
-
-
-        
-
-        
-
     }
 }

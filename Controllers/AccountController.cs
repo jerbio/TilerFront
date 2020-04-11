@@ -12,12 +12,12 @@ using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using Microsoft.AspNet.Identity.EntityFramework;
 using TilerFront.Models;
-
+using TilerElements;
 
 namespace TilerFront.Controllers
 {
     [Authorize]
-    public class AccountController : Controller
+    public class AccountController : TilerController
     {
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
@@ -223,8 +223,8 @@ namespace TilerFront.Controllers
                 case SignInStatus.Success:
                     {
                         UserController myUserCtrl = new UserController();
-                        ApplicationUser SessionUser = await myUserCtrl.GetUser(User.Identity.GetUserId(), User.Identity.GetUserName());
-                        RetValue = new UserAccountDirect(SessionUser);
+                        TilerUser SessionUser = await myUserCtrl.GetUser(User.Identity.GetUserId(), User.Identity.GetUserName());
+                        RetValue = new UserAccountDirect(SessionUser.Id, dbContext);
                         return RetValue;   
                     }
                 default:
@@ -306,67 +306,105 @@ namespace TilerFront.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Register(RegisterViewModel model)
         {
-            Controllers.ThirdPartyCalendarAuthenticationModelsController.initializeCurrentURI(System.Web.HttpContext.Current.Request.Url.Authority);
+            ThirdPartyCalendarAuthenticationModelsController thirdPartyController = new ThirdPartyCalendarAuthenticationModelsController();
+            thirdPartyController.initializeCurrentURI(System.Web.HttpContext.Current.Request.Url.Authority);
             if (ModelState.IsValid)
             {
                 int Min=Convert.ToInt32(model.TimeZoneOffSet);
                 TimeSpan OffSet = TimeSpan.FromMinutes(Min);
                 DateTimeOffset EndOfDay = new DateTimeOffset(2014, 1, 1, 22, 0, 0, OffSet);
-                var user = new ApplicationUser { UserName = model.Username, Email = model.Email, FullName = model.FullName, LastChange = EndOfDay.UtcDateTime};
-                var logGenerationresult = await generateLog(user);
-                //var result = logGenerationresult.Item1;
-                //if (result.Succeeded)
-                //{
-                    var result = await UserManager.CreateAsync(user, model.Password);
+                var travelCache = new TravelCache();
+                var user = new TilerUser { UserName = model.Username, Email = model.Email, FirstName = model.FirstName?? "", LastName = model.LastName?? "", EndfOfDay = EndOfDay.UtcDateTime, TravelCache = travelCache };
+                travelCache.Id = user.Id;
+                var result = await UserManager.CreateAsync(user, model.Password);
 
-                    if (result.Succeeded)
-                    {
-                        await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
-                        /*
-                        if (logGenerationresult.Item2 > 0)
-                        {
-                            string CurrentLogLocation = LogControl.getLogLocation();
-                            DBControl newDB = new DBControl(model.Username, logGenerationresult.Item2);
-                            LogControl OldLog = new LogControl(newDB);
-                            string OldLogLocation = BundleConfig.OldLog;
-                            LogControl.UpdateLogLocation(OldLogLocation);
-                            UserAccount OldUserAccount = new UserAccount(model.Username, logGenerationresult.Item2);
-                            await OldUserAccount.Login();
-                            newDB.deleteUser();
-                            await OldUserAccount.DeleteLog();
-                            LogControl.UpdateLogLocation(CurrentLogLocation);
-                        }
-                        
-                        string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
-                        var callbackUrl = Url.Action("ConfirmEmail", "Account",
-                           new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-                        await UserManager.SendEmailAsync(user.Id,
-                           "Confirm your account", "Please confirm your account by clicking <a href=\""
-                           + callbackUrl + "\">here </a>");
-                        */
-                        Task SendEmail = SendEmailConfirmationAsync(user.Id, "Please Confirm Your Tiler Account!");
-                        await SendEmail.ConfigureAwait(false);
+                if (result.Succeeded)
+                {
+                    user = dbContext.Users.Find(user.Id);
+                    await createProcrastinateCalendarEvent(user).ConfigureAwait(false);
+                    await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
+                    Task SendEmail = SendEmailConfirmationAsync(user.Id, "Please Confirm Your Tiler Account!");
+                    await SendEmail.ConfigureAwait(false);
 
-                        // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=320771
-                        // Send an email with this link
-                        // string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
-                        // var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-                        // await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
+                    // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=320771
+                    // Send an email with this link
+                    // string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
+                    // var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
+                    // await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
                         
-                        //return RedirectToAction("Index", "Home");
-                        return RedirectToAction("Desktop", "Account");
-                    }
-                    else
-                    {
-                        LogControlDirect LogToBedeleted = new LogControlDirect(user, "", true);
-                        await LogToBedeleted.DeleteLog();
-                    }
-                //}
+                    //return RedirectToAction("Index", "Home");
+                    return RedirectToAction("Desktop", "Account");
+                }
                 AddErrors(result);
             }
 
             // If we got this far, something failed, redisplay form
             return View(model);
+        }
+
+        public async Task createProcrastinateCalendarEvent (TilerUser user)
+        {
+            DateTimeOffset now = Utility.ProcrastinateStartTime;
+            CalendarEvent procrastinateCalEvent = ProcrastinateCalendarEvent.generateProcrastinateAll(now, user, TimeSpan.FromSeconds(1), "UTC");
+            dbContext.CalEvents.Add(procrastinateCalEvent);
+            await dbContext.SaveChangesAsync().ConfigureAwait(false);
+        }
+
+        public async Task<ActionResult> RegisterUser(RegisterViewModel model)
+        {
+            ThirdPartyCalendarAuthenticationModelsController thirdPartyController = new ThirdPartyCalendarAuthenticationModelsController();
+            thirdPartyController.initializeCurrentURI(System.Web.HttpContext.Current.Request.Url.Authority);
+            PostBackData retPost = new PostBackData("Failed to register user", 3);
+            JsonResult RetValue = new JsonResult();
+            if (ModelState.IsValid)
+            {
+                int Min = Convert.ToInt32(model.TimeZoneOffSet);
+                TimeSpan OffSet = TimeSpan.FromMinutes(Min);
+                DateTimeOffset EndOfDay = new DateTimeOffset(2014, 1, 1, 22, 0, 0, OffSet);
+                var travelCache = new TravelCache();
+                var user = new TilerUser { UserName = model.Username, Email = model.Email, FirstName = model.FirstName, LastName = model.LastName, EndfOfDay = EndOfDay.UtcDateTime, TravelCache = travelCache };
+                travelCache.Id = user.Id;
+
+                var result = await UserManager.CreateAsync(user, model.Password);
+
+                if (result.Succeeded)
+                {
+                    user = dbContext.Users.Find(user.Id);
+                    await createProcrastinateCalendarEvent(user).ConfigureAwait(false);
+                    await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
+                    Task SendEmail = SendEmailConfirmationAsync(user.Id, "Please Confirm Your Tiler Account!");
+                    await SendEmail.ConfigureAwait(false);
+
+                    string LoopBackUrl = "";
+                    if (Request.Browser.IsMobileDevice)
+                    {
+                        LoopBackUrl = "/Account/Mobile";
+                    }
+                    else
+                    {
+                        LoopBackUrl = "/Account/Desktop";
+                    }
+
+                    retPost = new PostBackData(LoopBackUrl, 0);
+                    RetValue.Data = (retPost.getPostBack);
+                    return RetValue;
+
+
+                    // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=320771
+                    // Send an email with this link
+                    // string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
+                    // var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
+                    // await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
+                }
+                retPost = new PostBackData(string.Join("<br>", result.Errors.Select(obj => obj.Split('.')).SelectMany(obj => obj)), 3);
+                RetValue.Data = (retPost.getPostBack);
+                return RetValue;
+            }
+            string AllErrors = string.Join("<br>", ModelState.Values.SelectMany(obj => obj.Errors.Select(obj1 => obj1.ErrorMessage)));
+            retPost = new PostBackData(AllErrors, 3);
+            RetValue.Data = (retPost.getPostBack);
+
+            return RetValue;
         }
 
 
@@ -377,144 +415,9 @@ namespace TilerFront.Controllers
 
         public async Task<ActionResult> SignUp(RegisterViewModel model)
         {
-            Controllers.ThirdPartyCalendarAuthenticationModelsController.initializeCurrentURI(System.Web.HttpContext.Current.Request.Url.Authority);
-            PostBackData retPost = new PostBackData("Failed to register user", 3);
-            JsonResult RetValue = new JsonResult();
-            if (ModelState.IsValid)
-            {
-                int Min = Convert.ToInt32(model.TimeZoneOffSet);
-                TimeSpan OffSet = TimeSpan.FromMinutes(Min);
-                DateTimeOffset EndOfDay = new DateTimeOffset(2014, 1, 1, 22, 0, 0, OffSet);
-                var user = new ApplicationUser { UserName = model.Username, Email = model.Email, FullName = model.FullName, LastChange = EndOfDay.UtcDateTime };
-                var logGenerationresult = await generateLog(user);
-                var result = logGenerationresult.Item1;
-                if (result.Succeeded)
-                {
-                    result = await UserManager.CreateAsync(user, model.Password);
-
-                    if (result.Succeeded)
-                    {
-                        await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
-                        /*
-                        if (logGenerationresult.Item2 > 0)
-                        {
-                            string CurrentLogLocation = LogControl.getLogLocation();
-                            DBControl newDB = new DBControl(model.Username, logGenerationresult.Item2);
-                            LogControl OldLog = new LogControl(newDB);
-                            string OldLogLocation = BundleConfig.OldLog;
-                            LogControl.UpdateLogLocation(OldLogLocation);
-                            UserAccount OldUserAccount = new UserAccount(model.Username, logGenerationresult.Item2);
-                            await OldUserAccount.Login();
-                            newDB.deleteUser();
-                            await OldUserAccount.DeleteLog();
-                            LogControl.UpdateLogLocation(CurrentLogLocation);
-                        }
-                        */
-                        /*
-                        string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
-                        var callbackUrl = Url.Action("ConfirmEmail", "Account",
-                           new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-                        await UserManager.SendEmailAsync(user.Id,
-                           "Confirm your account", "Please confirm your account by clicking <a href=\""
-                           + callbackUrl + "\">here </a>");*/
-
-                        Task SendEmail = SendEmailConfirmationAsync(user.Id, "Please Confirm Your Tiler Account!");
-                        await SendEmail.ConfigureAwait(false);
-
-                        string LoopBackUrl = "";
-                        if (Request.Browser.IsMobileDevice)
-                        {
-                            LoopBackUrl = "/Account/Mobile";
-                        }
-                        else
-                        {
-                            LoopBackUrl = "/Account/Desktop";
-                        }
-                        
-                        retPost = new PostBackData(LoopBackUrl, 0);
-                        RetValue.Data = (retPost.getPostBack);
-                        return RetValue;
-
-
-                        // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=320771
-                        // Send an email with this link
-                        // string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
-                        // var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-                        // await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
-                    }
-                    else
-                    {
-                        LogControlDirect LogToBedeleted = new LogControlDirect(user,"",true);
-                        await LogToBedeleted.DeleteLog();
-                    }
-                }
-                retPost = new PostBackData(string.Join("\n", result.Errors), 3);
-                RetValue.Data= (retPost.getPostBack);
-                return RetValue;
-            }
-            string AllErrors = string.Join("\n", ModelState.Values.SelectMany(obj=>obj.Errors.Select(obj1=>obj1.ErrorMessage)));
-            retPost = new PostBackData(AllErrors, 3);
-            RetValue.Data = (retPost.getPostBack);
-
-            return RetValue;
+            return await RegisterUser(model);
         }
 
-
-
-        async Task<Tuple<IdentityResult,int>> generateLog(ApplicationUser model)
-        {
-            Tuple<bool, int> ExistInOldDB = DBControl.doesUserExistInOldDB(model.UserName);
-            string CurrentLogLocation = LogControl.getLogLocation();
-            bool NewLogCreationSuccess=false;
-            Tuple<IdentityResult, int> retValue;
-            int OldID = -1;
-            if (ExistInOldDB.Item1)
-            {
-                /*
-                OldID = ExistInOldDB.Item2;
-                DBControl newDB = new DBControl(model.UserName, model.PasswordHash);
-                LogControl OldLog = new LogControl(newDB);
-
-                
-                string OldLogLocation = BundleConfig.OldLog;
-                LogControl.UpdateLogLocation(OldLogLocation);
-                UserAccount OldUserAccount = new UserAccount(model.UserName, ExistInOldDB.Item2);
-                await OldUserAccount.Login();
-                ///*
-                if (OldUserAccount.Status)
-                {
-                    Task<Tuple<Dictionary<string, TilerElements.CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location_Elements>>> Task_profileData = OldUserAccount.ScheduleData.getProfileInfo();
-                    Tuple<Dictionary<string, TilerElements.CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location_Elements>> profileData = await Task_profileData;
-                    //OldUserAccount.DeleteLog();
-
-                    LogControlDirect newLog = new LogControlDirect(model, CurrentLogLocation);
-                    newLog.genereateNewLogFile(model.Id);
-                    newLog.UpdateReferenceDay(profileData.Item2);
-                    NewLogCreationSuccess = await newLog.WriteToLog(profileData.Item1.Values, OldUserAccount.LastEventTopNodeID.ToString());
-                }
-                
-                //*/
-            }
-            else
-            {
-
-                LogControlDirect newLog = new LogControlDirect(model, CurrentLogLocation);
-                UserAccountDirect newUser = new UserAccountDirect(model);
-                List<string> NameDist = model.FullName.Split().ToList();
-                Task< TilerElements.CustomErrors> registerStatus =  newUser.Register(model);
-                NewLogCreationSuccess =! (await registerStatus).Status;
-            }
-
-            if (NewLogCreationSuccess)
-            {
-                retValue = new Tuple<IdentityResult, int>(IdentityResult.Success, OldID);
-                return retValue;
-            }
-
-            retValue = new Tuple<IdentityResult, int>(IdentityResult.Failed("Registration is currently unavailable"), OldID);
-
-            return retValue;
-        }
         //
         // GET: /Account/ConfirmEmail
         [AllowAnonymous]
@@ -549,7 +452,7 @@ namespace TilerFront.Controllers
         public ActionResult Mobile()
         {
             ViewBag.Message = "Welcome To Tiler";
-            ApplicationUser myUser = UserManager.FindById(User.Identity.GetUserId());
+            TilerUser myUser = UserManager.FindById(User.Identity.GetUserId());
 
             return View(myUser);
         }
@@ -700,32 +603,41 @@ namespace TilerFront.Controllers
             return RedirectToAction("VerifyCode", new { Provider = model.SelectedProvider, ReturnUrl = model.ReturnUrl, RememberMe = model.RememberMe });
         }
 
+
+        //public async Task<ActionResult> externalLogin(string returnUrl, SignInStatus signInstatus)
+        //{
+
+        //}
         //
         // GET: /Account/ExternalLoginCallback
         [AllowAnonymous]
         public async Task<ActionResult> ExternalLoginCallback(string returnUrl)
         {
-            ApplicationDbContext db = new ApplicationDbContext();
             var loginInfo = await AuthenticationManager.GetExternalLoginInfoAsync();
             if (loginInfo == null)
             {
                 return RedirectToAction("Login");
             }
-            Controllers.ThirdPartyCalendarAuthenticationModelsController.initializeCurrentURI(System.Web.HttpContext.Current.Request.Url.Authority);
-            int ThirdPartyType = -1;
+
+            if (System.Web.HttpContext.Current != null)// this helps save the reurn uri for notification
+            {
+                ThirdPartyCalendarAuthenticationModelsController thirdPartyController = new ThirdPartyCalendarAuthenticationModelsController();
+                thirdPartyController.initializeCurrentURI(System.Web.HttpContext.Current.Request.Url.Authority);
+            }
+            string ThirdPartyType;
             var result = await SignInManager.ExternalSignInAsync(loginInfo, isPersistent: false).ConfigureAwait(false);
             switch (result)
             {
                 case SignInStatus.Success:
                     {
-                        ThirdPartyType = Convert.ToInt32(loginInfo.ExternalIdentity.FindFirst("ThirdPartyType").Value);
+                        ThirdPartyType = loginInfo.ExternalIdentity.FindFirst("ThirdPartyType").Value;
                         DateTimeOffset Now = DateTimeOffset.UtcNow;
-                        if (ThirdPartyType==(int)TilerElements.ThirdPartyControl.CalendarTool.Google)
+                        if (ThirdPartyType==TilerElements.ThirdPartyControl.CalendarTool.google.ToString())
                         {
                             string RefreshToken = loginInfo.ExternalIdentity.FindFirst("RefreshToken").Value;
                             if(!string.IsNullOrEmpty(RefreshToken ))
                             {
-                                ApplicationUser AppUser = await UserManager.FindAsync(loginInfo.Login).ConfigureAwait(false);
+                                TilerUser AppUser = await UserManager.FindAsync(loginInfo.Login).ConfigureAwait(false);
                                 string Email = loginInfo.Email;
                                 string AccessToken = loginInfo.ExternalIdentity.FindFirst("AccessToken").Value;
                                 TimeSpan fiveMin = new TimeSpan(0,-5,0);
@@ -748,15 +660,15 @@ namespace TilerFront.Controllers
                 default:
                     // If the user does not have an account, then prompt the user to create an account
                     
-                    ThirdPartyType = Convert.ToInt32(loginInfo.ExternalIdentity.FindFirst("ThirdPartyType").Value);
+                    ThirdPartyType = loginInfo.ExternalIdentity.FindFirst("ThirdPartyType").Value;
                     ThirdPartyCalendarAuthenticationModel thirdPartyModel = null;
                     DateTimeOffset Deadline = DateTimeOffset.UtcNow;
-                    if (ThirdPartyType == (int)TilerElements.ThirdPartyControl.CalendarTool.Google)
+                    if (ThirdPartyType == TilerElements.ThirdPartyControl.CalendarTool.google.ToString())
                     {
                         string RefreshToken = loginInfo.ExternalIdentity.FindFirst("RefreshToken").Value;
                         if (!string.IsNullOrEmpty(RefreshToken))
                         {
-                            ApplicationUser AppUser = await UserManager.FindAsync(loginInfo.Login).ConfigureAwait(false);
+                            TilerUser AppUser = await UserManager.FindAsync(loginInfo.Login).ConfigureAwait(false);
                             string Email = loginInfo.Email;
                             string AccessToken = loginInfo.ExternalIdentity.FindFirst("AccessToken").Value;
                             TimeSpan fiveMin = new TimeSpan(0, -5, 0);
@@ -768,6 +680,17 @@ namespace TilerFront.Controllers
                             thirdPartyModel.Email = Email;
                             thirdPartyModel.Token = AccessToken;
                             thirdPartyModel.RefreshToken= RefreshToken;
+                        } else
+                        {
+                            string Email = loginInfo.Email;
+                            string AccessToken = loginInfo.ExternalIdentity.FindFirst("AccessToken").Value;
+                            thirdPartyModel = new ThirdPartyCalendarAuthenticationModel();
+                            thirdPartyModel.Deadline = Deadline;
+                            thirdPartyModel.Email = Email;
+                            thirdPartyModel.Token = AccessToken;
+                            thirdPartyModel.RefreshToken = RefreshToken;
+                            thirdPartyModel.ID = Email;
+                            await thirdPartyModel.revokeAccess().ConfigureAwait(false);
                         }
                     }
                     
@@ -806,7 +729,31 @@ namespace TilerFront.Controllers
                 {
                     return View("ExternalLoginFailure");
                 }
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email, FullName = info.ExternalIdentity.Name, LastChange = DateTime.Now };
+                string[] nameArray = (info.ExternalIdentity.Name ?? "").Split(' ');
+                string LastName = "";
+                string FirstName = "";
+                string OtherName = "";
+                if (nameArray.Length > 0)
+                {
+                    FirstName = nameArray[0];
+                    if (nameArray.Length > 1)
+                    {
+                        LastName = nameArray.Last();
+                    }
+                    if(nameArray.Length > 2)
+                    {
+                        for (var i =1;i< nameArray.Length-1; i++ )
+                        {
+                            OtherName = nameArray[i];
+                            if(i+1 < nameArray.Length - 1)
+                            {
+                                OtherName += " ";
+                            }
+                        }
+                        
+                    }
+                }
+                var user = new TilerUser { UserName = model.Email, Email = model.Email, FirstName = FirstName, LastName = LastName, OtherName = OtherName, EndfOfDay = DateTime.Now };
 
 
                 var result = await UserManager.CreateAsync(user);
@@ -814,11 +761,11 @@ namespace TilerFront.Controllers
                 
                 if (result.Succeeded)
                 {
-                    var logGenerationresult = await generateLog(user);
-                    var LogCreationresult = logGenerationresult.Item1;
                     result = await UserManager.AddLoginAsync(user.Id, info.Login);
-                    if (result.Succeeded && LogCreationresult.Succeeded)
+                    if (result.Succeeded )
                     {
+                        user = dbContext.Users.Find(user.Id);
+                        await createProcrastinateCalendarEvent(user).ConfigureAwait(false);
                         await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
                         Task SendThirdPartyAuthentication = new Task(() => { });
                         if (ThirdPartyCredentials!=null)
@@ -826,22 +773,7 @@ namespace TilerFront.Controllers
                             string Email = ThirdPartyCredentials.Email;
                             SendThirdPartyAuthentication = PopulateGoogleAuthentication(user.Id, ThirdPartyCredentials.Token, ThirdPartyCredentials.RefreshToken, Email, ThirdPartyCredentials.Deadline); ;
                         }
-                        
-                        /*
-                        string RefreshToken = loginInfo.ExternalIdentity.FindFirst("RefreshToken").Value;
-                        if (!string.IsNullOrEmpty(RefreshToken))
-                        {
-                            ApplicationDbContext db = new ApplicationDbContext();
-                            string Email = loginInfo.Email;
-                            ApplicationUser AppUser = db.Users.Where(obj => obj.Email == Email).Single();
-                            string AccessToken = loginInfo.ExternalIdentity.FindFirst("AccessToken").Value;
-                            TimeSpan fiveMin = new TimeSpan(0, -5, 0);
-                            TimeSpan Duration = TimeSpan.Parse(loginInfo.ExternalIdentity.FindFirst("ExpiryDuration").Value);
-                            Duration = Duration.Add(fiveMin);
-                            Now = Now.Add(Duration);
-                            await PopulateGoogleAuthentication(Email, AccessToken, RefreshToken, Now).ConfigureAwait(false);
-                        }
-                        */
+
                         // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=320771
                         // Send an email with this link
                         // string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
@@ -858,42 +790,20 @@ namespace TilerFront.Controllers
                         await SendEmail.ConfigureAwait(false);
                         return RedirectToAction("Desktop", "Account");
                     }
-                    else
-                    {
-                        LogControlDirect LogToBedeleted = new LogControlDirect(user);
-                        await LogToBedeleted.DeleteLog();
-                    }
                 }
 
                 AddErrors(result);
-                
-                
-                
-                
-                /*
-                var result = await UserManager.CreateAsync(user);
-                if (result.Succeeded)
-                {
-                    result = await UserManager.AddLoginAsync(user.Id, info.Login);
-                    if (result.Succeeded)
-                    {
-                        await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
-                        return RedirectToAction("Desktop", "Account");
-                    }
-                }
-                AddErrors(result);*/
             }
 
             ViewBag.ReturnUrl = returnUrl;
-            //return View("ExternalLoginFailure");
             return View("ExternalLoginConfirmation", model);
         }
 
 
         async Task<bool> PopulateGoogleAuthentication(string TilerUserID,string AccessToken,string RefreshToken, string GoogleEmail,DateTimeOffset ExpirationDate )
         {
-            ApplicationDbContext db = new ApplicationDbContext();
-            ApplicationUser AppUser = UserManager.FindById(TilerUserID);
+            //ApplicationDbContext db = new ApplicationDbContext();
+            TilerUser AppUser = UserManager.FindById(TilerUserID);
             bool RetValue = false;
             try
             { 
@@ -906,12 +816,14 @@ namespace TilerFront.Controllers
                 NewAccountCalendarImportation.isLongLived = false;
                 NewAccountCalendarImportation.Email = GoogleEmail;
                 NewAccountCalendarImportation.Deadline = ExpirationDate;
+                NewAccountCalendarImportation.ProviderID = ThirdPartyControl.CalendarTool.google.ToString();
 
 
                 //await NewAccountCalendarImportation.refreshAuthenticationToken().ConfigureAwait(false);
 
                 HttpContext myContext = System.Web.HttpContext.Current;
-                await ThirdPartyCalendarAuthenticationModelsController.CreateGoogle(NewAccountCalendarImportation);
+                ThirdPartyCalendarAuthenticationModelsController thirdPartyController = new ThirdPartyCalendarAuthenticationModelsController();
+                await thirdPartyController.CreateGoogle(NewAccountCalendarImportation);
                 RetValue = true;
             }
             catch

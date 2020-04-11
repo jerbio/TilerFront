@@ -1,5 +1,7 @@
-﻿using System.Web;
+﻿using System.Configuration;
+using System.Web;
 using System.Web.Optimization;
+using TilerElements;
 
 namespace TilerFront
 {
@@ -7,19 +9,24 @@ namespace TilerFront
     {
         // For more information on bundling, visit http://go.microsoft.com/fwlink/?LinkId=301862
         public static string OldLog;
+        public static string LogLocation;
+        public static string BigDataocation;
         public static void RegisterBundles(BundleCollection bundles)
         {
             OldLog = HttpContext.Current.Server.MapPath("~\\OldLogs\\");
-            string LogLocation = HttpContext.Current.Server.MapPath("~\\WagTapCalLogs\\");//initializes the log location\
-            string BigDataocation = HttpContext.Current.Server.MapPath("~\\BigDataLogs\\");//initializes the log location
+            LogLocation = HttpContext.Current.Server.MapPath("~\\WagTapCalLogs\\");//initializes the log location\
+            BigDataocation = HttpContext.Current.Server.MapPath("~\\BigDataLogs\\");//initializes the log location
             //LogLocation = @"C:\Users\OluJerome\Documents\Visual Studio 2010\Projects\LearnCuDAVS2010\LearnCUDAConsoleApplication\bin\Debug\WagTapCalLogs\";
             //LogLocation = @"C:\Users\OluJerome\Documents\Visual Studio 2010\Projects\LearnCuDAVS2010\LearnCUDAConsoleApplication\WagTapCalLogs\";
-            TilerFront.LogControl.UpdateLogLocation(LogLocation);
             TilerFront.LogControl.UpdateBigDataLogLocation(BigDataocation);
+            TilerFront.LogControl.UpdateLogLocation(LogLocation);
+
+            string apiKey = ConfigurationManager.AppSettings["googleMapsApiKey"];
+            Location.updateApiKey(apiKey);
             bundles.Add(new ScriptBundle("~/Scripts/signalR").Include(
-                        "~/Scripts/jquery.signalR-2.2.0.min.js"));
+                        "~/Scripts/jquery.signalR-{version}.js"));
 
-
+            
             bundles.Add(new ScriptBundle("~/bundles/jquery").Include(
                         "~/Scripts/jquery-{version}.js"));
 
@@ -46,11 +53,16 @@ namespace TilerFront
                     "~/CSS/SubCalEventStyles.css",
                     "~/CSS/LoggedHomeUser.css",
                     "~/CSS/SelectedSubEvent.css",
-                    "~/CSS/bootstrap-datepicker.css"
+                    "~/CSS/bootstrap-datepicker.css",
+                    "~/CSS/loadingBar.css"
                     ));
 
             bundles.Add(new StyleBundle("~/Content/RegistrationJS").Include(
                     "~/Scripts/RegisterIni.js"
+                ));
+
+            bundles.Add(new StyleBundle("~/Content/ManagePageJS").Include(
+                    "~/Scripts/ManageController.js"
                 ));
 
             bundles.Add(new StyleBundle("~/Content/RegistrationCss").Include(
@@ -62,19 +74,22 @@ namespace TilerFront
 
             bundles.Add(new ScriptBundle("~/Content/TilerJS").Include(
                     "~/Scripts/jquery-2.1.1.js",
-                    //"~/Scripts/jquery-2.1.0.min.js",
+                    "~/Scripts/Utility.js",
                     "~/Scripts/Chart.min.js",
                     "~/Scripts/moment.min.js",
+                    "~/Scripts/moment-timezone-with-data.min.js",
                     "~/Scripts/fullcalendar.min.js",
                     "~/Scripts/highcharts.js",
                     "~/Scripts/exporting.js",
+                    "~/Scripts/PageNotification.js",
                     "~/Scripts/WebControl.js",
                     "~/Scripts/HomePageControl.js",
                     "~/Scripts/SelectedEvent.js",
                     "~/Scripts/SearchHandler.js",
                     "~/Scripts/jquery.timepicker.min.js",
                     "~/Scripts/datepair.js",
-                    "~/Scripts/heartcode-canvasloader-min-0.9.1.js"
+                    "~/Scripts/heartcode-canvasloader-min-0.9.1.js",
+                    "~/Scripts/loadingBar.js"
                       ));
 
             bundles.Add(new StyleBundle("~/Content/TilerDesktopCss").Include(
@@ -90,16 +105,23 @@ namespace TilerFront
                     ));
 
             bundles.Add(new ScriptBundle("~/Content/TilerDesktopJS").Include(
+                    "~/Scripts/Utility.js",
                     "~/Scripts/MonthOverviewIni.js",
                     "~/Scripts/AddNewEvent_Desktop0.js",
                     "~/Scripts/jquery-ui.min.js",
-                    "~/Scripts/SeachHandlerDesktop.js",
+                    "~/Scripts/SearchHandlerDesktop.js",
                     "~/Scripts/bootstrap-datepicker.js",
-                    "~/Scripts/jquery.signalR-2.2.0.min.js"
-
+                    "~/Scripts/jquery.signalR-{version}.js",
+                    "~/Scripts/moment.min.js",
+                    "~/Scripts/moment-timezone-with-data.min.js",
+                    "~/Scripts/Preview/Index.js",
+                    "~/Scripts/Preview/PreviewDay.js",
+                    "~/Scripts/Preview/Sleep.js",
+                    "~/Scripts/Preview/Tardy.js"
                       ));
 
             bundles.Add(new ScriptBundle("~/Content/TilerMobileJS").Include(
+                    "~/Scripts/Utility.js",
                     "~/Scripts/yui-min.js",
                     "~/Scripts/MapData.js",
                     "~/Scripts/jquery.knob.js",
@@ -115,6 +137,8 @@ namespace TilerFront
                     "~/Scripts/jqm-datebox-1.4.4.core.min.js",
                     "~/Scripts/jqm-datebox-1.4.4.mode.slidebox.min.js",
                     "~/Scripts/jqm-datebox-1.4.4.mode.flipbox.min.js",
+                    "~/Scripts/moment.min.js",
+                    "~/Scripts/moment-timezone-with-data.min.js",
                     //"~/Scripts/YuiCombo/3.18.1/oop/oop-min.js&3.18.1/event…min.js&3.18.1/node-core/node-core-min.js",
                     "~/Scripts/YuiCombo/3.18.1/oop/oop-min.js",
                     "~/Scripts/YuiCombo/3.18.1/event-focus/event-focus-min.js",
@@ -169,7 +193,11 @@ namespace TilerFront
                     "~/Scripts/YuiCombo/3.18.1/selector-native/selector-native-min.js",
                     "~/Scripts/YuiCombo/3.18.1/selector/selector-min.js",
                     "~/Scripts/YuiCombo/3.18.1/node-core/node-core-min.js",
-                    "~/Scripts/YuiCombo/3.18.1/event-focus/event-focus-min.js"
+                    "~/Scripts/YuiCombo/3.18.1/event-focus/event-focus-min.js",
+                    "~/Scripts/Preview/Index.js",
+                    "~/Scripts/Preview/PreviewDay.js",
+                    "~/Scripts/Preview/Sleep.js",
+                    "~/Scripts/Preview/Tardy.js"
                       ));
 
 

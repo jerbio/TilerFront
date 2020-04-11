@@ -12,6 +12,9 @@ namespace TilerFront.Models
         public string PhoneNumber { get; set; }
         public bool TwoFactor { get; set; }
         public bool BrowserRemembered { get; set; }
+        public string UserName { get; set; }
+        public string Id { get; set; }
+        public string FullName { get; set; }
     }
 
     public class ThirdPartyAuthenticationForView
@@ -77,10 +80,8 @@ namespace TilerFront.Models
         public string TimeOfDay { get; set; }
         [Display(Name = "TimeZoneOffSet")]
         public string TimeZoneOffSet { get; set; }
-
-        /*
-        [Display(Name = "DST")]
-        public string Dst { get; set; }*/
+        [Display(Name = "TimeZone")]
+        public string TimeZone { get; set; } = "UTC";
     }
 
     public class AddPhoneNumberViewModel

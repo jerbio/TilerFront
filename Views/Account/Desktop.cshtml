@@ -1,10 +1,14 @@
-﻿
+﻿@using System.Configuration;
 
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
+    @{
+        String apiKey = ConfigurationManager.AppSettings["googleMapsApiKey"];
+    }
+
     <title>Tiler Desktop</title>
-    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true&libraries=places"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=@apiKey&signed_in=true&libraries=places"></script>
     @Scripts.Render("~/Content/TilerDesktopJS")
     @Styles.Render("~/Content/TilerDesktopCss")
     <script src="../signalr/hubs"></script>
@@ -41,6 +45,7 @@
             </div>
             <div class="ControlPanelButton SomethingNew" title="Get me somthing to do now" id="SomethingNew"></div>
             <div class="ControlPanelButton ControlPanelPausePanelButton" title="Pause or Resume Current Event" id="GlobalPauseResumeButton"></div>
+            <div class="ControlPanelButton" id="ProcrastinateAll" title="ProcrastinateAll"></div>
             <div class="ControlPanelButton" id="AddEventButton" title="Add New Tile/Event"></div>
 
         </div>
@@ -91,44 +96,83 @@
 
 
     <div id="ControlPanelContainer" tabindex="1">
-        <div id="InfoContainer">
-            <div id="ControlPanelNameOfSubevent" class="SubEventInformationContainer">
-                <label id="SelectedSubEventLabel" class="InfoContainerLabel">Name</label>
-                <div class="InfoControlPanel" id="ControlPanelNameOfSubeventInfo"></div>
-            </div>
-            <div id="ControlPanelSubEventTime" class="SubEventInformationContainer">
-                <label id="SelectedSubEventLabel" class="InfoContainerLabel">Date &amp; Time</label>
-                <div class="InfoControlPanel" id="ControlPanelSubEventTimeInfo"></div>
-            </div>
-            <div id="ControlPanelDeadlineOfSubevent" class="SubEventInformationContainer">
-                <label class="InfoContainerLabel">Deadline</label>
-                <div class="InfoControlPanel" id="ControlPanelDeadlineOfSubeventInfo"></div>
-            </div>
-        </div>
-        <div id="ProcrastinateEventModal" tabindex="1">
-            <div id="ProcrastinateEventInputContainer">
-                <div id="ProcrastinateHeading">Procrastinate this by</div>
-                <div id="ProcrastinateInputAndSubmit">
-                    <input maxlength="2" id="procrastinateHours" autofocus type="number">
-
-                    <span>H</span>
-                    <input maxlength="2" id="procrastinateMins" type="number">
-                    <span>M</span>
-                    <input maxlength="2" id="procrastinateDays" type="number">
-                    <span>D</span>
-                    <button id="submitProcatination" class="SubmitButton">Push It</button>
-                    <button id="cancelProcatination" class="SubmitButton">Cancel</button>
+        <div id="PrimaryControlPanelContainer">
+            <div id="InfoContainer">
+                <div id="ControlPanelNameOfSubevent" class="SubEventInformationContainer">
+                    <label id="SelectedSubEventLabel" class="InfoContainerLabel">Name</label>
+                    <div class="InfoControlPanel" id="ControlPanelNameOfSubeventInfo"></div>
+                </div>
+                <div id="ControlPanelSubEventTime" class="SubEventInformationContainer">
+                    <label id="SelectedSubEventLabel" class="InfoContainerLabel">Date &amp; Time</label>
+                    <div class="InfoControlPanel" id="ControlPanelSubEventTimeInfo"></div>
+                </div>
+                <div id="ControlPanelDeadlineOfSubevent" class="SubEventInformationContainer">
+                    <label class="InfoContainerLabel">Deadline</label>
+                    <div class="InfoControlPanel" id="ControlPanelDeadlineOfSubeventInfo"></div>
                 </div>
             </div>
-        </div>
-        <div id="ConfirmDeleteModal">
-            <div id="ConfirmContent">
-                <div id="DeleteMessage">Sure you want to delete this?</div>
-                <button class="SubmitButton" id="YeaToConfirmDelete">Yea</button>
-                <button class="SubmitButton" id="NayToConfirmDelete">Nay</button>
+            <div id="ProcrastinateEventModal" tabindex="1">
+                <div id="ProcrastinateEventInputContainer">
+                    <div id="ProcrastinateHeading">Procrastinate this by</div>
+                    <div id="ProcrastinateInputAndSubmit">
+                        <div id="ProcrastinateInputCollectionContainer">
+                            <div class="ProcrastinateInputModal">
+                                <input maxlength="2" id="procrastinateHours" autofocus type="number">
+                                <span>H</span>
+                            </div>
+                            <div class="ProcrastinateInputModal">
+                                <input maxlength="2" id="procrastinateMins" type="number">
+                                <span>M</span>
+                            </div>
+                            <div class="ProcrastinateInputModal">
+                                <input maxlength="2" id="procrastinateDays" type="number">
+                                <span>D</span>
+                            </div>
+                        </div>
+                        <div id="ProcrastinatButtonContainer">
+                            <button id="submitProcastination" class="SubmitButton">Push It</button>
+                            <button id="cancelProcastination" class="SubmitButton">Cancel</button>
+                            <button id="previewProcastination" class="SubmitButton">Preview</button>
+                        </div>
+                    </div>
+                </div>
             </div>
+            <div id="ConfirmDeleteModal">
+                <div id="ConfirmContent">
+                    <div id="DeleteMessage">Sure you want to delete this?</div>
+                    <button class="SubmitButton" id="YeaToConfirmDelete">Yea</button>
+                    <button class="SubmitButton" id="NayToConfirmDelete">Nay</button>
+                </div>
+            </div>
+            <div id="NotesModal" tabindex="1">
+                <div id="NotesTextAreaContainer">
+                    <div id="NotesHeading">Event Notes</div>
+                    <div id="Notes">
+                        <textarea id="notesArea" autofocus placeholder="Type hear to add notes to this event or tile"></textarea>
+                        <div id="Notes-Button-Container">
+                            <button id="submitNotes" class="SubmitButton">Save</button>
+                            <button id="cancelNotes" class="SubmitButton">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class='hideMultiSelectPanel' id="MultiSelectPanel"></div>
         </div>
-        <div class='hideMultiSelectPanel' id="MultiSelectPanel"></div>
+        <div id="PreviewModal" tabindex="1">
+            <div id="previewInformationContainer">
+                <div id="SleepPreview">
+                </div>
+                <div id="ConflictPreview">
+                </div>
+                <div id="PositioningPreview">
+                </div>
+            </div>
+            <div id="InlineDayPreviewContainer"> </div>
+            <div id="PreviewLoading">
+                <div id="PreviewSliderLoadingBar"></div>
+            </div>
+            <div id="closePreview"></div>
+        </div>
     </div>
     <div id="LoadingScreenPanel"></div>
 </body>

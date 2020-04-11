@@ -7,6 +7,16 @@
     <title>Tiler Settings</title>
     @Styles.Render("~/Content/TilerDesktopSettingsCss")
 </head>
+<script>
+    function RetrieveUserCredentials()
+    {
+        var retValue = { UserName: "@Model.UserName", ID: "@Model.Id", Name: "@Model.FullName" };
+        retValue.Name=retValue.Name.split(" ")[0]
+        UserCredentials = retValue;
+        return retValue;
+    }
+    RetrieveUserCredentials();
+</script>
 <h2>@ViewBag.Title.</h2>
 
 <p class="text-success">@ViewBag.StatusMessage</p>
@@ -14,10 +24,10 @@
     <h4>Change your account settings</h4>
     <hr />
     <div class="SettingSectionContainer">
-        <div class="SettingSection" >
-                <div class="LabelSection">
-                    <label>Password</label>
-                </div>
+        <div class="SettingSection">
+            <div class="LabelSection">
+                <label>Password</label>
+            </div>
             <div class="ContentDescription">
 
                 @if (Model.HasPassword)
@@ -31,7 +41,7 @@
 
             </div>
 
-            </div>
+        </div>
         <div class="SettingSection" onclick="location.href = '/Manage/ManageLogins'">
             <div>
                 <div class="LabelSection">
@@ -39,7 +49,6 @@
                 </div>
                 <div class="ContentDescription">
                     Number Of Social Logins - @Model.Logins.Count
-                    @*Html.ActionLink("Manage", "ManageLogins")*@
                 </div>
             </div>
         </div>
@@ -50,7 +59,6 @@
                 </div>
                 <div class="ContentDescription">
                     Update End of Day(Think When I go home/ go to bed)
-                    @*Html.ActionLink("Update End of Day", "ChangeStartOfDay")*@
                 </div>
                 <div></div>
             </div>
@@ -63,14 +71,33 @@
                 </div>
                 <div class="ContentDescription">
                     You can import your other calendars, google calendar
-                    @*Html.ActionLink("Update End of Day", "ChangeStartOfDay")*@
                 </div>
                 <div></div>
             </div>
         </div>
+
+        <div class="SettingSection ScheduleDump">
+            <div>
+                <div class="LabelSection">
+                    <label>Create schedule Dump</label>
+                </div>
+                <div>
+                    <textarea placeholder="It's a new dump" id="scheduleDumpNotes" class="ContentDescription"></textarea>
+                </div>
+                <div id="DumpReferenceId" class="UpdateSecion">
+                    <a id="dumpHref" download=""></a>
+                </div>
+                <div>
+                    
+                </div>
+            </div>
+            <div id="submitDumpButtonContainer">
+                <button id="submitDumpButton">Submit Dump</button>
+            </div>
+        </div>
     </div>
-        @*
-    
+    @*
+
 
         Phone Numbers can used as a second factor of verification in a two-factor authentication system.
 
@@ -78,25 +105,25 @@
             for details on setting up this ASP.NET application to support two-factor authentication using SMS.
 
          Uncomment the following block after you have set up two-factor authentication
-        *@
-        @*  
-            <dt>Phone Number:</dt>
-            <dd>
-                @(Model.PhoneNumber ?? "None") [
-                @if (Model.PhoneNumber != null)
-                {
-                    @Html.ActionLink("Change", "AddPhoneNumber")
-                    @: &nbsp;|&nbsp;
-                    @Html.ActionLink("Remove", "RemovePhoneNumber")
-                }
-                else
-                {
-                    @Html.ActionLink("Add", "AddPhoneNumber")
-                }
-                ]
-            </dd>
-        *@
-        @*
+    *@
+    @*
+        <dt>Phone Number:</dt>
+        <dd>
+            @(Model.PhoneNumber ?? "None") [
+            @if (Model.PhoneNumber != null)
+            {
+                @Html.ActionLink("Change", "AddPhoneNumber")
+                @: &nbsp;|&nbsp;
+                @Html.ActionLink("Remove", "RemovePhoneNumber")
+            }
+            else
+            {
+                @Html.ActionLink("Add", "AddPhoneNumber")
+            }
+            ]
+        </dd>
+    *@
+    @*
         <dt>Two-Factor Authentication:</dt>
         <dd>
             <p>
@@ -125,4 +152,6 @@
                 }
         </dd>*@
     </dl>
+    <div id="LoadingScreenPanel"></div>
 </div>
+@Scripts.Render("~/Content/ManagePageJS")

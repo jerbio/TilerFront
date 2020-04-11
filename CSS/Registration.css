@@ -34,9 +34,7 @@ body
 {
     position:absolute;
     height:100%;
-    //border: yellow solid 2px;
     width:100%;
-    //left:5%;
     transition: all .5s;
 }
 
@@ -53,11 +51,7 @@ body
     padding:0%;
     width:100%;
     height:100%;
-    //min-width:500px;
-    
     font-family: 'Muli', sans-serif;
-    
-    //overflow:auto;
 }
 
 #radialBground
@@ -89,16 +83,10 @@ body
     left:10%;
     top:10%;
     width:80%;
-    //max-width:720px;
-    //min-width:500px;
-    //margin-left:-360px;
     font-size:55px;
     height:75%;
-    //max-height:900px;
     display:block;
-    //border: solid 2px pink;
     transition: all .5s;
-    //overflow:auto;
 }
 
 #SignInInputContainer 
@@ -114,7 +102,6 @@ body
 {
     font-family: 'Muli', sans-serif;
     position:absolute;
-    //left:10%;
     width:100%;
     height:10%;
     background-color:rgba(255,255,255,.01);
@@ -139,7 +126,6 @@ body
     top:40%;
     border:none;
     height:30%;
-    //font-size:30px;
     border-bottom:solid black 4px;
 }
 
@@ -150,8 +136,6 @@ body
 {
     border:none;
     height:31%;
-    //font-size:30px;
-    //border-top:solid white 4px;
     top:70%;
 }
 
@@ -162,9 +146,6 @@ body
     border:none;
     top:30%;
     width:100%;
-    //left:5%;
-    //left:-100%;
-//    visibility:hidden;
     transition: all .5s;
 }
 
@@ -174,7 +155,6 @@ body
     left:0;
     width:100%;
     height:100%;
-    //font-size:45px;
 }
 
 #FullNameRegin 
@@ -206,14 +186,12 @@ body
     position:absolute;
     top:35%;
     position:absolute;
-    //left:10%;
     width:100%;
     height:10%;
     background-color:rgba(10,10,10,.01);
     font-size:xx-large;
     color:white;
     border:none;
-    //border-bottom:solid 10px rgba(250,250,250,1);
 }
 
 
@@ -222,14 +200,12 @@ body
     position:absolute;
     top:5%;
     position:absolute;
-    //left:10%;
     width:100%;
     height:10%;
     background-color:rgba(10,10,10,.01);
     font-size:xx-large;
     color:white;
     border:none;
-    //border-bottom:solid 10px rgba(250,250,250,1);
 }
 
 .regformError
@@ -251,17 +227,12 @@ body
 
 #SignInButton 
 {
-    //position:absolute;
     border:none; 
     border-top:solid 4px black;
     background-color:transparent;
     top:70%;
     left:0%;
-    //width:25%;
     text-align:center;
-    //border-radius:10px;
-    //font-size:40px;
-    //color:rgb(255,255,255);
     color:gray;
     text-shadow:0 0 20px rgba(20,20,20,.5);
 }
@@ -280,7 +251,6 @@ body
     width:80%;
     text-align:center;
     border-radius:10px;
-    //font-size:40px;
     color:rgb(0,0,0);
     
     
@@ -309,14 +279,10 @@ body
     border:none; 
     border-top:solid 4px gray;
     background-color:transparent;
-    //border-radius:5px;
-    //font-weight:bolder;
     color:gray;
     top:70%;
-    //width:10%;
     left:100%;
     transform:translateX(-100%);
-    //font-size:40px;
     
 }
 
@@ -324,20 +290,15 @@ body
 {
     position:absolute;
     text-align:center;
-    //background-color:rgb(40,255,10);
     border:groove 1px rgb(250,250,250);
     border-radius:5px;
     font-weight:bolder;
     color:gray;
     top:94%;
     width:80%;
-    
     left:10%;
-    //font-size:30px;
-    
-    
-    
 }
+
 #FormSubmissionError 
 {
     position:absolute;
@@ -380,4 +341,15 @@ body
 }
 
 
+}
+
+#PasswordInstruction {
+    color: red;
+    font-style: italic;
+    font-size: small;
+}
+
+#PasswordRegistrationInputContainer {
+    position: relative;
+    height: 400px;
 }

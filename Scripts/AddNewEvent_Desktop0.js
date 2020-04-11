@@ -2,7 +2,7 @@
 
 function addNewEvent(x, y, height, refStart)
 {
-    //debugger;
+    
     var AddEventPanel = getDomOrCreateNew("AddEventPanel");
     generateAddEventContainer(x, y, height, AddEventPanel.Dom, refStart);
     
@@ -10,7 +10,7 @@ function addNewEvent(x, y, height, refStart)
 
 function generatePostBackDataForTimeRestriction(RestrictionSlider)
 {
-    //debugger;
+    
     var RestrictionStatusButtonStatus = RestrictionSlider.getStatus();
     var RestrictionStart = RestrictionSlider.getStart();
     var RestrictionEnd = RestrictionSlider.getEnd();
@@ -25,7 +25,7 @@ function generateOfficeHours(Place)
 {
     var RetValue = { WeekDayData: [], IsTwentyFourHours: false,NoWeekData:true };
 
-    if (Place.opening_hours.weekday_text.length)
+    if (Place && Place.opening_hours && Place.opening_hours.weekday_text.length)
     {
         for (var i = 0; i < Place.opening_hours.weekday_text.length; i++)
         {
@@ -95,7 +95,6 @@ function generateOfficeHours(Place)
                 {
                     RetValue.IsTwentyFourHours = true;
                     return RetValue;
-                    break;
                 }
             }
             AllTimeDataStart.sort(function (a, b) { return (a) - (b) });
@@ -154,12 +153,12 @@ function prepSendTile(NameInput, AddressInput, NickNameSlider, SpliInput, HourIn
         {
             NickName = NickNameSlider.getAllElements()[0].TileInput.getInputDom().value;
         }
-        var newEvent= SubmitTile(NameInput.value, AddressInput.value,NickName, SpliInput.value, HourInput.value, MinuteInput.value, DeadlineInput.value, RepetitionInput.value, calendarColor, RepetitionFlag, restrictionData);
+        var newEvent= SubmitTile(NameInput.value, AddressInput,NickName, SpliInput.value, HourInput.value, MinuteInput.value, DeadlineInput.value, RepetitionInput.value, calendarColor, RepetitionFlag, restrictionData, AddressInput);
         SendScheduleInformation(newEvent, global_ExitManager.triggerLastExitAndPop);
     }
 }
 
-function SubmitTile(Name, Address,AddressNick, Splits, Hour, Minutes, Deadline, Repetition, CalendarColor,RepetitionFlag,TimeRestrictions)
+function SubmitTile(Name, AddressInput,AddressNick, Splits, Hour, Minutes, Deadline, Repetition, CalendarColor,RepetitionFlag,TimeRestrictions)
 {
     var DictOfData = {};
     DictOfData["day"] = { Range: OneDayInMs, Type: { Name: "Daily", Index: 0 }, Misc: null }
@@ -176,9 +175,11 @@ function SubmitTile(Name, Address,AddressNick, Splits, Hour, Minutes, Deadline, 
         return null;
     }
     */
+    let Address = AddressInput.value
     var LocationAddress = Address;
+    let LocationIsVerified = AddressInput.LocationIsVerified;
     var LocationNickName = AddressNick;
-    var EventLocation = new Location(LocationNickName, LocationAddress);
+    var EventLocation = new Location(LocationNickName, LocationAddress, LocationIsVerified, AddressInput.LocationId);
     Hour = Hour != "" ? Hour : 0;
     Minutes = Minutes != "" ? Minutes : 0;
 
@@ -255,64 +256,218 @@ function SubmitTile(Name, Address,AddressNick, Splits, Hour, Minutes, Deadline, 
     }
 
     return NewEvent;
-
-    /*
-    NewEvent.UserName = UserCredentials.UserName
-    NewEvent.UserID = UserCredentials.ID;
-
-    var TimeZone = new Date().getTimezoneOffset();
-    NewEvent.TimeZoneOffset = TimeZone;
-    //var url = "RootWagTap/time.top?WagCommand=1"
-    var url = global_refTIlerUrl + "Schedule/Event";
-
-    var HandleNEwPage = new LoadingScreenControl("Tiler is Adding \"" + NewEvent.Name + " \" to your schedule ...");
-    //alert("about to send out");
-    //debugger;
-    //return;
-    HandleNEwPage.Launch();
-    
-    
-    
-
-    $.ajax({
-        type: "POST",
-        url: url,
-        data: NewEvent,
-        // DO NOT SET CONTENT TYPE to json
-        // contentType: "application/json; charset=utf-8", 
-        // DataType needs to stay, otherwise the response object
-        // will be treated as a single string
-        //dataType: "json",
-        success: function (response) {
-            //alert(response);
-            //var myContainer = (CurrentTheme.getCurrentContainer());
-            //CurrentTheme.TransitionOldContainer();
-            //$(myContainer).empty();
-            //myContainer.outerHTML = "";
-        },
-        error: function (err) {
-            //var myError = err;
-            //var step = "err";
-            var NewMessage = "Oh No!!! Tiler is having issues modifying your schedule. Please try again Later :(";
-            var ExitAfter = { ExitNow: true, Delay: 1000 };
-            HandleNEwPage.UpdateMessage(NewMessage, ExitAfter, function () { });
-        }
-
-    }).done(function (data) {
-        HandleNEwPage.Hide();
-        global_ExitManager.triggerLastExitAndPop();
-        getRefreshedData();
-        affirmNewEvent(data);
-    });
-    */
-
 }
+
+
+function generateProcrastinateAllDoms() {
+    let ProcrastinateAllDomId = "ProcrastinateAllDom";
+    let procrastinateAllDom = getDomOrCreateNew(ProcrastinateAllDomId);
+
+    let ProcrastinateAllUserInputContainerId = "ProcrastinateAllContainer";
+    let ProcrastinateAllUserInputContainer = getDomOrCreateNew(ProcrastinateAllUserInputContainerId);
+
+    let HourInput = getDomOrCreateNew("procrastinateHours", "input");
+    let MinInput = getDomOrCreateNew("procrastinateMins", "input");
+    let DayInput = getDomOrCreateNew("procrastinateDays", "input");
+    HourInput.value = "";
+    MinInput.value = "";
+    DayInput.value = "";
+
+    let HourInputParent = HourInput.Dom.parentNode;
+    let MinInputParent = MinInput.Dom.parentNode;
+    let DayInputParent = DayInput.Dom.parentNode;
+
+
+    let procrastinateAllheaderContainerId = "ProcrastinateAllHeaderContainer";
+    let ProcrastinateAllDomHeaderContainer = getDomOrCreateNew(procrastinateAllheaderContainerId);
+    ProcrastinateAllDomHeaderContainer.innerHTML = "Clear all Events";
+    ProcrastinateAllUserInputContainer.appendChild(ProcrastinateAllDomHeaderContainer);
+
+
+
+    let ProcrastinateAllDomInputContainerId = "ProcrastinateAllInputContainer";
+    let ProcrastinateAllDomInputContainer = getDomOrCreateNew(ProcrastinateAllDomInputContainerId);
+    ProcrastinateAllUserInputContainer.Dom.appendChild(ProcrastinateAllDomInputContainer.Dom);
+
+    let ProcrastinateInputCollectionContainerId = "ProcrastinateInputCollectionContainer";
+    let ProcrastinateInputCollectionContainer = getDomOrCreateNew(ProcrastinateInputCollectionContainerId);
+    let ProcrastinateInputCollectionContainerParent = ProcrastinateInputCollectionContainer.Dom.parentNode;
+    ProcrastinateAllDomInputContainer.Dom.appendChild(ProcrastinateInputCollectionContainer.Dom);
+    
+    // ProcrastinateAllDomInputContainer.Dom.appendChild(HourInput.Dom);
+    // ProcrastinateAllDomInputContainer.Dom.appendChild(MinInput.Dom);
+    // ProcrastinateAllDomInputContainer.Dom.appendChild(DayInput.Dom);
+
+
+    let ProcrastinateAllDomButtonContainerId = "ProcrastinateAllButtonContainer";
+    let ProcrastinateAllDomButtonContainer = getDomOrCreateNew(ProcrastinateAllDomButtonContainerId);
+
+    let submitButton = getDomOrCreateNew("submitButton", "button");
+    let cancelButton = getDomOrCreateNew("cancelButton", "button");
+    let previewProcrastinateAllButton = getDomOrCreateNew("previewProcrastinateAllButton", "button");
+
+    submitButton.Dom.innerHTML = "Submit";
+    cancelButton.Dom.innerHTML = "Cancel";
+    previewProcrastinateAllButton.Dom.innerHTML = "Preview";
+
+    ProcrastinateAllDomButtonContainer.Dom.appendChild(submitButton.Dom);
+    ProcrastinateAllDomButtonContainer.Dom.appendChild(cancelButton.Dom);
+    // ProcrastinateAllDomButtonContainer.Dom.appendChild(previewProcrastinateAllButton.Dom);
+
+    $(submitButton.Dom).click(function (event) {//stops clicking of add event button from triggering a new modal dom
+        event.stopPropagation();
+    });
+
+    $(cancelButton.Dom).click(function (event) {//stops clicking of add event button from triggering a new modal dom
+        event.stopPropagation();
+    });
+
+    $(previewProcrastinateAllButton.Dom).click(function (event) {//stops clicking of add event button from triggering a new modal dom
+        event.stopPropagation();
+    });
+
+    let ProcrastinateAllDomPreviewContainerId = "ProcrastinateAllPreviewContainer";
+    let ProcrastinateAllDomPreviewContainer = getDomOrCreateNew(ProcrastinateAllDomPreviewContainerId);
+
+    ProcrastinateAllUserInputContainer.Dom.appendChild(ProcrastinateAllDomInputContainer);
+    ProcrastinateAllUserInputContainer.Dom.appendChild(ProcrastinateAllDomButtonContainer);
+    procrastinateAllDom.Dom.appendChild(ProcrastinateAllUserInputContainer);
+    procrastinateAllDom.Dom.appendChild(ProcrastinateAllDomPreviewContainer);
+
+    let retValue = {
+        container: procrastinateAllDom,
+        buttons: {
+            submitButton: submitButton,
+            cancelButton: cancelButton,
+            previewProcrastinateAllButton: previewProcrastinateAllButton
+        },
+        inputs: {
+            hour: HourInput,
+            minute: MinInput,
+            day: DayInput,
+            collection: ProcrastinateInputCollectionContainer,
+        }, 
+        parentNodes: {
+            collection: ProcrastinateInputCollectionContainerParent,
+            hour: HourInputParent,
+            minute: MinInputParent,
+            day: DayInputParent
+        },
+        preview: ProcrastinateAllDomPreviewContainer
+    };
+
+
+    $(previewProcrastinateAllButton.Dom).click(() => {
+        let preview = new Preview(null, ProcrastinateAllDomPreviewContainer);
+        preview.procrastinateAll();
+    });
+
+    return retValue;
+}
+
+
+function generateProcrastinateAll(x, y, height, width,WeekStart, RenderPlane) {
+    global_ExitManager.triggerLastExitAndPop();
+    let procrastinateAllControls = generateProcrastinateAllDoms();
+    initializeUserLocation();
+    getRefreshedData.disableDataRefresh();
+    if (generateProcrastinateAll.isOn)
+    {
+        global_ExitManager.triggerLastExitAndPop();
+        generateProcrastinateAll.isOn = false;
+        return;
+    }
+
+    function sendProcrastinateAllRequest(CallBack) {
+        let TimeData = getProcrastinateAllData();
+        var HandleNEwPage = new LoadingScreenControl("Tiler is Freeing up Some time :)");
+        HandleNEwPage.Launch();
+        var URL = global_refTIlerUrl + "Schedule/ProcrastinateAll";
+        preSendRequestWithLocation(TimeData);
+        $.ajax({
+            type: "POST",
+            url: URL,
+            data: TimeData,
+            // DO NOT SET CONTENT TYPE to json
+            // contentType: "application/json; charset=utf-8", 
+            // DataType needs to stay, otherwise the response object
+            // will be treated as a single string
+            success: function (response) {
+                //alert(response);
+                var myContainer = (response);
+                if (myContainer.Error.code == 0) {
+                    //exitSelectedEventScreen();
+                }
+                else {
+                    alert("error clearing out your schedule");
+                }
+    
+            },
+    
+            error: function (err) {
+                var myError = err;
+                var step = "err";
+                var NewMessage = "Ooops Tiler is having issues updating your schedule. Please try again Later:X";
+                var ExitAfter = { ExitNow: true, Delay: 1000 };
+                HandleNEwPage.UpdateMessage(NewMessage, ExitAfter, CallBack);
+                //InitializeHomePage();
+    
+    
+            }
+        }).done(function (data) {
+            getRefreshedData.enableDataRefresh();
+            HandleNEwPage.Hide();
+            getRefreshedData();
+            if(isFunction(CallBack)) {
+                CallBack();
+            }
+        });
+    }
+
+    function closeProcrastinateModal()
+    {
+        getRefreshedData.enableDataRefresh();
+        setTimeout(function () { generateProcrastinateAll.isOn = false; }, 200);
+        let procrastinateAllDom = procrastinateAllControls.container;
+        if (procrastinateAllDom.Dom.parentElement != null)
+        {
+            procrastinateAllDom.Dom.parentElement.removeChild(procrastinateAllDom.Dom);
+        }
+        procrastinateAllControls.parentNodes.collection.prepend(procrastinateAllControls.inputs.collection);
+        // procrastinateAllControls.parentNodes.minute.prepend(procrastinateAllControls.inputs.minute.Dom);
+        // procrastinateAllControls.parentNodes.day.prepend(procrastinateAllControls.inputs.day.Dom);
+
+        ActivateUserSearch.setSearchAsOn();
+    }
+    global_ExitManager.addNewExit(closeProcrastinateModal);
+    let procrastinateAllDom = procrastinateAllControls.container.Dom;
+    let modalHeight = ($(procrastinateAllDom).height());
+    let modalWidth= ($(procrastinateAllDom).width());
+    let MaxY = height -modalHeight;
+    let MaxX = width -modalWidth;
+    let modalXPos = x > MaxX?(x-modalWidth):x;
+    let modalYPos = y > MaxY ?(y-modalHeight):y;
+
+    procrastinateAllControls.container.Dom.style.left = modalXPos + "px";
+    procrastinateAllControls.container.Dom.style.top = modalYPos + "px";
+
+
+    RenderPlane.appendChild(procrastinateAllControls.container.Dom);
+    $(procrastinateAllControls.buttons.cancelButton.Dom).click(closeProcrastinateModal);
+    $(procrastinateAllControls.buttons.submitButton.Dom).click(sendProcrastinateAllRequest);
+
+
+    // global_ExitManager.triggerLastExitAndPop();
+}
+
+generateProcrastinateAll.isOn = false;
+
 
 /*generates modal "Add New Event & Add New Tile" for creating new item. Note: width is distance in pixels between left click and End of window */
 function generateModal(x, y, height, width,WeekStart, RenderPlane,UseCurrentTime)
 {
     //return;
-    //debugger;
+    
     initializeUserLocation();
 
     if (generateModal.isOn)
@@ -322,7 +477,7 @@ function generateModal(x, y, height, width,WeekStart, RenderPlane,UseCurrentTime
         return;
     }
 
-    //debugger;
+    
     global_ExitManager.triggerLastExitAndPop();
     generateModal.isOn = true;
     var modalAddDom = getDomOrCreateNew("AddModalDom");
@@ -406,7 +561,7 @@ function generateModal(x, y, height, width,WeekStart, RenderPlane,UseCurrentTime
 
     function removePanel()
     {
-        //debugger;
+        
         CloseModal();
     }
 
@@ -463,11 +618,11 @@ function generatePeek(CalEvent,Container)
     //var CalEvent = new CalEventData();
     var CalEndTime =null;
     var TotalDuration=null;
-    var peekValidityTest = isCalEvenValidForPeek(CalEvent)
+    var peekValidityTest = isCalEvenValidForPeek(CalEvent);
     if (peekValidityTest.isError)
     {
         //Container.innerHTML = "not peekable because " + peekValidityTest.ErrorMessage;
-        HidePeekUI(Container)
+        HidePeekUI(Container);
         return;
     }
 
@@ -476,12 +631,6 @@ function generatePeek(CalEvent,Container)
     //RevealPeekUI(Container, PeekData);
 
     return;
-    /*
-    if ((TotalDuration != null) && (CalEndTime != null))
-    {
-        createPeekUI(CalEvent, Container)
-    }
-    */
 
     function createPeekUI(CalEvent, Container)
     {
@@ -491,12 +640,13 @@ function generatePeek(CalEvent,Container)
             createPeekUI.Connection = null;
         }
 
-        CalEvent.UserName = UserCredentials.UserName
+        CalEvent.UserName = UserCredentials.UserName;
         CalEvent.UserID = UserCredentials.ID;
         var TimeZone = new Date().getTimezoneOffset();
         CalEvent.TimeZoneOffset = TimeZone;
 
         var url = global_refTIlerUrl + "Schedule/Peek";
+        preSendRequestWithLocation(CalEvent);
         getRefreshedData.disableDataRefresh();
         createPeekUI.Connection = $.ajax({
             type: "POST",
@@ -544,7 +694,7 @@ function generatePeek(CalEvent,Container)
     {
         $(Container).addClass("RevealPreviewPanel");
         /*
-        debugger;
+        ;
         var PeekDaysSampleData = [
                             { TotalDuration: 14, DurationRatio: 0.3, SleepTime: 4, DayIndex: 5 },
                             { TotalDuration: 12, DurationRatio: 0.5, SleepTime: 5, DayIndex: 6 },
@@ -632,7 +782,7 @@ function generatePeek(CalEvent,Container)
             
         }
         else {
-            //debugger;
+            
             generatePeek.ChartData.highcharts().series[1].setData(WorkData,true);
             generatePeek.ChartData.highcharts().series[0].setData(SleepData,true);
         }
@@ -708,7 +858,6 @@ function generateAddEventContainer(x,y,height,Container,refStartTime)
     $(ColorPicker.Selector.Container).addClass("ColorPickerContainerRigid");
     var recurrence = createCalEventRecurrence();
     global_ExitManager.addNewExit(CloseEventAddition);
-  //  var EnableTiler = generateTilerEnabled(EndDom.Selector.Container, SplitCount.Selector.Container);
 
     NewEventcontainer.Dom.appendChild(NameDom.Selector.Container);
     NewEventcontainer.Dom.appendChild(StartDom.Selector.Container);
@@ -727,7 +876,7 @@ function generateAddEventContainer(x,y,height,Container,refStartTime)
     
 
     $(SubmitButton.Selector.Button.Dom).click(function () {
-        var NewEvent = BindSubmitClick(NameDom.Selector.Input.Dom.value, LocationDom.Selector.Address.Dom.value, LocationDom.Selector.NickName.Dom.value, SplitCount.Selector.Input.Dom.value, StartDom, EndDom, DurationDom, null, true, ColorPicker.Selector.getColor(), global_ExitManager.triggerLastExitAndPop, recurrence);
+        var NewEvent = BindSubmitClick(NameDom.Selector.Input.Dom.value, LocationDom.Selector.Address.Dom, LocationDom.Selector.NickName.Dom.value, SplitCount.Selector.Input.Dom.value, StartDom, EndDom, DurationDom, null, true, ColorPicker.Selector.getColor(), global_ExitManager.triggerLastExitAndPop, recurrence);
         SendScheduleInformation(NewEvent, global_ExitManager.triggerLastExitAndPop);
     })
     AddCloseButoon(NewEventcontainer, false);
@@ -750,8 +899,19 @@ function generateNameContainer()
 
 function generateLocationContainer()
 {
-    var LocationContainer = getDomOrCreateNew("LocationContainer");
-    var LocationInputContainer = getDomOrCreateNew("LocationInput", "input");
+    let LocationContainer = getDomOrCreateNew("LocationContainer");
+    let LocationInputContainer = getDomOrCreateNew("LocationInput", "input");
+    LocationInputContainer.Dom.setAttribute("autocomplete", "off");
+    let processAutoComplete = LocationSearchCallBack(null, LocationInputContainer);
+
+    function onKeyPress(e, LocationInputContainer) {
+        processAutoComplete(e);
+    }
+
+
+    LocationInputContainer.Dom.addEventListener("keydown", onKeyPress);
+    
+
     var NickLocationInputContainer = getDomOrCreateNew("NickLocationInput", "input");
     LocationContainer.Dom.appendChild(LocationInputContainer.Dom);
     LocationInputContainer.Dom.setAttribute("placeholder", "Address?");
@@ -864,10 +1024,10 @@ function generateTilerEnabled(EndTimeContainer,SplitContainer)
 
 
 function AddToTileContainer(TileInptObject, Container) {
-    //debugger;
+    
     var AllElements = TileInptObject.getAllElements();
     for (var i = 0; i < AllElements.length; i++) {
-        //debugger;
+        
         var myElement = AllElements[i];
         if (myElement != null)
         {
@@ -879,7 +1039,7 @@ function AddToTileContainer(TileInptObject, Container) {
 //Handles the activities of sliders. Sliders show up beneath the done button
 function InactiveSlider(InActiveDom, ActiveDom, ButtonElements, AutoSentence)
 {
-    //debugger;
+    
     var InactiveSliderID =  InactiveSlider.ID++;
     var ButtonSlide = generateMyButton(LoopBackFunction);
     var InActiveMessage = ButtonElements.InActiveMessage;
@@ -950,7 +1110,7 @@ function InactiveSlider(InActiveDom, ActiveDom, ButtonElements, AutoSentence)
         else
         {
             Activate();
-            //debugger;
+            
 
             //var AllDoms = $(ButtonSlide).next("input")
             //$(ButtonSlide).next("div").next().children("input")[0].focus()
@@ -1111,7 +1271,7 @@ function cleanUpTimeRestriction(TimeRestrictionSlider)
     }
     function onCheckBoxChange(e)
     {
-        //debugger;
+        
         if (WorkDayCheckBox.checked)
         {
             triggerChangeInTime();
@@ -1135,7 +1295,7 @@ function cleanUpTimeRestriction(TimeRestrictionSlider)
 
     function onWeekDayCheckboxClick(e)
     {
-        //debugger;
+        
         if (WeekDayCheckBox.checked)
         {
             EveryDayCheckBox.checked = false;
@@ -1355,7 +1515,7 @@ function cleanUpTimeRestriction(TimeRestrictionSlider)
             {
                 for (var i= 0 ; i<WeekDayButtons.length;i++)
                 {
-                    //debugger;
+                    
                     var RestrictedWeekdayInputContainer = getDomOrCreateNew("RestrictedWeekdayInputContainer" + i);
                     $(RestrictedWeekdayInputContainer).addClass("RestrictedWeekdayInputContainer");
                     var StartRestrictedWeekdayInputContainer = getDomOrCreateNew("StartRestrictedWeekdayInputContainer" + i);
@@ -1421,7 +1581,7 @@ function cleanUpTimeRestriction(TimeRestrictionSlider)
         }
 
         function hideWeekDayButtons() {
-            //debugger;
+            
             InitializeWeekDayButtons();
             var RestrictionWeekDayContainer = RestrictiveWeekControl.RestrictionWeekDayContainer;
 
@@ -1514,6 +1674,11 @@ function cleanUpTimeRestriction(TimeRestrictionSlider)
     TimeRestrictionSlider.EnableWeekDayCheckBox = function () {
         WeekDayCheckBox.checked = true;
         onWeekDayCheckboxClick();
+    }
+
+    TimeRestrictionSlider.DisableWeekDayCheckBox = function () {
+        WeekDayCheckBox.checked = false;
+        DisableWeekDay();
     }
     
 }
@@ -1898,486 +2063,69 @@ function AddTiledEvent()
         }
     }
 
-    /*
-    Function handles the call back for the autoSuggest Box of location
-    */
-    function LocationSearchCallBack(ExitCallBack, InputBox)
-    {
-        $(InputBox).off();
-        var AutoSuggestEndPoint = global_refTIlerUrl + "User/Location";
-        //var GoogleAutoSuggestEndPoint = "https://maps.googleapis.com/maps/api/place/textsearch/json";
-        var GoogleAutoSuggestEndPoint = "";
-
-        var googleSendData = {};
-        
-        googleSendData.key = googleAPiKey
-        googleSendData.query = "";
-        
-        var LocationAutoSuggestControl = new AutoSuggestControl(AutoSuggestEndPoint, "GET", AddressCallBack, InputBox);
-        var GoogleAutoSuggestControl = new AutoSuggestControl(GoogleAutoSuggestEndPoint, "GET", googleAddressCallBack, InputBox, true, googleSendData);
-        var MyDataContainer = { AllData: [], Index: -1 };
-        var GoogleDataContainer = { AllData: [], Index: -1 };
-        var CombinedData= { AllData: [], Index: -1 };
-        var FullContainer = LocationAutoSuggestControl.getAutoSuggestControlContainer();
-
-
-        //Combined callback
-        function combinedCallBack(typeOfData,MyData)
-        {
-            //if (combinedCallBack.currentIndex == 0)
-            if (typeOfData == 0)
-            {
-                combinedCallBack.cleanUI();
-                LaunchPopulation(typeOfData)
-            }
-            else
-            {
-                combinedCallBack.indexContainer[typeOfData] = MyData;
-                return;
-            }
-
-            
-            function LaunchPopulation(Index)
-            {
-                if (combinedCallBack.indexContainer[Index]!=null)
-                {
-                    combinedCallBack.indexContainer[Index].forEach
-                    (
-                        function (myData)
-                        {
-                            CombinedData.AllData.push(myData);
-                            myData.Index = LaunchPopulation.Index;
-                            ++LaunchPopulation.Index;
-                            myData.Hover = HoverMe;
-                            function HoverMe()
-                            {
-                                if (combinedCallBack.CurrentHover != null) {
-                                    combinedCallBack.CurrentHover.UnHover();
-                                }
-                                combinedCallBack.CurrentHover = myData;
-                                //MyDataContainer.Index = Index;
-                                $(myData.Container).addClass("HoveLocationCacheContainer");
-                            }
-                        }
-                    )
-                    combinedCallBack.indexContainer[Index] = null;
-                    ++Index;
-                    combinedCallBack.currentIndex = Index;
-                    LaunchPopulation(combinedCallBack.currentIndex);
-                }
-                else
-                {
-                    if (combinedCallBack.currentIndex >= combinedCallBack.indexContainer.length)
-                    {
-                        combinedCallBack.currentIndex = 0;
-                        combinedCallBack.clearData();
-                        PopulateteContainerDom();
-                        return;
-                    }
-                    else
-                    {
-                        setTimeout(function () { LaunchPopulation(combinedCallBack.currentIndex) }, 200);
-                    }
-                }
-            }
-
-            function PopulateteContainerDom()
-            {
-                for (var i=0;i<CombinedData.AllData.length;i++)
-                {
-                    var Data=CombinedData.AllData[i];
-                    justPushIntoContainer(Data);
-                }
-                
-                function justPushIntoContainer(myData)
-                {
-                    combinedCallBack.DomContainer.Dom.appendChild(myData.Container);
-                }
-                
-            }
-            LaunchPopulation.Index = 0;
-
+    function proccessLocationLookupTile(params) {
+        let argExit = arguments[0];
+        let inputDom = arguments[1];
+        function exitCall() {
+            argExit();
+            debugger
         }
 
-        combinedCallBack.CurrentHover = null;
-        combinedCallBack.indexContainer = [null,null];
-        combinedCallBack.currentIndex = 0;
-
-        combinedCallBack.DomContainer = LocationAutoSuggestControl.getSuggestedValueContainer();
-
-        combinedCallBack.rePopulate = function () {
-
+        function onSelect (LocationData) {
+            NickNameSlider.turnOnSlide();       
+            var NickElements = NickNameSlider.getAllElements()
+            NickElements[0].TileInput.getInputDom().value = LocationData.Tag || LocationData.name;
+            getBusinessHourData(LocationData);
         }
 
-
-
-        combinedCallBack.clear = function ()
+        function getBusinessHourData(LocationData)
         {
-            debugger;
-            MyDataContainer.AllData.splice(0, MyDataContainer.AllData.length)
-            MyDataContainer.Index = -1;
-            //LocationAutoSuggestControl.clear();
-            LocationAutoSuggestControl.HideContainer();
-
-            GoogleDataContainer.AllData.splice(0, GoogleDataContainer.AllData.length)
-            GoogleDataContainer.Index = -1;
-            //LocationAutoSuggestControl.clear();
-            GoogleAutoSuggestControl.HideContainer();
-
-            CombinedData.AllData.splice(0, CombinedData.AllData.length);
-            CombinedData.Index = -1;
-            $(combinedCallBack.DomContainer).empty();
-            //LocationAutoSuggestControl.clear();
-            LocationAutoSuggestControl.HideContainer();
-        }
-
-        combinedCallBack.clearData=function()
-        {
-            MyDataContainer.AllData.splice(0, MyDataContainer.AllData.length)
-            MyDataContainer.Index = -1;
-            GoogleDataContainer.AllData.splice(0, GoogleDataContainer.AllData.length)
-            GoogleDataContainer.Index = -1;
-        }
-
-        combinedCallBack.cleanUI = function ()
-        {
-            //console.log("Called Clear " + combinedCallBack.currentIndex);
-            CombinedData.AllData.splice(0, CombinedData.AllData.length);
-            CombinedData.Index = -1;
-            $(combinedCallBack.DomContainer).empty();
-        }
-
-        //Tiler Address callback
-        function AddressCallBack(data, DomContainer, InputCOntainer)
-        {
-            //debugger;
-            var FullContainer = LocationAutoSuggestControl.getAutoSuggestControlContainer();
-            InputBox.parentNode.appendChild(FullContainer);
-            positionSearchResultContainer();
-            
-            
-
-            MyDataContainer.AllData.splice(0, MyDataContainer.AllData.length);
-            //debugger;
-            resolveEachRetrievedEvent.ID = 0;
-            /*
-            $(DomContainer).empty();
-            if (data.length == 0 || data.length == null || data.length == undefined || (document.activeElement != InputBox))
-            {
-                ReseAutoSuggest();
-                return;
-            }
-
-            */
-            
-
-            InputBox.onblur = function () { setTimeout(function () { ReseAutoSuggest() }, 300) }
-            
-            LocationAutoSuggestControl.ShowContainer();
-
-            for (var i = 0; ((i < data.length)&&(i<5)); i++)
-            {
-                resolveEachRetrievedEvent(data[i]);
-            }
-
-            //debugger;
-            var CombinedDataIndex = 0;
-            combinedCallBack.indexContainer[CombinedDataIndex] = MyDataContainer.AllData;
-            combinedCallBack(CombinedDataIndex, MyDataContainer.AllData);
-
-            function ReseAutoSuggest() {
-                MyDataContainer.AllData.splice(0, MyDataContainer.AllData.length)
-                MyDataContainer.Index = -1;
-                //debugger;
-                combinedCallBack.clear();
-            }
-
-            function resolveEachRetrievedEvent(LocationData)//,Index) {
-            {
-                var CalendarEventDom = generateDomForEach(LocationData);//,Index);
-                $(CalendarEventDom.Container).addClass("LocationCacheContainer");
-                //DomContainer.Dom.appendChild(CalendarEventDom.Container);
-                MyDataContainer.AllData.push(CalendarEventDom);
-                ++resolveEachRetrievedEvent.ID;
-            }
-            resolveEachRetrievedEvent.ID = 0;
-            
-
-            function generateDomForEach(LocationData)//,Index)
-            {
-                var TagSpan = getDomOrCreateNew(("TagSpan" + resolveEachRetrievedEvent.ID), "span");
-                TagSpan.innerHTML = LocationData.Tag + " &mdash; ";
-
-                $(TagSpan).addClass("LocationTag");
-                var AddressSpan = getDomOrCreateNew(("AddressSpan " + resolveEachRetrievedEvent.ID), "span");
-                AddressSpan.innerHTML = LocationData.Address;
-                $(AddressSpan).addClass("LocationAddress");
-                var CacheAddressContainer = getDomOrCreateNew(("CacheAddressContainer" + resolveEachRetrievedEvent.ID));
-                CacheAddressContainer.appendChild(TagSpan);
-                CacheAddressContainer.appendChild(AddressSpan);
-                CacheAddressContainer.onclick = function () { SelectMe() };
-
-                var RetValue = { Container: CacheAddressContainer, Hover: HoverMe, UnHover: UnHoverMe, Select: SelectMe, /*Index: Index,*/ Insert: InsertIntoInput };
-
-                function HoverMe()
-                {
-                    if(generateDomForEach.CurrentHover!=null)
-                    {
-                        generateDomForEach.CurrentHover.UnHover();
-                    }
-                    generateDomForEach.CurrentHover = RetValue;
-                    //MyDataContainer.Index = Index;
-                    $(CacheAddressContainer).addClass("HoveLocationCacheContainer");
-                }
-
-                function UnHoverMe()
-                {
-                    $(CacheAddressContainer).removeClass("HoveLocationCacheContainer");
-                }
-
-                function SelectMe()
-                {
-                    //InputCOntainer.value = LocationData.Address;
-                    InsertIntoInput();
-                    LocationAutoSuggestControl.HideContainer();
-                    NickNameSlider.turnOnSlide();
-                    //debugger
-                    var NickElements = NickNameSlider.getAllElements()
-                    NickElements[0].TileInput.getInputDom().value = LocationData.Tag;
-                    setTimeout(function () { InputBox.focus(), 200 });
-                }
-
-                function InsertIntoInput()
-                {
-                    InputCOntainer.value = LocationData.Address;
-                }
-
-                return RetValue;
-            }
-            generateDomForEach.CurrentHover = null;
-        }
-
-
-        //Google Address callback
-        function googleAddressCallBack(data, DomContainer, InputCOntainer)
-        {
-
-            function initialize()
-            {
-                ReseAutoSuggest();
-                var dataInput = InputCOntainer.value
-                dataInput = dataInput.trim();
-                var defaultLocation = new google.maps.LatLng(global_PositionCoordinate.Latitude, global_PositionCoordinate.Longitude);
+            var RestrictiveWeekSlider = TimeRestrictionSlider;
+            if(LocationData.place_id) {
                 var request = {
-                    location: defaultLocation,
-                    radius: 50,
-                    query: dataInput
-                    //query: "vectra bank"
+                    placeId: LocationData.place_id
                 };
-
-                var service = new google.maps.places.PlacesService(DomContainer);
-                service.textSearch(request, callback);
-            }
-
-            function callback(results, status) {
-                
-                if (status == google.maps.places.PlacesServiceStatus.OK) {
-                    for (var i = 0; ((i < results.length)&&(i<5)); i++) {
-                        //debugger
-                        resolveEachRetrievedEvent(results[i],i);
-                    }
-                }
-
-                var CombinedDataIndex = 1;
-                combinedCallBack.indexContainer[CombinedDataIndex] = GoogleDataContainer.AllData;
-                combinedCallBack(CombinedDataIndex, GoogleDataContainer.AllData);
-            }
-
-            initialize();
-
-            
-            
-
-            function ReseAutoSuggest() {
-                GoogleDataContainer.AllData.splice(0, GoogleDataContainer.AllData.length)
-                GoogleDataContainer.Index = -1;
-                //LocationAutoSuggestControl.HideContainer();
-            }
-
-            function resolveEachRetrievedEvent(LocationData)//, Index)
-            {
-                var CalendarEventDom = generateDomForEach(LocationData)//, Index);
-                $(CalendarEventDom.Container).addClass("LocationCacheContainer");
-                //DomContainer.Dom.appendChild(CalendarEventDom.Container);
-                GoogleDataContainer.AllData.push(CalendarEventDom);
-                ++resolveEachRetrievedEvent.ID;
-            }
-            resolveEachRetrievedEvent.ID = 0;
-            //GoogleDataContainer.AllData[0].Hover();
-
-            function generateDomForEach(LocationData)//, Index)
-            {
-                var RestrictiveWeekSlider = TimeRestrictionSlider;
-                var TagSpan = getDomOrCreateNew(("GoogleTagSpan" + resolveEachRetrievedEvent.ID), "span");
-                TagSpan.innerHTML = LocationData.name + " &mdash; ";
-
-                $(TagSpan).addClass("LocationTag");
-                var AddressSpan = getDomOrCreateNew(("GoogleAddressSpan " + resolveEachRetrievedEvent.ID), "span");
-                AddressSpan.innerHTML = LocationData.formatted_address;
-                $(AddressSpan).addClass("LocationAddress");
-                var CacheAddressContainer = getDomOrCreateNew(("GoogleCacheAddressContainer" + resolveEachRetrievedEvent.ID));
-                var GoogleSymbolContainer = getDomOrCreateNew(("GoogleSymbolContainer" + resolveEachRetrievedEvent.ID));
-                $(GoogleSymbolContainer).addClass("GoogleSearchSymbolContainer");
-                var GoogleSymbol = getDomOrCreateNew(("GoogleSymbol" + resolveEachRetrievedEvent.ID));
-                $(GoogleSymbol).addClass("GoogleSearchSymbol");
-                $(GoogleSymbol).addClass("GoogleSearchIcon");
-                GoogleSymbolContainer.appendChild(GoogleSymbol);
-
-                CacheAddressContainer.appendChild(TagSpan);
-                CacheAddressContainer.appendChild(AddressSpan);
-                CacheAddressContainer.appendChild(GoogleSymbolContainer);
-                CacheAddressContainer.onclick = function () { SelectMe() };
-
-                var RetValue = { Container: CacheAddressContainer, Hover: HoverMe, UnHover: UnHoverMe, Select: SelectMe, /*Index: Index,*/ Insert: InsertIntoInput };
-
-                function HoverMe() {
-                    if (generateDomForEach.CurrentHover != null) {
-                        generateDomForEach.CurrentHover.UnHover();
-                    }
-                    generateDomForEach.CurrentHover = RetValue;
-                    //GoogleDataContainer.Index = Index;
-                    $(CacheAddressContainer).addClass("HoveLocationCacheContainer");
-                }
-
-                function UnHoverMe() {
-                    $(CacheAddressContainer).removeClass("HoveLocationCacheContainer");
-                }
-
-                function SelectMe() {
-                    //InputCOntainer.value = LocationData.Address;
-                    InsertIntoInput();
-                    LocationAutoSuggestControl.HideContainer();
-                    NickNameSlider.turnOnSlide();
-                    //debugger
-                    var NickElements = NickNameSlider.getAllElements();
-                    getBusinessHourData(LocationData);
-                    NickElements[0].TileInput.getInputDom().value = LocationData.name;
-                    setTimeout(function () { InputBox.focus(), 200 });
-                }
-
-                function getBusinessHourData(LocationData)
+                var service = new google.maps.places.PlacesService(inputDom);
+                service.getDetails(request, LocationUpdateCallBack);
+                function LocationUpdateCallBack(place, status)
                 {
-                    debugger;
-                    var request = {
-                        placeId: LocationData.place_id
-                    };
-                    var service = new google.maps.places.PlacesService(DomContainer);
-                    service.getDetails(request, LocationUpdateCallBack);
-                    function LocationUpdateCallBack(place, status)
-                    {
-                        if (status == google.maps.places.PlacesServiceStatus.OK) {
-                            var RestrictedTimeData = generateOfficeHours(place);
-                            if((!RestrictedTimeData.IsTwentyFourHours)&&(!RestrictedTimeData.NoWeekData))
+                    if (status == google.maps.places.PlacesServiceStatus.OK) {
+                        var RestrictedTimeData = generateOfficeHours(place);
+                        if((!RestrictedTimeData.IsTwentyFourHours)&&(!RestrictedTimeData.NoWeekData))
+                        {
+                            RestrictiveWeekSlider .turnOnSlide();
+                            RestrictiveWeekSlider.EnableWeekDayCheckBox();
+                            var RestrictiveWeek = RestrictiveWeekSlider.getRestrictiveWeek();
+                            for (var i=0;i<RestrictedTimeData.WeekDayData.length;i++)
                             {
-                                RestrictiveWeekSlider .turnOnSlide();
-                                RestrictiveWeekSlider.EnableWeekDayCheckBox();
-                                var RestrictiveWeek = RestrictiveWeekSlider.getRestrictiveWeek();
-                                for (var i=0;i<RestrictedTimeData.WeekDayData.length;i++)
+                                var myDay = RestrictedTimeData.WeekDayData[i];
+                                if (!myDay.IsClosed)
                                 {
-                                    var myDay = RestrictedTimeData.WeekDayData[i];
-                                    if (!myDay.IsClosed)
-                                    {
-                                        var myButton = RestrictiveWeek.getWeekDayButton(myDay.DayIndex);
-                                        var Start = myDay.Start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                                        var End = myDay.End.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                                        myButton.UIElement.TurnOnButton();
-                                        myButton.WeekDayButton.getStartDom().value = Start;
-                                        myButton.WeekDayButton.setStart(Start);
-                                        myButton.WeekDayButton.getEndDom().value = End;
-                                        myButton.WeekDayButton.setEnd(End);
-                                    }
+                                    var myButton = RestrictiveWeek.getWeekDayButton(myDay.DayIndex);
+                                    var Start = myDay.Start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                                    var End = myDay.End.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                                    myButton.UIElement.TurnOnButton();
+                                    myButton.WeekDayButton.getStartDom().value = Start;
+                                    myButton.WeekDayButton.setStart(Start);
+                                    myButton.WeekDayButton.getEndDom().value = End;
+                                    myButton.WeekDayButton.setEnd(End);
                                 }
-                                setTimeout(function () { InputCOntainer.focus(); });//need to return focus to auto suggest input box. After selecting element system seems to shift focus to checkbox. 
                             }
+                            setTimeout(function () { inputDom.focus(); });//need to return focus to auto suggest input box. After selecting element system seems to shift focus to checkbox. 
+                        } else {
+                            RestrictiveWeekSlider.turnOffSlide();
+                            RestrictiveWeekSlider.DisableWeekDayCheckBox();
                         }
                     }
                 }
-
-                function InsertIntoInput() {
-                    InputCOntainer.value = LocationData.formatted_address;
-                }
-
-                return RetValue;
+            } else {
+                RestrictiveWeekSlider.turnOffSlide();
+                RestrictiveWeekSlider.DisableWeekDayCheckBox();
             }
-            generateDomForEach.CurrentHover = null;
+
         }
 
-        
-
-        function positionSearchResultContainer()
-        {
-            var InputBox = LocationAutoSuggestControl.getInputBox();
-            var Position = $(InputBox.Dom).position();
-            var Left = 50;// Position.left;
-            var Top = Position.top;
-            var height = $(InputBox.Dom).height();
-            Top += height;
-            $(FullContainer).css({ left: Left + "px", top: Top + "px", position: "absolute", width: "calc(100% - 100px)" });
-        }
-
-        
-        function ReturnFunction(e, ExitFunction)
-        {
-            if(e.which == 27)
-            {
-                if (LocationAutoSuggestControl.isContentOn() || GoogleAutoSuggestControl.isContentOn())
-                {
-                    debugger;
-                    combinedCallBack.clear();
-                    return;
-                }
-                else
-                {
-                    ExitFunction();
-                }
-                return;
-            }
-
-            LocationAutoSuggestControl.disableSendRequest();
-            GoogleAutoSuggestControl.disableSendRequest();
-            var OldIndex = CombinedData.Index;
-            if(e.which == 38)//UpArrow Press
-            {
-                var NewIndex = ((CombinedData.Index - 1) + CombinedData.AllData.length) % CombinedData.AllData.length
-                CombinedData.Index = NewIndex;
-
-                console.log("Going up -- Old index is : " + OldIndex + " New Index is -- " + NewIndex + " Total Possible :" + CombinedData.AllData.length);
-                CombinedData.AllData[CombinedData.Index].Hover();
-                //CombinedData.AllData[CombinedData.Index].Insert();
-                positionSearchResultContainer();
-                return;
-            }
-            if (e.which == 40)//Down Arrow Press
-            {
-                var NewIndex = ((CombinedData.Index + 1) + CombinedData.AllData.length) % CombinedData.AllData.length
-                CombinedData.Index = NewIndex;
-
-                console.log("Going Down -- Old index is : " + OldIndex + " New Index is -- " + NewIndex + " Total Possible :" + CombinedData.AllData.length);
-                CombinedData.AllData[CombinedData.Index].Hover();
-                //CombinedData.AllData[CombinedData.Index].Insert();
-                positionSearchResultContainer();
-                return;
-            }
-            if (e.which == 13)
-            {
-                CombinedData.AllData[CombinedData.Index].Select();
-                return;
-            }
-            LocationAutoSuggestControl.enableSendRequest();
-            GoogleAutoSuggestControl.enableSendRequest();
-        }
-
-        return ReturnFunction;
+        return LocationSearchCallBack(exitCall, arguments[1], onSelect);
     }
 
     var Element2 = {
@@ -2394,7 +2142,7 @@ function AddTiledEvent()
                 return message;
             }
         },
-        DefaultText: "Location", DropDown: LocationSearchCallBack
+        DefaultText: "Location", DropDown: proccessLocationLookupTile
     };
     
     var Hour = new TileInputBox({
@@ -2476,7 +2224,7 @@ function AddTiledEvent()
             }
         }, DefaultText: "Deadline", TriggerDone: true
     };
-    //debugger;
+    
     InActiveContainer.Hide();
 
 
@@ -2530,7 +2278,7 @@ function AddTiledEvent()
         //alert("show triggered");
         var keyEntryFunc = TileInputBox.Dictionary[Element4.ID].Me.getKeyCallBackFunc()
         var EndTimeInput = TileInputBox.Dictionary[Element4.ID].Me.getInputDom()
-        //debugger;
+        
         EndTimeInput.removeEventListener("keydown", keyEntryFunc);
     })
 
@@ -2607,7 +2355,7 @@ function AddTiledEvent()
         var myColor = ColorPicker.Selector.getColor();
         var restrictionData = generatePostBackDataForTimeRestriction(TimeRestrictionSlider);
         
-        var peekEvent = SubmitTile(Element1.TileInput.getInputDom().value, "","", Splits.getInputDom().value, Hour.getInputDom().value, Min.getInputDom().value, Element4.TileInput.getInputDom().value, RepetionChoice.getInputDom().value, myColor, RepetionSlider.getStatus(), restrictionData);
+        var peekEvent = SubmitTile(Element1.TileInput.getInputDom().value, {},"", Splits.getInputDom().value, Hour.getInputDom().value, Min.getInputDom().value, Element4.TileInput.getInputDom().value, RepetionChoice.getInputDom().value, myColor, RepetionSlider.getStatus(), restrictionData);
         setTimeout(function () { generatePeek(peekEvent, PreviewPanel) }, 300);
     }
 
@@ -2631,7 +2379,7 @@ function AddTiledEvent()
 
     InvisiblePanel.Dom.appendChild(modalTileEvent.Dom);
     //document.addEventListener("keydown", UIAddTileUITrigger);
-    //debugger;
+    
     FirstElement.reveal();
     FirstElement.forceFocus();
     AddCloseButoon(modalTileEvent, true);
@@ -2772,7 +2520,6 @@ function TileInputBox(TabElement, ModalContainer, SendTile, Exit, HideInput, get
         var JSONProperty;
         if (TabElement.DropDown != undefined)
         {
-            ///debugger;
             AutoSuggestFunction = TabElement.DropDown(Exit, InputBox.Dom);
         }
         /*
@@ -2911,13 +2658,13 @@ function TileInputBox(TabElement, ModalContainer, SendTile, Exit, HideInput, get
         //
         if (TabElement.SubTileInputBox != undefined)
         {
-            //debugger;
+            
             TabElement.SubTileInputBox.forEach(revealEachElement);
         }
 
         function revealEachElement(eachSubTileInputBox)
         {
-            //debugger;
+            
             OtherElements= OtherElements.concat(eachSubTileInputBox.getAllElements());
             eachSubTileInputBox.ReplaceNextElement(NextElement.Data);
             eachSubTileInputBox.reveal();
@@ -3329,9 +3076,9 @@ function generateSubmitButton()
 }
 
 
-function BindSubmitClick(Name, Address, AddressNick, Splits, Start, End, EventNonRigidDurationHolder, RepetitionEnd, RigidFlag, CalendarColor,ExitAdditionScreen,EventRepetition)
+function BindSubmitClick(Name, AddressDom, AddressNick, Splits, Start, End, EventNonRigidDurationHolder, RepetitionEnd, RigidFlag, CalendarColor,ExitAdditionScreen,EventRepetition)
 {
-    var EventLocation = new Location(AddressNick, Address);
+    var EventLocation = new Location(AddressNick, AddressDom.Dom.value, AddressDom.Dom.LocationIsVerified, AddressDom.LocationId);
     var EventName = Name;
     var EventName = Name;
     /*
@@ -3401,7 +3148,7 @@ function BindSubmitClick(Name, Address, AddressNick, Splits, Start, End, EventNo
 function SendScheduleInformation(NewEvent, CallBack)
 {
     //var url = "RootWagTap/time.top?WagCommand=1"
-    //debugger;
+    
     //NewEvent = null;
     var ErrorCheck = isCalEvenValidForSend(NewEvent)
     if (ErrorCheck.isError)
@@ -3414,8 +3161,9 @@ function SendScheduleInformation(NewEvent, CallBack)
     NewEvent.UserID = UserCredentials.ID;
     var TimeZone = new Date().getTimezoneOffset();
     NewEvent.TimeZoneOffset = TimeZone;
-
+    NewEvent.TimeZone = moment.tz.guess()
     var url = global_refTIlerUrl + "Schedule/Event";
+    preSendRequestWithLocation(NewEvent)
     var HandleNEwPage = new LoadingScreenControl("Tiler is Adding \"" + NewEvent.Name + " \" to your schedule ...");
     HandleNEwPage.Launch();
     $.ajax({
@@ -3444,7 +3192,6 @@ function SendScheduleInformation(NewEvent, CallBack)
     }).done(function (response) {
         HandleNEwPage.Hide();
         getRefreshedData.enableDataRefresh();
-        debugger;
         var AffirmCallBack = affirmNewEvent(response);
         
         getRefreshedData(AffirmCallBack);
@@ -3542,10 +3289,10 @@ function affirmNewEvent(response)
                 setTimeout(function () {
                     //renderSubEventsClickEvents(EventID);
 
-                    //debugger;
+                    
                     //if (true)
                     {
-                        //debugger;
+                        
                         var CurrentWeekContainer = $(getDomOrCreateNew("CurrentWeekContainer"));
                         var TimeSizeDom = $(global_DictionaryOfSubEvents[EventID].TimeSizeDom)
                         var bar = $(TimeSizeDom).offset().top - $(CurrentWeekContainer).offset().top
@@ -3553,7 +3300,7 @@ function affirmNewEvent(response)
                         //$("#NameOfWeekContainerPlane").animate({ scrollTop: WidthInPixels }, 1000);
                         $("#CurrentWeekContainer").animate({ scrollTop: WidthInPixels }, 1000);
                     }
-                    //debugger;
+                    
                     global_UISetup.RenderOnSubEventClick(EventID);
                 }, 1500);
                 
@@ -3611,13 +3358,6 @@ function createCalEventRecurrence()
     $(EnableRecurrenceContainer.Dom).addClass(CurrentTheme.FontColor);
     EnableRecurrenceLabel.Dom.innerHTML = "Do you want this event to recurr?<br/> <span class='PressSpacebar'>Press Spacebar to toggle and/or to select a color below.</span>"
 
-    /*var EnableRecurrenceButtonContainerID = "EnableRecurrenceButtonContainer";
-    var EnableRecurrenceButtonContainer = getDomOrCreateNew(EnableRecurrenceButtonContainerID);
-
-
-    EnableRecurrenceContainer.Dom.appendChild(EnableRecurrenceButtonContainer.Dom);
-    $(EnableRecurrenceButtonContainer.Dom).addClass("EnableButtonContainer");*/
-
     var EnableRecurrenceButtonID = "EnableRecurrenceButton";
     var EnableRecurrenceButton = generateMyButton(ButtonClick, EnableRecurrenceButtonID);// getDomOrCreateNew(EnableRecurrenceButtonID);
     $(EnableRecurrenceButton.Dom).addClass("EnableButton");
@@ -3632,22 +3372,9 @@ function createCalEventRecurrence()
 
 
     var EnableRecurrenceYesTextID = "EnableRecurrenceYesText";
-    /*var EnableRecurrenceYesText = getDomOrCreateNew(EnableRecurrenceYesTextID);
-    EnableRecurrenceButtonContainer.Dom.appendChild(EnableRecurrenceYesText.Dom);
-    $(EnableRecurrenceYesText.Dom).addClass("EnableButtonChoiceText");
-    $(EnableRecurrenceYesText.Dom).addClass("EnableButtonChoiceYeaText");
-
-
-    var EnableRecurrenceNoTextID = "EnableRecurrenceNoText";
-    var EnableRecurrenceNoText = getDomOrCreateNew(EnableRecurrenceNoTextID);
-    EnableRecurrenceButtonContainer.Dom.appendChild(EnableRecurrenceNoText.Dom);
-    //EnableRecurrenceButtonContainer.Dom.appendChild(EnableRecurrenceButton.Dom);//appending after because of z-index effect
-    $(EnableRecurrenceNoText.Dom).addClass("EnableButtonChoiceText");
-    $(EnableRecurrenceNoText.Dom).addClass("EnableButtonChoiceNayText");*/
 
     RecurrenceTabContent.Dom.appendChild(EnableRecurrenceContainer.Dom);
 
-//    $(EnableRecurrenceContainer.Dom).click(genFunctionForButtonClick(EnableRecurrenceButton, EnabledRecurrenceContainer));
     EventrepeatStatus = EnabledRecurrenceContainer;
 
     EnableRecurrenceButton.SetAsOff();

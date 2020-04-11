@@ -31,7 +31,7 @@ namespace TilerFront.Models
                         }
 
 
-                        Start=Start.Add(TimeDiff);
+                        Start=Start.Add(-TimeDiff);
                         DateTimeOffset End ;
                         parseCheck = DateTimeOffset.TryParse(eachWeekDays.End, out End);
                         if(!parseCheck )
@@ -39,7 +39,7 @@ namespace TilerFront.Models
                             throw new Exception("Error parsing one of your End times in restrictive week data");
                         }
 
-                        End=End.Add(TimeDiff);
+                        End=End.Add(-TimeDiff);
                         int DayIndex;
                         parseCheck = int.TryParse(eachWeekDays.Index, out DayIndex);
                         if(!parseCheck )

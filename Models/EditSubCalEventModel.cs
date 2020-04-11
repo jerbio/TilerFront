@@ -9,6 +9,7 @@ namespace TilerFront.Models
     {
         public long CalStart { get; set; }
         public long CalEnd { get; set; }
-        //public long Duration { get; set; }
+        public string Address { get; set; }
+        public string AddressDescription { get; set; }
     }
 }

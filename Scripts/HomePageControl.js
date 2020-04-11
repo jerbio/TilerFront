@@ -1,5 +1,5 @@
-var TotalSubEventList = new Array();
-var ActiveSubEvents = new Array();
+var TotalSubEventList = [];
+var ActiveSubEvents = [];
 var TwelveHourMilliseconds = OneHourInMs * 12;
 var Dictionary_OfSubEvents = {};
 var Dictionary_OfCalendarData = {};
@@ -7,7 +7,9 @@ var ToBeReorganized = [];
 var global_DeltaSubevents = [];
 var lowestMsToNow=999999999999999;
 var ClosestSubEventToNow;
-var global_RenderedList = new Array();
+var global_RenderedList = [];
+let currentSubevent
+let nextSubEvent
 
 
 
@@ -43,6 +45,7 @@ function InitializeHomePage(DomContainer)
     */
     var occupy = "occupy";
     var preppePostdData = { UserName: verifiedUser.UserName, UserID: verifiedUser.UserID };
+    preSendRequestWithLocation(preppePostdData);
     retrieveUserSchedule(myurl, preppePostdData,generateCalendarEvents);
 }
 
@@ -73,7 +76,8 @@ function retrieveUserSchedule(myurl, UserEntry,SuccessCallBack)
     UserCredentials.TimeZoneOffset = TimeZone;
     UserEntry.TimeZoneOffset = UserCredentials.TimeZoneOffset;
     UserEntry.StartRange = (new Date()).getTime() - TwelveHourMilliseconds;
-    UserEntry.EndRange = (new Date()).getTime()+TwelveHourMilliseconds;
+    UserEntry.EndRange = (new Date()).getTime() + TwelveHourMilliseconds;
+    UserEntry.TimeZone = moment.tz.guess()
     var HandleNewPage = new LoadingScreenControl("Tiler is retrieving your schedule :)");
     if(!!HandleNewPage.Launch){
         HandleNewPage.Launch();
@@ -90,11 +94,12 @@ function retrieveUserSchedule(myurl, UserEntry,SuccessCallBack)
         //dataType: "json",
         success: function(response) {
             SuccessCallBack(response)
-            retrieveUserSchedule.callAllCallbacks(response)
+            retrieveUserSchedule.callAllCallbacks(response);
         },
         error: function (err) {
             var myError = err;
             var step = "err";
+            HandleNewPage.Hide();
         }
 
     }).done(function (data) {
@@ -144,7 +149,7 @@ function generateCalendarEvents(data) {
     //alert(typeof (data));
     //var JsonData = JSON.parse(data);
     var JsonData = (data);
-
+    resetEventStatusUi()
     generateLoggedInUserAccountUI(JsonData.Content);
     //return JsonData;
 }
@@ -181,14 +186,15 @@ function generateHomePage(UserSchedule) {
     }
 
     ActiveSubEvents.forEach(function (myEvent) {
-        var MobileDom = genereateMobileDoms(myEvent);
+        var MobileDom = generateMobileDoms(myEvent);
         myEvent.Dom = MobileDom;
+        processNowAndNextRendering(myEvent);
     });
     /*var AllNonrepeatingNonEvents = generateNonRepeatEvents(UserSchedule.Schedule.NonRepeatCalendarEvent);
     var AllRepeatEventDoms = generateRepeatEvents(UserSchedule.Schedule.RepeatCalendarEvent);*/
     InitializeMiddleDomUI(MiddleContentDom);
     
-    if (ClosestSubEventToNow.Dom != null)
+    if (ClosestSubEventToNow && ClosestSubEventToNow.Dom != null)
     {
         var position = $(ClosestSubEventToNow.Dom.Dom).position();
         setTimeout(function () {
@@ -334,10 +340,11 @@ function generateProcrastinateAllFunction(TimeData,CallBack)
     var TimeZone = new Date().getTimezoneOffset();
     TimeData = TimeData.ToTimeSpan();
     var NowData = { DurationDays: TimeData.Days, DurationHours: TimeData.Hours, DurationMins: TimeData.Mins, UserName: UserCredentials.UserName, UserID: UserCredentials.ID, TimeZoneOffset: TimeZone };
+    NowData.TimeZone = moment.tz.guess()
     var HandleNEwPage = new LoadingScreenControl("Tiler is Freeing up Some time :)");
-    TimeData.Hours
     HandleNEwPage.Launch();
     var URL = global_refTIlerUrl + "Schedule/ProcrastinateAll";
+    preSendRequestWithLocation(NowData);
     $.ajax({
         type: "POST",
         url: URL,
@@ -353,7 +360,7 @@ function generateProcrastinateAllFunction(TimeData,CallBack)
                 //exitSelectedEventScreen();
             }
             else {
-                alert("error detected with marking as complete");
+                alert("error detected with clearing your schedule");
             }
 
         },
@@ -398,6 +405,8 @@ function prepFunctionForCompletionOfEvent(EventID, CallBack) {
             ThirdPartyUserID: SubEvent.ThirdPartyUserID,
             ThirdPartyType: SubEvent.ThirdPartyType
         };
+        MarkAsCompleteData.TimeZone = moment.tz.guess()
+        preSendRequestWithLocation(MarkAsCompleteData);
         $.ajax({
             type: "POST",
             url: Url,
@@ -705,7 +714,7 @@ function generateModalForTIleOrModal()
     
 
 
-    function genereateMobileDoms(myEvent) {
+    function generateMobileDoms(myEvent) {
         Tiers = myEvent.Tiers;
         var EventDom = getDomOrCreateNew("EventID" + myEvent.ID);
         var HorizontalLine = InsertHorizontalLine("70%", "15%", "100%")//creates underlying gray Line
@@ -821,6 +830,8 @@ function generateModalForTIleOrModal()
         //myEvent.SubCalEndDate.setHours(refEnd.Hour, refEnd.Minute);
 
         var toString = myEvent.SubCalStartDate.toLocaleString();
+
+
         $(EventDom.Dom).addClass("EventDomContainer");
         $(EventDom.Dom).addClass(CurrentTheme.FontColor);
         $(EventDom_ContainerA.Dom).addClass("EventDomContainerA");
@@ -1240,23 +1251,7 @@ function generateModalForTIleOrModal()
             //$(ParentDom).children().show();
 
         }
-        //$(EventBackButton).click(closeProcrastinateContainer)
-        EventBackButton.onclick =closeProcrastinateContainer;
-          /*
-            (function () {
-            var myEventProcrastinateButtonContainer = EventProcrastinateContainer.Dom;
-            //alert("empty....");
-                //myEventProcrastinateButtonContainer.innerHTML = "";
-            $(myEventProcrastinateButtonContainer).empty();
-            myEventProcrastinateButtonContainer.outerHTML = "";
-            CurrentTheme.TransitionOldContainer();
-
-                //$(ParentDom).children().show();
-
-            });
-        */
-
-        
+        EventBackButton.onclick =closeProcrastinateContainer;        
 
         //$(EventUpdateButton).click
             EventUpdateButton.onclick=(function () {
@@ -1265,10 +1260,11 @@ function generateModalForTIleOrModal()
 
             var TimeZone = new Date().getTimezoneOffset();
             var NowData = { UserName: UserCredentials.UserName, UserID: UserCredentials.ID, EventID: EventID, DurationDays: TimeData.Days, DurationHours: TimeData.Hours, DurationMins: TimeData.Mins ,TimeZoneOffset: TimeZone };
-            //var URL= "RootWagTap/time.top?WagCommand=2";
+            NowData.TimeZone = moment.tz.guess()
             var URL = global_refTIlerUrl + "Schedule/Event/Procrastinate";
             var HandleNEwPage = new LoadingScreenControl("Tiler is Postponing  :)");
             HandleNEwPage.Launch();
+            preSendRequestWithLocation(NowData);
             $.ajax({
                 type: "POST",
                 url: URL,
@@ -1494,10 +1490,10 @@ function generateModalForTIleOrModal()
             var NowData = { UserName: UserCredentials.UserName, UserID: UserCredentials.ID, EventID: EventID, TimeZoneOffset: TimeZone };
             //var URL = "RootWagTap/time.top?WagCommand=8"
             var URL = myurl = global_refTIlerUrl + "Schedule/Event/Now";
-
+            NowData.TimeZone = moment.tz.guess()
             var HandleNEwPage = new LoadingScreenControl("Tiler is moving up your Event ...  :)");
             HandleNEwPage.Launch();
-            
+            preSendRequestWithLocation(NowData);
 
             $.ajax({
                 type: "POST",
@@ -1605,7 +1601,7 @@ function generateModalForTIleOrModal()
             var URL = global_refTIlerUrl + "Schedule/Event";
             var HandleNEwPage = new LoadingScreenControl("Tiler is Deleting your event :)");
             HandleNEwPage.Launch();
-
+            preSendRequestWithLocation(DeletionEvent);
             $.ajax({
                 type: "DELETE",
                 url: URL,
@@ -1639,13 +1635,28 @@ function generateModalForTIleOrModal()
     }
 
 
-    
+    function processNowAndNextRendering(SubCalEvent) {
+        let now = Date.now();
+        let isCurrentSubEvent = now < SubCalEvent.SubCalEndDate.getTime() && now >= SubCalEvent.SubCalStartDate.getTime();
+        if(isCurrentSubEvent && !currentSubevent) {
+            currentSubevent = SubCalEvent;
+            renderNowUi(SubCalEvent);
+        }
+        if(!currentSubevent && !nextSubEvent) {
+            let isNext = now < SubCalEvent.SubCalStartDate.getTime();
+            if(isNext) {
+                nextSubEvent = SubCalEvent;
+                renderNextUi(SubCalEvent);
+            }
+        }
+    }
 
 
     function InitializeMiddleDomUI(Dom)
     {
         var CurrentTopPercent = 0;
         var TopIncrement = 0;
+        let now = Date.now()
         ActiveSubEvents.sort(function (a, b) { return (a.SubCalStartDate) - (b.SubCalStartDate) });
         /*AllNonRepeatingEvents.forEach(
             function (CalendarEvent)
@@ -1680,6 +1691,43 @@ function generateModalForTIleOrModal()
         //global_RenderedList = ActiveSubEvents;
     }
 
+    function renderNowUi (subEvent) {
+        if(subEvent) {
+            let currentSubEventClassName = "ListElementContainerCurrentSubevent";
+            let ListElementContainer = subEvent.Dom
+            $(ListElementContainer.Dom).addClass(currentSubEventClassName);
+            let nextSubEventTimeSpanInMs =  subEvent.SubCalEndDate.getTime() - Date.now();
+            let nextSubEventIndex = TotalSubEventList.indexOf(subEvent)
+            if(nextSubEventIndex >=0 && nextSubEventIndex < TotalSubEventList.length - 1) {
+                ++nextSubEventIndex;
+                let nextSubEvent = TotalSubEventList[nextSubEventIndex]
+                if(nextSubEventTimeSpanInMs >= OneMinInMs) {
+                    setTimeout(() => {
+                        $(ListElementContainer.Dom).removeClass(currentSubEventClassName);
+                        renderNextUi(nextSubEvent);
+                    }, nextSubEventTimeSpanInMs)
+                } else {
+                    $(ListElementContainer.Dom).removeClass(currentSubEventClassName);
+                    renderNowUi(nextSubEvent);
+                }
+            }
+        }
+    }
+
+
+    function renderNextUi(nextSubEvent) {
+        if(nextSubEvent) {
+            let nextSubEventClassName = "ListElementContainerNextSubevent";
+            let ListElementContainer = nextSubEvent.Dom;
+            $(ListElementContainer.Dom).addClass(nextSubEventClassName);
+            let timeSpanInMs = nextSubEvent.SubCalStartDate.getTime() - Date.now()
+            setTimeout(() => {
+                renderNowUi(nextSubEvent)
+                $(ListElementContainer.Dom).removeClass(nextSubEventClassName);
+            }, timeSpanInMs)
+        }
+    }
+
     function RefreshSubEventsMainDivSubEVents(CallBack)
     {
         //debugger;
@@ -1695,13 +1743,41 @@ function generateModalForTIleOrModal()
             CallBack();
         }
     }
+
+    RefreshSubEventsMainDivSubEVents = buildFunctionSubscription(RefreshSubEventsMainDivSubEVents)
+
+    function resetEventStatusUi() {
+        if (currentSubevent) {
+            let allCurrents = []
+            let currentSubEventClassName = "ListElementContainerCurrentSubevent";
+            let elements = $('.' + currentSubEventClassName)
+            for (let i = 0; i < elements.length; i++) {
+                let element = elements.get(i);
+                $(element).removeClass(currentSubEventClassName);
+            }
+            currentSubevent= undefined;
+        }
+        if (nextSubEvent) {
+            let nextSubEventClassName = "ListElementContainerNextSubevent";
+            let elements = $('.' + nextSubEventClassName)
+            for (let i = 0; i < elements.length; i++) {
+                let element = elements.get(i);
+                $(element).removeClass(nextSubEventClassName);
+            }
+            nextSubEvent= undefined;
+        }
+    }
+
+    resetEventStatusUi = buildFunctionSubscription(resetEventStatusUi)
     
+    RefreshSubEventsMainDivSubEVents.enroll(resetEventStatusUi, true);
 
     function getNewData(OldActiveEvents)
     {
         var myurl = global_refTIlerUrl + "Schedule";
         var verifiedUser = GetCookieValue();
         var preppePostdData = { UserName: verifiedUser.UserName, UserID: verifiedUser.UserID };
+        preSendRequestWithLocation(preppePostdData);
         retrieveUserSchedule(myurl, preppePostdData, sortOutData);
     }
 
@@ -1710,6 +1786,7 @@ function generateModalForTIleOrModal()
         var UserSchedule = PostData.Content;
         var StructuredData = StructuralizeNewData(UserSchedule)
         TotalSubEventList = StructuredData.TotalSubEventList;
+        pageNotifications.processNotifications(TotalSubEventList);
         ActiveSubEvents = StructuredData.ActiveSubEvents;
         Dictionary_OfCalendarData = StructuredData.Dictionary_OfCalendarData;
         Dictionary_OfSubEvents = StructuredData.Dictionary_OfSubEvents;
@@ -1721,8 +1798,9 @@ function generateModalForTIleOrModal()
             ClosestSubEventToNow = getClosestToNow(TotalSubEventList, new Date());
         }
         ActiveSubEvents.forEach(function (myEvent) {
-            var MobileDom = genereateMobileDoms(myEvent);
+            var MobileDom = generateMobileDoms(myEvent);
             myEvent.Dom = MobileDom;
+            processNowAndNextRendering(myEvent);
         });
         /*
         var AllNonrepeatingNonEvents = generateNonRepeatEvents(UserSchedule.Schedule.NonRepeatCalendarEvent);
@@ -1943,19 +2021,14 @@ function generateModalForTIleOrModal()
         return function () {
             var TimePickerValue = Timpicker !=null?Timpicker.Dom.value:"12:00am";
             var DatePickerValue = DatePicker.Dom.value;
+            let IsDefault = false;
             if (Timpicker.Dom.value.toLowerCase() == "")//handles initializing string values string 
             {
                 TimePickerValue = getTimeStringFromDate(new Date(Date.now())).replace(" ", "");
+                IsDefault = true;
             }
 
             if ((DatePicker.Dom.value.toLowerCase() == "") || (DatePicker.Dom.value.toLowerCase() == "")) {
-                /*
-                if (DatePicker.Dom.value.toLowerCase() == "")
-                {
-                    ExtraDayInMS = OneDayInMs;
-                }
-                */
-
                 var DayPlusOne = Number(new Date(Date.now())) + ExtraDayInMS;
                 {
                     DayPlusOne = new Date(DayPlusOne);
@@ -1969,7 +2042,7 @@ function generateModalForTIleOrModal()
 
             var TwentyFourHourTime =AP_To24Hour(TimePickerValue);
             var DateData = date_mm_dd__yyyy_ToDateObj(DatePickerValue, "/")
-            var retValue = { Time: TwentyFourHourTime, Date: DateData };
+            var retValue = { Time: TwentyFourHourTime, Date: DateData, IsDefault: IsDefault };
 
             return retValue;
 

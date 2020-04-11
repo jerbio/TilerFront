@@ -17,7 +17,7 @@ namespace TilerFront
 
         }
 
-        public override void removeAllEventsFromOutLook(ICollection<CalendarEvent> ArrayOfCalendarEvents)
+        public override void removeAllEventsFromOutLook(IEnumerable<CalendarEvent> ArrayOfCalendarEvents)
         {
             base.removeAllEventsFromOutLook(ArrayOfCalendarEvents);
         }

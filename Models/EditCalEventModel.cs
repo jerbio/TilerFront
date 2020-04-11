@@ -13,12 +13,20 @@ namespace TilerFront.Models
         public long End { get; set; }
         public long Duration { get; set; }
         public long Split { get; set; }
-
+        public string CalAddress { get; set; }
+        public string CalAddressDescription { get; set; }
+        public int AllEvents = 0;
+        public string Notes { get; set; }
+        public string EscapedNotes {
+            get {
+                return Notes ?? "";
+            }
+        }
 
         public DateTimeOffset getStart()
         {
             DateTimeOffset newStart = TilerElementExtension.JSStartTime.AddMilliseconds(this.Start);
-            newStart = newStart.Add(this.getTImeSpan);
+            newStart = newStart.Add(this.getTimeSpan);
             return newStart;
         }
 
@@ -26,7 +34,7 @@ namespace TilerFront.Models
         public DateTimeOffset getEnd()
         {
             DateTimeOffset newEnd = TilerElementExtension.JSStartTime.AddMilliseconds(this.End);
-            newEnd = newEnd.Add(this.getTImeSpan);
+            newEnd = newEnd.Add(this.getTimeSpan);
             return newEnd;
         }
     }

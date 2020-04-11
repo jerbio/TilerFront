@@ -68,9 +68,25 @@ namespace TilerFront.Models
         /// </summary>
         public string EndYear { get; set; }
         /// <summary>
+        /// Address provided by user
+        /// </summary>
+        public string LookupString { get; set; }
+        /// <summary>
+        /// Address is a confirmed location from google maps or mapping service
+        /// </summary>
+        public string LocationIsVerified { get; set; }
+        /// <summary>
         /// Full Address for new event. Fully described in default format. e.g 1234 stret apt 56 Kingston, CO 78901
         /// </summary>
         public string LocationAddress { get; set; }
+        /// <summary>
+        /// Should be populated when the location is from a cache
+        /// </summary>
+        public string LocationId { get; set; }
+        /// <summary>
+        /// Source from where location is pulled
+        /// </summary>
+        public string LocationSource { get; set; }
         /// <summary>
         /// Prefereed Nick name for location. If Nick name already exists, it overwrites previous full address & long lat with new nick name
         /// </summary>
@@ -79,6 +95,7 @@ namespace TilerFront.Models
         /// Name of Newly added Tile/Event
         /// </summary>
         public string Name { get; set; }
+
         /// <summary>
         /// ***No current use***
         /// </summary>
@@ -116,14 +133,18 @@ namespace TilerFront.Models
         public string isWorkWeek {get;set;}
         public string isEveryDay { get; set; }
         public RestrictionWeekConfig RestrictiveWeek { get; set; }
+        /// <summary>
+        /// The timezone of the location where the request is received. This defaults to UTC
+        /// </summary>
+        public string TimeZoneOrigin { get; set; } = "UTC";
 
-        public RestrictionProfile getRestrictionProfile()
+        public RestrictionProfile getRestrictionProfile(DateTimeOffset currentTime)
         {
             bool EveryDayFlag = Boolean.Parse(isEveryDay);
             bool WorkWeek = Boolean.Parse(isWorkWeek);
-            DateTimeOffset myNow = DateTimeOffset.UtcNow;;
+            DateTimeOffset myNow = currentTime;
             DateTimeOffset RestrictStart = new DateTimeOffset(myNow.Year, myNow.Month, myNow.Day, 0,0, 0,new TimeSpan());
-            RestrictStart = RestrictStart.Add(-getTImeSpan);
+            RestrictStart = RestrictStart.Add(-getTimeSpan);
             DateTimeOffset RestrictEnd = RestrictStart.AddSeconds(-1);
             RestrictionProfile retValue;
             DayOfWeek[] selectedDaysOftheweek = { };
@@ -131,8 +152,8 @@ namespace TilerFront.Models
             {
                 if ((DateTimeOffset.TryParse(RestrictionStart, out RestrictStart)) && ((DateTimeOffset.TryParse(RestrictionEnd, out RestrictEnd))))
                 {
-                    RestrictStart = RestrictStart.Add(getTImeSpan);
-                    RestrictEnd = RestrictEnd.Add(getTImeSpan);
+                    RestrictStart = RestrictStart.Add(-getTimeSpan);
+                    RestrictEnd = RestrictEnd.Add(-getTimeSpan);
                     selectedDaysOftheweek = RestrictionProfile.AllDaysOfWeek.ToArray();
                     if (WorkWeek)
                     {
@@ -140,7 +161,6 @@ namespace TilerFront.Models
                     }
                     else
                     {
-
                         RestrictionTimeLine RestrictionTimeLine = new TilerElements.RestrictionTimeLine(RestrictStart, RestrictEnd);
                         retValue = new RestrictionProfile(selectedDaysOftheweek, RestrictionTimeLine);
                     }
@@ -153,7 +173,7 @@ namespace TilerFront.Models
             }
 
 
-            retValue = RestrictiveWeek.getRestriction(getTImeSpan);
+            retValue = RestrictiveWeek.getRestriction(getTimeSpan);
 
             
             return retValue;
