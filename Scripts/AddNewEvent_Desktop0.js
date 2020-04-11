@@ -54,7 +54,6 @@ function generateOfficeHours(Place)
         function PickTimeFrames(DayOfWeek,TimeSections)
         {
             var DayIndex = WeekDays.indexOf(DayOfWeek);
-            //var RetValue = { DayIndex: DayIndex, Start: null, End: null, IsTwentyFourHours: false, IsClosed:null };
 
             var AllTimeDataStart = [];
             var AllTimeDataEnd = [];
@@ -71,7 +70,6 @@ function generateOfficeHours(Place)
                         var BeginAndEndArray = TimeText.split("–");
                         var Begin = BeginAndEndArray[0].trim();
                         Begin = Begin.trim();
-                        //Begin = Begin.slice(0, -1);
                         Begin =spliceSlice(Begin, Begin.length - 3, 0, " ");
                         var End = BeginAndEndArray[1].trim();
                         End = spliceSlice(End, End.length - 3, 0, " ");
@@ -168,14 +166,7 @@ function SubmitTile(Name, AddressInput,AddressNick, Splits, Hour, Minutes, Deadl
 
 
     var EventName = Name;
-    /*
-    if (!EventName)
-    {
-        alert("Oops your tile needs a name");
-        return null;
-    }
-    */
-    let Address = AddressInput.value
+    let Address = AddressInput.value;
     var LocationAddress = Address;
     let LocationIsVerified = AddressInput.LocationIsVerified;
     var LocationNickName = AddressNick;
@@ -194,13 +185,6 @@ function SubmitTile(Name, AddressInput,AddressNick, Splits, Hour, Minutes, Deadl
     var EventDuration = { Days: 0, Hours: Hour, Mins: Minutes };
 
     var DurationInMS = (parseInt(EventDuration.Days) * OneDayInMs) + (parseInt(EventDuration.Hours) * OneHourInMs) + (parseInt(EventDuration.Mins) * OneMinInMs)
-    /*
-    if (DurationInMS == 0) {
-        alert("Oops please provide a duration for \"" + EventName + "\"");
-        return null;
-    }
-    */
-
     Splits = Splits != "" ? Splits : 1;
     
     Repetition = Repetition.trim().toLowerCase();
@@ -220,16 +204,7 @@ function SubmitTile(Name, AddressInput,AddressNick, Splits, Hour, Minutes, Deadl
         repeteOpitonSelect = DictOfData[Repetition];
         if (repeteOpitonSelect != undefined) {
             RepetitionEnd = (End.getMonth() + 1) + "/" + End.getDate() + "/" + End.getFullYear();
-            var FullRange = End.getTime() - EventStart.Date.getTime()
-            /*
-            if (repeteOpitonSelect.Range > FullRange)//checks if the given deadline extends past the range for a selected repetition sequence. e.g If user selects weekly, this line checks if range is between start and end is larger than 7 days
-            {
-                alert("please check your repetition, you dont have up to a " + Repetition + " before deadline");
-                return;
-            }
-            */
-
-            //End = new Date(Start.getTime() + repeteOpitonSelect.Range);
+            var FullRange = End.getTime() - EventStart.Date.getTime();
         }
         else
         {
@@ -245,12 +220,11 @@ function SubmitTile(Name, AddressInput,AddressNick, Splits, Hour, Minutes, Deadl
             Splits = 1;
         }
     }
-    var EventEnd = {}
+    var EventEnd = {};
     EventEnd.Date = new Date(End.getFullYear(), End.getMonth(), End.getDate());
     EventEnd.Time = { Hour: 23, Minute: 59 };
     
     var NewEvent = new CalEventData(EventName, EventLocation, Splits, CalendarColor, EventDuration, EventStart, EventEnd, repeteOpitonSelect, RepetitionStart, RepetitionEnd, false,TimeRestrictions);
-    //NewEvent.RepeatData = null;
     if (NewEvent == null) {
         return;
     }
@@ -393,7 +367,6 @@ function generateProcrastinateAll(x, y, height, width,WeekStart, RenderPlane) {
             // DataType needs to stay, otherwise the response object
             // will be treated as a single string
             success: function (response) {
-                //alert(response);
                 var myContainer = (response);
                 if (myContainer.Error.code == 0) {
                     //exitSelectedEventScreen();
@@ -3176,6 +3149,13 @@ function SendScheduleInformation(NewEvent, CallBack)
         // will be treated as a single string
         //dataType: "json",
         success: function (response) {
+            if(response && response.Error && response.Error.code !== 0 || response.Error.code !== "0") {
+                alert(response.Error.Message);
+                var NewMessage = "Oh No!!! Tiler is having issues creating a new schedule.<br>" + response.Error.Message+ ".<br>Please the changes and try again"
+                var ExitAfter = { ExitNow: true, Delay: 5000 };
+                HandleNEwPage.UpdateMessage(NewMessage, ExitAfter, function () { });
+                return;
+            }
             triggerUndoPanel("Undo addition of \"" + NewEvent.Name+"\"");
             var b = 3;
 
@@ -3190,6 +3170,14 @@ function SendScheduleInformation(NewEvent, CallBack)
         }
 
     }).done(function (response) {
+        if(response && response.Error && response.Error.code !== 0 || response.Error.code !== "0") {
+            var NewMessage = "Oh No!!! Tiler is having issues creating a new schedule.\n" + response.Error.Message+ "Please the changes and try again"
+            var ExitAfter = { ExitNow: true, Delay: 20000 };
+            HandleNEwPage.UpdateMessage(NewMessage, ExitAfter, function () { });
+            return;
+        }
+
+
         HandleNEwPage.Hide();
         getRefreshedData.enableDataRefresh();
         var AffirmCallBack = affirmNewEvent(response);

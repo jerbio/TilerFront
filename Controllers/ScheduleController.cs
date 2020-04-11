@@ -106,13 +106,16 @@ namespace TilerFront.Controllers
                     subEvents = MySchedule.getAllCalendarEvents().SelectMany(obj => obj.ActiveSubEvents);
                 }
 #endif
+                DayTimeLine sleepTimeline = now.getDayTimeLineByTime(now.constNow.AddDays(2));
+                TimeLine sleepTImeline = TimeOfDayPreferrence.splitIntoDaySections(sleepTimeline)[TimeOfDayPreferrence.DaySection.Sleep];
 
                 UserSchedule currUserSchedule = new UserSchedule {
                     //NonRepeatCalendarEvent = NonRepeatingEvents.Select(obj => obj.ToCalEvent(TimelineForData)).ToArray(),
                     //RepeatCalendarEvent = RepeatingEvents,
                     SubCalendarEvents = subEvents.Select(subEvent => 
                         subEvent.ToSubCalEvent(subEvent.ParentCalendarEvent)
-                    ).ToList()
+                    ).ToList(),
+                    SleepTimeline = sleepTImeline.ToJson()
                 };
                 PausedEvent currentPausedEvent = getCurrentPausedEvent(db);
                 currUserSchedule.populatePauseData(currentPausedEvent, myAuthorizedUser.getRefNow());
@@ -1396,6 +1399,12 @@ namespace TilerFront.Controllers
                 {
                     selectedDaysOftheweek = RepeatWeeklyData.Split(',').Where(obj => !String.IsNullOrEmpty(obj)).Select(obj => Convert.ToInt32(obj)).Select(num => (DayOfWeek)num).ToArray();
                 }
+  
+                if(RepeatStart>=RepeatEnd)
+                {
+                    var postResult = new PostBackData(CustomErrors.Errors.Creation_Config_RepeatEnd_Earlier_Than_RepeatStart);
+                    return Ok(postResult.getPostBack);
+                }
 
                 RepetitionFlag = true;
                 MyRepetition = new Repetition(new TimeLine(RepeatStart, RepeatEnd), Utility.ParseEnum<Repetition.Frequency> (RepeatFrequency.ToUpper()), new TimeLine(FullStartTime, FullEndTime), selectedDaysOftheweek);
@@ -1431,6 +1440,12 @@ namespace TilerFront.Controllers
                     StartData = StartData.Add(-newEvent.getTimeSpan);
                     DateTimeOffset EndData = DateTimeOffset.Parse(EndTime + " " + EndDateEntry.Date.ToShortDateString()).UtcDateTime;
                     EndData = EndData.Add(-newEvent.getTimeSpan);
+                    if (StartData >= EndData)
+                    {
+                        var postResult = new PostBackData(CustomErrors.Errors.Creation_Config_End_Earlier_Than_Start);
+                        return Ok(postResult.getPostBack);
+                    }
+
                     if (RigidScheduleFlag) {
                         newCalendarEvent = new RigidCalendarEvent(
                             Name, StartData, EndData, EventDuration,new TimeSpan(), new TimeSpan(), MyRepetition, EventLocation,  new EventDisplay(true, userColor, userColor.User < 1 ? 0 : 1), new MiscData(), true,false, tilerUser, new TilerUserGroup(), TimeZone, null, new NowProfile(), null);

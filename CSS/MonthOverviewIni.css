@@ -1942,3 +1942,17 @@ width: auto;
   margin-left: 0px;
   max-width: 700px;
 }
+
+.sleep-time-grid{
+  background-color: rgb(245, 245, 245 );
+  border-radius: 5px;
+  position: absolute;
+  width: 100%;
+}
+
+.SleepContainer {
+  width: 15%;
+  position: absolute;
+  height: 100%;
+  left: 85%;
+}

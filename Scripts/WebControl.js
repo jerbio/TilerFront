@@ -7,7 +7,7 @@ var DebugLocal = true;
 //var global_refTIlerUrl = "http://tilersmart.azurewebsites.net/api/";
 var global_refTIlerUrl = window.location.origin + "/api/";
 var global_PositionCoordinate = { Latitude: 40.0274, Longitude: -105.2519, isInitialized: false, Message: "Uninitialized" };;
-
+var global_sleepTimeline = []
 var UserTheme = { Light: new Theme("Light"), Dark: new Theme("Dark") };
 var CurrentTheme = UserTheme.Light;
 var UserCredentials;
@@ -269,6 +269,46 @@ function triggerUndoPanel(UndoMessage)
 }
 
 
+function updateSleepTimeline(sleepTimeline) {
+    if(sleepTimeline) {
+        global_sleepTimeline = [];
+        let today = new Date(Date.now());
+        let sleepStart = new Date(sleepTimeline.start);
+        
+        sleepStart.setDate(today.getDate());
+        sleepStart.setFullYear(today.getFullYear());
+        let sleepEnd = new Date(sleepStart.getTime() + sleepTimeline.duration);
+        if(sleepStart.getDate() == sleepEnd.getDate()) {
+            global_sleepTimeline.push({
+                start: sleepStart,
+                end: sleepEnd
+            })
+        } else {
+            if(sleepStart.getTime() < sleepEnd.getTime()) {
+                while(sleepStart.getDate() !== sleepEnd.getDate()) {
+                    let nextSleepStart = new Date( sleepStart.getTime());
+                    nextSleepStart.setDate((nextSleepStart.getDate()+1));
+                    nextSleepStart.setHours(0,0,0,0);
+                    let currentSleepEnd = new Date( nextSleepStart.getTime() - OneMinInMs);
+                    global_sleepTimeline.push({
+                        start: sleepStart,
+                        end: currentSleepEnd
+                    });
+                    sleepStart = nextSleepStart;
+                }
+
+                global_sleepTimeline.push({
+                    start: sleepStart,
+                    end: sleepEnd
+                });
+
+            } else {
+                throw "Sleep time line is invalid"
+            }
+        }
+    }
+}
+
 function StructuralizeNewData(NewData)
 {
     var TotalSubEventList = new Array();
@@ -283,7 +323,8 @@ function StructuralizeNewData(NewData)
         } else {
             NewData.Schedule.SubCalendarEvents.forEach(SubCalendaEventsCreateDomElement)
         }
-        
+
+        updateSleepTimeline(NewData.Schedule.SleepTimeline);
         CleanupData();
     }
     else {
@@ -328,13 +369,8 @@ function StructuralizeNewData(NewData)
                 }
                 else {
                     ToBeReorganized.push(eachSubEvent);
-                    //if (Dictionary_OfSubEvents[eachSubEvent.ID].SubCalStartDate != eachSubEvent.SubCalStartDate)
-                    {
-                        //global_DeltaSubevents.push(eachSubEvent);
-                    }
 
                 }
-                //debugger;
                 var RangeStart = new Date(NowDate.getTime() - (OneHourInMs * 12));
                 var RangeEned = new Date(CurrentTheme.Now + TwelveHourMilliseconds);
 
