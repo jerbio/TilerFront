@@ -3149,7 +3149,7 @@ function SendScheduleInformation(NewEvent, CallBack)
         // will be treated as a single string
         //dataType: "json",
         success: function (response) {
-            if(response && response.Error && response.Error.code !== 0 || response.Error.code !== "0") {
+            if(response && response.Error && !(response.Error.code === 0 || response.Error.code === "0")) {
                 alert(response.Error.Message);
                 var NewMessage = "Oh No!!! Tiler is having issues creating a new schedule.<br>" + response.Error.Message+ ".<br>Please the changes and try again"
                 var ExitAfter = { ExitNow: true, Delay: 5000 };

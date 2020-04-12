@@ -65,7 +65,6 @@ namespace TilerFront
 
         public LogControl(TilerUser user, ApplicationDbContext database, DB_UserActivity useractivity = null)
         {
-            //LogDBDataAccess = DBAccess;
             LogStatus = false;
             CachedLocation = new Dictionary<string, TilerElements.Location>();
             _TilerUser = user;
@@ -1597,11 +1596,50 @@ namespace TilerFront
             return retValue;
         }
 
+
+        /// <summary>
+        ///  FUnction makes a storage call to retrieve all sub events. Note this includes both completed and deleted sub events. Except the case of count decrement
+        /// </summary>
+        /// <param name="timeline"></param>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        public IEnumerable<SubCalendarEvent> getSubCalendarEventForAnalysis(TimeLine timeline, TilerUser user)
+        {
+            if (timeline!=null && user!= null)
+            {
+                IQueryable<SubCalendarEvent> subEventQuery = null;
+                IQueryable<CalendarEvent> caleventQuery = getCalendarEventQuery(DataRetrivalOption.Evaluation, true);
+                caleventQuery = caleventQuery
+                    .Where(calEvent =>
+                        calEvent.CreatorId == user.Id
+                        && calEvent.StartTime_EventDB < timeline.End
+                        && calEvent.EndTime_EventDB > timeline.Start
+                    )
+                    .Include(calEvent => calEvent.TimeLineHistory_DB)
+                    .Include(calEvent => calEvent.AllSubEvents_DB)
+                    .Include(calEvent => calEvent.AllSubEvents_DB.Select(o=> o.ParentCalendarEvent.TimeLineHistory_DB))
+                    ;
+                var calEvents = caleventQuery.ToList();
+                HashSet<SubCalendarEvent> retValue = new HashSet<SubCalendarEvent>(calEvents.SelectMany(calEvent => calEvent.AllSubEvents_DB).ToList());
+                return retValue;
+            }
+            
+            if(timeline!=null)
+            {
+                throw new ArgumentNullException("timeline");
+            }
+            else
+            {
+                throw new ArgumentNullException("user");
+            }
+        }
+
         async public virtual Task<IEnumerable<SubCalendarEvent>> getAllSubCalendarEvents(TimeLine RangeOfLookUP, ReferenceNow Now, bool includeOtherEntities = false, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation) {
 #if liveDebugging
             includeOtherEntities = true;
 #else
 #endif
+            this.Now = Now;
             long rangeStart = RangeOfLookUP.Start.ToUnixTimeMilliseconds();
             long rangeEnd = RangeOfLookUP.End.ToUnixTimeMilliseconds();
             IQueryable<SubCalendarEvent> allSubCalQuery = getSubCalendarEventQuery(retrievalOption, includeOtherEntities: includeOtherEntities);
@@ -1631,6 +1669,7 @@ namespace TilerFront
 
         async public virtual Task<IEnumerable<SubCalendarEvent>> getAllEnabledSubCalendarEvent(TimeLine RangeOfLookUP, ReferenceNow Now, bool includeOtherEntities = true, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation)
         {
+            this.Now = Now;
             Stopwatch watch = new Stopwatch();
             watch.Start();
             IQueryable<SubCalendarEvent> allSubCalQuery = getSubCalendarEventQuery(retrievalOption, includeOtherEntities: includeOtherEntities);
@@ -1700,6 +1739,7 @@ namespace TilerFront
         {
             if (retrievalOption == DataRetrivalOption.Evaluation)
             {
+                this.Now = Now;
                 Stopwatch watch = new Stopwatch();
                 watch.Start();
                 CalendarEvent defaultCalEvent = CalendarEvent.getEmptyCalendarEvent(EventID.GenerateCalendarEvent(), Now.constNow, Now.constNow.AddHours(1));

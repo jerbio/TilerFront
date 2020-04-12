@@ -109,6 +109,7 @@ namespace TilerFront.Controllers
             }
             TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
             scheduleChangeSocket.triggerRefreshData(retrievedUser.getTilerUser());
+            await AnalysisController.updateSuggestionAnalysis(retrievedUser.ScheduleLogControl).ConfigureAwait(false);
             return Ok(retValue.getPostBack);
         }
 
@@ -183,6 +184,7 @@ namespace TilerFront.Controllers
 
             TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
             scheduleChangeSocket.triggerRefreshData(retrievedUser.getTilerUser());
+            await AnalysisController.updateSuggestionAnalysis(retrievedUser.ScheduleLogControl).ConfigureAwait(false);
             return Ok(retValue.getPostBack);
         }
     }

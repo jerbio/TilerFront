@@ -1389,6 +1389,33 @@ width: 100%;
     background-color: yellow;
 }
 
+#suggested-deadline-container-button {
+  border: 1px #ccc solid;
+  color: black;
+  background-color: white;
+  font-size: 16px;
+  font-family: 'texbold';
+  padding: 10px 15px;
+  -webkit-transition: all .2s ease-in-out;
+  -o-transition: all .2s ease-in-out;
+  -moz-transition: all .2s ease-in-out;
+  transition: all .2s ease-in-out;
+  cursor: pointer;
+  width: fit-content;
+}
+
+#suggested-deadline-container-button:focus,
+#suggested-deadline-container-button:hover {
+    border: 1px transparent solid;
+    outline: none;
+    background-color: yellow;
+}
+
+
+#suggested-deadline-container {
+  margin-top: 10px;
+}
+
 #TimeBar {
   position: fixed;
   height: calc(62.25% + 3px);

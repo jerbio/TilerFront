@@ -458,7 +458,7 @@ namespace TilerFront.Controllers
         /// </summary>
         /// <param name="ID"></param>
         /// <returns></returns>
-        static async Task<List<IndexedThirdPartyAuthentication>> getAllThirdPartyAuthentication(string ID, ApplicationDbContext db)
+        static async public Task<List<IndexedThirdPartyAuthentication>> getAllThirdPartyAuthentication(string ID, ApplicationDbContext db)
         {
             //ApplicationDbContext db = new ApplicationDbContext();
             List<ThirdPartyCalendarAuthenticationModel> AllAuthentications = ( db.ThirdPartyAuthentication.Where(obj => ID == obj.TilerID).ToList());
@@ -596,6 +596,7 @@ namespace TilerFront.Controllers
                     myPostData = new PostBackData("\"There aren't events for the next three months is coming up in the next three months\"", 0);
                 }
                 TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
+                await AnalysisController.updateSuggestionAnalysis(retrievedUser.ScheduleLogControl).ConfigureAwait(false);
                 scheduleChangeSocket.triggerRefreshData(retrievedUser.getTilerUser());
                 return Ok(myPostData.getPostBack);
             }
@@ -648,6 +649,7 @@ namespace TilerFront.Controllers
                 retValue = new PostBackData("", 1);
             }
             TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
+            await AnalysisController.updateSuggestionAnalysis(retrievedUser.ScheduleLogControl).ConfigureAwait(false);
             scheduleChangeSocket.triggerRefreshData(retrievedUser.getTilerUser());
             return Ok(retValue.getPostBack);
         }
@@ -702,6 +704,7 @@ namespace TilerFront.Controllers
 
                 
                 TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
+                await AnalysisController.updateSuggestionAnalysis(retrievedUser.ScheduleLogControl).ConfigureAwait(false);
                 scheduleChangeSocket.triggerRefreshData(retrievedUser.getTilerUser());
                 return Ok(myPostData.getPostBack);
             }
@@ -743,6 +746,7 @@ namespace TilerFront.Controllers
                 scheduleDumpCopy.Id = scheduleDump.Id;
                 TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
                 scheduleChangeSocket.triggerRefreshData(retrievedUser.getTilerUser());
+                await AnalysisController.updateSuggestionAnalysis(retrievedUser.ScheduleLogControl).ConfigureAwait(false);
                 PostBackData postBack = new PostBackData(scheduleDumpCopy, 0);
                 return Ok(postBack.getPostBack);
             }
@@ -840,6 +844,7 @@ namespace TilerFront.Controllers
                             retrievedUser.ScheduleLogControl.updateUserActivty(activity);
                             schedule.markSubEventAsCompleteCalendarEventAndReadjust(UserData.EventID);
                             await schedule.WriteFullScheduleToLog().ConfigureAwait(false);
+                            await AnalysisController.updateSuggestionAnalysis(retrievedUser.ScheduleLogControl).ConfigureAwait(false);
                             retValue = new PostBackData("\"Success\"", 0);
                         }
                         break;
@@ -1031,8 +1036,8 @@ namespace TilerFront.Controllers
             if (retrievedUser.Status)
             {
                 DB_UserActivity activity = new DB_UserActivity(myUser.getRefNow(), UserActivity.ActivityType.Undo);
-                retrievedUser.ScheduleLogControl.updateUserActivty(activity);
-                await retrievedUser.ScheduleLogControl.Undo().ConfigureAwait(false);
+                //retrievedUser.ScheduleLogControl.updateUserActivty(activity);
+                //await retrievedUser.ScheduleLogControl.Undo().ConfigureAwait(false);
                 retValue = new PostBackData("\"Success\"", 0);
             }
             else
@@ -1093,6 +1098,7 @@ namespace TilerFront.Controllers
 
                             await schedule.deleteSubCalendarEvent(eventModel.EventID).ConfigureAwait(false);
                             await schedule.WriteFullScheduleToLog().ConfigureAwait(false);
+                            await AnalysisController.updateSuggestionAnalysis(retrievedUser.ScheduleLogControl).ConfigureAwait(false);
                             retValue = new PostBackData("\"Success\"", 0);   
                         }
                         break;
@@ -1507,6 +1513,7 @@ namespace TilerFront.Controllers
                 retValue = new PostBackData("", 1);
             }
             TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
+            await AnalysisController.updateSuggestionAnalysis(retrievedUser.ScheduleLogControl).ConfigureAwait(false);
             scheduleChangeSocket.triggerRefreshData(retrievedUser.getTilerUser());
             return Ok(retValue.getPostBack);
         }

@@ -4868,7 +4868,29 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                     return ContainerForExtraOptions;
                 }
 
-            
+                
+                function handleSuggestedDeadline() {
+                    if(SubEvent.SuggestedDeadline && SubEvent.SuggestedDeadline > 0) {
+                        let suggestedTime = new Date(SubEvent.SuggestedDeadline)
+                        let onSuggestionClick = () => {
+                            CalEndTime.value = moment(suggestedTime, "MM-DD-YYYY").format("hh:mma");
+                            CalEventEndDateBinder.datepicker("setDate", suggestedTime);
+                            EditContainerData.RevealContainer()
+                        };
+                        let suggestedDedalineContainerId = "suggested-deadline-container"
+                        let suggestedDedalineContainerDom = getDomOrCreateNew(suggestedDedalineContainerId);
+                        let suggestedDedalineButtonId = "suggested-deadline-container-button"
+                        let suggestedDedalineContainerButtonDom = getDomOrCreateNew(suggestedDedalineButtonId);
+                        suggestedDedalineContainerDom.appendChild(suggestedDedalineContainerButtonDom);
+                        suggestedDedalineContainerButtonDom.addEventListener("click", onSuggestionClick);
+                        suggestedDedalineContainerButtonDom.Dom.innerHTML = "Try Suggested Deadline?";
+                        let suggestedDateString = moment(suggestedTime, "MM-DD-YYYY").format("ddd MMM DD, YYYY");
+                        suggestedDedalineContainerButtonDom.setAttribute('title', suggestedDateString);
+                        
+                        return suggestedDedalineContainerDom;
+                    }
+                }
+
                 SubCalStartInfo.appendChild(SubEventStartTime);
                 SubCalStartInfo.appendChild(SubEventStartDate);
 
@@ -4881,8 +4903,15 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
             
 
                 var ControlPanelDeadlineOfSubevent=getDomOrCreateNew("ControlPanelDeadlineOfSubevent")
-                ControlPanelDeadlineOfSubeventInfo.appendChild(CalEndTime)
+                ControlPanelDeadlineOfSubeventInfo.appendChild(CalEndTime);
                 ControlPanelDeadlineOfSubeventInfo.appendChild(CalEndDate);
+                let suggestDeadlineButton = handleSuggestedDeadline()
+                if(suggestDeadlineButton) {
+                    ControlPanelDeadlineOfSubeventInfo.appendChild(suggestDeadlineButton);
+                }
+                
+
+                
 
                 var InfoCOntainer = getDomOrCreateNew("InfoContainer")
                 let optionData = extraOptionsData();
