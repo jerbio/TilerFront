@@ -4870,15 +4870,15 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
 
                 
                 function handleSuggestedDeadline() {
-                    if(SubEvent.SuggestedDeadline && SubEvent.SuggestedDeadline > 0) {
+                    let suggestedDedalineContainerId = "suggested-deadline-container"
+                    let suggestedDedalineContainerDom = getDomOrCreateNew(suggestedDedalineContainerId);
+                    if (SubEvent.SuggestedDeadline && SubEvent.SuggestedDeadline > 0) {
                         let suggestedTime = new Date(SubEvent.SuggestedDeadline)
                         let onSuggestionClick = () => {
                             CalEndTime.value = moment(suggestedTime, "MM-DD-YYYY").format("hh:mma");
                             CalEventEndDateBinder.datepicker("setDate", suggestedTime);
                             EditContainerData.RevealContainer()
                         };
-                        let suggestedDedalineContainerId = "suggested-deadline-container"
-                        let suggestedDedalineContainerDom = getDomOrCreateNew(suggestedDedalineContainerId);
                         let suggestedDedalineButtonId = "suggested-deadline-container-button"
                         let suggestedDedalineContainerButtonDom = getDomOrCreateNew(suggestedDedalineButtonId);
                         suggestedDedalineContainerDom.appendChild(suggestedDedalineContainerButtonDom);
@@ -4886,9 +4886,12 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                         suggestedDedalineContainerButtonDom.Dom.innerHTML = "Try Suggested Deadline?";
                         let suggestedDateString = moment(suggestedTime, "MM-DD-YYYY").format("ddd MMM DD, YYYY");
                         suggestedDedalineContainerButtonDom.setAttribute('title', suggestedDateString);
-                        
-                        return suggestedDedalineContainerDom;
+                        $(suggestedDedalineContainerDom).removeClass("setAsDisplayNone");
+                    } else {
+                        $(suggestedDedalineContainerDom).addClass("setAsDisplayNone");
                     }
+
+                    return suggestedDedalineContainerDom;
                 }
 
                 SubCalStartInfo.appendChild(SubEventStartTime);
@@ -4906,9 +4909,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                 ControlPanelDeadlineOfSubeventInfo.appendChild(CalEndTime);
                 ControlPanelDeadlineOfSubeventInfo.appendChild(CalEndDate);
                 let suggestDeadlineButton = handleSuggestedDeadline()
-                if(suggestDeadlineButton) {
-                    ControlPanelDeadlineOfSubeventInfo.appendChild(suggestDeadlineButton);
-                }
+                ControlPanelDeadlineOfSubeventInfo.appendChild(suggestDeadlineButton);
                 
 
                 
