@@ -1608,7 +1608,7 @@ namespace TilerFront
             if (timeline!=null && user!= null)
             {
                 IQueryable<SubCalendarEvent> subEventQuery = null;
-                IQueryable<CalendarEvent> caleventQuery = getCalendarEventQuery(DataRetrivalOption.Evaluation, true);
+                IQueryable<CalendarEvent> caleventQuery = getCalendarEventQuery(DataRetrivalOption.Evaluation, false);
                 caleventQuery = caleventQuery
                     .Where(calEvent =>
                         calEvent.CreatorId == user.Id
@@ -1616,8 +1616,8 @@ namespace TilerFront
                         && calEvent.EndTime_EventDB > timeline.Start
                     )
                     .Include(calEvent => calEvent.TimeLineHistory_DB)
+                    .Include(calEvent => calEvent.TimeLineHistory_DB.TimeLines_DB)
                     .Include(calEvent => calEvent.AllSubEvents_DB)
-                    .Include(calEvent => calEvent.AllSubEvents_DB.Select(o=> o.ParentCalendarEvent.TimeLineHistory_DB))
                     ;
                 var calEvents = caleventQuery.ToList();
                 HashSet<SubCalendarEvent> retValue = new HashSet<SubCalendarEvent>(calEvents.SelectMany(calEvent => calEvent.AllSubEvents_DB).ToList());
