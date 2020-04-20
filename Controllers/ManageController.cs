@@ -432,7 +432,7 @@ namespace TilerFront.Controllers
                     bool ResetThirdparty = false;
 
                     ThirdPartyCalendarAuthenticationModel thirdpartydata = new ThirdPartyCalendarAuthenticationModel();
-                    Google.Apis.Oauth2.v2.Data.Userinfoplus userInfo ;
+                    Google.Apis.Oauth2.v2.Data.Userinfo userInfo ;
                     try
                     {
                         userInfo = service.Userinfo.Get().Execute();
