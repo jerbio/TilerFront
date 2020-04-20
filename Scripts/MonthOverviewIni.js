@@ -3528,17 +3528,19 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
 
             SubEventStartTime.value =formatTimePortionOfStringToRightFormat(SubEventStartTime.value )
             let SubCalStartDateTimeString = SubEventStartTime.value.trim() + " " + $(SubEventStartDate).datepicker("getDate").toLocaleDateString().trim();
-            let SubCalStartDateInMS = Date.parse(SubCalStartDateTimeString);
+            let SubCalStartDateInMS = moment(SubCalStartDateTimeString, "hh:mm a MM/DD/YYYY").toDate().getTime();
+            
 
 
             SubEventEndTime.value = formatTimePortionOfStringToRightFormat(SubEventEndTime.value)
             let SubCalEndDateTimeString = SubEventEndTime.value.trim() + " " + $(SubEventEndDate).datepicker("getDate").toLocaleDateString().trim();
-            let SubCaEndDateInMS = Date.parse(SubCalEndDateTimeString);
-
+            let SubCaEndDateInMS = moment(SubCalEndDateTimeString, "hh:mm a MM/DD/YYYY").toDate().getTime();
+            
             CalEndTime.value = formatTimePortionOfStringToRightFormat(CalEndTime.value)
 
             let CalDateEndTimeString = CalEndTime.value.trim() + " " + $(CalEndDate).datepicker("getDate").toLocaleDateString().trim();
-            let CalEndDateInMS = Date.parse(CalDateEndTimeString);
+            let CalEndDateInMS = moment(CalDateEndTimeString, "hh:mm a MM/DD/YYYY").toDate().getTime();
+            
             let splitValue = Number(getDomOrCreateNew("InputSplitCount", "input").value);
             
 
@@ -4664,17 +4666,12 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                     }
                 }
 
-                //continueButton.onclick = continueEvent;
-
                 var ControlPanelContainer = getDomOrCreateNew("ControlPanelContainer");
                 ControlPanelContainer.focus();
 
                 function containerKeyPress(e) {
-                    //e.stopPropagation();
-                
                     if (e.which == 27)//escape key press
                     {
-
                         return;//closeControlPanel();
                     }
 
@@ -4800,9 +4797,6 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
 
 
                 var calendarEventData = getDomOrCreateNew("CalEndDate", "input");
-
-
-                //ControlPanelNameOfSubeventInfo.value = SubEvent.Name;
                 ControlPanelNameOfSubeventInfo.appendChild(NameContanierInput);
 
 

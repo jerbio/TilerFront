@@ -73,8 +73,10 @@ function generateOfficeHours(Place)
                         Begin =spliceSlice(Begin, Begin.length - 3, 0, " ");
                         var End = BeginAndEndArray[1].trim();
                         End = spliceSlice(End, End.length - 3, 0, " ");
-                        var Begin = Date.parse((new Date()).toLocaleDateString()+" " + Begin);
-                        End = Date.parse((new Date()).toLocaleDateString() + " " + End);
+                        let beginString = Begin+" " + (new Date()).toLocaleDateString();
+                        Begin = moment(beginString, "hh:mm a MM/DD/YYYY").toDate();
+                        let endString = End+ " " + (new Date()).toLocaleDateString();
+                        End = moment(endString, "hh:mm a MM/DD/YYYY").toDate();
                         var EndData = new Date(End);
                         if ((EndData.getHours() == 0) && (EndData.getMinutes() == 0))
                         {
