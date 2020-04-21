@@ -54,7 +54,7 @@ namespace TilerFront.Controllers
                         break;
                     case "tiler":
                         {
-                            DateTimeOffset myNow = myUser.getRefNow();
+                           DateTimeOffset myNow = myUser.getRefNow();
                             myNow = myUser.getRefNow();
                             HashSet<string> calendarIds = new HashSet<string>() { myUser.EventID };
                             Task<Tuple<ThirdPartyControl.CalendarTool, IEnumerable<CalendarEvent>>> thirdPartyDataTask = ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(retrievedUser.UserID, db);
@@ -107,9 +107,9 @@ namespace TilerFront.Controllers
                         break;
                 }
             }
+            await AnalysisController.updateSuggestionAnalysis(retrievedUser.ScheduleLogControl).ConfigureAwait(false);
             TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
             scheduleChangeSocket.triggerRefreshData(retrievedUser.getTilerUser());
-            await AnalysisController.updateSuggestionAnalysis(retrievedUser.ScheduleLogControl).ConfigureAwait(false);
             return Ok(retValue.getPostBack);
         }
 
@@ -182,9 +182,9 @@ namespace TilerFront.Controllers
                 }
             }
 
+            await AnalysisController.updateSuggestionAnalysis(retrievedUser.ScheduleLogControl).ConfigureAwait(false);
             TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
             scheduleChangeSocket.triggerRefreshData(retrievedUser.getTilerUser());
-            await AnalysisController.updateSuggestionAnalysis(retrievedUser.ScheduleLogControl).ConfigureAwait(false);
             return Ok(retValue.getPostBack);
         }
     }

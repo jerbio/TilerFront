@@ -595,8 +595,8 @@ namespace TilerFront.Controllers
                 {
                     myPostData = new PostBackData("\"There aren't events for the next three months is coming up in the next three months\"", 0);
                 }
-                TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
                 await AnalysisController.updateSuggestionAnalysis(retrievedUser.ScheduleLogControl).ConfigureAwait(false);
+                TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
                 scheduleChangeSocket.triggerRefreshData(retrievedUser.getTilerUser());
                 return Ok(myPostData.getPostBack);
             }
@@ -648,8 +648,8 @@ namespace TilerFront.Controllers
             {
                 retValue = new PostBackData("", 1);
             }
-            TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
             await AnalysisController.updateSuggestionAnalysis(retrievedUser.ScheduleLogControl).ConfigureAwait(false);
+            TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
             scheduleChangeSocket.triggerRefreshData(retrievedUser.getTilerUser());
             return Ok(retValue.getPostBack);
         }
@@ -701,10 +701,8 @@ namespace TilerFront.Controllers
                     myPostData = new PostBackData("\"There aren't events for the next three months is coming up in the next three months\"", 0);
                 }
                 
-
-                
-                TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
                 await AnalysisController.updateSuggestionAnalysis(retrievedUser.ScheduleLogControl).ConfigureAwait(false);
+                TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
                 scheduleChangeSocket.triggerRefreshData(retrievedUser.getTilerUser());
                 return Ok(myPostData.getPostBack);
             }
@@ -744,9 +742,9 @@ namespace TilerFront.Controllers
                     ScheduleXmlString= "<?xml version=\"1.0\" encoding=\"utf-8\"?><ScheduleLog><LastIDCounter>1024</LastIDCounter><referenceDay>8:00 AM</referenceDay><EventSchedules></EventSchedules></ScheduleLog>"
                 };
                 scheduleDumpCopy.Id = scheduleDump.Id;
+                await AnalysisController.updateSuggestionAnalysis(retrievedUser.ScheduleLogControl).ConfigureAwait(false);
                 TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
                 scheduleChangeSocket.triggerRefreshData(retrievedUser.getTilerUser());
-                await AnalysisController.updateSuggestionAnalysis(retrievedUser.ScheduleLogControl).ConfigureAwait(false);
                 PostBackData postBack = new PostBackData(scheduleDumpCopy, 0);
                 return Ok(postBack.getPostBack);
             }
@@ -1512,8 +1510,8 @@ namespace TilerFront.Controllers
             {
                 retValue = new PostBackData("", 1);
             }
-            TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
             await AnalysisController.updateSuggestionAnalysis(retrievedUser.ScheduleLogControl).ConfigureAwait(false);
+            TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
             scheduleChangeSocket.triggerRefreshData(retrievedUser.getTilerUser());
             return Ok(retValue.getPostBack);
         }
