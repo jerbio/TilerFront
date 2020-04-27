@@ -3199,6 +3199,7 @@ namespace TilerFront
                     .Include(calEvent => calEvent.Repetition_EventDB)
                     .Include(calEvent => calEvent.ProfileOfNow_EventDB)
                     .Include(calEvent => calEvent.Procrastination_EventDB)
+                    .Include(calEvent => calEvent.AllSubEvents_DB)
                     .Include(calEvent => calEvent.DayPreference_DB)
                     .Include(calEvent => calEvent.TimeLineHistory_DB)
                     .Include(calEvent => calEvent.TimeLineHistory_DB.TimeLines_DB)

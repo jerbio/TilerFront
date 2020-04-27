@@ -686,7 +686,6 @@ namespace TilerFront.Controllers
                 List<SubCalendarEvent> allSubEvents = schedule.getAllCalendarEvents().Where(calEvent => calEvent.isActive).SelectMany(calEvent => calEvent.ActiveSubEvents).ToList();
                 TimeLine timeLine = new TimeLine();
                 timeLine.AddBusySlots(allSubEvents.Select(subEvent => subEvent.ActiveSlot));
-                List<BlobSubCalendarEvent> interferringSubEvents = Utility.getConflictingEvents(allSubEvents);
 
                 BusyTimeLine nextBusySchedule = schedule.NextActivity;
                 PostBackData myPostData;

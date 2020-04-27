@@ -63,7 +63,7 @@ namespace TilerFront.Controllers
 
         public static async Task updateSuggestionAnalysis(LogControl logcontrol)
         {
-            new AnalysisController().SuggestionAnalysis(logcontrol);
+            await new AnalysisController().SuggestionAnalysis(logcontrol).ConfigureAwait(false);
         }
     }
 }

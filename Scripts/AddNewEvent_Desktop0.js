@@ -3172,7 +3172,7 @@ function SendScheduleInformation(NewEvent, CallBack)
         }
 
     }).done(function (response) {
-        if(response && response.Error && response.Error.code !== 0 || response.Error.code !== "0") {
+        if(response && response.Error && !(response.Error.code === 0 || response.Error.code === "0")) {
             var NewMessage = "Oh No!!! Tiler is having issues creating a new schedule.\n" + response.Error.Message+ "Please the changes and try again"
             var ExitAfter = { ExitNow: true, Delay: 20000 };
             HandleNEwPage.UpdateMessage(NewMessage, ExitAfter, function () { });
