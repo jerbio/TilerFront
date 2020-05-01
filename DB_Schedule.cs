@@ -115,6 +115,13 @@ namespace TilerFront
                     }
                 }
             );
+
+            foreach (DayTimeLine dayTimeLine in Now.getAllDaysForCalc())// Need to clear sub events because the daytimeline holds the subevents in the wrong day after a shift
+            {
+                dayTimeLine.ClearAllSubEvents();
+            }
+
+            populateDayTimeLinesWithSubcalendarEvents();
             return;
         }
 

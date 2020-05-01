@@ -3206,20 +3206,36 @@ namespace TilerFront
                     .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents)
                     .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB))
                     .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.ProfileOfNow_EventDB))
-                    .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.Procrastination_EventDB))
-                    .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.DayPreference_DB))
-                    .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB.Select(subEvent => subEvent.Name)))
+                    .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.Procrastination_EventDB)).SingleOrDefault(calEvent => calEvent.Id == id);
+
+
+            // Multiple getCalendarEventQuery calls because we're trying to leverage the caching functionality of entity frameworl. Attributes that  have been included don't get pulled in again meaning the row size from DB is smaller
+            retValue = getCalendarEventQuery(retrievalOption, includeSubEvents)
+                    .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.DayPreference_DB)).SingleOrDefault(calEvent => calEvent.Id == id);
+            retValue = getCalendarEventQuery(retrievalOption, includeSubEvents)
+                    .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB.Select(subEvent => subEvent.Name))).SingleOrDefault(calEvent => calEvent.Id == id);
+            retValue = getCalendarEventQuery(retrievalOption, includeSubEvents)
                     .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB.Select(subEvent => subEvent.ProfileOfNow_EventDB)))
                     .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB.Select(subEvent => subEvent.Procrastination_EventDB)))
-                    .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB.Select(subEvent => subEvent.Name)))
-                    .Include(calEvent => calEvent.Repetition_EventDB.SubRepetitions.Select(repetition => repetition.SubRepetitions))
-                    .Include(calEvent => calEvent.Repetition_EventDB.SubRepetitions.Select(repetition => repetition.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB)))
-                    .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB.Select(subEvent => subEvent.Name)))
+                    .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB.Select(subEvent => subEvent.Name))).SingleOrDefault(calEvent => calEvent.Id == id);
+            retValue = getCalendarEventQuery(retrievalOption, includeSubEvents)
+                    .Include(calEvent => calEvent.Repetition_EventDB.SubRepetitions.Select(repetition => repetition.SubRepetitions)).SingleOrDefault(calEvent => calEvent.Id == id);
+            retValue = getCalendarEventQuery(retrievalOption, includeSubEvents)
+                    .Include(calEvent => calEvent.Repetition_EventDB.SubRepetitions.Select(repetition => repetition.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB))).SingleOrDefault(calEvent => calEvent.Id == id);
+            retValue = getCalendarEventQuery(retrievalOption, includeSubEvents)
+                    .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB.Select(subEvent => subEvent.Name))).SingleOrDefault(calEvent => calEvent.Id == id);
+            retValue = getCalendarEventQuery(retrievalOption, includeSubEvents)
                     .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB.Select(subEvent => subEvent.Name.Creator_EventDB)))
                     .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB.Select(subEvent => subEvent.DataBlob_EventDB)))
                     .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB.Select(subEvent => subEvent.Location_DB)))
+                    .SingleOrDefault(calEvent => calEvent.Id == id);
+            retValue = getCalendarEventQuery(retrievalOption, includeSubEvents)
                     .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB.Select(subEvent => subEvent.Procrastination_EventDB)))
+                    .SingleOrDefault(calEvent => calEvent.Id == id);
+            retValue = getCalendarEventQuery(retrievalOption, includeSubEvents)
                     .Include(calEvent => calEvent.Repetition_EventDB.SubRepetitions.Select(repetition => repetition.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB)))
+                    .SingleOrDefault(calEvent => calEvent.Id == id);
+            retValue = getCalendarEventQuery(retrievalOption, includeSubEvents)
                     .Include(calEvent => calEvent.Repetition_EventDB.SubRepetitions.Select(repetition => repetition.RepeatingEvents.Select(repCalEvent => repCalEvent.Procrastination_EventDB)))
                     .Include(calEvent => calEvent.Repetition_EventDB.SubRepetitions.Select(repetition => repetition.RepeatingEvents.Select(repCalEvent => repCalEvent.ProfileOfNow_EventDB)))
                     .SingleOrDefault(calEvent => calEvent.Id == id);
