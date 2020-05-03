@@ -1022,7 +1022,7 @@ function setSubCalendarEventAsNow(SubEventID, CallBackSuccess, CallBackFailure, 
 {
     var TimeZone = new Date().getTimezoneOffset();
     var NowData = { UserName: UserCredentials.UserName, UserID: UserCredentials.ID, EventID: SubEventID, TimeZoneOffset: TimeZone };
-    var URL = myurl = global_refTIlerUrl + "Schedule/Event/Now";
+    var URL = global_refTIlerUrl + "Schedule/Event/Now";
     preSendRequestWithLocation(NowData);
 
     var ProcrastinateRequest= $.ajax({
@@ -1042,7 +1042,7 @@ function setSubCalendarEventAsNow(SubEventID, CallBackSuccess, CallBackFailure, 
 function SetCalendarEventAsNow(CalendarEventID, CallBackSuccess, CallBackFailure, CallBackDone) {
     var TimeZone = new Date().getTimezoneOffset();
     var NowData = { UserName: UserCredentials.UserName, UserID: UserCredentials.ID, ID: SubEventID, TimeZoneOffset: TimeZone };
-    var URL = myurl = global_refTIlerUrl + "CalendarEvent/Now/";
+    var URL = global_refTIlerUrl + "CalendarEvent/Now/";
     preSendRequestWithLocation(NowData);
 
     var AjaxRequest = $.ajax({
@@ -3335,4 +3335,46 @@ function isUndefinedOrNull(data) {
        }
 
        return ReturnFunction;
+   }
+
+
+   function genFunctionCallForNow(EventID,CallBack)
+   {
+       return function ()
+       {
+           var TimeZone = new Date().getTimezoneOffset();
+           var NowData = { UserName: UserCredentials.UserName, UserID: UserCredentials.ID, EventID: EventID, TimeZoneOffset: TimeZone };
+           //var URL = "RootWagTap/time.top?WagCommand=8"
+           var URL = global_refTIlerUrl + "Schedule/Event/Now";
+           NowData.TimeZone = moment.tz.guess()
+           var HandleNEwPage = new LoadingScreenControl("Tiler is moving up your Event ...  :)");
+           HandleNEwPage.Launch();
+           preSendRequestWithLocation(NowData);
+
+           $.ajax({
+               type: "POST",
+               url: URL,
+               data: NowData,
+               // DO NOT SET CONTENT TYPE to json
+               // contentType: "application/json; charset=utf-8", 
+               // DataType needs to stay, otherwise the response object
+               // will be treated as a single string
+               dataType: "json",
+               success: function (response) {
+                   //InitializeHomePage();
+                   //alert("alert 0-a");
+               },
+               error: function ()
+               {
+                   var NewMessage = "Ooops Tiler is having issues accessing your schedule. Please try again Later:(";
+                   var ExitAfter = { ExitNow: true, Delay: 1000 };
+                   HandleNEwPage.UpdateMessage(NewMessage, ExitAfter, InitializeHomePage);
+               }
+           }).done(function (data) {
+               if(isFunction(CallBack)) {
+                    CallBack()
+               }
+               HandleNEwPage.Hide();
+           });
+       }
    }

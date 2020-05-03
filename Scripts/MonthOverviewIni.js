@@ -966,6 +966,12 @@ function IconSet()
     $(RepeatIcon).addClass("ControlPanelButton");
     $(RepeatIcon).addClass("ControlPanelRepeatButton");
 
+    let NowIconId = "ControlPanelNowButton" + myID;
+    let NowIcon =  getDomOrCreateNew(NowIconId);
+    $(NowIcon).addClass("ControlPanelButton");
+    $(NowIcon).addClass("ControlPanelNowButton");
+
+
     this.getCloseButton = function ()
     {
         return CloseIcon;
@@ -1007,7 +1013,12 @@ function IconSet()
     this.showCompleteButton = function () {
         $(CompleteIcon).removeClass("setAsDisplayNone");
     }
-
+    this.hideNowButton = function () {
+        $(NowIcon).addClass("setAsDisplayNone");
+    }
+    this.showNowButton = function () {
+        $(NowIcon).removeClass("setAsDisplayNone");
+    }
     this.getProcrastinateButton = function () {
         return ProcrastinateIcon;
     }
@@ -1025,6 +1036,10 @@ function IconSet()
 
     this.getRepeateButton = function () {
         return RepeatIcon;
+    }
+
+    this.getNowButton = function () {
+        return NowIcon;
     }
 
     this.hideRepeatButton = function () {
@@ -1062,6 +1077,7 @@ function IconSet()
     IconSetContainer.appendChild(PauseResumeIcon)
     IconSetContainer.appendChild(RepeatIcon)
     IconSetContainer.appendChild(CloseIcon)
+    IconSetContainer.appendChild(NowIcon)
     
 }
 
@@ -3707,6 +3723,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                 var ControlPanelProcrastinateButton = global_ControlPanelIconSet.getProcrastinateButton();
                 var ControlPanelLocationButton = global_ControlPanelIconSet.getLocationButton();
                 var RepeatButton = global_ControlPanelIconSet.getRepeateButton();
+                var NowButton = global_ControlPanelIconSet.getNowButton();
                 var ModalDelete = getDomOrCreateNew("ConfirmDeleteModal")
                 var ControlPanelContainer = getDomOrCreateNew("ControlPanelContainer");
                 var PrimaryControlPanelContainer = getDomOrCreateNew("PrimaryControlPanelContainer");
@@ -3761,8 +3778,10 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                 let nowIsWithinSubevent = now < SubEvent.SubCalEndDate.getTime() && now >= SubEvent.SubCalStartDate.getTime();
                 if (nowIsWithinSubevent) {
                     global_ControlPanelIconSet.showRepeatButton();
+                    global_ControlPanelIconSet.hideNowButton();
                 } else {
                     global_ControlPanelIconSet.hideRepeatButton();
+                    global_ControlPanelIconSet.showNowButton();
                 }
 
                 if (!SubEvent.SubCalAddress) {
@@ -4633,6 +4652,10 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                     }
                 }
 
+
+                function setSubEventAsNow() {
+
+                }
                 function closeModalDelete(slidePanel = true) {
                     DeleteMessage.innerHTML = "Sure you want to delete ?"
                     if (slidePanel) {
@@ -4645,6 +4668,12 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                 deleteButton.onclick = deleteSubevent;
                 completeButton.onclick = markAsComplete;
                 RepeatButton.onclick = repeatSubEventRequest;
+
+                let afterNowButtonCliclCallBack = function() {
+                    global_ExitManager.triggerLastExitAndPop();
+                    getRefreshedData();
+                }
+                NowButton.onclick = genFunctionCallForNow(SubEvent.ID, afterNowButtonCliclCallBack);
                 if (SubEvent.isPaused) {
                     global_eventIsPaused = true;
                     global_ControlPanelIconSet.switchToResumeButton();

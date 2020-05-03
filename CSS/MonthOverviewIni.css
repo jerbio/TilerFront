@@ -678,6 +678,8 @@ body {
 .ControlPanelProcrastinateButton { background-position: -270px 0; }
 .ControlPanelRepeatButton { background-position: -495px 0; }
 .ControlPanelRepeatButton:hover { background-position: -495px -45px; }
+.ControlPanelNowButton { background-position: -587px 0px; }
+.ControlPanelNowButton:hover { background-position: -587px -45px; }
 #ControlPanelSearchButton { background-position: -225px 0; }
 #ControlPanelSearchButton:hover { background-position: -225px -45px; }
 
