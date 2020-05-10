@@ -1558,6 +1558,215 @@ namespace TilerFront.Controllers
 
 
         /// <summary>
+        /// Triggers a schedule update when a notification is received pertaining third party event modification
+        /// </summary>
+        /// <param name="newEvent"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [ResponseType(typeof(PostBackStruct))]
+        [Route("api/Schedule/Suggestion")]
+        public async Task<IHttpActionResult> SuggestCalEventDeadline([FromBody]UnregisteredEvent newEvent)
+        {
+            string BColor = newEvent.BColor;
+            string RColor = newEvent.RColor;
+            string GColor = newEvent.GColor;
+            string Opacity = newEvent.Opacity;
+            string ColorSelection = newEvent.ColorSelection;
+            int Count = Convert.ToInt32(newEvent.Count ?? 1.ToString());
+            string DurationDays = newEvent.DurationDays;
+            string DurationHours = newEvent.DurationHours;
+            string DurationMins = newEvent.DurationMins;
+            string EndDay = newEvent.EndDay;
+            string EndHour = newEvent.EndHour;
+            string EndMins = newEvent.EndMins;
+            string EndMonth = newEvent.EndMonth;
+            string EndYear = newEvent.EndYear;
+
+            string LocationAddress = string.IsNullOrEmpty(newEvent.LocationAddress) ? "" : newEvent.LocationAddress;
+            string LocationTag = LocationAddress = string.IsNullOrEmpty(newEvent.LocationTag) ? "" : newEvent.LocationTag;
+            EventName Name = new EventName(null, null, newEvent.Name);
+
+            string RepeatData = newEvent.RepeatData;
+            string RepeatEndDay = newEvent.RepeatEndDay;
+            string RepeatEndMonth = newEvent.RepeatEndMonth;
+            string RepeatEndYear = newEvent.RepeatEndYear;
+            string RepeatStartDay = newEvent.RepeatStartDay;
+            string RepeatStartMonth = newEvent.RepeatStartMonth;
+            string RepeatStartYear = newEvent.RepeatStartYear;
+            string RepeatType = newEvent.RepeatType;
+            string RepeatWeeklyData = newEvent.RepeatWeeklyData;
+            string Rigid = newEvent.Rigid;
+            string StartDay = newEvent.StartDay;
+            string StartHour = newEvent.StartHour;
+            string StartMins = newEvent.StartMins;
+            string StartMonth = newEvent.StartMonth;
+            string StartYear = newEvent.StartYear;
+            string RepeatFrequency = newEvent.RepeatFrequency;
+            string TimeZone = newEvent.TimeZone;
+            string lookupString_arg = newEvent.LookupString;
+            string locationIsVerified_arg = newEvent.LocationIsVerified;
+            bool locationIsVerified = Convert.ToBoolean(locationIsVerified_arg);
+            string lookupString = lookupString_arg;
+
+            string restrictionPreference = newEvent.isRestricted;
+
+            bool restrictionFlag = Convert.ToBoolean(restrictionPreference);
+
+            string StartTime = StartHour + ":" + StartMins;
+            string EndTime = EndHour + ":" + EndMins;
+            DateTimeOffset StartDateEntry = new DateTimeOffset(Convert.ToInt32(StartYear), Convert.ToInt32(StartMonth), Convert.ToInt32(StartDay), 0, 0, 0, new TimeSpan());
+            DateTimeOffset EndDateEntry = new DateTimeOffset(Convert.ToInt32(EndYear), Convert.ToInt32(EndMonth), Convert.ToInt32(EndDay), 0, 0, 0, new TimeSpan());
+
+            TimeSpan fullTimeSpan = new TimeSpan(Convert.ToInt32(DurationDays), Convert.ToInt32(DurationHours), Convert.ToInt32(DurationMins), 0);
+            TimeSpan EventDuration = TimeSpan.FromSeconds(fullTimeSpan.TotalSeconds * Convert.ToInt32(Count));
+
+            bool RigidScheduleFlag = Convert.ToBoolean(Rigid);
+            TilerElements.Location EventLocation = new TilerElements.Location(LocationAddress, LocationTag);
+            EventLocation.LookupString = lookupString;
+            if (locationIsVerified)
+            {
+                EventLocation.verify();
+            }
+
+
+            Repetition MyRepetition = new Repetition();
+            DateTimeOffset RepeatStart = new DateTimeOffset();
+            DateTimeOffset RepeatEnd = new DateTimeOffset();
+            bool RepetitionFlag = false;
+            TilerColor userColor = new TilerColor(Convert.ToInt32(RColor), Convert.ToInt32(GColor), Convert.ToInt32(BColor), Convert.ToInt32(Opacity), Convert.ToInt32(ColorSelection));
+
+            if (RigidScheduleFlag)
+            {
+                DateTimeOffset FullStartTime = new DateTimeOffset(StartDateEntry.Year, StartDateEntry.Month, StartDateEntry.Day, Convert.ToInt32(StartTime.Split(':')[0]), Convert.ToInt32(StartTime.Split(':')[1]), 0, new TimeSpan());// DateTimeOffset.Parse(StartDateEntry + " " + StartTime);
+                DateTimeOffset FullEndTime = new DateTimeOffset(EndDateEntry.Year, EndDateEntry.Month, EndDateEntry.Day, Convert.ToInt32(EndTime.Split(':')[0]), Convert.ToInt32(EndTime.Split(':')[1]), 0, new TimeSpan());// DateTimeOffset.Parse(EndDateEntry + " " + EndTime);
+                FullStartTime = FullStartTime.Add(-newEvent.getTimeSpan);
+                FullEndTime = FullEndTime.Add(-newEvent.getTimeSpan);
+                EventDuration = (FullEndTime - FullStartTime);
+            }
+
+            if (!string.IsNullOrEmpty(RepeatType))
+            {
+
+                DateTimeOffset FullStartTime = new DateTimeOffset(StartDateEntry.Year, StartDateEntry.Month, StartDateEntry.Day, Convert.ToInt32(StartTime.Split(':')[0]), Convert.ToInt32(StartTime.Split(':')[1]), 0, new TimeSpan());// DateTimeOffset.Parse(StartDateEntry + " " + StartTime);
+                DateTimeOffset FullEndTime = new DateTimeOffset(EndDateEntry.Year, EndDateEntry.Month, EndDateEntry.Day, Convert.ToInt32(EndTime.Split(':')[0]), Convert.ToInt32(EndTime.Split(':')[1]), 0, new TimeSpan());// DateTimeOffset.Parse(EndDateEntry + " " + EndTime);
+
+                FullStartTime = FullStartTime.Add(-newEvent.getTimeSpan);
+                FullEndTime = FullEndTime.Add(-newEvent.getTimeSpan);
+
+                RepeatEnd = new DateTimeOffset(Convert.ToInt32(RepeatEndYear), Convert.ToInt32(RepeatEndMonth), Convert.ToInt32(RepeatEndDay), 23, 59, 0, new TimeSpan());
+                RepeatEnd = RepeatEnd.Add(-newEvent.getTimeSpan);
+                if (!RigidScheduleFlag)
+                {
+                    DateTimeOffset newEndTime = FullEndTime;
+
+                    string Frequency = RepeatFrequency.Trim().ToUpper();
+                    RepeatEnd = newEndTime;
+                }
+
+
+
+
+                RepeatStart = StartDateEntry;
+                DayOfWeek[] selectedDaysOftheweek = { };
+                RepeatWeeklyData = string.IsNullOrEmpty(RepeatWeeklyData) ? "" : RepeatWeeklyData.Trim();
+                if (!string.IsNullOrEmpty(RepeatWeeklyData))
+                {
+                    selectedDaysOftheweek = RepeatWeeklyData.Split(',').Where(obj => !String.IsNullOrEmpty(obj)).Select(obj => Convert.ToInt32(obj)).Select(num => (DayOfWeek)num).ToArray();
+                }
+
+
+                //RepeatEnd = (DateTimeOffset.UtcNow).AddDays(7);
+                RepetitionFlag = true;
+                MyRepetition = new Repetition(new TimeLine(RepeatStart, RepeatEnd), Utility.ParseEnum<Repetition.Frequency>(RepeatFrequency.ToUpper()), new TimeLine(FullStartTime, FullEndTime), selectedDaysOftheweek);
+                EndDateEntry = RepeatEnd;
+            }
+
+            UserAccount retrievedUser = await newEvent.getUserAccount(db);
+            PostBackData retValue;
+            await retrievedUser.Login();
+            retrievedUser.getTilerUser().updateTimeZoneTimeSpan(newEvent.getTimeSpan);
+            TilerUser tilerUser = retrievedUser.getTilerUser();
+
+            if (retrievedUser.Status)
+            {
+                DateTimeOffset myNow = newEvent.getRefNow();
+                Task<Tuple<ThirdPartyControl.CalendarTool, IEnumerable<CalendarEvent>>> thirdPartyDataTask = ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(retrievedUser.UserID, db);
+                Schedule schedule = new DB_Schedule(retrievedUser, myNow, createDump: false);
+                schedule.CurrentLocation = newEvent.getCurrentLocation();
+                var thirdPartyData = await thirdPartyDataTask.ConfigureAwait(false);
+                schedule.updateDataSetWithThirdPartyData(thirdPartyData);
+
+                CalendarEvent newCalendarEvent;
+                RestrictionProfile myRestrictionProfile = newEvent.getRestrictionProfile(myNow);
+                if (myRestrictionProfile != null)
+                {
+                    string TimeString = StartDateEntry.Date.ToShortDateString() + " " + StartTime;
+                    DateTimeOffset StartDateTime = DateTimeOffset.Parse(TimeString).UtcDateTime;
+                    StartDateTime = StartDateTime.Add(-newEvent.getTimeSpan);
+                    TimeString = EndDateEntry.Date.ToShortDateString() + " " + EndTime;
+                    DateTimeOffset EndDateTime = DateTimeOffset.Parse(TimeString).UtcDateTime;
+                    EndDateTime = EndDateTime.Add(-newEvent.getTimeSpan);
+                    newCalendarEvent = new CalendarEventRestricted(tilerUser, new TilerUserGroup(), Name, StartDateTime, EndDateTime, myRestrictionProfile, EventDuration, MyRepetition, false, true, Count, RigidScheduleFlag, new NowProfile(), new TilerElements.Location(), new TimeSpan(0, 15, 0), new TimeSpan(0, 15, 0), null, schedule.Now, new Procrastination(Utility.BeginningOfTime, new TimeSpan()), null, new EventDisplay(true, userColor, userColor.User < 1 ? 0 : 1), new MiscData());
+                }
+                else
+                {
+                    DateTimeOffset StartData = DateTimeOffset.Parse(StartTime + " " + StartDateEntry.Date.ToShortDateString()).UtcDateTime;
+                    StartData = StartData.Add(-newEvent.getTimeSpan);
+                    StartData = newEvent.getRefNow();
+                    DateTimeOffset EndData = DateTimeOffset.Parse(EndTime + " " + EndDateEntry.Date.ToShortDateString()).UtcDateTime;
+                    EndData = EndData.Add(-newEvent.getTimeSpan);
+                    if (RigidScheduleFlag)
+                    {
+                        newCalendarEvent = new RigidCalendarEvent(
+                            Name, StartData, EndData, EventDuration, new TimeSpan(), new TimeSpan(), MyRepetition, EventLocation, new EventDisplay(true, userColor, userColor.User < 1 ? 0 : 1), new MiscData(), true, false, tilerUser, new TilerUserGroup(), TimeZone, null, new NowProfile(), null);
+                    }
+                    else
+                    {
+                        newCalendarEvent = new CalendarEvent(
+                            Name, StartData, EndData, EventDuration, new TimeSpan(), new TimeSpan(), Count, MyRepetition, EventLocation, new EventDisplay(true, userColor, userColor.User < 1 ? 0 : 1), new MiscData(), null, new NowProfile(), true, false, tilerUser, new TilerUserGroup(), TimeZone, null, null);
+                    }
+                }
+                Name.Creator_EventDB = newCalendarEvent.getCreator;
+                Name.AssociatedEvent = newCalendarEvent;
+                if (newCalendarEvent.IsFromRecurringAndNotChildRepeatCalEvent)
+                {
+                    if (newCalendarEvent.getIsEventRestricted)
+                    {
+                        newCalendarEvent.Repeat.PopulateRepetitionParameters(newCalendarEvent as CalendarEventRestricted);
+                    }
+                    else
+                    {
+                        newCalendarEvent.Repeat.PopulateRepetitionParameters(newCalendarEvent);
+                    }
+                }
+
+                string BeforemyName = newCalendarEvent.ToString();
+                string AftermyName = newCalendarEvent.ToString();
+#if loadFromXml
+                if (!string.IsNullOrEmpty(xmlFileId) && !string.IsNullOrWhiteSpace(xmlFileId)) {
+                    var tempSched = TilerTests.TestUtility.getSchedule(xmlFileId, connectionName: "DefaultConnection", filePath: LogControl.getLogLocation());
+                    MySchedule = (DB_Schedule)tempSched.Item1;
+                }
+#endif
+
+                Tuple<List<SubCalendarEvent>[], DayTimeLine[], List<SubCalendarEvent>> peekingEvents = schedule.peekIntoSchedule(newCalendarEvent);
+                PeekResult peekData = new PeekResult(peekingEvents.Item1, peekingEvents.Item2, peekingEvents.Item3);
+
+                CustomErrors userError = newCalendarEvent.Error;
+                int errorCode = userError?.Code ?? 0;
+                retValue = new PostBackData(peekData, errorCode);
+
+            }
+            else
+            {
+                retValue = new PostBackData("", 1);
+            }
+
+            return Ok(retValue.getPostBack);
+
+        }
+
+        /// <summary>
         /// Peeks into user schedule. Generates an update to a schedule for any changes.
         /// </summary>
         /// <param name="newEvent"></param>

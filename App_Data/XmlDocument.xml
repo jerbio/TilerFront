@@ -896,6 +896,13 @@
             <param name="newEvent"></param>
             <returns></returns>
         </member>
+        <member name="M:TilerFront.Controllers.ScheduleController.SuggestCalEventDeadline(TilerFront.Models.UnregisteredEvent)">
+            <summary>
+            Triggers a schedule update when a notification is received pertaining third party event modification
+            </summary>
+            <param name="newEvent"></param>
+            <returns></returns>
+        </member>
         <member name="M:TilerFront.Controllers.ScheduleController.PeekCalEvent(TilerFront.Models.UnregisteredEvent)">
             <summary>
             Peeks into user schedule. Generates an update to a schedule for any changes.
