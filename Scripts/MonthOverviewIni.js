@@ -2152,6 +2152,11 @@ getRefreshedData.pauseUnEnroll = function (Id) {
     {
         RangeData.forEach(
             function (WeekRange) {
+                WeekRange.DaysOfWeek.forEach(renderUIChanges);
+
+        });
+        RangeData.forEach(
+            function (WeekRange) {
                 WeekRange.DaysOfWeek.forEach(triggerSubEventRenderOnMonth);
 
             });
@@ -2779,8 +2784,6 @@ function renderSideBarEvents(DayOfWeek, ID, MyArray, Index, TabCount)
 renderSideBarEvents.PercentWidthOfDay = 100 / 7;
 renderSideBarEvents.SubEventGridWidthContainer = (100 / 7) * (0.15);//0.15 be cause the SubEventListContainer uses a width of 85%
 
-
-
 function renderSubEventsClickEvents(SubEventID)
 {
     global_DictionaryOfSubEvents[SubEventID].Bind();
@@ -2807,50 +2810,29 @@ renderClassicSubEventsClickEvents.BottomPanelIsOpen = false;
 renderClassicSubEventsClickEvents.isRefListSubEventClicked = false;
 
 
-        function renderUIChanges(DayOfWeek) {
+function renderUIChanges(DayOfWeek) {
     for (var ID in DayOfWeek.UISpecs) {
         DayOfWeek.UISpecs[ID].Dom.Active = false;
-
-
-        /*
-        if ((DayOfWeek.UISpecs[ID].Dom.Active))
-        {
-            DayOfWeek.UISpecs[ID].Dom.Active = false;
-            DayOfWeek.UISpecs[ID].Enabled = false;
-        }
-        else
-        {
-            var OldDomID = ID + "_" + DayOfWeek.UISpecs[ID].OldIDindex;
-            var toBeDeletedDom = getDomOrCreateNew(OldDomID);
-    
-            toBeDeletedDom.Dom.parentElement.removeChild(toBeDeletedDom.Dom);
-            var retValue = delete DayOfWeek.UISpecs[SubEvent.ID];
-        }
-    
-        */
-        }
+        var OldDomID = ID + "_" + DayOfWeek.UISpecs[ID].OldIDindex;
+        var toBeDeletedDom = getDomOrCreateNew(OldDomID);//gets the HTML element
+        toBeDeletedDom.Dom.Active = false
     }
+}
 
 
 
-        function genFunctionForSelectCalendarRange(ArrayOfCalendars, RefDate) {
-            /*AllRanges[Index].Start = RangeOfWeek.Start;
-            AllRanges[Index].End = RangeOfWeek.End;*/
-
+function genFunctionForSelectCalendarRange(ArrayOfCalendars, RefDate) {
     return function () {
-        ArrayOfCalendars.forEach(function (eachRange) {
-            if ((RefDate.getTime() >= eachRange.Start) && (RefDate.getTime() < eachRange.End)) {
-                $(eachRange.Dom).show();
+            ArrayOfCalendars.forEach(function (eachRange) {
+                if ((RefDate.getTime() >= eachRange.Start) && (RefDate.getTime() < eachRange.End)) {
+                    $(eachRange.Dom).show();
+                }
+                else {
+                    $(eachRange.Dom).hide();
             }
-            else {
-                $(eachRange.Dom).hide();
-        }
-
-            //$(eachRange.Dom).show();
         })
-
-        }
     }
+}
 
 function PopulateUI(ParentDom, refDate)// draws up the container and gathers all possible calendar within range.
 {
@@ -2894,19 +2876,15 @@ function PopulateUI(ParentDom, refDate)// draws up the container and gathers all
         var CurrentWeekDOm = WeekGird.WeekTwentyFourHourGrid;
         var CurrentNameWeekDOM = WeekGird.NameOfWeek;
         if (!CurrentWeekDOm.status) {
-                NameOfWeekContainerPlane.appendChild(CurrentNameWeekDOM);
-                VerticalScrollContainer.Dom.appendChild(CurrentWeekDOm.Dom);
-                var translatePercent = 100 * index;
-                CurrentWeekDOm.Dom.style.transform = 'translateX(' + translatePercent + '%)';
-                $(CurrentWeekDOm.Dom).addClass("weekContainer");
-                CurrentNameWeekDOM.Dom.style.transform = 'translateX(' + translatePercent + '%)';
-                $(CurrentNameWeekDOM.Dom).addClass("weekContainer");
-                //CurrentWeekDOm.Dom.style.width = "100%";
-                //CurrentWeekDOm.Dom.style.width = "100%";
-
-                //var ctx = CurrentWeekDOm.Dom.getContext("2d");
-                CurrentWeekDOm.index = index;
-                CurrentWeek = new Date(Number(CurrentWeek) + Number(OneWeekInMs));
+            NameOfWeekContainerPlane.appendChild(CurrentNameWeekDOM);
+            VerticalScrollContainer.Dom.appendChild(CurrentWeekDOm.Dom);
+            var translatePercent = 100 * index;
+            CurrentWeekDOm.Dom.style.transform = 'translateX(' + translatePercent + '%)';
+            $(CurrentWeekDOm.Dom).addClass("weekContainer");
+            CurrentNameWeekDOM.Dom.style.transform = 'translateX(' + translatePercent + '%)';
+            $(CurrentNameWeekDOM.Dom).addClass("weekContainer");
+            CurrentWeekDOm.index = index;
+            CurrentWeek = new Date(Number(CurrentWeek) + Number(OneWeekInMs));
         }
         ++index;
     }
