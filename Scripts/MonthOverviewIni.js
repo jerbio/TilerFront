@@ -2135,14 +2135,6 @@ getRefreshedData.pauseUnEnroll = function (Id) {
         PerformanceStart = new Date();
         TriggerWeekUIupdate(global_CurrentWeekArrangedData);
         PerformanceEnd = new Date();
-        //console.log("TriggerUI motion " + (PerformanceEnd - PerformanceStart));
-        
-        /*
-        RangeData.forEach(
-            function (WeekRange) {
-                WeekRange.DaysOfWeek.forEach(renderUIChanges);
-
-            });*/
         return;
     }
 
@@ -2152,7 +2144,7 @@ getRefreshedData.pauseUnEnroll = function (Id) {
     {
         RangeData.forEach(
             function (WeekRange) {
-                WeekRange.DaysOfWeek.forEach(renderUIChanges);
+                WeekRange.DaysOfWeek.forEach(prepareClearingOfOldUISubEVents);
 
         });
         RangeData.forEach(
@@ -2810,7 +2802,7 @@ renderClassicSubEventsClickEvents.BottomPanelIsOpen = false;
 renderClassicSubEventsClickEvents.isRefListSubEventClicked = false;
 
 
-function renderUIChanges(DayOfWeek) {
+function prepareClearingOfOldUISubEVents(DayOfWeek) {
     for (var ID in DayOfWeek.UISpecs) {
         DayOfWeek.UISpecs[ID].Dom.Active = false;
         var OldDomID = ID + "_" + DayOfWeek.UISpecs[ID].OldIDindex;
