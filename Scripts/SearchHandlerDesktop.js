@@ -229,12 +229,7 @@ function CallBackFunctionForReturnedValuesDesktop(data, DomContainer) {
     {
         var DoNowButtonOfSearchedEventContainerID = "DoNowButtonOfSearchedEventContainer" + CallBackFunctionForReturnedValuesDesktop.counter
         var DoNowButtonOfSearchedEventContainer = getDomOrCreateNew(DoNowButtonOfSearchedEventContainerID);
-        var DoNowButtonOfSearchedEventImageID = "DoNowButtonOfSearchedEventImage" + CallBackFunctionForReturnedValuesDesktop.counter
-        var DoNowButtonOfSearchedEventImage = getDomOrCreateNew(DoNowButtonOfSearchedEventImageID);
 
-
-        $(DoNowButtonOfSearchedEventImage.Dom).addClass("NowIcon");
-        $(DoNowButtonOfSearchedEventImage.Dom).addClass("NowIcon_Search");
         var MyIconSet = new IconSet();
         var IconSetContainer = MyIconSet.getIconSetContainer();
         $(IconSetContainer).addClass("IconSetSearch");
@@ -243,6 +238,7 @@ function CallBackFunctionForReturnedValuesDesktop(data, DomContainer) {
         MyIconSet.hideProcrastinateButton();
         MyIconSet.HidePausePauseResumeButton();
         MyIconSet.hideRepeatButton();
+        MyIconSet.hideNowButton();
         
         var DeleteButton = MyIconSet.getDeleteButton();
         DeleteButton.onclick = function () { DeleteTrigger(DoNowButtonOfSearchedEventContainer, MyCalendarEVent, function () { }) }
@@ -253,7 +249,7 @@ function CallBackFunctionForReturnedValuesDesktop(data, DomContainer) {
 
 
         if(MyCalendarEVent.canDoNow) {
-            DoNowButtonOfSearchedEventContainer.Dom.appendChild(DoNowButtonOfSearchedEventImage.Dom)
+            MyIconSet.showNowButton();
         }
         
         DoNowButtonOfSearchedEventContainer.Dom.appendChild(MyIconSet.getIconSetContainer());
@@ -328,7 +324,7 @@ function CallBackFunctionForReturnedValuesDesktop(data, DomContainer) {
                 Exit()
             }
         }
-        $(DoNowButtonOfSearchedEventImage.Dom).click(genFunctionCallForCalendarEventNow(MyCalendarEVent.ID))
+        $(MyIconSet.getNowButton()).click(genFunctionCallForCalendarEventNow(MyCalendarEVent.ID))
         $(DoNowButtonOfSearchedEventContainer.Dom).addClass("DoNowButtonOfSearchedEventContainer");
         return DoNowButtonOfSearchedEventContainer;
     }
