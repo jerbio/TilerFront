@@ -508,10 +508,6 @@
     <Compile Include="LogControlXml.cs" />
     <Compile Include="LogControlDirect.cs" />
     <Compile Include="LogControl.cs" />
-    <Compile Include="Migrations\202001271017315_timelineHistoryFix.cs" />
-    <Compile Include="Migrations\202001271017315_timelineHistoryFix.Designer.cs">
-      <DependentUpon>202001271017315_timelineHistoryFix.cs</DependentUpon>
-    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -2804,13 +2800,6 @@
     <None Include="WagTapCalLogs\BeforeInsertionFixingStiticRestricted.xml">
       <CopyToPublishDirectory>Always</CopyToPublishDirectory>
     </None>
-    <None Include="WagTapCalLogs\Copy_d350ba4d-fe0b-445c-bed6-b6411c2156b3.xml">
-      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
-    </None>
-    <None Include="WagTapCalLogs\d350ba4d-fe0b-445c-bed6-b6411c2156b3.xml">
-      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="WagTapCalLogs\d84d266b-f8e3-448d-995b-dbe2444a659e.xml">
       <CopyToPublishDirectory>Always</CopyToPublishDirectory>
     </None>
@@ -2826,11 +2815,6 @@
       <Project>{bcb7ff8a-4b37-4ce2-9a41-4ccb7d616afd}</Project>
       <Name>ScheduleAnalysis</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Migrations\202001271017315_timelineHistoryFix.resx">
-      <DependentUpon>202001271017315_timelineHistoryFix.cs</DependentUpon>
-    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
