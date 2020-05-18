@@ -7,7 +7,7 @@ var DebugLocal = true;
 //var global_refTIlerUrl = "http://tilersmart.azurewebsites.net/api/";
 var global_refTIlerUrl = window.location.origin + "/api/";
 var global_PositionCoordinate = { Latitude: 40.0274, Longitude: -105.2519, isInitialized: false, Message: "Uninitialized" };;
-
+var global_sleepTimeline = []
 var UserTheme = { Light: new Theme("Light"), Dark: new Theme("Dark") };
 var CurrentTheme = UserTheme.Light;
 var UserCredentials;
@@ -269,6 +269,46 @@ function triggerUndoPanel(UndoMessage)
 }
 
 
+function updateSleepTimeline(sleepTimeline) {
+    if(sleepTimeline) {
+        global_sleepTimeline = [];
+        let today = new Date(Date.now());
+        let sleepStart = new Date(sleepTimeline.start);
+        
+        sleepStart.setDate(today.getDate());
+        sleepStart.setFullYear(today.getFullYear());
+        let sleepEnd = new Date(sleepStart.getTime() + sleepTimeline.duration);
+        if(sleepStart.getDate() == sleepEnd.getDate()) {
+            global_sleepTimeline.push({
+                start: sleepStart,
+                end: sleepEnd
+            })
+        } else {
+            if(sleepStart.getTime() < sleepEnd.getTime()) {
+                while(sleepStart.getDate() !== sleepEnd.getDate()) {
+                    let nextSleepStart = new Date( sleepStart.getTime());
+                    nextSleepStart.setDate((nextSleepStart.getDate()+1));
+                    nextSleepStart.setHours(0,0,0,0);
+                    let currentSleepEnd = new Date( nextSleepStart.getTime() - OneMinInMs);
+                    global_sleepTimeline.push({
+                        start: sleepStart,
+                        end: currentSleepEnd
+                    });
+                    sleepStart = nextSleepStart;
+                }
+
+                global_sleepTimeline.push({
+                    start: sleepStart,
+                    end: sleepEnd
+                });
+
+            } else {
+                throw "Sleep time line is invalid"
+            }
+        }
+    }
+}
+
 function StructuralizeNewData(NewData)
 {
     var TotalSubEventList = new Array();
@@ -283,7 +323,8 @@ function StructuralizeNewData(NewData)
         } else {
             NewData.Schedule.SubCalendarEvents.forEach(SubCalendaEventsCreateDomElement)
         }
-        
+
+        updateSleepTimeline(NewData.Schedule.SleepTimeline);
         CleanupData();
     }
     else {
@@ -328,13 +369,8 @@ function StructuralizeNewData(NewData)
                 }
                 else {
                     ToBeReorganized.push(eachSubEvent);
-                    //if (Dictionary_OfSubEvents[eachSubEvent.ID].SubCalStartDate != eachSubEvent.SubCalStartDate)
-                    {
-                        //global_DeltaSubevents.push(eachSubEvent);
-                    }
 
                 }
-                //debugger;
                 var RangeStart = new Date(NowDate.getTime() - (OneHourInMs * 12));
                 var RangeEned = new Date(CurrentTheme.Now + TwelveHourMilliseconds);
 
@@ -986,7 +1022,7 @@ function setSubCalendarEventAsNow(SubEventID, CallBackSuccess, CallBackFailure, 
 {
     var TimeZone = new Date().getTimezoneOffset();
     var NowData = { UserName: UserCredentials.UserName, UserID: UserCredentials.ID, EventID: SubEventID, TimeZoneOffset: TimeZone };
-    var URL = myurl = global_refTIlerUrl + "Schedule/Event/Now";
+    var URL = global_refTIlerUrl + "Schedule/Event/Now";
     preSendRequestWithLocation(NowData);
 
     var ProcrastinateRequest= $.ajax({
@@ -1006,7 +1042,7 @@ function setSubCalendarEventAsNow(SubEventID, CallBackSuccess, CallBackFailure, 
 function SetCalendarEventAsNow(CalendarEventID, CallBackSuccess, CallBackFailure, CallBackDone) {
     var TimeZone = new Date().getTimezoneOffset();
     var NowData = { UserName: UserCredentials.UserName, UserID: UserCredentials.ID, ID: SubEventID, TimeZoneOffset: TimeZone };
-    var URL = myurl = global_refTIlerUrl + "CalendarEvent/Now/";
+    var URL = global_refTIlerUrl + "CalendarEvent/Now/";
     preSendRequestWithLocation(NowData);
 
     var AjaxRequest = $.ajax({
@@ -3299,4 +3335,46 @@ function isUndefinedOrNull(data) {
        }
 
        return ReturnFunction;
+   }
+
+
+   function genFunctionCallForNow(EventID,CallBack)
+   {
+       return function ()
+       {
+           var TimeZone = new Date().getTimezoneOffset();
+           var NowData = { UserName: UserCredentials.UserName, UserID: UserCredentials.ID, EventID: EventID, TimeZoneOffset: TimeZone };
+           //var URL = "RootWagTap/time.top?WagCommand=8"
+           var URL = global_refTIlerUrl + "Schedule/Event/Now";
+           NowData.TimeZone = moment.tz.guess()
+           var HandleNEwPage = new LoadingScreenControl("Tiler is moving up your Event ...  :)");
+           HandleNEwPage.Launch();
+           preSendRequestWithLocation(NowData);
+
+           $.ajax({
+               type: "POST",
+               url: URL,
+               data: NowData,
+               // DO NOT SET CONTENT TYPE to json
+               // contentType: "application/json; charset=utf-8", 
+               // DataType needs to stay, otherwise the response object
+               // will be treated as a single string
+               dataType: "json",
+               success: function (response) {
+                   //InitializeHomePage();
+                   //alert("alert 0-a");
+               },
+               error: function ()
+               {
+                   var NewMessage = "Ooops Tiler is having issues accessing your schedule. Please try again Later:(";
+                   var ExitAfter = { ExitNow: true, Delay: 1000 };
+                   HandleNEwPage.UpdateMessage(NewMessage, ExitAfter, InitializeHomePage);
+               }
+           }).done(function (data) {
+               if(isFunction(CallBack)) {
+                    CallBack()
+               }
+               HandleNEwPage.Hide();
+           });
+       }
    }

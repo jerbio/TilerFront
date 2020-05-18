@@ -83,7 +83,11 @@ namespace TilerFront
             TilerUser = myAccount.getTilerUser();
         }
 
-        public virtual void RemoveAllCalendarEventFromLogAndCalendar()//MyTemp Function for deleting all calendar events
+
+        /// <summary>
+        /// Function sets all calendar events in as disabled and then deletes them from the UI
+        /// </summary>
+        public virtual void RemoveAllCalendarEventFromLogAndCalendar()
         {
             myAccount.DeleteAllCalendarEvents();
             removeAllFromOutlook();
@@ -111,6 +115,13 @@ namespace TilerFront
                     }
                 }
             );
+
+            foreach (DayTimeLine dayTimeLine in Now.getAllDaysForCalc())// Need to clear sub events because the daytimeline holds the subevents in the wrong day after a shift
+            {
+                dayTimeLine.ClearAllSubEvents();
+            }
+
+            populateDayTimeLinesWithSubcalendarEvents();
             return;
         }
 
@@ -172,8 +183,7 @@ namespace TilerFront
 
         async virtual public Task persistToDB(bool persistNewChanges = true)
         {
-            //RemoveAllCalendarEventFromLogAndCalendar();
-            if(persistNewChanges)
+            if (persistNewChanges)
             {
                 await WriteFullScheduleToLog().ConfigureAwait(false);
             } else

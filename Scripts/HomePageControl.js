@@ -342,7 +342,6 @@ function generateProcrastinateAllFunction(TimeData,CallBack)
     var NowData = { DurationDays: TimeData.Days, DurationHours: TimeData.Hours, DurationMins: TimeData.Mins, UserName: UserCredentials.UserName, UserID: UserCredentials.ID, TimeZoneOffset: TimeZone };
     NowData.TimeZone = moment.tz.guess()
     var HandleNEwPage = new LoadingScreenControl("Tiler is Freeing up Some time :)");
-    TimeData.Hours
     HandleNEwPage.Launch();
     var URL = global_refTIlerUrl + "Schedule/ProcrastinateAll";
     preSendRequestWithLocation(NowData);
@@ -361,7 +360,7 @@ function generateProcrastinateAllFunction(TimeData,CallBack)
                 //exitSelectedEventScreen();
             }
             else {
-                alert("error detected with marking as complete");
+                alert("error detected with clearing your schedule");
             }
 
         },
@@ -1065,9 +1064,9 @@ function generateModalForTIleOrModal()
 
         $(EventNowContainer.Dom).addClass("EventNowContainer");
         $(EventNowButton.Dom).addClass("EventNowButton");
-        //$(EventNowButton.Dom).addClass("NowIcon");
-        //$(EventNowContainer.Dom).click(genFunctionCallForNow(myEvent.ID, EventDom_ContainerB.Dom, triggerClickOfEventDom_ContainerCWhenDisablePanelIsClicked));
-        (EventNowContainer.Dom).onclick = (genFunctionCallForNow(myEvent.ID, EventDom_ContainerB.Dom, triggerClickOfEventDom_ContainerCWhenDisablePanelIsClicked));
+        (EventNowContainer.Dom).onclick = (genFunctionCallForNow(myEvent.ID, () => {
+            RefreshSubEventsMainDivSubEVents(triggerClickOfEventDom_ContainerCWhenDisablePanelIsClicked)
+         }));
 
 
         //Delete Button
@@ -1482,45 +1481,6 @@ function generateModalForTIleOrModal()
         $(ParentDom).append(EventProcrastinateContainer.Dom);*/
     }
 
-
-    function genFunctionCallForNow(EventID,ParentDom,CallBack)
-    {
-        return function ()
-        {
-            var TimeZone = new Date().getTimezoneOffset();
-            var NowData = { UserName: UserCredentials.UserName, UserID: UserCredentials.ID, EventID: EventID, TimeZoneOffset: TimeZone };
-            //var URL = "RootWagTap/time.top?WagCommand=8"
-            var URL = myurl = global_refTIlerUrl + "Schedule/Event/Now";
-            NowData.TimeZone = moment.tz.guess()
-            var HandleNEwPage = new LoadingScreenControl("Tiler is moving up your Event ...  :)");
-            HandleNEwPage.Launch();
-            preSendRequestWithLocation(NowData);
-
-            $.ajax({
-                type: "POST",
-                url: URL,
-                data: NowData,
-                // DO NOT SET CONTENT TYPE to json
-                // contentType: "application/json; charset=utf-8", 
-                // DataType needs to stay, otherwise the response object
-                // will be treated as a single string
-                dataType: "json",
-                success: function (response) {
-                    //InitializeHomePage();
-                    //alert("alert 0-a");
-                },
-                error: function ()
-                {
-                    var NewMessage = "Ooops Tiler is having issues accessing your schedule. Please try again Later:(";
-                    var ExitAfter = { ExitNow: true, Delay: 1000 };
-                    HandleNEwPage.UpdateMessage(NewMessage, ExitAfter, InitializeHomePage);
-                }
-            }).done(function (data) {
-                RefreshSubEventsMainDivSubEVents(CallBack);
-                //InitializeHomePage();//hack alert
-            });
-        }
-    }
 
 
 

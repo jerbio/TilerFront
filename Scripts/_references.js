@@ -1,4 +1,4 @@
-﻿/// <reference path="jquery-3.4.1.js" />
+﻿/// <reference path="jquery-3.5.0.js" />
 /// <autosync enabled="true" />
 /// <reference path="../areas/routedebugger/Scripts/detect.js" />
 /// <reference path="addnewevent.js" />

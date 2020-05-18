@@ -106,13 +106,16 @@ namespace TilerFront.Controllers
                     subEvents = MySchedule.getAllCalendarEvents().SelectMany(obj => obj.ActiveSubEvents);
                 }
 #endif
+                DayTimeLine sleepTimeline = now.getDayTimeLineByTime(now.constNow.AddDays(2));
+                TimeLine sleepTImeline = TimeOfDayPreferrence.splitIntoDaySections(sleepTimeline)[TimeOfDayPreferrence.DaySection.Sleep];
 
                 UserSchedule currUserSchedule = new UserSchedule {
                     //NonRepeatCalendarEvent = NonRepeatingEvents.Select(obj => obj.ToCalEvent(TimelineForData)).ToArray(),
                     //RepeatCalendarEvent = RepeatingEvents,
                     SubCalendarEvents = subEvents.Select(subEvent => 
                         subEvent.ToSubCalEvent(subEvent.ParentCalendarEvent)
-                    ).ToList()
+                    ).ToList(),
+                    SleepTimeline = sleepTImeline.ToJson()
                 };
                 PausedEvent currentPausedEvent = getCurrentPausedEvent(db);
                 currUserSchedule.populatePauseData(currentPausedEvent, myAuthorizedUser.getRefNow());
@@ -455,7 +458,7 @@ namespace TilerFront.Controllers
         /// </summary>
         /// <param name="ID"></param>
         /// <returns></returns>
-        static async Task<List<IndexedThirdPartyAuthentication>> getAllThirdPartyAuthentication(string ID, ApplicationDbContext db)
+        static async public Task<List<IndexedThirdPartyAuthentication>> getAllThirdPartyAuthentication(string ID, ApplicationDbContext db)
         {
             //ApplicationDbContext db = new ApplicationDbContext();
             List<ThirdPartyCalendarAuthenticationModel> AllAuthentications = ( db.ThirdPartyAuthentication.Where(obj => ID == obj.TilerID).ToList());
@@ -584,14 +587,15 @@ namespace TilerFront.Controllers
                 BusyTimeLine nextBusySchedule = schedule.NextActivity;
                 if (nextBusySchedule != null)
                 {
-                    SubCalendarEvent subEvent = schedule.getSubCalendarEvent(nextBusySchedule.ID);
-                    CalendarEvent calEvent = schedule.getCalendarEvent(nextBusySchedule.ID);
+                    SubCalendarEvent subEvent = schedule.getSubCalendarEvent(nextBusySchedule.Id);
+                    CalendarEvent calEvent = schedule.getCalendarEvent(nextBusySchedule.Id);
                     myPostData = new PostBackData(subEvent.ToSubCalEvent(calEvent), 0);
                 }
                 else
                 {
                     myPostData = new PostBackData("\"There aren't events for the next three months is coming up in the next three months\"", 0);
                 }
+                await AnalysisController.updateSuggestionAnalysis(retrievedUser.ScheduleLogControl).ConfigureAwait(false);
                 TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
                 scheduleChangeSocket.triggerRefreshData(retrievedUser.getTilerUser());
                 return Ok(myPostData.getPostBack);
@@ -644,6 +648,7 @@ namespace TilerFront.Controllers
             {
                 retValue = new PostBackData("", 1);
             }
+            await AnalysisController.updateSuggestionAnalysis(retrievedUser.ScheduleLogControl).ConfigureAwait(false);
             TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
             scheduleChangeSocket.triggerRefreshData(retrievedUser.getTilerUser());
             return Ok(retValue.getPostBack);
@@ -681,14 +686,13 @@ namespace TilerFront.Controllers
                 List<SubCalendarEvent> allSubEvents = schedule.getAllCalendarEvents().Where(calEvent => calEvent.isActive).SelectMany(calEvent => calEvent.ActiveSubEvents).ToList();
                 TimeLine timeLine = new TimeLine();
                 timeLine.AddBusySlots(allSubEvents.Select(subEvent => subEvent.ActiveSlot));
-                List<BlobSubCalendarEvent> interferringSubEvents = Utility.getConflictingEvents(allSubEvents);
 
                 BusyTimeLine nextBusySchedule = schedule.NextActivity;
                 PostBackData myPostData;
                 if (nextBusySchedule != null)
                 {
-                    SubCalendarEvent subEvent = schedule.getSubCalendarEvent(nextBusySchedule.ID);
-                    CalendarEvent calEvent = schedule.getCalendarEvent(nextBusySchedule.ID);
+                    SubCalendarEvent subEvent = schedule.getSubCalendarEvent(nextBusySchedule.Id);
+                    CalendarEvent calEvent = schedule.getCalendarEvent(nextBusySchedule.Id);
                     myPostData = new PostBackData(subEvent.ToSubCalEvent(calEvent), 0);
                 }
                 else
@@ -696,8 +700,7 @@ namespace TilerFront.Controllers
                     myPostData = new PostBackData("\"There aren't events for the next three months is coming up in the next three months\"", 0);
                 }
                 
-
-                
+                await AnalysisController.updateSuggestionAnalysis(retrievedUser.ScheduleLogControl).ConfigureAwait(false);
                 TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
                 scheduleChangeSocket.triggerRefreshData(retrievedUser.getTilerUser());
                 return Ok(myPostData.getPostBack);
@@ -738,6 +741,7 @@ namespace TilerFront.Controllers
                     ScheduleXmlString= "<?xml version=\"1.0\" encoding=\"utf-8\"?><ScheduleLog><LastIDCounter>1024</LastIDCounter><referenceDay>8:00 AM</referenceDay><EventSchedules></EventSchedules></ScheduleLog>"
                 };
                 scheduleDumpCopy.Id = scheduleDump.Id;
+                await AnalysisController.updateSuggestionAnalysis(retrievedUser.ScheduleLogControl).ConfigureAwait(false);
                 TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
                 scheduleChangeSocket.triggerRefreshData(retrievedUser.getTilerUser());
                 PostBackData postBack = new PostBackData(scheduleDumpCopy, 0);
@@ -837,6 +841,7 @@ namespace TilerFront.Controllers
                             retrievedUser.ScheduleLogControl.updateUserActivty(activity);
                             schedule.markSubEventAsCompleteCalendarEventAndReadjust(UserData.EventID);
                             await schedule.WriteFullScheduleToLog().ConfigureAwait(false);
+                            await AnalysisController.updateSuggestionAnalysis(retrievedUser.ScheduleLogControl).ConfigureAwait(false);
                             retValue = new PostBackData("\"Success\"", 0);
                         }
                         break;
@@ -1028,8 +1033,8 @@ namespace TilerFront.Controllers
             if (retrievedUser.Status)
             {
                 DB_UserActivity activity = new DB_UserActivity(myUser.getRefNow(), UserActivity.ActivityType.Undo);
-                retrievedUser.ScheduleLogControl.updateUserActivty(activity);
-                await retrievedUser.ScheduleLogControl.Undo().ConfigureAwait(false);
+                //retrievedUser.ScheduleLogControl.updateUserActivty(activity);
+                //await retrievedUser.ScheduleLogControl.Undo().ConfigureAwait(false);
                 retValue = new PostBackData("\"Success\"", 0);
             }
             else
@@ -1090,6 +1095,7 @@ namespace TilerFront.Controllers
 
                             await schedule.deleteSubCalendarEvent(eventModel.EventID).ConfigureAwait(false);
                             await schedule.WriteFullScheduleToLog().ConfigureAwait(false);
+                            await AnalysisController.updateSuggestionAnalysis(retrievedUser.ScheduleLogControl).ConfigureAwait(false);
                             retValue = new PostBackData("\"Success\"", 0);   
                         }
                         break;
@@ -1396,9 +1402,13 @@ namespace TilerFront.Controllers
                 {
                     selectedDaysOftheweek = RepeatWeeklyData.Split(',').Where(obj => !String.IsNullOrEmpty(obj)).Select(obj => Convert.ToInt32(obj)).Select(num => (DayOfWeek)num).ToArray();
                 }
+  
+                if(RepeatStart>=RepeatEnd)
+                {
+                    var postResult = new PostBackData(CustomErrors.Errors.Creation_Config_RepeatEnd_Earlier_Than_RepeatStart);
+                    return Ok(postResult.getPostBack);
+                }
 
-                
-                //RepeatEnd = (DateTimeOffset.UtcNow).AddDays(7);
                 RepetitionFlag = true;
                 MyRepetition = new Repetition(new TimeLine(RepeatStart, RepeatEnd), Utility.ParseEnum<Repetition.Frequency> (RepeatFrequency.ToUpper()), new TimeLine(FullStartTime, FullEndTime), selectedDaysOftheweek);
                 EndDateEntry = MyRepetition.Range.End > EndDateEntry ? MyRepetition.Range.End : EndDateEntry;
@@ -1408,8 +1418,6 @@ namespace TilerFront.Controllers
             await retrievedUser.Login();
             TilerUser tilerUser = retrievedUser.getTilerUser();
             retrievedUser.getTilerUser().updateTimeZoneTimeSpan(newEvent.getTimeSpan);
-            Task HoldUpForWriteNewEvent;
-            Task CommitChangesToSchedule;
             if (retrievedUser.Status)
             {
                 DateTimeOffset myNow = newEvent.getRefNow();
@@ -1435,6 +1443,12 @@ namespace TilerFront.Controllers
                     StartData = StartData.Add(-newEvent.getTimeSpan);
                     DateTimeOffset EndData = DateTimeOffset.Parse(EndTime + " " + EndDateEntry.Date.ToShortDateString()).UtcDateTime;
                     EndData = EndData.Add(-newEvent.getTimeSpan);
+                    if (StartData >= EndData)
+                    {
+                        var postResult = new PostBackData(CustomErrors.Errors.Creation_Config_End_Earlier_Than_Start);
+                        return Ok(postResult.getPostBack);
+                    }
+
                     if (RigidScheduleFlag) {
                         newCalendarEvent = new RigidCalendarEvent(
                             Name, StartData, EndData, EventDuration,new TimeSpan(), new TimeSpan(), MyRepetition, EventLocation,  new EventDisplay(true, userColor, userColor.User < 1 ? 0 : 1), new MiscData(), true,false, tilerUser, new TilerUserGroup(), TimeZone, null, new NowProfile(), null);
@@ -1495,6 +1509,7 @@ namespace TilerFront.Controllers
             {
                 retValue = new PostBackData("", 1);
             }
+            await AnalysisController.updateSuggestionAnalysis(retrievedUser.ScheduleLogControl).ConfigureAwait(false);
             TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
             scheduleChangeSocket.triggerRefreshData(retrievedUser.getTilerUser());
             return Ok(retValue.getPostBack);
@@ -1672,8 +1687,6 @@ namespace TilerFront.Controllers
             retrievedUser.getTilerUser().updateTimeZoneTimeSpan(newEvent.getTimeSpan);
             TilerUser tilerUser = retrievedUser.getTilerUser();
 
-            Task HoldUpForWriteNewEvent;
-            Task CommitChangesToSchedule;
             if (retrievedUser.Status)
             {
                 DateTimeOffset myNow = newEvent.getRefNow();

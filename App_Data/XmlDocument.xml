@@ -934,6 +934,11 @@
             <param name="user">The referemce tiler user</param>
             <returns></returns>
         </member>
+        <member name="M:TilerFront.DB_Schedule.RemoveAllCalendarEventFromLogAndCalendar">
+            <summary>
+            Function sets all calendar events in as disabled and then deletes them from the UI
+            </summary>
+        </member>
         <member name="M:TilerFront.DB_Schedule.CleanUpForUI(System.Collections.Generic.IEnumerable{TilerElements.CalendarEvent})">
             <summary>
             Function rearranges the sub events by Id to be associated with the order of time
@@ -1296,6 +1301,14 @@
             <param name="userId"></param>
             <returns></returns>
         </member>
+        <member name="M:TilerFront.LogControl.getSubCalendarEventForAnalysis(TilerElements.TimeLine,TilerElements.TilerUser)">
+            <summary>
+             FUnction makes a storage call to retrieve all sub events. Note this includes both completed and deleted sub events. Except the case of count decrement
+            </summary>
+            <param name="timeline"></param>
+            <param name="user"></param>
+            <returns></returns>
+        </member>
         <member name="M:TilerFront.LogControl.getAllEnabledCalendarEvent(TilerElements.TimeLine,TilerElements.ReferenceNow,System.Boolean,System.Boolean,TilerElements.DataRetrivalOption,System.Collections.Generic.HashSet{System.String})">
             <summary>
             This gets all cal events within <paramref name="RangeOfLookUP"/>. Note: This uses the subcalendar event as the bases for the query. So if a sub event is not within the rangelookup it won't pull the calendar event, this is for performance reasons. Hence why the general default is to be generous.  If you want to pull a specific calendar event then you need to include the calendar id as part of <paramref name="tilerIds"/>.
@@ -1304,6 +1317,7 @@
             <param name="RangeOfLookUP"></param>
             <param name="Now"></param>
             <param name="includeSubEvents"></param>
+            <param name="includeUpdateHistory"></param>
             <param name="retrievalOption"></param>
             <param name="tilerIds"></param>
             <returns></returns>

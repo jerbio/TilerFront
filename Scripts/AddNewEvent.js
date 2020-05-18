@@ -215,7 +215,14 @@ function prepCalDataForPost()
         var RestrictionStart = EventRestrictionStart.value;
         var RestrictionEnd = EventRestrictionEnd.value;
         var RestrictionWorkWeek = EventRestrictionIsWorkWeek.checked;
-        var retValue = { isRestriction: RestrictionStatusButtonStatus, Start: RestrictionStart, End: RestrictionEnd, isWorkWeek: RestrictionWorkWeek }
+        let RestrictionIsEveryDay = !EventRestrictionIsWorkWeek.checked;
+        var retValue = { 
+            isRestriction: RestrictionStatusButtonStatus,
+            Start: RestrictionStart,
+            End: RestrictionEnd,
+            isWorkWeek: RestrictionWorkWeek,
+            isEveryDay: RestrictionIsEveryDay
+        }
         return retValue;
     }
 
