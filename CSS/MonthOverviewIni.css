@@ -1615,12 +1615,12 @@ width: auto;
 }
 
 #PreviewModal.inActive {
-   /*display: none;*/ 
+   display: none;
 }
 
 #PreviewModal.active {
-    left: 363px;
-    min-width: 300px;
+  left: 363px;
+  min-width: 300px;
 }
 
 
@@ -1869,7 +1869,7 @@ width: auto;
     vertical-align: top;
 }
 
-#TilerCloseButton
+.TilerCloseButton
 {
   position: absolute;
   width: 22px;
@@ -1881,7 +1881,7 @@ width: auto;
 }
 
 
-#TilerCloseButton:hover div
+.TilerCloseButton:hover div
 {
     border-color:black;
 }
@@ -1898,7 +1898,7 @@ width: auto;
     left:0%;
 }
 
-#RightCloseBar
+.RightCloseBar
 {
     width: 20px;
   height: 15px;
@@ -1912,7 +1912,7 @@ width: auto;
   left: 14px;
 }
 
-#LeftCloseBar
+.LeftCloseBar
 {
     width: 15px;
   height: 15px;
@@ -1955,7 +1955,7 @@ width: auto;
 
 #closePreview {
   position: absolute;
-  bottom: 0;
+  bottom: 25px;
   right: 0;
 }
 
@@ -1974,7 +1974,7 @@ width: auto;
 }
 
 .preview-day-of-week {
-  top: 20px;
+  top: 30px;
   position: relative;
 }
 

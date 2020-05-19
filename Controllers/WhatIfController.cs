@@ -210,7 +210,7 @@ namespace TilerFront.Controllers
                         {
                             HashSet<string> calendarIds = new HashSet<string>() { SubEventEdit.EventID };
                             Task<Tuple<ThirdPartyControl.CalendarTool, IEnumerable<CalendarEvent>>> thirdPartyDataTask = ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(retrievedUser.UserID, db);
-                            schedule = new DB_Schedule(retrievedUser, now, calendarIds: calendarIds);
+                            schedule = new DB_Schedule(retrievedUser, now, calendarIds: calendarIds, includeUpdateHistory: true);
                             var thirdPartyData = await thirdPartyDataTask.ConfigureAwait(false);
                             schedule.updateDataSetWithThirdPartyData(thirdPartyData);
                             schedule.CurrentLocation = SubEventEdit.getCurrentLocation();
@@ -238,9 +238,17 @@ namespace TilerFront.Controllers
                 
                 JObject before = evaluation.Item1.ToJson();
                 JObject after = evaluation.Item2.ToJson();
+
+                HealthComparison healthComparison = new HealthComparison(evaluation.Item1, evaluation.Item2);
+                var delta = healthComparison.delta();
+                JObject deltaJson = new JObject();
+                deltaJson.Add("conflictDeltaCount", delta.Item1);
+                deltaJson.Add("tardyDeltaCount", delta.Item2);
+
                 JObject resultData = new JObject();
                 resultData.Add("before", before);
                 resultData.Add("after", after);
+                resultData.Add("delta", deltaJson);
                 returnPostBack = new PostBackData(resultData, 0);
                 return Ok(returnPostBack.getPostBack);
             }

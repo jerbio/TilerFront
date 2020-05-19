@@ -14,7 +14,6 @@
             let previousRequest = this.currentRequests.shift();
             previousRequest.abort();
         }
-        
     }
 
     _afterPreveiwRequestCompletes () {
@@ -67,6 +66,7 @@
                 this._afterPreveiwRequestCompletes();
             }
         );
+        this.currentRequests.push(request);
     }
 
     procrastinateEvent() {
@@ -192,6 +192,7 @@
                 this._afterPreveiwRequestCompletes();
             }
         );
+        this.currentRequests.push(request);
     }
 
     bestPossibleDay(subEventId) {
@@ -233,14 +234,17 @@
         $(this.UIContainer.parentNode).addClass('active');// this will be unnecessary. The goal is what ever container is provided as UIContainer, will append our generated preview node as the child node. If there is no container then this defaults to sliding out of the subevent infomration.
         $(this.UIContainer.parentNode).removeClass('inActive');
         let closePreviewButton = getDomOrCreateNew("closePreview");
-        closePreviewButton.innerHTML = "Close"
-        closePreviewButton.onclick = this.hide.bind(this);
+        // closePreviewButton.innerHTML = "Close"
+        let clickCallBack = this.hide.bind(this);
+        closePreviewButton.onclick = clickCallBack;
+        global_ExitManager.addNewExit(clickCallBack);
     }
 
     hide() {
         $(this.UIContainer.parentNode).removeClass('active');// this will be unnecessary. The goal is what ever container is provided as UIContainer, will append our generated preview node as the child node. If there is no container then this defaults to sliding out of the subevent infomration.
         $(this.UIContainer.parentNode).addClass("inActive");
         $(this.UIContainer).empty();
+        this._beforePreviewRequest();
     }
 
     sleepRendering(previewDay) {
@@ -333,7 +337,7 @@
         let dayStart = previewDay.start;
         let conflictData = this.conflictData;
         if(!conflictData) {
-            conflictData = {}
+            conflictData = {};
             this.conflictData = conflictData;
         }
 
@@ -360,11 +364,19 @@
             $(dayConflictInfo.textContainer).addClass("day-preview-conflict-text-container");
 
             let dayConflictInfoTextId = "day-preview-conflict-text-"+dayConflictInfo.id;
+            let dayConflictInfoTextExtraId = "day-preview-conflict-text-extra-"+dayConflictInfo.id;
+            let dayConflictInfoTextExtraContainerId = "day-preview-conflict-text-extra-container-"+dayConflictInfo.id;
             let dayConflictInfoText = getDomOrCreateNew(dayConflictInfoTextId, "span");
             dayConflictInfo.textDom = dayConflictInfoText;
+            let dayConflictInfoTextExtra = getDomOrCreateNew(dayConflictInfoTextExtraId, "span");
+            dayConflictInfo.extraTextDom = dayConflictInfoTextExtra;
+            let dayConflictInfoTextExtraContainer = getDomOrCreateNew(dayConflictInfoTextExtraContainerId, "div");
+            dayConflictInfoTextExtraContainer.appendChild(dayConflictInfoTextExtra);
             $(dayConflictInfo.textDom).addClass("day-preview-conflict-text");
+            $(dayConflictInfoTextExtraContainer).addClass("day-preview-conflict-text-extra-container");
 
             dayConflictInfoTextContainer.Dom.appendChild(dayConflictInfoText);
+            dayConflictInfoTextContainer.Dom.appendChild(dayConflictInfoTextExtraContainer);
             dayConflictInfoContainer.Dom.appendChild(dayConflictInfoIconContainer);
             dayConflictInfoContainer.Dom.appendChild(dayConflictInfoTextContainer);
 
@@ -372,7 +384,20 @@
         }
 
         if(previewDay.conflict && previewDay.conflict.length > 0) {
+            if (previewDay.conflictDelta !== 0 && !isUndefinedOrNull(previewDay.conflictDelta)) {
+                let absConflictDelta = Math.abs(previewDay.conflictDelta);
+                if(previewDay.conflictDelta > 0) {
+                    dayConflictInfo.extraTextDom.innerHTML = absConflictDelta + " more conflict" + (absConflictDelta > 1 ? "s" :"");
+                    $(dayConflictInfo.extraTextDom).removeClass("upgrade");
+                    $(dayConflictInfo.extraTextDom).addClass("degrade");
+                } else {
+                    dayConflictInfo.extraTextDom.innerHTML = absConflictDelta + " less conflict" + (absConflictDelta > 1 ? "s" :"");
+                    $(dayConflictInfo.extraTextDom).addClass("upgrade");
+                    $(dayConflictInfo.extraTextDom).removeClass("degrade");
+                }
+            }
             dayConflictInfo.textDom.innerHTML = previewDay.conflict.length + " conflict" + (previewDay.conflict.length>1 ? "s" :"");
+            
         } else {
             dayConflictInfo.textDom.innerHTML = "No conflicts";
         }
@@ -517,6 +542,8 @@
 
             let previewAttributeWrapperId = "day-preview-attribute-wrapper-"+dayInfo.id;
             let previewAttributeWrapper = getDomOrCreateNew(previewAttributeWrapperId);
+            $(previewAttributeWrapper).addClass('day-preview-attribute-wrapper');
+            
             dayInfo.previewAttributeDom = previewAttributeWrapper;
 
             dayInfo.dayContainer.Dom.appendChild(dayInfo.previewAttributeDom.Dom);
@@ -539,9 +566,10 @@
 
     processPreviewDays(previewDays) {
         if(previewDays && Array.isArray(previewDays) && previewDays.length > 0) {
+            let orderedPreviewDays = previewDays.sort((a,b) => { return Number(a.start) - Number(b.start); });
             let dayDoms = [];
-            for (let i=0; i< previewDays.length; i++) {
-                let previewDay = previewDays[i];
+            for (let i=0; i< orderedPreviewDays.length; i++) {
+                let previewDay = orderedPreviewDays[i];
                 let dayDom = this.generateDayDom(previewDay);
                 dayDoms.push(dayDom);
                 this.UIContainer.appendChild(dayDom);
@@ -602,7 +630,7 @@ class SetAsNowPreview {
         let retValue = {
             dom: dayDomContainer,
             sleep: sleepInfo
-        }
+        };
 
         return retValue;
     }
@@ -611,10 +639,10 @@ class SetAsNowPreview {
 
     processWebRequest(data) {
         let days = []
-        days.sort((day) => {return day.Start - day.Start})
+        days.sort((day) => {return day.Start - day.Start});
         days.forEach((day) => {
-            this.processDayDom(day)
-        })
+            this.processDayDom(day);
+        });
     }
 
     update(eventId) {

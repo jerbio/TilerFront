@@ -577,12 +577,14 @@ Add Close button to the given element. Container is Dom element to which you wan
 */
 function AddCloseButoon(Container, LeftPosition)
 {
-    var TilerCloseButtonID = "TilerCloseButton"
-    var TilerCloseButton = getDomOrCreateNew("TilerCloseButton");
+    let counterId = AddCloseButoon.getId();
+    var TilerCloseButtonID = "TilerCloseButton"+counterId;
+    var TilerCloseButton = getDomOrCreateNew(TilerCloseButtonID);
     $(TilerCloseButton.Dom).attr('tabindex', 0)
     $(TilerCloseButton).removeClass("LeftCloseButton");
     $(TilerCloseButton).removeClass("RightCloseButton");
     $(TilerCloseButton).removeClass("setAsDisplayNone");
+    $(TilerCloseButton).addClass('TilerCloseButton');
 
     if(LeftPosition)
     {
@@ -593,9 +595,13 @@ function AddCloseButoon(Container, LeftPosition)
         $(TilerCloseButton).addClass("RightCloseButton");
     }
     
-
-    var LeftCloseBar = getDomOrCreateNew("LeftCloseBar");
-    var RightCloseBar = getDomOrCreateNew("RightCloseBar");
+    let leftClosebarId ="LeftCloseBar"+counterId;
+    let rightClosebarId ="RightCloseBar"+counterId;
+    let LeftCloseBar = getDomOrCreateNew(leftClosebarId);
+    let RightCloseBar = getDomOrCreateNew(rightClosebarId);
+    
+    $(LeftCloseBar).addClass("LeftCloseBar");
+    $(RightCloseBar).addClass("RightCloseBar");
 
     TilerCloseButton.onclick = function (e) {
         e.stopPropagation();
@@ -606,14 +612,21 @@ function AddCloseButoon(Container, LeftPosition)
     
 
     Container.appendChild(TilerCloseButton);
+    return TilerCloseButton;
 }
 
-AddCloseButoon.HideClosButton=function()
+AddCloseButoon.HideClosButton = function()
 {
     var TilerCloseButton = getDomOrCreateNew("TilerCloseButton");
     $(TilerCloseButton).addClass("setAsDisplayNone");
-}
+};
 
+
+AddCloseButoon.CloseCounter = 0;
+AddCloseButoon.getId = () => {
+    AddCloseButoon.CloseCounter+=1;
+    return AddCloseButoon.CloseCounter;
+}
 function RevealControlPanelSection(SelectedEvents)
 {
     //global_ExitManager.triggerLastExitAndPop();
@@ -3963,7 +3976,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                         let previewDom = getDomOrCreateNew("InlineDayPreviewContainer");
                         let preview = PreviewtDataDict [SubEvent.ID];
                         if(!preview) {
-                            let preview = new Preview(SubEvent.ID, previewDom.Dom);
+                            preview = new Preview(SubEvent.ID, previewDom.Dom);
                             PreviewtDataDict[SubEvent.ID] = preview;
                         }
                         preview.editSubEvent();
@@ -4550,6 +4563,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                         $(PreviewModal).removeClass("active");
                         $(PreviewModal).addClass("inActive");
                     }
+                    debugger
                     let closePreviewButton = getDomOrCreateNew("closePreview");
                     closePreviewButton.innerHTML = "Close"
                     closePreviewButton.onclick = closePreview;
