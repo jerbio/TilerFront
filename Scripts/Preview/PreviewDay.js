@@ -296,9 +296,9 @@ class PreviewDay {
             let dayData = dayToData[dayIndex];
             if(isUndefinedOrNull(dayData)) {
 
-                let tardyDelta = afterTardy.length;
-                let conflictDelta = afterConflict.length;
-                let sleepDelta = afterSleep.duration;
+                let tardyDelta = (afterDayData.tardy || []).length;
+                let conflictDelta = (afterDayData.conflicts || []).length;
+                let sleepDelta = afterDayData.duration;
                 afterDayData.tardyDelta = tardyDelta;
                 afterDayData.conflictDelta = conflictDelta;
                 afterDayData.sleepDelta = sleepDelta;

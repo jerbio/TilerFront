@@ -6,7 +6,7 @@
         this.previewDays = [];
         this.isLoading = false;
         this.previewEventId = eventId;
-        this.currentRequests = [];
+        this.currentRequests = [];        
     }
 
     _beforePreviewRequest () {
@@ -53,7 +53,7 @@
             success: (response) => {
                 let previewDays = PreviewDay.convertPreviewResponseToPreviewDays(response.Content);
                 this.processPreviewDays(previewDays);    
-                this.show();
+                // this.show();
                 this.endLoading();
             },
             error: (err) => {
@@ -245,10 +245,11 @@
         $(this.UIContainer.parentNode).addClass("inActive");
         $(this.UIContainer).empty();
         this._beforePreviewRequest();
+        $(this.UIContainer.parentNode).removeClass('loaded');
     }
 
     sleepRendering(previewDay) {
-        if(previewDay.sleep) {
+        // if(previewDay.sleep) {
             
             let sleepData = this.sleepData;
             if(!sleepData) {
@@ -266,6 +267,7 @@
                 let sleepContainer = getDomOrCreateNew(sleepContainerDomId);
                 daySleepInfo.container = sleepContainer;
                 $(daySleepInfo.container).addClass("day-preview-sleep-container");
+                $(daySleepInfo.container).addClass("hidden");
 
                 let sleepColorContainerDomId = "day-preview-sleep-color-container-" + daySleepInfo.id;
                 let sleepColorContainerDom = getDomOrCreateNew(sleepColorContainerDomId);
@@ -288,49 +290,51 @@
             }
 
             // daySleepInfo.TextDom.innerHTML = moment.duration(previewDay.sleep.duration, 'milliseconds').humanize();
+            if(previewDay.sleep) {
+                let sleepDuration = previewDay.sleep.duration/OneHourInMs;
 
-            let sleepDuration = previewDay.sleep.duration/OneHourInMs;
+                let goodSleep = 6;
+                let needMoreSleep = 4;
+                let badSleep = 2;
 
-            let goodSleep = 6;
-            let needMoreSleep = 4;
-            let badSleep = 2;
-
-            let goodSleepClass="good-sleep";
-            let badSleepClass = "bad-sleep";
-            let needMoreSleepClass="need-more-sleep";
+                let goodSleepClass="good-sleep";
+                let badSleepClass = "bad-sleep";
+                let needMoreSleepClass="need-more-sleep";
 
 
-            $(daySleepInfo.container).removeClass(goodSleepClass);
-            $(daySleepInfo.container).removeClass(badSleepClass);
-            $(daySleepInfo.container).removeClass(needMoreSleepClass);
+                $(daySleepInfo.container).removeClass(goodSleepClass);
+                $(daySleepInfo.container).removeClass(badSleepClass);
+                $(daySleepInfo.container).removeClass(needMoreSleepClass);
+                $(daySleepInfo.container).removeClass("hidden");
 
-            let sleepClass = goodSleepClass
-            if(sleepDuration < goodSleep) {
-                if(sleepDuration > badSleep) {
-                    sleepClass = needMoreSleepClass
+                let sleepClass = goodSleepClass;
+                if(sleepDuration < goodSleep) {
+                    if(sleepDuration > badSleep) {
+                        sleepClass = needMoreSleepClass;
+                    }
+                    else {
+                        sleepClass = badSleepClass;
+                    }
                 }
-                else {
-                    sleepClass = badSleepClass;
-                }
+                
+
+                $(daySleepInfo.container).addClass(sleepClass);
+
+                daySleepInfo.TextDom.innerHTML = Math.round(sleepDuration);
             }
-            
-
-            $(daySleepInfo.container).addClass(sleepClass);
-
-            daySleepInfo.TextDom.innerHTML = Math.round(sleepDuration);
             
             let retValue = {
                 dom: daySleepInfo.container.Dom,
                 info: daySleepInfo
-            }
+            };
 
             return retValue;
-        } else {
-            return {
-                dom: null,
-                info: null
-            }
-        }
+        // } else {
+        //     return {
+        //         dom: null,
+        //         info: null
+        //     };
+        // }
     }
 
     conflictRendering(previewDay) {
@@ -478,12 +482,14 @@
             $(dayTardyInfo.infoCount).removeClass("setAsDisplayNone");
             $(dayTardyInfo.tardyContainer).addClass("not-on-time");
             $(dayTardyInfo.tardyContainer).removeClass("on-time");
+            $(dayTardyInfo.icon).addClass("is-tardy");
         } else {
             dayTardyInfo.infoCount.innerHTML = "";
             $(dayTardyInfo.infoCount).addClass("setAsDisplayNone");
             dayTardyInfo.infoDesc.innerHTML = "On Time";
             $(dayTardyInfo.tardyContainer).addClass("on-time");
             $(dayTardyInfo.tardyContainer).removeClass("not-on-time");
+            $(dayTardyInfo.icon).removeClass("is-tardy");
         }
         let retValue = {
             dom: dayTardyInfo.tardyContainer
@@ -565,6 +571,7 @@
 
 
     processPreviewDays(previewDays) {
+        $(this.UIContainer.parentNode).removeClass('loaded');
         if(previewDays && Array.isArray(previewDays) && previewDays.length > 0) {
             let orderedPreviewDays = previewDays.sort((a,b) => { return Number(a.start) - Number(b.start); });
             let dayDoms = [];
@@ -574,6 +581,8 @@
                 dayDoms.push(dayDom);
                 this.UIContainer.appendChild(dayDom);
             }
+
+            $(this.UIContainer.parentNode).addClass('loaded');
         }
     }
 }

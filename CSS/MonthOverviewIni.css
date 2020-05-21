@@ -1623,6 +1623,14 @@ width: auto;
   min-width: 300px;
 }
 
+.leftControlPanel #PreviewModal.active {
+  left: -303px;
+  min-width: 300px;
+}
+
+.leftControlPanel #PreviewModal.active.loaded {
+  left: -643px;
+}
 
 .hideMultiSelectPanel {
     display: none;

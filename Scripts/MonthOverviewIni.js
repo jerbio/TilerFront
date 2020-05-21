@@ -2417,12 +2417,14 @@ getRefreshedData.enroll(resetEventStatusUi);
         var widthOfDayContainer = $(DayContainer).width();
         var widthOfListSubEvent = $(SubEventDom).width();
         var leftOfDayContainer = $(SubEventDom).offset().left;
-        var RightBorder = leftOfDayContainer + widthOfListSubEvent + widthOfIconSet;
+        var RightBorder = leftOfDayContainer + widthOfListSubEvent + widthOfIconSet + 540;//540 is the width of the preview modal
         var topOfSubEvent = $(SubEventDom).offset().top;
         var PossibleBottom = topOfSubEvent + heightOfIconSet + 36;//extra 36 is save button
         var LeftOffset=0
+        let isOnLeft = false
         if (RightBorder > documentWidth) {
             LeftOffset = leftOfDayContainer - widthOfIconSet// - buffer
+            isOnLeft = true
         }
         else
         {
@@ -2438,6 +2440,19 @@ getRefreshedData.enroll(resetEventStatusUi);
 
         ControlPanelContainer.style.top = topOfSubEvent + "px";
         ControlPanelContainer.style.left = LeftOffset + "px";
+        if(isOnLeft) {
+            $(ControlPanelContainer).addClass('leftControlPanel')
+            $(ControlPanelContainer).removeClass('rightControlPanel')
+        } else {
+            $(ControlPanelContainer).removeClass('leftControlPanel')
+            $(ControlPanelContainer).addClass('rightControlPanel')
+        }
+        
+
+
+        
+        
+        
         /*
         setTimeout(
             function ()
