@@ -477,16 +477,20 @@
         }
 
         if(previewDay.tardy && previewDay.tardy.length > 0) {
+            let title = previewDay.tardy.map((tardy) => tardy.SubCalEvent.name || 'Busy').join(',  ');
             dayTardyInfo.infoCount.innerHTML = previewDay.tardy.length;
             dayTardyInfo.infoDesc.innerHTML = "Late";
+            dayTardyInfo.tardyContainer.setAttribute("Title", title);
             $(dayTardyInfo.infoCount).removeClass("setAsDisplayNone");
             $(dayTardyInfo.tardyContainer).addClass("not-on-time");
             $(dayTardyInfo.tardyContainer).removeClass("on-time");
             $(dayTardyInfo.icon).addClass("is-tardy");
         } else {
+            let title = '';
             dayTardyInfo.infoCount.innerHTML = "";
             $(dayTardyInfo.infoCount).addClass("setAsDisplayNone");
             dayTardyInfo.infoDesc.innerHTML = "On Time";
+            dayTardyInfo.tardyContainer.setAttribute("Title", title);
             $(dayTardyInfo.tardyContainer).addClass("on-time");
             $(dayTardyInfo.tardyContainer).removeClass("not-on-time");
             $(dayTardyInfo.icon).removeClass("is-tardy");
