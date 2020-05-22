@@ -1525,6 +1525,7 @@ width: auto;
   -webkit-box-shadow: 10px 10px 30px 0px rgba(128,128,128,1);
   -moz-box-shadow: 10px 10px 30px 0px rgba(128,128,128,1);
   box-shadow: 10px 10px 30px 0px rgba(128,128,128,1);
+  height: 275px;
 }
 
 
@@ -1544,6 +1545,10 @@ width: auto;
   -moz-transition: all .2s ease-in-out;
   transition: all .2s ease-in-out;
   cursor: pointer;
+}
+
+#previewProcrastinateAllButton {
+  width: 92%;
 }
 
 

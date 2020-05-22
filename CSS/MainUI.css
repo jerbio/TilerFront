@@ -1044,6 +1044,32 @@ width: 20px;
     padding-right: 80px;
 }
 
+#ProcrastinateAllPreviewInline {
+    display: inline-flex;
+    max-width: 540px;
+    top: 0px;
+    position: relative;
+    overflow: auto;
+    height: 465px;
+    padding-right: 80px;
+}
+#ProcrastinateAllPreviewTitle {
+    top: 15px;
+    position: relative;
+    margin-left: 25px;
+    font-weight: bolder;
+    font-size: 25px;
+}
+
+
+#ProcrastinateAllPreviewContainer {
+    background: white;
+    width: fit-content;
+    position: relative;
+    border: solid 1px gray;
+    min-width: 380px;
+}
+
 .preview-day-whole-container {
     width: 215px;
     margin: 50px 25px 0 25px;

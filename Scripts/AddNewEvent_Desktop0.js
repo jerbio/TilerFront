@@ -288,7 +288,7 @@ function generateProcrastinateAllDoms() {
 
     ProcrastinateAllDomButtonContainer.Dom.appendChild(submitButton.Dom);
     ProcrastinateAllDomButtonContainer.Dom.appendChild(cancelButton.Dom);
-    // ProcrastinateAllDomButtonContainer.Dom.appendChild(previewProcrastinateAllButton.Dom);
+    ProcrastinateAllDomButtonContainer.Dom.appendChild(previewProcrastinateAllButton.Dom);
 
     $(submitButton.Dom).click(function (event) {//stops clicking of add event button from triggering a new modal dom
         event.stopPropagation();
@@ -303,12 +303,21 @@ function generateProcrastinateAllDoms() {
     });
 
     let ProcrastinateAllDomPreviewContainerId = "ProcrastinateAllPreviewContainer";
+    let ProcrastinateAllPreviewTitleId = "ProcrastinateAllPreviewTitle";
+    let ProcrastinateAllPreviewInlineId = "ProcrastinateAllPreviewInline";
+    
     let ProcrastinateAllDomPreviewContainer = getDomOrCreateNew(ProcrastinateAllDomPreviewContainerId);
+    let ProcrastinateAllPreviewTitle = getDomOrCreateNew(ProcrastinateAllPreviewTitleId);
+    ProcrastinateAllPreviewTitle.innerHTML = "Week Forecast"
+    let ProcrastinateAllPreviewInline = getDomOrCreateNew(ProcrastinateAllPreviewInlineId);
 
     ProcrastinateAllUserInputContainer.Dom.appendChild(ProcrastinateAllDomInputContainer);
     ProcrastinateAllUserInputContainer.Dom.appendChild(ProcrastinateAllDomButtonContainer);
     procrastinateAllDom.Dom.appendChild(ProcrastinateAllUserInputContainer);
     procrastinateAllDom.Dom.appendChild(ProcrastinateAllDomPreviewContainer);
+
+    ProcrastinateAllDomPreviewContainer.Dom.appendChild(ProcrastinateAllPreviewTitle);
+    ProcrastinateAllDomPreviewContainer.Dom.appendChild(ProcrastinateAllPreviewInline);
 
     let retValue = {
         container: procrastinateAllDom,
@@ -334,7 +343,7 @@ function generateProcrastinateAllDoms() {
 
 
     $(previewProcrastinateAllButton.Dom).click(() => {
-        let preview = new Preview(null, ProcrastinateAllDomPreviewContainer);
+        let preview = new Preview(null, ProcrastinateAllPreviewInline);
         preview.procrastinateAll();
     });
 

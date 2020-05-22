@@ -81,60 +81,45 @@
         this._beforePreviewRequest();
         this.show();
         this.startLoading();
-        let endLoading = this.endLoading;
+        // let endLoading = this.endLoading;
 
 
         
 
-        setTimeout(() => {
-            let previewDays = Preview.generateRandomPreviewDays();
-            this.processPreviewDays(previewDays);
-            this.show();
-            this.endLoading();
-        }, 500);
+        // setTimeout(() => {
+        //     let previewDays = Preview.generateRandomPreviewDays();
+        //     this.processPreviewDays(previewDays);
+        //     this.show();
+        //     this.endLoading();
+        // }, 500);
         
 
-        // let request = $.ajax({
-        //     type: "POST",
-        //     url: Url,
-        //     data: postData,
-        //     // DO NOT SET CONTENT TYPE to json
-        //     // contentType: "application/json; charset=utf-8", 
-        //     // DataType needs to stay, otherwise the response object
-        //     // will be treated as a single string
-        //     //dataType: "json",
-        //     success: (response) => {
-        //         //PreviewDay.processPreviewRequest(response.Content);
-        //         let previewDays = PreviewDay.convertPreviewResponseToPreviewDays(response.Content);
-        //         this.processPreviewDays(previewDays);    
-        //         this.show();
-        //         var myContainer = (response);
-        //         if (myContainer.Error.code == 0) {
-        //             //exitSelectedEventScreen();
-        //         }
-        //         else {
-        //             var NewMessage = myContainer.Error && myContainer.Error.code && myContainer.Error.Message ? myContainer.Error.Message : "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
-        //             var ExitAfter = {
-        //                 ExitNow: true, Delay: 5000
-        //             };
-        //         }
-        //         this.endLoading();
-        //     },
-        //     error: (err) => {
-        //         var myError = err;
-        //         var step = "err";
-        //         var NewMessage = err.Error && err.Error.code && err.Error.Message ? err.Error.Message : "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
-        //         var ExitAfter = {
-        //             ExitNow: true, Delay: 1000
-        //         };
-        //         this.endLoading();
-        //     }
+        let request = $.ajax({
+            type: "POST",
+            url: Url,
+            data: postData,
+            // DO NOT SET CONTENT TYPE to json
+            // contentType: "application/json; charset=utf-8", 
+            // DataType needs to stay, otherwise the response object
+            // will be treated as a single string
+            //dataType: "json",
+            success: (response) => {
+                let previewDays = PreviewDay.convertPreviewResponseToPreviewDays(response.Content);
+                this.processPreviewDays(previewDays);    
+                // this.show();
+                this.endLoading();
+            },
+            error: (err) => {
+                this.showError();
+                this.endLoading();
+            }
 
-        // }).done(
-        //     () => {
-        //         this._afterPreveiwRequestCompletes();
-        //     }
-        // );
+        }).done(
+            () => {
+                this._afterPreveiwRequestCompletes();
+            }
+        );
+        this.currentRequests.push(request);
     }
 
     procrastinateAll() {
@@ -161,29 +146,13 @@
             // will be treated as a single string
             //dataType: "json",
             success: (response) => {
-                //PreviewDay.processPreviewRequest(response.Content);
                 let previewDays = PreviewDay.convertPreviewResponseToPreviewDays(response.Content);
                 this.processPreviewDays(previewDays);    
-                this.show();
-                var myContainer = (response);
-                if (myContainer.Error.code == 0) {
-                    //exitSelectedEventScreen();
-                }
-                else {
-                    var NewMessage = myContainer.Error && myContainer.Error.code && myContainer.Error.Message ? myContainer.Error.Message : "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
-                    var ExitAfter = {
-                        ExitNow: true, Delay: 5000
-                    };
-                }
+                // this.show();
                 this.endLoading();
             },
             error: (err) => {
-                var myError = err;
-                var step = "err";
-                var NewMessage = err.Error && err.Error.code && err.Error.Message ? err.Error.Message : "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
-                var ExitAfter = {
-                    ExitNow: true, Delay: 1000
-                };
+                this.showError();
                 this.endLoading();
             }
 
@@ -220,7 +189,7 @@
         this.isLoading = true;
         let loadingBarId = "PreviewLoading";
         let loadingBar = getDomOrCreateNew(loadingBarId);
-        $(loadingBar).addClass("active")
+        $(loadingBar).addClass("active");
     }
 
     endLoading() {
