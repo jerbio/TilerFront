@@ -1547,7 +1547,7 @@ width: auto;
   cursor: pointer;
 }
 
-#previewProcrastinateAllButton {
+button#previewProcrastinateAllButton{
   width: 92%;
 }
 

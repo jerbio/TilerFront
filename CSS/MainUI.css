@@ -1068,6 +1068,8 @@ width: 20px;
     position: relative;
     border: solid 1px gray;
     min-width: 380px;
+    right: 101%;
+    bottom: 101%;
 }
 
 .preview-day-whole-container {
@@ -1231,21 +1233,25 @@ width: 20px;
     padding: 10px 0px 0 5px;
 }
 
-#PreviewLoading {
-    width: 85%;
+#PreviewLoading,
+.slide-loading-bar-container {
+    width: 90%;
     height: 5px;
     top: 5px;
     position: absolute;
     display: none;
-    left: 10%;
+    left: 5%;
     overflow: hidden;
 }
 
-#PreviewLoading.active {
+#PreviewLoading.active,
+.slide-loading-bar-container.active {
     display: block;
 }
 
-#PreviewSliderLoadingBar {
+#PreviewSliderLoadingBar,
+.loading-bar-slider
+ {
     border-top: 5px solid rgb(100, 100, 100);
     width: 30%;
     height: 5px;

@@ -6,7 +6,15 @@
         this.previewDays = [];
         this.isLoading = false;
         this.previewEventId = eventId;
-        this.currentRequests = [];        
+        this.currentRequests = [];
+        let loadingId = 'loading-bar-container-' + generateUUID();
+        this.loadingContainerDom_ = getDomOrCreateNew(loadingId);
+        $(this.loadingContainerDom_).addClass('slide-loading-bar-container');
+        let slidingLoadingBarId = 'loading-bar-slide-' + generateUUID();
+        this.slidingLoadingDom_ = getDomOrCreateNew(slidingLoadingBarId);
+        $(this.slidingLoadingDom_).addClass('loading-bar-slider');
+        this.loadingDom.appendChild(this.slidingLoadingDom);
+        this.UIContainer.parentNode.appendChild(this.loadingDom);
     }
 
     _beforePreviewRequest () {
@@ -26,6 +34,14 @@
 
     showError(response) {
 
+    }
+
+    get loadingDom() {
+        return this.loadingContainerDom_;
+    }
+
+    get slidingLoadingDom() {
+        return this.slidingLoadingDom_;
     }
 
     editSubEvent() {
@@ -188,14 +204,14 @@
     startLoading() {
         this.isLoading = true;
         let loadingBarId = "PreviewLoading";
-        let loadingBar = getDomOrCreateNew(loadingBarId);
+        let loadingBar = this.loadingDom;
         $(loadingBar).addClass("active");
     }
 
     endLoading() {
         this.isLoading = false;
         let loadingBarId = "PreviewLoading";
-        let loadingBar = getDomOrCreateNew(loadingBarId);
+        let loadingBar = this.loadingDom;
         $(loadingBar).removeClass("active");
     }
 
@@ -218,92 +234,84 @@
     }
 
     sleepRendering(previewDay) {
-        // if(previewDay.sleep) {
-            
-            let sleepData = this.sleepData;
-            if(!sleepData) {
-                this.sleepData = {};
-                sleepData = this.sleepData;
-            }
-            let dayStart = previewDay.start;
-            let daySleepInfo = sleepData[dayStart];
-            if (!daySleepInfo) {
-                daySleepInfo = {
-                    id: globalCounter()
-                };
-                sleepData[dayStart] = daySleepInfo;
-                let sleepContainerDomId = "day-preview-sleep-container-" + daySleepInfo.id;
-                let sleepContainer = getDomOrCreateNew(sleepContainerDomId);
-                daySleepInfo.container = sleepContainer;
-                $(daySleepInfo.container).addClass("day-preview-sleep-container");
-                $(daySleepInfo.container).addClass("hidden");
-
-                let sleepColorContainerDomId = "day-preview-sleep-color-container-" + daySleepInfo.id;
-                let sleepColorContainerDom = getDomOrCreateNew(sleepColorContainerDomId);
-                daySleepInfo.colorContainer = sleepColorContainerDom;
-                $(daySleepInfo.colorContainer).addClass("day-preview-sleep-color-container");
-
-                let sleepTextContainerDomId = "day-preview-sleep-text-container-" + daySleepInfo.id;
-                let sleepTextContainerDom = getDomOrCreateNew(sleepTextContainerDomId);
-                daySleepInfo.TextContainer = sleepTextContainerDom;
-                $(daySleepInfo.TextContainer).addClass("day-preview-sleep-text-container");
-
-                let sleepTextDomId = "day-preview-sleep-text-" + daySleepInfo.id;
-                let sleepTextDom = getDomOrCreateNew(sleepTextDomId, "span");
-                daySleepInfo.TextDom = sleepTextDom;
-                $(daySleepInfo.TextDom).addClass("day-preview-sleep-text");
-                
-                daySleepInfo.TextContainer.Dom.appendChild(daySleepInfo.TextDom);
-                daySleepInfo.container.Dom.appendChild(daySleepInfo.colorContainer.Dom);
-                daySleepInfo.container.Dom.appendChild(daySleepInfo.TextContainer.Dom);
-            }
-
-            // daySleepInfo.TextDom.innerHTML = moment.duration(previewDay.sleep.duration, 'milliseconds').humanize();
-            if(previewDay.sleep) {
-                let sleepDuration = previewDay.sleep.duration/OneHourInMs;
-
-                let goodSleep = 6;
-                let needMoreSleep = 4;
-                let badSleep = 2;
-
-                let goodSleepClass="good-sleep";
-                let badSleepClass = "bad-sleep";
-                let needMoreSleepClass="need-more-sleep";
-
-
-                $(daySleepInfo.container).removeClass(goodSleepClass);
-                $(daySleepInfo.container).removeClass(badSleepClass);
-                $(daySleepInfo.container).removeClass(needMoreSleepClass);
-                $(daySleepInfo.container).removeClass("hidden");
-
-                let sleepClass = goodSleepClass;
-                if(sleepDuration < goodSleep) {
-                    if(sleepDuration > badSleep) {
-                        sleepClass = needMoreSleepClass;
-                    }
-                    else {
-                        sleepClass = badSleepClass;
-                    }
-                }
-                
-
-                $(daySleepInfo.container).addClass(sleepClass);
-
-                daySleepInfo.TextDom.innerHTML = Math.round(sleepDuration);
-            }
-            
-            let retValue = {
-                dom: daySleepInfo.container.Dom,
-                info: daySleepInfo
+        let sleepData = this.sleepData;
+        if(!sleepData) {
+            this.sleepData = {};
+            sleepData = this.sleepData;
+        }
+        let dayStart = previewDay.start;
+        let daySleepInfo = sleepData[dayStart];
+        if (!daySleepInfo) {
+            daySleepInfo = {
+                id: globalCounter()
             };
+            sleepData[dayStart] = daySleepInfo;
+            let sleepContainerDomId = "day-preview-sleep-container-" + daySleepInfo.id;
+            let sleepContainer = getDomOrCreateNew(sleepContainerDomId);
+            daySleepInfo.container = sleepContainer;
+            $(daySleepInfo.container).addClass("day-preview-sleep-container");
+            $(daySleepInfo.container).addClass("hidden");
 
-            return retValue;
-        // } else {
-        //     return {
-        //         dom: null,
-        //         info: null
-        //     };
-        // }
+            let sleepColorContainerDomId = "day-preview-sleep-color-container-" + daySleepInfo.id;
+            let sleepColorContainerDom = getDomOrCreateNew(sleepColorContainerDomId);
+            daySleepInfo.colorContainer = sleepColorContainerDom;
+            $(daySleepInfo.colorContainer).addClass("day-preview-sleep-color-container");
+
+            let sleepTextContainerDomId = "day-preview-sleep-text-container-" + daySleepInfo.id;
+            let sleepTextContainerDom = getDomOrCreateNew(sleepTextContainerDomId);
+            daySleepInfo.TextContainer = sleepTextContainerDom;
+            $(daySleepInfo.TextContainer).addClass("day-preview-sleep-text-container");
+
+            let sleepTextDomId = "day-preview-sleep-text-" + daySleepInfo.id;
+            let sleepTextDom = getDomOrCreateNew(sleepTextDomId, "span");
+            daySleepInfo.TextDom = sleepTextDom;
+            $(daySleepInfo.TextDom).addClass("day-preview-sleep-text");
+            
+            daySleepInfo.TextContainer.Dom.appendChild(daySleepInfo.TextDom);
+            daySleepInfo.container.Dom.appendChild(daySleepInfo.colorContainer.Dom);
+            daySleepInfo.container.Dom.appendChild(daySleepInfo.TextContainer.Dom);
+        }
+
+        // daySleepInfo.TextDom.innerHTML = moment.duration(previewDay.sleep.duration, 'milliseconds').humanize();
+        if(previewDay.sleep) {
+            let sleepDuration = previewDay.sleep.duration/OneHourInMs;
+
+            let goodSleep = 6;
+            let needMoreSleep = 4;
+            let badSleep = 2;
+
+            let goodSleepClass="good-sleep";
+            let badSleepClass = "bad-sleep";
+            let needMoreSleepClass="need-more-sleep";
+
+
+            $(daySleepInfo.container).removeClass(goodSleepClass);
+            $(daySleepInfo.container).removeClass(badSleepClass);
+            $(daySleepInfo.container).removeClass(needMoreSleepClass);
+            $(daySleepInfo.container).removeClass("hidden");
+
+            let sleepClass = goodSleepClass;
+            if(sleepDuration < goodSleep) {
+                if(sleepDuration > badSleep) {
+                    sleepClass = needMoreSleepClass;
+                }
+                else {
+                    sleepClass = badSleepClass;
+                }
+            }
+            
+
+            $(daySleepInfo.container).addClass(sleepClass);
+
+            daySleepInfo.TextDom.innerHTML = Math.round(sleepDuration);
+        }
+        
+        let retValue = {
+            dom: daySleepInfo.container.Dom,
+            info: daySleepInfo
+        };
+
+        return retValue;
     }
 
     conflictRendering(previewDay) {
@@ -502,7 +510,7 @@
             let toDayBeginning = new Date().setHours(0,0,0,0);
             let tomorrow = toDayBeginning + OneDayInMs;
             let dayOfWeekString = WeekDays[new Date(dayStart).getDay()];
-            dayOfWeekString = dayOfWeekString.substring(0, 3) +"  "+ (new Date(dayStart).getMonth()+1) +"/"+ (new Date(dayStart).getDate()+1)
+            dayOfWeekString = dayOfWeekString.substring(0, 3) +"  "+ (new Date(dayStart).getMonth()+1) +"/"+ (new Date(dayStart).getDate());
             if(tomorrow ===  dayStart) {
                 dayOfWeekString = "Tomorrow";
             }
@@ -548,6 +556,7 @@
         if(previewDays && Array.isArray(previewDays) && previewDays.length > 0) {
             let orderedPreviewDays = previewDays.sort((a,b) => { return Number(a.start) - Number(b.start); });
             let dayDoms = [];
+            this.UIContainer.innerHTML = '';
             for (let i=0; i< orderedPreviewDays.length; i++) {
                 let previewDay = orderedPreviewDays[i];
                 let dayDom = this.generateDayDom(previewDay);

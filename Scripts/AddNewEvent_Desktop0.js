@@ -308,7 +308,7 @@ function generateProcrastinateAllDoms() {
     
     let ProcrastinateAllDomPreviewContainer = getDomOrCreateNew(ProcrastinateAllDomPreviewContainerId);
     let ProcrastinateAllPreviewTitle = getDomOrCreateNew(ProcrastinateAllPreviewTitleId);
-    ProcrastinateAllPreviewTitle.innerHTML = "Week Forecast"
+    ProcrastinateAllPreviewTitle.innerHTML = "Week Forecast";
     let ProcrastinateAllPreviewInline = getDomOrCreateNew(ProcrastinateAllPreviewInlineId);
 
     ProcrastinateAllUserInputContainer.Dom.appendChild(ProcrastinateAllDomInputContainer);
@@ -318,6 +318,7 @@ function generateProcrastinateAllDoms() {
 
     ProcrastinateAllDomPreviewContainer.Dom.appendChild(ProcrastinateAllPreviewTitle);
     ProcrastinateAllDomPreviewContainer.Dom.appendChild(ProcrastinateAllPreviewInline);
+    $(ProcrastinateAllDomPreviewContainer).addClass("setAsDisplayNone")
 
     let retValue = {
         container: procrastinateAllDom,
@@ -343,6 +344,7 @@ function generateProcrastinateAllDoms() {
 
 
     $(previewProcrastinateAllButton.Dom).click(() => {
+        $(ProcrastinateAllDomPreviewContainer).removeClass("setAsDisplayNone");
         let preview = new Preview(null, ProcrastinateAllPreviewInline);
         preview.procrastinateAll();
     });
