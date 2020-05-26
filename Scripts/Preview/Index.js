@@ -120,6 +120,12 @@
             // will be treated as a single string
             //dataType: "json",
             success: (response) => {
+                if(response && response.Error && !(response.Error.code === 0 || response.Error.code === "0")) {
+                    alert(response.Error.Message);
+                    // let previewDays = PreviewDay.convertPreviewResponseToPreviewDays(response.Content);
+                    // this.processPreviewDays(previewDays);
+                    return;
+                }
                 let previewDays = PreviewDay.convertPreviewResponseToPreviewDays(response.Content);
                 this.processPreviewDays(previewDays);    
                 // this.show();
@@ -132,6 +138,7 @@
 
         }).done(
             () => {
+                this.endLoading();
                 this._afterPreveiwRequestCompletes();
             }
         );
@@ -150,7 +157,6 @@
         this._beforePreviewRequest();
         this.show();
         this.startLoading();
-        let endLoading = this.endLoading;
 
         let request = $.ajax({
             type: "POST",
@@ -162,6 +168,14 @@
             // will be treated as a single string
             //dataType: "json",
             success: (response) => {
+                if(response && response.Error && !(response.Error.code === 0 || response.Error.code === "0")) {
+                    alert(response.Error.Message);
+                    // let previewDays = PreviewDay.convertPreviewResponseToPreviewDays(response.Content);
+                    // this.processPreviewDays(previewDays);
+                    return;
+                }
+
+
                 let previewDays = PreviewDay.convertPreviewResponseToPreviewDays(response.Content);
                 this.processPreviewDays(previewDays);    
                 // this.show();
@@ -174,6 +188,7 @@
 
         }).done(
             () => {
+                this.endLoading();
                 this._afterPreveiwRequestCompletes();
             }
         );

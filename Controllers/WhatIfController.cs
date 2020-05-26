@@ -104,7 +104,8 @@ namespace TilerFront.Controllers
                 }
                 catch (CustomErrors error)
                 {
-                    return BadRequest(error.Message);
+                    returnPostBack = new PostBackData(error);
+                    return Ok(returnPostBack.getPostBack);
                 }
                 
             }
