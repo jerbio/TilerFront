@@ -45,6 +45,9 @@ namespace TilerFront.Controllers
             if(logControl.Now== null)
             {
                 logControl.Now = new ReferenceNow(DateTimeOffset.UtcNow, logControl.getTilerRetrievedUser().EndfOfDay, logControl.getTilerRetrievedUser().TimeZoneDifference);
+            } else
+            {
+                logControl.Now = new ReferenceNow(logControl.Now.constNow, logControl.getTilerRetrievedUser().EndfOfDay, logControl.getTilerRetrievedUser().TimeZoneDifference);
             }
             DateTimeOffset nowTime = logControl.Now.constNow;
             TimeLine timeline = new TimeLine(logControl.Now.constNow.AddDays(-45), logControl.Now.constNow.AddDays(45));
