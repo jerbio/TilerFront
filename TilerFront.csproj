@@ -662,8 +662,8 @@
     <Content Include="Content\bootstrap-grid.css.map" />
     <None Include="Properties\PublishProfiles\mytilerkid - FTP.pubxml" />
     <None Include="Properties\PublishProfiles\mytilerkid - FTP1.pubxml" />
+    <None Include="Properties\PublishProfiles\mytilerkid - LaptopDeploy.pubxml" />
     <None Include="Properties\PublishProfiles\mytilerkid - Web Deploy - DesktopDeploy.pubxml" />
-    <None Include="Properties\PublishProfiles\mytilerkid - Web Deploy - LaptopDeploy.pubxml" />
     <Content Include="Scripts\index.js.flow" />
     <Content Include="Scripts\esm\popper.min.js.map" />
     <Content Include="Scripts\esm\popper.js.map" />
