@@ -1773,10 +1773,10 @@ function getRefreshedData(CallBackAfterRefresh)//RangeData)
 {
     //setTimeout(refreshIframe,200);
     
-    if (--refreshCounter < 0)//debugging counter. THis allows us to set a max number of refreshes before stopping calls to backend
-    {
-        return;
-    }
+    // if (--refreshCounter < 0)//debugging counter. THis allows us to set a max number of refreshes before stopping calls to backend
+    // {
+    //     return;
+    // }
     refreshCounter = 0
     StopPullingData();
     monthViewResetData();
@@ -1988,7 +1988,6 @@ getRefreshedData.pauseUnEnroll = function (Id) {
     //essentially returns a function that structuralizes the data for month grid
         return function (NewData)
         {
-            //NewData = JSON.parse(NewData);
             var PerformanceStart = new Date();
             NewData = NewData.Content;
             ActiveSubEvents = new Array();
@@ -2050,21 +2049,6 @@ getRefreshedData.pauseUnEnroll = function (Id) {
 
     function PopulateMonthGrid(NewData, RangeData)
     {
-        //populates the grid with the provided grid data
-        /*var encasingDOm = document.getElementById("FullWeekContainer");
-        var RangeData = PopulateUI(encasingDOm);*/
-        //genFunctionForSelectCalendarRange(RangeData, 1)();
-        /*PopulateMonthGrid
-        NewData.Schedule.RepeatCalendarEvent.forEach(function (RepeatCalendarEvent) {
-            RepeatCalendarEvent.RepeatCalendarEvents.forEach(
-                function (repeatCalEvent) {
-                    repeatCalEvent.AllSubCalEvents.forEach(
-                        function (subEvent) {
-                            getMyPositionFromRange(subEvent, RangeData);
-                        })
-                })
-        })
-        //*/
         var PerformanceStart = new Date();
         global_CurrentWeekArrangedData.forEach(
             function (WeekRange) {

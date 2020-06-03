@@ -15,6 +15,7 @@ class PageNotification {
             subEvent: null,
             time: null
         };
+        this.isEnabled = true;
     }
 
     get isGranted() {
@@ -60,7 +61,7 @@ class PageNotification {
         let subEventsAfterNow = this.subEventList.filter((subEvent) => subEvent.Start > currentTime );
         subEventsAfterNow.sort((subEventA, subEventB) => { return subEventA.Start - subEventB.Start;});
         subEventsAfterNow.forEach((subEvent) => {
-            this.dictOfSubEvents[subEvent.Id] = subEvent;
+            this.dictOfSubEvents[subEvent.ID] = subEvent;
         });
         if(subEventsAfterNow.length > 0) {
             for(let i =0; i < subEventsAfterNow.length; i++) {
@@ -73,28 +74,48 @@ class PageNotification {
     }
 
     dispatchNotification(subEvent) {
+        let checkIfIsStillNext = (subEvent) => {
+            this.dispatchNotification.isWaitingOnTimeVerification = true;
+            let callBackAfterRefresh = () => {
+                let postRefreshSubEvent = this.dictOfSubEvents[subEvent.ID];
+                if (postRefreshSubEvent) {
+                    let subEventStart = subEvent.SubCalStartDate.getTime();
+                    let postRefreshStart = postRefreshSubEvent.SubCalStartDate.getTime();
+                    if (postRefreshStart == subEventStart) {
+                        if (this.isGranted) {
+                            let durationString = moment.duration(TenMinInMs, 'milliseconds').humanize();
+                            let notificationTitle = subEvent.Name + " starts in " + durationString;
+                            let notification = new Notification(notificationTitle);
+                            this.dispachedNotifications.push(notification);
+                        }
+                    }
+                }
+                this.dispatchNotification.isWaitingOnTimeVerification = false;
+                this.processListOfSubEvents();
+            };
+            getRefreshedData(callBackAfterRefresh);
+
+
+        };
+
         let currentTimeInMS = Date.now();
         let subEventStart = subEvent.SubCalStartDate.getTime();
         let notificationStart = (subEventStart - TenMinInMs) - currentTimeInMS;
-        if(notificationStart > 0) {
-            let durationString = moment.duration(TenMinInMs, 'milliseconds').humanize();
+        if(notificationStart > 0 && notificationStart < OneWeekInMs) {
             this.nextSubEventNotification.subEvent = subEvent;
             this.nextSubEventNotification.time = currentTimeInMS + notificationStart;
-            let currentTimeOut = setTimeout(() => {
-                let notificationTitle = subEvent.Name + " starts in " + durationString;
-                if (this.isGranted) {
-                    let notification = new Notification(notificationTitle);
-                    this.dispachedNotifications.push(notification);
-                    this.processListOfSubEvents();
-                }
-                
-
-            }, notificationStart);
-            this.activeTimers.push(currentTimeOut);
+            if(!this.dispatchNotification.isWaitingOnTimeVerification) {
+                let currentTimeOut = setTimeout(() => {
+                    checkIfIsStillNext(subEvent);
+                }, notificationStart);
+                this.activeTimers.push(currentTimeOut);
+            }
             return true;
         }
         return false;
     }
+
+    
 
     authenticateNotification() {
         let permissionType = {
