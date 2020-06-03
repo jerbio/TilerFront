@@ -8,3 +8,6 @@ WagTapCalLogs/*
 WagTapCalLogs
 bin
 .vsCode/*
+Properties/PublishProfiles/mytilerkid - LaptopDeploy.pubxml
+Properties/PublishProfiles/mytilerkid - LaptopDeploy.pubxml.user
+Properties/PublishProfiles/mytilerkid - Web Deploy - DesktopDeploy.pubxml.user
