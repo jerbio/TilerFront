@@ -174,6 +174,8 @@ function generateSubEventEditPage(subEvent) {
                 var ExitAfter = { ExitNow: true, Delay: 1000 };
                 HandleNEwPage.UpdateMessage(NewMessage, ExitAfter)
             }
+        }).done(() => {
+            sendPostScheduleEditAnalysisUpdate({});
         })
     }
 

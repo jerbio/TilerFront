@@ -495,6 +495,8 @@ function sendUndoRequest(CallBack)
         dataType: "json",
         success: CallBackSuccess,
         error: CallBackFailure,
+    }).done(() => {
+        sendPostScheduleEditAnalysisUpdate({});
     })
 
     function CallBackSuccess()
@@ -1017,6 +1019,25 @@ function procrastinateSubEvent(ID, Day, Hour, Minute,CallBackSuccess,CallBackFai
     }
 }
 
+function sendPostScheduleEditAnalysisUpdate({CallBackSuccess, CallBackFailure, CallBackDone}) {
+    let TimeZone = new Date().getTimezoneOffset();
+    let postData = { UserName: UserCredentials.UserName, UserID: UserCredentials.ID, TimeZoneOffset: TimeZone };
+    let url = global_refTIlerUrl + "Analysis/Analyze";
+    preSendRequestWithLocation(postData);
+
+    var ProcrastinateRequest= $.ajax({
+        type: "POST",
+        url: url,
+        data: postData,
+        dataType: "json",
+        success: CallBackSuccess,
+        error: CallBackFailure
+    })
+    
+    if (CallBackDone != undefined) {
+        ProcrastinateRequest.done(CallBackDone);
+    }
+}
 
 function setSubCalendarEventAsNow(SubEventID, CallBackSuccess, CallBackFailure, CallBackDone)
 {
@@ -1033,10 +1054,12 @@ function setSubCalendarEventAsNow(SubEventID, CallBackSuccess, CallBackFailure, 
         success: CallBackSuccess,
         error: CallBackFailure
     })
-    
-    if (CallBackDone != undefined) {
-        ProcrastinateRequest.done(CallBackDone);
-    }
+    ProcrastinateRequest.done(() => {
+        if (CallBackDone != undefined) {
+            CallBackDone()
+        }
+        sendPostScheduleEditAnalysisUpdate({})        
+    });    
 }
 
 function SetCalendarEventAsNow(CalendarEventID, CallBackSuccess, CallBackFailure, CallBackDone) {
@@ -1054,9 +1077,12 @@ function SetCalendarEventAsNow(CalendarEventID, CallBackSuccess, CallBackFailure
         error: CallBackFailure
     })
 
-    if (CallBackDone != undefined) {
-        AjaxRequest.done(CallBackDone);
-    }
+    AjaxRequest.done(() => {
+        if (CallBackDone != undefined) {
+            CallBackDone()
+        }
+        sendPostScheduleEditAnalysisUpdate({})        
+    });
 }
 
 function deleteSubEvent(SubEventID, CallBackSuccess, CallBackFailure, CallBackDone)
@@ -1084,10 +1110,12 @@ function deleteSubEvent(SubEventID, CallBackSuccess, CallBackFailure, CallBackDo
         error: CallBackFailure
     });
 
-    if (CallBackDone != undefined)
-    {
-        AjaxRequest.done(CallBackDone);
-    }
+    AjaxRequest.done(() => {
+        if (isFunction(CallBackDone)) {
+            CallBackDone()
+        }
+        sendPostScheduleEditAnalysisUpdate({})        
+    });
 }
 
 
@@ -1114,9 +1142,12 @@ function deleteCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure, 
         error: CallBackFailure
     });
 
-    if (CallBackDone != undefined) {
-        AjaxRequest.done(CallBackDone);
-    }
+    AjaxRequest.done(() => {
+        if (isFunction(CallBackDone)) {
+            CallBackDone()
+        }
+        sendPostScheduleEditAnalysisUpdate({})        
+    });
 }
 
 function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure, CallBackDone)
@@ -1145,9 +1176,12 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
         error: CallBackFailure
     });
 
-    if (CallBackDone != undefined) {
-        AjaxRequest.done(CallBackDone);
-    }
+    AjaxRequest.done(() => {
+        if (isFunction(CallBackDone)) {
+            CallBackDone()
+        }
+        sendPostScheduleEditAnalysisUpdate({})        
+    });
 }
 
     function createEvent(EventEntry)
@@ -2748,6 +2782,7 @@ function Location(Tag, Address, LocationIsVerified, LocationId)
                 }
             }).done(function (data) {
                 HandleNEwPage.Hide();
+                sendPostScheduleEditAnalysisUpdate({});
             });
         }
         FindSomethingNewButton.onclick = reoptimizeSchedule;
@@ -3375,6 +3410,7 @@ function isUndefinedOrNull(data) {
                     CallBack()
                }
                HandleNEwPage.Hide();
+               sendPostScheduleEditAnalysisUpdate({});
            });
        }
    }

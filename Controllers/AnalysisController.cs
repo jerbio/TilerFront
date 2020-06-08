@@ -40,6 +40,29 @@ namespace TilerFront.Controllers
             return Ok(retValue.getPostBack);
         }
 
+
+        [HttpPost]
+        [ResponseType(typeof(PostBackStruct))]
+        [Route("api/Analysis/Analyze")]
+        public async Task<IHttpActionResult> UpdateCalEvent([FromBody]AuthorizedUser myUser)
+        {
+            UserAccount retrievedUser = await myUser.getUserAccount(db); //new UserAccountDirect(myUser.UserName, myUser.UserID);
+            await retrievedUser.Login();
+            retrievedUser.getTilerUser().updateTimeZoneTimeSpan(myUser.getTimeSpan);
+            PostBackData retValue;
+            if (retrievedUser.Status)
+            {
+                await SuggestionAnalysis(retrievedUser.ScheduleLogControl).ConfigureAwait(false);
+                retValue = new PostBackData(0);
+            }
+            else
+            {
+                retValue = new PostBackData("", 1);
+            }
+
+            return Ok(retValue.getPostBack);
+        }
+
         public async Task SuggestionAnalysis(LogControl logControl)
         {
             if(logControl.Now== null)
@@ -66,7 +89,8 @@ namespace TilerFront.Controllers
 
         public static async Task updateSuggestionAnalysis(LogControl logcontrol)
         {
-            await new AnalysisController().SuggestionAnalysis(logcontrol).ConfigureAwait(false);
+            return;
+            //await new AnalysisController().SuggestionAnalysis(logcontrol).ConfigureAwait(false);
         }
     }
 }

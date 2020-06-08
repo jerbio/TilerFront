@@ -124,6 +124,7 @@ function LaunchAddnewEvent(LoopBackCaller, CurrentUser,isTIle)
             var SubEventDate = new Date(data.Content.SubCalStartDate)
             var myDropDown = new DropDownNotification();
             myDropDown.ShowMessage("Earliest time for \"" + NewEvent.Name + "\" is " + SubEventDate.toLocaleString());
+            sendPostScheduleEditAnalysisUpdate({});
         });
         }
     );

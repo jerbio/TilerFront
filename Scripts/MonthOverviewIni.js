@@ -816,7 +816,7 @@ function RevealControlPanelSection(SelectedEvents)
             }).done(function (data) {
                 HandleNEwPage.Hide();
                 triggerUIUPdate();//hack alert
-                //getRefreshedData();
+                sendPostScheduleEditAnalysisUpdate({});
             });
         }
         function triggerUIUPdate() {
@@ -873,7 +873,7 @@ function RevealControlPanelSection(SelectedEvents)
                 HandleNEwPage.Hide();
                 //triggerUIUPdate();//hack alert
                 global_ExitManager.triggerLastExitAndPop();
-                //getRefreshedData();
+                sendPostScheduleEditAnalysisUpdate({});
             }
 
 
@@ -4165,7 +4165,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                         }).done(function (data) {
                             HandleNEwPage.Hide();
                             triggerUIUPdate();//hack alert
-                            //getRefreshedData();
+                            sendPostScheduleEditAnalysisUpdate({});
                         });
                     }
                     function triggerUIUPdate() {
@@ -4225,7 +4225,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                         }).done(function (data) {
                             HandleNEwPage.Hide();
                             triggerUIUPdate();//hack alert
-                            //getRefreshedData();
+                            sendPostScheduleEditAnalysisUpdate({});
                         });
                     }
                     function triggerUIUPdate() {
@@ -4303,7 +4303,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                         }).done(function (data) {
                             HandleNEwPage.Hide();
                             triggerUIUPdate();//hack alert
-                            //getRefreshedData();
+                            sendPostScheduleEditAnalysisUpdate({});
                         });
                 }
                     function triggerUIUPdate() {
@@ -4368,8 +4368,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                     }).done(function (data) {
                         HandleNEwPage.Hide();
                         triggerUIUPdate();//hack alert
-                        //getRefreshedData();
-
+                        sendPostScheduleEditAnalysisUpdate({});
                     });
 
                     function triggerUIUPdate() {
@@ -4650,6 +4649,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                             debugger;
                             HandleNEwPage.Hide();
                             triggerUIUPdate();//hack alert
+                            sendPostScheduleEditAnalysisUpdate({});
                         });
                     }
                         function triggerUIUPdate() {
@@ -4719,6 +4719,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                     }).done(function (data) {
                         debugger;
                         triggerUIUPdate();//hack alert
+                        sendPostScheduleEditAnalysisUpdate({});
                     });
 
                     function triggerUIUPdate() {
@@ -5040,7 +5041,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                         HandleNEwPage.Hide();
                         //triggerUIUPdate();//hack alert
                         global_ExitManager.triggerLastExitAndPop();
-                        //getRefreshedData();
+                        sendPostScheduleEditAnalysisUpdate({});
                     }
                     $.ajax({
                         type: "POST",
@@ -5623,7 +5624,7 @@ function GlobaPauseResumeButtonManager(events) {
             }).done(function (data) {
                 HandleNEwPage.Hide();
                 triggerUIUPdate();//hack alert
-                //getRefreshedData();
+                sendPostScheduleEditAnalysisUpdate({});
             });
         }
         function triggerUIUPdate() {
@@ -5678,7 +5679,7 @@ function GlobaPauseResumeButtonManager(events) {
             }).done(function (data) {
                 HandleNEwPage.Hide();
                 triggerUIUPdate();//hack alert
-                //getRefreshedData();
+                sendPostScheduleEditAnalysisUpdate({});
             });
         }
         function triggerUIUPdate() {

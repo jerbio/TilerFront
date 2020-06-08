@@ -1438,18 +1438,16 @@ namespace TilerFront
                 calEvent => calEvent.Id,
                 id => id,
                 (calEvent, id) => new { calEvent = calEvent, id = id }).Select(obj => obj.calEvent);
-            }
-
-            calEVents = calEVents
+                calEVents = calEVents
                     .Include(calEvent => calEvent.DataBlob_EventDB)
                     .Include(calEvent => calEvent.Name)
                     .Include(calEvent => calEvent.Name.Creator_EventDB)
-                    .Include(calEvent => calEvent.Location_DB)
                     .Include(calEvent => calEvent.Creator_EventDB)
-                    .Include(calEvent => calEvent.ProfileOfNow_EventDB)
-                    .Include(calEvent => calEvent.Procrastination_EventDB)
                     .Include(calEvent => calEvent.UiParams_EventDB.UIColor)
                     ;
+
+            }
+
             if (includeSubEvents)
             {
                 calEVents = calEVents
@@ -1480,7 +1478,10 @@ namespace TilerFront
                 calEVents = calEVents
                     .Include(calEvent => calEvent.RestrictionProfile_DB)
                     .Include(calEvent => calEvent.Procrastination_EventDB)
-                    .Include(calEvent => calEvent.DayPreference_DB);
+                    .Include(calEvent => calEvent.DayPreference_DB)
+                    .Include(calEvent => calEvent.Location_DB)
+                    .Include(calEvent => calEvent.ProfileOfNow_EventDB)
+                    ;
 
             }
             else if (retrievalOption == DataRetrivalOption.All)
@@ -1735,7 +1736,13 @@ namespace TilerFront
         /// <param name="retrievalOption"></param>
         /// <param name="tilerIds"></param>
         /// <returns></returns>
-        async public virtual Task<Dictionary<string, CalendarEvent>> getAllEnabledCalendarEvent(TimeLine RangeOfLookUP, ReferenceNow Now, bool includeUpdateHistory, bool includeSubEvents = true, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation, HashSet<string> tilerIds = null)
+        async public virtual Task<Dictionary<string, CalendarEvent>> getAllEnabledCalendarEvent(
+            TimeLine RangeOfLookUP,
+            ReferenceNow Now,
+            bool includeUpdateHistory,
+            bool includeSubEvents = true,
+            DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation,
+            HashSet<string> tilerIds = null)
         {
             if (retrievalOption == DataRetrivalOption.Evaluation)
             {
@@ -1750,7 +1757,28 @@ namespace TilerFront
                         tilerIds = new HashSet<string>();
                     }
                     var calIds = tilerIds.Select(o=> new EventID(o).getAllEventDictionaryLookup).ToArray();
-                    IQueryable<SubCalendarEvent> subCalendarEvents = getSubCalendarEventQuery(retrievalOption, includeOtherEntities: true);
+                    IQueryable<SubCalendarEvent> subCalendarEvents = getSubCalendarEventQuery(retrievalOption, includeOtherEntities: false);
+
+                    //if (System.Diagnostics.Debugger.IsAttached)
+                    //{
+                    //    subCalendarEvents = subCalendarEvents.Include(subEvent => subEvent.Name)
+                    //        .Include(subEvent => subEvent.Name.Creator_EventDB)
+                    //        .Include(subEvent => subEvent.Location_DB)
+                    //        .Include(subEvent => subEvent.Creator_EventDB)
+                    //        .Include(subEvent => subEvent.Location_DB)
+                    //        .Include(subEvent => subEvent.DataBlob_EventDB);
+                    //}
+
+                    if (tilerIds != null && tilerIds.Count > 0)
+                    {
+                        subCalendarEvents = subCalendarEvents.Include(subEvent => subEvent.Name)
+                            .Include(subEvent => subEvent.Name.Creator_EventDB)
+                            .Include(subEvent => subEvent.Location_DB)
+                            .Include(subEvent => subEvent.Creator_EventDB)
+                            .Include(subEvent => subEvent.Location_DB)
+                            .Include(subEvent => subEvent.DataBlob_EventDB);
+                    }
+
                     subCalendarEvents = subCalendarEvents
                         .Where(subEvent =>
                                 (
@@ -1816,9 +1844,6 @@ namespace TilerFront
                         .Include(subEvent => subEvent.Procrastination_EventDB)
                         .Include(subEvent => subEvent.Location_DB)
                         .Include(subEvent => subEvent.ParentCalendarEvent.DayPreference_DB)
-                        //.Include(subEvent => subEvent.ParentCalendarEvent.ProfileOfNow_EventDB)
-                        //.Include(subEvent => subEvent.ParentCalendarEvent.Procrastination_EventDB)
-                        //.Include(subEvent => subEvent.ParentCalendarEvent.Location_DB)
                         ;
 
                     if(includeUpdateHistory)
@@ -1893,6 +1918,12 @@ namespace TilerFront
                             .Include(calEvent => calEvent.Procrastination_EventDB)
                             .Include(calEvent => calEvent.DayPreference_DB)
                             .Include(calEvent => calEvent.TimeLineHistory_DB.TimeLines_DB)
+                            .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Name))
+                            .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Name.Creator_EventDB))
+                            .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Location_DB))
+                            .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.DataBlob_EventDB))
+                            .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.UiParams_EventDB))
+                            .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.UiParams_EventDB.UIColor))
                             .Where(calEvent => calEvent.IsEnabled_DB && !calEvent.Complete_EventDB)
                         ;
                     }
@@ -3209,7 +3240,7 @@ namespace TilerFront
                     .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.Procrastination_EventDB)).SingleOrDefault(calEvent => calEvent.Id == id);
 
 
-            // Multiple getCalendarEventQuery calls because we're trying to leverage the caching functionality of entity frameworl. Attributes that  have been included don't get pulled in again meaning the row size from DB is smaller
+            // Multiple getCalendarEventQuery calls because we're trying to leverage the caching functionality of entity framework. Attributes that have been included don't get pulled in again meaning the row size from DB is smaller.
             retValue = getCalendarEventQuery(retrievalOption, includeSubEvents)
                     .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.DayPreference_DB)).SingleOrDefault(calEvent => calEvent.Id == id);
             retValue = getCalendarEventQuery(retrievalOption, includeSubEvents)

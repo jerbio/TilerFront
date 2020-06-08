@@ -100,21 +100,22 @@ namespace TilerFront
         /// <returns></returns>
         async Task CleanUpForUI(IEnumerable<CalendarEvent> calEvents)
         {
-            calEvents.AsParallel()
-                .ForAll(async (eachCalendarEvent) =>
+            foreach (CalendarEvent eachCalendarEvent in calEvents)
+            {
                 {
-                    if(!eachCalendarEvent.IsFromRecurringAndNotChildRepeatCalEvent)
+                    if (!eachCalendarEvent.IsFromRecurringAndNotChildRepeatCalEvent)
                     {
                         shiftSUbEventsByTimeAndId(eachCalendarEvent.ActiveSubEvents);
-                    } else
+                    }
+                    else
                     {
-                        if(eachCalendarEvent.isRepeatLoaded)
+                        if (eachCalendarEvent.isRepeatLoaded)
                         {
                             await CleanUpForUI(eachCalendarEvent.Repeat.RecurringCalendarEvents()).ConfigureAwait(false);
                         }
                     }
                 }
-            );
+            };
 
             foreach (DayTimeLine dayTimeLine in Now.getAllDaysForCalc())// Need to clear sub events because the daytimeline holds the subevents in the wrong day after a shift
             {
@@ -127,7 +128,7 @@ namespace TilerFront
 
         void shiftSUbEventsByTimeAndId(IEnumerable<SubCalendarEvent> subEvents)
         {
-            List<DateTimeOffset> AllStartTimes = subEvents.AsParallel().Where(obj => !obj.isLocked && !obj.LockToId).Select(obj => obj.Start).ToList();
+            List<DateTimeOffset> AllStartTimes = subEvents.Where(obj => !obj.isLocked && !obj.LockToId).Select(obj => obj.Start).ToList();
             AllStartTimes.Sort();
             List<SubCalendarEvent> OrderedSubEvent = subEvents.Where(obj => !obj.isLocked && !obj.LockToId).OrderBy(obj => obj.SubEvent_ID.getSubCalendarEventID()).ToList();
 

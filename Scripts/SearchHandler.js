@@ -164,6 +164,7 @@ function CallBackFunctionForReturnedValues(data, DomContainer) {
                 // will be treated as a single string
             }).done(function (data) {
                 RefreshSubEventsMainDivSubEVents(generateSearchBarContainer.closeSearch);
+                sendPostScheduleEditAnalysisUpdate({});
 
                 /*
                 if (InitializeHomePage!=null)

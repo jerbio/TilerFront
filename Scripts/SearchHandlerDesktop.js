@@ -432,6 +432,7 @@ function CallBackFunctionForReturnedValuesDesktop(data, DomContainer) {
                 // will be treated as a single string
             }).done(function (data) {
                 ActivateUserSearch.ClearSearch();
+                sendPostScheduleEditAnalysisUpdate({});
             });
         }
     }

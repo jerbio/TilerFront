@@ -378,8 +378,7 @@ function generateProcrastinateAllFunction(TimeData,CallBack)
     }).done(function (data) {
         HandleNEwPage.Hide();
         RefreshSubEventsMainDivSubEVents(CallBack);
-        //InitializeHomePage();//hack alert
-        //alert("alert 1-");
+        sendPostScheduleEditAnalysisUpdate({});
     });
 }
 
@@ -441,7 +440,7 @@ function prepFunctionForCompletionOfEvent(EventID, CallBack) {
         }).done(function (data) {
             HandleNEwPage.Hide();
             RefreshSubEventsMainDivSubEVents(CallBack);
-            //InitializeHomePage();//hack alert
+            sendPostScheduleEditAnalysisUpdate({});
         });
     }
 }
@@ -1287,7 +1286,7 @@ function generateModalForTIleOrModal()
             }).done(function (data) {
                 HandleNEwPage.Hide()
                 RefreshSubEventsMainDivSubEVents(CallBack);
-                //InitializeHomePage();//hack alert
+                sendPostScheduleEditAnalysisUpdate({});
             });
 
             return;
@@ -1583,7 +1582,7 @@ function generateModalForTIleOrModal()
                 }
             }).done(function (data) {
                 RefreshSubEventsMainDivSubEVents(CallBack);
-                //InitializeHomePage();//hack alert
+                sendPostScheduleEditAnalysisUpdate({});
             });
         }
     }
