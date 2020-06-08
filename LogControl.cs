@@ -1757,27 +1757,7 @@ namespace TilerFront
                         tilerIds = new HashSet<string>();
                     }
                     var calIds = tilerIds.Select(o=> new EventID(o).getAllEventDictionaryLookup).ToArray();
-                    IQueryable<SubCalendarEvent> subCalendarEvents = getSubCalendarEventQuery(retrievalOption, includeOtherEntities: false);
-
-                    //if (System.Diagnostics.Debugger.IsAttached)
-                    //{
-                    //    subCalendarEvents = subCalendarEvents.Include(subEvent => subEvent.Name)
-                    //        .Include(subEvent => subEvent.Name.Creator_EventDB)
-                    //        .Include(subEvent => subEvent.Location_DB)
-                    //        .Include(subEvent => subEvent.Creator_EventDB)
-                    //        .Include(subEvent => subEvent.Location_DB)
-                    //        .Include(subEvent => subEvent.DataBlob_EventDB);
-                    //}
-
-                    if (tilerIds != null && tilerIds.Count > 0)
-                    {
-                        subCalendarEvents = subCalendarEvents.Include(subEvent => subEvent.Name)
-                            .Include(subEvent => subEvent.Name.Creator_EventDB)
-                            .Include(subEvent => subEvent.Location_DB)
-                            .Include(subEvent => subEvent.Creator_EventDB)
-                            .Include(subEvent => subEvent.Location_DB)
-                            .Include(subEvent => subEvent.DataBlob_EventDB);
-                    }
+                    IQueryable<SubCalendarEvent> subCalendarEvents = getSubCalendarEventQuery(retrievalOption, includeOtherEntities: true);
 
                     subCalendarEvents = subCalendarEvents
                         .Where(subEvent =>
@@ -3234,6 +3214,7 @@ namespace TilerFront
                     .Include(calEvent => calEvent.DayPreference_DB)
                     .Include(calEvent => calEvent.TimeLineHistory_DB)
                     .Include(calEvent => calEvent.TimeLineHistory_DB.TimeLines_DB)
+                    .Include(calEvent => calEvent.DataBlob_EventDB)
                     .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents)
                     .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB))
                     .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.ProfileOfNow_EventDB))
