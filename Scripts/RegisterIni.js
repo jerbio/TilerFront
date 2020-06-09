@@ -42,8 +42,6 @@ function InitializeSignInReg()
     var SignInButton = document.getElementById("SignInButton");
     var RegisterButton = document.getElementById("gotToRegisterScreenButton");
     
-
-    var RegPageFormContainer = document.getElementById("RegPageFormContainer");
     $(RegPageFormContainer).hide();
 
     var callBackprepSignInFunc=prepSignInFunc(UserNameSignInDom, PasswordSigninDom);
@@ -55,13 +53,54 @@ function InitializeSignInReg()
             callBackprepSignInFunc();
         }
     });
-    //$(SignInButton).click();
-    //$(RegisterButton).click();
+    $(PasswordReginDom).keyup(function (e) {//catches enter key press
+        if(e.target.value) {
+            let passwordEntry = onPasswordEntry(e.target.value);
+            let PasswordInstructionDom = getDomOrCreateNew("PasswordInstruction");
+            let passwordMinLengthDom = getDomOrCreateNew("passwordMinLength");
+            let passwordNeedsUpperCaseDom = getDomOrCreateNew("passwordNeedsUpperCase");
+            let passwordNeedsLowerCaseDom = getDomOrCreateNew("passwordNeedsLowerCase");
+            let passwordNeedsNumberDom = getDomOrCreateNew("passwordNeedsNumber");
+            let passwordNeedsNoneLetterAndNoneNumberDom = getDomOrCreateNew("passwordNeedsNoneLetterAndNoneNumber");
+            if (passwordEntry.isValid) {
+                $(PasswordInstructionDom).addClass('setAsDisplayNone');
+            } else {
+                $(PasswordInstructionDom).removeClass('setAsDisplayNone');
+                if(passwordEntry.hasLowerCase) {
+                    $(passwordNeedsLowerCaseDom).addClass('setAsDisplayNone');
+                } else {
+                    $(passwordNeedsLowerCaseDom).removeClass('setAsDisplayNone');
+                }
+    
+                if(passwordEntry.hasUpperCase) {
+                    $(passwordNeedsUpperCaseDom).addClass('setAsDisplayNone');
+                } else {
+                    $(passwordNeedsUpperCaseDom).removeClass('setAsDisplayNone');
+                }
+    
+                if(passwordEntry.hasNumber) {
+                    $(passwordNeedsNumberDom).addClass('setAsDisplayNone');
+                } else {
+                    $(passwordNeedsNumberDom).removeClass('setAsDisplayNone');
+                }
+    
+                if(passwordEntry.isLongEnough) {
+                    $(passwordMinLengthDom).addClass('setAsDisplayNone');
+                } else {
+                    $(passwordMinLengthDom).removeClass('setAsDisplayNone');
+                }
 
+                if(passwordEntry.isNoneLetterAndNoneNumber) {
+                    $(passwordNeedsNoneLetterAndNoneNumberDom).addClass('setAsDisplayNone');
+                } else {
+                    $(passwordNeedsNoneLetterAndNoneNumberDom).removeClass('setAsDisplayNone');
+                }
+            }
+        }
+
+    });
 
     var TitleText = getDomOrCreateNew("BigBackGroundText");
-    //addEventgotoScreenButton(gotoSignInScreenButton, SignInFormContainer, TitleText);
-    //addEventgotoScreenButton(gotToRegisterScreenButton, RegPageFormContainer, TitleText);
 }
 
 
@@ -72,7 +111,7 @@ function CheckFocuseChange()
     var SignInButton = document.getElementById("SignInButton");
     var registerButton = document.getElementById("gotToRegisterScreenButton");
 
-    if ((UserNameReginDom.value != null && UserNameReginDom.value != "")) {
+    if ((UserNameReginDom.value !== null && UserNameReginDom.value !== "")) {
         $(registerButton).addClass("enabledButton");
     }
     else
@@ -84,7 +123,7 @@ function CheckFocuseChange()
         return;
     }
 
-    if ((PasswordReginDom.value != null && PasswordReginDom.value != "") && (UserNameReginDom.value != null && UserNameReginDom.value != "")) {
+    if ((PasswordReginDom.value !== null && PasswordReginDom.value !== "") && (UserNameReginDom.value !== null && UserNameReginDom.value !== "")) {
         $(SignInButton).removeClass("disabledButton");
         $(SignInButton).addClass("enabledButton");
         $(registerButton).addClass("enabledButton");
@@ -103,7 +142,7 @@ function checkIfEmailIsValid()
     var EmailReginDom = document.getElementById("EmailRegin");
     var EmailErrorDom = document.getElementById("EmailError");
     var res = EmailReginDom.value.match(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9_%+-]+\.[A-Za-z0-9._%+-]+\b/g);
-    if ((res == "")||(res==null)) {
+    if ((res === "")||(res === null)) {
         EmailReginDom.style.borderBottom = "solid red 2px";
         EmailErrorDom.innerHTML = "Invalid Email";
         return false;
@@ -116,7 +155,56 @@ function checkIfEmailIsValid()
     }
 }
 
+function onPasswordEntry(passwordString) {
+    let minPasswordLength = 6;
 
+    function isPasswordLongEnough(passwordString) {
+        let retValue = false;
+        
+        if(isString(passwordString) && passwordString.length > minPasswordLength) {
+            retValue = true;
+        }
+        return retValue;
+    }
+
+    function passwordHasUpperCase(passwordString) {
+        let hasUpperCase = /[A-Z]+/;
+        let retValue = hasUpperCase.test(passwordString);
+        return retValue;
+    }
+
+    function passwordHasLowerCase(passwordString) {
+        let hasLowerCase = /[a-z]+/;
+        let retValue = hasLowerCase.test(passwordString);
+        return retValue;
+    }
+
+    function passwordHasNumber(passwordString) {
+        let hasNumber = /[0-9]+/;
+        let retValue = hasNumber.test(passwordString);
+        return retValue;
+    }
+
+    function isNoneLetterAndNoneNumber(passwordString) {
+        let hasNumber = /[^a-zA-Z0-9]/;
+        let retValue = hasNumber.test(passwordString);
+        return retValue;
+    }
+
+    let passwordIsValid = isPasswordLongEnough(passwordString) && passwordHasUpperCase(passwordString) && passwordHasLowerCase(passwordString) && passwordHasNumber(passwordString) && isNoneLetterAndNoneNumber(passwordString);
+
+    let retValue = {
+        isLongEnough: isPasswordLongEnough(passwordString),
+        hasUpperCase: passwordHasUpperCase(passwordString),
+        hasLowerCase: passwordHasLowerCase(passwordString),
+        hasNumber: passwordHasNumber(passwordString),
+        hasNonNumberAndNonLetter: passwordHasNumber(passwordString),
+        isNoneLetterAndNoneNumber: isNoneLetterAndNoneNumber(passwordString),
+        isValid: passwordIsValid
+    };
+
+    return retValue;
+}
 
 
 function checkIfPasswordIsValid()
@@ -126,7 +214,7 @@ function checkIfPasswordIsValid()
     var ConfirmPasswordReginDom = document.getElementById("ConfirmPasswordRegin");
     var PassWordErrorDom = document.getElementById("PassWordConfirmErrorContainer");
 
-    if ((ConfirmPasswordReginDom.value != PasswordReginDom.value) && (ConfirmPasswordReginDom.value != "") && (PasswordReginDom.value != ""))
+    if ((ConfirmPasswordReginDom.value !== PasswordReginDom.value) && (ConfirmPasswordReginDom.value !== "") && (PasswordReginDom.value !== ""))
     {
         ConfirmPasswordReginDom.style.borderBottom = "solid red 2px";
         PassWordErrorDom.innerHTML = "These Passwords don't match. Try again?";
@@ -142,8 +230,7 @@ function checkIfPasswordIsValid()
 }
 function checkIfBothPasswordsAreSame(PasswordDom1,PasswordDom2)
 {
-    return PasswordDom1.value == PasswordDom2.value
-    true;
+    return PasswordDom1.value === PasswordDom2.value;
 }
 
 function prepSignInFunc(UserNameDom, PasswordDom)
@@ -159,10 +246,9 @@ function prepSignInFunc(UserNameDom, PasswordDom)
 //RegisterUser(FullName, UserName, Password, Email)
 
 function prepRegisterFunc(FullNameDom, UserNameDom, PasswordDom, EmailDom, ConfirmPasswordDOm) {
-    return function () 
-    {
+    return function () {
         RegisterUser(FullNameDom.value, UserNameDom.value, PasswordDom.value,ConfirmPasswordDOm.value, EmailDom.value);
-    }
+    };
 }
 //*/
 
@@ -183,10 +269,11 @@ function prepFunctionOnRegisterRequest(SignInButton, RegisterButton, ShowSignInF
         SignButtonContainer.style.top = "90%";
         SignInButton.innerHTML = "Back";
         BigBackGroundText.style.top = "50%";
+        BigBackGroundText.style.color = "rgba(200,200,200,.5)";
         BigBackGroundText.style.marginTop = "-150px";
 
         
-        if (ShowSignInFormCallBack == null)
+        if (ShowSignInFormCallBack === null)
         {
             postRegistrationDataCallBack = prepRegisterFunc(FullNameReginDom, UserNameReginDom, PasswordReginDom, EmailReginDom, ConfirmPasswordReginDom);
             ShowSignInFormCallBack = prepFunctionOnSignInRequest(SignInButton, RegisterButton, retValue, postRegistrationDataCallBack, postSignInCallBack);
@@ -221,6 +308,7 @@ function prepFunctionOnSignInRequest(SignInButton, RegistrationButton, displayRe
         SignInButton.innerHTML = "Sign In";
         BigBackGroundText.style.top = "0%";
         BigBackGroundText.style.marginTop = "0";
+        BigBackGroundText.style.color = "rgba(0,0,0,1)";
 
         RegistrationButton.removeEventListener("click", postRegisterCallBack);
         RegistrationButton.addEventListener("click", displayRegisterCallBack);
@@ -256,11 +344,7 @@ function addEventgotoScreenButton(ClickDom, ShowThisDOm,TitleText)
 
 function SignInUser(UserName,Password)
 {
-    debugger
     var TimeZone = new Date().getTimezoneOffset();
-    
-    //var url = global_refTIlerUrl+ "User/SignIn";
-    //url="RootWagTap/time.top?WagCommand=4";
 
 
     var __RequestVerificationToken = $('input[name=__RequestVerificationToken]').val();
@@ -279,7 +363,7 @@ function SignInUser(UserName,Password)
             debugger;
             var myContainer = response
             //myContainer= JSON.parse(myContainer);
-            if (myContainer.Error.code == 0) {
+            if (myContainer.Error.code === "0") {
                 LaunchLoggedUser(myContainer.Error.Message);
             }
             else {
@@ -321,7 +405,7 @@ function hideRegistrationError()
 
 function RegisterUser(FullName, UserName, Password,PassWordConfirmation, Email)
 {
-    var FullName = FullName.split(" ");
+    FullName = FullName.split(" ");
 
     if (!checkIfPasswordIsValid() || !checkIfEmailIsValid())
     {
@@ -333,22 +417,24 @@ function RegisterUser(FullName, UserName, Password,PassWordConfirmation, Email)
 
     var __RequestVerificationToken = $('input[name=__RequestVerificationToken]').val();
     //var LoginCredentials = { Username: UserName, Password: Password, };
+    let firstName = FullName[0];
+    let lastName = FullName[1];
 
-    var RegistrationCredentials = { Username: UserName, Password: Password, ConfirmPassword: PassWordConfirmation, FullName: FullName, Email: Email, __RequestVerificationToken: __RequestVerificationToken, TimeZoneOffSet: TimeZone };
+    var RegistrationCredentials = { Username: UserName, Password: Password, ConfirmPassword: PassWordConfirmation, FirstName: firstName, LastName: lastName, Email: Email, __RequestVerificationToken: __RequestVerificationToken, TimeZoneOffSet: TimeZone };
     
     //var url="RootWagTap/time.top?WagCommand=3";
     //var url = global_refTIlerUrl + "User/New";
     var url = window.location.origin + "/Account/SignUp";
+    preSendRequestWithLocation(RegistrationCredentials);
     debugger;
     $.ajax({
         type: "POST",
         url: url,
         data: RegistrationCredentials,
         success: function (response) {
-            debugger;
             var myContainer = response
             //myContainer= JSON.parse(myContainer);
-            if (myContainer.Error.code == 0) {
+            if (myContainer.Error.code === "0") {
                 LaunchLoggedUser(myContainer.Error.Message);
             }
             else {
@@ -370,7 +456,6 @@ function RegisterUser(FullName, UserName, Password,PassWordConfirmation, Email)
 
 function LaunchLoggedUser(urlString)
 {
-    debugger;    
     window.location.href = urlString;
 }
 

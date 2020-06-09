@@ -122,9 +122,11 @@ function CallBackFunctionForReturnedValues(data, DomContainer) {
         $(DoNowButtonOfSearchedEventImage.Dom).addClass("NowIcon");
         
         //$(DoNowButtonOfSearchedEventImage.Dom).addClass("SearchIcon");
+        if(MyCalendarEVent.canDoNow) {
+            DoNowButtonOfSearchedEventContainer.Dom.appendChild(DoNowButtonOfSearchedEventImage.Dom);
+        }
 
-
-        DoNowButtonOfSearchedEventContainer.Dom.appendChild(DoNowButtonOfSearchedEventImage.Dom)
+        
 
         setTimeout(function() {(DoNowButtonOfSearchedEventContainer.Dom).onclick=(genFunctionCallForCalendarEventNow(MyCalendarEVent.ID))}, 500)
 
@@ -145,6 +147,8 @@ function CallBackFunctionForReturnedValues(data, DomContainer) {
 
             var Url = global_refTIlerUrl + "CalendarEvent/Now/";
             var NowData = { UserName: UserCredentials.UserName, ID: CalendarEventID, UserID: UserCredentials.ID, TimeZoneOffset: TimeZone };
+            preSendRequestWithLocation(NowData);
+            NowData.TimeZone = moment.tz.guess()
             $.ajax({
                 type: "POST",
                 url: Url,
@@ -160,6 +164,7 @@ function CallBackFunctionForReturnedValues(data, DomContainer) {
                 // will be treated as a single string
             }).done(function (data) {
                 RefreshSubEventsMainDivSubEVents(generateSearchBarContainer.closeSearch);
+                sendPostScheduleEditAnalysisUpdate({});
 
                 /*
                 if (InitializeHomePage!=null)
@@ -232,136 +237,3 @@ function generateSearchBarContainer(ParentDom)
 
     return;
 }
-
-/*
-function generateSearchBarContainer(ParentDom)
-{
-    var SearchBarContainerID = "SearchBarContainer";
-    var SearchBarContainer = getDomOrCreateNew(SearchBarContainerID);
-    ParentDom = ParentDom.data[0];
-    ParentDom.appendChild(SearchBarContainer.Dom);
-    $(ParentDom).addClass("textshadow");
-    $(ParentDom).addClass("blurry-text");
-
-    
-    //(getDomOrCreateNew("NameProfileInfoContainerContent").Dom).style.textShadow = "0 0 15px rgba(0,0,0,0.5)";
-    
-
-    
-    var DomAndContainer = generateFullSearchBar();
-
-
-    var SearchBarAndContentContainerID = "SearchBarAndContentContainer";
-    var SearchBarAndContentContainer = getDomOrCreateNew(SearchBarAndContentContainerID);
-
-
-    SearchBarAndContentContainer.Dom.appendChild(DomAndContainer.SearchBar.Dom);
-    SearchBarAndContentContainer.Dom.appendChild(DomAndContainer.returnedValue.Dom);
-
-
-    SearchBarAndContentContainer.Dom.appendChild(DomAndContainer.SearchBar.Dom);
-
-    SearchBarContainer.Dom.appendChild(SearchBarAndContentContainer.Dom);
-}
-
-var CountInput = 0;
-
-function generateFullSearchBar()
-{
-    var SearchBarID = "SearchBar";
-    var SearchBar = getDomOrCreateNew(SearchBarID, "input");
-
-    setTimeout(PrepcreationOfRetvalueContainer(SearchBar.Dom), 50);
-    $(SearchBar.Dom).on('input', prepCalToBackEnd(SearchBar.Dom, SearchBar))
-    var returnedValueContainerID = "returnedValueContainer";
-    var returnedValueContainer = getDomOrCreateNew(returnedValueContainerID);
-    
-    var retValue = { SearchBar: SearchBar, returnedValue: returnedValueContainer };
-    return retValue;
-}
-
-function prepCalToBackEnd(InputDom, SearchBar)
-{
-    return function ()
-    {
-        var FullLetter = InputDom.value;
-        var url = "RootWagTap/time.top?WagCommand=10";
-        var NameOfEvent = { NameOfEvent: FullLetter, UserName: UserCredentials.UserName, UserID: UserCredentials.ID };
-
-
-        $.ajax({
-            type: "POST",
-            url: url,
-            data: NameOfEvent,
-            // DO NOT SET CONTENT TYPE to json
-            // contentType: "application/json; charset=utf-8", 
-            // DataType needs to stay, otherwise the response object
-            // will be treated as a single string
-            //dataType: "json",
-            success: function (response) {
-                response = JSON.parse(response);
-                var data = response.Content;
-                var b = data;
-            }
-        });
-
-
-
-        var returnedValue = getReturnedValueContainer(FullLetter);
-        var retValue = { SearchBar: SearchBar, returnedValue: returnedValue }
-    }
-}
-
-function PrepcreationOfRetvalueContainer(SearchBarDom)
-{
-    return function ()
-    {
-        SearchBarDom.style.width = "100%";
-    }
-}
-
-function getReturnedValueContainer(returnedValues)
-{   //creates autosuggest box container
-    var returnedValueContainerID = "returnedValueContainer";
-    var heighOfDomEachDom = 150;
-    var returnedValueContainer = getDomOrCreateNew(returnedValueContainerID);
-    $(returnedValueContainer).empty();
-    returnedValueContainer.Dom.outterHTML = "";
-    returnedValueContainer.Dom.style.height = 0;
-    var NumberOfReturnedValues = returnedValues.length;
-    if (NumberOfReturnedValues < 1)
-    {
-        returnedValueContainer.Dom.innerHTML = "";
-        $(returnedValueContainer.Dom).hide();
-    }
-    else
-    {
-        returnedValueContainer.Dom.innerHTML = "";
-        $(returnedValueContainer.Dom).show();
-        var HeightOfContainer = heighOfDomEachDom * NumberOfReturnedValues;
-        returnedValueContainer.Dom.style.height = HeightOfContainer + "px";
-        for (var i = 0; i < returnedValues.length; i++)
-        {
-            //returnedValues[i];
-            var EntryRow = generateRowForReturnedValue(returnedValues[i]);
-            returnedValueContainer.Dom.appendChild(EntryRow.Dom);
-            EntryRow.Dom.style.height = heighOfDomEachDom + "px";
-            EntryRow.Dom.style.lineHeight = ( heighOfDomEachDom) + "px";
-
-            EntryRow.Dom.style.top = (heighOfDomEachDom * i) + "px";
-        }
-    }
-    return returnedValueContainer;
-}
-
-
-function generateRowForReturnedValue(myCalEvent)
-{
-    var retCalEventID="retCalEvent"+NumberOfDom++;
-    var retCalEvent = getDomOrCreateNew(retCalEventID);
-    retCalEvent.Dom.innerHTML = myCalEvent;
-    $(retCalEvent.Dom).addClass("retCalEvent");
-    return retCalEvent;
-}
-
-*/

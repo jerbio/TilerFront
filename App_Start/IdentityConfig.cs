@@ -15,6 +15,10 @@ using SendGrid;
 using System.Net;
 using System.Configuration;
 using System.Diagnostics;
+//using SendGrid.Helpers.Mail;
+using System.Net.Mime;
+using SendGrid.Helpers.Mail;
+using TilerElements;
 
 namespace TilerFront
 {
@@ -32,34 +36,71 @@ namespace TilerFront
         }
         */
 
+        //private async Task configSendGridasyncOldApi(IdentityMessage message)
+        //{
+        //    var myMessage = new SendGridMessage();
+        //    myMessage.AddTo(message.Destination);
+        //    myMessage.From = new System.Net.Mail.MailAddress(
+        //                        "noreply@mytiler.com", "Tiler S.");
+        //    myMessage.Subject = message.Subject;
+        //    myMessage.Text = message.Body;
+        //    myMessage.Html = message.Body;
+
+        //    var credentials = new NetworkCredential(
+        //               ConfigurationManager.AppSettings["sendGridMailAccount"],
+        //               ConfigurationManager.AppSettings["sendGridMailPassword"]
+        //               );
+
+        //    // Create a Web transport for sending email.
+        //    var transportWeb = new Web(credentials);
+
+        //    // Send the email.
+        //    if (transportWeb != null)
+        //    {
+        //        await transportWeb.DeliverAsync(myMessage);
+        //    }
+        //    else
+        //    {
+        //        Trace.TraceError("Failed to create Web transport.");
+        //        await Task.FromResult(0);
+        //    }
+        //}
+
+
         private async Task configSendGridasync(IdentityMessage message)
         {
-            var myMessage = new SendGridMessage();
-            myMessage.AddTo(message.Destination);
-            myMessage.From = new System.Net.Mail.MailAddress(
-                                "noreply@mytiler.com", "Tiler S.");
-            myMessage.Subject = message.Subject;
-            myMessage.Text = message.Body;
-            myMessage.Html = message.Body;
+            String apiKey = ConfigurationManager.AppSettings["tilerSendGridKey"];//, Environment.GetEnvironmentVariable("007HealthLineSendGridKey", EnvironmentVariableTarget.User);
 
-            var credentials = new NetworkCredential(
-                       ConfigurationManager.AppSettings["mailAccount"],
-                       ConfigurationManager.AppSettings["mailPassword"]
-                       );
+            var client = new SendGridClient(apiKey);
+            var from = new EmailAddress("noreply@mytiler.com");
+            var subject = message.Subject;
+            var to = new EmailAddress(message.Destination);
+            var plainTextContent = ""; // "and easy to do anywhere, even with C#";
+            //var htmlContent = "<strong>and easy to do anywhere, even with C#</strong>";
+            Content htmlContent = new Content(MediaTypeNames.Text.Html, message.Body);
+            var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent.Value);
+            var response = await client.SendEmailAsync(msg);
 
-            // Create a Web transport for sending email.
-            var transportWeb = new Web(credentials);
 
-            // Send the email.
-            if (transportWeb != null)
-            {
-                await transportWeb.DeliverAsync(myMessage);
-            }
-            else
-            {
-                Trace.TraceError("Failed to create Web transport.");
-                await Task.FromResult(0);
-            }
+            //dynamic sg = new SendGridClient(apiKey);
+
+
+            //Email from = new Email("noreply@mytiler.com");
+            //String subject = message.Subject;
+            //Email to = new Email(message.Destination);
+            //Content content = new Content(MediaTypeNames.Text.Html, message.Body);
+            //Mail mail = new Mail(from, subject, to, content);
+
+            //String ret = mail.Get();
+
+            //string requestBody = ret;
+
+
+            //dynamic response = sg.client.mail.send.post(requestBody: requestBody);
+
+            System.Diagnostics.Debug.WriteLine((response.StatusCode.ToString() as string) + "!!!!!~~~~~good for my soul");
+            System.Diagnostics.Debug.WriteLine((response.Body.ReadAsStringAsync().Result.ToString() as string) + "****$$$$$good for my soul");
+            System.Diagnostics.Debug.WriteLine((response.Headers.ToString().ToString() as string) + "******boots for you for my soul");
         }
 
     }
@@ -74,17 +115,17 @@ namespace TilerFront
     }
 
     // Configure the application user manager used in this application. UserManager is defined in ASP.NET Identity and is used by the application.
-    public class ApplicationUserManager : UserManager<ApplicationUser>
+    public class ApplicationUserManager : UserManager<TilerUser>
     {
-        public ApplicationUserManager(IUserStore<ApplicationUser> store)
+        public ApplicationUserManager(IUserStore<TilerUser> store)
             : base(store)
         {
         }
         public static ApplicationUserManager Create(IdentityFactoryOptions<ApplicationUserManager> options, IOwinContext context) 
         {
-            var manager = new ApplicationUserManager(new UserStore<ApplicationUser>(context.Get<ApplicationDbContext>()));
+            var manager = new ApplicationUserManager(new UserStore<TilerUser>(context.Get<ApplicationDbContext>()));
             // Configure validation logic for usernames
-            manager.UserValidator = new UserValidator<ApplicationUser>(manager)
+            manager.UserValidator = new UserValidator<TilerUser>(manager)
             {
                 AllowOnlyAlphanumericUserNames = false,
                 RequireUniqueEmail = true
@@ -107,11 +148,11 @@ namespace TilerFront
 
             // Register two factor authentication providers. This application uses Phone and Emails as a step of receiving a code for verifying the user
             // You can write your own provider and plug it in here.
-            manager.RegisterTwoFactorProvider("Phone Code", new PhoneNumberTokenProvider<ApplicationUser>
+            manager.RegisterTwoFactorProvider("Phone Code", new PhoneNumberTokenProvider<TilerUser>
             {
                 MessageFormat = "Your security code is {0}"
             });
-            manager.RegisterTwoFactorProvider("Email Code", new EmailTokenProvider<ApplicationUser>
+            manager.RegisterTwoFactorProvider("Email Code", new EmailTokenProvider<TilerUser>
             {
                 Subject = "Security Code",
                 BodyFormat = "Your security code is {0}"
@@ -122,21 +163,21 @@ namespace TilerFront
             if (dataProtectionProvider != null)
             {
                 manager.UserTokenProvider = 
-                    new DataProtectorTokenProvider<ApplicationUser>(dataProtectionProvider.Create("ASP.NET Identity"));
+                    new DataProtectorTokenProvider<TilerUser>(dataProtectionProvider.Create("ASP.NET Identity"));
             }
             return manager;
         }
     }
 
     // Configure the application sign-in manager which is used in this application.
-    public class ApplicationSignInManager : SignInManager<ApplicationUser, string>
+    public class ApplicationSignInManager : SignInManager<TilerUser, string>
     {
         public ApplicationSignInManager(ApplicationUserManager userManager, IAuthenticationManager authenticationManager)
             : base(userManager, authenticationManager)
         {
         }
 
-        public override Task<ClaimsIdentity> CreateUserIdentityAsync(ApplicationUser user)
+        public override Task<ClaimsIdentity> CreateUserIdentityAsync(TilerUser user)
         {
             return user.GenerateUserIdentityAsync((ApplicationUserManager)UserManager);
         }

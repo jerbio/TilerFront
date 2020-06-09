@@ -98,7 +98,7 @@ function LaunchAndroidMap(LocationData)//handles Android devices
     this.LaunchDirection = LaunchDirection;
     function LaunchDirection()
     {
-        this.StartString = "current location";
+        this.StartString = "your location";
         this.destinationString = LocationData;
         this.FullURL = "http://maps.google.com/maps?saddr=" + this.StartString + "&daddr=" + this.destinationString;
         window.location = this.FullURL;

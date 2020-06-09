@@ -25,13 +25,12 @@ using Google.Apis.Util.Store;
 
 namespace TilerFront.Controllers
 {
-    public static class ThirdPartyCalendarAuthenticationModelsController// : Controller
+    public class ThirdPartyCalendarAuthenticationModelsController : TilerApiController
     {
-        private static ApplicationDbContext db = new ApplicationDbContext();
-        private static string CurrentURI = null;
-        private static bool isCurrentURIUpdated = false;
+        private string CurrentURI = null;
+        private bool isCurrentURIUpdated = false;
 
-        static public async Task<bool> CreateGoogle(ThirdPartyCalendarAuthenticationModel thirdPartyCalendarAuthentication)
+        public async Task<bool> CreateGoogle(ThirdPartyCalendarAuthenticationModel thirdPartyCalendarAuthentication)
         {
             bool RetValue = false;
             //if (ModelState.IsValid)
@@ -62,11 +61,11 @@ namespace TilerFront.Controllers
                                 db.ThirdPartyAuthentication.Add(thirdPartyCalendarAuthentication);
                                 await db.SaveChangesAsync();
                                 RetValue = true;
-                                if (!(await SendRequestForGoogleNotification(thirdPartyCalendarAuthentication).ConfigureAwait(false)))
-                                {
-                                    await deleteGoogleAccount(thirdPartyCalendarAuthentication.getThirdPartyOut()).ConfigureAwait(false);
-                                    RetValue=false;
-                                }
+                                //if (!(await SendRequestForGoogleNotification(thirdPartyCalendarAuthentication).ConfigureAwait(false)))
+                                //{
+                                //    await deleteGoogleAccount(thirdPartyCalendarAuthentication.getThirdPartyOut()).ConfigureAwait(false);
+                                //    RetValue=false;
+                                //}
                             }
                         }
 
@@ -92,7 +91,7 @@ namespace TilerFront.Controllers
             return RetValue;
         }
 
-        public static void initializeCurrentURI(string URIEntry)
+        public void initializeCurrentURI(string URIEntry)
         {
             if(string.IsNullOrEmpty( CurrentURI))
             {
@@ -104,7 +103,7 @@ namespace TilerFront.Controllers
         }
 
 
-        static public async Task<bool> SendRequestForGoogleNotification(ThirdPartyCalendarAuthenticationModel AuthenticationData)
+        public async Task<bool> SendRequestForGoogleNotification(ThirdPartyCalendarAuthenticationModel AuthenticationData)
         {
             bool RetValue = false;
             try
@@ -117,8 +116,7 @@ namespace TilerFront.Controllers
                 );
                 //url = "https://mytilerkid.azurewebsites.net/api/GoogleNotification/Trigger";
                 var httpWebRequest = HttpWebRequest.Create(url) as HttpWebRequest;
-                httpWebRequest.Headers["Authorization"] =
-                    string.Format("Bearer {0}", AuthenticationData.Token);
+                httpWebRequest.Headers["Authorization"] = string.Format("Bearer {0}", AuthenticationData.Token);
                 httpWebRequest.Method = "POST";
                 // added the character set to the content-type as per David's suggestion
                 httpWebRequest.ContentType = "application/json; charset=UTF-8";
@@ -128,14 +126,6 @@ namespace TilerFront.Controllers
                 GoogleNotificationRequestModel NotificationRequest = AuthenticationData.getGoogleNotificationCredentials(CurrentURI);
 
                 var requestText = JsonConvert.SerializeObject(NotificationRequest);
-
-                /*
-                GoogleNotificationWatchResponseModel testGoogleResponse = new GoogleNotificationWatchResponseModel();
-                testGoogleResponse.expiration = "98989";
-                testGoogleResponse.id = "jkhj2hkjhkjh";
-                testGoogleResponse.kind = "99898989";
-                testGoogleResponse.resourceUri= "hjhj98878";
-                requestText = JsonConvert.SerializeObject(testGoogleResponse);*/
 
                 using (var stream = httpWebRequest.GetRequestStream())
                 // replaced Encoding.UTF8 by new UTF8Encoding(false) to avoid the byte order mark
@@ -206,7 +196,7 @@ namespace TilerFront.Controllers
             return RetValue;
         }
 
-        static public async Task<bool> deleteGoogleAccount(ThirdPartyAuthenticationForView modelData)
+        public async Task<bool> deleteGoogleAccount(ThirdPartyAuthenticationForView modelData)
         {
             bool RetValue = false;
             ThirdPartyCalendarAuthenticationModel ThirdPartyAuth = db.ThirdPartyAuthentication.Where(obj => obj.ID == modelData.ID).Single();

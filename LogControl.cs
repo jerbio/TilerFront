@@ -1,4 +1,5 @@
 ﻿//#define UseDefaultLocation
+//#define liveDebugging
 
 using System;
 using System.Collections.Generic;
@@ -11,265 +12,98 @@ using DBTilerElement;
 using TilerElements;
 using System.Threading.Tasks;
 using System.IO.Compression;
-
-#if ForceReadFromXml
-#else
-using CassandraUserLog;
-using TilerSearch;
-#endif
-
+using System.Xml.Serialization;
+using System.Data.Entity;
+using TilerFront.Models;
+using BigDataTiler;
+using System.Data.Entity.Core.Objects;
+using System.Collections.Concurrent;
+using System.Diagnostics;
 
 
 namespace TilerFront
 {
     public class LogControl
     {
+        protected TilerDbContext _Context;
         protected string ID;
         protected string UserName;
         string NameOfUser;
-        protected static string WagTapLogLocation = "WagTapCalLogs\\";
         protected static string BigDataLogLocation = "BigDataLogs\\";
-        protected DBControl LogDBDataAccess;
-        protected long LastIDNumber;
-        protected string CurrentLog;
+        protected static string LogLocation = "BigDataLogs\\";
         protected bool LogStatus;
         protected bool UpdateLocaitionCache = false;
-        protected Dictionary<string, Location_Elements> CachedLocation;
-        protected Location_Elements DefaultLocation= new Location_Elements();
-        protected Location_Elements NewLocation;
+        protected Dictionary<string, TilerElements.Location> CachedLocation;
+        protected TilerElements.Location DefaultLocation = new TilerElements.Location();
+        protected TilerElements.Location NewLocation;
         protected DB_UserActivity activity;
-
-
-#if ForceReadFromXml
-#else
-        protected CassandraUserLog.CassandraLog myCassandraAccess;
-        protected TilerSearch.EventNameSearchHandler NameSearcher;
-        protected LocationSearchHandler LocationSearcher;
-#endif
+        Dictionary<string, Func<XmlNode, Reason>> createDictionaryOfOPtionToFunction;
+        Dictionary<string, CalendarEvent> _AllScheduleData;
+        protected ScheduleDump _TempDump;
+        protected TilerUser _TilerUser;
+        protected bool _UpdateBigData = true;
         Tuple<bool, string, DateTimeOffset, long> ScheduleMetadata;
-        
-#if ForceReadFromXml
-#else
-        public static bool useCassandra=true;
-#endif
 
         protected LogControl()
-        { 
-            ID="";
-            UserName="";
-            NameOfUser="";
-            LastIDNumber = 0;
-            CurrentLog="";
-            LogStatus=false;
-#if ForceReadFromXml
-#else
-            NameSearcher = new EventNameSearchHandler();
-            LocationSearcher = new LocationSearchHandler();
-#endif
-            Dictionary<string, Location_Elements> CachedLocation = new Dictionary<string, Location_Elements>();
+        {
+            ID = "";
+            UserName = "";
+            NameOfUser = "";
+            LogStatus = false;
+            Dictionary<string, TilerElements.Location> CachedLocation = new Dictionary<string, TilerElements.Location>();
+
+            createDictionaryOfOPtionToFunction = new Dictionary<string, Func<XmlNode, Reason>>
+            {
+                {Reason.Options.BestFit.ToString(),(XmlNode node)=> { return  getBestFitReason(node); } },
+                {Reason.Options.PreservedOrder.ToString(),(XmlNode node)=> { return  getPreservedOrderReason(node); } },
+                {Reason.Options.Weather.ToString(), (XmlNode node)=> { return  getWeatherReason(node); } },
+                {Reason.Options.CloseToCluster.ToString(), (XmlNode node)=> { return  getLocationReason(node); } },
+                {Reason.Options.Occupancy.ToString(), (XmlNode node)=> { return  getOccupancyReason(node); } },
+                {Reason.Options.RestrictedEvent.ToString(), (XmlNode node)=> { return  getRestrictedEventReason(node); } }
+            };
         }
 
-
-        public LogControl(DBControl DBAccess, string logLocation = "", DB_UserActivity useractivity = null)
+        public LogControl(TilerUser user, ApplicationDbContext database, DB_UserActivity useractivity = null)
         {
-            if (!string.IsNullOrEmpty(logLocation))
-            {
-                WagTapLogLocation = logLocation;
-            }
-            LogDBDataAccess = DBAccess;
             LogStatus = false;
-            CachedLocation = new Dictionary<string, Location_Elements>();
-
+            CachedLocation = new Dictionary<string, TilerElements.Location>();
+            _TilerUser = user;
+            _Context = database;
         }
         #region Functions
-        virtual async public Task Initialize()
-        {
-            TilerElementExtension.CurrentTime = DateTimeOffset.UtcNow;
-            Tuple<bool, string, string> VerifiedUser = LogDBDataAccess.LogIn();
-            CurrentLog = "";
-            if (VerifiedUser.Item1)
-            {
-                Tuple<bool, string, DateTimeOffset, long> resultofLatestChange = await LogDBDataAccess.getLatestChanges(VerifiedUser.Item2).ConfigureAwait(false);
-                ID = VerifiedUser.Item2;
-#if ForceReadFromXml
-#else
-                myCassandraAccess = new CassandraUserLog.CassandraLog(ID);
-#endif
-
-                if (!resultofLatestChange.Item1)
-                {
-                    CurrentLog = ID.ToString() + ".xml";
-                    string LogDir = (WagTapLogLocation + CurrentLog);
-                    string myCurrDir = Directory.GetCurrentDirectory();
-                    Console.WriteLine("Log DIR is:" + LogDir);
-                    LogStatus = File.Exists(LogDir);
-#if ForceReadFromXml
-
-#else
-                    Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, Location_Elements>> tempProfileData = await getProfileInfo();
-                    await LogDBDataAccess.CreateLatestChange(this.ID, new DateTimeOffset(), Convert.ToInt64(LastIDNumber));
-                    resultofLatestChange = await LogDBDataAccess.getLatestChanges(VerifiedUser.Item2);
-                    myCassandraAccess.BatchMigrateXMLToCassandra(this);
-#endif
-                }
-                else
-                {
-                    
-#if ForceReadFromXml
-                    CurrentLog = ID.ToString() + ".xml";
-                    string LogDir = (WagTapLogLocation + CurrentLog);
-                    string myCurrDir = Directory.GetCurrentDirectory();
-                    Console.WriteLine("Log DIR is:" + LogDir);
-                    LogStatus = File.Exists(LogDir);
-#else
-                    LogStatus = true;
-                    LastIDNumber = resultofLatestChange.Item4;
-                    useCassandra = true;
-#endif
-
-                    ScheduleMetadata = resultofLatestChange;
-                }
-                NameOfUser = VerifiedUser.Item3;
-            }
-        }
-
-
-        public static void UpdateLogLocation(string LogLocation)
-        {
-            WagTapLogLocation = LogLocation;
-        }
-
         public static void UpdateBigDataLogLocation(string bigLogLocation)
         {
             BigDataLogLocation = bigLogLocation;
         }
-        public static string getLogLocation()
+
+        public static void UpdateLogLocation(string logLocation)
         {
-            return WagTapLogLocation;
+            LogLocation = logLocation;
         }
 
+        public static string getLogLocation()
+        {
+            return LogLocation;
+        }
+
+        /// <summary>
+        /// Function returns the tiler User retrieved from the db
+        /// </summary>
+        /// <returns></returns>
+        public TilerUser getTilerRetrievedUser()
+        {
+            return _TilerUser;
+
+        }
 
         #region Write Data
 
-        public void Undo(string LogFile = "")
+        public async Task Undo(string LogFile = "")
         {
-            Task<bool> retValue;
-
-#if ForceReadFromXml
-#else
-            if (useCassandra)
-            {
-                retValue =  myCassandraAccess.Commit(AllEvents);
-                LogDBDataAccess.WriteLatestData(DateTime.Now,Convert.ToInt64( LatestID), ID);
-                bool boolRetValue = await retValue;
-                return boolRetValue;
-            }
-#endif
-
-
-
-            retValue = new Task<bool>(() => { return true; });
-            retValue.Start();
-            string LogFileCopy = "";
-            if (LogFile == "")
-            {
-                LogFile = WagTapLogLocation + CurrentLog;
-                LogFileCopy = WagTapLogLocation + "Copy_" + CurrentLog;
-            }
-
-
-
-            XmlDocument xmldoc = new XmlDocument();
-            XmlDocument xmldocCopy = new XmlDocument();
-            xmldoc.Load(LogFile);
-            try
-            {
-                xmldocCopy.Load(LogFileCopy);
-            }
-            catch
-            {
-                try
-                {
-                    genereateNewLogFile("Copy_" + ID);
-                    xmldocCopy.Load(LogFileCopy);
-                }
-                catch (Exception e)
-                {
-                    Console.Write(e.Message);
-                }
-
-            }
-
-            xmldoc.InnerXml = xmldocCopy.InnerXml;
-
-            while (true)
-            {
-                try
-                {
-                    xmldoc.Save(LogFile);
-                    xmldocCopy.Save(LogFileCopy);
-                    updateBigData(xmldocCopy, xmldoc);
-                    break;
-                }
-                catch (Exception e)
-                {
-                    Thread.Sleep(160);
-                }
-            }
-
+            throw new NotImplementedException("Undo has not been fully implemented for RDBMS");
         }
 
-        public CustomErrors genereateNewLogFile(string UserID)//creates a new xml log file. Uses the passed UserID
-        {
-            
-            CustomErrors retValue = new CustomErrors(false, "success");
-#if ForceReadFromXml
-#else
-            if (useCassandra)
-            {
-                return retValue;
-            }
-#endif
-            try
-            {
 
-                string NameOfFile = WagTapLogLocation + UserID + ".xml";
-                if (File.Exists(NameOfFile))
-                {
-                    File.Delete(NameOfFile);
-                }
-
-                FileStream myFileStream = File.Create(NameOfFile);
-                myFileStream.Close();
-
-                CurrentLog = UserID + ".xml";
-                EmptyCalendarXMLFile(NameOfFile);
-                //EmptyCalendarXMLFile();
-            }
-            catch (Exception e)
-            {
-                retValue = new CustomErrors(true, "Error generating log\n" + e.ToString(), 20000000);
-            }
-
-            return retValue;
-
-        }
-
-        public async Task<CustomErrors> DeleteLog()
-        {
-            CustomErrors retValue = new CustomErrors(false, "Success");
-            try
-            {
-                string NameOfFile = WagTapLogLocation + CurrentLog;
-                File.Delete(NameOfFile);
-            }
-            catch (Exception e)
-            {
-                retValue = new CustomErrors(true, e.ToString(), 20002000);
-            }
-
-            return retValue;
-        }
 
         public void updateUserActivty(UserActivity activity)
         {
@@ -281,97 +115,69 @@ namespace TilerFront
         /// </summary>
         /// <param name="oldData"></param>
         /// <param name="newData"></param>
-        public async void updateBigData(XmlDocument oldData, XmlDocument newData)
+        public virtual async Task updateBigData(XmlDocument oldData, XmlDocument newData)
         {
-            bool corruptZipFile = false;
-            string zipFile = LoggedUserID + ".zip";
-            string zipFolder = LoggedUserID;
-
-            string fullZipPath = @BigDataLogLocation + zipFile;
-            try
+            if(_UpdateBigData)
             {
-                if (activity == null)
+                bool corruptZipFile = false;
+                string zipFile = LoggedUserID + ".zip";
+                string zipFolder = LoggedUserID;
+                string fullZipPath = @BigDataLogLocation + zipFile;
+                try
                 {
-                    activity = new DB_UserActivity(DateTimeOffset.UtcNow, UserActivity.ActivityType.None);
-                }
-                XmlDocument combinedDoc = new XmlDocument();
-
-                XmlNode timeOfCreation = combinedDoc.CreateElement("TimeOfCreation");
-                XmlNode bigDataLog = combinedDoc.CreateElement("BigDataLog");
-                XmlNode miscDataLog = combinedDoc.CreateElement("MiscData");
-                miscDataLog.InnerText = activity.getMiscdata();
-
-                timeOfCreation.InnerXml = activity.ToXML();
-                bigDataLog.AppendChild(timeOfCreation);
-                bigDataLog.AppendChild(miscDataLog);
-                XmlNode beforeProcessing = combinedDoc.CreateElement("BeforeProcessing");
-                XmlNode importedNBeforeProcessingNode = combinedDoc.ImportNode(oldData.DocumentElement as XmlNode, true);
-                beforeProcessing.PrependChild(importedNBeforeProcessingNode);
-
-                XmlNode afterProcessing = combinedDoc.CreateElement("AfterProcessing");
-                XmlNode importedNAfterProcessingNode = combinedDoc.ImportNode(newData.DocumentElement as XmlNode, true);
-                afterProcessing.PrependChild(importedNAfterProcessingNode);
-
-                bigDataLog.AppendChild(beforeProcessing);
-                bigDataLog.AppendChild(afterProcessing);
-
-                XmlDeclaration xmldecl;
-                xmldecl = combinedDoc.CreateXmlDeclaration("1.0", "utf-8", null);
-                combinedDoc.AppendChild(bigDataLog);
-                XmlElement root = combinedDoc.DocumentElement;
-                combinedDoc.InsertBefore(xmldecl, root);
-                MemoryStream xmlStream = new MemoryStream();
-                combinedDoc.Save(xmlStream);
-                DateTimeOffset javascriptStart = new DateTimeOffset(1970, 1, 1, 0, 0, 0, new TimeSpan());
-                string beforFileName = ((long)(DateTimeOffset.UtcNow
-                   .Subtract(javascriptStart)
-                   .TotalMilliseconds)).ToString();
-
-
-                
-
-                if (File.Exists(fullZipPath))
-                {
-                    corruptZipFile = true;
-                    using (FileStream zipToOpen = new FileStream(@fullZipPath, FileMode.Open))
+                    BigDataLogControl bigdataControl = new BigDataLogControl();
+                    if (activity == null)
                     {
-                        using (ZipArchive archive = new ZipArchive(zipToOpen, ZipArchiveMode.Update))
-                        {
-                            ZipArchiveEntry readmeEntry = archive.CreateEntry(beforFileName + ".xml", CompressionLevel.Optimal);
-                            xmlStream.WriteTo(readmeEntry.Open());
-                        }
+                        activity = new DB_UserActivity(DateTimeOffset.UtcNow, UserActivity.ActivityType.None);
                     }
-                }
-                else
-                {
-                    using (var memoryStream = new MemoryStream())
+                    XmlDocument combinedDoc = new XmlDocument();
+
+                    XmlNode timeOfCreationNode = combinedDoc.CreateElement("TimeOfCreation");
+                    XmlNode bigDataLog = combinedDoc.CreateElement("BigDataLog");
+                    XmlNode miscDataLog = combinedDoc.CreateElement("MiscData");
+                    miscDataLog.InnerText = activity.getMiscdata();
+
+                    timeOfCreationNode.InnerXml = activity.ToXML();
+                    bigDataLog.AppendChild(timeOfCreationNode);
+                    bigDataLog.AppendChild(miscDataLog);
+                    XmlNode beforeProcessing = combinedDoc.CreateElement("BeforeProcessing");
+                    XmlNode importedNBeforeProcessingNode = combinedDoc.ImportNode(oldData.DocumentElement as XmlNode, true);
+                    beforeProcessing.PrependChild(importedNBeforeProcessingNode);
+
+                    XmlNode afterProcessing = combinedDoc.CreateElement("AfterProcessing");
+                    XmlNode importedNAfterProcessingNode = combinedDoc.ImportNode(newData.DocumentElement as XmlNode, true);
+                    afterProcessing.PrependChild(importedNAfterProcessingNode);
+
+                    bigDataLog.AppendChild(beforeProcessing);
+                    bigDataLog.AppendChild(afterProcessing);
+
+                    XmlDeclaration xmldecl;
+                    xmldecl = combinedDoc.CreateXmlDeclaration("1.0", "utf-8", null);
+                    combinedDoc.AppendChild(bigDataLog);
+                    XmlElement root = combinedDoc.DocumentElement;
+                    combinedDoc.InsertBefore(xmldecl, root);
+                    DateTimeOffset timeOfCreation = DateTimeOffset.UtcNow;
+                    LogChange log = new LogChange()
                     {
-                        using (var archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
-                        {
-                            var demoFile = archive.CreateEntry(beforFileName + ".xml", CompressionLevel.Optimal);
-
-                            using (var entryStream = demoFile.Open())
-                            {
-                                xmlStream.WriteTo(entryStream);
-                            }
-                        }
-
-                        using (var fileStream = new FileStream(@fullZipPath, FileMode.Create))
-                        {
-                            memoryStream.Seek(0, SeekOrigin.Begin);
-                            memoryStream.CopyTo(fileStream);
-                        }
+                        Id = Guid.NewGuid().ToString(),
+                        TimeOfCreation = timeOfCreation,
+                        JsTimeOfCreation = timeOfCreation.toJSMilliseconds(),
+                        TypeOfEvent = activity.TriggerType.ToString(),
+                        UserId = _TilerUser.Id
+                    };
+                    log.loadXmlFile(combinedDoc);
+                    await bigdataControl.AddLogDocument(log).ConfigureAwait(false);
+                }
+                catch (Exception e)
+                {
+                    if (corruptZipFile)
+                    {
+                        File.Delete(fullZipPath);
                     }
+                    CustomErrors retValue = new CustomErrors("Error generating bigdata log\n" + e.ToString(), 20000000);
                 }
             }
-            catch (Exception e)
-            {
-                if(corruptZipFile)
-                {
-                    File.Delete(fullZipPath);
-                }
-                CustomErrors retValue = new CustomErrors(true, "Error generating bigdata log\n" + e.ToString(), 20000000);
-            }
+            
         }
 
         virtual public void UpdateReferenceDayInXMLLog(DateTimeOffset referenceDay, string LogFile = "")
@@ -383,8 +189,6 @@ namespace TilerFront
                 return;
             }
 #endif
-            if (LogFile == "")
-            { LogFile = WagTapLogLocation + CurrentLog; }
             XmlDocument xmldoc = new XmlDocument();
             xmldoc.Load(LogFile);
             XmlElement refDayNode = xmldoc.CreateElement("referenceDay");
@@ -403,84 +207,37 @@ namespace TilerFront
             return;
         }
 
-        async public Task<bool> WriteToLogOld(IEnumerable<CalendarEvent> AllEvents, string LatestID, string LogFile = "")
+        async public Task<ScheduleDump> CreateScheduleDump(IEnumerable<CalendarEvent> AllEvents, TilerUser user, ReferenceNow now, string notes, Dictionary<string, TilerElements.Location> cachedLocation = null)
         {
-            Task<bool>  retValue;
-            
-#if ForceReadFromXml
-#else
-            if (useCassandra)
-            {
-                retValue =  myCassandraAccess.Commit(AllEvents);
-                LogDBDataAccess.WriteLatestData(DateTime.Now,Convert.ToInt64( LatestID), ID);
-                bool boolRetValue = await retValue;
-                return boolRetValue;
-            }
-#endif
-
-
-
-            retValue = new Task<bool>(() => { return true; });
-            retValue.Start();
-            string LogFileCopy = "";
-            if (LogFile == "")
-            { 
-                LogFile = WagTapLogLocation + CurrentLog;
-                LogFileCopy = WagTapLogLocation + "Copy_" + CurrentLog;
-            }
-
-            
-
+            Task<ScheduleDump> retValue;
             XmlDocument xmldoc = new XmlDocument();
-            XmlDocument xmldocCopy = new XmlDocument();
-            xmldoc.Load(LogFile);
-            try
-            {
-                xmldocCopy.Load(LogFileCopy);
-            }
-            catch
-            {
-                try
-                {
-                    genereateNewLogFile("Copy_" + ID);
-                    xmldocCopy.Load(LogFileCopy);
-                }
-                catch(Exception e)
-                {
-                    Console.Write(e.Message);
-                }
-            }
+            xmldoc.InnerXml = "<?xml version=\"1.0\" encoding=\"utf-8\"?><ScheduleLog><LastIDCounter>1024</LastIDCounter><referenceDay>" + now.EndOfDay.DateTime + "</referenceDay><scheduleNotes>" + notes + "</scheduleNotes><lastUpdated>" + user.LastScheduleModification.DateTime + "</lastUpdated><EventSchedules></EventSchedules></ScheduleLog>";
 
-
-            xmldocCopy.InnerXml = xmldoc.InnerXml;
-            CachedLocation = await getLocationCache().ConfigureAwait(false); ;//populates with current location info
-            Dictionary<string, Location_Elements> OldLocationCache = new Dictionary<string, Location_Elements>(CachedLocation);
-            xmldoc.DocumentElement.SelectSingleNode("/ScheduleLog/LastIDCounter").InnerText = LatestID;
+            CachedLocation = cachedLocation ?? await getAllLocationsByUser().ConfigureAwait(false); ;//populates with current location info
+            Dictionary<string, TilerElements.Location> OldLocationCache = new Dictionary<string, TilerElements.Location>(CachedLocation);
+            xmldoc.DocumentElement.SelectSingleNode("/ScheduleLog/LastIDCounter").InnerText = "false";
             XmlNodeList EventSchedulesNodes = xmldoc.DocumentElement.SelectNodes("/ScheduleLog/EventSchedules");
-            
+
             XmlNode EventSchedulesNodesNode = xmldoc.DocumentElement.SelectSingleNode("/ScheduleLog/EventSchedules");
-            XmlNode EventSchedulesNodesNodeCpy = xmldoc.CreateElement("NodeCopy");// .DocumentElement.SelectSingleNode("/ScheduleLog/EventSchedules");
+            XmlNode EventSchedulesNodesNodeCpy = xmldoc.CreateElement("NodeCopy");
             EventSchedulesNodesNodeCpy.InnerXml = EventSchedulesNodesNode.InnerXml;
             EventSchedulesNodesNode.RemoveAll();
             XmlNodeList EventScheduleNodes = xmldoc.DocumentElement.SelectNodes("/ScheduleLog/EventSchedules/EventSchedule");
             bool errorWritingFile = false;
             CalendarEvent ErrorEvent = new CalendarEvent();
             EventScheduleNodes = xmldoc.DocumentElement.SelectNodes("/ScheduleLog/EventSchedules/EventSchedule");
-            DateTimeOffset purgeLimit = DateTimeOffset.UtcNow.AddMonths(-3);
             try
             {
                 foreach (CalendarEvent MyEvent in AllEvents)
                 {
-                    //break;
-                    if (MyEvent.End > purgeLimit)
                     {
                         XmlElement EventScheduleNode;
                         ErrorEvent = MyEvent;
                         EventScheduleNode = CreateEventScheduleNode(MyEvent);
-                
+
                         XmlNode MyImportedNode = xmldoc.ImportNode(EventScheduleNode as XmlNode, true);
                         //(EventScheduleNode, true);
-                        if (!UpdateInnerXml(ref EventScheduleNodes, "ID", MyEvent.ID.ToString(), EventScheduleNode))
+                        if (!UpdateInnerXml(ref EventScheduleNodes, "ID", MyEvent.getId, EventScheduleNode))
                         {
                             xmldoc.DocumentElement.SelectSingleNode("/ScheduleLog/EventSchedules").AppendChild(MyImportedNode);
                         }
@@ -491,53 +248,36 @@ namespace TilerFront
                     }
                 }
             }
-            catch
+            catch (Exception e)
             {
                 EventSchedulesNodesNode.InnerXml = EventSchedulesNodesNodeCpy.InnerXml;
                 errorWritingFile = true;
             }
 
-            UpdateCacheLocation(xmldoc, OldLocationCache,NewLocation);
-            int loopCounter = 0;
-            while (true)
+            UpdateCacheLocation(xmldoc, OldLocationCache, NewLocation);
+            ScheduleDump scheduleDump = new ScheduleDump()
             {
-                try
-                {
-                    xmldoc.Save(LogFile);
-                    xmldocCopy.Save(LogFileCopy);
-                    updateBigData(xmldocCopy, xmldoc);
-
-                    //new TilerFront.SocketHubs.ScheduleChange().Send("we gott it ", "its happening");
-                    break;
-                }
-                catch (Exception e)
-                {
-                    Thread.Sleep(160);
-                    
-                    if(++loopCounter > 3)
-                    {
-                        break;
-                    }
-                }
-            }
-
-            if(errorWritingFile)
-            {
-                throw new Exception("Error wrtiting file" + ErrorEvent.Name);
-            }
-
+                UserId = user.Id,
+                ScheduleXmlString = xmldoc.InnerXml,
+                ReferenceNow = now.constNow,
+                StartOfDay = now.EndOfDay
+            };
+            retValue = new Task<ScheduleDump>(() => { return scheduleDump; });
+            retValue.Start();
             return await retValue.ConfigureAwait(false); ;
         }
+
         /// <summary>
         /// updates the logcontrol with a possible new location
         /// </summary>
         /// <param name="NewLocation"></param>
-        public void updateNewLocation(Location_Elements NewLocation)
+        public void updateNewLocation(TilerElements.Location NewLocation)
         {
             this.NewLocation = NewLocation;
         }
 
-        public void UpdateCacheLocation(XmlDocument xmldoc, Dictionary<string, Location_Elements> currentCache, Location_Elements NewLocation )
+
+        public void UpdateCacheLocation(XmlDocument xmldoc, Dictionary<string, TilerElements.Location> currentCache, TilerElements.Location NewLocation)
         {
             XmlNode LocationCacheNode = xmldoc.DocumentElement.SelectSingleNode("/ScheduleLog/LocationCache");
             if (LocationCacheNode == null)
@@ -553,14 +293,132 @@ namespace TilerFront
             XmlNodeList AllCachedLocations = xmldoc.DocumentElement.SelectNodes("/ScheduleLog/LocationCache/Locations/Location");
 
 
-           
-            foreach (KeyValuePair<string, Location_Elements> eachKeyValuePair in CachedLocation)
+
+            foreach (KeyValuePair<string, TilerElements.Location> eachKeyValuePair in CachedLocation)
+            {
+
+                string LocationID = eachKeyValuePair.Value.Id;
+                XmlElement myCacheLocationNode = CreateLocationNode(eachKeyValuePair.Value, "Location");
+
+                XmlNode MyImportedNode = xmldoc.ImportNode(myCacheLocationNode as XmlNode, true);
+                myCacheLocationNode = MyImportedNode as XmlElement;
+
+
+                XmlNode LocationIDNode = xmldoc.CreateElement("LocationID");
+                XmlNode CacheNameNode = xmldoc.CreateElement("CachedName");
+                CacheNameNode.InnerText = eachKeyValuePair.Value.Description.ToLower();
+                LocationIDNode.InnerText = LocationID.ToString();
+                MyImportedNode.PrependChild(LocationIDNode);
+                MyImportedNode.PrependChild(CacheNameNode);
+                MyImportedNode = xmldoc.ImportNode(myCacheLocationNode as XmlNode, true);
+
+                if (!UpdateInnerXml(ref AllCachedLocations, "LocationID", LocationID.ToString(), myCacheLocationNode))
+                {
+                    xmldoc.DocumentElement.SelectSingleNode("/ScheduleLog/LocationCache/Locations").AppendChild(MyImportedNode);
+                }
+
+
+            }
+        }
+
+
+        protected virtual async Task Commit(IEnumerable<CalendarEvent> calendarEvents, TilerUser tilerUser, TravelCache travelCache)
+        {
+#if liveDebugging
+            Debug.WriteLine("********************************Check directive of #liveDebugging if test is failing********************************");
+            return;
+#else
+            IEnumerable<SubCalendarEvent> subevents = calendarEvents.SelectMany(calEVent => calEVent.RemoveSubEventFromEntity);
+            foreach (SubCalendarEvent subEvent in subevents)
+            {
+                _Context.Entry(subEvent).State = EntityState.Deleted;
+            }
+
+            if (travelCache!=null)
+            {
+                foreach (var cacheEntry in travelCache.purgedLocations)
+                {
+                    _Context.Entry(cacheEntry).State = EntityState.Deleted;
+                }
+            }
+
+
+            Task saveDbChangesTask = _Context.SaveChangesAsync();
+            if (_TempDump != null && _UpdateBigData)
+            {
+                ReferenceNow now = new ReferenceNow(_TempDump.ReferenceNow, _TempDump.StartOfDay, _TilerUser.TimeZoneDifference);
+                Task<ScheduleDump> scheduleDumpCreationTask = CreateScheduleDump(calendarEvents, _TilerUser, now, "", CachedLocation);
+                await scheduleDumpCreationTask.ConfigureAwait(false);
+                ScheduleDump scheduleDump = scheduleDumpCreationTask.Result;
+
+                Task updateBigDataTask = updateBigData(_TempDump.XmlDoc, scheduleDump.XmlDoc);
+                await updateBigDataTask.ConfigureAwait(false);
+            }
+
+            await saveDbChangesTask.ConfigureAwait(false);
+#endif
+        }
+
+        public async Task Commit(IEnumerable<CalendarEvent> calendarEvents, CalendarEvent calendarEvent, String LatestId, ReferenceNow now, TravelCache travelCache)
+        {
+            _TilerUser.LatestId = LatestId;
+            _TilerUser.LastScheduleModification = now.constNow;
+            if (calendarEvent != null)
+            {
+                _Context.CalEvents.Add(calendarEvent);
+            }
+
+
+            await Commit(calendarEvents, _TilerUser, travelCache).ConfigureAwait(false);
+        }
+
+        public async Task DiscardChanges()
+        {
+            var changedEntries = _Context.ChangeTracker.Entries()
+                .Where(x => x.State != EntityState.Unchanged).ToList();
+
+            foreach (var entry in changedEntries)
+            {
+                switch (entry.State)
+                {
+                    case EntityState.Modified:
+                        entry.CurrentValues.SetValues(entry.OriginalValues);
+                        entry.State = EntityState.Unchanged;
+                        break;
+                    case EntityState.Added:
+                        entry.State = EntityState.Detached;
+                        break;
+                    case EntityState.Deleted:
+                        entry.State = EntityState.Unchanged;
+                        break;
+                }
+            }
+        }
+
+        public async Task UpdateLocationCache(XmlDocument xmldoc, Dictionary<string, TilerElements.Location> currentCache, TilerElements.Location NewLocation)
+        {
+            XmlNode LocationCacheNode = xmldoc.DocumentElement.SelectSingleNode("/ScheduleLog/LocationCache");
+            if (LocationCacheNode == null)
+            {
+                XmlNode ScheduleLogNode = xmldoc.DocumentElement.SelectSingleNode("/ScheduleLog");
+                LocationCacheNode = CreateLocationCacheNode();
+
+                XmlNode MyImportedNode = xmldoc.ImportNode(LocationCacheNode as XmlNode, true);
+                xmldoc.DocumentElement.SelectSingleNode("/ScheduleLog").AppendChild(MyImportedNode);
+                LocationCacheNode = xmldoc.DocumentElement.SelectSingleNode("/ScheduleLog/LocationCache");
+            }
+
+            XmlNodeList AllCachedLocations = xmldoc.DocumentElement.SelectNodes("/ScheduleLog/LocationCache/Locations/Location");
+
+
+
+            foreach (KeyValuePair<string, TilerElements.Location> eachKeyValuePair in CachedLocation)
             {
                 if (!currentCache.ContainsKey(eachKeyValuePair.Key))
                 {
                     //if (!eachKeyValuePair.Value.isNull)
                     {
-                        string LocationID = eachKeyValuePair.Value.ID;
+                        string LocationID = eachKeyValuePair.Value.Id;
                         XmlElement myCacheLocationNode = CreateLocationNode(eachKeyValuePair.Value, "Location");
 
                         XmlNode MyImportedNode = xmldoc.ImportNode(myCacheLocationNode as XmlNode, true);
@@ -587,18 +445,29 @@ namespace TilerFront
                     {
                         if (NewLocation.Description.ToLower() == eachKeyValuePair.Key)
                         {
-                            updateLocationNode(NewLocation, xmldoc);
+                            await AddNewLocation(NewLocation).ConfigureAwait(false);
                         }
                     }
                 }
             }
         }
 
-        public bool isLocationIsDifferent(Location_Elements OldLocation, Location_Elements NewLocation)
+        public bool isLocationIsDifferent(TilerElements.Location OldLocation, TilerElements.Location NewLocation)
         {
-            double newDistance = Location_Elements.calculateDistance(OldLocation, NewLocation);
+            double newDistance = TilerElements.Location.calculateDistance(OldLocation, NewLocation);
             bool retValue = newDistance >= 0.5;
             return retValue;
+        }
+
+        virtual public async Task AddNewLocation(TilerElements.Location Location)
+        {
+            _Context.Locations.Add(Location);
+        }
+
+        virtual public async Task updateLocationNode(TilerElements.Location Location)
+        {
+            TilerElements.Location location = await _Context.Locations.FindAsync(Location.Id).ConfigureAwait(false);
+            location.update(Location);
         }
 
         virtual protected XmlNode getLocationNodeByTagName(string TagName, XmlDocument DocNode = null)
@@ -606,10 +475,7 @@ namespace TilerFront
             TagName = TagName.Trim().ToLower();
             XmlNode retValue = null;
             XmlDocument doc = DocNode;
-            if (DocNode == null)
-            {
-                doc = getLogDataStore();
-            }
+
             XmlNode node = doc.DocumentElement.SelectSingleNode("/ScheduleLog/LocationCache");
             if (node == null)
             {
@@ -618,9 +484,9 @@ namespace TilerFront
             XmlNodeList AllLocationNodes = node.SelectNodes("Locations/Location");
             foreach (XmlNode eachXmlNode in AllLocationNodes)
             {
-                string desciption = eachXmlNode.SelectSingleNode("Description").InnerText.ToLower(); 
+                string desciption = eachXmlNode.SelectSingleNode("Description").InnerText.ToLower();
                 string CachedName = eachXmlNode.SelectSingleNode("CachedName").InnerText.ToLower();
-                if ((desciption == TagName)|| (CachedName == TagName))
+                if ((desciption == TagName) || (CachedName == TagName))
                 {
                     retValue = eachXmlNode;
                     break;
@@ -629,28 +495,29 @@ namespace TilerFront
             return retValue;
         }
 
-        virtual public XmlNode updateLocationNode(Location_Elements Location, XmlDocument DocNode = null)
+
+        virtual public XmlNode updateScheduleLocationNode(TilerElements.Location Location, XmlDocument DocNode = null)
         {
             XmlNode OldNode = getLocationNodeByTagName(Location.Description, DocNode);
-            Location_Elements OldLocation;
-            if(OldNode != null)
+            TilerElements.Location OldLocation;
+            if (OldNode != null)
             {
                 OldLocation = getLocation(OldNode);
             }
             else
             {
-                OldLocation = new Location_Elements();
+                OldLocation = new TilerElements.Location();
             }
-            
+
 
             XmlElement newNode = CreateLocationNode(Location);
-            if(isLocationIsDifferent(OldLocation, Location))
+            if (isLocationIsDifferent(OldLocation, Location))
             {
                 OldNode.InnerXml = newNode.InnerXml;
                 XmlNode LocationIDNode = DocNode.CreateElement("LocationID");
                 XmlNode CacheNameNode = DocNode.CreateElement("CachedName");
                 CacheNameNode.InnerText = Location.Description.ToLower();
-                LocationIDNode.InnerText = Location.ID;
+                LocationIDNode.InnerText = Location.Id;
                 OldNode.PrependChild(LocationIDNode);
                 OldNode.PrependChild(CacheNameNode);
             }
@@ -658,19 +525,62 @@ namespace TilerFront
             return OldNode;
         }
 
+
         public XmlElement generateNowProfileNode(NowProfile myNowProfile)
         {
             XmlDocument xmldoc = new XmlDocument();
             XmlElement NowProfileNode = xmldoc.CreateElement("NowProfile");
             XmlElement InitializedNode = xmldoc.CreateElement("Initialized");
             XmlElement PreferredStart = xmldoc.CreateElement("PreferredStart");
-            PreferredStart.InnerText = myNowProfile.PreferredTime.ToString();
-            InitializedNode.InnerText = myNowProfile.isInitialized.ToString();
+            PreferredStart.InnerText = myNowProfile?.PreferredTime.ToString();
+            InitializedNode.InnerText = myNowProfile?.isInitialized.ToString();
             NowProfileNode.AppendChild(InitializedNode);
             NowProfileNode.AppendChild(PreferredStart);
             return NowProfileNode;
         }
 
+        /// <summary>
+        /// This function generates a tiler user node that simply stores the id and user name for a given tiler user
+        /// </summary>
+        /// <param name="user">tiler user</param>
+        /// <returns></returns>
+        public XmlElement generateTilerUserNode(TilerUser user)
+        {
+            XmlDocument xmlDoc = new XmlDocument();
+            XmlElement UserNode = xmlDoc.CreateElement("UserNode");
+            XmlElement idNode = xmlDoc.CreateElement("Id");
+            XmlElement userNameNode = xmlDoc.CreateElement("UserName");
+            XmlElement CalendarType = xmlDoc.CreateElement("CalendarType");
+            idNode.InnerText = user.Id;
+            userNameNode.InnerText = user.UserName;
+            CalendarType.InnerText = user.CalendarType;
+            UserNode.AppendChild(idNode);
+            UserNode.AppendChild(userNameNode);
+            return UserNode;
+        }
+
+        public XmlElement generateTimeZone(string timeZone)
+        {
+            XmlDocument xmlDoc = new XmlDocument();
+            XmlElement TimeZoneNode = xmlDoc.CreateElement("TimeZone");
+            TimeZoneNode.InnerText = timeZone;
+            return TimeZoneNode;
+        }
+
+        public XmlElement generateTilerUserGroup(TilerUserGroup usergroup)
+        {
+            XmlDocument xmlDoc = new XmlDocument();
+            XmlElement userGroupNode = xmlDoc.CreateElement("UserGroup");
+            XmlElement idNode = xmlDoc.CreateElement("Id");
+            XmlElement usersNode = xmlDoc.CreateElement("Users");
+            foreach (TilerUser user in usergroup.users)
+            {
+                XmlElement userNode = generateTilerUserNode(user);
+                usersNode.AppendChild(userNode);
+            }
+
+            return userGroupNode;
+        }
 
         public XmlElement CreateLocationCacheNode()
         {
@@ -690,63 +600,91 @@ namespace TilerFront
 
             XmlElement MyEventScheduleNode = xmldoc.CreateElement("EventSchedule");
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Completed"));
-            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.isComplete.ToString();
+            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.getIsComplete.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("RepetitionFlag"));
-            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.RepetitionStatus.ToString();
+            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.IsFromRecurringAndNotChildRepeatCalEvent.ToString();
+            MyEventScheduleNode.PrependChild(xmldoc.CreateElement("IsRepeatsChildCalEvent"));
+            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.IsRepeatsChildCalEvent.ToString();
 
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("EventSubSchedules"));
             //MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.Repetition.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("RigidFlag"));
-            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.Rigid.ToString();
+            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.isRigid.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Duration"));
-            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.ActiveDuration.ToString();
+            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.getActiveDuration.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Split"));
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.NumberOfSplit.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Deadline"));
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.End.UtcDateTime.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("PrepTime"));
-            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.Preparation.ToString();
-            //MyEventScheduleNode.PrependChild(xmldoc.CreateElement("PreDeadlineFlag"));
-            //MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.Pre.ToString();
-            
+            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.getPreparation.ToString();
+
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("CompletionCount"));
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.CompletionCount.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("DeletionCount"));
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.DeletionCount.ToString();
 
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("PreDeadline"));
-            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.PreDeadline.ToString();
+            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.getPreDeadline.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("StartTime"));
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.Start.UtcDateTime.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Name"));
-            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.Name.ToString();
+            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.getName?.NameValue.ToString();
+            MyEventScheduleNode.PrependChild(xmldoc.CreateElement("NameId"));
+            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.getName?.NameId.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("ID"));
-            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.ID.ToString();
+            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.getId;
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Enabled"));
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.isEnabled.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Location"));
-            MyEventScheduleNode.ChildNodes[0].InnerXml = CreateLocationNode(MyEvent.myLocation, "EventScheduleLocation").InnerXml;
+            MyEventScheduleNode.ChildNodes[0].InnerXml = CreateLocationNode(MyEvent.Location, "EventScheduleLocation").InnerXml;
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("UIParams"));
-            MyEventScheduleNode.ChildNodes[0].InnerXml = createDisplayUINode(MyEvent.UIParam, "UIParams").InnerXml;
+            MyEventScheduleNode.ChildNodes[0].InnerXml = createDisplayUINode(MyEvent.getUIParam, "UIParams").InnerXml;
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("MiscData"));
             MyEventScheduleNode.ChildNodes[0].InnerXml = createMiscDataNode(MyEvent.Notes, "MiscData").InnerXml;
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Restricted"));
-            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.isEventRestricted.ToString();
+            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.getIsEventRestricted.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("NowProfile"));
-            MyEventScheduleNode.ChildNodes[0].InnerXml = (generateNowProfileNode(MyEvent.NowInfo).InnerXml);
+            MyEventScheduleNode.ChildNodes[0].InnerXml = (generateNowProfileNode(MyEvent.getNowInfo).InnerXml);
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("ProcrastinationProfile"));
-            MyEventScheduleNode.ChildNodes[0].InnerXml = (generateProcrastinationNode(MyEvent.ProcrastinationInfo).InnerXml);
+            MyEventScheduleNode.ChildNodes[0].InnerXml = (generateProcrastinationNode(MyEvent.getProcrastinationInfo)?.InnerXml);
+            MyEventScheduleNode.PrependChild(xmldoc.CreateElement("isProcrastinateEvent"));
+            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.getIsProcrastinateCalendarEvent.ToString();
+            MyEventScheduleNode.PrependChild(xmldoc.CreateElement("TimeZone"));
+            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.getTimeZone;
+            MyEventScheduleNode.PrependChild(xmldoc.CreateElement("TimeCreated"));
+            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.TimeCreated.ToString();
+            MyEventScheduleNode.PrependChild(xmldoc.CreateElement("ThirdpartyType"));
+            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.ThirdpartyType.ToString();
+            MyEventScheduleNode.PrependChild(xmldoc.CreateElement("EventPreference"));
+            MyEventScheduleNode.ChildNodes[0].InnerXml = CreateEventPreference(MyEvent.DayPreference)?.InnerXml;
+            MyEventScheduleNode.PrependChild(xmldoc.CreateElement("LastCompletionTimes"));
+            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.LastCompletionTime_DB;
+            MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Access_DB"));
+            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.Access_DB;
+            MyEventScheduleNode.PrependChild(xmldoc.CreateElement("IniStartTime"));
+            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.InitialStartTime_DB.ToString();
+            MyEventScheduleNode.PrependChild(xmldoc.CreateElement("IniEndTime"));
+            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.InitialEndTime_DB.ToString();
+            MyEventScheduleNode.PrependChild(xmldoc.CreateElement("DeadlineSuggestion"));
+            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.DeadlineSuggestion_DB.ToString();
+            if (!MyEvent.isThirdParty)
+            {
+                MyEventScheduleNode.PrependChild(xmldoc.CreateElement("UpdateHistory"));
+                MyEventScheduleNode.ChildNodes[0].InnerText = CreateUpdateHistory(MyEvent.TimeLineHistory)?.InnerXml;
+            }
             
-            if (MyEvent.isEventRestricted)
+
+            if (MyEvent.getIsEventRestricted)
             {
                 CalendarEventRestricted restrictedMyEvent = (CalendarEventRestricted)MyEvent;
-                XmlElement restrictionProfileData = generateXMLRestrictionProfile(restrictedMyEvent.RetrictionInfo);
+                XmlElement restrictionProfileData = generateXMLRestrictionProfile(restrictedMyEvent.RestrictionProfile);
                 MyEventScheduleNode.PrependChild(xmldoc.CreateElement("RestrictionProfile"));
                 MyEventScheduleNode.ChildNodes[0].InnerXml = restrictionProfileData.InnerXml;
             }
 
 
-            if (MyEvent.RepetitionStatus)
+            if (MyEvent.IsFromRecurringAndNotChildRepeatCalEvent && MyEvent.isRepeatLoaded)
             {
                 MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Recurrence"));
                 MyEventScheduleNode.ChildNodes[0].InnerXml = CreateRepetitionNode(MyEvent.Repeat).InnerXml;
@@ -763,16 +701,9 @@ namespace TilerFront
                 SubScheduleNodes.PrependChild(xmldoc.CreateElement("EventSubSchedule"));
                 SubScheduleNodes.ChildNodes[0].InnerXml = CreateSubScheduleNode(MySubEvent).InnerXml;
             }
-            //MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.ID;
 
 
             return MyEventScheduleNode;
-        }
-
-        public DateTimeOffset Truncate(DateTimeOffset dateTime, TimeSpan timeSpan)
-        {
-            if (timeSpan == TimeSpan.Zero) return dateTime; // Or could throw an ArgumentException
-            return dateTime.AddTicks(-(dateTime.Ticks % timeSpan.Ticks));
         }
 
         public XmlElement CreateRepetitionNode(Repetition RepetitionObjEntry)//This takes a repetition object, and creates a Repetition XmlNode
@@ -800,7 +731,7 @@ namespace TilerFront
             RepeatCalendarEventsNode.PrependChild(xmldoc.CreateElement("RepeatEndDate"));
             RepeatCalendarEventsNode.ChildNodes[0].InnerText = RepetitionObjEntry.Range.End.UtcDateTime.ToString();
             RepeatCalendarEventsNode.PrependChild(xmldoc.CreateElement("RepeatFrequency"));
-            RepeatCalendarEventsNode.ChildNodes[0].InnerText = RepetitionObjEntry.Frequency;
+            RepeatCalendarEventsNode.ChildNodes[0].InnerText = RepetitionObjEntry.getFrequency.ToString();
             RepeatCalendarEventsNode.PrependChild(xmldoc.CreateElement("RepeatDay"));
             RepeatCalendarEventsNode.ChildNodes[0].InnerText = RepetitionObjEntry.weekDay.ToString();
             RepeatCalendarEventsNode.PrependChild(xmldoc.CreateElement("RepeatDays"));
@@ -828,32 +759,39 @@ namespace TilerFront
 
         public XmlElement generateProcrastinationNode(Procrastination ProcrastinationData)
         {
-            XmlDocument xmldoc = new XmlDocument();
-            XmlElement ProcrastinationProfileNode = xmldoc.CreateElement("ProcrastinationProfile");
-            XmlElement ProcrastinationPreferredStart = xmldoc.CreateElement("ProcrastinationPreferredStart");
-            ProcrastinationPreferredStart.InnerText = ProcrastinationData.PreferredStartTime.ToString();
-            XmlElement ProcrastinationDislikedStartNode = xmldoc.CreateElement("ProcrastinationDislikedStart");
-            ProcrastinationDislikedStartNode.InnerText = ProcrastinationData.DislikedStartTime.ToString();
-            XmlElement ProcrastinationDislikedDaySectionNode = xmldoc.CreateElement("ProcrastinationDislikedDaySection");
-            ProcrastinationDislikedDaySectionNode.InnerText = ProcrastinationData.DislikedDaySection.ToString();
-            ProcrastinationProfileNode.AppendChild(ProcrastinationPreferredStart);
-            ProcrastinationProfileNode.AppendChild(ProcrastinationDislikedStartNode);
-            ProcrastinationProfileNode.AppendChild(ProcrastinationDislikedDaySectionNode);
-            return ProcrastinationProfileNode;
+            if(ProcrastinationData!=null)
+            {
+                XmlDocument xmldoc = new XmlDocument();
+                XmlElement ProcrastinationProfileNode = xmldoc.CreateElement("ProcrastinationProfile");
+                XmlElement ProcrastinationPreferredStart = xmldoc.CreateElement("ProcrastinationPreferredStart");
+                ProcrastinationPreferredStart.InnerText = ProcrastinationData?.PreferredStartTime.ToString();
+                XmlElement ProcrastinationDislikedStartNode = xmldoc.CreateElement("ProcrastinationDislikedStart");
+                ProcrastinationDislikedStartNode.InnerText = ProcrastinationData?.DislikedStartTime.ToString();
+                XmlElement ProcrastinationDislikedDaySectionNode = xmldoc.CreateElement("ProcrastinationDislikedDaySection");
+                ProcrastinationDislikedDaySectionNode.InnerText = ProcrastinationData?.DislikedDaySection.ToString();
+                ProcrastinationProfileNode.AppendChild(ProcrastinationPreferredStart);
+                ProcrastinationProfileNode.AppendChild(ProcrastinationDislikedStartNode);
+                ProcrastinationProfileNode.AppendChild(ProcrastinationDislikedDaySectionNode);
+                return ProcrastinationProfileNode;
+            } else
+            {
+                return null;
+            }
+            
         }
 
         public XmlElement generateXMLRestrictionProfile(RestrictionProfile RestrictionProfileData)
         {
             XmlDocument xmldoc = new XmlDocument();
             XmlElement RestrictionProfileNode = xmldoc.CreateElement("RestrictionProfile");
-            List<Tuple<DayOfWeek, RestrictionTimeLine>> ActiveRestrictions = RestrictionProfileData.getActiveDays();
-            foreach (Tuple<DayOfWeek, RestrictionTimeLine> eachTuple in ActiveRestrictions)
+            List<RestrictionDay> ActiveRestrictions = RestrictionProfileData.getActiveDays();
+            foreach (RestrictionDay eachTuple in ActiveRestrictions)
             {
                 XmlElement RestrictionNode = xmldoc.CreateElement("RestrictionNode");
                 XmlElement RestrictionDayOfWeekNode = xmldoc.CreateElement("RestrictionDayOfWeek");
-                RestrictionDayOfWeekNode.InnerText = ((int)eachTuple.Item1).ToString();
+                RestrictionDayOfWeekNode.InnerText = eachTuple.DayOfWeekString;
                 XmlElement RestrictionTimeLineNode = xmldoc.CreateElement("RestrictionTimeLineData");
-                RestrictionTimeLineNode.InnerXml=generateRestrictionTimeLineNode(eachTuple.Item2).InnerXml;
+                RestrictionTimeLineNode.InnerXml = generateRestrictionTimeLineNode(eachTuple.RestrictionTimeLine).InnerXml;
                 RestrictionNode.AppendChild(RestrictionTimeLineNode);
                 RestrictionNode.AppendChild(RestrictionDayOfWeekNode);
                 RestrictionProfileNode.AppendChild(RestrictionNode);
@@ -880,34 +818,25 @@ namespace TilerFront
 
             SubCalendarEventRestricted restrictedMySub;
             XmlDocument xmldoc = new XmlDocument();
-            
 
 
-            
-            
+
+
+
             XmlElement MyEventSubScheduleNode = xmldoc.CreateElement("EventSubSchedule");
             DateTimeOffset StartTime = MySubEvent.Start;
-            StartTime = Truncate(StartTime, TimeSpan.FromSeconds(1));
+            StartTime = StartTime.removeSecondsAndMilliseconds();
             DateTimeOffset EndTime = MySubEvent.End;
-            EndTime = Truncate(EndTime, TimeSpan.FromSeconds(1));
-            TimeSpan EventTimeSpan = MySubEvent.ActiveDuration;
-            long AllSecs = (long)EventTimeSpan.TotalSeconds;
-            long AllTicks = (long)EventTimeSpan.TotalMilliseconds;
-            long DiffSecs = (long)(EndTime - StartTime).TotalSeconds;
-            long DiffTicks = (long)(EndTime - StartTime).TotalMilliseconds;
-            EventTimeSpan = TimeSpan.FromSeconds(AllSecs);
-            if ((EndTime - StartTime) != EventTimeSpan)
-            {
-                EndTime = StartTime.Add(EventTimeSpan);
-            }
+            EndTime = EndTime.removeSecondsAndMilliseconds();
+            TimeSpan EventTimeSpan = MySubEvent.getActiveDuration;
 
-            if ((!string.IsNullOrEmpty(MySubEvent.myLocation.Description)) || (!MySubEvent.myLocation.isNull))
+            if ((!string.IsNullOrEmpty(MySubEvent.Location.Description)) || (!MySubEvent.Location.isNull))
             {
-                string TaggedLocation = MySubEvent.myLocation.Description;
+                string TaggedLocation = MySubEvent.Location.Description;
                 TaggedLocation = TaggedLocation.ToLower();
                 if (!CachedLocation.ContainsKey(TaggedLocation))
                 {
-                    CachedLocation.Add(TaggedLocation, MySubEvent.myLocation);
+                    CachedLocation.Add(TaggedLocation, MySubEvent.Location);
                 }
 
             }
@@ -927,34 +856,69 @@ namespace TilerFront
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("ActiveStartTime"));
             MyEventSubScheduleNode.ChildNodes[0].InnerText = StartTime.UtcDateTime.ToString();
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("PrepTime"));
-            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.Preparation.ToString();
+            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.getPreparation.ToString();
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("ThirdPartyID"));
             MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.ThirdPartyID;
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("Rigid"));
-            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.Rigid.ToString();
+            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.isRigid.ToString();
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("ID"));
-            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.ID.ToString();
+            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.getId;
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("Enabled"));
             MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.isEnabled.ToString();
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("Complete"));
-            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.isComplete.ToString();
-            
+            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.getIsComplete.ToString();
+            MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("Name"));
+            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.getName?.NameValue?.ToString();
+            MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("NameId"));
+            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.getName?.NameId.ToString();
+
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("Location"));
-            MyEventSubScheduleNode.ChildNodes[0].InnerXml = CreateLocationNode(MySubEvent.myLocation, "EventSubScheduleLocation").InnerXml;
+            MyEventSubScheduleNode.ChildNodes[0].InnerXml = CreateLocationNode(MySubEvent.Location, "EventSubScheduleLocation").InnerXml;
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("UIParams"));
-            MyEventSubScheduleNode.ChildNodes[0].InnerXml = createDisplayUINode(MySubEvent.UIParam, "UIParams").InnerXml;
+            MyEventSubScheduleNode.ChildNodes[0].InnerXml = createDisplayUINode(MySubEvent.getUIParam, "UIParams").InnerXml;
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("MiscData"));
             MyEventSubScheduleNode.ChildNodes[0].InnerXml = createMiscDataNode(MySubEvent.Notes, "MiscData").InnerXml;
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("ConflictProfile"));
             MyEventSubScheduleNode.ChildNodes[0].InnerXml = CreateConflictProfile(MySubEvent.Conflicts, "ConflictProfile").InnerXml;
+            MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("TimePositionReasons"));
+            MyEventSubScheduleNode.ChildNodes[0].InnerXml = ReasonForPosition(MySubEvent.ReasonsForPosiition.SelectMany(obj => obj.Value).ToList(), "TimePositionReasons").InnerXml;
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("Restricted"));
-            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.isEventRestricted.ToString();
+            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.getIsEventRestricted.ToString();
             MyEventSubScheduleNode.PrependChild(CreatePauseUsedUpNode(MySubEvent, xmldoc));
+            MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("isProcrastinateEvent"));
+            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.getIsProcrastinateCalendarEvent.ToString();
+            MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("TimeZone"));
+            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.getTimeZone;
+            MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("TimeCreated"));
+            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.TimeCreated.ToString();
+            MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("TravelTimeAfter"));
+            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.TravelTimeAfter.ToString();
+            MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("TravelTimeBefore"));
+            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.TravelTimeBefore.ToString();
+            MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("isWake"));
+            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.isWake.ToString();
+            MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("isSleep"));
+            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.isSleep.ToString();
+            MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("ThirdpartyType"));
+            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.ThirdpartyType.ToString();
+            MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("AutoDeleted"));
+            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.AutoDeleted_EventDB.ToString();
+            MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("AutoDeletionReason"));
+            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.AutoDeletion_ReasonDB.ToString();
+            MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("RepetitionLock"));
+            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.RepetitionLock_DB.ToString();
+            MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("isTardy"));
+            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.isTardy.ToString();
+            MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("IniStartTime"));
+            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.InitialStartTime_DB.ToString();
+            MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("IniEndTime"));
+            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.InitialEndTime_DB.ToString();
 
-            if (MySubEvent.isEventRestricted)
+
+            if (MySubEvent.getIsEventRestricted)
             {
                 restrictedMySub = (SubCalendarEventRestricted)MySubEvent;
-                XmlElement restrictionProfileData =  generateXMLRestrictionProfile(restrictedMySub.RetrictionInfo);
+                XmlElement restrictionProfileData = generateXMLRestrictionProfile(restrictedMySub.RestrictionProfile);
                 MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("RestrictionProfile"));
                 MyEventSubScheduleNode.ChildNodes[0].InnerXml = restrictionProfileData.InnerXml;
             }
@@ -969,7 +933,7 @@ namespace TilerFront
         /// <returns></returns>
         public XmlElement CreatePauseUsedUpNode(SubCalendarEvent SubEvent, XmlDocument xmldoc)
         {
-            
+
 
             XmlElement UsedUpTime = xmldoc.CreateElement("UsedUpTime");
             XmlElement PauseTime = xmldoc.CreateElement("PauseTime");
@@ -981,8 +945,61 @@ namespace TilerFront
 
             return RetValue;
         }
+        public XmlElement ReasonForPosition(List<Reason> reasons, string ElementIdentifier = "TimePositionReasons")
+        {
+            XmlSerializer serializer = new XmlSerializer(typeof(List<Reason>));
+            XmlDocument xmldoc = new XmlDocument();
+            XmlElement retValue = xmldoc.CreateElement(ElementIdentifier);
+            using (XmlWriter writer = xmldoc.CreateNavigator().AppendChild())
+            {
+                serializer.Serialize(writer, reasons);
+            }
+            retValue.InnerXml = xmldoc.FirstChild.InnerXml;
+            return retValue;
+        }
 
-        public XmlElement CreateLocationNode(Location_Elements Arg1, string Identifier = "Location")
+
+        public XmlElement CreateEventPreference(EventPreference preference, string ElementIdentifier = "EventPreference")
+        {
+            if(preference!=null)
+            {
+                XmlSerializer serializer = new XmlSerializer(typeof(EventPreference));
+                XmlDocument xmldoc = new XmlDocument();
+                XmlElement retValue = xmldoc.CreateElement(ElementIdentifier);
+                using (XmlWriter writer = xmldoc.CreateNavigator().AppendChild())
+                {
+                    serializer.Serialize(writer, preference);
+                }
+                retValue.InnerXml = xmldoc.FirstChild.InnerXml;
+                return retValue;
+            } else
+            {
+                return null;
+            }
+        }
+
+        public XmlElement CreateUpdateHistory(TimeLineHistory updateHistory, string ElementIdentifier = "UpdateHistory")
+        {
+            if (updateHistory != null)
+            {
+                var updateHistory_copy = updateHistory.CreateCopy();
+                XmlSerializer serializer = new XmlSerializer(typeof(TimeLineHistory));
+                XmlDocument xmldoc = new XmlDocument();
+                XmlElement retValue = xmldoc.CreateElement(ElementIdentifier);
+                using (XmlWriter writer = xmldoc.CreateNavigator().AppendChild())
+                {
+                    serializer.Serialize(writer, updateHistory_copy);
+                }
+                retValue.InnerXml = xmldoc.FirstChild.InnerXml;
+                return retValue;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public XmlElement CreateLocationNode(TilerElements.Location Arg1, string Identifier = "Location")
         {
             XmlDocument xmldoc = new XmlDocument();
             XmlElement var1 = xmldoc.CreateElement(Identifier);
@@ -992,10 +1009,10 @@ namespace TilerFront
             string MappedAddress = "";
             string IsNull = true.ToString(); ;
             string CheckCalendarEvent = 0.ToString();
-            if ((Arg1 != null) )//&& (!Arg1.isNull))
+            if ((Arg1 != null))//&& (!Arg1.isNull))
             {
-                XCoordinate = Arg1.XCoordinate.ToString();
-                YCoordinate = Arg1.YCoordinate.ToString();
+                XCoordinate = Arg1.Latitude.ToString();
+                YCoordinate = Arg1.Longitude.ToString();
                 Descripion = Arg1.Description;
                 MappedAddress = Arg1.Address;
                 IsNull = Arg1.isNull.ToString();
@@ -1013,6 +1030,18 @@ namespace TilerFront
             var1.ChildNodes[0].InnerText = IsNull;
             var1.PrependChild(xmldoc.CreateElement("CheckCalendarEvent"));
             var1.ChildNodes[0].InnerText = CheckCalendarEvent;
+            var1.PrependChild(xmldoc.CreateElement("Id"));
+            var1.ChildNodes[0].InnerText = Arg1.Id;
+            var1.PrependChild(xmldoc.CreateElement("UserId"));
+            var1.ChildNodes[0].InnerText = Arg1.UserId;
+            var1.PrependChild(xmldoc.CreateElement("LocationValidation"));
+            var1.ChildNodes[0].InnerText = Arg1.LocationValidation_DB;
+            var1.PrependChild(xmldoc.CreateElement("LookupString"));
+            var1.ChildNodes[0].InnerText = Arg1.LookupString;
+            var1.PrependChild(xmldoc.CreateElement("IsDefault"));
+            var1.ChildNodes[0].InnerText = Arg1.isDefault.ToString();
+            var1.PrependChild(xmldoc.CreateElement("IsVerified"));
+            var1.ChildNodes[0].InnerText = Arg1.IsVerified.ToString();
             return var1;
         }
 
@@ -1084,12 +1113,16 @@ namespace TilerFront
         {
             XmlDocument xmldoc = new XmlDocument();
             XmlElement var1 = xmldoc.CreateElement(ElementIdentifier);
-            var1.PrependChild(xmldoc.CreateElement("Visible"));
-            var1.ChildNodes[0].InnerText = Arg1.isVisible.ToString();
             var1.PrependChild(xmldoc.CreateElement("Color"));
+            if (Arg1 == null)
+            {
+                Arg1 = new EventDisplay();
+            }
             var1.ChildNodes[0].InnerXml = createColorNode(Arg1.UIColor, "Color").InnerXml;
             var1.PrependChild(xmldoc.CreateElement("Type"));
-            var1.ChildNodes[0].InnerText = Arg1.isDefault.ToString();
+            var1.ChildNodes[0].InnerText = Arg1.Default.ToString();
+            var1.PrependChild(xmldoc.CreateElement("Visible"));
+            var1.ChildNodes[0].InnerText = Arg1.Visible.ToString();
             return var1;
         }
 
@@ -1116,72 +1149,89 @@ namespace TilerFront
             XmlDocument xmldoc = new XmlDocument();
             XmlElement var1 = xmldoc.CreateElement(ElementIdentifier);
             var1.PrependChild(xmldoc.CreateElement("UserNote"));
-            var1.ChildNodes[0].InnerText = Arg1.UserNote.ToString();
+            var1.ChildNodes[0].InnerText = Arg1?.UserNote;
             var1.PrependChild(xmldoc.CreateElement("TypeSelection"));
-            var1.ChildNodes[0].InnerText = Arg1.TypeSelection.ToString();
+            var1.ChildNodes[0].InnerText = Arg1?.TypeSelection.ToString();
             return var1;
         }
         public void EmptyCalendarXMLFile(string dirString = "")
         {
-            if (string.IsNullOrEmpty(dirString))
-            {
-                dirString = WagTapLogLocation + CurrentLog;
-            }
 
-            File.WriteAllText(dirString, "<?xml version=\"1.0\" encoding=\"utf-8\"?><ScheduleLog><LastIDCounter>1024</LastIDCounter><referenceDay>8:00 AM</referenceDay><EventSchedules></EventSchedules></ScheduleLog>");
         }
 
-        public void deleteAllCalendarEvets(string dirString = "")
+        public virtual void deleteAllCalendarEvents(string dirString = "")
         {
-#if ForceReadFromXml
-#else
-            if(useCassandra)
-            {
-                return;
-            }
-#endif
-            if (string.IsNullOrEmpty(dirString))
-            {
-                dirString = WagTapLogLocation + CurrentLog;
-            }
-
-            XmlDocument doc = new XmlDocument();
-            while (true)
-            {
-                if (!File.Exists(dirString))
-                {
-                    break;
-                }
-                try
-                {
-                    doc.Load(dirString);
-                    break;
-                }
-                catch (Exception e)
-                {
-                    Thread.Sleep(160);
-                }
-            }
-
-            XmlNode EventSchedulesNodes = doc.DocumentElement.SelectSingleNode("/ScheduleLog/EventSchedules");
-            EventSchedulesNodes.InnerText = "";
-            while (true)
-            {
-                try
-                {
-                    doc.Save(dirString);
-                    break;
-                }
-                catch (Exception e)
-                {
-                    Thread.Sleep(160);
-                }
-            }
-
+            _Context.CalEvents.Where(calEvent => calEvent.CreatorId == _TilerUser.Id)
+                .ForEachAsync(calEvent => {
+                    calEvent.Disable(false);
+                });
         }
-        #endregion
+#endregion
 
-        #region Read Data
+#region Read Data
+
+        /// <summary>
+        /// Function retrieves a db_tiler user from an xmlnode.  Note if there is no user node it returns an object in which the isNull property is set to true
+        /// </summary>
+        /// <param name="userNode">The xml node with the tiler user information</param>
+        /// <returns></returns>
+        protected DB_TilerUser getTilerLoggedUser(XmlNode userNode)
+        {
+            DB_TilerUser retValue = new DB_TilerUser();
+            if (userNode != null)
+            {
+                XmlNode idNode = userNode.SelectSingleNode("Id");
+                string id = idNode.InnerText;
+                XmlNode userNameNode = userNode.SelectSingleNode("UserName");
+                XmlNode CalendarType = userNode.SelectSingleNode("CalendarType");
+                string userName = userNameNode.InnerText;
+                retValue.Id = id;
+                retValue.UserName = UserName;
+                retValue.CalendarType = CalendarType.InnerText;
+                retValue.isNull = false;
+            }
+            return retValue;
+        }
+        /// <summary>
+        /// Function retrieves a tiler user group form an xmlnode. Npte if there isn't a node a new object will be created with the isNull flag set
+        /// </summary>
+        /// <param name="userGroupNode">xml node with formated user group</param>
+        /// <returns></returns>
+        public DB_TilerUserGroup getTilerUserGroup(XmlNode userGroupNode)
+        {
+            DB_TilerUserGroup retValue = new DB_TilerUserGroup();
+            if (userGroupNode != null)
+            {
+                XmlNode idNode = userGroupNode.SelectSingleNode("Id");
+                string id = idNode.InnerText;
+                List<TilerUser> users = new List<TilerUser>();
+                XmlNode userNodes = userGroupNode.SelectSingleNode("Users");
+                if (userNodes.ChildNodes != null)
+                {
+                    foreach (XmlNode userNode in userNodes.ChildNodes)
+                    {
+                        TilerUser user = getTilerLoggedUser(userNode);
+                        users.Add(user);
+                    }
+
+                }
+                retValue.Id = id;
+                retValue.Users = users;
+                retValue.isNull = false;
+            }
+            return retValue;
+        }
+
+        /// <summary>
+        /// gets the Schedule dump by the dump id
+        /// </summary>
+        /// <param name="dumpId"></param>
+        /// <returns></returns>
+        public async Task<ScheduleDump> GetScheduleDump(string dumpId)
+        {
+            ScheduleDump retValue = await Database.ScheduleDumps.FindAsync(dumpId).ConfigureAwait(false);
+            return retValue;
+        }
 
 
         public string GetShortcutTarget(string file)
@@ -1242,79 +1292,55 @@ namespace TilerFront
             }
         }
 
-        virtual public async Task<DateTimeOffset> getDayReferenceTime(string NameOfFile = "")
+        /// <summary>
+        /// Function gets the end of the day of the specified user.
+        /// </summary>
+        /// <param name="NameOfFile"></param>
+        /// <returns></returns>
+        virtual public DateTimeOffset getDayReferenceTime()
         {
-#if ForceReadFromXml
-#else
-            if (useCassandra)
+            TilerUser user = _TilerUser;
+            if (user == null)
             {
-#if LocalDebug
-                return new DateTimeOffset(1970, 1, 1, 16, 0, 0, new TimeSpan());
-#else
-                return SessionUser.LastChange;
-#endif
+                user = _Context.Users.Find(ID);
+                if (user == null)
+                {
+                    throw new NullReferenceException("Cannot find user with ID " + ID);
+                }
             }
-#endif       
-            XmlDocument doc = getLogDataStore(NameOfFile);
-            XmlNode node = doc.DocumentElement.SelectSingleNode("/ScheduleLog/referenceDay");
-            DateTimeOffset retValue = DateTimeOffset.Parse(node.InnerText).UtcDateTime;
-
+            DateTimeOffset retValue = user.EndfOfDay;
             return retValue;
         }
 
-        private XmlDocument getLogDataStore(string NameOfFile = "")
+        virtual protected IQueryable<TilerElements.Location> getLocationsByUserId(string userId)
         {
-
-            XmlDocument doc = new XmlDocument();
-            if (string.IsNullOrEmpty(NameOfFile))
-            {
-                //NameOfFile = "MyEventLog.xml";
-                NameOfFile = WagTapLogLocation + CurrentLog;
-            }
-#if readfromBeforeInsertionFixingStiticRestricted
-                NameOfFile = WagTapLogLocation + "BeforeInsertionFixingStiticRestricted.xml.lnk";
-                NameOfFile = GetShortcutTarget(NameOfFile);
-#endif
-            while (true)
-            {
-                if (!File.Exists(NameOfFile))
-                {
-                    break;
-                }
-                try
-                {
-                    doc.Load(NameOfFile);
-                    break;
-                }
-                catch (Exception e)
-                {
-                    Thread.Sleep(160);
-                    ;
-
-                }
-            }
-
-            return doc;
+            IQueryable<TilerElements.Location> retValue = _Context.Locations.Where(location => location.UserId == userId);
+            return retValue;
         }
 
-        async protected Task<Dictionary<string, Location_Elements>> getLocationCache(string NameOfFile = "")
+        virtual public IQueryable<TilerElements.Location> getLocationsByDescription(string description)
         {
-            Dictionary<string, Location_Elements> retValue = new Dictionary<string, Location_Elements>();
-#if ForceReadFromXml
-#else
-            if (useCassandra)
-            {
-                Task<Tuple<bool, string, DateTimeOffset, long>> gettingLatesData = LogDBDataAccess.getLatestChanges(ID);
-                Task<Dictionary<string, Location_Elements>> gettingLocationCache = myCassandraAccess.getAllCachedLocations();
-                Tuple<bool, string, DateTimeOffset, long> LatesData =await gettingLatesData;
-                LastIDNumber = LatesData.Item4;
-                retValue = await gettingLocationCache;
-                return retValue;
-            }
-#endif
+            IQueryable<TilerElements.Location> retValue = getLocationsByUserId(_TilerUser.Id).Where(location => location.SearchdDescription.Contains(description));
+            return retValue;
+        }
+
+        virtual public IQueryable<TilerElements.Location> getAllLocationsQuery()
+        {
+            return _Context.Locations;
+        }
+
+        async virtual protected Task<Dictionary<string, TilerElements.Location>> getAllLocationsByUser()
+        {
+            Dictionary<string, TilerElements.Location> retValue = await _Context.Locations.Where(location => location.UserId == _TilerUser.Id).ToDictionaryAsync(obj => obj.SearchdDescription.ToLower(), obj => obj).ConfigureAwait(false);
+            return retValue;
+        }
+
+        public Dictionary<string, TilerElements.Location> getLocationCache(ScheduleDump scheduleDump)
+        {
+            Dictionary<string, TilerElements.Location> retValue = new Dictionary<string, TilerElements.Location>();
 
 
-            XmlDocument doc = getLogDataStore(NameOfFile);
+            XmlDocument doc = scheduleDump.XmlDoc;
             XmlNode node = doc.DocumentElement.SelectSingleNode("/ScheduleLog/LocationCache");
             if (node == null)
             {
@@ -1323,7 +1349,7 @@ namespace TilerFront
             XmlNodeList AllLocationNodes = node.SelectNodes("Locations/Location");
             foreach (XmlNode eachXmlNode in AllLocationNodes)
             {
-                Location_Elements myLocation = generateLocationObjectFromNode(eachXmlNode);
+                TilerElements.Location myLocation = generateLocationObjectFromNode(eachXmlNode);
 
                 if (myLocation != null)
                 {
@@ -1340,157 +1366,1028 @@ namespace TilerFront
             return retValue;
         }
 
-
-
-        public Dictionary<string, CalendarEvent> getAllCalendarFromXml(TimeLine RangeOfLookUP)
+        private IQueryable<Repetition> getRepeatCalendarEvent(
+            DataRetrivalOption retrievalOption,
+            bool includeRecurringEvents, 
+            HashSet<string> ids = null
+            )
         {
-#if ForceReadFromXml
-#else
-            if (useCassandra)
+            IQueryable<Repetition> repetitions = _Context.Repetitions
+                    .Include(repetition => repetition.SubRepetitions)
+                    .Include(repetition => repetition.SubRepetitions.Select(subRepetition => subRepetition.SubRepetitions))
+                    ;
+
+
+            if (includeRecurringEvents)
             {
-                return myCassandraAccess.getAllCalendarEvent();
+                repetitions = repetitions
+                    .Include(repetition => repetition.RepeatingEvents);
             }
-#endif
 
-            XmlDocument doc = getLogDataStore();
-            Dictionary<string, CalendarEvent> MyCalendarEventDictionary = new Dictionary<string, CalendarEvent>();
-
-
-            XmlNode node = doc.DocumentElement.SelectSingleNode("/ScheduleLog/LastIDCounter");
-            string LastUsedIndex = node.InnerText;
-            LastIDNumber =Convert.ToInt64( LastUsedIndex);
-            DateTimeOffset userReferenceDay;
-            XmlNode EventSchedulesNodes = doc.DocumentElement.SelectSingleNode("/ScheduleLog/EventSchedules");
-
-            string ID;
-            string Deadline;
-            string Split;
-            string Completed;
-            string Rigid;
-            string Name;
-            string[] StartDateTime;
-            string StartDate;
-            string StartTime;
-            string[] EndDateTime;
-            string EndDate;
-            string EndTime;
-            string PreDeadline;
-            string CalendarEventDuration;
-            string PreDeadlineFlag;
-            string EventRepetitionflag;
-            string PrepTimeFlag;
-            string PrepTime;
-
-            if (EventSchedulesNodes.ChildNodes!=null)
+            if (ids!=null && ids.Count> 0)
             {
+                repetitions = repetitions.Join(ids,
+                    repetition => repetition.Id,
+                    id => id,
+                    (repetition, id) => new { repetition = repetition, id = id })
+                    .Select(obj => obj.repetition);
+            }
+
+            return repetitions;
+        }
+
+
+        public IQueryable<CalendarEvent> getItAll()
+        {
+            IQueryable<CalendarEvent> calEVents = _Context.CalEvents;
+            
+            calEVents = calEVents
+                .Include(calEvent => calEvent.DataBlob_EventDB)
+                .Include(calEvent => calEvent.Name)
+                .Include(calEvent => calEvent.Name.Creator_EventDB)
+                .Include(calEvent => calEvent.Location_DB)
+                .Include(calEvent => calEvent.Creator_EventDB)
+                .Include(calEvent => calEvent.ProfileOfNow_EventDB)
+                .Include(calEvent => calEvent.AllSubEvents_DB)
+                .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.ParentCalendarEvent))
+                .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Name))
+                .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.DataBlob_EventDB))
+                .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Name.Creator_EventDB))
+                .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Creator_EventDB))
+                .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Location_DB))
+                .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.DataBlob_EventDB))
+                .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.RestrictionProfile_DB))
+                .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Procrastination_EventDB))
+                .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.ProfileOfNow_EventDB));
+            ;
+            return calEVents;
+        }
+
+
+        public IQueryable<CalendarEvent> getCalendarEventQuery(
+            DataRetrivalOption retrievalOption, 
+            bool includeSubEvents, 
+            HashSet<string> ids= null)
+        {
+            IQueryable<CalendarEvent> calEVents = _Context.CalEvents;
+            if (ids != null && ids.Count > 0)
+            {
+                calEVents = calEVents
+                .Join(ids,
+                calEvent => calEvent.Id,
+                id => id,
+                (calEvent, id) => new { calEvent = calEvent, id = id }).Select(obj => obj.calEvent);
+                calEVents = calEVents
+                    .Include(calEvent => calEvent.DataBlob_EventDB)
+                    .Include(calEvent => calEvent.Name)
+                    .Include(calEvent => calEvent.Name.Creator_EventDB)
+                    .Include(calEvent => calEvent.Creator_EventDB)
+                    .Include(calEvent => calEvent.UiParams_EventDB.UIColor)
+                    ;
+
+            }
+
+            if (includeSubEvents)
+            {
+                calEVents = calEVents
+                    .Include(calEvent => calEvent.AllSubEvents_DB)
+                    .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.ParentCalendarEvent))
+                    .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Name))
+                    .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.DataBlob_EventDB))
+                    .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Name.Creator_EventDB))
+                    .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Creator_EventDB))
+                    .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Location_DB))
+                    .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.DataBlob_EventDB))
+                    .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.RestrictionProfile_DB))
+                    .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Procrastination_EventDB))
+                    .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.ProfileOfNow_EventDB));
+                ;
+            }
+
+            if (retrievalOption == DataRetrivalOption.Ui)
+            {
+                calEVents = calEVents
+                    .Include(calEvent => calEvent.UiParams_EventDB)
+                    .Include(calEvent => calEvent.UiParams_EventDB.UIColor)
+                    .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.UiParams_EventDB))
+                    .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.UiParams_EventDB.UIColor));
+            }
+            else if (retrievalOption == DataRetrivalOption.Evaluation)
+            {
+                calEVents = calEVents
+                    .Include(calEvent => calEvent.RestrictionProfile_DB)
+                    .Include(calEvent => calEvent.Procrastination_EventDB)
+                    .Include(calEvent => calEvent.DayPreference_DB)
+                    .Include(calEvent => calEvent.Location_DB)
+                    .Include(calEvent => calEvent.ProfileOfNow_EventDB)
+                    ;
+
+            }
+            else if (retrievalOption == DataRetrivalOption.All)
+            {
+                calEVents = calEVents
+                    .Include(calEvent => calEvent.UiParams_EventDB)
+                    .Include(calEvent => calEvent.UiParams_EventDB.UIColor)
+                    .Include(calEvent => calEvent.Procrastination_EventDB)
+                    .Include(calEvent => calEvent.DayPreference_DB)
+                    .Include(calEvent => calEvent.Repetition_EventDB)
+                    .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents)
+                    .Include(calEvent => calEvent.Repetition_EventDB.SubRepetitions)
+                    .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Procrastination_EventDB))
+                    .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.ProfileOfNow_EventDB))
+                    .Include(calEvent => calEvent.RestrictionProfile_DB)
+                    ;
+            }
+
+
+            
+            return calEVents;
+        }
+
+        private IQueryable<SubCalendarEvent> getSubCalendarEventQuery(
+            DataRetrivalOption retrievalOption,
+            bool includeOtherEntities,
+            HashSet<string> ids = null)
+        {
+            IQueryable<SubCalendarEvent> subEvents = _Context.SubEvents.Where(subEvent => subEvent.CreatorId == _TilerUser.Id);
+            if (ids != null && ids.Count > 0)
+            {
+                subEvents = subEvents
+                .Join(ids,
+                subEvent => subEvent.Id,
+                id => id,
+                (subEvent, id) => new { subEvent = subEvent, id = id }).Select(obj => obj.subEvent);
+            }
+            if (includeOtherEntities)
+            {
+                subEvents = subEvents
+                    .Include(subEvent => subEvent.Name)
+                    .Include(subEvent => subEvent.Name.Creator_EventDB)
+                    .Include(subEvent => subEvent.Location_DB)
+                    .Include(subEvent => subEvent.Creator_EventDB)
+                    .Include(subEvent => subEvent.Location_DB)
+                    .Include(subEvent => subEvent.DataBlob_EventDB);
+            }
+
+            if (retrievalOption == DataRetrivalOption.Ui)
+            {
+                subEvents = subEvents
+                    .Include(subEvent => subEvent.UiParams_EventDB)
+                    .Include(subEvent => subEvent.UiParams_EventDB.UIColor);
+            }
+            else if (retrievalOption == DataRetrivalOption.Evaluation)
+            {
+                subEvents = subEvents
+                    .Include(subEvent => subEvent.RestrictionProfile_DB)
+                    .Include(subEvent => subEvent.Procrastination_EventDB)
+                    .Include(subEvent => subEvent.ProfileOfNow_EventDB);
+            }
+            else if (retrievalOption == DataRetrivalOption.All)
+            {
+                subEvents = subEvents
+                    .Include(subEvent => subEvent.UiParams_EventDB)
+                    .Include(subEvent => subEvent.UiParams_EventDB.UIColor)
+                    .Include(subEvent => subEvent.Procrastination_EventDB)
+                    .Include(subEvent => subEvent.ProfileOfNow_EventDB)
+                    .Include(subEvent => subEvent.RestrictionProfile_DB)
+                    .Include(subEvent => subEvent.Procrastination_EventDB)
+                    .Include(subEvent => subEvent.ProfileOfNow_EventDB);
+            }
+
+            subEvents = subEvents
+                .Include(subEvent => subEvent.ParentCalendarEvent);
+            return subEvents;
+        }
+
+        /// <summary>
+        /// Function retrieves the travel cache of for a specific user
+        /// </summary>
+        /// <param name="tilerUser"></param>
+        /// <returns></returns>
+        async public virtual Task<TravelCache> getTravelCache(TilerUser tilerUser)
+        {
+            return await getTravelCache(tilerUser.Id).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Function retrieves the travel cache of for a specific user
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        async public virtual Task<TravelCache> getTravelCache(string userId)
+        {
+            var retValueQuery = _Context.TravelCaches.Where(travel => travel.Id == userId);
+            var retValue = await retValueQuery
+                .Include(cache => cache.LocationCombo_DB)
+                .SingleOrDefaultAsync().ConfigureAwait(false);
+            if (retValue == null)
+            {
+                retValue = new TravelCache
+                {
+                    Id = userId
+                };
+                _Context.TravelCaches.Add(retValue);
+                _Context.SaveChanges();
+            }
+            if(retValue.Id == null)
+            {
+                retValue.Id = userId;
+            }
+            return retValue;
+        }
+
+
+        /// <summary>
+        ///  FUnction makes a storage call to retrieve all sub events. Note this includes both completed and deleted sub events. Except the case of count decrement
+        /// </summary>
+        /// <param name="timeline"></param>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        public IEnumerable<SubCalendarEvent> getSubCalendarEventForAnalysis(TimeLine timeline, TilerUser user)
+        {
+            if (timeline!=null && user!= null)
+            {
+                IQueryable<SubCalendarEvent> subEventQuery = null;
+                IQueryable<CalendarEvent> caleventQuery = getCalendarEventQuery(DataRetrivalOption.Evaluation, false);
+                caleventQuery = caleventQuery
+                    .Where(calEvent =>
+                        calEvent.CreatorId == user.Id
+                        && calEvent.StartTime_EventDB < timeline.End
+                        && calEvent.EndTime_EventDB > timeline.Start
+                    )
+                    .Include(calEvent => calEvent.TimeLineHistory_DB)
+                    .Include(calEvent => calEvent.TimeLineHistory_DB.TimeLines_DB)
+                    .Include(calEvent => calEvent.AllSubEvents_DB)
+                    ;
+                var calEvents = caleventQuery.ToList();
+                HashSet<SubCalendarEvent> retValue = new HashSet<SubCalendarEvent>(calEvents.SelectMany(calEvent => calEvent.AllSubEvents_DB).ToList());
+                return retValue;
+            }
+            
+            if(timeline!=null)
+            {
+                throw new ArgumentNullException("timeline");
+            }
+            else
+            {
+                throw new ArgumentNullException("user");
+            }
+        }
+
+        async public virtual Task<IEnumerable<SubCalendarEvent>> getAllSubCalendarEvents(TimeLine RangeOfLookUP, ReferenceNow Now, bool includeOtherEntities = false, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation) {
+#if liveDebugging
+            includeOtherEntities = true;
+#else
+#endif
+            this.Now = Now;
+            long rangeStart = RangeOfLookUP.Start.ToUnixTimeMilliseconds();
+            long rangeEnd = RangeOfLookUP.End.ToUnixTimeMilliseconds();
+            IQueryable<SubCalendarEvent> allSubCalQuery = getSubCalendarEventQuery(retrievalOption, includeOtherEntities: includeOtherEntities);
+            allSubCalQuery = allSubCalQuery
+                .Where(subEvent =>
+                        subEvent.IsEnabled_DB
+                        && !subEvent.Complete_EventDB
+                        && subEvent.StartTime_EventDB < RangeOfLookUP.End
+                        && subEvent.EndTime_EventDB > RangeOfLookUP.Start
+                        && subEvent.CompletionTime_EventDB< rangeEnd
+                        && subEvent.CompletionTime_EventDB > rangeStart
+                        && subEvent.ParentCalendarEvent.IsEnabled_DB
+                        && !subEvent.ParentCalendarEvent.Complete_EventDB
+                        && subEvent.ParentCalendarEvent.StartTime_EventDB < RangeOfLookUP.End
+                        && subEvent.ParentCalendarEvent.EndTime_EventDB > RangeOfLookUP.Start);
+            allSubCalQuery = allSubCalQuery
+                .Include(subEvent => subEvent.ParentCalendarEvent)
+                .Include(subEvent => subEvent.ParentCalendarEvent.AllSubEvents_DB)
+                .Include(subEvent => subEvent.RepeatParentEvent)
+                .Include(subEvent => subEvent.ParentCalendarEvent.TimeLineHistory_DB)
+                ;
+
+            List<SubCalendarEvent> retValue = await allSubCalQuery.ToListAsync().ConfigureAwait(false);
+            return retValue;
+        }
+
+
+        async public virtual Task<IEnumerable<SubCalendarEvent>> getAllEnabledSubCalendarEvent(TimeLine RangeOfLookUP, ReferenceNow Now, bool includeOtherEntities = true, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation)
+        {
+            this.Now = Now;
+            Stopwatch watch = new Stopwatch();
+            watch.Start();
+            IQueryable<SubCalendarEvent> allSubCalQuery = getSubCalendarEventQuery(retrievalOption, includeOtherEntities: includeOtherEntities);
+            allSubCalQuery = allSubCalQuery
+                .Where(subEvent =>
+                        subEvent.IsEnabled_DB
+                        && !subEvent.Complete_EventDB
+                        && subEvent.StartTime_EventDB < RangeOfLookUP.End
+                        && subEvent.EndTime_EventDB > RangeOfLookUP.Start
+                        && subEvent.ParentCalendarEvent.IsEnabled_DB
+                        && !subEvent.ParentCalendarEvent.Complete_EventDB
+                        && subEvent.ParentCalendarEvent.StartTime_EventDB < RangeOfLookUP.End
+                        && subEvent.ParentCalendarEvent.EndTime_EventDB > RangeOfLookUP.Start
+                        && (
+                                (subEvent.RepeatParentEventId == null) || 
+                                (
+                                    (
+                                        (
+                                            subEvent.RepeatParentEventId != null && subEvent.RepeatParentEvent.IsEnabled_DB
+                                            && !subEvent.RepeatParentEvent.Complete_EventDB
+                                            && subEvent.RepeatParentEvent.StartTime_EventDB < RangeOfLookUP.End
+                                            && subEvent.RepeatParentEvent.EndTime_EventDB > RangeOfLookUP.Start
+                                        ) &&
+                                        (subEvent.RepeatParentEvent != null && subEvent.RepeatParentEvent.IsEnabled_DB)
+                                    )
+                                    && (
+                                        (
+                                            (subEvent.RepeatParentEvent.RepeatParentEventId == null) ||
+                                            (
+                                                (
+                                                    subEvent.RepeatParentEvent.RepeatParentEventId != null && subEvent.RepeatParentEvent.RepeatParentEvent.IsEnabled_DB
+                                                    && !subEvent.RepeatParentEvent.RepeatParentEvent.Complete_EventDB
+                                                    && subEvent.RepeatParentEvent.RepeatParentEvent.StartTime_EventDB < RangeOfLookUP.End
+                                                    && subEvent.RepeatParentEvent.RepeatParentEvent.EndTime_EventDB > RangeOfLookUP.Start
+                                                ) &&
+                                                (subEvent.RepeatParentEvent.RepeatParentEvent != null && subEvent.RepeatParentEvent.RepeatParentEvent.IsEnabled_DB)
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+
+                        
+                    );
+
+            allSubCalQuery = allSubCalQuery.Where(calEvent => calEvent.CreatorId == _TilerUser.Id);
+            var retValue = await allSubCalQuery
+                .ToListAsync().ConfigureAwait(false);
+            watch.Stop();
+            TimeSpan webFrontEndSpan = watch.Elapsed;
+            Debug.WriteLine("web Front End Span " + webFrontEndSpan.ToString());
+            return retValue;
+
+        }
+        /// <summary>
+        /// This gets all cal events within <paramref name="RangeOfLookUP"/>. Note: This uses the subcalendar event as the bases for the query. So if a sub event is not within the rangelookup it won't pull the calendar event, this is for performance reasons. Hence why the general default is to be generous.  If you want to pull a specific calendar event then you need to include the calendar id as part of <paramref name="tilerIds"/>.
+        /// <paramref name="retrievalOption"/> provides a way of stream lining whats pulled from the DB. Evaluation ignores the UI component and includes only data to compute the schedule. Information such as NowProfile, procrastination and location
+        /// </summary>
+        /// <param name="RangeOfLookUP"></param>
+        /// <param name="Now"></param>
+        /// <param name="includeSubEvents"></param>
+        /// <param name="includeUpdateHistory"></param>
+        /// <param name="retrievalOption"></param>
+        /// <param name="tilerIds"></param>
+        /// <returns></returns>
+        async public virtual Task<Dictionary<string, CalendarEvent>> getAllEnabledCalendarEvent(
+            TimeLine RangeOfLookUP,
+            ReferenceNow Now,
+            bool includeUpdateHistory,
+            bool includeSubEvents = true,
+            DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation,
+            HashSet<string> tilerIds = null)
+        {
+            if (retrievalOption == DataRetrivalOption.Evaluation)
+            {
+                this.Now = Now;
+                Stopwatch watch = new Stopwatch();
+                watch.Start();
+                CalendarEvent defaultCalEvent = CalendarEvent.getEmptyCalendarEvent(EventID.GenerateCalendarEvent(), Now.constNow, Now.constNow.AddHours(1));
+                if (RangeOfLookUP != null)
+                {
+                    if (tilerIds == null)
+                    {
+                        tilerIds = new HashSet<string>();
+                    }
+                    var calIds = tilerIds.Select(o=> new EventID(o).getAllEventDictionaryLookup).ToArray();
+                    IQueryable<SubCalendarEvent> subCalendarEvents = getSubCalendarEventQuery(retrievalOption, includeOtherEntities: true);
+
+                    subCalendarEvents = subCalendarEvents
+                        .Where(subEvent =>
+                                (
+                                    subEvent.IsEnabled_DB
+                                    && !subEvent.Complete_EventDB
+                                    && subEvent.ParentCalendarEvent.IsEnabled_DB
+                                    && !subEvent.ParentCalendarEvent.Complete_EventDB
+                                    && subEvent.ParentCalendarEvent.StartTime_EventDB < RangeOfLookUP.End
+                                    && subEvent.ParentCalendarEvent.EndTime_EventDB > RangeOfLookUP.Start
+                                    && subEvent.StartTime_EventDB < RangeOfLookUP.End// for performance reasons we will ignore sub events outside two weeks that are not within the range
+                                    && subEvent.EndTime_EventDB > RangeOfLookUP.Start// for performance reasons we will ignore sub events outside two weeks that are not within the specified range so the range has to be generous
+                                    && (
+                                            (subEvent.RepeatParentEventId == null) ||
+                                            (
+                                                (
+                                                    (
+                                                        subEvent.RepeatParentEventId != null && subEvent.RepeatParentEvent.IsEnabled_DB
+                                                        && !subEvent.RepeatParentEvent.Complete_EventDB
+                                                        && subEvent.RepeatParentEvent.StartTime_EventDB < RangeOfLookUP.End
+                                                        && subEvent.RepeatParentEvent.EndTime_EventDB > RangeOfLookUP.Start
+                                                    ) &&
+                                                    (subEvent.RepeatParentEvent != null && subEvent.RepeatParentEvent.IsEnabled_DB)
+                                                )
+                                                && (
+                                                    (
+                                                        (subEvent.RepeatParentEvent.RepeatParentEventId == null) ||
+                                                        (
+                                                            (
+                                                                subEvent.RepeatParentEvent.RepeatParentEventId != null && subEvent.RepeatParentEvent.RepeatParentEvent.IsEnabled_DB
+                                                                && !subEvent.RepeatParentEvent.RepeatParentEvent.Complete_EventDB
+                                                                && subEvent.RepeatParentEvent.RepeatParentEvent.StartTime_EventDB < RangeOfLookUP.End
+                                                                && subEvent.RepeatParentEvent.RepeatParentEvent.EndTime_EventDB > RangeOfLookUP.Start
+                                                            ) &&
+                                                            (subEvent.RepeatParentEvent.RepeatParentEvent != null && subEvent.RepeatParentEvent.RepeatParentEvent.IsEnabled_DB)
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    ) || ((
+                                            (calIds.Contains(subEvent.RepeatParentEventId) || calIds.Contains(subEvent.CalendarEventId))
+                                            )
+                                        || (
+                                                (
+                                                    (
+                                                        subEvent.RepeatParentEvent.RepeatParentEventId != null
+                                                    ) &&
+                                                    (calIds.Contains(subEvent.RepeatParentEvent.RepeatParentEventId))
+                                                )
+                                            )
+                                        )
+
+                            );
+
+                    #region includeCalendarEvents 
+                    subCalendarEvents = subCalendarEvents
+                        .Include(subEvent => subEvent.ParentCalendarEvent)
+                        .Include(subEvent => subEvent.ParentCalendarEvent.RepeatParentEvent)
+                        .Include(subEvent => subEvent.RepeatParentEvent)
+                        .Include(subEvent => subEvent.ParentCalendarEvent.RestrictionProfile_DB)
+                        .Include(subEvent => subEvent.RepeatParentEvent.RestrictionProfile_DB)
+                        .Include(subEvent => subEvent.ProfileOfNow_EventDB)
+                        .Include(subEvent => subEvent.Procrastination_EventDB)
+                        .Include(subEvent => subEvent.Location_DB)
+                        .Include(subEvent => subEvent.ParentCalendarEvent.DayPreference_DB)
+                        ;
+
+                    if(includeUpdateHistory)
+                    {
+                        subCalendarEvents = subCalendarEvents
+                            .Include(subEvent => subEvent.ParentCalendarEvent.TimeLineHistory_DB)
+                            .Include(subEvent => subEvent.ParentCalendarEvent.TimeLineHistory_DB.TimeLines_DB)
+                            ;
+                    }
+                    #endregion
+
+
+                    HashSet<CalendarEvent> parentCals = new HashSet<CalendarEvent>();
+                    HashSet<CalendarEvent> calendarEventsFromSubCalquery = new HashSet<CalendarEvent>();
+                    HashSet<string> allIds = new HashSet<string>();
+                    HashSet<string> subEventIds = new HashSet<string>();
+                    HashSet<string> repeatParentIds = new HashSet<string>();
+                    HashSet<string> parentIds = new HashSet<string>();
+                    Dictionary<string, List<TilerEvent>> procrastinationToTilerEvents = new Dictionary<string, List<TilerEvent>>();
+                    Dictionary<string, List<TilerEvent>> ProfileOfNowToTilerEvents = new Dictionary<string, List<TilerEvent>>();
+                    List<SubCalendarEvent> subEventsRetrieved = subCalendarEvents.ToList();
+                    watch.Stop();
+                    TimeSpan subeventSpan = watch.Elapsed;
+                    Debug.WriteLine("||||>sub event span " + subeventSpan.ToString());
+                    watch.Reset();
+                    watch.Start();
+                    foreach (SubCalendarEvent subEvent in subEventsRetrieved)
+                    {
+                        CalendarEvent parentCalEvent = subEvent.ParentCalendarEvent;
+                        parentCalEvent.isRepeatLoaded_DB = false;
+                        parentCalEvent.DefaultCalendarEvent = defaultCalEvent;
+                        calendarEventsFromSubCalquery.Add(parentCalEvent);
+                        allIds.Add(parentCalEvent.Id);
+                        allIds.Add(subEvent.Id);
+                        subEventIds.Add(subEvent.Id);
+
+                        if (parentCalEvent.RepeatParentEvent != null)
+                        {
+                            CalendarEvent repeatParent = parentCalEvent.RepeatParentEvent as CalendarEvent;     
+                            calendarEventsFromSubCalquery.Add(repeatParent);
+                            allIds.Add(parentCalEvent.RepeatParentId);
+                            repeatParent.isRepeatLoaded_DB = false;
+                        }
+                    }
+
+                    watch.Stop();
+                    TimeSpan noParenttSpan = watch.Elapsed;
+                    watch.Reset();
+                    watch.Start();
+                    bool procrastinateubEventPresent = true;
+
+
+                    var rightOfJoin = _Context.CalEvents.Include(calendarEvent => calendarEvent.Name);
+                    if (tilerIds!=null && tilerIds.Count > 0)
+                    {
+                        foreach(string tilerId in tilerIds)// this is needed just in case a subevent within the regular range is acted upon. Take for exaple There is a calEvent of with subeventA, subeventB and subeventC. However the schedule performed a delete on subeventA and subeventA is out side the timeRange but subeventB and subeventC are within range. You still need to include subeventA because it is being deleted.
+                        {
+                            EventID eventId = new EventID(tilerId);
+                            if(!subEventIds.Contains(tilerId))
+                            {
+                                parentIds.Add(eventId.getAllEventDictionaryLookup);
+                            }
+                            
+                        }
+                        rightOfJoin = rightOfJoin
+                            .Include(calEvent => calEvent.RepeatParentEvent)
+                            .Include(calEvent => calEvent.Location_DB)
+                            .Include(calEvent => calEvent.AllSubEvents_DB)
+                            .Include(calEvent => calEvent.TimeLineHistory_DB)
+                            .Include(calEvent => calEvent.RestrictionProfile_DB)
+                            .Include(calEvent => calEvent.ProfileOfNow_EventDB)
+                            .Include(calEvent => calEvent.Procrastination_EventDB)
+                            .Include(calEvent => calEvent.DayPreference_DB)
+                            .Include(calEvent => calEvent.TimeLineHistory_DB.TimeLines_DB)
+                            .Where(calEvent => calEvent.IsEnabled_DB && !calEvent.Complete_EventDB)
+                        ;
+                    }
+
+                    if(parentIds.Count > 0)
+                    {
+                        var loadedCalendarEvents = parentIds.Join(rightOfJoin,
+                        calEventId => calEventId,
+                        dbCalEvent => dbCalEvent.Id,
+                        (calEvent, dbCalEvent) => new { calEvent, dbCalEvent })
+                        .Select(obj => obj.dbCalEvent).ToList();
+
+                        parentCals = new HashSet<CalendarEvent>(loadedCalendarEvents);
+                        foreach (CalendarEvent calEvent in parentCals)
+                        {
+                            calEvent.isRepeatLoaded_DB = false;
+                        }
+                    }
+                    
+
+                    HashSet<CalendarEvent> calendarEvents = new HashSet<CalendarEvent>();
+                    foreach (CalendarEvent calEvent in parentCals.Concat(calendarEventsFromSubCalquery))
+                    {
+                        if (calEvent != null)
+                        {
+                            calendarEvents.Add(calEvent);
+                        }
+                    }
+
+                    watch.Stop();
+                    TimeSpan parenttSpan = watch.Elapsed;
+                    watch.Reset();
+                    watch.Start();
+                    Dictionary<string, CalendarEvent> MyCalendarEventDictionary = calendarEvents
+                        .ToDictionary(calEvent => calEvent.Calendar_EventID.getAllEventDictionaryLookup, calEvent => calEvent);
+                    foreach (CalendarEvent calEvent in MyCalendarEventDictionary.Values.Where(calEvent => calEvent.getIsEventRestricted))
+                    {
+                        CalendarEventRestricted calAsRestricted = calEvent as CalendarEventRestricted;
+                        calEvent.DefaultCalendarEvent = defaultCalEvent;
+                        if (retrievalOption != DataRetrivalOption.Ui)
+                        {
+                            calAsRestricted.RestrictionProfile_DB.InitializeOverLappingDictionary();
+                            if (Now != null)
+                            {
+                                if (retrievalOption == DataRetrivalOption.Evaluation)
+                                {
+                                    calAsRestricted.setNow(Now, true);
+                                }
+                                else
+                                {
+                                    calAsRestricted.setNow(Now, false);
+                                }
+                            }
+                        }
+                    }
+
+                    if (!procrastinateubEventPresent)
+                    {
+                        EventID clearAllId = new EventID(_TilerUser.ClearAllId);
+
+                        var procrastinateCalEvent = MyCalendarEventDictionary[clearAllId.getAllEventDictionaryLookup];
+                        procrastinateCalEvent.AllSubEvents_DB = new List<SubCalendarEvent>();
+                    }
+
+                    watch.Stop();
+                    TimeSpan dictionaryReorgSpan = watch.Elapsed;
+                    Debug.WriteLine("no parentSpan " + noParenttSpan.ToString());
+                    Debug.WriteLine("parentSpan " + parenttSpan.ToString());
+                    Debug.WriteLine("dictionaryReorgSpan " + dictionaryReorgSpan.ToString());
+
+                    return MyCalendarEventDictionary;
+                }
+
+                throw new NullReferenceException("You have to provide the range to lookup in the user calelndar");
+            }
+            else
+            {
+                return await getAllNonEvaluationEnabledCalendarEvent(RangeOfLookUP, Now, includeSubEvents, retrievalOption).ConfigureAwait(false);
+            }
+        }
+
+        async public virtual Task<Dictionary<string, CalendarEvent>> getAllNonEvaluationEnabledCalendarEvent(TimeLine RangeOfLookUP, ReferenceNow Now, bool includeSubEvents = true, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation)
+        {
+            Stopwatch watch = new Stopwatch();
+            watch.Start();
+            CalendarEvent defaultCalEvent = CalendarEvent.getEmptyCalendarEvent(EventID.GenerateCalendarEvent(), Now.constNow, Now.constNow.AddHours(1));
+            if (RangeOfLookUP != null)
+            {
+                IQueryable<SubCalendarEvent> subCalendarEvents = getSubCalendarEventQuery(retrievalOption, true);
+                subCalendarEvents = subCalendarEvents
+                    .Where(subEvent =>
+                            subEvent.StartTime_EventDB < RangeOfLookUP.End
+                            && subEvent.EndTime_EventDB > RangeOfLookUP.Start
+                            && subEvent.ParentCalendarEvent.IsEnabled_DB
+                            && !subEvent.ParentCalendarEvent.Complete_EventDB
+                            && subEvent.ParentCalendarEvent.StartTime_EventDB < RangeOfLookUP.End
+                            && subEvent.ParentCalendarEvent.EndTime_EventDB > RangeOfLookUP.Start
+                            && ((subEvent.RepeatParentEventId == null) || (subEvent.RepeatParentEvent != null && subEvent.RepeatParentEvent.IsEnabled_DB
+                            && !subEvent.RepeatParentEvent.Complete_EventDB
+                            && subEvent.RepeatParentEvent.StartTime_EventDB < RangeOfLookUP.End
+                            && subEvent.RepeatParentEvent.EndTime_EventDB > RangeOfLookUP.Start))
+                            && (
+                                    (subEvent.RepeatParentEventId == null) ||
+                                    (
+                                        (
+                                            (
+                                                subEvent.RepeatParentEventId != null && subEvent.RepeatParentEvent.IsEnabled_DB
+                                                && !subEvent.RepeatParentEvent.Complete_EventDB
+                                                && subEvent.RepeatParentEvent.StartTime_EventDB < RangeOfLookUP.End
+                                                && subEvent.RepeatParentEvent.EndTime_EventDB > RangeOfLookUP.Start
+                                            ) &&
+                                            (subEvent.RepeatParentEvent != null && subEvent.RepeatParentEvent.IsEnabled_DB)
+                                        )
+                                        && (
+                                            (
+                                                (subEvent.RepeatParentEvent.RepeatParentEventId == null) ||
+                                                (
+                                                    (
+                                                        subEvent.RepeatParentEvent.RepeatParentEventId != null && subEvent.RepeatParentEvent.RepeatParentEvent.IsEnabled_DB
+                                                        && !subEvent.RepeatParentEvent.RepeatParentEvent.Complete_EventDB
+                                                        && subEvent.RepeatParentEvent.RepeatParentEvent.StartTime_EventDB < RangeOfLookUP.End
+                                                        && subEvent.RepeatParentEvent.RepeatParentEvent.EndTime_EventDB > RangeOfLookUP.Start
+                                                    ) &&
+                                                    (subEvent.RepeatParentEvent.RepeatParentEvent != null && subEvent.RepeatParentEvent.RepeatParentEvent.IsEnabled_DB)
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                        )
+                        .Include(subEvent => subEvent.ParentCalendarEvent.RepeatParentEvent)
+                        .Include(subEvent => subEvent.ParentCalendarEvent.TimeLineHistory_DB)
+                        .Include(subEvent => subEvent.ParentCalendarEvent.TimeLineHistory_DB.TimeLines_DB)
+                        .Include(subEvent => subEvent.RepeatParentEvent)
+                        ;
+
+                HashSet<CalendarEvent> parentCals = new HashSet<CalendarEvent>();
+                HashSet<CalendarEvent> repeatCalendarEvents = new HashSet<CalendarEvent>();
+                HashSet<string> allIds = new HashSet<string>();
+                HashSet<string> repeatParentIds = new HashSet<string>();
+                HashSet<string> parentIds = new HashSet<string>();
+                HashSet<string> repeatIds = new HashSet<string>();
+                List<SubCalendarEvent> subEventsRetrieved = subCalendarEvents.ToList();
+                watch.Stop();
+                TimeSpan subeventSpan = watch.Elapsed;
+                Debug.WriteLine("sub event span " + subeventSpan.ToString());
+                watch.Reset();
+                watch.Start();
+                foreach (SubCalendarEvent subEvent in subCalendarEvents)
+                {
+
+                    CalendarEvent parentCalEvent = subEvent.ParentCalendarEvent;
+                    parentCalEvent.DefaultCalendarEvent = defaultCalEvent;
+                    parentIds.Add(subEvent.ParentCalendarEvent.Id);
+                    allIds.Add(subEvent.ParentCalendarEvent.Id);
+                    if (subEvent.RepeatParentEvent != null)
+                    {
+                        repeatIds.Add(subEvent.RepeatParentEvent.Id);
+                        repeatCalendarEvents.Add(subEvent.RepeatParentEvent as CalendarEvent);
+                        parentIds.Add(subEvent.RepeatParentEvent.Id);
+                    }
+
+                    if (subEvent.ParentCalendarEvent.RepeatParentEvent != null)
+                    {
+                        parentIds.Add(subEvent.ParentCalendarEvent.RepeatParentEvent.Id);
+                    }
+                }
+
+                watch.Stop();
+                TimeSpan noParenttSpan = watch.Elapsed;
+                watch.Reset();
+                watch.Start();
+                bool procrastinateubEventPresent = true;
+                if (!parentIds.Contains(_TilerUser.ClearAllId))
+                {
+                    parentIds.Add(_TilerUser.ClearAllId);
+                    procrastinateubEventPresent = false;
+                }
+
+
+                var loadedCalendarEvents = parentIds.Join(_Context.CalEvents
+                    .Include(calendarEvent => calendarEvent.DataBlob_EventDB)
+                    .Include(calendarEvent => calendarEvent.Name)
+                    .Include(calendarEvent => calendarEvent.Name.Creator_EventDB)
+                    .Include(calendarEvent => calendarEvent.Location_DB)
+                    .Include(calendarEvent => calendarEvent.Creator_EventDB)
+                    .Include(calendarEvent => calendarEvent.ProfileOfNow_EventDB)
+                    .Include(calendarEvent => calendarEvent.DayPreference_DB)
+                    .Include(calendarEvent => calendarEvent.Procrastination_EventDB)
+                    .Include(calendarEvent => calendarEvent.RestrictionProfile_DB)
+                    .Include(calendarEvent => calendarEvent.TimeLineHistory_DB)
+                    .Include(calendarEvent => calendarEvent.TimeLineHistory_DB.TimeLines_DB)
+                    ,
+                    calEventId => calEventId,
+                    dbCalEvent => dbCalEvent.Id,
+                    (calEvent, dbCalEvent) => new { calEvent, dbCalEvent })
+                    .Select(obj => obj.dbCalEvent).ToList();
+
+                parentCals = new HashSet<CalendarEvent>(loadedCalendarEvents);
+
+
+
+
+
+                List<CalendarEvent> calendarEvents = new List<CalendarEvent>();
+                if (repeatCalendarEvents.Count > 0)
+                {
+                    IQueryable<Repetition> repetittions = getRepeatCalendarEvent(retrievalOption, false);
+                    var enumerable = repeatCalendarEvents.Join(
+                        repetittions,
+                        calEvent => calEvent.EventRepetitionId,
+                        repetition => repetition.Id,
+                        (calEvent, repetition) => new { repetition = repetition, calEvent = calEvent }).ToList();
+                    //.AsEnumerable();
+
+                    foreach (var obj in enumerable)
+                    {
+                        obj.calEvent.Repetition_EventDB = obj.repetition;
+
+                    }
+
+                }
+
+
+
+                calendarEvents.AddRange(parentCals);
+                watch.Stop();
+
+                TimeSpan parenttSpan = watch.Elapsed;
+                watch.Reset();
+                watch.Start();
+
+                List<CalendarEvent> parentCalEvents = new List<CalendarEvent>();
+                List<CalendarEvent> childCalEvents = new List<CalendarEvent>();
+                List<CalendarEvent> weekDayCalendarEvents = new List<CalendarEvent>();
+                foreach (var calEvent in calendarEvents)
+                {
+                    calEvent.DefaultCalendarEvent = defaultCalEvent;
+                    if (!calEvent.IsRepeatsChildCalEvent)
+                    {
+                        parentCalEvents.Add(calEvent);
+                    }
+                    else
+                    {
+                        if (!calEvent.IsRepeatsChildCalEvent || !calEvent.IsRecurring)
+                        {
+                            childCalEvents.Add(calEvent);
+                        }
+                        else
+                        {
+                            weekDayCalendarEvents.Add(calEvent);
+                        }
+
+                    }
+                }
+
+                Dictionary<string, Tuple<CalendarEvent, List<CalendarEvent>>> calToRepeatCalEvents = parentCalEvents.ToDictionary(obj => obj.Calendar_EventID.getCalendarEventComponent(), obj => new Tuple<CalendarEvent, List<CalendarEvent>>(obj, new List<CalendarEvent>()));
+
+                foreach (CalendarEvent calEvent in childCalEvents)
+                {
+                    calEvent.DefaultCalendarEvent = defaultCalEvent;
+                    string calId = calEvent.Calendar_EventID.getCalendarEventComponent();
+                    if (calToRepeatCalEvents.ContainsKey(calId))
+                    {
+                        calToRepeatCalEvents[calId].Item2.Add(calEvent);
+                    }
+                }
+
+                foreach (CalendarEvent calEvent in parentCalEvents.Where(calEvent => calEvent.IsRecurring))
+                {
+                    calEvent.DefaultCalendarEvent = defaultCalEvent;
+                    string calComponentId = calEvent.getTilerID.getCalendarEventComponent();
+                    if (calToRepeatCalEvents.ContainsKey(calComponentId))
+                    {
+                        List<CalendarEvent> calEvents = calToRepeatCalEvents[calComponentId].Item2;
+                        if (calEvent.Repeat.SubRepetitions != null && calEvent.Repeat.SubRepetitions.Count > 0)
+                        {
+                            var weekDayToRepetition = calEvents.ToLookup(repCalEvent => (DayOfWeek)(Convert.ToInt32(repCalEvent.getTilerID.getRepeatDayCalendarEventComponent())), repCalEvent => repCalEvent);
+                            foreach (var kvp in weekDayToRepetition)
+                            {
+                                Repetition repetition = calEvent.Repeat.getSubRepeitionByWeekDay(kvp.Key);
+                                var allEvents = weekDayToRepetition[kvp.Key];
+                                repetition.RepeatingEvents = allEvents.ToList();
+                            }
+
+
+                        }
+                        else
+                        {
+                            if (calEvents.Count != calEvent.Repeat.RepeatingEvents.Count)
+                            {
+                                var AllCalEvents = calEvent.Repeat.RepeatingEvents.Except(calEvents).ToList();
+                                foreach (var calEVent in AllCalEvents)
+                                {
+                                    _Context.Entry(calEVent).State = EntityState.Detached; // this is needed because of the call to IQueryable<Repetition> repetittions = getRepeatCalendarEvent(DataRetrivalOption.Evaluation, false);. That line autopopulates and JOINS(capitalization is no mistake) Repetion.repeatingevents with any corresponding calendar event (based on the autogenerated repetion_id column) that are already attached to the context AKA already part of context object. 
+                                }
+                                calEvent.Repeat.RepeatingEvents = calEvents;
+                            }
+
+                        }
+                    }
+                }
+
+
+
+                Dictionary<string, CalendarEvent> MyCalendarEventDictionary = parentCalEvents.Where(calEvent => !calEvent.IsRepeatsChildCalEvent).ToDictionary(calEvent => calEvent.Calendar_EventID.getAllEventDictionaryLookup, calEvent => calEvent);
+                foreach (CalendarEvent calEvent in MyCalendarEventDictionary.Values.Where(calEvent => calEvent.getIsEventRestricted))
+                {
+                    CalendarEventRestricted calAsRestricted = calEvent as CalendarEventRestricted;
+                    calEvent.DefaultCalendarEvent = defaultCalEvent;
+                    if (retrievalOption != DataRetrivalOption.Ui)
+                    {
+                        calAsRestricted.RestrictionProfile_DB.InitializeOverLappingDictionary();
+                        if (Now != null)
+                        {
+                            if (retrievalOption == DataRetrivalOption.Evaluation)
+                            {
+                                calAsRestricted.setNow(Now, true);
+                            }
+                            else
+                            {
+                                calAsRestricted.setNow(Now, false);
+                            }
+                        }
+                    }
+
+                }
+
+                if (!procrastinateubEventPresent)
+                {
+                    EventID clearAllId = new EventID(_TilerUser.ClearAllId);
+
+                    var procrastinateCalEvent = MyCalendarEventDictionary[clearAllId.getAllEventDictionaryLookup];
+                    procrastinateCalEvent.AllSubEvents_DB = new List<SubCalendarEvent>();
+                }
+
+                watch.Stop();
+                TimeSpan dictionaryReorgSpan = watch.Elapsed;
+                Debug.WriteLine("no parentSpan " + noParenttSpan.ToString());
+                Debug.WriteLine("parentSpan " + parenttSpan.ToString());
+                Debug.WriteLine("dictionaryReorgSpan " + dictionaryReorgSpan.ToString());
+
+                return MyCalendarEventDictionary;
+            }
+
+            throw new NullReferenceException("You have to provide the range to lookup in the user calelndar");
+
+        }
+        
+
+        public virtual Tuple<Dictionary<string, CalendarEvent>, Dictionary<ThirdPartyControl.CalendarTool, List<CalendarEvent>>> getAllCalendarFromXml(ScheduleDump scheduleDump, ReferenceNow now)
+        {
+            Dictionary<string, CalendarEvent> MyCalendarEventDictionary = new Dictionary<string, CalendarEvent>();
+            List<CalendarEvent> googleCalendarEvents = new List<CalendarEvent>();
+            Dictionary<ThirdPartyControl.CalendarTool, List<CalendarEvent>> thirdPartyCalendarEvent = new Dictionary<ThirdPartyControl.CalendarTool, List<CalendarEvent>>();
+            XmlDocument doc = scheduleDump.XmlDoc;
+            XmlNode IdNode = doc.DocumentElement.SelectSingleNode("/ScheduleLog/LastIDCounter");
+
+            XmlNode EventSchedulesNodes = doc.DocumentElement.SelectSingleNode("/ScheduleLog/EventSchedules");
+            CalendarEvent defaultCalendarEvent = CalendarEvent.getEmptyCalendarEvent(EventID.GenerateCalendarEvent(), Now.constNow, Now.constNow.AddHours(1));
+
+
+            if (EventSchedulesNodes.ChildNodes != null)
+            {
+                string googleId = EventID.generateGoogleCalendarEventID(0).getCalendarEventComponent();
                 foreach (XmlNode EventScheduleNode in EventSchedulesNodes.ChildNodes)
                 {
                     CalendarEvent RetrievedEvent;
-
-                    //RetrievedEvent = getCalendarEventObjFromNode(EventScheduleNode, RangeOfLookUP);
-                    ///*
-                    try
-                    {
-                        RetrievedEvent = getCalendarEventObjFromNode(EventScheduleNode, RangeOfLookUP);
-                    }
-                    catch
-                    {
-                        RetrievedEvent = new CalendarEvent();
-                    }
-                    //*/
-
+                    RetrievedEvent = getCalendarEventObjFromNode(EventScheduleNode);
                     if (RetrievedEvent != null)
-                    { MyCalendarEventDictionary.Add(RetrievedEvent.Calendar_EventID.getCalendarEventComponent(), RetrievedEvent); }
+                    {
+                        RetrievedEvent.DefaultCalendarEvent = defaultCalendarEvent;
+                        if(RetrievedEvent.IsFromRecurringAndNotChildRepeatCalEvent && RetrievedEvent.isRepeatLoaded)
+                        {
+                            foreach(CalendarEvent calEvent in RetrievedEvent.Repeat.RecurringCalendarEvents())
+                            {
+                                calEvent.DefaultCalendarEvent = defaultCalendarEvent;
+                            }
+                        }
+                        string id = RetrievedEvent.Calendar_EventID.getAllEventDictionaryLookup;
+                        
+                        string calendarComponent = RetrievedEvent.Calendar_EventID.getCalendarEventComponent();
+                        if (googleId == calendarComponent)
+                        {
+                            googleCalendarEvents.AddRange(RetrievedEvent.Repeat.RecurringCalendarEvents());
+                            googleCalendarEvents.Add(RetrievedEvent);
+                        } else
+                        {
+                            MyCalendarEventDictionary.Add(id, RetrievedEvent);
+                        }
+                    }
                 }
-
+            }
+#region GoogleCalendarEvent
+            if(googleCalendarEvents.Count > 0)
+            {
+                ThirdPartyCalendarEvent googleCalendarEvent = new GoogleCalendarEvent(googleCalendarEvents, _TilerUser);
+                thirdPartyCalendarEvent.Add(ThirdPartyControl.CalendarTool.google, new List<CalendarEvent>() { googleCalendarEvent });
             }
             
+#endregion
 
-            return MyCalendarEventDictionary;
+            Tuple<Dictionary<string, CalendarEvent>, Dictionary<ThirdPartyControl.CalendarTool, List<CalendarEvent>>> retValue = new Tuple<Dictionary<string, CalendarEvent>, Dictionary<ThirdPartyControl.CalendarTool, List<CalendarEvent>>>(
+                MyCalendarEventDictionary,
+                thirdPartyCalendarEvent);
+
+            return retValue;
         }
-        public CalendarEvent getCalendarEventObjFromNode(XmlNode EventScheduleNode, TimeLine RangeOfLookUP)
+
+        public virtual CalendarEvent getCalendarEventObjFromNode(XmlNode EventScheduleNode)
         {
             string ID;
             string Deadline;
-            string Split;
+            int Split;
             string Completed;
             string Rigid;
-            string Name;
+            EventName Name;
             string[] StartDateTime;
             string StartDate;
             string StartTime;
             string[] EndDateTime;
             string EndDate;
             string EndTime;
-            string PreDeadline;
-            string CalendarEventDuration;
+            TimeSpan PreDeadline;
+            TimeSpan CalendarEventDuration;
             string PreDeadlineFlag;
             string EventRepetitionflag;
             string PrepTimeFlag;
-            string PrepTime;
+            TimeSpan PrepTime;
             string RepeatStart;
             string RepeatEnd;
             string RepeatFrequency;
             string LocationData;
             string EnableFlag;
 
-            
-            
-            
-            Name = EventScheduleNode.SelectSingleNode("Name").InnerText;
+
+            string NameId = EventScheduleNode.SelectSingleNode("NameId")?.InnerText ?? Guid.NewGuid().ToString();
+            Name = new DB_EventName(null, null, EventScheduleNode.SelectSingleNode("Name").InnerText, NameId);
             ID = EventScheduleNode.SelectSingleNode("ID").InnerText;
             //EventScheduleNode.SelectSingleNode("ID").InnerXml = "<wetin></wetin>";
             Deadline = EventScheduleNode.SelectSingleNode("Deadline").InnerText;
             Rigid = EventScheduleNode.SelectSingleNode("RigidFlag").InnerText;
             XmlNode RecurrenceXmlNode = EventScheduleNode.SelectSingleNode("Recurrence");
             EventRepetitionflag = EventScheduleNode.SelectSingleNode("RepetitionFlag").InnerText;
+            string IsRepeatsChildCalEventString = EventScheduleNode.SelectSingleNode("IsRepeatsChildCalEvent")?.InnerText;
 
 
-            DateTimeOffset StartDateTimeStruct = DateTimeOffset.Parse(EventScheduleNode.SelectSingleNode("StartTime").InnerText).UtcDateTime;
-            DateTimeOffset EndDateTimeStruct = DateTimeOffset.Parse(EventScheduleNode.SelectSingleNode("Deadline").InnerText).UtcDateTime;
+            //DateTimeOffset StartDateTimeStruct = DateTimeOffset.Parse(EventScheduleNode.SelectSingleNode("StartTime").InnerText).UtcDateTime;
+            //DateTimeOffset EndDateTimeStruct = DateTimeOffset.Parse(EventScheduleNode.SelectSingleNode("Deadline").InnerText).UtcDateTime;
+            //DateTimeOffset start = DateTimeOffset.Parse(EventScheduleNode.SelectSingleNode("StartTime").InnerText);
+            DateTimeOffset StartDateTimeStruct = Utility.ParseTime(EventScheduleNode.SelectSingleNode("StartTime").InnerText);
+            DateTimeOffset EndDateTimeStruct = Utility.ParseTime(EventScheduleNode.SelectSingleNode("Deadline").InnerText);
+            DateTimeOffset start = Utility.ParseTime(EventScheduleNode.SelectSingleNode("StartTime").InnerText);
             StartDateTime = EventScheduleNode.SelectSingleNode("StartTime").InnerText.Split(' ');
 
             StartDate = StartDateTime[0];
             StartTime = StartDateTime[1] + StartDateTime[2];
             EndDateTime = EventScheduleNode.SelectSingleNode("Deadline").InnerText.Split(' ');
+            DateTimeOffset end = Utility.ParseTime(EventScheduleNode.SelectSingleNode("Deadline").InnerText);
             EndDate = EndDateTime[0];
             EndTime = EndDateTime[1] + EndDateTime[2];
-            DateTimeOffset StartTimeConverted = DateTimeOffset.Parse(StartDate).UtcDateTime;// new DateTimeOffset(Convert.ToInt32(StartDate.Split('/')[2]), Convert.ToInt32(StartDate.Split('/')[0]), Convert.ToInt32(StartDate.Split('/')[1]));
-            DateTimeOffset EndTimeConverted = DateTimeOffset.Parse(EndDate).UtcDateTime; //new DateTimeOffset(Convert.ToInt32(EndDate.Split('/')[2]), Convert.ToInt32(EndDate.Split('/')[0]), Convert.ToInt32(EndDate.Split('/')[1]));
-            /*
-            if (RangeOfLookUP.InterferringTimeLine(new TimeLine(StartDateTimeStruct, EndDateTimeStruct)) == null)
-            {
-                return null;
-            }
-            */
+            DateTimeOffset StartTimeConverted = Utility.ParseTime(StartDate);// new DateTimeOffset(Convert.ToInt32(StartDate.Split('/')[2]), Convert.ToInt32(StartDate.Split('/')[0]), Convert.ToInt32(StartDate.Split('/')[1]));
+            DateTimeOffset EndTimeConverted = Utility.ParseTime(EndDate); //new DateTimeOffset(Convert.ToInt32(EndDate.Split('/')[2]), Convert.ToInt32(EndDate.Split('/')[0]), Convert.ToInt32(EndDate.Split('/')[1]));
 
             Repetition Recurrence;
             if (Convert.ToBoolean(EventRepetitionflag))
             {
-                /*
-                RepeatStart = RecurrenceXmlNode.SelectSingleNode("RepeatStartDate").InnerText;
-                RepeatEnd = RecurrenceXmlNode.SelectSingleNode("RepeatEndDate").InnerText;
-                RepeatFrequency = RecurrenceXmlNode.SelectSingleNode("RepeatFrequency").InnerText;
-                XmlNode XmlNodeWithList = RecurrenceXmlNode.SelectSingleNode("RepeatCalendarEvents");
-                Recurrence = new Repetition(true, new TimeLine(DateTimeOffset.Parse(RepeatStart), DateTimeOffset.Parse(RepeatEnd)), RepeatFrequency, getAllRepeatCalendarEvents(XmlNodeWithList, RangeOfLookUP));*/
-                Recurrence = getRepetitionObject(RecurrenceXmlNode, RangeOfLookUP); ;
-
-                StartTimeConverted = (Recurrence.Range.Start);
-                EndTimeConverted = (Recurrence.Range.End);
+                Recurrence = getRepetitionObject(RecurrenceXmlNode);
+                if(Recurrence!=null)
+                {
+                    StartTimeConverted = (Recurrence.Range.Start);
+                    EndTimeConverted = (Recurrence.Range.End);
+                }
             }
             else
             {
                 Recurrence = new Repetition();
             }
-            Split = EventScheduleNode.SelectSingleNode("Split").InnerText;
-            PreDeadline = EventScheduleNode.SelectSingleNode("PreDeadline").InnerText;
-            //PreDeadlineFlag = EventScheduleNode.SelectSingleNode("PreDeadlineFlag").InnerText;
-            CalendarEventDuration = EventScheduleNode.SelectSingleNode("Duration").InnerText;
-            //EventRepetitionflag = EventScheduleNode.SelectSingleNode("RepetitionFlag").InnerText;
-            //PrepTimeFlag = EventScheduleNode.SelectSingleNode("PrepTimeFlag").InnerText;
-            PrepTime = EventScheduleNode.SelectSingleNode("PrepTime").InnerText;
+            Split = Convert.ToInt32(EventScheduleNode.SelectSingleNode("Split").InnerText);
+            PreDeadline = TimeSpan.Parse(EventScheduleNode.SelectSingleNode("PreDeadline").InnerText);
+            CalendarEventDuration = TimeSpan.Parse(EventScheduleNode.SelectSingleNode("Duration").InnerText);
+            PrepTime = TimeSpan.Parse(EventScheduleNode.SelectSingleNode("PrepTime").InnerText);
             Completed = EventScheduleNode.SelectSingleNode("Completed").InnerText;
             EnableFlag = EventScheduleNode.SelectSingleNode("Enabled").InnerText;
+            string iniStartTimeString = EventScheduleNode.SelectSingleNode("IniStartTime")?.InnerText;
+            string iniEndTimeString = EventScheduleNode.SelectSingleNode("IniEndTime")?.InnerText;
+            long iniStartTime = iniStartTimeString.isNot_NullEmptyOrWhiteSpace() ? Convert.ToInt64(iniStartTimeString) : -1;
+            long iniEndTime = iniEndTimeString.isNot_NullEmptyOrWhiteSpace() ? Convert.ToInt64(iniEndTimeString) : -1;
+            string timeLineUpdates = EventScheduleNode.SelectSingleNode("TimeLineUpdates")?.InnerText;
+
+
             bool EVentEnableFlag = Convert.ToBoolean(EnableFlag);
             bool completedFlag = Convert.ToBoolean(Completed);
 
@@ -1499,40 +2396,93 @@ namespace TilerFront
             int CompleteCount = 0;
             int DeleteCount = 0;
 
-            //string Name, string StartTime, DateTimeOffset StartDate, string EndTime, DateTimeOffset EventEndDate, string eventSplit, string PreDeadlineTime, string EventDuration, bool EventRepetitionflag, bool DefaultPrepTimeflag, bool RigidScheduleFlag, string eventPrepTime, bool PreDeadlineFlag
-
-            //MainWindow.CreateSchedule("","",new DateTimeOffset(),"",new DateTimeOffset(),"","","",true,true,true,"",false);
-
-            Location_Elements var3 = getLocation(EventScheduleNode);
+            TilerElements.Location location = getLocation(EventScheduleNode);
             MiscData noteData = getMiscData(EventScheduleNode);
             EventDisplay UiData = getDisplayUINode(EventScheduleNode);
             Procrastination procrastinationData = generateProcrastinationObject(EventScheduleNode);
             NowProfile NowProfileData = generateNowProfile(EventScheduleNode);
-
-            CalendarEvent RetrievedEvent = new CalendarEvent(ID, Name, StartTime, StartTimeConverted, EndTime, EndTimeConverted, Split, PreDeadline, CalendarEventDuration, Recurrence, false, Convert.ToBoolean(Rigid), PrepTime, false, var3, EVentEnableFlag, UiData, noteData, completedFlag);
-            RetrievedEvent = new DB_CalendarEventExtra(RetrievedEvent, procrastinationData, NowProfileData);
-
-            SubCalendarEvent[] AllSubCalEvents = ReadSubSchedulesFromXMLNode(EventScheduleNode.SelectSingleNode("EventSubSchedules"), RetrievedEvent, RangeOfLookUP).ToArray();
-            //AllSubCalEvents = AllSubCalEvents.Select(obj => new DB_SubCalendarEvent(obj, NowProfileData, procrastinationData)).ToArray();
-            
-            //AllSubCalEvents
-            XmlNode restrictedNode = EventScheduleNode.SelectSingleNode("Restricted");
-            
-            
-            /*if (AllSubCalEvents.Length < 1)
+            bool procrastinationEventFlag = Convert.ToBoolean(EventScheduleNode.SelectSingleNode("isProcrastinateEvent")?.InnerText ?? "False");
+            bool rigidFlag = Convert.ToBoolean(Rigid);
+            string timeZone = EventScheduleNode.SelectSingleNode("TimeZone")?.InnerText ?? "UTC";
+            TilerUser creator = getTilerLoggedUser(EventScheduleNode.SelectSingleNode("UserNode"));
+            if ((creator as DB_TilerUser).isNull)
             {
-                return null;
-            }*/
-            RetrievedEvent = new CalendarEvent(RetrievedEvent, AllSubCalEvents);
-            
-            
+                creator = new DB_TilerUser()
+                {
+                    Id = this.LoggedUserID,
+                    UserName = this.UserName,
+                    isNull = false
+                };
+                if (creator.Id == this._TilerUser.Id)
+                {
+                    creator = this._TilerUser;
+                }
+            }
+
+            TilerUserGroup userGroup = getTilerUserGroup(EventScheduleNode.SelectSingleNode("UserGroup"));
+            CalendarEvent RetrievedEvent = null;
+            if (rigidFlag)
+            {
+                if (!procrastinationEventFlag)
+                {
+                    RetrievedEvent = new RigidCalendarEvent(
+                    Name, start, end, CalendarEventDuration, PreDeadline, PrepTime, Recurrence, location, UiData, noteData, EVentEnableFlag, completedFlag, creator, userGroup, timeZone, new EventID(ID), NowProfileData, null);
+                }
+
+
+
+
+            }
+            else
+            {
+                RetrievedEvent = new CalendarEvent(Name, start, end, CalendarEventDuration, PreDeadline, PrepTime, Split, Recurrence, location, UiData, noteData, procrastinationData, NowProfileData, EVentEnableFlag, completedFlag, creator, userGroup, timeZone, new EventID(ID), null);
+            }
+
+            if (rigidFlag && procrastinationEventFlag)
+            {
+                creator.ClearAllId = ID;
+                RetrievedEvent = new DB_ProcrastinateCalendarEvent(new EventID(creator.getClearAllEventsId()), Name, start, end, CalendarEventDuration, PreDeadline, PrepTime, Recurrence, location, UiData, noteData, EVentEnableFlag, completedFlag, creator, userGroup, timeZone, Split, NowProfileData);
+            }
+            else
+            {
+                RetrievedEvent = new DB_CalendarEvent(RetrievedEvent, procrastinationData, NowProfileData);
+            }
+            Name.Creator_EventDB = RetrievedEvent.getCreator;
+            Name.AssociatedEvent = RetrievedEvent;
+            SubCalendarEvent[] AllSubCalEvents = ReadSubSchedulesFromXMLNode(EventScheduleNode.SelectSingleNode("EventSubSchedules"), RetrievedEvent).ToArray();
+            XmlNode restrictedNode = EventScheduleNode.SelectSingleNode("Restricted");
+            XmlNode eventPreferenceNode = EventScheduleNode.SelectSingleNode("EventPreference");
+            XmlNode updateHistoryNode = EventScheduleNode.SelectSingleNode("UpdateHistory");
+
+            XmlNode calendarTypeNode = EventScheduleNode.SelectSingleNode("ThirdpartyType");
+            if (calendarTypeNode != null)
+            {
+                ThirdPartyControl.CalendarTool calendarType = getThirdPartyCalendarType(calendarTypeNode);
+                if (calendarType != ThirdPartyControl.CalendarTool.tiler)
+                {
+                    DB_CalendarEvent calEvent = (RetrievedEvent as DB_CalendarEvent);
+                    calEvent.CalendarType = calendarType;
+                }
+            }
+
+            if (rigidFlag && procrastinationEventFlag)
+            {
+                RetrievedEvent = new DB_ProcrastinateCalendarEvent(RetrievedEvent as DB_ProcrastinateCalendarEvent, AllSubCalEvents);
+            }
+            else
+            {
+                RetrievedEvent = new CalendarEvent(RetrievedEvent, AllSubCalEvents);
+            }
+
+
+
             if (restrictedNode != null)
             {
                 if (Convert.ToBoolean(restrictedNode.InnerText))
                 {
                     XmlNode RestrictionProfileNode = EventScheduleNode.SelectSingleNode("RestrictionProfile");
                     DB_RestrictionProfile myRestrictionProfile = (DB_RestrictionProfile)getRestrictionProfile(RestrictionProfileNode);
-                    RetrievedEvent = new DB_CalendarEventRestricted(RetrievedEvent,myRestrictionProfile);
+                    RetrievedEvent = new DB_CalendarEventRestricted(RetrievedEvent, myRestrictionProfile, this.Now);
                 }
             }
 
@@ -1542,9 +2492,8 @@ namespace TilerFront
             }
             else
             {
-                CompleteCount = RetrievedEvent.AllSubEvents.Where(obj => obj.isComplete).Count();
+                CompleteCount = RetrievedEvent.AllSubEvents.Where(obj => obj.getIsComplete).Count();
             }
-
 
             if ((deleteNode != null))
             {
@@ -1554,34 +2503,219 @@ namespace TilerFront
             {
                 DeleteCount = RetrievedEvent.AllSubEvents.Where(obj => !obj.isEnabled).Count();
             }
+
+            DateTimeOffset timeCreated;
+            XmlNode timeCreatednode = EventScheduleNode.SelectSingleNode("TimeCreated");
+            if (timeCreatednode == null)
+            {
+                timeCreatednode = EventScheduleNode.SelectSingleNode("TimeCreaated"); // this is to handle previous typo issues
+            }
+
+            if (timeCreatednode != null)
+            {
+                timeCreated = Utility.ParseTime(timeCreatednode.InnerText.ToString());
+                RetrievedEvent.TimeCreated = timeCreated;
+            }
+            EventPreference eventPreference = null;
+            if (eventPreferenceNode!=null && !string.IsNullOrEmpty(eventPreferenceNode.InnerXml) && !string.IsNullOrWhiteSpace(eventPreferenceNode.InnerXml))
+            {
+                eventPreference = getEventPreference(eventPreferenceNode);
+            }
+            else
+            {
+                eventPreference = EventPreference.NullInstance;
+            }
+
+            TimeLineHistory updateHistory = null;
+            if (updateHistoryNode != null && !string.IsNullOrEmpty(updateHistoryNode.InnerXml) && !string.IsNullOrWhiteSpace(updateHistoryNode.InnerXml))
+            {
+                updateHistory = getupdateHistory(updateHistoryNode);
+            }
+            
+            RetrievedEvent.DayPreference_DB = eventPreference;
+
+            RetrievedEvent.TimeLineHistory_DB = updateHistory;
+
             RetrievedEvent.InitializeCounts(DeleteCount, CompleteCount);
+
+            XmlNode LastCompletionTimesNode = EventScheduleNode.SelectSingleNode("LastCompletionTimes");
+            if(LastCompletionTimesNode!=null)
+            {
+                RetrievedEvent.LastCompletionTime_DB = LastCompletionTimesNode.InnerText;
+            }
+
+            XmlNode MyEventScheduleNode = EventScheduleNode.SelectSingleNode("Access_DB");
+
+            XmlNode DeadlineSuggestionNode = EventScheduleNode.SelectSingleNode("DeadlineSuggestion");
+            if (DeadlineSuggestionNode != null)
+            {
+                RetrievedEvent.DeadlineSuggestion_DB =long.Parse(DeadlineSuggestionNode.InnerText);
+            }
+            
+            if (MyEventScheduleNode!=null)
+            {
+                RetrievedEvent.Access_DB = MyEventScheduleNode.InnerText;
+            }
+            if(Recurrence!=null)
+            {
+                foreach (CalendarEvent calEvent in Recurrence.RepeatingEvents)
+                {
+                    calEvent.RepeatParent_DB = RetrievedEvent;
+                }
+            } else
+            {
+                RetrievedEvent.IsRecurring = Convert.ToBoolean(EventRepetitionflag);
+                RetrievedEvent.isRepeatLoaded_DB = false;
+            }
+
+            if(!string.IsNullOrEmpty(IsRepeatsChildCalEventString) && !string.IsNullOrWhiteSpace(IsRepeatsChildCalEventString))
+            {
+                RetrievedEvent.IsRepeatsChildCalEvent = Convert.ToBoolean(IsRepeatsChildCalEventString);
+            }
+            
+
+
+            RetrievedEvent.InitialStartTime_DB = iniStartTime;
+            RetrievedEvent.InitialEndTime_DB= iniEndTime;
 
             return RetrievedEvent;
         }
-        
+
+        public WeatherReason getWeatherReason(XmlNode ReasonNode)
+        {
+            MemoryStream stm = new MemoryStream();
+
+            StreamWriter stw = new StreamWriter(stm);
+            stw.Write(ReasonNode.OuterXml);
+            stw.Flush();
+
+            stm.Position = 0;
+            XmlRootAttribute xRoot = new XmlRootAttribute();
+            xRoot.ElementName = ReasonNode.Name;
+            xRoot.IsNullable = true;
+            XmlSerializer ser = new XmlSerializer(typeof(WeatherReason), xRoot);
+            WeatherReason result = (ser.Deserialize(stm) as WeatherReason);
+
+            return result;
+        }
+
+        public BestFitReason getBestFitReason(XmlNode ReasonNode)
+        {
+            MemoryStream stm = new MemoryStream();
+            StreamWriter stw = new StreamWriter(stm);
+            stw.Write(ReasonNode.OuterXml);
+            stw.Flush();
+
+            stm.Position = 0;
+            XmlRootAttribute xRoot = new XmlRootAttribute();
+            xRoot.ElementName = ReasonNode.Name;
+            xRoot.IsNullable = true;
+            XmlSerializer ser = new XmlSerializer(typeof(BestFitReason), xRoot);
+            BestFitReason result = (ser.Deserialize(stm) as BestFitReason);
+
+            return result;
+        }
+
+        public EventPreference getEventPreference(XmlNode PreferenceNode)
+        {
+            MemoryStream stm = new MemoryStream();
+            StreamWriter stw = new StreamWriter(stm);
+            stw.Write(PreferenceNode.OuterXml);
+            stw.Flush();
+
+            stm.Position = 0;
+            XmlRootAttribute xRoot = new XmlRootAttribute();
+            xRoot.ElementName = PreferenceNode.Name;
+            xRoot.IsNullable = true;
+            XmlSerializer ser = new XmlSerializer(typeof(EventPreference), xRoot);
+            EventPreference result = (ser.Deserialize(stm) as EventPreference);
+
+            return result;
+        }
+
+        public TimeLineHistory getupdateHistory(XmlNode UpdateHistoryNode)
+        {
+            MemoryStream stm = new MemoryStream();
+            StreamWriter stw = new StreamWriter(stm);
+            stw.Write(UpdateHistoryNode.OuterXml);
+            stw.Flush();
+
+            stm.Position = 0;
+            XmlRootAttribute xRoot = new XmlRootAttribute();
+            xRoot.ElementName = UpdateHistoryNode.Name;
+            xRoot.IsNullable = true;
+            XmlSerializer ser = new XmlSerializer(typeof(TimeLineHistory), xRoot);
+            TimeLineHistory result = (ser.Deserialize(stm) as TimeLineHistory);
+
+            return result;
+        }
+
+        public PreservedOrder getPreservedOrderReason(XmlNode ReasonNode)
+        {
+            MemoryStream stm = new MemoryStream();
+            StreamWriter stw = new StreamWriter(stm);
+            stw.Write(ReasonNode.OuterXml);
+            stw.Flush();
+
+            stm.Position = 0;
+            XmlRootAttribute xRoot = new XmlRootAttribute();
+            xRoot.ElementName = ReasonNode.Name;
+            xRoot.IsNullable = true;
+            XmlSerializer ser = new XmlSerializer(typeof(PreservedOrder), xRoot);
+            PreservedOrder result = (ser.Deserialize(stm) as PreservedOrder);
+
+            return result;
+        }
+
+
+        public Reason getLocationReason(XmlNode ReasonNode)
+        {
+            MemoryStream stm = new MemoryStream();
+            StreamWriter stw = new StreamWriter(stm);
+            stw.Write(ReasonNode.OuterXml);
+            stw.Flush();
+            LocationReason result = new LocationReason();
+            return result;
+        }
+
+        public Reason getOccupancyReason(XmlNode ReasonNode)
+        {
+            DurationReason result = new DurationReason(new TimeSpan());
+            return result;
+        }
+
+
+        public Reason getRestrictedEventReason(XmlNode ReasonNode)
+        {
+            RestrictedEventReason result = new RestrictedEventReason(new RestrictionProfile(new DateTimeOffset(), new TimeSpan()));
+            return result;
+        }
+
+
+
         Procrastination generateProcrastinationObject(XmlNode ReferenceNode)
         {
             XmlNode ProcrastinationProfileNode = ReferenceNode.SelectSingleNode("ProcrastinationProfile");
-            if(ProcrastinationProfileNode ==null)
+            if (ProcrastinationProfileNode == null)
             {
-                Procrastination retValueEmpty= new Procrastination(new DateTimeOffset(), new TimeSpan());
-                return retValueEmpty;
+                return null;
             }
-
-            DateTimeOffset ProcrastinationPreferredStart = DateTimeOffset.Parse(ProcrastinationProfileNode.SelectSingleNode("ProcrastinationPreferredStart").InnerText).UtcDateTime; ;
-            DateTimeOffset ProcrastinationDislikedStart = DateTimeOffset.Parse(ProcrastinationProfileNode.SelectSingleNode("ProcrastinationDislikedStart").InnerText).UtcDateTime;
-            int DaySection = Convert.ToInt32(ProcrastinationProfileNode.SelectSingleNode("ProcrastinationDislikedDaySection").InnerText);
+            string ProcrastinationPreferredStartString = ProcrastinationProfileNode.SelectSingleNode("ProcrastinationPreferredStart")?.InnerText;
+            string ProcrastinationDislikedStartString = ProcrastinationProfileNode.SelectSingleNode("ProcrastinationDislikedStart")?.InnerText;
+            string ProcrastinationDislikedDaySectionString = ProcrastinationProfileNode.SelectSingleNode("ProcrastinationDislikedDaySection")?.InnerText;
+            DateTimeOffset ProcrastinationPreferredStart = string.IsNullOrEmpty(ProcrastinationPreferredStartString) ? new DateTimeOffset() : DateTimeOffset.Parse(ProcrastinationPreferredStartString).UtcDateTime; ;
+            DateTimeOffset ProcrastinationDislikedStart = string.IsNullOrEmpty(ProcrastinationDislikedStartString) ? new DateTimeOffset() : DateTimeOffset.Parse(ProcrastinationDislikedStartString).UtcDateTime;
+            int DaySection = string.IsNullOrEmpty(ProcrastinationDislikedDaySectionString) ? 0 : Convert.ToInt32(ProcrastinationDislikedDaySectionString);
             DB_Procrastination retValue = new DB_Procrastination(ProcrastinationDislikedStart, ProcrastinationPreferredStart, DaySection);
             return retValue;
         }
-        
-        List<SubCalendarEvent> ReadSubSchedulesFromXMLNode(XmlNode MyXmlNode, CalendarEvent MyParent, TimeLine RangeOfLookUP)
+
+        protected virtual List<SubCalendarEvent> ReadSubSchedulesFromXMLNode(XmlNode MyXmlNode, CalendarEvent MyParent)
         {
             List<SubCalendarEvent> MyArrayOfNodes = new List<SubCalendarEvent>();
             string ID = "";
             DateTimeOffset Start = new DateTimeOffset();
             DateTimeOffset End = new DateTimeOffset();
-            TimeSpan SubScheduleDuration = new TimeSpan();
             TimeSpan PrepTime = new TimeSpan();
             BusyTimeLine BusySlot = new BusyTimeLine();
             bool Enabled;
@@ -1591,70 +2725,180 @@ namespace TilerFront
                 XmlNode SubEventNode = MyXmlNode.ChildNodes[i];
                 BusyTimeLine SubEventActivePeriod = new BusyTimeLine(MyXmlNode.ChildNodes[i].SelectSingleNode("ID").InnerText, stringToDateTime(MyXmlNode.ChildNodes[i].SelectSingleNode("ActiveStartTime").InnerText), stringToDateTime(MyXmlNode.ChildNodes[i].SelectSingleNode("ActiveEndTime").InnerText));
                 ID = EventID.convertToSubcalendarEventID(MyXmlNode.ChildNodes[i].SelectSingleNode("ID").InnerText).ToString();
-                Start = DateTimeOffset.Parse(MyXmlNode.ChildNodes[i].SelectSingleNode("ActiveStartTime").InnerText).UtcDateTime;
-                End = DateTimeOffset.Parse(MyXmlNode.ChildNodes[i].SelectSingleNode("ActiveEndTime").InnerText).UtcDateTime;
+                Start = Utility.ParseTime(MyXmlNode.ChildNodes[i].SelectSingleNode("ActiveStartTime").InnerText);
+                End = Utility.ParseTime(MyXmlNode.ChildNodes[i].SelectSingleNode("ActiveEndTime").InnerText);
 
-                bool rigidFlag =MyParent.Rigid;
+                string iniStartTimeString = MyXmlNode.ChildNodes[i].SelectSingleNode("IniStartTime")?.InnerText;
+                string iniEndTimeString = MyXmlNode.ChildNodes[i].SelectSingleNode("IniEndTime")?.InnerText;
+
+
+                long iniStartTimeInMs = iniStartTimeString.isNot_NullEmptyOrWhiteSpace() ? Convert.ToInt64(iniStartTimeString) : -1;
+                long iniEndTimeInMS = iniEndTimeString.isNot_NullEmptyOrWhiteSpace() ? Convert.ToInt64(iniEndTimeString) : -1;
+
+
+                DateTimeOffset iniStartTime = DateTimeOffset.FromUnixTimeMilliseconds(iniStartTimeInMs);
+                DateTimeOffset iniEndTime = DateTimeOffset.FromUnixTimeMilliseconds(iniEndTimeInMS);
+
+                bool rigidFlag = MyParent.isRigid;
                 XmlNode rigidNode = MyXmlNode.ChildNodes[i].SelectSingleNode("Rigid");
-                if (rigidNode!=null)
+                if (rigidNode != null)
                 {
-                    rigidFlag=Convert.ToBoolean(rigidNode.InnerText);
+                    rigidFlag = Convert.ToBoolean(rigidNode.InnerText);
                 }
 
-                if (RangeOfLookUP.InterferringTimeLine(new TimeLine(Start, End)) == null)
-                {
-                    continue;
-                }
 
                 BusySlot = new BusyTimeLine(ID, Start, End);
                 PrepTime = new TimeSpan(ConvertToMinutes(MyXmlNode.ChildNodes[i].SelectSingleNode("PrepTime").InnerText) * 60 * 10000000);
                 //stringToDateTime();
-                Start = DateTimeOffset.Parse(MyXmlNode.ChildNodes[i].SelectSingleNode("StartTime").InnerText).UtcDateTime;
-                End = DateTimeOffset.Parse(MyXmlNode.ChildNodes[i].SelectSingleNode("EndTime").InnerText).UtcDateTime;
+                Start = Utility.ParseTime(MyXmlNode.ChildNodes[i].SelectSingleNode("StartTime").InnerText);
+                End = Utility.ParseTime(MyXmlNode.ChildNodes[i].SelectSingleNode("EndTime").InnerText);
                 Enabled = Convert.ToBoolean(MyXmlNode.ChildNodes[i].SelectSingleNode("Enabled").InnerText);
                 bool CompleteFlag = Convert.ToBoolean(MyXmlNode.ChildNodes[i].SelectSingleNode("Complete").InnerText);
-                Location_Elements var1 = getLocation(MyXmlNode.ChildNodes[i]);
+                TilerElements.Location var1 = getLocation(MyXmlNode.ChildNodes[i]);
                 MiscData noteData = getMiscData(MyXmlNode.ChildNodes[i]);
                 EventDisplay UiData = getDisplayUINode(MyXmlNode.ChildNodes[i]);
                 ConflictProfile conflictProfile = getConflctProfile(MyXmlNode.ChildNodes[i]);
+                string nameString = MyXmlNode.ChildNodes[i].SelectSingleNode("Name")?.InnerText ?? MyParent.getName.NameValue;
+                string id = MyXmlNode.ChildNodes[i].SelectSingleNode("NameId")?.InnerText ?? MyParent.getName.NameId;
+                EventName name = new DB_EventName(null, null, nameString, id);
+                TilerUser creator = getTilerLoggedUser(MyXmlNode.ChildNodes[i].SelectSingleNode("UserNode"));
+                if ((creator as DB_TilerUser).isNull)
+                {
+                    creator = MyParent.getCreator;
+                }
+                string timeZone = MyXmlNode.ChildNodes[i].SelectSingleNode("TimeZone")?.InnerText ?? "UTC";
+                DB_TilerUserGroup userGroup = getTilerUserGroup(MyXmlNode.ChildNodes[i].SelectSingleNode("UserGroup"));
+                Tuple<TimeSpan, DateTimeOffset> PauseData = getPauseData(SubEventNode);
 
-                SubCalendarEvent retrievedSubEvent = new SubCalendarEvent(ID, BusySlot, Start, End, PrepTime, MyParent.ID, rigidFlag, Enabled, UiData, noteData, CompleteFlag, var1, MyParent.RangeTimeLine, conflictProfile);
+                SubCalendarEvent retrievedSubEvent;
+                bool procrastinationEventFlag = Convert.ToBoolean(MyXmlNode.ChildNodes[i].SelectSingleNode("isProcrastinateEvent")?.InnerText ?? "False");
+                if (!procrastinationEventFlag)
+                {
+                    retrievedSubEvent = new DB_SubCalendarEvent(MyParent, creator, userGroup, timeZone, ID, name, BusySlot, Start, End, PrepTime, ID, rigidFlag, Enabled, UiData, noteData, CompleteFlag, var1, MyParent.StartToEnd, conflictProfile);
+                    retrievedSubEvent = new DB_SubCalendarEvent(retrievedSubEvent, MyParent.getNowInfo, MyParent.getProcrastinationInfo, MyParent);
+                    (retrievedSubEvent as DB_SubCalendarEvent).UseTime = PauseData.Item1;
+                    (retrievedSubEvent as DB_SubCalendarEvent).PauseTime = PauseData.Item2;
+                }
+                else
+                {
+                    DB_ProcrastinateAllSubCalendarEvent procrastinateSubEvent = new DB_ProcrastinateAllSubCalendarEvent(creator, userGroup, timeZone, new TimeLine(Start, End), new EventID(ID), MyParent.Location, MyParent as ProcrastinateCalendarEvent, Enabled, CompleteFlag);
+                    procrastinateSubEvent.UseTime = PauseData.Item1;
+                    procrastinateSubEvent.PauseTime = PauseData.Item2;
+                    retrievedSubEvent = procrastinateSubEvent;
+                }
+                name.Creator_EventDB = retrievedSubEvent.getCreator;
+                name.AssociatedEvent = retrievedSubEvent;
                 retrievedSubEvent.ThirdPartyID = MyXmlNode.ChildNodes[i].SelectSingleNode("ThirdPartyID").InnerText;//this is a hack to just update the Third partyID
                 XmlNode restrictedNode = MyXmlNode.ChildNodes[i].SelectSingleNode("Restricted");
-                retrievedSubEvent = new DB_SubCalendarEvent(retrievedSubEvent, MyParent.NowInfo, MyParent.ProcrastinationInfo);
-                
-                Tuple<TimeSpan, DateTimeOffset> PauseData = getPauseData(SubEventNode);
-                (retrievedSubEvent as DB_SubCalendarEvent).UsedTime = PauseData.Item1;
-                (retrievedSubEvent as DB_SubCalendarEvent).PauseTime = PauseData.Item2;
+
+
+
+
+
                 if (restrictedNode != null)
                 {
                     if (Convert.ToBoolean(restrictedNode.InnerText))
-                    { 
-                        XmlNode RestrictionProfileNode =MyXmlNode.ChildNodes[i].SelectSingleNode("RestrictionProfile");
+                    {
+                        XmlNode RestrictionProfileNode = MyXmlNode.ChildNodes[i].SelectSingleNode("RestrictionProfile");
                         DB_RestrictionProfile myRestrictionProfile = (DB_RestrictionProfile)getRestrictionProfile(RestrictionProfileNode);
-                        retrievedSubEvent = new DB_SubCalendarEventRestricted(retrievedSubEvent, myRestrictionProfile);
+                        retrievedSubEvent = new DB_SubCalendarEventRestricted(retrievedSubEvent, myRestrictionProfile, MyParent as CalendarEventRestricted, this.Now);
                         (retrievedSubEvent as DB_SubCalendarEventRestricted).UsedTime = PauseData.Item1;
                         (retrievedSubEvent as DB_SubCalendarEventRestricted).PauseTime = PauseData.Item2;
                     }
                 }
+
+                DateTimeOffset timeCreated;
+                XmlNode timeCreatednode = MyXmlNode.ChildNodes[i].SelectSingleNode("TimeCreated");
+                if (timeCreatednode != null)
+                {
+                    timeCreated = Utility.ParseTime(timeCreatednode.InnerText);
+                    retrievedSubEvent.TimeCreated = timeCreated;
+                }
+
+                TimeSpan TravelTimeAfter;
+                TimeSpan TravelTimeBefore;
+                TimeSpan.TryParse(MyXmlNode.ChildNodes[i].SelectSingleNode("TravelTimeAfter")?.InnerText ?? "", out TravelTimeAfter);
+                TimeSpan.TryParse(MyXmlNode.ChildNodes[i].SelectSingleNode("TravelTimeBefore")?.InnerText ?? "", out TravelTimeBefore);
+
+                bool isSleep, isWake, isTardy;
+                bool.TryParse(MyXmlNode.ChildNodes[i].SelectSingleNode("isSleep")?.InnerText ?? "", out isSleep);
+                bool.TryParse(MyXmlNode.ChildNodes[i].SelectSingleNode("isWake")?.InnerText ?? "", out isWake);
+                bool.TryParse(MyXmlNode.ChildNodes[i].SelectSingleNode("isTardy")?.InnerText ?? "", out isTardy);
+
+                retrievedSubEvent.isSleep = isSleep;
+                retrievedSubEvent.isWake = isWake;
+                retrievedSubEvent.IsTardy_DB = isTardy;
+
+                retrievedSubEvent.TravelTimeAfter = TravelTimeAfter;
+                retrievedSubEvent.TravelTimeBefore = TravelTimeBefore;
                 MyArrayOfNodes.Add(retrievedSubEvent);
+                XmlNode calendarTypeNode = SubEventNode.SelectSingleNode("ThirdpartyType");
+                if (calendarTypeNode != null)
+                {
+                    ThirdPartyControl.CalendarTool calendarType = getThirdPartyCalendarType(calendarTypeNode);
+                    if (calendarType != ThirdPartyControl.CalendarTool.tiler)
+                    {
+                        DB_SubCalendarEvent subEvent = (retrievedSubEvent as DB_SubCalendarEvent);
+                        subEvent.CalendarType = calendarType;
+                    }
+                }
+
+                XmlNode autoDeletedNode = MyXmlNode.ChildNodes[i].SelectSingleNode("AutoDeleted");
+                if(autoDeletedNode != null)
+                {
+                    retrievedSubEvent.AutoDeleted_EventDB = Convert.ToBoolean(autoDeletedNode.InnerText);
+                }
+
+                XmlNode AutoDeletionReasonNode = MyXmlNode.ChildNodes[i].SelectSingleNode("AutoDeletionReason");
+                if (AutoDeletionReasonNode != null)
+                {
+                    retrievedSubEvent.AutoDeletion_ReasonDB = AutoDeletionReasonNode.InnerText;
+                }
+
+                XmlNode RepetitionLockNode = MyXmlNode.ChildNodes[i].SelectSingleNode("RepetitionLock");
+                if (RepetitionLockNode != null)
+                {
+                    retrievedSubEvent.RepetitionLock_DB = Convert.ToBoolean(RepetitionLockNode.InnerText);
+                }
+
+                retrievedSubEvent.InitialStartTime_DB = iniStartTimeInMs;
+                retrievedSubEvent.InitialEndTime_DB = iniEndTimeInMS;
+
+                createReasonObjects(retrievedSubEvent, MyXmlNode.ChildNodes[i]);
             }
 
             return MyArrayOfNodes;
         }
 
+        void createReasonObjects(dynamic subCalevent, XmlNode node)
+        {
+            node = node.SelectSingleNode("TimePositionReasons");
+            List<Reason> reasons = new List<Reason>();
+            if (node != null)
+            {
+                foreach (XmlNode eachNode in node.ChildNodes)
+                {
+                    string OPtionName = eachNode.SelectSingleNode("Option").InnerText;
+                    Reason generatedReason = createDictionaryOfOPtionToFunction[OPtionName](eachNode);
+                    reasons.Add(generatedReason);
+                }
+            }
 
-        Tuple<TimeSpan, DateTimeOffset> getPauseData (XmlNode ReferenceNode)
+            subCalevent.updateReasons(reasons);
+        }
+
+
+        Tuple<TimeSpan, DateTimeOffset> getPauseData(XmlNode ReferenceNode)
         {
             Tuple<TimeSpan, DateTimeOffset> RetValue = new Tuple<TimeSpan, DateTimeOffset>(new TimeSpan(), new DateTimeOffset());
             XmlNode PauseInformation = ReferenceNode.SelectSingleNode("PauseInformation");
-            if(PauseInformation!= null)
+            if (PauseInformation != null)
             {
                 TimeSpan UsedUpTime = TimeSpan.Parse(PauseInformation.SelectSingleNode("UsedUpTime").InnerText);
-                DateTimeOffset PauseTime = DateTimeOffset.Parse(PauseInformation.SelectSingleNode("PauseTime").InnerText);
+                DateTimeOffset PauseTime = Utility.ParseTime(PauseInformation.SelectSingleNode("PauseTime").InnerText);
                 RetValue = new Tuple<TimeSpan, DateTimeOffset>(UsedUpTime, PauseTime);
             }
-            
+
             return RetValue;
 
         }
@@ -1666,15 +2910,17 @@ namespace TilerFront
             {
                 return new NowProfile();
             }
-            bool initializedFlag = Convert.ToBoolean(NowProfileNode.SelectSingleNode("Initialized").InnerText);
-            DateTimeOffset preferredTime = DateTimeOffset.Parse(NowProfileNode.SelectSingleNode("PreferredStart").InnerText).UtcDateTime;
+            string innerText = NowProfileNode.SelectSingleNode("Initialized").InnerText;
+            bool initializedFlag = string.IsNullOrEmpty(innerText) ? false : Convert.ToBoolean(NowProfileNode.SelectSingleNode("Initialized").InnerText);
+            innerText = NowProfileNode.SelectSingleNode("PreferredStart").InnerText;
+            DateTimeOffset preferredTime = string.IsNullOrEmpty(innerText) ? new DateTimeOffset() : Utility.ParseTime(innerText);
             DB_NowProfile retValue = new DB_NowProfile(preferredTime, initializedFlag);
             return retValue;
         }
 
         RestrictionProfile getRestrictionProfile(XmlNode RestrictionNode)
         {
-            List<Tuple<DayOfWeek, RestrictionTimeLine>> RestrictionTimeLines = new List<Tuple<DayOfWeek, RestrictionTimeLine>>();
+            List<RestrictionDay> RestrictionTimeLines = new List<RestrictionDay>();
             foreach (XmlNode eachXmlNode in RestrictionNode.SelectNodes("RestrictionNode"))
             {
                 RestrictionTimeLines.Add(getgetRestrictionTuples(eachXmlNode));
@@ -1684,17 +2930,23 @@ namespace TilerFront
             return retValue;
         }
 
-        Tuple<DayOfWeek, RestrictionTimeLine> getgetRestrictionTuples(XmlNode RestrictionTupleNode)
+        RestrictionDay getgetRestrictionTuples(XmlNode RestrictionTupleNode)
         {
             DayOfWeek myDayOfWeek = getRestrictionDayOfWeek(RestrictionTupleNode);
             RestrictionTimeLine myRestrictionTimeLine = getRestrictionTimeLine(RestrictionTupleNode);
-            Tuple<DayOfWeek, RestrictionTimeLine> retValue = new Tuple<DayOfWeek, RestrictionTimeLine>(myDayOfWeek, myRestrictionTimeLine);
+            RestrictionDay retValue = new RestrictionDay(myDayOfWeek, myRestrictionTimeLine);
             return retValue;
         }
 
         DayOfWeek getRestrictionDayOfWeek(XmlNode RestrictionDayOfWeek)
         {
-            DayOfWeek retValue = RestrictionProfile.AllDaysOfWeek[Convert.ToInt32(RestrictionDayOfWeek.SelectSingleNode("RestrictionDayOfWeek").InnerText)];
+            DayOfWeek retValue = Utility.ParseEnum<DayOfWeek>(RestrictionDayOfWeek.SelectSingleNode("RestrictionDayOfWeek").InnerText);
+            return retValue;
+        }
+
+        ThirdPartyControl.CalendarTool getThirdPartyCalendarType(XmlNode thirdPartyTypeNode)
+        {
+            ThirdPartyControl.CalendarTool retValue = Utility.ParseEnum<ThirdPartyControl.CalendarTool>(thirdPartyTypeNode.InnerText);
             return retValue;
         }
 
@@ -1706,58 +2958,65 @@ namespace TilerFront
         RestrictionTimeLine getRestrictionTimeLine(XmlNode RestrictionTimeLineNode)
         {
             RestrictionTimeLineNode = RestrictionTimeLineNode.SelectSingleNode("RestrictionTimeLineData");
-            DateTimeOffset Start = DateTimeOffset.Parse(RestrictionTimeLineNode.SelectSingleNode("StartTime").InnerText).UtcDateTime;
-            DateTimeOffset End = DateTimeOffset.Parse(RestrictionTimeLineNode.SelectSingleNode("EndTime").InnerText).UtcDateTime;
+            DateTimeOffset Start = Utility.ParseTime(RestrictionTimeLineNode.SelectSingleNode("StartTime").InnerText);
+            DateTimeOffset End = Utility.ParseTime(RestrictionTimeLineNode.SelectSingleNode("EndTime").InnerText);
             TimeSpan rangeSpan = TimeSpan.FromTicks(Convert.ToInt64(RestrictionTimeLineNode.SelectSingleNode("RangeSpan").InnerText));
             DB_RestrictionTimeLine retValue = new DB_RestrictionTimeLine(Start, End, rangeSpan);
             return retValue;
         }
 
-        Repetition getRepetitionObject(XmlNode RecurrenceXmlNode, TimeLine RangeOfLookUP)
+        Repetition getRepetitionObject(XmlNode RecurrenceXmlNode)
         {
-            Repetition RetValue = new Repetition();
-            string RepeatStart = RecurrenceXmlNode.SelectSingleNode("RepeatStartDate").InnerText;
-            string RepeatEnd = RecurrenceXmlNode.SelectSingleNode("RepeatEndDate").InnerText;
-            string RepeatFrequency = RecurrenceXmlNode.SelectSingleNode("RepeatFrequency").InnerText;
-            XmlNode XmlNodeWithList = RecurrenceXmlNode.SelectSingleNode("RepeatCalendarEvents");
-            int repetitionDay = 7;
-            XmlNode RepetitionDayNode = RecurrenceXmlNode.SelectSingleNode("RepeatDay");
-            if (RepetitionDayNode != null)
+            
+            if(!string.IsNullOrEmpty( RecurrenceXmlNode.InnerXml) && !string.IsNullOrEmpty(RecurrenceXmlNode.InnerXml))
             {
-                repetitionDay = Convert.ToInt32(RepetitionDayNode.InnerText);
-            }
-            XmlNode RepetitionDayNodes = RecurrenceXmlNode.SelectSingleNode("RepeatDays");
-            if (RepetitionDayNodes != null)
-            {
-                XmlNodeList AllRepeatingDays = RecurrenceXmlNode.SelectNodes("Recurrence");
-                if (AllRepeatingDays.Count > 0)
+                Repetition RetValue = new Repetition();
+                string RepeatStart = RecurrenceXmlNode.SelectSingleNode("RepeatStartDate").InnerText;
+                string RepeatEnd = RecurrenceXmlNode.SelectSingleNode("RepeatEndDate").InnerText;
+                string RepeatFrequency = RecurrenceXmlNode.SelectSingleNode("RepeatFrequency").InnerText;
+                XmlNode XmlNodeWithList = RecurrenceXmlNode.SelectSingleNode("RepeatCalendarEvents");
+                int repetitionDay = 7;
+                XmlNode RepetitionDayNode = RecurrenceXmlNode.SelectSingleNode("RepeatDay");
+                if (RepetitionDayNode != null)
                 {
-                    List<Repetition> repetitionNodes = new List<Repetition>();
-                    foreach (XmlNode eacXmlNode in AllRepeatingDays)
+                    repetitionDay = Convert.ToInt32(RepetitionDayNode.InnerText);
+                }
+                XmlNode RepetitionDayNodes = RecurrenceXmlNode.SelectSingleNode("RepeatDays");
+                if (RepetitionDayNodes != null)
+                {
+                    XmlNodeList AllRepeatingDays = RecurrenceXmlNode.SelectNodes("Recurrence");
+                    if (AllRepeatingDays.Count > 0)
                     {
-                        repetitionNodes.Add(getRepetitionObject(eacXmlNode, RangeOfLookUP));
+                        List<Repetition> repetitionNodes = new List<Repetition>();
+                        foreach (XmlNode eacXmlNode in AllRepeatingDays)
+                        {
+                            repetitionNodes.Add(getRepetitionObject(eacXmlNode));
+                        }
+
+                        RetValue = new Repetition(true, new TimeLine(Utility.ParseTime(RepeatStart), Utility.ParseTime(RepeatEnd)), RepeatFrequency, repetitionNodes.ToArray(), repetitionDay);
+                        return RetValue;
                     }
 
-                    RetValue = new Repetition(true, new TimeLine(DateTimeOffset.Parse(RepeatStart).UtcDateTime, DateTimeOffset.Parse(RepeatEnd).UtcDateTime), RepeatFrequency, repetitionNodes.ToArray(), repetitionDay);
-                    return RetValue;
                 }
 
+
+
+                RetValue = new Repetition(true, new TimeLine(Utility.ParseTime(RepeatStart), Utility.ParseTime(RepeatEnd)), RepeatFrequency, getAllRepeatCalendarEvents(XmlNodeWithList), repetitionDay);
+
+                return RetValue;
             }
-
-
-
-            RetValue = new Repetition(true, new TimeLine(DateTimeOffset.Parse(RepeatStart).UtcDateTime, DateTimeOffset.Parse(RepeatEnd).UtcDateTime), RepeatFrequency, getAllRepeatCalendarEvents(XmlNodeWithList, RangeOfLookUP), repetitionDay);
-
-            return RetValue;
+            return null;
+            
         }
-        CalendarEvent[] getAllRepeatCalendarEvents(XmlNode RepeatEventSchedulesNode, TimeLine RangeOfLookUP)
+
+        CalendarEvent[] getAllRepeatCalendarEvents(XmlNode RepeatEventSchedulesNode)
         {
             XmlNodeList ListOfRepeatEventScheduleNode = RepeatEventSchedulesNode.ChildNodes;
             List<CalendarEvent> ListOfRepeatCalendarNodes = new List<CalendarEvent>();
 
             foreach (XmlNode MyNode in ListOfRepeatEventScheduleNode)
             {
-                CalendarEvent myCalendarEvent = getCalendarEventObjFromNode(MyNode, RangeOfLookUP);
+                CalendarEvent myCalendarEvent = getCalendarEventObjFromNode(MyNode);
                 if (myCalendarEvent != null)
                 {
                     ListOfRepeatCalendarNodes.Add(myCalendarEvent);
@@ -1765,42 +3024,35 @@ namespace TilerFront
             }
             return ListOfRepeatCalendarNodes.ToArray();
         }
-        Location_Elements getLocation(XmlNode Arg1)
+        TilerElements.Location getLocation(XmlNode Arg1)
         {
             XmlNode var1 = Arg1.SelectSingleNode("Location");
-            bool UninitializedLocation = false;
             return generateLocationObjectFromNode(var1);
         }
 
-        Location_Elements generateLocationObjectFromNode(XmlNode var1)
+        TilerElements.Location generateLocationObjectFromNode(XmlNode var1)
         {
             bool UninitializedLocation = false;
             if (var1 == null)
             {
-#if UseDefaultLocation
-                return DefaultLocation;
-#else
-                return new Location_Elements();
-#endif
+                return new TilerElements.Location();
             }
             else
             {
+                string ID = var1.SelectSingleNode("Id")?.InnerText?? Guid.NewGuid().ToString();
                 string XCoordinate_Str = var1.SelectSingleNode("XCoordinate").InnerText;
                 string YCoordinate_Str = var1.SelectSingleNode("YCoordinate").InnerText;
                 string Descripion = var1.SelectSingleNode("Description").InnerText;
+                string UserId = var1.SelectSingleNode("UserId")?.InnerText;
                 Descripion = string.IsNullOrEmpty(Descripion) ? "" : Descripion;
                 string Address = var1.SelectSingleNode("Address").InnerText;
                 Address = string.IsNullOrEmpty(Address) ? "" : Address;
                 UninitializedLocation = Convert.ToBoolean(var1.SelectSingleNode("isNull").InnerText);
                 string CheckDefault_Str = var1.SelectSingleNode("CheckCalendarEvent") == null ? 0.ToString() : var1.SelectSingleNode("CheckCalendarEvent").InnerText;
-#if UseDefaultLocation
-                if (UninitializedLocation)
-                { return DefaultLocation; }
-#endif
 
                 if (string.IsNullOrEmpty(XCoordinate_Str) || string.IsNullOrEmpty(YCoordinate_Str))
                 {
-                    return new Location_Elements(Address);
+                    return new TilerElements.Location(Address);
                 }
                 else
                 {
@@ -1808,7 +3060,7 @@ namespace TilerFront
                     double yCoOrdinate = double.MaxValue;
 
                     bool isDefault;
-                    if(CheckDefault_Str == "0")
+                    if (CheckDefault_Str == "0")
                     {
                         isDefault = false;
                     }
@@ -1816,27 +3068,39 @@ namespace TilerFront
                     {
                         isDefault = Convert.ToBoolean(CheckDefault_Str);
                     }
-                        
+
 
                     if (!(double.TryParse(XCoordinate_Str, out xCoOrdinate)))
                     {
-                        xCoOrdinate = Location_Elements.MaxLatitude;
+                        xCoOrdinate = TilerElements.Location.MaxLatitude;
                         UninitializedLocation = true;
-#if UseDefaultLocation
-                        return DefaultLocation;
-#endif
                     }
 
                     if (!(double.TryParse(YCoordinate_Str, out yCoOrdinate)))
                     {
                         yCoOrdinate = double.MaxValue;
                         UninitializedLocation = true;
-#if UseDefaultLocation
-                        return DefaultLocation;
-#endif
                     }
 
-                    return new Location_Elements(xCoOrdinate, yCoOrdinate, Address, Descripion, UninitializedLocation, isDefault);
+                    bool IsVerified = false;
+
+                    string LocationValidation_Str = var1.SelectSingleNode("LocationValidation") == null ? "" : var1.SelectSingleNode("LocationValidation").InnerText;
+                    string LookupString_Str = var1.SelectSingleNode("LookupString") == null ? "" : var1.SelectSingleNode("LookupString").InnerText;
+                    string IsVerified_Str = var1.SelectSingleNode("IsVerified") == null ? "" : var1.SelectSingleNode("IsVerified").InnerText;
+                    if(string.IsNullOrEmpty(IsVerified_Str) || string.IsNullOrWhiteSpace(IsVerified_Str))
+                    {
+                        IsVerified = !(isDefault && UninitializedLocation);
+                    } else
+                    {
+                        IsVerified = Convert.ToBoolean(IsVerified_Str);
+                    }
+
+                    TilerElements.Location retValue = new TilerElements.Location(xCoOrdinate, yCoOrdinate, Address, Descripion, UninitializedLocation, isDefault, ID);
+                    retValue.LookupString = LookupString_Str;
+                    retValue.LocationValidation_DB = LocationValidation_Str;
+                    retValue.UserId = UserId;
+                    retValue.IsVerified = IsVerified;
+                    return retValue;
                 }
             }
         }
@@ -1844,25 +3108,26 @@ namespace TilerFront
         {
             XmlNode var1 = Arg1.SelectSingleNode("MiscData");
             string stringData = (var1.SelectSingleNode("UserNote").InnerText);
-            int NoteData = Convert.ToInt32(var1.SelectSingleNode("TypeSelection").InnerText);
+            string innerText = var1.SelectSingleNode("TypeSelection").InnerText;
+            int NoteData = Convert.ToInt32(string.IsNullOrEmpty(innerText)?"0":"1");
             MiscData retValue = new MiscData(stringData, NoteData);
             return retValue;
         }
         public EventDisplay getDisplayUINode(XmlNode Arg1)
         {
             XmlNode var1 = Arg1.SelectSingleNode("UIParams");
-            int DefaultFlag = Convert.ToInt32(var1.SelectSingleNode("Type").InnerText);
+            int DisplayType = Convert.ToInt32(var1.SelectSingleNode("Type").InnerText);
             bool DisplayFlag = Convert.ToBoolean(var1.SelectSingleNode("Visible").InnerText);
             EventDisplay retValue;
             TilerColor colorNode = getColorNode(var1);
-            if (DefaultFlag == 0)
+            if (DisplayType == 0)
             {
                 retValue = new EventDisplay();
             }
             else
             {
 
-                retValue = new EventDisplay(DisplayFlag, colorNode, DefaultFlag);
+                retValue = new EventDisplay(DisplayFlag, colorNode, DisplayType);
             }
             return retValue;
         }
@@ -1920,67 +3185,157 @@ namespace TilerFront
             return retValue;
         }
 
-        public CalendarEvent getCalendarEventWithID(string ID)
+        public virtual async Task<CalendarEvent> getCalendarEventWithID(EventID id, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation)
         {
-            TimeLine RangeOfLookup = new TimeLine(DateTimeOffset.Now.AddYears(-1000), DateTimeOffset.Now.AddYears(1000));
-            Dictionary<string, CalendarEvent> AllScheduleData = getAllCalendarFromXml(RangeOfLookup);
-            CalendarEvent retValue = null;
-            if (AllScheduleData.ContainsKey(ID))
+            return await getCalendarEventWithID(id.getRepeatCalendarEventID(), retrievalOption).ConfigureAwait(false);
+        }
+
+        public async Task<CalendarEvent> getCalendarEventWithID(string id, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation, bool includeSubEvents = true)
+        {
+            EventID idObj = new EventID(id);
+            id = idObj.getRepeatCalendarEventID();
+
+
+            ConcurrentBag<CalendarEvent> parentCalEvents = new ConcurrentBag<CalendarEvent>();
+
+            ConcurrentBag<CalendarEvent> childCalEvents = new ConcurrentBag<CalendarEvent>();
+            CalendarEvent retValue = getCalendarEventQuery(retrievalOption, includeSubEvents)
+                    .Include(calEvent => calEvent.Repetition_EventDB)
+                    .Include(calEvent => calEvent.ProfileOfNow_EventDB)
+                    .Include(calEvent => calEvent.Procrastination_EventDB)
+                    .Include(calEvent => calEvent.AllSubEvents_DB)
+                    .Include(calEvent => calEvent.DayPreference_DB)
+                    .Include(calEvent => calEvent.TimeLineHistory_DB)
+                    .Include(calEvent => calEvent.TimeLineHistory_DB.TimeLines_DB)
+                    .Include(calEvent => calEvent.DataBlob_EventDB)
+                    .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents)
+                    .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB))
+                    .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.ProfileOfNow_EventDB))
+                    .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.Procrastination_EventDB)).SingleOrDefault(calEvent => calEvent.Id == id);
+
+
+            // Multiple getCalendarEventQuery calls because we're trying to leverage the caching functionality of entity framework. Attributes that have been included don't get pulled in again meaning the row size from DB is smaller.
+            retValue = getCalendarEventQuery(retrievalOption, includeSubEvents)
+                    .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.DayPreference_DB)).SingleOrDefault(calEvent => calEvent.Id == id);
+            retValue = getCalendarEventQuery(retrievalOption, includeSubEvents)
+                    .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB.Select(subEvent => subEvent.Name))).SingleOrDefault(calEvent => calEvent.Id == id);
+            retValue = getCalendarEventQuery(retrievalOption, includeSubEvents)
+                    .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB.Select(subEvent => subEvent.ProfileOfNow_EventDB)))
+                    .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB.Select(subEvent => subEvent.Procrastination_EventDB)))
+                    .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB.Select(subEvent => subEvent.Name))).SingleOrDefault(calEvent => calEvent.Id == id);
+            retValue = getCalendarEventQuery(retrievalOption, includeSubEvents)
+                    .Include(calEvent => calEvent.Repetition_EventDB.SubRepetitions.Select(repetition => repetition.SubRepetitions)).SingleOrDefault(calEvent => calEvent.Id == id);
+            retValue = getCalendarEventQuery(retrievalOption, includeSubEvents)
+                    .Include(calEvent => calEvent.Repetition_EventDB.SubRepetitions.Select(repetition => repetition.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB))).SingleOrDefault(calEvent => calEvent.Id == id);
+            retValue = getCalendarEventQuery(retrievalOption, includeSubEvents)
+                    .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB.Select(subEvent => subEvent.Name))).SingleOrDefault(calEvent => calEvent.Id == id);
+            retValue = getCalendarEventQuery(retrievalOption, includeSubEvents)
+                    .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB.Select(subEvent => subEvent.Name.Creator_EventDB)))
+                    .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB.Select(subEvent => subEvent.DataBlob_EventDB)))
+                    .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB.Select(subEvent => subEvent.Location_DB)))
+                    .SingleOrDefault(calEvent => calEvent.Id == id);
+            retValue = getCalendarEventQuery(retrievalOption, includeSubEvents)
+                    .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB.Select(subEvent => subEvent.Procrastination_EventDB)))
+                    .SingleOrDefault(calEvent => calEvent.Id == id);
+            retValue = getCalendarEventQuery(retrievalOption, includeSubEvents)
+                    .Include(calEvent => calEvent.Repetition_EventDB.SubRepetitions.Select(repetition => repetition.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB)))
+                    .SingleOrDefault(calEvent => calEvent.Id == id);
+            retValue = getCalendarEventQuery(retrievalOption, includeSubEvents)
+                    .Include(calEvent => calEvent.Repetition_EventDB.SubRepetitions.Select(repetition => repetition.RepeatingEvents.Select(repCalEvent => repCalEvent.Procrastination_EventDB)))
+                    .Include(calEvent => calEvent.Repetition_EventDB.SubRepetitions.Select(repetition => repetition.RepeatingEvents.Select(repCalEvent => repCalEvent.ProfileOfNow_EventDB)))
+                    .SingleOrDefault(calEvent => calEvent.Id == id);
+
+            if (retValue != null && retValue.getIsEventRestricted)
             {
-                retValue = AllScheduleData[ID];
+                (retValue as CalendarEventRestricted).RestrictionProfile_DB.InitializeOverLappingDictionary();
+            }
+            retValue.isRepeatLoaded_DB = true;
+            return retValue;
+        }
+
+        public void reloadContext()
+        {
+            foreach (var entity in _Context.ChangeTracker.Entries())
+            {
+                entity.Reload();
+            }
+        }
+        /// <summary>
+        /// Function returns a subcalendarevent  based on the provided ID. It checks if the userId is also valid.
+        /// set <paramref name="includeParentCalevent"/> to false if you don't want the subcalendarevent calendar event to include the parent calendar event of the subevent
+        /// </summary>
+        /// <param name="ID"></param>
+        /// <param name="includeParentCalevent"></param>
+        /// <param name="includeRepetition"></param>
+        /// <returns></returns>
+        public async Task<SubCalendarEvent> getSubEventWithID(string ID, bool includeParentCalevent = true, bool includeRepetition = true)
+        {
+            IQueryable<SubCalendarEvent> subEventQuery = Database.SubEvents
+                .Include(subEvent => subEvent.DataBlob_EventDB)
+                .Include(subEvent => subEvent.Name)
+                .Include(subEvent => subEvent.Name.Creator_EventDB)
+                .Include(subEvent => subEvent.Location_DB)
+                .Include(subEvent => subEvent.Creator_EventDB)
+                .Include(subEvent => subEvent.DataBlob_EventDB)
+                .Include(subEvent => subEvent.Procrastination_EventDB)
+                .Include(subEvent => subEvent.ProfileOfNow_EventDB)
+                .Include(subEvent => subEvent.RestrictionProfile_DB);
+
+            if(includeParentCalevent)
+            {
+                subEventQuery = subEventQuery.Include(subEvent => subEvent.ParentCalendarEvent);
+            }
+
+            if(includeRepetition)
+            {
+                subEventQuery = subEventQuery
+                    .Include(subEvent => subEvent.Repetition_EventDB)
+                    .Include(subEvent => subEvent.Repetition_EventDB.RepeatingEvents);
+            }
+
+
+            SubCalendarEvent retValue = await subEventQuery
+                .SingleOrDefaultAsync(subEvent => subEvent.CreatorId == _TilerUser.Id && subEvent.Id == ID).ConfigureAwait(false);
+            if (retValue!= null && retValue.getIsEventRestricted)
+            {
+                (retValue as SubCalendarEventRestricted).RestrictionProfile_DB.InitializeOverLappingDictionary();
             }
             return retValue;
         }
 
-        public IList<CalendarEvent> getCalendarEventWithName(string Name)
+        public async Task<IQueryable<CalendarEvent>> getEnabledCalendarEventWithName(string Name)
         {
-            IList<CalendarEvent> retValue = new CalendarEvent[0];
-#if ForceReadFromXml
-#else
-            if (useCassandra)
-            {
-                retValue = myCassandraAccess.SearchEventsByName(Name);
-                return retValue;
-            }
-#endif
+            IQueryable<EventName> eventNames = _Context.EventNames
+                .Where(name => name.CreatorId == _TilerUser.Id && name.Name.Contains(Name));
+            var result = eventNames.Join(_Context.CalEvents
+                .Include(CalEvent => CalEvent.UiParams_EventDB)
+                .Include(CalEvent => CalEvent.DataBlob_EventDB)
+                .Where(calEvent => !calEvent.IsRepeatsChildCalEvent && calEvent.IsEnabled_DB),
+                eventName => eventName.Id,
+                calEvent => calEvent.Name.Id,
+                (eventName, calEvent) => new { calEvent = calEvent, eventName = eventName }
+                );
+            var res = result
+                .Select(obj => obj.calEvent);
 
-            TimeLine RangeOfLookup = new TimeLine(DateTimeOffset.Now.AddYears(-1000), DateTimeOffset.Now.AddYears(1000));
-            Dictionary<string, CalendarEvent> AllScheduleData = getAllCalendarFromXml(RangeOfLookup);
-            
-            Name = Name.ToLower();
-            if (AllScheduleData.Count > 0)
-            {
-                retValue = AllScheduleData.Values.Where(obj => obj.Name.ToLower().Contains(Name)).ToList();
-            }
-
+            var retValue = res
+                .Include(obj => obj.DataBlob_EventDB)
+                .Include(obj => obj.UiParams_EventDB)
+                .Include(obj => obj.Name);
             return retValue;
         }
 
 
-        async public Task<IList<Location_Elements>> getCachedLocationByName(string Name)
+        public IQueryable<CalendarEvent> getCalendarEventsForUser(string userId)
         {
-            
-            IList<Location_Elements> retValue = new List<Location_Elements>();
-#if ForceReadFromXml
-#else
-            if (useCassandra)
-            {
-                retValue = myCassandraAccess.SearchLocationByName(Name);
-                return retValue;
-            }
-#endif
-            TimeLine RangeOfLookup = new TimeLine(DateTimeOffset.Now.AddYears(-1000), DateTimeOffset.Now.AddYears(1000));
-            CachedLocation = await getLocationCache().ConfigureAwait(false); ;
-            
-
-            Name = Name.ToLower();
-            if (CachedLocation.Count > 0)
-            {
-                retValue = CachedLocation.Select(obj => obj.Value).Where(obj1 => obj1.Description.ToLower().Contains(Name) || obj1.Address.ToLower().Contains(Name)).ToList();
-            }
+            IQueryable<CalendarEvent> retValue = _Context.CalEvents
+                .Include(CalEvent => CalEvent.Name)
+                .Include(CalEvent => CalEvent.UiParams_EventDB)
+                .Include(CalEvent => CalEvent.DataBlob_EventDB)
+                .Where(calEvent => calEvent.CreatorId == userId);
             return retValue;
         }
-        #endregion
+#endregion
 
         private DateTimeOffset stringToDateTime(string MyDateTimeString)//String should be in format "MM/DD/YY HH:MM:SSA"
         {
@@ -2036,30 +3391,68 @@ namespace TilerFront
 
         }
 
-
-
-        async public Task<Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, Location_Elements>>> getProfileInfo(TimeLine RangeOfLookup = null)
+        public async virtual Task createTempDump(ReferenceNow now)
         {
-            //getLocationCache
-            if (RangeOfLookup == null)
-            {
-                RangeOfLookup = new TimeLine(DateTimeOffset.Now.AddYears(-10), DateTimeOffset.Now.AddYears(10));
-            }
+            _TempDump = await CreateScheduleDump(_AllScheduleData.Values, this._TilerUser, now, "").ConfigureAwait(false);
+        }
 
-            Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, Location_Elements>> retValue;
+
+        /// <summary>
+        /// This function wipes out the database completely.BECAREFUL. You''l need to comment out the lines below return
+        /// </summary>
+        public void deleteAllDatabaseData()
+        {
+            return;
+            //_Context.Database.ExecuteSqlCommand("TRUNCATE TABLE Undoes");
+            //_Context.Database.ExecuteSqlCommand("TRUNCATE TABLE TilerEvents");
+            //_Context.Database.ExecuteSqlCommand("DELETE FROM Procrastinations");
+            //_Context.Database.ExecuteSqlCommand("DELETE FROM  EventNames");
+            //_Context.Database.ExecuteSqlCommand("DELETE FROM  Reasons");
+            //_Context.Database.ExecuteSqlCommand("DELETE FROM  Locations");
+            //_Context.Database.ExecuteSqlCommand("DELETE FROM  Repetitions");
+            //_Context.Database.ExecuteSqlCommand("DELETE FROM  MiscDatas");
+            //_Context.Database.ExecuteSqlCommand("DELETE FROM  TilerUserGroups");
+            //_Context.Database.ExecuteSqlCommand("DELETE FROM  EventDisplays");
+            //_Context.Database.ExecuteSqlCommand("DELETE FROM  TilerColors");
+            //_Context.Database.ExecuteSqlCommand("DELETE FROM  AspNetUsers");
+            //_Context.Database.ExecuteSqlCommand("DELETE FROM  RestrictionDays");
+            //_Context.Database.ExecuteSqlCommand("DELETE FROM  RestrictionTimeLines");
+            //_Context.Database.ExecuteSqlCommand("DELETE FROM  RestrictionProfiles");
+            //_Context.Database.ExecuteSqlCommand("DELETE FROM  Classifications");
+            //_Context.Database.ExecuteSqlCommand("DELETE FROM  NowProfiles");
+            //_Context.Database.ExecuteSqlCommand("DELETE FROM  EventTimeLines");
+            //_Context.Database.ExecuteSqlCommand("DELETE FROM  AspNetRoles");
+            //_Context.Database.ExecuteSqlCommand("DELETE FROM  AspNetUserRoles");
+            //_Context.Database.ExecuteSqlCommand("DELETE FROM  AspNetUserLogins");
+            //_Context.Database.ExecuteSqlCommand("DELETE FROM  AspNetUserClaims");
+
+
+        }
+
+        async virtual public Task<Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location>>> getProfileInfo(TimeLine RangeOfLookup, ReferenceNow Now, bool includeUpdateHistory, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation, bool createDump = true, HashSet<string> calendarIds = null)
+        {
+            Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location>> retValue;
             if (this.Status)
             {
-                Task<Dictionary<string, Location_Elements>> TaskLocationCache = getLocationCache();
+                Task<Dictionary<string, TilerElements.Location>> TaskLocationCache = getAllLocationsByUser();
+                Dictionary<string, TilerElements.Location> LocationCache = await TaskLocationCache.ConfigureAwait(false);
+                RangeOfLookup  = RangeOfLookup == null ? new TimeLine(Now.constNow.AddYears(-200), Now.constNow.AddYears(200)) : RangeOfLookup;
+                Stopwatch scheduleLoadWatch = new Stopwatch();
+                scheduleLoadWatch.Start();
+                Dictionary<string, CalendarEvent> AllScheduleData = await this.getAllEnabledCalendarEvent(RangeOfLookup, Now, includeUpdateHistory, retrievalOption: retrievalOption, tilerIds: calendarIds);
+                scheduleLoadWatch.Stop();
+                Debug.WriteLine("Total DB Lookup took " + scheduleLoadWatch.Elapsed.ToString());
+                if (createDump && _UpdateBigData)
+                {
+                    _AllScheduleData = AllScheduleData;
+                    await createTempDump(Now).ConfigureAwait(false);
+                }
                 
-                Dictionary<string, CalendarEvent> AllScheduleData = this.getAllCalendarFromXml(RangeOfLookup);
-                Task<DateTimeOffset> getReferenceTime = getDayReferenceTime();
+                DateTimeOffset ReferenceTime = getDayReferenceTime();
 
-
-                Dictionary<string, Location_Elements> LocationCache = await TaskLocationCache.ConfigureAwait(false);
                 await populateDefaultLocation(LocationCache).ConfigureAwait(false);
-                DateTimeOffset ReferenceTime = await getReferenceTime.ConfigureAwait(false);
-                
-                retValue = new Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, Location_Elements>>(AllScheduleData, ReferenceTime, LocationCache);
+
+                retValue = new Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location>>(AllScheduleData, ReferenceTime, LocationCache);
             }
             else
             {
@@ -2068,52 +3461,49 @@ namespace TilerFront
             return retValue;
         }
 
-
-        
-
-        async protected Task populateDefaultLocation(Dictionary<string, Location_Elements> locations = null)
+        async protected Task populateDefaultLocation(Dictionary<string, TilerElements.Location> locations = null)
         {
             double xLocation = 40.083319;
             double yLocation = -105.3505482;
-            Location_Elements retValue;
+            TilerElements.Location retValue;
             if ((locations == null))
             {
 
-                retValue = Location_Elements.getDefaultLocation();
+                retValue = TilerElements.Location.getDefaultLocation();
                 DefaultLocation = retValue;
-                locations = await getLocationCache().ConfigureAwait(false);
+                locations = await getAllLocationsByUser().ConfigureAwait(false);
                 return;
             }
 
             if ((locations.Count < 1))
             {
-                retValue = Location_Elements.getDefaultLocation();
+                retValue = TilerElements.Location.getDefaultLocation();
                 DefaultLocation = retValue;
-                locations = await getLocationCache().ConfigureAwait(false);
+                locations = await getAllLocationsByUser().ConfigureAwait(false);
                 return;
             }
 
-            Location_Elements AverageLocations = Location_Elements.AverageGPSLocation(locations.Values);
+            TilerElements.Location AverageLocations = TilerElements.Location.AverageGPSLocation(locations.Values);
 
-            xLocation = AverageLocations.XCoordinate;
-            yLocation = AverageLocations.YCoordinate;
-            Location_Elements.InitializeDefaultLongLat(xLocation, yLocation);
+            xLocation = AverageLocations.Latitude;
+            yLocation = AverageLocations.Longitude;
+            TilerElements.Location.InitializeDefaultLongLat(xLocation, yLocation);
             DefaultLocation = AverageLocations;
-            
+
         }
-        #endregion
+#endregion
 
-        #region Properties
+#region Properties
 
-        public int LastUserID
+        virtual public int LastUserID
         {
             get
             {
-                return Convert.ToInt32(LastIDNumber);
+                return Convert.ToInt32(_TilerUser.LatestId);
             }
         }
 
-        public bool Status
+        virtual public bool Status
         {
             get
             {
@@ -2121,7 +3511,7 @@ namespace TilerFront
             }
         }
 
-        public string LoggedUserID
+        virtual public string LoggedUserID
         {
             get
             {
@@ -2129,17 +3519,7 @@ namespace TilerFront
             }
         }
 
-
-        public string getFullLogDir
-        {
-            get
-            {
-                return WagTapLogLocation + CurrentLog;
-            }
-
-        }
-
-        public Location_Elements defaultLocation
+        virtual public TilerElements.Location defaultLocation
         {
             get
             {
@@ -2147,7 +3527,7 @@ namespace TilerFront
             }
         }
 
-        public string Usersname
+        virtual public string Usersname
         {
             get
             {
@@ -2155,15 +3535,28 @@ namespace TilerFront
             }
         }
 
-        public static string LogLocation
+        virtual public TilerDbContext Database
         {
             get
             {
-                return WagTapLogLocation;
+                return _Context;
             }
         }
 
+        public ReferenceNow Now { get; set; }
+
         #endregion
+
+        public void disableUpdateBigData()
+        {
+            _UpdateBigData = false;
+        }
+
+        public void enableUpdateBigData()
+        {
+            _UpdateBigData = true;
+        }
+
     }
 
 }

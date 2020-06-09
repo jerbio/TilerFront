@@ -8,7 +8,6 @@
     $(DomInformation.Dom).addClass("ScreenContainer");
     var DomTopSection = generateSelectedEventLabelDom(SelectedEvent);
     var CompletionMapDom = generateCompletionMap(SelectedEvent);
-    //$(CompletionMapDom).addClass("SubEventLabelSection TextColorLight")
     $(CompletionMapDom).addClass("SubEventNonLabelSection ContentSectionLight")
     var NextEventDom = generateNextEventSelection(SelectedEvent);
     var WeatherSelectionDom = generateWeatherSelection(SelectedEvent);
@@ -35,19 +34,202 @@ function exitSelectedEventScreen()
     myContainer.outerHTML = "";
 }
 
+function generateEditField(options) {
+    let id = generateUUID()
+    let container = getDomOrCreateNew("editable-field-" + id)
+    $(container).addClass("editable-field-container")
+    let retValue = {
+        container: null,
+        input: null,
+        label: null
+    }
+
+    if (options.label) {
+        let label = getDomOrCreateNew("editable-field-label-" + id, 'div')
+        $(label).addClass("editable-field-label")
+        $(label).addClass("inline-block")
+        label.innerText = options.label
+        container.label = label
+        container.appendChild(label)
+        retValue.label = label
+    }
+    let input = getDomOrCreateNew("editable-field-input-" + id, 'input')
+    $(input).addClass("editable-field-input")
+    container.appendChild(input)
+    if (options.name) {
+        input.name = options.name
+    }
+
+    if (options.placeHolder) {
+        input.placeholder = options.placeHolder
+        container.input = input
+    }
+
+    if (options.value) {
+        input.value = options.value
+    }
+
+    retValue.container = container
+    retValue.input = input
+    return retValue
+}
+
+function generateSubEventEditPage(subEvent) {
+    let subEventId = subEvent.ID
+    let page = getDomOrCreateNew("Edit-SubEvent-Page-" + subEventId)
+    let pageTitle = getDomOrCreateNew("Edit-SubEvent-page-title-" + subEventId)
+    let pageContent = getDomOrCreateNew("Edit-SubEvent-page-content-" + subEventId)
+    let pageContentContainer = getDomOrCreateNew("Edit-SubEvent-page-content-container" + subEventId)
+    $(pageContentContainer).addClass('edit-subEvent-page-content-container')
+    $(pageTitle).addClass('edit-subEvent-page-title')
+    $(pageContent).addClass('edit-subEvent-page-content')
+    pageContentContainer.appendChild(pageContent)
+    let pageFooter = getDomOrCreateNew("Edit-SubEvent-page-footer-" + subEventId)
+    $(pageFooter).addClass('edit-subEvent-page-footer')
+    $(page).show();
+    let nameEdit = generateEditField({ id: "Edit-SubEvent-Name-" + subEventId, label: 'Name', placeHolder: 'Name', value: subEvent.Name || subEvent.SubCalCalendarName })
+    let addressEdit = generateEditField({ id: "Edit-SubEvent-Address-" + subEventId, label: 'Address', placeHolder: 'Address', value: subEvent.SubCalAddress })
+    let addressNickNameEdit = generateEditField({ id: "Edit-SubEvent-Address-nick-Name" + subEventId, label: 'Address Description', placeHolder: 'Another name for the address', value: subEvent.SubCalAddressDescription })
+    let durationEdit = generateEditField({ id: "Edit-SubEvent-Duration-" + subEventId, label: 'Duration', placeHolder: 'Duration', value: subEvent.Name })
+    let deadlineTimeEdit = generateEditField({ id: "Edit-SubEvent-Deadline-time-" + subEventId, label: 'Deadline Time', placeHolder: 'Deadline', value: moment(subEvent.SubCalCalEventEnd).format("hh:mm a") })
+    let deadlineDateEdit = generateEditField({ id: "Edit-SubEvent-Deadline-date-" + subEventId, label: 'Deadline Date', placeHolder: 'Deadline', value: moment(subEvent.SubCalCalEventEnd).format("MM/DD/YYYY") })
+    let startTimeEdit = generateEditField({ id: "Edit-SubEvent-Start-time-" + subEventId, label: 'Start Time', placeHolder: 'Start Time', value: moment(subEvent.SubCalStartDate).format("hh:mm a") })
+    let startDateEdit = generateEditField({ id: "Edit-SubEvent-Start-date-" + subEventId, label: 'Start Date', placeHolder: 'Start Date', value: moment(subEvent.SubCalStartDate).format("MM/DD/YYYY") })
+    let endTimeEdit = generateEditField({ id: "Edit-SubEvent-End-Time-" + subEventId, label: 'End Time', placeHolder: 'End Time', value: moment(subEvent.SubCalEndDate).format("hh:mm a") })
+    let endDateEdit = generateEditField({ id: "Edit-SubEvent-End-Date-" + subEventId, label: 'End Date', placeHolder: 'End Date', value: moment(subEvent.SubCalEndDate).format("MM/DD/YYYY") })
+    let numberOfEvents = generateEditField({ id: "Edit-SubEvent-Number-Of-Split-", label: 'Split', placeHolder: 'Number of subevents', value: Dictionary_OfCalendarData[subEvent.CalendarID].TotalNumberOfEvents })
+    numberOfEvents.input.type = "number"
+    let cancelButton = getDomOrCreateNew("Cancel-Edit-SubEvent-" + subEventId, "button")
+    $(cancelButton).addClass('cancel-edit-SubEvent edit-button')
+    cancelButton.innerHTML = 'Cancel'
+    let saveButton = getDomOrCreateNew("Save-Edit-SubEvent-" + subEventId, "button")
+    saveButton.innerHTML = 'Save'
+    $(saveButton).addClass('save-edit-subEvent edit-button')
+    
+    function closeEditContainer(e) {
+        var myContainer = (CurrentTheme.getCurrentContainer());
+        $(myContainer).hide();
+        $(myContainer).empty();
+        CurrentTheme.TransitionOldContainer();
+        myContainer.outerHTML = "";
+    }
+
+    function prepareForSubmission(e) {
+        let postData = {
+        }
+        let userData = GetCookieValue()
+        let startTime = startTimeEdit.input.value.split(' ').length === 1 ? spliceSlice(startTimeEdit.input.value, 5, 0, ' ') : startTimeEdit.input.value
+        let endTime = endTimeEdit.input.value.split(' ').length === 1 ? spliceSlice(endTimeEdit.input.value, 5, 0, ' ') : endTimeEdit.input.value
+        let deadlineTime = deadlineTimeEdit.input.value.split(' ').length === 1 ? spliceSlice(deadlineTimeEdit.input.value, 5, 0, ' ') : deadlineTimeEdit.input.value
+        postData.CalEnd = moment(deadlineTime + " " + deadlineDateEdit.input.value).valueOf()
+        postData.Start = moment(startTime + " " + startDateEdit.input.value).valueOf()
+        postData.End = moment(endTime + " " + endDateEdit.input.value).valueOf()
+        postData.EventName = nameEdit.input.value
+        postData.address = addressEdit.input.value
+        postData.AddressDescription = addressNickNameEdit.input.value
+        postData.EventID = subEventId
+        postData.mobileFlag = true
+        var TimeZone = new Date().getTimezoneOffset();
+        postData.TimeZoneOffset = TimeZone;
+        postData.TimeZone = moment.tz.guess()
+
+        postData.Start = postData.Start;
+        postData.End = postData.End;
+        postData.CalEnd = postData.CalEnd;
+
+        postData.offset = new Date().getTimezoneOffset()
+        postData.Split = numberOfEvents.input.value
+        postData.UserName = userData.UserName
+        postData.UserID = userData.UserID
+        postData.ThirdPartyType = subEvent.ThirdPartyType
+        let url = global_refTIlerUrl + "SubCalendarEvent/Update"
+        postData.TimeZone = moment.tz.guess()
+        preSendRequestWithLocation(postData);
+        var HandleNEwPage = new LoadingScreenControl("Tiler is Updating the event ...");
+        HandleNEwPage.Launch();
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: postData,
+            success: (result) => {
+                let callBack = () => {
+                    closeEditContainer(e)
+                    CurrentTheme.TransitionOldContainer(); // removes the initial selected sub event details page
+                    let subEvent = result.Content.subEvent
+                    subEvent.SubCalCalEventEnd = new Date(subEvent.SubCalCalEventEnd)
+                    subEvent.SubCalCalEventStart = new Date(subEvent.SubCalCalEventStart)
+                    subEvent.SubCalStartDate = new Date(subEvent.SubCalStartDate)
+                    subEvent.SubCalEndDate = new Date(subEvent.SubCalEndDate)
+                    loadSelectedSubEvent(subEvent.ID, subEvent)
+                    HandleNEwPage.Hide();
+                }
+                RefreshSubEventsMainDivSubEVents(callBack);
+
+            },
+            error: (error) => {
+                debugger;
+                var myError = error;
+                var step = "err";
+                var NewMessage = "Oh No!!! Tiler is having issues modifying your schedule. Please try again Later :(";
+                var ExitAfter = { ExitNow: true, Delay: 1000 };
+                HandleNEwPage.UpdateMessage(NewMessage, ExitAfter)
+            }
+        }).done(() => {
+            sendPostScheduleEditAnalysisUpdate({});
+        })
+    }
+
+    BindImputToTimePicketMobile(deadlineTimeEdit.input)
+    BindImputToDatePicketMobile(deadlineDateEdit.input);
+
+    BindImputToTimePicketMobile(startTimeEdit.input)
+    BindImputToDatePicketMobile(startDateEdit.input)
+    BindImputToTimePicketMobile(endTimeEdit.input)
+    BindImputToDatePicketMobile(endDateEdit.input)
+
+    let pageTitleContent = getDomOrCreateNew("Edit-SubEvent-page-title-content-" + subEventId)
+    $(pageTitleContent).addClass('edit-subevent-title')
+    pageTitleContent.innerHTML = 'Update event'
+    pageTitle.appendChild(pageTitleContent)
+    cancelButton.onclick = closeEditContainer
+    saveButton.onclick = prepareForSubmission
+    pageContent.appendChild(nameEdit.container)
+    pageContent.appendChild(startTimeEdit.container)
+    pageContent.appendChild(startDateEdit.container)
+    pageContent.appendChild(endTimeEdit.container)
+    pageContent.appendChild(endDateEdit.container)
+    if (!Dictionary_OfCalendarData[subEvent.CalendarID].Rigid) {
+        pageContent.appendChild(numberOfEvents.container)
+        pageContent.appendChild(deadlineTimeEdit.container)
+        pageContent.appendChild(deadlineDateEdit.container)
+    }
+    pageFooter.appendChild(saveButton)
+    pageFooter.appendChild(cancelButton)
+
+    page.appendChild(pageTitle)
+    page.appendChild(pageContentContainer)
+    page.appendChild(pageFooter)
+    $(page).addClass('edit-subevent-page')
+
+    CurrentTheme.TransitionNewContainer(page);
+}
+
 function generateSelectedEventLabelDom(SelectedEvent)
 {
     var LabelSectionDom = getDomOrCreateNew("LabelSectionDom"+SelectedEvent.ID)
-
-        //document.createElement("div");
     $(LabelSectionDom.Dom).addClass("LabelSectionDom");
     $(LabelSectionDom.Dom).addClass(CurrentTheme.ContentSection);
     $(LabelSectionDom.Dom).addClass(CurrentTheme.FontColor);
 
+    let onClick = () => {
+        
+        generateSubEventEditPage(SelectedEvent)
+    }
+
     var HorizontalLine = InsertHorizontalLine("95%", "2.5%", "98%");
     LabelSectionDom.Dom.appendChild(HorizontalLine);
     var LabelBackButton = getDomOrCreateNew("BackIconSelectedEvent").Dom;
-    //$(LabelBackButton).css({ "position": "absolute", "left":"25px","top": "50%", "margin-top": "-50px", "width": "100px", "height": "100px" })
+
     $(LabelBackButton).addClass("BackIcon");
     LabelSectionDom.Dom.appendChild(LabelBackButton);
 
@@ -61,12 +243,12 @@ function generateSelectedEventLabelDom(SelectedEvent)
     var LabelDescription = getDomOrCreateNew("LabelDescription" + SelectedEvent.ID);
     $(LabelDescription.Dom).addClass("LabelDescription");
     LabelSectionDom.Dom.appendChild(LabelDescription.Dom);
-    
+    LabelDescription.onclick = onClick
 
     var LabelDescriptionTop = document.createElement("div");
     $(LabelDescriptionTop).addClass("LabelDescriptionTop");
     LabelDescription.Dom.appendChild(LabelDescriptionTop);
-    LabelDescriptionTop.innerHTML = SelectedEvent.Name;
+    LabelDescriptionTop.innerHTML = SelectedEvent.SubCalCalendarName;
 
     
 
@@ -75,11 +257,9 @@ function generateSelectedEventLabelDom(SelectedEvent)
     LabelDescriptionTop.appendChild(LabelDescriptionTopName);
     
     var LabelDescriptionBottom = getDomOrCreateNew("LabelDescriptionBottom" + SelectedEvent.ID)
-        //document.createElement("div");
     $(LabelDescriptionBottom.Dom).addClass("LabelDescriptionBottom");
     LabelDescription.Dom.appendChild(LabelDescriptionBottom.Dom);
     var VerticalLine = InsertVerticalLine("95%", "50%", "0%");
-    //LabelDescriptionBottom.Dom.appendChild(VerticalLine);
 
     var LabelDescriptionBottomLocation = document.createElement("div");
     $(LabelDescriptionBottomLocation).addClass("LabelDescriptionBottomLocation");
@@ -90,6 +270,7 @@ function generateSelectedEventLabelDom(SelectedEvent)
     $(LabelDescriptionBottomTime).addClass("LabelDescriptionBottomTime");
     LabelDescriptionBottom.Dom.appendChild(LabelDescriptionBottomTime);
     LabelDescriptionBottomTime.innerHTML = "" + getTimeStringFromDate(SelectedEvent.SubCalStartDate) + "-" + getTimeStringFromDate(SelectedEvent.SubCalEndDate) + "";
+
     return LabelSectionDom.Dom;
 }
 
@@ -131,36 +312,7 @@ function generateNextEventSelection(SelectedEvent)
     var nextDate = new Date(SelectedEvent.SubCalStartDate);
     var EndDate = new Date(SelectedEvent.SubCalEndDate);
     UpdateTimer(ContentNextEvent.Dom, LabelNextEvent, nextDate, EndDate);
-    /*var DayID="DayNext"
-    var DayDom = getDomOrCreateNew(DayID);
-    var DayNameID = "Days";
-    var DayNameDom = getDomOrCreateNew(DayNameID);
-    DayNameDom.Dom.innerHTML = "Days";
-    var DayTextID = "DayText";
-    var DayTextDom = getDomOrCreateNew(DayTextID);
-    
-    var TotalTime =nextDate-Date.now;
-    var TotalDays = TotalTime/OneDayInMs;
-    var TotalDaysInt =Math.floor(TotalDays);
-    var TimeLeft =TotalDays-TotalDaysInt;
-    var TotalHours =TimeLeft/OneHourInMs;
-    var TotalHoursInt =  Math.floor(TotalHours);
-    var 
-    var MsLeft = TotalTime-DaysLeft;
-    DayTextDom.Dom.innerHTML = 
-    
-
-
-    var HourID = "HourNext"
-    var HourDom = getDomOrCreateNew(HourID);
-    var MinID = "MinNext";
-    var MinDom = getDomOrCreateNew(MinID);
-    var SecondID = "SecondNext";
-    var SecondDom = getDomOrCreateNew(SecondID);
-    */
-
     NextEvent.Dom.appendChild(LabelNextEvent.Dom);
-    //NextEvent.Dom.appendChild(LabelSectionSplitter.Dom);
     NextEvent.Dom.appendChild(ContentNextEvent.Dom);
     
     return NextEvent.Dom;
@@ -189,11 +341,6 @@ function generateWeatherSelection(SelectedEvent) {
     $(LabelWeatherSubEvent.Dom).addClass("SubEventLabelSection");
     LabelWeatherSubEvent.Dom.innerHTML = "<p>Weather</p>"
     $(LabelWeatherSubEvent.Dom).addClass(CurrentTheme.FontColor);
-
-    //Populates splitter of Next event section
-    /*var SectionSplitterID = "LabelSectionSplitter"
-    var LabelSectionSplitter = getDomOrCreateNew(SectionSplitterID);
-    $(LabelSectionSplitter.Dom).addClass("SectionSplitter");*/
     //Populates  of Next event COntent
     var ContentWeatherSubEventID = "ContentWeatherSubEvent"
     var ContentWeatherSubEvent = getDomOrCreateNew(ContentWeatherSubEventID);
@@ -313,11 +460,7 @@ function generateRangeUpdate(SelectedEvent) {
     $(LabelRangeModify.Dom).addClass("SubEventLabelSection");
 
 
-
-    //var LabelWeatherSubEventID = "LabelWeatherSubEvent"
-    //var LabelWeatherSubEvent = getDomOrCreateNew(LabelWeatherSubEventID);
-    //$(LabelWeatherSubEvent.Dom).addClass("SubEventLabelSection");
-    LabelRangeModify.Dom.innerHTML = "<p>Change Deadline</p>"
+    LabelRangeModify.Dom.innerHTML = "<p>Deadline</p>"
     $(LabelRangeModify.Dom).addClass(CurrentTheme.AlternateFontColor);
 
     //Populates splitter of Next event section
@@ -351,37 +494,8 @@ function generateRangeUpdate(SelectedEvent) {
     var SubEventEnd = getDomOrCreateNew("SelectedDeadline","input");
     SubEventEnd.value = new Date(SelectedEvent.SubCalCalEventEnd).toDateString();
     SubEventEndDate.Dom.appendChild(SubEventEnd);
-    BindImputToDatePicketMobile(SubEventEnd);
-    function UpdateDateDisplay() {
-        /*var myDate = $(SliderContainer.Dom).slider("value");
-        SubEventEndDateNameContent.Dom.innerHTML = DateTimeToDayMDYTimeString(new Date(myDate));*/
-    }
-
-    
-    
-
     ContentRangeModify.Dom.appendChild(SliderContainer.Dom);
     ContentRangeModify.Dom.appendChild(SubEventEndDate.Dom);
-    
-    $(
-        function ()
-        {
-            /*
-            $(SliderContainer.Dom).slider({
-                    range: true,
-                    min: StartCalEvent,
-                    max: EndCalEvent,
-                    values: CurrentDate,
-                    slide: UpdateDateDisplay,
-                    change: UpdateDateDisplay
-                });
-            $(SliderContainer.Dom).slider("value", new Date(CurrentDate));*/
-        }
-    );
-    
-
-
-
     return RangeModify.Dom;
 }
 
@@ -396,23 +510,6 @@ function generateEventOptions(SelectedEvent) {
     $(EventOptionsSubEvent.Dom).append(TopDividerDom);
     CurrentTheme.getCurrentContainer().appendChild(EventOptionsSubEvent.Dom);
 
-
-    /*
-    //Populates Label of Next event section
-    var LabelEventOptionsSubEventID = "LabelEventOptionsSubEvent"
-    var LabelEventOptionsSubEvent = getDomOrCreateNew(LabelEventOptionsSubEventID);
-    $(LabelEventOptionsSubEvent.Dom).addClass("SubEventLabelSection");
-    //Populates splitter of Next event section
-    var SectionSplitterID = "LabelSectionSplitterEventOptionsSubEvent"
-    var LabelSectionSplitter = getDomOrCreateNew(SectionSplitterID);
-    $(LabelSectionSplitter.Dom).addClass("SectionSplitter");
-    //Populates  of Next event COntent
-    var ContentEventOptionsSubEventID = "ContentEventOptionsSubEvent"
-    var ContentEventOptionsSubEvent = getDomOrCreateNew(ContentEventOptionsSubEventID);
-    $(ContentEventOptionsSubEvent.Dom).addClass("SubEventContentSection");
-
-
-    */
     /*Populate Options*/
     var ProcrastinateOptionID = "ProcrastinateOption";
     var ProcrastinateOption = getDomOrCreateNew(ProcrastinateOptionID);
@@ -462,9 +559,6 @@ function generateEventOptions(SelectedEvent) {
     $(SilentOptionTxt.Dom).addClass("SelectedEventOptionText");
     SilentOption.Dom.appendChild(SilentOptionImgContainer.Dom);
     SilentOption.Dom.appendChild(SilentOptionTxt.Dom);
-    $(SilentOption.Dom).click(prepFunctionForSilentClick(SelectedEvent.ID));
-
-
 
     var DirectionsOptionID = "DirectionsOption";
     var DirectionsOption = getDomOrCreateNew(DirectionsOptionID);
@@ -519,59 +613,10 @@ function generateEventOptions(SelectedEvent) {
     return EventOptionsSubEvent.Dom;
 }
 
-function prepFunctionForSilentClick(EventID)
-{
-    return function ()
-    {
-        /*
-        var TimeZone = new Date().getTimezoneOffset();
-
-        
-        var MarkAsCompleteData = { UserName: UserCredentials.UserName, UserID: UserCredentials.ID, EventID: EventID ,TimeZoneOffset: TimeZone};
-        $.ajax({
-            type: "POST",
-            url: "RootWagTap/time.top?WagCommand=7",
-            data: MarkAsCompleteData,
-            // DO NOT SET CONTENT TYPE to json
-            // contentType: "application/json; charset=utf-8", 
-            // DataType needs to stay, otherwise the response object
-            // will be treated as a single string
-            //dataType: "json",
-            success: function (response) {
-                //alert(response);
-                var myContainer = JSON.parse(response);
-                if (myContainer.Error.code === "0")
-                {
-                    //exitSelectedEventScreen();
-                }
-                else {
-                    alert("error detected with marking as complete");
-                }
-
-            },
-            error: function (err) {
-                var myError = err;
-                var step = "err";
-            }
-
-        }).done(function (data) {
-            InitializeHomePage();//hack alert
-        });*/
-    }
-}
-
 function UpdateTimer(EncasingDom,LabelSection, CountDownDate, EndDate)
 {
     var DomObject = EncasingDom;//RetrieveDom("Event_Content_Text_Container1_Element1");
     DomObject.innerHTML = "";
-    //DomObject.style.backgroundImage = "url('./Images/Praise_Night_Mast.jpg')";
-    //DomObject.style.width="90%";
-    //DomObject.style.height = "90%";
-    //DomObject.style.left = "5%";
-    //DomObject.style.top= "5%";
-    //DomObject.style.border = "3px solid rgba(100,100,100,1)"
-    //DomObject.style.boxShadow = "0px 0px 4px 4px rgba(5,5,5,0.6)"
-    //DomObject.style.borderRadius = "5px";
 
     var DomObject1 = getDomOrCreateNew("Event_Content_Text_Container1_Element_Timer1_Hook_Case1");
     var DomObject2 = getDomOrCreateNew("Event_Content_Text_Container1_Element_Timer1_Hook1");

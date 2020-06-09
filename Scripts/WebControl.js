@@ -1,34 +1,27 @@
 "use strict"
 var DisableRegistration = false;
 var Debug = false;
-var DebugLocal = false;
+var DebugLocal = true;
 
 //var global_refTIlerUrl = "http://localhost:53201/api/";
 //var global_refTIlerUrl = "http://tilersmart.azurewebsites.net/api/";
 var global_refTIlerUrl = window.location.origin + "/api/";
-if (Debug)
-{
-    global_refTIlerUrl = "http://mytilerKid.azurewebsites.net/api/";
-    if(DebugLocal)
-    {
-        global_refTIlerUrl = "https://localhost:44305/api/";
-    }
-}
 var global_PositionCoordinate = { Latitude: 40.0274, Longitude: -105.2519, isInitialized: false, Message: "Uninitialized" };;
-
+var global_sleepTimeline = []
 var UserTheme = { Light: new Theme("Light"), Dark: new Theme("Dark") };
 var CurrentTheme = UserTheme.Light;
 var UserCredentials;
 try
 {
-    //debugger;
     UserCredentials=  RetrieveUserCredentials();
 }
 catch(e)
 {
-    //debugger;
     UserCredentials= { UserName: "", ID: "", Name: "" };
 }
+
+let pageNotifications = new PageNotification(UserCredentials.ID);
+pageNotifications.authenticateNotification();
 
 var global_DictionaryOfSubEvents = {};
 var global_RemovedElemnts = {};
@@ -40,6 +33,7 @@ var OneHourInMs = 3600000;
 var OneYearInMs = 365 * OneDayInMs;
 var OneMinInMs = 60000;
 var OneSecondInMs = 1000;
+var TenMinInMs = 600000;
 
 
 var HeightOfCalendar = 720;
@@ -100,12 +94,11 @@ function SetCookie(CookieValue)
 function GetCookieValue()//verifies that user has cookies
 {
     var CookieName = "TilerCaluserWaggy";
-    var CookieValue = "";
+    var CookieValue = "";//= JSON.parse(CookieValue);
     var DocumentCookie = " " + document.cookie + ";";
     var CookieSearchStr = " " + CookieName + "=";
     var CookieStartPosition = DocumentCookie.indexOf(CookieSearchStr);
     var CookieEndPosition;
-	var CookieValue ;//= JSON.parse(CookieValue);
 
     if (CookieStartPosition != -1) {
         CookieStartPosition += CookieSearchStr.length;
@@ -135,7 +128,7 @@ function GetCookieValue()//verifies that user has cookies
 
 
 
-function getLocation(onSuccessLocationRetrieval, onfailure) {
+function initializeUserLocation(onSuccessLocationRetrieval, onfailure) {
     global_PositionCoordinate.Message ="Initializing"
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(populatePosition, showError);
@@ -276,6 +269,46 @@ function triggerUndoPanel(UndoMessage)
 }
 
 
+function updateSleepTimeline(sleepTimeline) {
+    if(sleepTimeline) {
+        global_sleepTimeline = [];
+        let today = new Date(Date.now());
+        let sleepStart = new Date(sleepTimeline.start);
+        
+        sleepStart.setDate(today.getDate());
+        sleepStart.setFullYear(today.getFullYear());
+        let sleepEnd = new Date(sleepStart.getTime() + sleepTimeline.duration);
+        if(sleepStart.getDate() == sleepEnd.getDate()) {
+            global_sleepTimeline.push({
+                start: sleepStart,
+                end: sleepEnd
+            })
+        } else {
+            if(sleepStart.getTime() < sleepEnd.getTime()) {
+                while(sleepStart.getDate() !== sleepEnd.getDate()) {
+                    let nextSleepStart = new Date( sleepStart.getTime());
+                    nextSleepStart.setDate((nextSleepStart.getDate()+1));
+                    nextSleepStart.setHours(0,0,0,0);
+                    let currentSleepEnd = new Date( nextSleepStart.getTime() - OneMinInMs);
+                    global_sleepTimeline.push({
+                        start: sleepStart,
+                        end: currentSleepEnd
+                    });
+                    sleepStart = nextSleepStart;
+                }
+
+                global_sleepTimeline.push({
+                    start: sleepStart,
+                    end: sleepEnd
+                });
+
+            } else {
+                throw "Sleep time line is invalid"
+            }
+        }
+    }
+}
+
 function StructuralizeNewData(NewData)
 {
     var TotalSubEventList = new Array();
@@ -284,8 +317,14 @@ function StructuralizeNewData(NewData)
     var Dictionary_OfSubEvents = {};
     if (NewData != "")
     {
-        generateNonRepeatEvents(NewData.Schedule.NonRepeatCalendarEvent);
-        generateRepeatEvents(NewData.Schedule.RepeatCalendarEvent);
+        if (!NewData.Schedule.SubCalendarEvents) {
+            generateNonRepeatEvents(NewData.Schedule.NonRepeatCalendarEvent);
+            generateRepeatEvents(NewData.Schedule.RepeatCalendarEvent);
+        } else {
+            NewData.Schedule.SubCalendarEvents.forEach(SubCalendaEventsCreateDomElement)
+        }
+
+        updateSleepTimeline(NewData.Schedule.SleepTimeline);
         CleanupData();
     }
     else {
@@ -298,25 +337,21 @@ function StructuralizeNewData(NewData)
 
     function generateNonRepeatEvents(AllNonRepeatingEvents) {
         AllNonRepeatingEvents.forEach(CalendarCreateDomElement);
-        //return AllNonRepeatingEvents;
     }
 
-
-    function CalendarCreateDomElement(CalendarEvent) {
+    function SubCalendaEventsCreateDomElement(SubCalendarEvent) {
         //function is responsible for populating Dictionary_OfSubEvents. It also tries to populate the respective sub event dom
         var UIColor = {};
-        UIColor.R = CalendarEvent.RColor;
-        UIColor.G = CalendarEvent.GColor;
-        UIColor.B = CalendarEvent.BColor;
-        UIColor.O = CalendarEvent.OColor;
-        UIColor.S = CalendarEvent.ColorSelection;
-        var CalendarData = { CompletedEvents: CalendarEvent.NumberOfCompletedTasks, DeletedEvents: CalendarEvent.NumberOfDeletedEvents, TotalNumberOfEvents: CalendarEvent.NumberOfSubEvents, UI: UIColor, Rigid: CalendarEvent.Rigid };
+        UIColor.R = SubCalendarEvent.RColor;
+        UIColor.G = SubCalendarEvent.GColor;
+        UIColor.B = SubCalendarEvent.BColor;
+        UIColor.O = SubCalendarEvent.OColor;
+        UIColor.S = SubCalendarEvent.ColorSelection;
+        let CalendarEvent = SubCalendarEvent.CalEvent;
+        var CalendarData = { CompletedEvents: CalendarEvent.NumberOfCompletedTasks|| 0, DeletedEvents: CalendarEvent.NumberOfDeletedEvents||0, TotalNumberOfEvents: CalendarEvent.NumberOfSubEvents||0, UI: UIColor, Rigid: CalendarEvent.Rigid };
         Dictionary_OfCalendarData[CalendarEvent.ID] = CalendarData;
-        var i = 0;
-        for (; i < CalendarEvent.AllSubCalEvents.length; i++) {
-            CalendarEvent.AllSubCalEvents[i].Name = CalendarEvent.CalendarName;
-            TotalSubEventList.push(PopulateDomForScheduleEvent(CalendarEvent.AllSubCalEvents[i], CalendarEvent.Tiers));
-        }
+        SubCalendarEvent.Name = SubCalendarEvent.SubCalCalendarName
+        TotalSubEventList.push(PopulateDomForScheduleEvent(SubCalendarEvent, CalendarEvent.Tiers, CalendarData));
     }
 
 
@@ -334,13 +369,8 @@ function StructuralizeNewData(NewData)
                 }
                 else {
                     ToBeReorganized.push(eachSubEvent);
-                    //if (Dictionary_OfSubEvents[eachSubEvent.ID].SubCalStartDate != eachSubEvent.SubCalStartDate)
-                    {
-                        //global_DeltaSubevents.push(eachSubEvent);
-                    }
 
                 }
-                //debugger;
                 var RangeStart = new Date(NowDate.getTime() - (OneHourInMs * 12));
                 var RangeEned = new Date(CurrentTheme.Now + TwelveHourMilliseconds);
 
@@ -353,33 +383,17 @@ function StructuralizeNewData(NewData)
 
 
 
-    function PopulateDomForScheduleEvent(myEvent, Tiers) {
-        
-
-        //debugger;
-        /*
-        myEvent.SubCalStartDate = new Date(myEvent.SubCalStartDate + global_TimeZone_ms );
-        myEvent.SubCalEndDate = new Date(myEvent.SubCalEndDate + global_TimeZone_ms );
-        myEvent.SubCalCalEventStart = new Date(myEvent.SubCalCalEventStart + global_TimeZone_ms );
-        myEvent.SubCalCalEventEnd = new Date(myEvent.SubCalCalEventEnd + global_TimeZone_ms );
-        //*/
-
-        ///*
+    function PopulateDomForScheduleEvent(myEvent, Tiers, CalendarData) {
+        myEvent.Start = myEvent.SubCalStartDate;
+        myEvent.End = myEvent.SubCalEndDate;
         myEvent.SubCalStartDate = new Date(myEvent.SubCalStartDate);// + global_TimeZone_ms);
         myEvent.SubCalEndDate = new Date(myEvent.SubCalEndDate);// + global_TimeZone_ms);
         myEvent.SubCalCalEventStart = new Date(myEvent.SubCalCalEventStart);//+ global_TimeZone_ms);
         myEvent.SubCalCalEventEnd = new Date(myEvent.SubCalCalEventEnd);// + global_TimeZone_ms);
         myEvent.Tiers = Tiers;
-        //*/
-        /*myEvent.SubCalStartDate = !myEvent.SubCalStartDate.dst() ? new Date(Number(myEvent.SubCalStartDate.getTime()) + OneHourInMs) : myEvent.SubCalStartDate;
-        myEvent.SubCalEndDate =! myEvent.SubCalEndDate.dst() ? new Date(Number(myEvent.SubCalEndDate.getTime()) + OneHourInMs) : myEvent.SubCalEndDate;
-        myEvent.SubCalCalEventStart = !myEvent.SubCalCalEventStart.dst() ? new Date(Number(myEvent.SubCalCalEventStart.getTime()) + OneHourInMs) : myEvent.SubCalCalEventStart;
-        myEvent.SubCalCalEventEnd = !myEvent.SubCalCalEventEnd.dst() ? new Date(Number(myEvent.SubCalCalEventEnd.getTime()) + OneHourInMs) : myEvent.SubCalCalEventEnd;*/
-
-
-
-        //var MobileDom = genereateMobileDoms(myEvent);
-        //myEvent.Dom = MobileDom;
+        myEvent.Split = CalendarData.TotalNumberOfEvents
+        myEvent.DeletionCount = CalendarData.DeletedEvents
+        myEvent.CompletionCount = CalendarData.CompletedEvents
         return myEvent
     }
     return { TotalSubEventList: TotalSubEventList,ActiveSubEvents: ActiveSubEvents,Dictionary_OfCalendarData: Dictionary_OfCalendarData,Dictionary_OfSubEvents:Dictionary_OfSubEvents};
@@ -457,7 +471,7 @@ function sendUndoRequest(CallBack)
     var UndoData = {
         UserName: UserCredentials.UserName, UserID: UserCredentials.ID, TimeZoneOffset: TimeZone
     };
-
+    UndoData.TimeZone = moment.tz.guess()
     var HandleNEwPage = new LoadingScreenControl("Tiler is undoing your last request :)");
     HandleNEwPage.Launch();
 
@@ -468,6 +482,7 @@ function sendUndoRequest(CallBack)
     //var URL= "RootWagTap/time.top?WagCommand=2";
     var URL = global_refTIlerUrl + "Schedule/Undo";
     var HandleNEwPage = new LoadingScreenControl("Tiler is Undoing :)");
+    preSendRequestWithLocation(UndoData);
     HandleNEwPage.Launch();
     var ProcrastinateRequest = $.ajax({
         type: "POST",
@@ -480,6 +495,8 @@ function sendUndoRequest(CallBack)
         dataType: "json",
         success: CallBackSuccess,
         error: CallBackFailure,
+    }).done(() => {
+        sendPostScheduleEditAnalysisUpdate({});
     })
 
     function CallBackSuccess()
@@ -653,44 +670,6 @@ function OutOfFocusManager()
     this.addNewExit = addNewExit;
 }
 
-
-/*
-*Function generates a desired HTML element. The default it a Div. First arguement is the desited ID, returns Null if an ID is not provided. Second arguement is desired DOM type e.g span, label, button etc
-
-*/
-function getDomOrCreateNew(DomID, DomType)
-{
-    var retValue = { status: false, Dom: null, Misc:null };
-    if ((DomID==null)||(DomID==undefined))//checks domID for valid ID
-    {
-        return retValue;
-
-    }
-
-    if (DomType == null)
-    {
-        DomType="div";
-    }
-
-    var myDom = document.getElementById(DomID);
-    retValue.status = true;
-    if (myDom == null)
-    {
-        myDom = document.createElement(DomType);
-        myDom.setAttribute("id", DomID);
-        retValue.status = false;
-    }
-    
-    retValue.Dom = myDom;
-
-    var JustAnotherObj = retValue;
-    retValue = JustAnotherObj.Dom;
-    retValue.status = JustAnotherObj.status;
-    retValue.Dom = JustAnotherObj.Dom;
-    retValue.Misc = JustAnotherObj.Misc;
-    retValue.DomID = DomID;
-    return retValue;
-}
 
 function DateTimeToDayMDYTimeString(DateData)
 {
@@ -872,9 +851,8 @@ function Theme(color)
         //document.getElementById("CalBodyContainer").appendChild(NewContainer);
     }
 
-    function transitionOldContainer(NewContainer)
+    function transitionOldContainer()
     {
-        //var oldContainer = GetCurrentContainer();
         HideCurrentContainer(true);
         ContainerStack.pop();
         LoadNewContainer();
@@ -967,7 +945,9 @@ function formatTimePortionOfStringToRightFormat(TimeString)
     var i = 0;
     for (; i < myIndex; i++)
     {
-        retValue+=TimeString[i]
+        if(TimeString[i]!=" ") {
+            retValue+=TimeString[i]
+        }
     }
     retValue += (" " + TimeString[i] + "m");
     return retValue;
@@ -1017,6 +997,8 @@ function procrastinateSubEvent(ID, Day, Hour, Minute,CallBackSuccess,CallBackFai
     //var URL= "RootWagTap/time.top?WagCommand=2";
     var URL = global_refTIlerUrl + "Schedule/Event/Procrastinate";
     var HandleNEwPage = new LoadingScreenControl("Tiler is Postponing  :)");
+    NowData.TimeZone = moment.tz.guess()
+    preSendRequestWithLocation(NowData);
     HandleNEwPage.Launch();
     var ProcrastinateRequest = $.ajax({
         type: "POST",
@@ -1037,17 +1019,16 @@ function procrastinateSubEvent(ID, Day, Hour, Minute,CallBackSuccess,CallBackFai
     }
 }
 
-
-function setSubCalendarEventAsNow(SubEventID, CallBackSuccess, CallBackFailure, CallBackDone)
-{
-    var TimeZone = new Date().getTimezoneOffset();
-    var NowData = { UserName: UserCredentials.UserName, UserID: UserCredentials.ID, EventID: SubEventID, TimeZoneOffset: TimeZone };
-    var URL = myurl = global_refTIlerUrl + "Schedule/Event/Now";
+function sendPostScheduleEditAnalysisUpdate({CallBackSuccess, CallBackFailure, CallBackDone}) {
+    let TimeZone = new Date().getTimezoneOffset();
+    let postData = { UserName: UserCredentials.UserName, UserID: UserCredentials.ID, TimeZoneOffset: TimeZone };
+    let url = global_refTIlerUrl + "Analysis/Analyze";
+    preSendRequestWithLocation(postData);
 
     var ProcrastinateRequest= $.ajax({
         type: "POST",
-        url: URL,
-        data: NowData,
+        url: url,
+        data: postData,
         dataType: "json",
         success: CallBackSuccess,
         error: CallBackFailure
@@ -1058,10 +1039,34 @@ function setSubCalendarEventAsNow(SubEventID, CallBackSuccess, CallBackFailure, 
     }
 }
 
+function setSubCalendarEventAsNow(SubEventID, CallBackSuccess, CallBackFailure, CallBackDone)
+{
+    var TimeZone = new Date().getTimezoneOffset();
+    var NowData = { UserName: UserCredentials.UserName, UserID: UserCredentials.ID, EventID: SubEventID, TimeZoneOffset: TimeZone };
+    var URL = global_refTIlerUrl + "Schedule/Event/Now";
+    preSendRequestWithLocation(NowData);
+
+    var ProcrastinateRequest= $.ajax({
+        type: "POST",
+        url: URL,
+        data: NowData,
+        dataType: "json",
+        success: CallBackSuccess,
+        error: CallBackFailure
+    })
+    ProcrastinateRequest.done(() => {
+        if (CallBackDone != undefined) {
+            CallBackDone()
+        }
+        sendPostScheduleEditAnalysisUpdate({})        
+    });    
+}
+
 function SetCalendarEventAsNow(CalendarEventID, CallBackSuccess, CallBackFailure, CallBackDone) {
     var TimeZone = new Date().getTimezoneOffset();
     var NowData = { UserName: UserCredentials.UserName, UserID: UserCredentials.ID, ID: SubEventID, TimeZoneOffset: TimeZone };
-    var URL = myurl = global_refTIlerUrl + "CalendarEvent/Now/";
+    var URL = global_refTIlerUrl + "CalendarEvent/Now/";
+    preSendRequestWithLocation(NowData);
 
     var AjaxRequest = $.ajax({
         type: "POST",
@@ -1072,9 +1077,12 @@ function SetCalendarEventAsNow(CalendarEventID, CallBackSuccess, CallBackFailure
         error: CallBackFailure
     })
 
-    if (CallBackDone != undefined) {
-        AjaxRequest.done(CallBackDone);
-    }
+    AjaxRequest.done(() => {
+        if (CallBackDone != undefined) {
+            CallBackDone()
+        }
+        sendPostScheduleEditAnalysisUpdate({})        
+    });
 }
 
 function deleteSubEvent(SubEventID, CallBackSuccess, CallBackFailure, CallBackDone)
@@ -1086,6 +1094,8 @@ function deleteSubEvent(SubEventID, CallBackSuccess, CallBackFailure, CallBackDo
     //var URL = "RootWagTap/time.top?WagCommand=6"
     var URL = global_refTIlerUrl + "Schedule/Event";
     var HandleNEwPage = new LoadingScreenControl("Tiler is Deleting your event :)");
+    DeletionEvent.TimeZone = moment.tz.guess()
+    preSendRequestWithLocation(DeletionEvent);
     HandleNEwPage.Launch();
 
     var AjaxRequest = $.ajax({
@@ -1100,10 +1110,12 @@ function deleteSubEvent(SubEventID, CallBackSuccess, CallBackFailure, CallBackDo
         error: CallBackFailure
     });
 
-    if (CallBackDone != undefined)
-    {
-        AjaxRequest.done(CallBackDone);
-    }
+    AjaxRequest.done(() => {
+        if (isFunction(CallBackDone)) {
+            CallBackDone()
+        }
+        sendPostScheduleEditAnalysisUpdate({})        
+    });
 }
 
 
@@ -1116,7 +1128,8 @@ function deleteCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure, 
     var URL = global_refTIlerUrl + "CalendarEvent";
     var HandleNEwPage = new LoadingScreenControl("Tiler is Deleting your event :)");
     HandleNEwPage.Launch();
-
+    DeletionEvent.TimeZone = moment.tz.guess()
+    preSendRequestWithLocation(DeletionEvent);
     var AjaxRequest = $.ajax({
         type: "DELETE",
         url: URL,
@@ -1129,9 +1142,12 @@ function deleteCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure, 
         error: CallBackFailure
     });
 
-    if (CallBackDone != undefined) {
-        AjaxRequest.done(CallBackDone);
-    }
+    AjaxRequest.done(() => {
+        if (isFunction(CallBackDone)) {
+            CallBackDone()
+        }
+        sendPostScheduleEditAnalysisUpdate({})        
+    });
 }
 
 function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure, CallBackDone)
@@ -1145,6 +1161,8 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
     HandleNEwPage.Launch();
 
     var MarkAsCompleteData = { UserName: UserCredentials.UserName, UserID: UserCredentials.ID, EventID: CalendarEventID, TimeZoneOffset: TimeZone };
+    MarkAsCompleteData.TimeZone = moment.tz.guess()
+    preSendRequestWithLocation(MarkAsCompleteData);
     var AjaxRequest = $.ajax({
         type: "POST",
         url: Url,
@@ -1158,9 +1176,12 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
         error: CallBackFailure
     });
 
-    if (CallBackDone != undefined) {
-        AjaxRequest.done(CallBackDone);
-    }
+    AjaxRequest.done(() => {
+        if (isFunction(CallBackDone)) {
+            CallBackDone()
+        }
+        sendPostScheduleEditAnalysisUpdate({})        
+    });
 }
 
     function createEvent(EventEntry)
@@ -1679,10 +1700,12 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
     }
 
 
-    function Location(Tag,Address)
+function Location(Tag, Address, LocationIsVerified, LocationId)
     {
         this.Tag = Tag;
         this.Address = Address;
+        this.LocationIsVerified = LocationIsVerified;
+        this.LocationId = LocationId;
     }
 
     function CalEventData(eventName, eventLocation, eventCounts, eventColor, eventDuration, eventStart, eventEnd, eventRepeatData, eventRepeatStart, eventRepeatEnd, rigidFlag, RestrictionData)
@@ -1690,6 +1713,8 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
         this.Name = eventName;
         this.LocationTag = eventLocation.Tag;
         this.LocationAddress = eventLocation.Address;
+        this.LocationIsVerified = eventLocation.LocationIsVerified;
+        this.LocationId = eventLocation.LocationId;
         this.RColor = eventColor.r;
         this.GColor = eventColor.g;
         this.BColor = eventColor.b;
@@ -1698,9 +1723,9 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
         this.DurationDays = 0;// eventDuration.Days;
         this.DurationHours = eventDuration.Hours;
         this.DurationMins = eventDuration.Mins;
-        this.StartHour = eventStart.Time.Hour;
+        this.StartHour = eventStart.IsDefault && !rigidFlag ? 0 : eventStart.Time.Hour;
         this.EndHour = eventEnd.Time.Hour;
-        this.StartMins = eventStart.Time.Minute;
+        this.StartMins = eventStart.IsDefault && !rigidFlag ? 0 : eventStart.Time.Minute;
         this.EndMins = eventEnd.Time.Minute;
         this.StartDay = eventStart.Date.getDate();
         this.EndDay = eventEnd.Date.getDate();
@@ -1757,8 +1782,14 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
                 {
                     eventRepeatData.Misc.AllDoms.forEach(function (eachDom) { if (eachDom.status) { Days0fWeek += "" + eachDom.DayOfWeekIndex + "," } });
                 }
+                if (this.isEveryDay === undefined) {
+                    if (RepeatFrequency.toLowerCase() === 'daily') {
+                        this.isEveryDay = true
+                    }
+                }
             }
         }
+        this.isEveryDay = this.isEveryDay || false
         this.RepeatType = RepeatType;
         this.RepeatWeeklyData = Days0fWeek;
         this.RepeatFrequency = RepeatFrequency;
@@ -1867,7 +1898,7 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
 
     function LoadingScreenControl(Message,CallBbackFunctionAfterExitingLoad)
     {
-        var LoadingScreenPanel = document.getElementById("LoadingScreenPanel");;
+        var LoadingScreenPanel = document.getElementById("LoadingScreenPanel");
         $(LoadingScreenPanel).empty();
         var CalBodyContainer = document.getElementById("CalBodyContainer");;
         this.Dom = LoadingScreenPanel;
@@ -2067,8 +2098,21 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
             $(InputBarContainer.Dom).removeClass("setAsDisplayNone");
             IsContentOn = true;
         }
+
+        function HideAutoSuggestResult() {
+            $(DomAndContainer.returnedValue).addClass("setAsDisplayNone");
+        }
+
+        
+        function ShowAutoSuggestResult() {
+            $(DomAndContainer.returnedValue).removeClass("setAsDisplayNone");
+        }
+
         this.HideContainer = HideContainer;
         this.ShowContainer = ShowContainer;
+
+        this.HideAutoSuggestResult = HideAutoSuggestResult;
+        this.ShowAutoSuggestResult = ShowAutoSuggestResult;
 
         var IsTilerAutoContentOn = function ()
         {
@@ -2543,10 +2587,6 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
 {
     var CompletionMapID = "CompletionMap";
     var CompletionMap = getDomOrCreateNew(CompletionMapID);
-    //$(CompletionMap.Dom).addClass("SubEventNonLabelSection");
-    //$(CompletionMap.Dom).addClass(CurrentTheme.ContentSection)
-    //$(CompletionMap.Dom).addClass(CurrentTheme.FontColor);
-
     generatePieChart(CompletionMap, SelectedEvent);
 
     
@@ -2556,98 +2596,101 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
 
     function generatePieChart(getDomObj, myEvent)
     {
-        var pieChartContainerID = "pieChartContainer";
+        $(getDomObj).empty();
+        var pieChartContainerID = "pieChartContainer"+generateUUID();
         var pieChartContainer = getDomOrCreateNew(pieChartContainerID,"canvas");
         var LegendContainerID = "LegendContainer";
         var LegendContainer = getDomOrCreateNew(LegendContainerID);
         $(LegendContainer.Dom).addClass("LegendContainer");
+        $(pieChartContainer.Dom).addClass("pieChartContainer");
 
         
 
 
         var ctx = pieChartContainer.Dom;
         ctx = ctx.getContext("2d");
-        var myNewChart = new Chart(ctx);
-        
-        getDomObj.Dom.appendChild(pieChartContainer.Dom);
-        getDomObj.Dom.appendChild(LegendContainer.Dom);
 
-        $(pieChartContainer.Dom).addClass("PieChart");
-
-        var TotalNumberOfTask = parseInt(Dictionary_OfCalendarData[myEvent.CalendarID].TotalNumberOfEvents)
-        var DelededEvents=parseInt(Dictionary_OfCalendarData[myEvent.CalendarID].DeletedEvents);
-        var NumberOfCompleteTask =parseInt(Dictionary_OfCalendarData[myEvent.CalendarID].CompletedEvents);
-
+        var TotalNumberOfTask = parseInt(myEvent.Split)
+        var DelededEvents = parseInt(myEvent.DeletionCount);
+        var NumberOfCompleteTask = parseInt(myEvent.CompletionCount);
 
         var CompletedTask={
             value: NumberOfCompleteTask,
-            color: "green"
+            color: "#28cc6a",
+            hoverColor: "#2FEF7C",
+            label: 'Completed Tasks'
         };
         var CompletedTaskLegend = makeMyLegend("CompletedTask");
         CompletedTaskLegend[1].Dom.innerHTML = "Completed";
         LegendContainer.Dom.appendChild(CompletedTaskLegend[2].Dom);
         CompletedTaskLegend[2].Dom.style.top = "0";
-        CompletedTaskLegend[0].Dom.style.backgroundColor = "green";
+        CompletedTaskLegend[0].Dom.style.backgroundColor = CompletedTask.color;
 
         var DisabledTask={
             value: DelededEvents,
-            color: "red"
+            color: "#BA003E",
+            hoverColor: "#d60047",
+            label: 'Deleted Tasks'
         };
         var DisabledTaskLegend = makeMyLegend("DisabledTask");
         DisabledTaskLegend[1].Dom.innerHTML = "Disabled";
         LegendContainer.Dom.appendChild(DisabledTaskLegend[2].Dom);
         DisabledTaskLegend[2].Dom.style.top = "33%";
-        DisabledTaskLegend[0].Dom.style.backgroundColor = "red";
+        DisabledTaskLegend[0].Dom.style.backgroundColor = DisabledTask.color;
 
         var NotCompleted =
             {
                 value: TotalNumberOfTask - (DelededEvents + NumberOfCompleteTask),
-            color: "gray"
+                color: "#6B6D70",
+                hoverColor: "#b5b8bc",
+                label: 'Available Tasks'
             };
         var NotCompletedLegend = makeMyLegend("NotCompleted");
         NotCompletedLegend[1].Dom.innerHTML = "Not Completed";
         LegendContainer.Dom.appendChild(NotCompletedLegend[2].Dom);
         NotCompletedLegend[2].Dom.style.top = "66%";
-        NotCompletedLegend[0].Dom.style.backgroundColor = "gray";
+        NotCompletedLegend[0].Dom.style.backgroundColor = NotCompleted.color;
 
 
-        var data = [CompletedTask, DisabledTask, NotCompleted];
+        let data = {
+            labels: [
+                CompletedTask.label,
+                DisabledTask.label,
+                NotCompleted.label
+            ],
+            datasets: [
+                {
+                    data: [CompletedTask.value, DisabledTask.value, NotCompleted.value],
+                    backgroundColor: [
+                        CompletedTask.color,
+                        DisabledTask.color,
+                        NotCompleted.color
+                    ],
+                    hoverBackgroundColor: [
+                        CompletedTask.hoverColor,
+                        DisabledTask.hoverColor,
+                        NotCompleted.hoverColor
+                    ]
+                }]
+        };
 
-        var option= {
-        //Boolean - Whether we should show a stroke on each segment
-        segmentShowStroke : true,
-	
-        //String - The colour of each segment stroke
-        segmentStrokeColor : "rgba(50,50,50,.8)",
-	
-        //Number - The width of each segment stroke
-        segmentStrokeWidth : 1,
-	
-        //The percentage of the chart that we cut out of the middle.
-        percentageInnerCutout : 45,
-	
-        //Boolean - Whether we should animate the chart	
-        animation : true,
-	
-        //Number - Amount of animation steps
-        animationSteps : 100,
-	
-        //String - Animation easing effect
-        animationEasing : "easeOutBounce",
-	
-        //Boolean - Whether we animate the rotation of the Doughnut
-        animateRotate : true,
+        var myDoughnutChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: data,
+            options: {
+                responsive: false,
+                legend: { 
+                    display: false,
+                    position: 'right'
+                }
+            }
+        });
 
-        //Boolean - Whether we animate scaling the Doughnut from the centre
-        animateScale : false,
-	
-        //Function - Will fire on animation completion.
-        onAnimationComplete : null
-    }
 
-        myNewChart.Doughnut(data, option);
-        //pieChartContainer.Dom.style.height = "70px";
-        //pieChartContainer.Dom.style.width = "140px";
+        getDomObj.Dom.appendChild(pieChartContainer.Dom);
+        getDomObj.Dom.appendChild(LegendContainer.Dom);
+
+        $(pieChartContainer.Dom).addClass("PieChart");
     }
 
     function makeMyLegend(ID)
@@ -2690,6 +2733,141 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
     }
 
 
+    /*
+    *Function binds the "somethinew" button to the back end for a simple rest call
+    */
+    function SomethingNewButton(shuffleButton,callback) {
+        var FindSomethingNewButton = shuffleButton;
+
+        function reoptimizeSchedule() {
+            var TimeZone = new Date().getTimezoneOffset();
+            var ShuffleData = { UserName: UserCredentials.UserName, UserID: UserCredentials.ID, TimeZoneOffset: TimeZone, Longitude: global_PositionCoordinate.Longitude, Latitude: global_PositionCoordinate.Latitude, IsInitialized: global_PositionCoordinate.isInitialized };
+            var URL = global_refTIlerUrl + "Schedule/Shuffle";
+            var HandleNEwPage = new LoadingScreenControl("Tiler looking up the next good event  :)");
+            HandleNEwPage.Launch();
+            ShuffleData.TimeZone = moment.tz.guess()
+            preSendRequestWithLocation(ShuffleData);
+            var exit = function (data) {
+                HandleNEwPage.Hide();
+                global_ExitManager.triggerLastExitAndPop();
+            }
+            $.ajax({
+                type: "POST",
+                url: URL,
+                data: ShuffleData,
+                // DO NOT SET CONTENT TYPE to json
+                // contentType: "application/json; charset=utf-8", 
+                // DataType needs to stay, otherwise the response object
+                // will be treated as a single string
+                dataType: "json",
+                success: function (response) {
+                    triggerUndoPanel("Undo optimized shuffle");
+                    var myContainer = (response);
+                    if (myContainer.Error.code == 0) {
+                        if (isFunction(callback)) {
+                            callback(response);
+                        }
+                    }
+                    else {
+                        alert("error optimizing your schedule");
+                    }
+
+                },
+                error: function () {
+                    var NewMessage = "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
+                    var ExitAfter = {
+                        ExitNow: true, Delay: 1000
+                    };
+                    HandleNEwPage.UpdateMessage(NewMessage, ExitAfter, exit);
+                }
+            }).done(function (data) {
+                HandleNEwPage.Hide();
+                sendPostScheduleEditAnalysisUpdate({});
+            });
+        }
+        FindSomethingNewButton.onclick = reoptimizeSchedule;
+    }
+
+
+    function removeAllChildNodes(myNode) {
+        while (myNode.firstChild) {
+            myNode.removeChild(myNode.firstChild);
+        }
+    }
+
+
+    function destroyallNodes(Node) {
+        while (Node.firstChild) {
+            recursiveDeletion(Node.firstChild)
+        }
+        function recursiveDeletion(Node) {
+            while (Node.firstChild) {
+                destroyallNodes(Node)
+            }
+            if (!!Node.parentNode) {
+                removeAllChildNodes(Node.parentNode);
+            }
+        }
+    }
+
+    function isFunction(data) {
+        var RetValue = false;
+        if (typeof (data) === "function") {
+            RetValue = true;
+        }
+        return RetValue;
+    }
+
+    function isObject(data) {
+        var RetValue = false;
+        if ((typeof (data) === "object") && (data !== null)) {
+            RetValue = true;
+        }
+        return RetValue;
+    }
+
+    function isString(data) {
+        var RetValue = false;
+        if ((typeof (data) === "string") && (data !== null)) {
+            RetValue = true;
+        }
+        return RetValue;
+    }
+
+    function isNumber(data) {
+        var RetValue = false;
+        if ((typeof (data) === "number") && (data !== null)) {
+            RetValue = true;
+        }
+        return RetValue;
+    }
+
+
+    function isNull(data) {
+        var RetValue = false;
+        if ((typeof (data) === "object") && (data === null)) {
+            RetValue = true;
+        }
+        return RetValue;
+    }
+
+    function isUndefined(data) {
+        var RetValue = false;
+        if ((typeof (data) === "undefined") && (data !== null)) {
+            RetValue = true;
+        }
+        return RetValue;
+    }
+
+    function isUndefinedOrNull(data) {
+        var RetValue = false;
+        if (isUndefined(data) || isNull(data)) {
+            RetValue = true;
+        }
+
+        return RetValue;
+    }
+
     generateColorCircle.ID = 0;
 
 
@@ -2697,3 +2875,542 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
     generateMyButton.ID = 0;
 
 
+function isFunction(data) {
+    var RetValue = false;
+    if (typeof (data) === "function") {
+        RetValue = true;
+    }
+    return RetValue;
+}
+
+function isObject(data) {
+    var RetValue = false;
+    if ((typeof (data) === "object") && (data !== null)) {
+        RetValue = true;
+    }
+    return RetValue;
+}
+
+function isString(data) {
+    var RetValue = false;
+    if ((typeof (data) === "string") && (data !== null)) {
+        RetValue = true;
+    }
+    return RetValue;
+}
+
+function isNumber(data) {
+    var RetValue = false;
+    if ((typeof (data) === "number") && (data !== null)) {
+        RetValue = true;
+    }
+    return RetValue;
+}
+
+
+function isNull(data) {
+    var RetValue = false;
+    if ((typeof (data) === "object") && (data === null)) {
+        RetValue = true;
+    }
+    return RetValue;
+}
+
+function isArray(data) {
+    var RetValue = Array.isArray(data);
+    return RetValue;
+}
+
+function isUndefined(data) {
+    var RetValue = false;
+    if ((typeof (data) === "undefined") && (data !== null)) {
+        RetValue = true;
+    }
+    return RetValue;
+}
+
+function isUndefinedOrNull(data) {
+    var RetValue = false;
+    if (isUndefined(data) || isNull(data)) {
+        RetValue = true;
+    }
+
+    return RetValue;
+}
+
+
+    /*
+    Function handles the call back for the autoSuggest Box of location
+    */
+   function LocationSearchCallBack(ExitCallBack, InputBox, onSelctionMade)
+   {
+       $(InputBox).off();
+       var AutoSuggestEndPoint = global_refTIlerUrl + "User/Location";
+       //var GoogleAutoSuggestEndPoint = "https://maps.googleapis.com/maps/api/place/textsearch/json";
+       var GoogleAutoSuggestEndPoint = "";
+
+       var googleSendData = {};
+       
+       googleSendData.key = googleAPiKey
+       googleSendData.query = "";
+       
+       var LocationAutoSuggestControl = new AutoSuggestControl(AutoSuggestEndPoint, "GET", AddressCallBack, InputBox);
+       var GoogleAutoSuggestControl = new AutoSuggestControl(GoogleAutoSuggestEndPoint, "GET", googleAddressCallBack, InputBox, true, googleSendData);
+       var MyDataContainer = { AllData: [], Index: -1 };
+       var GoogleDataContainer = { AllData: [], Index: -1 };
+       var CombinedData= { AllData: [], Index: -1 };
+       var FullContainer = LocationAutoSuggestControl.getAutoSuggestControlContainer();
+
+
+       //Combined callback
+       function combinedCallBack(typeOfData,MyData)
+       {
+           //if (combinedCallBack.currentIndex == 0)
+           if (typeOfData == 0)
+           {
+               combinedCallBack.cleanUI();
+               LaunchPopulation(typeOfData)
+           }
+           else
+           {
+               combinedCallBack.indexContainer[typeOfData] = MyData;
+               return;
+           }
+
+           
+           function LaunchPopulation(Index)
+           {
+               if (combinedCallBack.indexContainer[Index]!=null)
+               {
+                   combinedCallBack.indexContainer[Index].forEach
+                   (
+                       function (myData)
+                       {
+                           CombinedData.AllData.push(myData);
+                           myData.Index = LaunchPopulation.Index;
+                           ++LaunchPopulation.Index;
+                           myData.Hover = HoverMe;
+                           function HoverMe()
+                           {
+                               if (combinedCallBack.CurrentHover != null) {
+                                   combinedCallBack.CurrentHover.UnHover();
+                               }
+                               combinedCallBack.CurrentHover = myData;
+                               //MyDataContainer.Index = Index;
+                               $(myData.Container).addClass("HoveLocationCacheContainer");
+                           }
+                       }
+                   )
+                   combinedCallBack.indexContainer[Index] = null;
+                   ++Index;
+                   combinedCallBack.currentIndex = Index;
+                   LaunchPopulation(combinedCallBack.currentIndex);
+               }
+               else
+               {
+                   if (combinedCallBack.currentIndex >= combinedCallBack.indexContainer.length)
+                   {
+                       combinedCallBack.currentIndex = 0;
+                       combinedCallBack.clearData();
+                       PopulateteContainerDom();
+                       return;
+                   }
+                   else
+                   {
+                       setTimeout(function () { LaunchPopulation(combinedCallBack.currentIndex) }, 200);
+                   }
+               }
+           }
+
+           function PopulateteContainerDom()
+           {
+               for (var i=0;i<CombinedData.AllData.length;i++)
+               {
+                   var Data=CombinedData.AllData[i];
+                   justPushIntoContainer(Data);
+               }
+               
+               function justPushIntoContainer(myData)
+               {
+                   combinedCallBack.DomContainer.Dom.appendChild(myData.Container);
+               }
+               
+           }
+           LaunchPopulation.Index = 0;
+
+       }
+
+       combinedCallBack.CurrentHover = null;
+       combinedCallBack.indexContainer = [null,null];
+       combinedCallBack.currentIndex = 0;
+
+       combinedCallBack.DomContainer = LocationAutoSuggestControl.getSuggestedValueContainer();
+
+       combinedCallBack.rePopulate = function () {
+
+       }
+
+
+
+       combinedCallBack.clear = function ()
+       {
+           MyDataContainer.AllData.splice(0, MyDataContainer.AllData.length)
+           MyDataContainer.Index = -1;
+           //LocationAutoSuggestControl.clear();
+           LocationAutoSuggestControl.HideContainer();
+
+           GoogleDataContainer.AllData.splice(0, GoogleDataContainer.AllData.length)
+           GoogleDataContainer.Index = -1;
+           //LocationAutoSuggestControl.clear();
+           GoogleAutoSuggestControl.HideContainer();
+
+           CombinedData.AllData.splice(0, CombinedData.AllData.length);
+           CombinedData.Index = -1;
+           $(combinedCallBack.DomContainer).empty();
+           //LocationAutoSuggestControl.clear();
+           LocationAutoSuggestControl.HideContainer();
+       }
+
+       combinedCallBack.clearData=function()
+       {
+           MyDataContainer.AllData.splice(0, MyDataContainer.AllData.length)
+           MyDataContainer.Index = -1;
+           GoogleDataContainer.AllData.splice(0, GoogleDataContainer.AllData.length)
+           GoogleDataContainer.Index = -1;
+       }
+
+       combinedCallBack.cleanUI = function ()
+       {
+           //console.log("Called Clear " + combinedCallBack.currentIndex);
+           CombinedData.AllData.splice(0, CombinedData.AllData.length);
+           CombinedData.Index = -1;
+           $(combinedCallBack.DomContainer).empty();
+       }
+
+       //Tiler Address callback
+       function AddressCallBack(data, DomContainer, InputCOntainer)
+       {
+           
+           var FullContainer = LocationAutoSuggestControl.getAutoSuggestControlContainer();
+           InputBox.parentNode.appendChild(FullContainer);
+           positionSearchResultContainer();
+           
+           
+
+           MyDataContainer.AllData.splice(0, MyDataContainer.AllData.length);
+           
+           resolveEachRetrievedEvent.ID = 0;
+           
+
+           InputBox.onblur = function () { setTimeout(function () { ReseAutoSuggest() }, 300) }
+           
+           LocationAutoSuggestControl.ShowContainer();
+
+           for (var i = 0; ((i < data.length)&&(i<5)); i++)
+           {
+               resolveEachRetrievedEvent(data[i]);
+           }
+
+           
+           var CombinedDataIndex = 0;
+           combinedCallBack.indexContainer[CombinedDataIndex] = MyDataContainer.AllData;
+           combinedCallBack(CombinedDataIndex, MyDataContainer.AllData);
+
+           function ReseAutoSuggest() {
+               MyDataContainer.AllData.splice(0, MyDataContainer.AllData.length)
+               MyDataContainer.Index = -1;
+               
+               combinedCallBack.clear();
+           }
+
+           function resolveEachRetrievedEvent(LocationData)//,Index) {
+           {
+               var CalendarEventDom = generateDomForEach(LocationData);//,Index);
+               $(CalendarEventDom.Container).addClass("LocationCacheContainer");
+               //DomContainer.Dom.appendChild(CalendarEventDom.Container);
+               MyDataContainer.AllData.push(CalendarEventDom);
+               ++resolveEachRetrievedEvent.ID;
+           }
+           resolveEachRetrievedEvent.ID = 0;
+           
+
+           function generateDomForEach(LocationData)//,Index)
+           {
+               var TagSpan = getDomOrCreateNew(("TagSpan" + resolveEachRetrievedEvent.ID), "span");
+               TagSpan.innerHTML = LocationData.Tag + " &mdash; ";
+
+               $(TagSpan).addClass("LocationTag");
+               var AddressSpan = getDomOrCreateNew(("AddressSpan " + resolveEachRetrievedEvent.ID), "span");
+               AddressSpan.innerHTML = LocationData.Address;
+               $(AddressSpan).addClass("LocationAddress");
+               var CacheAddressContainer = getDomOrCreateNew(("CacheAddressContainer" + resolveEachRetrievedEvent.ID));
+               CacheAddressContainer.appendChild(TagSpan);
+               CacheAddressContainer.appendChild(AddressSpan);
+               CacheAddressContainer.onclick = function () { SelectMe() };
+
+               var RetValue = { Container: CacheAddressContainer, Hover: HoverMe, UnHover: UnHoverMe, Select: SelectMe, /*Index: Index,*/ Insert: InsertIntoInput };
+
+               function HoverMe()
+               {
+                   if(generateDomForEach.CurrentHover!=null)
+                   {
+                       generateDomForEach.CurrentHover.UnHover();
+                   }
+                   generateDomForEach.CurrentHover = RetValue;
+                   //MyDataContainer.Index = Index;
+                   $(CacheAddressContainer).addClass("HoveLocationCacheContainer");
+               }
+
+               function UnHoverMe()
+               {
+                   $(CacheAddressContainer).removeClass("HoveLocationCacheContainer");
+               }
+
+               function SelectMe()
+               {
+                   //InputCOntainer.value = LocationData.Address;
+                   InsertIntoInput();
+                   LocationAutoSuggestControl.HideContainer();
+
+                   if(isFunction(onSelctionMade)) {
+                    onSelctionMade(LocationData)
+                   }
+                   setTimeout(function () { InputBox.focus(), 200 });
+               }
+
+               function InsertIntoInput()
+               {
+                   updateLocationInputWithClickData(InputCOntainer, LocationData.Address, "tiler", LocationData.LocationId)
+                   if (LocationData.isVerified !== undefined && LocationData.isVerified !== null) {
+                       InputCOntainer.LocationIsVerified = LocationData.isVerified;
+                   }
+               }
+
+               return RetValue;
+           }
+           generateDomForEach.CurrentHover = null;
+       }
+
+
+       //Google Address callback
+       function googleAddressCallBack(data, DomContainer, InputCOntainer)
+       {
+
+           function initialize()
+           {
+               ReseAutoSuggest();
+               var dataInput = InputCOntainer.value
+               dataInput = dataInput.trim();
+               var defaultLocation = new google.maps.LatLng(global_PositionCoordinate.Latitude, global_PositionCoordinate.Longitude);
+               var request = {
+                   location: defaultLocation,
+                   radius: 50,
+                   query: dataInput
+                   //query: "vectra bank"
+               };
+
+               var service = new google.maps.places.PlacesService(DomContainer);
+               service.textSearch(request, callback);
+           }
+
+           function callback(results, status) {
+               
+               if (status == google.maps.places.PlacesServiceStatus.OK) {
+                   for (var i = 0; ((i < results.length)&&(i<5)); i++) {
+                       resolveEachRetrievedEvent(results[i], onSelctionMade);
+                   }
+               }
+
+               var CombinedDataIndex = 1;
+               combinedCallBack.indexContainer[CombinedDataIndex] = GoogleDataContainer.AllData;
+               combinedCallBack(CombinedDataIndex, GoogleDataContainer.AllData);
+           }
+
+           initialize();
+
+           
+           
+
+           function ReseAutoSuggest() {
+               GoogleDataContainer.AllData.splice(0, GoogleDataContainer.AllData.length)
+               GoogleDataContainer.Index = -1;
+               //LocationAutoSuggestControl.HideContainer();
+           }
+
+           function resolveEachRetrievedEvent(LocationData, onSelctionMade)//, Index)
+           {
+               var CalendarEventDom = generateDomForEach(LocationData, onSelctionMade)//, Index);
+               $(CalendarEventDom.Container).addClass("LocationCacheContainer");
+               //DomContainer.Dom.appendChild(CalendarEventDom.Container);
+               GoogleDataContainer.AllData.push(CalendarEventDom);
+               ++resolveEachRetrievedEvent.ID;
+           }
+           resolveEachRetrievedEvent.ID = 0;
+           //GoogleDataContainer.AllData[0].Hover();
+
+           function generateDomForEach(LocationData, onSelctionMade)//, Index)
+           {
+               var TagSpan = getDomOrCreateNew(("GoogleTagSpan" + resolveEachRetrievedEvent.ID), "span");
+               TagSpan.innerHTML = LocationData.name + " &mdash; ";
+
+               $(TagSpan).addClass("LocationTag");
+               var AddressSpan = getDomOrCreateNew(("GoogleAddressSpan " + resolveEachRetrievedEvent.ID), "span");
+               AddressSpan.innerHTML = LocationData.formatted_address;
+               $(AddressSpan).addClass("LocationAddress");
+               var CacheAddressContainer = getDomOrCreateNew(("GoogleCacheAddressContainer" + resolveEachRetrievedEvent.ID));
+               var GoogleSymbolContainer = getDomOrCreateNew(("GoogleSymbolContainer" + resolveEachRetrievedEvent.ID));
+               $(GoogleSymbolContainer).addClass("GoogleSearchSymbolContainer");
+               var GoogleSymbol = getDomOrCreateNew(("GoogleSymbol" + resolveEachRetrievedEvent.ID));
+               $(GoogleSymbol).addClass("GoogleSearchSymbol");
+               $(GoogleSymbol).addClass("GoogleSearchIcon");
+               GoogleSymbolContainer.appendChild(GoogleSymbol);
+
+               CacheAddressContainer.appendChild(TagSpan);
+               CacheAddressContainer.appendChild(AddressSpan);
+               CacheAddressContainer.appendChild(GoogleSymbolContainer);
+               CacheAddressContainer.onclick = function () { SelectMe() };
+
+               var RetValue = { Container: CacheAddressContainer, Hover: HoverMe, UnHover: UnHoverMe, Select: SelectMe, /*Index: Index,*/ Insert: InsertIntoInput };
+
+               function HoverMe() {
+                   if (generateDomForEach.CurrentHover != null) {
+                       generateDomForEach.CurrentHover.UnHover();
+                   }
+                   generateDomForEach.CurrentHover = RetValue;
+                   //GoogleDataContainer.Index = Index;
+                   $(CacheAddressContainer).addClass("HoveLocationCacheContainer");
+               }
+
+               function UnHoverMe() {
+                   $(CacheAddressContainer).removeClass("HoveLocationCacheContainer");
+               }
+
+               function SelectMe() {
+                   //InputCOntainer.value = LocationData.Address;
+                   InsertIntoInput();
+                   LocationAutoSuggestControl.HideContainer();
+                   if(isFunction(onSelctionMade)) {
+                        onSelctionMade(LocationData)
+                   }
+
+                   setTimeout(function () { InputBox.focus(), 200 });
+               }
+
+               function InsertIntoInput() {
+                   updateLocationInputWithClickData(InputCOntainer, LocationData.formatted_address, "google")
+               }
+
+               return RetValue;
+           }
+           generateDomForEach.CurrentHover = null;
+       }
+
+       function positionSearchResultContainer()
+       {
+           var InputBox = LocationAutoSuggestControl.getInputBox();
+           var Position = $(InputBox.Dom).position();
+           var Left = 50;// Position.left;
+           var Top = Position.top;
+           var height = $(InputBox.Dom).height();
+           Top += height;
+           $(FullContainer).css({ left: Left + "px", top: Top + "px", position: "absolute", width: "calc(100% - 100px)" });
+       }
+
+       
+       function ReturnFunction(e, ExitFunction)
+       {
+           if(e.which == 27)
+           {
+               if (LocationAutoSuggestControl.isContentOn() || GoogleAutoSuggestControl.isContentOn())
+               {
+                   combinedCallBack.clear();
+                   return;
+               }
+               else
+               {
+                   ExitFunction();
+               }
+               return;
+           }
+
+           LocationAutoSuggestControl.disableSendRequest();
+           GoogleAutoSuggestControl.disableSendRequest();
+           var OldIndex = CombinedData.Index;
+           if(e.which == 38)//UpArrow Press
+           {
+               var NewIndex = ((CombinedData.Index - 1) + CombinedData.AllData.length) % CombinedData.AllData.length
+               CombinedData.Index = NewIndex;
+
+               console.log("Going up -- Old index is : " + OldIndex + " New Index is -- " + NewIndex + " Total Possible :" + CombinedData.AllData.length);
+               CombinedData.AllData[CombinedData.Index].Hover();
+               //CombinedData.AllData[CombinedData.Index].Insert();
+               positionSearchResultContainer();
+               return;
+           }
+           if (e.which == 40)//Down Arrow Press
+           {
+               var NewIndex = ((CombinedData.Index + 1) + CombinedData.AllData.length) % CombinedData.AllData.length
+               CombinedData.Index = NewIndex;
+
+               console.log("Going Down -- Old index is : " + OldIndex + " New Index is -- " + NewIndex + " Total Possible :" + CombinedData.AllData.length);
+               CombinedData.AllData[CombinedData.Index].Hover();
+               //CombinedData.AllData[CombinedData.Index].Insert();
+               positionSearchResultContainer();
+               return;
+           }
+           if (e.which == 13)
+           {
+               CombinedData.AllData[CombinedData.Index].Select();
+               return;
+           }
+           e.target.LocationIsVerified = false
+           resetLocationInput(e.target)
+           LocationAutoSuggestControl.enableSendRequest();
+           GoogleAutoSuggestControl.enableSendRequest();
+       }
+
+       return ReturnFunction;
+   }
+
+
+   function genFunctionCallForNow(EventID,CallBack)
+   {
+       return function ()
+       {
+           var TimeZone = new Date().getTimezoneOffset();
+           var NowData = { UserName: UserCredentials.UserName, UserID: UserCredentials.ID, EventID: EventID, TimeZoneOffset: TimeZone };
+           //var URL = "RootWagTap/time.top?WagCommand=8"
+           var URL = global_refTIlerUrl + "Schedule/Event/Now";
+           NowData.TimeZone = moment.tz.guess()
+           var HandleNEwPage = new LoadingScreenControl("Tiler is moving up your Event ...  :)");
+           HandleNEwPage.Launch();
+           preSendRequestWithLocation(NowData);
+
+           $.ajax({
+               type: "POST",
+               url: URL,
+               data: NowData,
+               // DO NOT SET CONTENT TYPE to json
+               // contentType: "application/json; charset=utf-8", 
+               // DataType needs to stay, otherwise the response object
+               // will be treated as a single string
+               dataType: "json",
+               success: function (response) {
+                   //InitializeHomePage();
+                   //alert("alert 0-a");
+               },
+               error: function ()
+               {
+                   var NewMessage = "Ooops Tiler is having issues accessing your schedule. Please try again Later:(";
+                   var ExitAfter = { ExitNow: true, Delay: 1000 };
+                   HandleNEwPage.UpdateMessage(NewMessage, ExitAfter, InitializeHomePage);
+               }
+           }).done(function (data) {
+               if(isFunction(CallBack)) {
+                    CallBack()
+               }
+               HandleNEwPage.Hide();
+               sendPostScheduleEditAnalysisUpdate({});
+           });
+       }
+   }

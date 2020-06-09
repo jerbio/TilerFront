@@ -1,2 +1,13 @@
 App_Data/aspnet-TilerFront-ground.mdf
 App_Data/aspnet-TilerFront-ground_log.ldf
+TilerFront.csproj.user
+obj/*
+BigDataLogs/*
+obj
+WagTapCalLogs/*
+WagTapCalLogs
+bin
+.vsCode/*
+Properties/PublishProfiles/mytilerkid - LaptopDeploy.pubxml
+Properties/PublishProfiles/mytilerkid - LaptopDeploy.pubxml.user
+Properties/PublishProfiles/mytilerkid - Web Deploy - DesktopDeploy.pubxml.user

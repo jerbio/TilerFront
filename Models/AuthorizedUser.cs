@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Threading.Tasks;
-
+using TilerElements;
 
 namespace TilerFront.Models
 {
@@ -11,12 +11,28 @@ namespace TilerFront.Models
     {
         public bool MobileFlag { get; set; }
         public int TimeZoneOffset { get; set; }
-        protected DateTimeOffset refNow = DateTimeOffset.UtcNow;
-        public TimeSpan getTImeSpan
+        /// <summary>
+        /// Longitude of user
+        /// </summary>
+        public string UserLongitude { get; set; }
+        /// <summary>
+        /// Latitude of user
+        /// </summary>
+        public string UserLatitude { get; set; }
+        /// <summary>
+        /// IsLocationVerified
+        /// </summary>
+        public string UserLocationVerified { get; set; }
+        /// <summary>
+        /// TimeZone desired by the user. This defaults to UTC
+        /// </summary>
+        public string TimeZone { get; set; } = "UTC";
+        protected DateTimeOffset refNow = DateTimeOffset.UtcNow.removeSecondsAndMilliseconds();
+        public TimeSpan getTimeSpan
         {
             get 
             {
-                int TimeSpanint = TimeZoneOffset;
+                int TimeSpanint = -TimeZoneOffset;// negating because the front end said the reverse polarity
                 TimeSpan TimeZoneSpan = TimeSpan.FromMinutes(TimeSpanint);
                 return TimeZoneSpan;
             }
@@ -24,39 +40,81 @@ namespace TilerFront.Models
 
         public DateTimeOffset getRefNow()
         {
-            return refNow;
-        }
+            //string timeInString = "5/25/2020 2:47:00 PM +00:00";
+            string timeInString = "";
 
-        async public Task<UserAccountDirect> getUserAccountDirect(bool Passive=true)
-        {
-            Controllers.UserController myUserController = new Controllers.UserController();
-            ApplicationUser User ;
-
-            if (Passive)
+            if (string.IsNullOrEmpty(timeInString))
             {
-                User = new ApplicationUser() { UserName = UserName, Id = UserID,FullName="" };
+                return refNow;
             }
             else
             {
-                User = await myUserController.GetUser(UserID, UserName);
+                DateTimeOffset retValue = DateTimeOffset.Parse(timeInString);
+                return retValue;
             }
-            return new UserAccountDirect(User, Passive);
+            
         }
 
-        async public Task<UserAccountDebug> getUserAccountDebug(bool Passive = true)
+        async virtual public Task<UserAccount> getUserAccount(TilerDbContext db=null)
         {
-            Controllers.UserController myUserController = new Controllers.UserController();
-            ApplicationUser User;
-
-            if (Passive)
+            if (db != null)
             {
-                User = new ApplicationUser() { UserName = UserName, Id = UserID, FullName = "" };
+                return new UserAccountDirect(UserID, db);
             }
             else
             {
-                User = await myUserController.GetUser(UserID, UserName);
+                TilerUser User = new TilerUser() { UserName = UserName, Id = UserID};
+                return new UserAccountXml(User);
             }
-            return new UserAccountDebug(User, Passive);
+            
         }
+
+        public Location getCurrentLocation ()
+        {
+            bool locationIsVerified = false;
+            Location retValue = null;
+            double longitude = 0;
+            double latitude = 0;
+            if (!string.IsNullOrEmpty(UserLocationVerified) && !string.IsNullOrWhiteSpace(UserLocationVerified)
+                &&!string.IsNullOrEmpty(UserLongitude) && !string.IsNullOrWhiteSpace(UserLongitude)
+                && !string.IsNullOrEmpty(UserLatitude) && !string.IsNullOrWhiteSpace(UserLatitude)
+                )
+            {
+                longitude = Convert.ToDouble(UserLongitude);
+                latitude = Convert.ToDouble(UserLatitude);
+                locationIsVerified = Convert.ToBoolean(UserLocationVerified);
+            }
+
+            //latitude = 40.0202094;
+            //longitude = -105.2511571;
+
+            if (locationIsVerified)
+            {
+                retValue = new Location(latitude, longitude);
+                retValue.IsVerified = true;
+            }
+            else
+            {
+                retValue = Location.getDefaultLocation();
+            }
+
+            return retValue;
+        }
+
+        //async public Task<UserAccountDebug> getUserAccountDebug(bool Passive = true)
+        //{
+        //    Controllers.UserController myUserController = new Controllers.UserController();
+        //    TilerUser User;
+        //    ApplicationDbContext db = new ApplicationDbContext();
+        //    if (Passive)
+        //    {
+        //        User = new TilerUser() { UserName = UserName, Id = UserID, FullName = "" };
+        //    }
+        //    else
+        //    {
+        //        User = await myUserController.GetUser(UserID, UserName);
+        //    }
+        //    return new UserAccountDebug(User);
+        //}
     }
 }

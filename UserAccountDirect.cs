@@ -3,14 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using TilerElements;
+using TilerFront.Models;
 using System.Threading.Tasks;
+using System.Data.Entity;
 
 namespace TilerFront
 {
     public class UserAccountDirect:UserAccount
     {
-        protected Models.ApplicationUser sessionUser;
-        //LogControl UserLog;
+        
         protected UserAccountDirect()
         {
             
@@ -18,88 +19,35 @@ namespace TilerFront
 
 
 
-        public UserAccountDirect(Models.ApplicationUser user, bool Passive=false)
+        public UserAccountDirect(string userId, TilerDbContext database)
         {
-            sessionUser = user;
-            UserLog = new LogControlDirect(sessionUser, "", Passive);
-            ID = sessionUser.Id;
+            ID = userId;
+            _Database = database;
         }
 
-        /*
-        public UserAccountDirect(string UserName,string USerID, bool Passive)
-        {
-            if (!Passive)
-            {
-                sessionUser = new Models.ApplicationUser();
-                sessionUser.UserName = UserName;
-                sessionUser.Id = USerID;
-            }
-
-            UserLog = new LogControlDirect(sessionUser, "", Passive);
-        }*/
-
+        /// <summary>
+        /// Essentially initializes the user log and pulls a user's account
+        /// </summary>
+        /// <returns></returns>
         public override async System.Threading.Tasks.Task<bool> Login()
         {
             HttpContext ctx = HttpContext.Current;
-            
-            if (ctx != null)
-            {
-                await UserLog.Initialize();
-            }
-            return UserLog.Status;
-        }
+            TilerUser tilerUser = Database.Users.Find(ID);
+            UserLog = new LogControlDirect(tilerUser, Database as ApplicationDbContext);
 
-        
-
-
-        override protected Dictionary<string, CalendarEvent> getAllCalendarElements(TimeLine RangeOfLookup, string desiredDirectory = "")
-        {
-            Dictionary<string, CalendarEvent> retValue = new Dictionary<string, CalendarEvent>();
-            retValue = UserLog.getAllCalendarFromXml(RangeOfLookup);
-            return retValue;
-        }
-
-        async override protected Task<DateTimeOffset> getDayReferenceTime(string desiredDirectory = "")
-        {
-            DateTimeOffset retValue = await UserLog.getDayReferenceTime(desiredDirectory);
+            bool retValue = tilerUser != null;
             return retValue;
         }
 
 
-        async protected Task<DateTimeOffset> getDayReferenceTimeFromXml(string desiredDirectory = "")
-        {
 
-            DateTimeOffset retValue = await ((LogControlDirect)UserLog).getDayReferenceTimeFromXml(desiredDirectory);
-            return retValue;
-        }
-
-
-        async public Task<CustomErrors> Register(Models.ApplicationUser user)
-        {
-            CustomErrors retValue = UserLog.genereateNewLogFile(user.Id);
-            return retValue;
-        }
-
-        override async public Task<CustomErrors> DeleteLog()
-        {
-            return await UserLog.DeleteLog();
-        }
-        
-        //async public Task CommitEventToLog(IEnumerable<CalendarEvent> AllEvents, string LatestID, string LogFile = "")
-        //{
-        //    await ((LogControlDirect)UserLog).WriteToLog(AllEvents, LatestID, LogFile);
-        //    sessionUser.LastChange = DateTimeOffset.Now.DateTime;
-        //    Task SaveChangesToDB = new Controllers.UserController().SaveUser(sessionUser);
-        //    await SaveChangesToDB;
-        //}
-        
         override public bool DeleteAllCalendarEvents()
         {
             bool retValue = false;
 
             if (UserLog.Status)
             {
-                UserLog.deleteAllCalendarEvets();
+                UserLog.deleteAllCalendarEvents();
                 retValue = true;
             }
             else
@@ -114,6 +62,8 @@ namespace TilerFront
         {
             UserLog.UpdateReferenceDayInXMLLog(referenceTime);
         }
+
+        
 
         #region properties
         public int LastEventTopNodeID
@@ -133,7 +83,8 @@ namespace TilerFront
         {
             get
             {
-                return UserLog.Status;
+                bool retValue = (SessionUser != null) && UserLog.Status;
+                return retValue;
             }
         }
 
@@ -141,7 +92,7 @@ namespace TilerFront
         {
             get
             {
-                return sessionUser.Id;
+                return SessionUser.Id;
             }
         }
 
@@ -158,22 +109,6 @@ namespace TilerFront
             get
             {
                 return Name;
-            }
-        }
-
-        public string getFullLogDir
-        {
-            get
-            {
-                return UserLog.getFullLogDir;
-            }
-        }
-
-        virtual public LogControl ScheduleLogControl
-        {
-            get
-            {
-                return UserLog;
             }
         }
 

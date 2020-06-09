@@ -5,7 +5,8 @@ using System.Web;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.SignalR;
 using Newtonsoft.Json.Linq;
-
+using TilerElements;
+using DBTilerElement;
 using System.Threading.Tasks;
 
 namespace TilerFront.SocketHubs
@@ -26,13 +27,27 @@ namespace TilerFront.SocketHubs
 
         }
 
-        public void triggerRefreshData() {
-            string who = HttpContext.Current.User.Identity.GetUserId();
+        public void triggerRefreshData(TilerUser tilerUser ) {
+
+            string who = tilerUser.Id;
+            
             var context = Microsoft.AspNet.SignalR.GlobalHost.ConnectionManager.GetHubContext<TilerFront.SocketHubs.ScheduleChange>();
             dynamic triggerRefreshRequest = new JObject();
             triggerRefreshRequest.refreshData = new JObject();
             triggerRefreshRequest.refreshData.trigger = true;
             context.Clients.Group(who).refereshDataFromSockets(triggerRefreshRequest);
+        }
+
+        public void pausedEventUpdate(Models.PausedEvent PausedEvent, IEnumerable<SubCalendarEvent> SubEvents)
+        {
+            string who = HttpContext.Current.User.Identity.GetUserId();
+            var context = Microsoft.AspNet.SignalR.GlobalHost.ConnectionManager.GetHubContext<TilerFront.SocketHubs.ScheduleChange>();
+            dynamic pauseEventRequest = new JObject();
+            pauseEventRequest.pauseData = new JObject();
+            pauseEventRequest.pauseData.pausedEvent = new JObject(PausedEvent);
+            JArray jobjectSubeevents = new JArray(SubEvents.Select(subEvent=>subEvent.ToSubCalEvent()).ToArray());
+            pauseEventRequest.pauseData.subevents = jobjectSubeevents;
+            context.Clients.Group(who).refereshDataFromSockets(pauseEventRequest);
         }
 
         public override Task OnConnected()

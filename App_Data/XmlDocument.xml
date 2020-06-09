@@ -775,14 +775,14 @@
             <param name="userId"></param>
             <returns></returns>
         </member>
-        <member name="M:TilerFront.Controllers.ScheduleController.getAllThirdPartyAuthentication(System.String)">
+        <member name="M:TilerFront.Controllers.ScheduleController.getAllThirdPartyAuthentication(System.String,TilerFront.Models.ApplicationDbContext)">
             <summary>
             Retrieves the third party authentication credentials needed to retrieve third party calendar. Attaches an index for multiple calendar retrieval. Based on a specific userID
             </summary>
             <param name="ID"></param>
             <returns></returns>
         </member>
-        <member name="M:TilerFront.Controllers.ScheduleController.getThirdPartyAuthentication(System.String,System.String,System.Int32)">
+        <member name="M:TilerFront.Controllers.ScheduleController.getThirdPartyAuthentication(System.String,System.String,System.String,TilerFront.Models.ApplicationDbContext)">
             <summary>
             Retrieves the third party authentication credentials needed to retrieve third party calendar. Gets a specific calendar authentication. You need full credentials to get specific oauth credentials
             </summary>
@@ -791,18 +791,17 @@
             <param name="ThirdPartyType"></param>
             <returns></returns>
         </member>
-        <member name="M:TilerFront.Controllers.ScheduleController.googleNotificationTrigger(System.String)">
+        <member name="M:TilerFront.Controllers.ScheduleController.googleNotificationTrigger(System.String,TilerFront.Models.ApplicationDbContext)">
             <summary>
             Handles the trigger when new google notification comes through.
             </summary>
             <param name="GoogleNotificationID"></param>
             <returns></returns>
         </member>
-        <member name="M:TilerFront.Controllers.ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(My24HourTimerWPF.Schedule,System.String)">
+        <member name="M:TilerFront.Controllers.ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(System.String,TilerFront.Models.ApplicationDbContext,TilerElements.TimeLine,System.Boolean)">
             <summary>
             Function retrives the third party credential. Credential are used to retrieve calendar event. The retrieved events are used to populate mySchedule
             </summary>
-            <param name="mySchedule"></param>
             <param name="TilerUserID"></param>
             <returns></returns>
         </member>
@@ -838,7 +837,7 @@
             <summary>
             Marks a series of Event as complete. It takes a collection of IDs and then marks them as complete
             </summary>
-            <param name="UserData"></param>
+            <param name="requestData"></param>
             <returns></returns>
         </member>
         <member name="M:TilerFront.Controllers.ScheduleController.Now(TilerFront.Models.getEventModel)">
@@ -859,7 +858,7 @@
             <summary>
             Deletes a Sub event from Tiler. The deletion does not trigger a schedule readjustment.
             </summary>
-            <param name="myUser"></param>
+            <param name="eventModel"></param>
             <returns></returns>
         </member>
         <member name="M:TilerFront.Controllers.ScheduleController.HandleOptionsEvent(TilerFront.Models.getEventModel)">
@@ -873,7 +872,7 @@
             <summary>
             Deletes multiple subevents.
             </summary>
-            <param name="myUser"></param>
+            <param name="requestData"></param>
             <returns></returns>
         </member>
         <member name="M:TilerFront.Controllers.ScheduleController.HandleOptionsEvents(TilerFront.Models.getEventModel)">
@@ -914,6 +913,84 @@
             <param name="TimeZoneOffSet"></param>
             <param name="DaySelection"></param>
             <returns></returns>
+        </member>
+        <member name="M:TilerFront.Controllers.SubCalendarEventController.RepeatSubCalendarEvent(TilerFront.Models.getEventModel)">
+            <summary>
+            Function adds a repeated after the specified sub event 
+            </summary>
+            <param name="UserData"></param>
+            <returns></returns>
+        </member>
+        <member name="T:TilerFront.TilerController">
+            <summary>
+            Tiler controller that provides custom tiler functionality
+            </summary>
+        </member>
+        <member name="M:TilerFront.TilerController.saveLatestChange(TilerElements.TilerDbContext,TilerElements.TilerUser)">
+            <summary>
+            This is to be called when you need save the last change to the database
+            </summary>
+            <param name="db">The database context for accessing db</param>
+            <param name="user">The referemce tiler user</param>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.DB_Schedule.RemoveAllCalendarEventFromLogAndCalendar">
+            <summary>
+            Function sets all calendar events in as disabled and then deletes them from the UI
+            </summary>
+        </member>
+        <member name="M:TilerFront.DB_Schedule.CleanUpForUI(System.Collections.Generic.IEnumerable{TilerElements.CalendarEvent})">
+            <summary>
+            Function rearranges the sub events by Id to be associated with the order of time
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.DB_Schedule.AddToScheduleAndCommitAsync(TilerElements.CalendarEvent,System.Boolean)">
+            <summary>
+            Function adds a new event to the schedule but is async chronous
+            </summary>
+            <param name="NewEvent"></param>
+            <param name="optimizeSchedule"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.DB_Schedule.AddToScheduleAndCommit(TilerElements.CalendarEvent,System.Boolean)">
+            <summary>
+            Function adds a new event to the schedule 
+            </summary>
+            <param name="NewEvent"></param>
+            <param name="optimizeSchedule"></param>
+        </member>
+        <member name="M:TilerFront.DB_Schedule.CreateScheduleDump(TilerElements.ReferenceNow,System.String)">
+            <summary>
+            Function creates a schedule dump that is equivalent to schedule from RDBMS
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.DB_Schedule.CreateAndPersistScheduleDump(TilerElements.ScheduleDump,TilerElements.ReferenceNow)">
+            <summary>
+            Creates a schedule dump and then persists it to the DB
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="P:TilerFront.Models.AuthorizedUser.UserLongitude">
+            <summary>
+            Longitude of user
+            </summary>
+        </member>
+        <member name="P:TilerFront.Models.AuthorizedUser.UserLatitude">
+            <summary>
+            Latitude of user
+            </summary>
+        </member>
+        <member name="P:TilerFront.Models.AuthorizedUser.UserLocationVerified">
+            <summary>
+            IsLocationVerified
+            </summary>
+        </member>
+        <member name="P:TilerFront.Models.AuthorizedUser.TimeZone">
+            <summary>
+            TimeZone desired by the user. This defaults to UTC
+            </summary>
         </member>
         <member name="P:TilerFront.Models.getEventModel.EventID">
             <summary>
@@ -1069,9 +1146,29 @@
             Year component of End date.
             </summary>
         </member>
+        <member name="P:TilerFront.Models.UnregisteredEvent.LookupString">
+            <summary>
+            Address provided by user
+            </summary>
+        </member>
+        <member name="P:TilerFront.Models.UnregisteredEvent.LocationIsVerified">
+            <summary>
+            Address is a confirmed location from google maps or mapping service
+            </summary>
+        </member>
         <member name="P:TilerFront.Models.UnregisteredEvent.LocationAddress">
             <summary>
             Full Address for new event. Fully described in default format. e.g 1234 stret apt 56 Kingston, CO 78901
+            </summary>
+        </member>
+        <member name="P:TilerFront.Models.UnregisteredEvent.LocationId">
+            <summary>
+            Should be populated when the location is from a cache
+            </summary>
+        </member>
+        <member name="P:TilerFront.Models.UnregisteredEvent.LocationSource">
+            <summary>
+            Source from where location is pulled
             </summary>
         </member>
         <!-- Badly formed XML comment ignored for member "P:TilerFront.Models.UnregisteredEvent.LocationTag" -->
@@ -1105,13 +1202,18 @@
             is the restrcition to be for only work week.
             </summary>
         </member>
+        <member name="P:TilerFront.Models.UnregisteredEvent.TimeZoneOrigin">
+            <summary>
+            The timezone of the location where the request is received. This defaults to UTC
+            </summary>
+        </member>
         <member name="M:TilerFront.GoogleTilerEventControl.getThirdPartyControlForIndex">
             <summary>
             Function generates google calendar control. Its populated with events retrieved within +/- 90 days of google calendar update. It returns null if access to google api is lost.
             </summary>
             <returns></returns>
         </member>
-        <member name="M:TilerFront.GoogleTilerEventControl.getThirdPartyControlForIndex(System.Collections.Generic.IEnumerable{TilerFront.GoogleTilerEventControl})">
+        <member name="M:TilerFront.GoogleTilerEventControl.getThirdPartyControlForIndex(System.Collections.Generic.IEnumerable{TilerFront.GoogleTilerEventControl},TilerElements.TimeLine,System.Boolean)">
             <summary>
             Function generates google calendar control. Its populated with events retrieved within +/- 90 days of google calendar update. It returns null if access to google api is lost.
             </summary>
@@ -1124,6 +1226,12 @@
             <param name="referenceDay"></param>
             <param name="LogFile"></param>
         </member>
+        <member name="M:TilerFront.LogControl.getTilerRetrievedUser">
+            <summary>
+            Function returns the tiler User retrieved from the db
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:TilerFront.LogControl.updateBigData(System.Xml.XmlDocument,System.Xml.XmlDocument)">
             <summary>
             Function is to be called for the generation of auto logs for a user interaction with the schedule
@@ -1131,11 +1239,18 @@
             <param name="oldData"></param>
             <param name="newData"></param>
         </member>
-        <member name="M:TilerFront.LogControl.updateNewLocation(TilerElements.Location_Elements)">
+        <member name="M:TilerFront.LogControl.updateNewLocation(TilerElements.Location)">
             <summary>
             updates the logcontrol with a possible new location
             </summary>
             <param name="NewLocation"></param>
+        </member>
+        <member name="M:TilerFront.LogControl.generateTilerUserNode(TilerElements.TilerUser)">
+            <summary>
+            This function generates a tiler user node that simply stores the id and user name for a given tiler user
+            </summary>
+            <param name="user">tiler user</param>
+            <returns></returns>
         </member>
         <member name="M:TilerFront.LogControl.CreatePauseUsedUpNode(TilerElements.SubCalendarEvent,System.Xml.XmlDocument)">
             <summary>
@@ -1144,11 +1259,105 @@
             <param name="SubEvent"></param>
             <returns></returns>
         </member>
+        <member name="M:TilerFront.LogControl.getTilerLoggedUser(System.Xml.XmlNode)">
+            <summary>
+            Function retrieves a db_tiler user from an xmlnode.  Note if there is no user node it returns an object in which the isNull property is set to true
+            </summary>
+            <param name="userNode">The xml node with the tiler user information</param>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.LogControl.getTilerUserGroup(System.Xml.XmlNode)">
+            <summary>
+            Function retrieves a tiler user group form an xmlnode. Npte if there isn't a node a new object will be created with the isNull flag set
+            </summary>
+            <param name="userGroupNode">xml node with formated user group</param>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.LogControl.GetScheduleDump(System.String)">
+            <summary>
+            gets the Schedule dump by the dump id
+            </summary>
+            <param name="dumpId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.LogControl.getDayReferenceTime">
+            <summary>
+            Function gets the end of the day of the specified user.
+            </summary>
+            <param name="NameOfFile"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.LogControl.getTravelCache(TilerElements.TilerUser)">
+            <summary>
+            Function retrieves the travel cache of for a specific user
+            </summary>
+            <param name="tilerUser"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.LogControl.getTravelCache(System.String)">
+            <summary>
+            Function retrieves the travel cache of for a specific user
+            </summary>
+            <param name="userId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.LogControl.getSubCalendarEventForAnalysis(TilerElements.TimeLine,TilerElements.TilerUser)">
+            <summary>
+             FUnction makes a storage call to retrieve all sub events. Note this includes both completed and deleted sub events. Except the case of count decrement
+            </summary>
+            <param name="timeline"></param>
+            <param name="user"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.LogControl.getAllEnabledCalendarEvent(TilerElements.TimeLine,TilerElements.ReferenceNow,System.Boolean,System.Boolean,TilerElements.DataRetrivalOption,System.Collections.Generic.HashSet{System.String})">
+            <summary>
+            This gets all cal events within <paramref name="RangeOfLookUP"/>. Note: This uses the subcalendar event as the bases for the query. So if a sub event is not within the rangelookup it won't pull the calendar event, this is for performance reasons. Hence why the general default is to be generous.  If you want to pull a specific calendar event then you need to include the calendar id as part of <paramref name="tilerIds"/>.
+            <paramref name="retrievalOption"/> provides a way of stream lining whats pulled from the DB. Evaluation ignores the UI component and includes only data to compute the schedule. Information such as NowProfile, procrastination and location
+            </summary>
+            <param name="RangeOfLookUP"></param>
+            <param name="Now"></param>
+            <param name="includeSubEvents"></param>
+            <param name="includeUpdateHistory"></param>
+            <param name="retrievalOption"></param>
+            <param name="tilerIds"></param>
+            <returns></returns>
+        </member>
         <member name="M:TilerFront.LogControl.getRestrictionTimeLine(System.Xml.XmlNode)">
             <summary>
             Funciton returns aall the possible active restriction timelines for the restriciton profile
             </summary>
             <param name="RestrictionTimeLineNode"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.LogControl.getSubEventWithID(System.String,System.Boolean,System.Boolean)">
+            <summary>
+            Function returns a subcalendarevent  based on the provided ID. It checks if the userId is also valid.
+            set <paramref name="includeParentCalevent"/> to false if you don't want the subcalendarevent calendar event to include the parent calendar event of the subevent
+            </summary>
+            <param name="ID"></param>
+            <param name="includeParentCalevent"></param>
+            <param name="includeRepetition"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.LogControl.deleteAllDatabaseData">
+            <summary>
+            This function wipes out the database completely.BECAREFUL. You''l need to comment out the lines below return
+            </summary>
+        </member>
+        <member name="T:TilerFront.TilerApiController">
+            <summary>
+            Tiler controller that provides custom tiler functionality
+            </summary>
+        </member>
+        <member name="F:TilerFront.TilerApiController.xmlFileId">
+            <summary>
+            name of file to be read from wagtapcallogs
+            </summary>
+        </member>
+        <member name="M:TilerFront.UserAccount.getTilerUser">
+            <summary>
+            Gets the tilerUser account associated with the userAccount
+            </summary>
             <returns></returns>
         </member>
         <member name="M:TilerFront.UserAccount.getCurrentPausedEvent(TilerFront.Models.ApplicationDbContext,System.String,System.Boolean)">
@@ -1170,6 +1379,18 @@
             <param name="db"></param>
             <param name="EventId"></param>
             <param name="userId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.UserAccountXml.Login">
+            <summary>
+            Function logs in the current user. It simply checks to see if the id already exists
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.UserAccountDirect.Login">
+            <summary>
+            Essentially initializes the user log and pulls a user's account
+            </summary>
             <returns></returns>
         </member>
     </members>
