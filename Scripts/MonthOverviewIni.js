@@ -3997,7 +3997,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                         }
 
                         let isValid = true;
-                        isValid = isValid && subEventPost.Split > 0;
+                        isValid = isValid && ((currentSubevent.Split == subEventPost.Split) || (subEventPost.Split > 0));
 
                         subEventPost.Split > 0
 
@@ -4923,19 +4923,19 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                     var splitAndNoteContainer = getDomOrCreateNew("SplitCountAndNoteContainer");
                     var ContainerForExtraOptions = getDomOrCreateNew("ExtraOptionsContainer")
                     ContainerForExtraOptions.appendChild(splitAndNoteContainer)
+                    let splitInputBox = getDomOrCreateNew("InputSplitCount", "input");
+                    let splitInputBoxContainer = getDomOrCreateNew("InputSplitCountContainer");
+                    var splitInputBoxLabel = getDomOrCreateNew("splitInputBoxLabel", "label");
+                    splitInputBoxLabel.innerHTML = "Splits"
 
                     if (!SubEvent.isThirdParty) {
                         $(ContainerForExtraOptions.Dom).removeClass("setAsDisplayNone");
                         $(splitAndNoteContainer).addClass("SubEventInformationContainer");
-                        var splitInputBox = getDomOrCreateNew("InputSplitCount", "input");
-                        var splitInputBoxContainer = getDomOrCreateNew("InputSplitCountContainer");
                         if (!Dictionary_OfCalendarData[SubEvent.CalendarID].Rigid) {
                             splitInputBox.oninput = EditContainerData.RevealContainer;
                             splitInputBox.setAttribute("type", "Number");
                             splitInputBox.onkeydown = stopPropagationOfKeyDown;
                             splitInputBox.value = Dictionary_OfCalendarData[SubEvent.CalendarID].TotalNumberOfEvents;
-                            var splitInputBoxLabel = getDomOrCreateNew("splitInputBoxLabel", "label");
-                            splitInputBoxLabel.innerHTML = "Splits"
 
                             splitInputBoxContainer.appendChild(splitInputBoxLabel);
                             splitInputBoxContainer.appendChild(splitInputBox);
@@ -4955,12 +4955,14 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                             $(CompletionMap.Dom).addClass("setAsDisplayNone");
                         }
 
-
-                        let renderNoteResult = renderNotesUIData(null)
-
-
+                        let renderNoteResult = renderNotesUIData(null);
                         splitAndNoteContainer.appendChild(renderNoteResult.button)
                     } else {
+                        splitInputBox.Dom.value = 1;
+                        splitInputBoxContainer.appendChild(splitInputBoxLabel);
+                        splitInputBoxContainer.appendChild(splitInputBox);
+                        splitAndNoteContainer.appendChild(splitInputBoxContainer);
+                        $(splitInputBoxContainer.Dom).addClass("setAsDisplayNone");
                         $(ContainerForExtraOptions.Dom).addClass("setAsDisplayNone");
                     }
                     return ContainerForExtraOptions;
