@@ -328,24 +328,23 @@ namespace TilerFront
             Debug.WriteLine("********************************Check directive of #liveDebugging if test is failing********************************");
             return;
 #else
-
             IEnumerable<SubCalendarEvent> subevents = calendarEvents.SelectMany(calEVent => calEVent.RemoveSubEventFromEntity);
             foreach (SubCalendarEvent subEvent in subevents)
             {
                 _Context.Entry(subEvent).State = EntityState.Deleted;
             }
 
-            if(travelCache!=null)
+            if (travelCache!=null)
             {
                 foreach (var cacheEntry in travelCache.purgedLocations)
                 {
                     _Context.Entry(cacheEntry).State = EntityState.Deleted;
                 }
             }
-            
+
 
             Task saveDbChangesTask = _Context.SaveChangesAsync();
-            if(_TempDump!= null && _UpdateBigData)
+            if (_TempDump != null && _UpdateBigData)
             {
                 ReferenceNow now = new ReferenceNow(_TempDump.ReferenceNow, _TempDump.StartOfDay, _TilerUser.TimeZoneDifference);
                 Task<ScheduleDump> scheduleDumpCreationTask = CreateScheduleDump(calendarEvents, _TilerUser, now, "", CachedLocation);
@@ -1898,12 +1897,6 @@ namespace TilerFront
                             .Include(calEvent => calEvent.Procrastination_EventDB)
                             .Include(calEvent => calEvent.DayPreference_DB)
                             .Include(calEvent => calEvent.TimeLineHistory_DB.TimeLines_DB)
-                            .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Name))
-                            .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Name.Creator_EventDB))
-                            .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Location_DB))
-                            .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.DataBlob_EventDB))
-                            .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.UiParams_EventDB))
-                            .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.UiParams_EventDB.UIColor))
                             .Where(calEvent => calEvent.IsEnabled_DB && !calEvent.Complete_EventDB)
                         ;
                     }
