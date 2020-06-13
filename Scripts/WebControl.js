@@ -1025,7 +1025,7 @@ function sendPostScheduleEditAnalysisUpdate({CallBackSuccess, CallBackFailure, C
     let url = global_refTIlerUrl + "Analysis/Analyze";
     preSendRequestWithLocation(postData);
 
-    var ProcrastinateRequest= $.ajax({
+    let scheduleAnalysisRequest= $.ajax({
         type: "POST",
         url: url,
         data: postData,
@@ -1034,9 +1034,13 @@ function sendPostScheduleEditAnalysisUpdate({CallBackSuccess, CallBackFailure, C
         error: CallBackFailure
     })
     
-    if (CallBackDone != undefined) {
-        ProcrastinateRequest.done(CallBackDone);
-    }
+    scheduleAnalysisRequest.done((response) => {
+        getRefreshedData()
+        if (isFunction(CallBackDone)) {
+            CallBackDone(response)
+        }
+    })
+    
 }
 
 function setSubCalendarEventAsNow(SubEventID, CallBackSuccess, CallBackFailure, CallBackDone)
