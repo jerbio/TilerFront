@@ -4972,8 +4972,9 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                 function handleSuggestedDeadline() {
                     let suggestedDedalineContainerId = "suggested-deadline-container"
                     let suggestedDedalineContainerDom = getDomOrCreateNew(suggestedDedalineContainerId);
-                    if (SubEvent.SuggestedDeadline && SubEvent.SuggestedDeadline > 0) {
-                        let suggestedTime = new Date(SubEvent.SuggestedDeadline)
+                    let suggestedDeadline = SubEvent.SuggestedDeadline || SubEvent.LastSuggestedDeadline
+                    if ( suggestedDeadline && suggestedDeadline > 0) {
+                        let suggestedTime = new Date(suggestedDeadline)
                         let onSuggestionClick = () => {
                             CalEndTime.value = moment(suggestedTime, "MM-DD-YYYY").format("hh:mma");
                             CalEventEndDateBinder.datepicker("setDate", suggestedTime);
