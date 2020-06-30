@@ -339,16 +339,16 @@ function generateProcrastinateAllFunction(TimeData,CallBack)
 
     var TimeZone = new Date().getTimezoneOffset();
     TimeData = TimeData.ToTimeSpan();
-    var NowData = { DurationDays: TimeData.Days, DurationHours: TimeData.Hours, DurationMins: TimeData.Mins, UserName: UserCredentials.UserName, UserID: UserCredentials.ID, TimeZoneOffset: TimeZone };
-    NowData.TimeZone = moment.tz.guess()
+    let procrastinateAllData = { DurationDays: TimeData.Days, DurationHours: TimeData.Hours, DurationMins: TimeData.Mins, UserName: UserCredentials.UserName, UserID: UserCredentials.ID, TimeZoneOffset: TimeZone };
+    procrastinateAllData.TimeZone = moment.tz.guess()
     var HandleNEwPage = new LoadingScreenControl("Tiler is Freeing up Some time :)");
     HandleNEwPage.Launch();
     var URL = global_refTIlerUrl + "Schedule/ProcrastinateAll";
-    preSendRequestWithLocation(NowData);
+    preSendRequestWithLocation(procrastinateAllData);
     $.ajax({
         type: "POST",
         url: URL,
-        data: NowData,
+        data: procrastinateAllData,
         // DO NOT SET CONTENT TYPE to json
         // contentType: "application/json; charset=utf-8", 
         // DataType needs to stay, otherwise the response object

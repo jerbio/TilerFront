@@ -1890,7 +1890,7 @@ namespace TilerFront
                         rightOfJoin = rightOfJoin
                             .Include(calEvent => calEvent.RepeatParentEvent)
                             .Include(calEvent => calEvent.Location_DB)
-                            .Include(calEvent => calEvent.AllSubEvents_DB)
+                            .Include(calEvent => calEvent.AllSubEvents_DB) // This causes an error when adding a new primary type column to only subcalendar event type. When the join in the latter part of this code is run, for some reason entity framework doesnt realize that the primary type is not nullable but tries to assign a null variavle. I think this is because EF loses the default settings when joining the tables
                             .Include(calEvent => calEvent.TimeLineHistory_DB)
                             .Include(calEvent => calEvent.RestrictionProfile_DB)
                             .Include(calEvent => calEvent.ProfileOfNow_EventDB)

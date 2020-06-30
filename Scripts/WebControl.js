@@ -484,7 +484,7 @@ function sendUndoRequest(CallBack)
     var HandleNEwPage = new LoadingScreenControl("Tiler is Undoing :)");
     preSendRequestWithLocation(UndoData);
     HandleNEwPage.Launch();
-    var ProcrastinateRequest = $.ajax({
+    let undoRequest = $.ajax({
         type: "POST",
         url: URL,
         data: UndoData,
