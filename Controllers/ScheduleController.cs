@@ -564,6 +564,8 @@ namespace TilerFront.Controllers
                 {
                     fullTimeSpan = ProcrastinateDuration.TotalTimeSpan;
                 }
+                TimeLine procrastinateionTimeline = UserData.getProcrastinateTimeLine();
+
                 DateTimeOffset nowTime = myAuthorizedUser.getRefNow();
 
                 Task<Tuple<ThirdPartyControl.CalendarTool, IEnumerable<CalendarEvent>>> thirdPartyDataTask = ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(retrievedUser.UserID, db);
@@ -574,10 +576,17 @@ namespace TilerFront.Controllers
                 var thirdPartyData = await thirdPartyDataTask.ConfigureAwait(false);
                 schedule.updateDataSetWithThirdPartyData(thirdPartyData);
 
+                Tuple<CustomErrors, Dictionary<string, CalendarEvent>> ScheduleUpdateMessage;
 
-
-
-                Tuple<CustomErrors, Dictionary<string, CalendarEvent>> ScheduleUpdateMessage = schedule.ProcrastinateAll(fullTimeSpan);
+                if (procrastinateionTimeline != null)
+                {
+                    ScheduleUpdateMessage = schedule.ProcrastinateAll(procrastinateionTimeline);
+                } else
+                {
+                    ScheduleUpdateMessage = schedule.ProcrastinateAll(fullTimeSpan);
+                }
+                
+                
                 DB_UserActivity activity = new DB_UserActivity(myAuthorizedUser.getRefNow(), UserActivity.ActivityType.ProcrastinateAll);
                 JObject json = JObject.FromObject(UserData);
                 activity.updateMiscelaneousInfo(json.ToString());

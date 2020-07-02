@@ -907,6 +907,9 @@ namespace TilerFront
             MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.AutoDeletion_ReasonDB.ToString();
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("RepetitionLock"));
             MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.RepetitionLock_DB.ToString();
+            MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("NowLock"));
+            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.NowLock_DB.ToString();
+            
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("isTardy"));
             MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.isTardy.ToString();
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("IniStartTime"));
@@ -2859,6 +2862,11 @@ namespace TilerFront
                 if (RepetitionLockNode != null)
                 {
                     retrievedSubEvent.RepetitionLock_DB = Convert.ToBoolean(RepetitionLockNode.InnerText);
+                }
+                XmlNode NowLockNode = MyXmlNode.ChildNodes[i].SelectSingleNode("NowLock");
+                if (NowLockNode != null)
+                {
+                    retrievedSubEvent.NowLock_DB = Convert.ToBoolean(NowLockNode.InnerText);
                 }
 
                 retrievedSubEvent.InitialStartTime_DB = iniStartTimeInMs;
