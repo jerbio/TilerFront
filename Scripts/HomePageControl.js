@@ -378,7 +378,7 @@ function generateProcrastinateAllFunction(TimeData,CallBack)
     }).done(function (data) {
         HandleNEwPage.Hide();
         RefreshSubEventsMainDivSubEVents(CallBack);
-        sendPostScheduleEditAnalysisUpdate({});
+        sendPostScheduleEditAnalysisUpdate({CallBackSuccess: RefreshSubEventsMainDivSubEVents});;
     });
 }
 
@@ -440,7 +440,7 @@ function prepFunctionForCompletionOfEvent(EventID, CallBack) {
         }).done(function (data) {
             HandleNEwPage.Hide();
             RefreshSubEventsMainDivSubEVents(CallBack);
-            sendPostScheduleEditAnalysisUpdate({});
+            sendPostScheduleEditAnalysisUpdate({CallBackSuccess: RefreshSubEventsMainDivSubEVents});;
         });
     }
 }
@@ -1286,7 +1286,7 @@ function generateModalForTIleOrModal()
             }).done(function (data) {
                 HandleNEwPage.Hide()
                 RefreshSubEventsMainDivSubEVents(CallBack);
-                sendPostScheduleEditAnalysisUpdate({});
+                sendPostScheduleEditAnalysisUpdate({CallBackSuccess: RefreshSubEventsMainDivSubEVents});;
             });
 
             return;
@@ -1582,7 +1582,7 @@ function generateModalForTIleOrModal()
                 }
             }).done(function (data) {
                 RefreshSubEventsMainDivSubEVents(CallBack);
-                sendPostScheduleEditAnalysisUpdate({});
+                sendPostScheduleEditAnalysisUpdate({CallBackSuccess: RefreshSubEventsMainDivSubEVents});;
             });
         }
     }
@@ -1597,8 +1597,8 @@ function generateModalForTIleOrModal()
 
     function processNowAndNextRendering(SubCalEvent) {
         let now = Date.now();
-        let isCurrentSubEvent = now < SubCalEvent.SubCalEndDate.getTime() && now >= SubCalEvent.SubCalStartDate.getTime();
-        if(isCurrentSubEvent && !currentSubevent) {
+        let isCurrentSubEvent = now < SubCalEvent.SubCalEndDate.getTime() && now >= SubCalEvent.SubCalStartDate.getTime() && !SubCalEvent.isAllDay;
+        if(isCurrentSubEvent) {
             currentSubevent = SubCalEvent;
             renderNowUi(SubCalEvent);
         }
@@ -1651,6 +1651,24 @@ function generateModalForTIleOrModal()
         //global_RenderedList = ActiveSubEvents;
     }
 
+    function RefreshSubEventsMainDivSubEVents(CallBack)
+    {
+        //debugger;
+        var curentActiveElements = ActiveSubEvents;
+        Dictionary_OfSubEvents = {};
+        Dictionary_OfCalendarData = {};
+        ActiveSubEvents = [];
+        TotalSubEventList = [];
+        sortOutData.OldActiveEvents = curentActiveElements;
+        getNewData(sortOutData.OldActiveEvents);
+        if (isFunction(CallBack))
+        {
+            CallBack();
+        }
+    }
+
+    RefreshSubEventsMainDivSubEVents = buildFunctionSubscription(RefreshSubEventsMainDivSubEVents)
+
     function renderNowUi (subEvent) {
         if(subEvent) {
             let currentSubEventClassName = "ListElementContainerCurrentSubevent";
@@ -1682,30 +1700,12 @@ function generateModalForTIleOrModal()
             $(ListElementContainer.Dom).addClass(nextSubEventClassName);
             let timeSpanInMs = nextSubEvent.SubCalStartDate.getTime() - Date.now()
             setTimeout(() => {
-                renderNowUi(nextSubEvent)
+                // renderNowUi(nextSubEvent)
                 $(ListElementContainer.Dom).removeClass(nextSubEventClassName);
+                RefreshSubEventsMainDivSubEVents(CallBack)
             }, timeSpanInMs)
         }
     }
-
-    function RefreshSubEventsMainDivSubEVents(CallBack)
-    {
-        //debugger;
-        var curentActiveElements = ActiveSubEvents;
-        Dictionary_OfSubEvents = {};
-        Dictionary_OfCalendarData = {};
-        ActiveSubEvents = [];
-        TotalSubEventList = [];
-        sortOutData.OldActiveEvents = curentActiveElements;
-        getNewData(sortOutData.OldActiveEvents);
-        if (CallBack!=null)
-        {
-            CallBack();
-        }
-    }
-
-    RefreshSubEventsMainDivSubEVents = buildFunctionSubscription(RefreshSubEventsMainDivSubEVents)
-
     function resetEventStatusUi() {
         if (currentSubevent) {
             let allCurrents = []
@@ -1728,7 +1728,6 @@ function generateModalForTIleOrModal()
         }
     }
 
-    resetEventStatusUi = buildFunctionSubscription(resetEventStatusUi)
     
     RefreshSubEventsMainDivSubEVents.enroll(resetEventStatusUi, true);
 

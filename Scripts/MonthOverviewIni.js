@@ -471,7 +471,7 @@ function RenderListTimeInformation(DayOfWeek, ID, isNext)
 
     let isCurrentDayOfWeek = now < DayOfWeek.End.getTime() && now >= DayOfWeek.Start.getTime();
     if(isCurrentDayOfWeek) {
-        let isCurrentSubEvent = now < RefSubEvent.SubCalEndDate.getTime() && now >= RefSubEvent.SubCalStartDate.getTime();
+        let isCurrentSubEvent = now < RefSubEvent.SubCalEndDate.getTime() && now >= RefSubEvent.SubCalStartDate.getTime() && !RefSubEvent.isAllDay;
         if(isCurrentSubEvent) {
             global_UISetup.currentSubEvent = RefSubEvent;
             renderNowUi(RefSubEvent);
@@ -816,7 +816,7 @@ function RevealControlPanelSection(SelectedEvents)
             }).done(function (data) {
                 HandleNEwPage.Hide();
                 triggerUIUPdate();//hack alert
-                sendPostScheduleEditAnalysisUpdate({});
+                sendPostScheduleEditAnalysisUpdate({CallBackSuccess: getRefreshedData});;
             });
         }
         function triggerUIUPdate() {
@@ -873,7 +873,7 @@ function RevealControlPanelSection(SelectedEvents)
                 HandleNEwPage.Hide();
                 //triggerUIUPdate();//hack alert
                 global_ExitManager.triggerLastExitAndPop();
-                sendPostScheduleEditAnalysisUpdate({});
+                sendPostScheduleEditAnalysisUpdate({CallBackSuccess: getRefreshedData});;
             }
 
 
@@ -1769,7 +1769,7 @@ function initializeWebSockets() {
 }
 
 
-function getRefreshedData(CallBackAfterRefresh)//RangeData)
+function getRefreshedData(CallBackAfterRefresh)
 {
     //setTimeout(refreshIframe,200);
     
@@ -2220,8 +2220,8 @@ getRefreshedData.pauseUnEnroll = function (Id) {
             $(ListElementContainer.Dom).addClass(nextSubEventClassName);
             let timeSpanInMs = nextSubEvent.SubCalStartDate.getTime() - Date.now()
             setTimeout(() => {
-                renderNowUi(nextSubEvent)
                 $(ListElementContainer.Dom).removeClass(nextSubEventClassName);
+                getRefreshedData()
             }, timeSpanInMs)
         }
     }
@@ -4165,7 +4165,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                         }).done(function (data) {
                             HandleNEwPage.Hide();
                             triggerUIUPdate();//hack alert
-                            sendPostScheduleEditAnalysisUpdate({});
+                            sendPostScheduleEditAnalysisUpdate({CallBackSuccess: getRefreshedData});;
                         });
                     }
                     function triggerUIUPdate() {
@@ -4225,7 +4225,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                         }).done(function (data) {
                             HandleNEwPage.Hide();
                             triggerUIUPdate();//hack alert
-                            sendPostScheduleEditAnalysisUpdate({});
+                            sendPostScheduleEditAnalysisUpdate({CallBackSuccess: getRefreshedData});;
                         });
                     }
                     function triggerUIUPdate() {
@@ -4303,7 +4303,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                         }).done(function (data) {
                             HandleNEwPage.Hide();
                             triggerUIUPdate();//hack alert
-                            sendPostScheduleEditAnalysisUpdate({});
+                            sendPostScheduleEditAnalysisUpdate({CallBackSuccess: getRefreshedData});;
                         });
                 }
                     function triggerUIUPdate() {
@@ -4368,7 +4368,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                     }).done(function (data) {
                         HandleNEwPage.Hide();
                         triggerUIUPdate();//hack alert
-                        sendPostScheduleEditAnalysisUpdate({});
+                        sendPostScheduleEditAnalysisUpdate({CallBackSuccess: getRefreshedData});;
                     });
 
                     function triggerUIUPdate() {
@@ -4649,7 +4649,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                             debugger;
                             HandleNEwPage.Hide();
                             triggerUIUPdate();//hack alert
-                            sendPostScheduleEditAnalysisUpdate({});
+                            sendPostScheduleEditAnalysisUpdate({CallBackSuccess: getRefreshedData});;
                         });
                     }
                         function triggerUIUPdate() {
@@ -4719,7 +4719,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                     }).done(function (data) {
                         debugger;
                         triggerUIUPdate();//hack alert
-                        sendPostScheduleEditAnalysisUpdate({});
+                        sendPostScheduleEditAnalysisUpdate({CallBackSuccess: getRefreshedData});;
                     });
 
                     function triggerUIUPdate() {
@@ -5044,7 +5044,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                         HandleNEwPage.Hide();
                         //triggerUIUPdate();//hack alert
                         global_ExitManager.triggerLastExitAndPop();
-                        sendPostScheduleEditAnalysisUpdate({});
+                        sendPostScheduleEditAnalysisUpdate({CallBackSuccess: getRefreshedData});;
                     }
                     $.ajax({
                         type: "POST",
@@ -5627,7 +5627,7 @@ function GlobaPauseResumeButtonManager(events) {
             }).done(function (data) {
                 HandleNEwPage.Hide();
                 triggerUIUPdate();//hack alert
-                sendPostScheduleEditAnalysisUpdate({});
+                sendPostScheduleEditAnalysisUpdate({CallBackSuccess: getRefreshedData});;
             });
         }
         function triggerUIUPdate() {
@@ -5682,7 +5682,7 @@ function GlobaPauseResumeButtonManager(events) {
             }).done(function (data) {
                 HandleNEwPage.Hide();
                 triggerUIUPdate();//hack alert
-                sendPostScheduleEditAnalysisUpdate({});
+                sendPostScheduleEditAnalysisUpdate({CallBackSuccess: getRefreshedData});;
             });
         }
         function triggerUIUPdate() {

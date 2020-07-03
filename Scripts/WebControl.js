@@ -1035,7 +1035,14 @@ function sendPostScheduleEditAnalysisUpdate({CallBackSuccess, CallBackFailure, C
     })
     
     scheduleAnalysisRequest.done((response) => {
-        getRefreshedData()
+        // if (isFunction(getRefreshedData)) {
+        //     getRefreshedData()
+        // }
+
+        // if (isFunction(RefreshSubEventsMainDivSubEVents)) {
+        //     RefreshSubEventsMainDivSubEVents()
+        // }
+        
         if (isFunction(CallBackDone)) {
             CallBackDone(response)
         }
@@ -1062,7 +1069,7 @@ function setSubCalendarEventAsNow(SubEventID, CallBackSuccess, CallBackFailure, 
         if (CallBackDone != undefined) {
             CallBackDone()
         }
-        sendPostScheduleEditAnalysisUpdate({})        
+        sendPostScheduleEditAnalysisUpdate({CallBackSuccess, CallBackFailure})
     });    
 }
 
@@ -1085,7 +1092,7 @@ function SetCalendarEventAsNow(CalendarEventID, CallBackSuccess, CallBackFailure
         if (CallBackDone != undefined) {
             CallBackDone()
         }
-        sendPostScheduleEditAnalysisUpdate({})        
+        sendPostScheduleEditAnalysisUpdate({CallBackSuccess, CallBackFailure})     
     });
 }
 
@@ -1118,7 +1125,7 @@ function deleteSubEvent(SubEventID, CallBackSuccess, CallBackFailure, CallBackDo
         if (isFunction(CallBackDone)) {
             CallBackDone()
         }
-        sendPostScheduleEditAnalysisUpdate({})        
+        sendPostScheduleEditAnalysisUpdate({CallBackSuccess, CallBackFailure})
     });
 }
 
@@ -1150,7 +1157,7 @@ function deleteCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure, 
         if (isFunction(CallBackDone)) {
             CallBackDone()
         }
-        sendPostScheduleEditAnalysisUpdate({})        
+        sendPostScheduleEditAnalysisUpdate({CallBackSuccess, CallBackFailure})
     });
 }
 
@@ -1184,7 +1191,7 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
         if (isFunction(CallBackDone)) {
             CallBackDone()
         }
-        sendPostScheduleEditAnalysisUpdate({})        
+        sendPostScheduleEditAnalysisUpdate({CallBackSuccess, CallBackFailure})
     });
 }
 
@@ -3411,10 +3418,10 @@ function isUndefinedOrNull(data) {
                }
            }).done(function (data) {
                if(isFunction(CallBack)) {
-                    CallBack()
+                    CallBack(data)
                }
                HandleNEwPage.Hide();
-               sendPostScheduleEditAnalysisUpdate({});
+               sendPostScheduleEditAnalysisUpdate({CallBackDone: CallBack });
            });
        }
    }

@@ -155,12 +155,14 @@ function generateSubEventEditPage(subEvent) {
                 let callBack = () => {
                     closeEditContainer(e)
                     CurrentTheme.TransitionOldContainer(); // removes the initial selected sub event details page
-                    let subEvent = result.Content.subEvent
-                    subEvent.SubCalCalEventEnd = new Date(subEvent.SubCalCalEventEnd)
-                    subEvent.SubCalCalEventStart = new Date(subEvent.SubCalCalEventStart)
-                    subEvent.SubCalStartDate = new Date(subEvent.SubCalStartDate)
-                    subEvent.SubCalEndDate = new Date(subEvent.SubCalEndDate)
-                    loadSelectedSubEvent(subEvent.ID, subEvent)
+                    if (result.Content && result.Content.subEvent) {
+                        let subEvent = result.Content.subEvent
+                        subEvent.SubCalCalEventEnd = new Date(subEvent.SubCalCalEventEnd)
+                        subEvent.SubCalCalEventStart = new Date(subEvent.SubCalCalEventStart)
+                        subEvent.SubCalStartDate = new Date(subEvent.SubCalStartDate)
+                        subEvent.SubCalEndDate = new Date(subEvent.SubCalEndDate)
+                        loadSelectedSubEvent(subEvent.ID, subEvent)
+                    }
                     HandleNEwPage.Hide();
                 }
                 RefreshSubEventsMainDivSubEVents(callBack);
@@ -175,7 +177,7 @@ function generateSubEventEditPage(subEvent) {
                 HandleNEwPage.UpdateMessage(NewMessage, ExitAfter)
             }
         }).done(() => {
-            sendPostScheduleEditAnalysisUpdate({});
+            sendPostScheduleEditAnalysisUpdate({CallBackSuccess: RefreshSubEventsMainDivSubEVents});;
         })
     }
 
