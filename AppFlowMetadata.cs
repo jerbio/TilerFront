@@ -14,15 +14,17 @@ using Google.Apis.Calendar.v3;
 using Google.Apis.Plus.v1;
 using Google.Apis.Calendar.v3.Data;
 using Google.Apis.Util.Store;
+using System.Configuration;
 
 namespace TilerFront
 {
     public class AppFlowMetadata : FlowMetadata
     {
-        
+        static string googleClientId = ConfigurationManager.AppSettings["googleClientId"];
+        static string googleClientSecret = ConfigurationManager.AppSettings["googleClientSecret"];
         public AppFlowMetadata()
         {
-
+            
         }
 
         ///*
@@ -38,8 +40,8 @@ namespace TilerFront
             {
                 ClientSecrets = new ClientSecrets
                 {
-                    ClientId = "518133740160-i5ie6s4h802048gujtmui1do8h2lqlfj.apps.googleusercontent.com",
-                    ClientSecret = "NKRal5rA8NM5qHnmiigU6kWh"
+                    ClientId = googleClientId,
+                    ClientSecret = googleClientSecret
                 },
                 Scopes = new[] { PlusService.Scope.UserinfoEmail, CalendarService.Scope.Calendar, CalendarService.Scope.CalendarReadonly},
                 DataStore = new FileDataStore("Drive.Api.Auth.Store")

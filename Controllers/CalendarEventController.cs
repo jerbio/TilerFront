@@ -17,7 +17,7 @@ using TilerCore;
 
 namespace TilerFront.Controllers
 {
-
+    [Authorize]
     public class CalendarEventController : TilerApiController
     {
         // GET api/CalendarEvent/5

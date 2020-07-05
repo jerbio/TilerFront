@@ -12,6 +12,7 @@ using Google.Apis.Oauth2.v2;
 using System.Data.Entity;
 using DBTilerElement;
 using TilerElements;
+using System.Configuration;
 
 namespace TilerFront.Models
 {
@@ -75,8 +76,11 @@ namespace TilerFront.Models
             GoogleAuthorizationCodeFlow.Initializer myInit = new GoogleAuthorizationCodeFlow.Initializer();
             AuthorizationCodeFlow.Initializer codeFlowIntial = myInit;
             codeFlowIntial.ClientSecrets = new ClientSecrets();
-            codeFlowIntial.ClientSecrets.ClientId = "518133740160-i5ie6s4h802048gujtmui1do8h2lqlfj.apps.googleusercontent.com";
-            codeFlowIntial.ClientSecrets.ClientSecret = "NKRal5rA8NM5qHnmiigU6kWh";
+            string googleClientId = ConfigurationManager.AppSettings["googleClientId"];
+            string googleClientSecret = ConfigurationManager.AppSettings["googleClientSecret"];
+
+            codeFlowIntial.ClientSecrets.ClientId = googleClientId;
+            codeFlowIntial.ClientSecrets.ClientSecret = googleClientSecret;
             IAuthorizationCodeFlow myFlow = AppFlowMetadata.getFlow();
             Google.Apis.Auth.OAuth2.UserCredential RetValue = new Google.Apis.Auth.OAuth2.UserCredential(myFlow, this.ID, responseData);
             return RetValue;

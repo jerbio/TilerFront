@@ -19,6 +19,8 @@ using Google.Apis.Plus.v1;
 using Google.Apis.Calendar.v3.Data;
 using Google.Apis.Util.Store;
 using TilerElements;
+using System.Configuration;
+using Microsoft.Owin.Security.OAuth;
 
 namespace TilerFront
 {
@@ -92,10 +94,13 @@ namespace TilerFront
 
             facebookOptions.Scope.Add("email");
 
+            string googleClientId = ConfigurationManager.AppSettings["googleClientId"];
+            string googleClientSecret = ConfigurationManager.AppSettings["googleClientSecret"];
+
             var googleOptions = new GoogleOAuth2AuthenticationOptions()
             {
-                ClientId = "518133740160-i5ie6s4h802048gujtmui1do8h2lqlfj.apps.googleusercontent.com",
-                ClientSecret = "NKRal5rA8NM5qHnmiigU6kWh",
+                ClientId = googleClientId,
+                ClientSecret = googleClientSecret,
                 Provider = new GoogleOAuth2AuthenticationProvider
                 {
                     OnAuthenticated = async context =>
@@ -125,8 +130,20 @@ namespace TilerFront
             googleOptions.Scope.Add(PlusService.Scope.UserinfoEmail);
             googleOptions.Scope.Add(CalendarService.Scope.Calendar);
             googleOptions.Scope.Add(CalendarService.Scope.CalendarReadonly);
-            
-            
+
+            TimeSpan expiryTimeSpan = TimeSpan.FromDays(1);
+            OAuthAuthorizationServerOptions OAuthServerOptions = new OAuthAuthorizationServerOptions()
+            {
+                AllowInsecureHttp = true,
+                TokenEndpointPath = new PathString("/account/token"),
+                AccessTokenExpireTimeSpan = expiryTimeSpan,
+                Provider = new SimpleAuthorizationServerProvider()
+            };
+
+
+            app.UseOAuthAuthorizationServer(OAuthServerOptions);
+            app.UseOAuthBearerAuthentication(new OAuthBearerAuthenticationOptions());
+
 
             app.UseFacebookAuthentication(
                appId: "1530915617167749",

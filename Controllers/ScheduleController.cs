@@ -25,8 +25,7 @@ using System.Diagnostics;
 
 namespace TilerFront.Controllers
 {
-    //[EnableCors(origins: "*", headers: "accept, authorization, origin", methods: "DELETE,PUT,POST,GET")]
-    //[EnableCors("*", "*", "*",)]
+    [Authorize]
     /// <summary>
     /// Represents a users schedule. Provides access to schedule creation, modification and deletion
     /// </summary>

@@ -542,6 +542,7 @@
     <Compile Include="PeekResult.cs" />
     <Compile Include="PostBackData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SimpleAuthorizationServerProvider.cs" />
     <Compile Include="SocketHubs\ScheduleChange.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="Controllers\TilerApiController.cs" />
@@ -2785,12 +2786,6 @@
     <Content Include="Scripts\_references.js" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
-    </Content>
-    <Content Include="Web.Debug.config">
-      <DependentUpon>Web.config</DependentUpon>
-    </Content>
-    <Content Include="Web.Release.config">
-      <DependentUpon>Web.config</DependentUpon>
     </Content>
     <Content Include="Views\Web.config" />
     <Content Include="Views\_ViewStart.cshtml" />

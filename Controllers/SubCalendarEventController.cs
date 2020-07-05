@@ -17,6 +17,7 @@ using Newtonsoft.Json.Linq;
 
 namespace TilerFront.Controllers
 {
+    [Authorize]
     public class SubCalendarEventController : TilerApiController
     {
         [HttpPost]

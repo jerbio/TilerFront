@@ -10,9 +10,11 @@ using System.Threading.Tasks;
 
 using Google.Apis.Auth.OAuth2.Mvc;
 using Google.Apis.Services;
+using System.Web.Http;
 
 namespace TilerFront.Controllers
 {
+    [Authorize]
     public class AuthCallbackController : Google.Apis.Auth.OAuth2.Mvc.Controllers.AuthCallbackController
     {
         protected override Google.Apis.Auth.OAuth2.Mvc.FlowMetadata FlowData

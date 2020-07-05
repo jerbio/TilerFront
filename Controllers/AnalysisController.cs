@@ -13,6 +13,7 @@ using System.Collections.Concurrent;
 
 namespace TilerFront.Controllers
 {
+    [Authorize]
     public class AnalysisController : TilerApiController
     {
         [HttpPost]

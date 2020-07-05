@@ -25,6 +25,7 @@ using Google.Apis.Util.Store;
 
 namespace TilerFront.Controllers
 {
+    [Authorize]
     public class ThirdPartyCalendarAuthenticationModelsController : TilerApiController
     {
         private string CurrentURI = null;
