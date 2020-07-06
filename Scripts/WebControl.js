@@ -108,8 +108,7 @@ function GetCookieValue()//verifies that user has cookies
     }
     if (CookieValue == "")
     {
-        if (Debug)
-            {
+        if (Debug) {
         ///*
             CookieValue = { UserName: "jerbio", UserID: "d350ba4d-fe0b-445c-bed6-b6411c2156b3",FullName:"Jerome" }
         //*/
@@ -124,7 +123,11 @@ function GetCookieValue()//verifies that user has cookies
     return CookieValue;
 }
 
-
+function getBearerToken() {
+    let localStorage = window.localStorage;
+    let retValue = localStorage.getItem('bearerAccessToken');
+    return retValue;
+}
 
 
 
@@ -237,10 +240,7 @@ function triggerUndoPanel(UndoMessage)
                     hideUndoPanel();
                 }
             }
-
-
         }
-
     }
 
     
@@ -268,6 +268,38 @@ function triggerUndoPanel(UndoMessage)
     }
 }
 
+
+function configureAuthorizationToken(userName, password) {
+    let url = window.location.origin + "/account/token";
+    let LoginCredentials = {username: userName, password: password, "grant_type":'password'};
+    let retValue = $.ajax({
+        type: "POST",
+        url: url,
+        data: LoginCredentials,
+        // DO NOT SET CONTENT TYPE to json
+        // contentType: "application/json; charset=utf-8", 
+        // DataType needs to stay, otherwise the response object
+        // will be treated as a single string
+        //dataType: "json",
+        success: function (response) {
+            debugger;
+            let now = Date.now();
+            let tokenLifeSpan = response['expires_in'];
+            let tokenLifeSpanInMs = tokenLifeSpan * 1000
+            let expiryTime = now + tokenLifeSpanInMs;
+            let localStorage = window.localStorage;
+            localStorage.setItem('bearerAccessToken', response['access_token']);
+            localStorage.setItem('bearerExpiryDate', expiryTime);
+            localStorage.setItem('bearerTokenType', response['token_type']);
+        },
+        error: function (err) {
+            showRegistrationError(err);
+            setTimeout(hideRegistrationError, 6000);
+        }
+    })
+
+    return retValue
+}
 
 function updateSleepTimeline(sleepTimeline) {
     if(sleepTimeline) {

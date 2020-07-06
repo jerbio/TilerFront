@@ -23,6 +23,7 @@ using System.IO;
 
 namespace TilerFront
 {
+    [Authorize]
     /// <summary>
     /// Tiler controller that provides custom tiler functionality
     /// </summary>

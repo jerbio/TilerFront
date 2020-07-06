@@ -734,11 +734,6 @@
         <member name="M:TilerFront.Controllers.GoogleNotificationController.GoogNextNotif(TilerFront.Models.GoogleNotificationRequestModel)">
             *
         </member>
-        <member name="T:TilerFront.Controllers.ScheduleController">
-            <summary>
-            Represents a users schedule. Provides access to schedule creation, modification and deletion
-            </summary>
-        </member>
         <member name="M:TilerFront.Controllers.ScheduleController.GetSchedule(TilerFront.Models.getScheduleModel)">
             <summary>
             Retrieve Events within a time frame. Required elements are UserID and UserName. Provided starttime and Endtime for the range of the schedule allows for retrieval of schedule within a timerange
@@ -920,11 +915,6 @@
             </summary>
             <param name="UserData"></param>
             <returns></returns>
-        </member>
-        <member name="T:TilerFront.TilerController">
-            <summary>
-            Tiler controller that provides custom tiler functionality
-            </summary>
         </member>
         <member name="M:TilerFront.TilerController.saveLatestChange(TilerElements.TilerDbContext,TilerElements.TilerUser)">
             <summary>
@@ -1342,11 +1332,6 @@
         <member name="M:TilerFront.LogControl.deleteAllDatabaseData">
             <summary>
             This function wipes out the database completely.BECAREFUL. You''l need to comment out the lines below return
-            </summary>
-        </member>
-        <member name="T:TilerFront.TilerApiController">
-            <summary>
-            Tiler controller that provides custom tiler functionality
             </summary>
         </member>
         <member name="F:TilerFront.TilerApiController.xmlFileId">
