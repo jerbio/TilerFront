@@ -322,6 +322,7 @@ namespace TilerFront.Controllers
                 {
                     user = dbContext.Users.Find(user.Id);
                     await createProcrastinateCalendarEvent(user).ConfigureAwait(false);
+                    await createAnalysis(user).ConfigureAwait(false);
                     await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
                     Task SendEmail = SendEmailConfirmationAsync(user.Id, "Please Confirm Your Tiler Account!");
                     await SendEmail.ConfigureAwait(false);
@@ -350,6 +351,15 @@ namespace TilerFront.Controllers
             await dbContext.SaveChangesAsync().ConfigureAwait(false);
         }
 
+
+        public async Task createAnalysis(TilerUser user)
+        {
+            Analysis scheduleAnalysis = Analysis.generateAnalysisObject(user);
+            scheduleAnalysis.setUser(user);
+            dbContext.Analysis.Add(scheduleAnalysis);
+            await dbContext.SaveChangesAsync().ConfigureAwait(false);
+        }
+
         public async Task<ActionResult> RegisterUser(RegisterViewModel model)
         {
             ThirdPartyCalendarAuthenticationModelsController thirdPartyController = new ThirdPartyCalendarAuthenticationModelsController();
@@ -371,6 +381,7 @@ namespace TilerFront.Controllers
                 {
                     user = dbContext.Users.Find(user.Id);
                     await createProcrastinateCalendarEvent(user).ConfigureAwait(false);
+                    await createAnalysis(user).ConfigureAwait(false);
                     await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
                     Task SendEmail = SendEmailConfirmationAsync(user.Id, "Please Confirm Your Tiler Account!");
                     await SendEmail.ConfigureAwait(false);
@@ -766,6 +777,7 @@ namespace TilerFront.Controllers
                     {
                         user = dbContext.Users.Find(user.Id);
                         await createProcrastinateCalendarEvent(user).ConfigureAwait(false);
+                        await createAnalysis(user).ConfigureAwait(false);
                         await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
                         Task SendThirdPartyAuthentication = new Task(() => { });
                         if (ThirdPartyCredentials!=null)

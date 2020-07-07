@@ -251,7 +251,7 @@ namespace TilerFront.Controllers
                 LogControl LogAccess = myUserAccount.ScheduleLogControl;
                 List<CalendarEvent> ScheduleData = new List<CalendarEvent>();
 
-                Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location>> ProfileData = await LogAccess.getProfileInfo(TimelineForData, null, true);
+                Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location>, Analysis> ProfileData = await LogAccess.getProfileInfo(TimelineForData, null, true);
 
                 ScheduleData = ScheduleData.Concat(ProfileData.Item1.Values).ToList();
 

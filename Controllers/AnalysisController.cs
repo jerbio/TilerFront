@@ -77,11 +77,13 @@ namespace TilerFront.Controllers
             TimeLine timeline = new TimeLine(logControl.Now.constNow.AddDays(-45), logControl.Now.constNow.AddDays(45));
             List<IndexedThirdPartyAuthentication> AllIndexedThirdParty = await ScheduleController.getAllThirdPartyAuthentication(logControl.LoggedUserID, db).ConfigureAwait(false);
             List<GoogleTilerEventControl> AllGoogleTilerEvents = AllIndexedThirdParty.Select(obj => new GoogleTilerEventControl(obj, db)).ToList();
-            List<SubCalendarEvent> subEvents = logControl.getSubCalendarEventForAnalysis(timeline, logControl.getTilerRetrievedUser()).ToList();
+            var tupleOfSUbEVentsAndAnalysis = logControl.getSubCalendarEventForAnalysis(timeline, logControl.getTilerRetrievedUser());
+            List<SubCalendarEvent> subEvents = tupleOfSUbEVentsAndAnalysis.Item1.ToList();
+            Analysis analysis = tupleOfSUbEVentsAndAnalysis.Item2;
             Task<ConcurrentBag<CalendarEvent>> GoogleCalEventsTask = GoogleTilerEventControl.getAllCalEvents(AllGoogleTilerEvents, timeline);
             IEnumerable<CalendarEvent> GoogleCalEvents = await GoogleCalEventsTask.ConfigureAwait(false);
             subEvents.AddRange(GoogleCalEvents.SelectMany(o => o.AllSubEvents));
-            ScheduleSuggestionsAnalysis scheduleSuggestion = new ScheduleSuggestionsAnalysis(subEvents, logControl.Now, logControl.getTilerRetrievedUser());
+            ScheduleSuggestionsAnalysis scheduleSuggestion = new ScheduleSuggestionsAnalysis(subEvents, logControl.Now, logControl.getTilerRetrievedUser(), analysis);
             var overoccupiedTimelines = scheduleSuggestion.getOverLoadedWeeklyTimelines(nowTime);
             var suggestion = scheduleSuggestion.suggestScheduleChange(overoccupiedTimelines);
             List<CalendarEvent> calEvents = new HashSet<CalendarEvent>(subEvents.Select(o => o.ParentCalendarEvent)).ToList();

@@ -19,7 +19,7 @@ using BigDataTiler;
 using System.Data.Entity.Core.Objects;
 using System.Collections.Concurrent;
 using System.Diagnostics;
-
+using System.Runtime.CompilerServices;
 
 namespace TilerFront
 {
@@ -1606,7 +1606,7 @@ namespace TilerFront
         /// <param name="timeline"></param>
         /// <param name="user"></param>
         /// <returns></returns>
-        public IEnumerable<SubCalendarEvent> getSubCalendarEventForAnalysis(TimeLine timeline, TilerUser user)
+        public Tuple<IEnumerable<SubCalendarEvent>, Analysis> getSubCalendarEventForAnalysis(TimeLine timeline, TilerUser user)
         {
             if (timeline!=null && user!= null)
             {
@@ -1623,7 +1623,8 @@ namespace TilerFront
                     .Include(calEvent => calEvent.AllSubEvents_DB)
                     ;
                 var calEvents = caleventQuery.ToList();
-                HashSet<SubCalendarEvent> retValue = new HashSet<SubCalendarEvent>(calEvents.SelectMany(calEvent => calEvent.AllSubEvents_DB).ToList());
+                Analysis analysis = _Context.Analysis.Find(user.Id);
+                Tuple<IEnumerable<SubCalendarEvent>, Analysis> retValue = new Tuple<IEnumerable<SubCalendarEvent>, Analysis>(new HashSet<SubCalendarEvent>(calEvents.SelectMany(calEvent => calEvent.AllSubEvents_DB).ToList()), analysis);
                 return retValue;
             }
             
@@ -1725,8 +1726,8 @@ namespace TilerFront
             TimeSpan webFrontEndSpan = watch.Elapsed;
             Debug.WriteLine("web Front End Span " + webFrontEndSpan.ToString());
             return retValue;
-
         }
+
         /// <summary>
         /// This gets all cal events within <paramref name="RangeOfLookUP"/>. Note: This uses the subcalendar event as the bases for the query. So if a sub event is not within the rangelookup it won't pull the calendar event, this is for performance reasons. Hence why the general default is to be generous.  If you want to pull a specific calendar event then you need to include the calendar id as part of <paramref name="tilerIds"/>.
         /// <paramref name="retrievalOption"/> provides a way of stream lining whats pulled from the DB. Evaluation ignores the UI component and includes only data to compute the schedule. Information such as NowProfile, procrastination and location
@@ -3437,9 +3438,23 @@ namespace TilerFront
 
         }
 
-        async virtual public Task<Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location>>> getProfileInfo(TimeLine RangeOfLookup, ReferenceNow Now, bool includeUpdateHistory, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation, bool createDump = true, HashSet<string> calendarIds = null)
+        public async Task<Analysis> getAnalysis(TilerUser user)
         {
-            Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location>> retValue;
+            Analysis retValue = _Context.Analysis.Find(user.Id);
+            if(retValue == null)
+            {
+                Analysis scheduleAnalysis = Analysis.generateAnalysisObject(user);
+                scheduleAnalysis.setUser(user);
+                _Context.Analysis.Add(scheduleAnalysis);
+                await _Context.SaveChangesAsync().ConfigureAwait(false);
+                retValue = scheduleAnalysis;
+            }
+            return retValue;
+        }
+
+        async virtual public Task<Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location>, Analysis>> getProfileInfo(TimeLine RangeOfLookup, ReferenceNow Now, bool includeUpdateHistory, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation, bool createDump = true, HashSet<string> calendarIds = null)
+        {
+            Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location>, Analysis> retValue;
             if (this.Status)
             {
                 Task<Dictionary<string, TilerElements.Location>> TaskLocationCache = getAllLocationsByUser();
@@ -3449,6 +3464,7 @@ namespace TilerFront
                 scheduleLoadWatch.Start();
                 Dictionary<string, CalendarEvent> AllScheduleData = await this.getAllEnabledCalendarEvent(RangeOfLookup, Now, includeUpdateHistory, retrievalOption: retrievalOption, tilerIds: calendarIds);
                 scheduleLoadWatch.Stop();
+                Analysis analysis = await getAnalysis(this.getTilerRetrievedUser()).ConfigureAwait(false);
                 Debug.WriteLine("Total DB Lookup took " + scheduleLoadWatch.Elapsed.ToString());
                 if (createDump && _UpdateBigData)
                 {
@@ -3460,7 +3476,7 @@ namespace TilerFront
 
                 await populateDefaultLocation(LocationCache).ConfigureAwait(false);
 
-                retValue = new Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location>>(AllScheduleData, ReferenceTime, LocationCache);
+                retValue = new Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location>, Analysis>(AllScheduleData, ReferenceTime, LocationCache, analysis);
             }
             else
             {
