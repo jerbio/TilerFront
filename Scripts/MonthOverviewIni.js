@@ -650,14 +650,14 @@ function RevealControlPanelSection(SelectedEvents)
     var MultiSelectPanel = getDomOrCreateNew("MultiSelectPanel")
     var ControlPanelContainer = getDomOrCreateNew("ControlPanelContainer");
     var IconSetContainer = RevealControlPanelSection.IconSet.getIconSetContainer();
-    var PauseResumeButton = RevealControlPanelSection.IconSet.getPauseResumeButton();
-    $(PauseResumeButton).addClass("setAsDisplayNone")
     $(ControlPanelContainer).addClass("ControlPanelContainerLowerBar");
     if (Object.keys(SelectedEvents).length < 1) {
         $(MultiSelectPanel).addClass("hideMultiSelectPanel");
         global_ExitManager.triggerLastExitAndPop();
         return;
     }
+    RevealControlPanelSection.IconSet.hideNowButton()
+    RevealControlPanelSection.IconSet.hidePausePauseResumeButton()
 
     ControlPanelContainer.style.left = "auto";
     ControlPanelContainer.style.top = "auto";
@@ -978,15 +978,18 @@ function IconSet()
 
     var PauseResumeIconID = "ControlPanelResumePauseButton" + myID;
     var PauseResumeIcon = getDomOrCreateNew(PauseResumeIconID);
+    PauseResumeIcon.setAttribute("Title", "Pause/Resume this tile");
     $(PauseResumeIcon).addClass("ControlPanelButton");
 
     var RepeatIconID = "ControlPanelRepeatButton" + myID;
     var RepeatIcon = getDomOrCreateNew(RepeatIconID);
+    RepeatIcon.setAttribute("Title", "Repeat right after this event");
     $(RepeatIcon).addClass("ControlPanelButton");
     $(RepeatIcon).addClass("ControlPanelRepeatButton");
 
     let NowIconId = "ControlPanelNowButton" + myID;
     let NowIcon =  getDomOrCreateNew(NowIconId);
+    NowIcon.setAttribute("Title", "Do this now");
     $(NowIcon).addClass("ControlPanelButton");
     $(NowIcon).addClass("ControlPanelNowButton");
 
@@ -1068,12 +1071,12 @@ function IconSet()
         $(RepeatIcon).removeClass("setAsDisplayNone");
     }
 
-    this.HidePausePauseResumeButton = function () 
+    this.hidePausePauseResumeButton = function () 
     {
         $(PauseResumeIcon).addClass("setAsDisplayNone");
     }
 
-    this.ShowPausePauseResumeButton = function () {
+    this.showPausePauseResumeButton = function () {
         $(PauseResumeIcon).removeClass("setAsDisplayNone");
     }
 
@@ -3821,6 +3824,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                     global_ControlPanelIconSet.hideProcrastinateButton();
                     global_ControlPanelIconSet.hideCompleteButton();
                     global_ControlPanelIconSet.hideDeleteButton();
+                    global_ControlPanelIconSet.hideNowButton();
                 }
 
                 if (!SubEvent.SubCalRigid) {
@@ -4754,7 +4758,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                     global_ControlPanelIconSet.switchToResumeButton();
                     PauseResumeButton.onclick = continueEvent;
                     $(ControlPanelCloseButton).addClass("setAsDisplayNone");
-                    global_ControlPanelIconSet.ShowPausePauseResumeButton();
+                    global_ControlPanelIconSet.showPausePauseResumeButton();
                 }
                 else {
                     global_ControlPanelIconSet.switchToPauseButton();
@@ -4762,11 +4766,11 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                     $(ControlPanelCloseButton).addClass("setAsDisplayNone");
                     if((SubEvent.isPauseAble)&&(!global_eventIsPaused)) 
                     {
-                        global_ControlPanelIconSet.ShowPausePauseResumeButton();
+                        global_ControlPanelIconSet.showPausePauseResumeButton();
                     }
                     else
                     {
-                        global_ControlPanelIconSet.HidePausePauseResumeButton();
+                        global_ControlPanelIconSet.hidePausePauseResumeButton();
                     }
                 }
 

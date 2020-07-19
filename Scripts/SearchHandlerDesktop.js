@@ -236,7 +236,7 @@ function CallBackFunctionForReturnedValuesDesktop(data, DomContainer) {
         $(MyIconSet.getCloseButton()).addClass("setAsDisplayNone");
         MyIconSet.hideLocationButton();
         MyIconSet.hideProcrastinateButton();
-        MyIconSet.HidePausePauseResumeButton();
+        MyIconSet.hidePausePauseResumeButton();
         MyIconSet.hideRepeatButton();
         MyIconSet.hideNowButton();
         
