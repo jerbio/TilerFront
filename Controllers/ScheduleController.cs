@@ -253,6 +253,7 @@ namespace TilerFront.Controllers
                 
                 
                 List<SubCalendarEvent> subEvents = await LogAccess.getAllSubCalendarEvents(TimelineForData, now)
+                    .Include(subEvent => subEvent.Name)
                     .Where(subEvent => 
                     (StartTimeMs <= subEvent.DeletionTime_DB && subEvent.DeletionTime_DB <= EndTimeMs)
                     || (StartTimeMs <= subEvent.CompletionTime_EventDB && subEvent.CompletionTime_EventDB <= EndTimeMs)

@@ -1649,16 +1649,8 @@ namespace TilerFront
             IQueryable<SubCalendarEvent> allSubCalQuery = getSubCalendarEventQuery(retrievalOption, includeOtherEntities: includeOtherEntities);
             allSubCalQuery = allSubCalQuery
                 .Where(subEvent =>
-                        subEvent.IsEnabled_DB
-                        && !subEvent.Complete_EventDB
-                        && subEvent.StartTime_EventDB < RangeOfLookUP.End
+                        subEvent.StartTime_EventDB < RangeOfLookUP.End
                         && subEvent.EndTime_EventDB > RangeOfLookUP.Start
-                        && subEvent.CompletionTime_EventDB< rangeEnd
-                        && subEvent.CompletionTime_EventDB > rangeStart
-                        && subEvent.ParentCalendarEvent.IsEnabled_DB
-                        && !subEvent.ParentCalendarEvent.Complete_EventDB
-                        && subEvent.ParentCalendarEvent.StartTime_EventDB < RangeOfLookUP.End
-                        && subEvent.ParentCalendarEvent.EndTime_EventDB > RangeOfLookUP.Start
                         && subEvent.CreatorId == this._TilerUser.Id
                         );
             allSubCalQuery = allSubCalQuery
@@ -1725,6 +1717,7 @@ namespace TilerFront
             watch.Stop();
             TimeSpan webFrontEndSpan = watch.Elapsed;
             Debug.WriteLine("web Front End Span " + webFrontEndSpan.ToString());
+            Debug.WriteLine("Bungled maybe");
             return retValue;
         }
 
