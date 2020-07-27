@@ -88,8 +88,6 @@ namespace TilerFront.Controllers
                     var GoogleTilerEventControlobj = new GoogleTilerEventControl(obj, db);
                 }
 
-                List<CalendarEvent> ScheduleData = new List<CalendarEvent>();
-
                 Task<ConcurrentBag<CalendarEvent>> GoogleCalEventsTask = GoogleTilerEventControl.getAllCalEvents(AllGoogleTilerEvents, TimelineForData);
                 ReferenceNow now = new ReferenceNow(myAuthorizedUser.getRefNow(), tilerUser.EndfOfDay, tilerUser.TimeZoneDifference);
 
@@ -243,44 +241,73 @@ namespace TilerFront.Controllers
             PostBackData returnPostBack;
             if (myUserAccount.Status)
             {
-                DateTimeOffset StartTime = new DateTimeOffset(myAuthorizedUser.StartRange * TimeSpan.TicksPerMillisecond, new TimeSpan()).AddYears(1969).Add(-myAuthorizedUser.getTimeSpan);
-                DateTimeOffset EndTime = new DateTimeOffset(myAuthorizedUser.EndRange * TimeSpan.TicksPerMillisecond, new TimeSpan()).AddYears(1969).Add(-myAuthorizedUser.getTimeSpan);
-                TimeLine TimelineForData = new TimeLine(StartTime, EndTime);
+                TilerUser tilerUser = myUserAccount.getTilerUser();
+                ReferenceNow now = new ReferenceNow(myAuthorizedUser.getRefNow(), tilerUser.EndfOfDay, tilerUser.TimeZoneDifference);
+                long StartTimeMs = myAuthorizedUser.StartRange;// new DateTimeOffset(myAuthorizedUser.StartRange * TimeSpan.TicksPerMillisecond, new TimeSpan()).AddYears(1969).Add(-myAuthorizedUser.getTimeSpan).ToUnixTimeMilliseconds();
+                long EndTimeMs = myAuthorizedUser.EndRange;// new DateTimeOffset(myAuthorizedUser.EndRange * TimeSpan.TicksPerMillisecond, new TimeSpan()).AddYears(1969).Add(-myAuthorizedUser.getTimeSpan).ToUnixTimeMilliseconds();
+                TimeLine TimelineForData = new TimeLine(Utility.BeginningOfTime.AddDays(1), now.constNow.AddDays(Utility.defaultEndDay));
 
 
                 LogControl LogAccess = myUserAccount.ScheduleLogControl;
                 List<CalendarEvent> ScheduleData = new List<CalendarEvent>();
-
-                Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location>, Analysis> ProfileData = await LogAccess.getProfileInfo(TimelineForData, null, true);
-
-                ScheduleData = ScheduleData.Concat(ProfileData.Item1.Values).ToList();
-
-                IEnumerable<CalendarEvent> NonRepeatingEvents = ScheduleData.Where(obj => !obj.IsFromRecurringAndNotChildRepeatCalEvent);
-
-
-
-
-                //IEnumerable<CalendarEvent> RepeatingEvents = ScheduleData.Where(obj => obj.RepetitionStatus).SelectMany(obj => obj.Repeat.RecurringCalendarEvents);
-                IList<UserSchedule.repeatedEventData> RepeatingEvents = ScheduleData.AsParallel().Where(obj => obj.IsFromRecurringAndNotChildRepeatCalEvent).
-                    Select(obj => new UserSchedule.repeatedEventData
-                    {
-                        ID = obj.Calendar_EventID.ToString(),
-                        Latitude = obj.Location.Latitude,
-                        Longitude = obj.Location.Longitude,
-                        RepeatAddress = obj.Location.Address,
-                        RepeatAddressDescription = obj.Location.Description,
-                        RepeatCalendarName = obj.getName.NameValue,
-                        RepeatCalendarEvents = obj.Repeat.RecurringCalendarEvents().AsParallel().
-                            Select(obj1 => obj1.ToDeletedCalEvent(TimelineForData)).ToList(),
-                        RepeatEndDate = obj.End,
-                        RepeatStartDate = obj.Start,
-                        RepeatTotalDuration = obj.getActiveDuration
-                    }).ToList();
+                
+                
+                List<SubCalendarEvent> subEvents = await LogAccess.getAllSubCalendarEvents(TimelineForData, now)
+                    .Where(subEvent => 
+                    (StartTimeMs <= subEvent.DeletionTime_DB && subEvent.DeletionTime_DB <= EndTimeMs)
+                    || (StartTimeMs <= subEvent.CompletionTime_EventDB && subEvent.CompletionTime_EventDB <= EndTimeMs)
+                    || (StartTimeMs <= subEvent.ParentCalendarEvent.DeletionTime_DB && subEvent.ParentCalendarEvent.DeletionTime_DB <= EndTimeMs)
+                    || (StartTimeMs <= subEvent.ParentCalendarEvent.CompletionTime_EventDB && subEvent.ParentCalendarEvent.CompletionTime_EventDB <= EndTimeMs)
+                    ).ToListAsync().ConfigureAwait(false);
 
 
-                UserSchedule currUserSchedule = new UserSchedule { NonRepeatCalendarEvent = NonRepeatingEvents.Select(obj => obj.ToDeletedCalEvent(TimelineForData)).ToArray(), RepeatCalendarEvent = RepeatingEvents };
+                DayTimeLine sleepTimeline = now.getDayTimeLineByTime(now.constNow.AddDays(2));
+                TimeLine sleepTImeline = TimeOfDayPreferrence.splitIntoDaySections(sleepTimeline)[TimeOfDayPreferrence.DaySection.Sleep];
+
+                UserSchedule currUserSchedule = new UserSchedule
+                {
+                    //NonRepeatCalendarEvent = NonRepeatingEvents.Select(obj => obj.ToCalEvent(TimelineForData)).ToArray(),
+                    //RepeatCalendarEvent = RepeatingEvents,
+                    SubCalendarEvents = subEvents.Select(subEvent =>
+                        subEvent.ToSubCalEvent(subEvent.ParentCalendarEvent)
+                    ).ToList(),
+                    SleepTimeline = sleepTImeline.ToJson()
+                };
+                PausedEvent currentPausedEvent = getCurrentPausedEvent(db);
+                currUserSchedule.populatePauseData(currentPausedEvent, myAuthorizedUser.getRefNow());
                 InitScheduleProfile retValue = new InitScheduleProfile { Schedule = currUserSchedule, Name = myUserAccount.Usersname };
                 returnPostBack = new PostBackData(retValue, 0);
+
+                //Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location>, Analysis> ProfileData = await LogAccess.getProfileInfo(TimelineForData, null, true);
+
+                //ScheduleData = ScheduleData.Concat(ProfileData.Item1.Values).ToList();
+
+                //IEnumerable<CalendarEvent> NonRepeatingEvents = ScheduleData.Where(obj => !obj.IsFromRecurringAndNotChildRepeatCalEvent);
+
+
+
+
+                ////IEnumerable<CalendarEvent> RepeatingEvents = ScheduleData.Where(obj => obj.RepetitionStatus).SelectMany(obj => obj.Repeat.RecurringCalendarEvents);
+                //IList<UserSchedule.repeatedEventData> RepeatingEvents = ScheduleData.AsParallel().Where(obj => obj.IsFromRecurringAndNotChildRepeatCalEvent).
+                //    Select(obj => new UserSchedule.repeatedEventData
+                //    {
+                //        ID = obj.Calendar_EventID.ToString(),
+                //        Latitude = obj.Location.Latitude,
+                //        Longitude = obj.Location.Longitude,
+                //        RepeatAddress = obj.Location.Address,
+                //        RepeatAddressDescription = obj.Location.Description,
+                //        RepeatCalendarName = obj.getName.NameValue,
+                //        RepeatCalendarEvents = obj.Repeat.RecurringCalendarEvents().AsParallel().
+                //            Select(obj1 => obj1.ToDeletedCalEvent(TimelineForData)).ToList(),
+                //        RepeatEndDate = obj.End,
+                //        RepeatStartDate = obj.Start,
+                //        RepeatTotalDuration = obj.getActiveDuration
+                //    }).ToList();
+
+
+                //UserSchedule currUserSchedule = new UserSchedule { NonRepeatCalendarEvent = NonRepeatingEvents.Select(obj => obj.ToDeletedCalEvent(TimelineForData)).ToArray(), RepeatCalendarEvent = RepeatingEvents };
+                //InitScheduleProfile retValue = new InitScheduleProfile { Schedule = currUserSchedule, Name = myUserAccount.Usersname };
+                //returnPostBack = new PostBackData(retValue, 0);
             }
             else
             {

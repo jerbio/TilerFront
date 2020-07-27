@@ -505,6 +505,10 @@
     <Compile Include="LogControlXml.cs" />
     <Compile Include="LogControlDirect.cs" />
     <Compile Include="LogControl.cs" />
+    <Compile Include="Migrations\202007262320253_deletionTIme.cs" />
+    <Compile Include="Migrations\202007262320253_deletionTIme.designer.cs">
+      <DependentUpon>202007262320253_deletionTIme.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -2877,6 +2881,11 @@
       <Project>{f948eba6-4b87-4162-b240-a5c19829f889}</Project>
       <Name>ScheduleAnalysis</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\202007262320253_deletionTIme.resx">
+      <DependentUpon>202007262320253_deletionTIme.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

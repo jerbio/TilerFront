@@ -63,7 +63,7 @@ namespace TilerFront
             };
         }
 
-        public LogControl(TilerUser user, ApplicationDbContext database, DB_UserActivity useractivity = null)
+        public LogControl(TilerUser user, ApplicationDbContext database, DB_UserActivity useractivity = null):this()
         {
             LogStatus = false;
             CachedLocation = new Dictionary<string, TilerElements.Location>();
@@ -1166,7 +1166,7 @@ namespace TilerFront
         {
             _Context.CalEvents.Where(calEvent => calEvent.CreatorId == _TilerUser.Id)
                 .ForEachAsync(calEvent => {
-                    calEvent.Disable(false);
+                    calEvent.Disable(this.Now, false);
                 });
         }
 #endregion
@@ -1638,7 +1638,7 @@ namespace TilerFront
             }
         }
 
-        async public virtual Task<IEnumerable<SubCalendarEvent>> getAllSubCalendarEvents(TimeLine RangeOfLookUP, ReferenceNow Now, bool includeOtherEntities = false, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation) {
+        public virtual IQueryable<SubCalendarEvent> getAllSubCalendarEvents(TimeLine RangeOfLookUP, ReferenceNow Now, bool includeOtherEntities = false, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation) {
 #if liveDebugging
             includeOtherEntities = true;
 #else
@@ -1658,16 +1658,16 @@ namespace TilerFront
                         && subEvent.ParentCalendarEvent.IsEnabled_DB
                         && !subEvent.ParentCalendarEvent.Complete_EventDB
                         && subEvent.ParentCalendarEvent.StartTime_EventDB < RangeOfLookUP.End
-                        && subEvent.ParentCalendarEvent.EndTime_EventDB > RangeOfLookUP.Start);
+                        && subEvent.ParentCalendarEvent.EndTime_EventDB > RangeOfLookUP.Start
+                        && subEvent.CreatorId == this._TilerUser.Id
+                        );
             allSubCalQuery = allSubCalQuery
                 .Include(subEvent => subEvent.ParentCalendarEvent)
-                .Include(subEvent => subEvent.ParentCalendarEvent.AllSubEvents_DB)
                 .Include(subEvent => subEvent.RepeatParentEvent)
-                .Include(subEvent => subEvent.ParentCalendarEvent.TimeLineHistory_DB)
                 ;
 
-            List<SubCalendarEvent> retValue = await allSubCalQuery.ToListAsync().ConfigureAwait(false);
-            return retValue;
+            //List<SubCalendarEvent> retValue = await allSubCalQuery.ToListAsync().ConfigureAwait(false);
+            return allSubCalQuery;
         }
 
 
