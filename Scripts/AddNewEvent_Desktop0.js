@@ -801,19 +801,6 @@ function generateAddEventContainer(x,y,height,Container,refStartTime)
     $(NewEventcontainer.Dom).click(function (event) {//stops clicking of add event from propagating
         event.stopPropagation();
     });
-    /*
-    function removePanel(e)
-    {
-        //if (e.keyCode == 27)
-        {
-            getRefreshedData();
-            CloseEventAddition();
-            
-        }
-        e.stopPropagation();
-    }
-    */
-    
 
     function CloseEventAddition()
     {
@@ -827,13 +814,7 @@ function generateAddEventContainer(x,y,height,Container,refStartTime)
         getRefreshedData.enableDataRefresh();
         ActivateUserSearch.setSearchAsOn();
     }
-    //$(document).keyup(removePanel);
 
-    
-
-    //myClickManager.AddNewElement(NewEventcontainer.Dom);
-    //NewEventcontainer.Dom.style.left = x+"px";
-    //NewEventcontainer.Dom.style.top = y + "px";
     Container.appendChild(NewEventcontainer.Dom);
     var NameDom = generateNameContainer();
     var LocationDom = generateLocationContainer();

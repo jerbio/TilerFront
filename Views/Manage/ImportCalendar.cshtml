@@ -1,56 +1,112 @@
-﻿@model IEnumerable<TilerFront.Models.ThirdPartyAuthenticationForView>
+﻿@using TilerFront.Models
+@using System.Configuration;
+@model dynamic
+
+
+@*@model IEnumerable<TilerFront.Models.ThirdPartyAuthenticationForView>
+    @using Microsoft.AspNet.Identity
+    @User TilerElements.TilerUser*@
 
 @{
     ViewBag.Title = "Index";
+    String apiKey = ConfigurationManager.AppSettings["googleMapsApiKey"];
+}
+<script src="https://maps.googleapis.com/maps/api/js?key=@apiKey&signed_in=true&libraries=places"></script>
+<h2>Index</h2>
+@if (Request.IsAuthenticated)
+{
+    <script>
+    debugger
+    function RetrieveUserCredentials()
+    {
+        var retValue = { UserName: "@Model.user.UserName", ID: "@Model.user.Id", Name: "@Model.user.FullName" };
+        retValue.Name=retValue.Name.split(" ")[0]
+        UserCredentials = retValue;
+        return retValue;
+    }
+    RetrieveUserCredentials();
+    </script>
 }
 
-<h2>Index</h2>
 
-    
-    <div>
-        <div>@Html.ActionLink("Add Google Calendar", "ImportGoogle", "Manage")</div>
-    </div>
-    <table class="table">
-        <tr>
-        
-            <th>
-                @Html.DisplayNameFor(model => model.Email)
+<div>
+    <div>@Html.ActionLink("Add Google Calendar", "ImportGoogle", "Manage")</div>
+</div>
+<table class="table">
+    <tr>
+
+            @*<th>
+                @Html.DisplayNameFor(model => ((ThirdPartyAuthenticationForView)(model.thirdpartyCalendars)).Email)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.ProviderName)
+                @Html.DisplayNameFor(model => ((ThirdPartyAuthenticationForView)(model.thirdpartyCalendars)).ProviderName)
             </th>
-            <th></th>
+            <th></th>*@
         </tr>
 
-    @foreach (var item in Model) {
+    @foreach (ThirdPartyAuthenticationForView item in Model.thirdpartyCalendars)
+    {
         <tr>
-        @using (Html.BeginForm("deleteGoogleAccount", "Manage", FormMethod.Post))
-        {
-            @Html.AntiForgeryToken();
-            <td>
-                @Html.DisplayFor(modelItem => item.Email)
-                @Html.TextBoxFor(modelItem => item.Email, new { @Name = "Email", @class = "form-control", @style = "display:none;" })
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ProviderName)
-                @Html.TextBoxFor(modelItem => item.ProviderName, new { @Name = "ProviderName", @class = "form-control", @style = "display:none;" })
-            </td>
-            <td>
-                @Html.TextBoxFor(modelItem => item.ID, new { @Name = "ID",  @class = "form-control", @style = "display:none;", @id = "TimeZoneData" })
-            </td>
+            @using (Html.BeginForm("deleteGoogleAccount", "Manage", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken();
+                <td>
+                    @Html.DisplayFor(modelItem => item.Email)
+                    @Html.TextBoxFor(modelItem => item.Email, new { @Name = "Email", @class = "form-control", @style = "display:none;" })
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ProviderName)
+                    @Html.TextBoxFor(modelItem => item.ProviderName, new { @Name = "ProviderName", @class = "form-control", @style = "display:none;" })
+                </td>
+                <td>
+                    @Html.TextBoxFor(modelItem => item.ID, new { @Name = "ID", @class = "form-control", @style = "display:none;", @id = "TimeZoneData" })
+                </td>
 
-            <td>
-                <input type="submit" value="Delete" class="btn btn-default" />
-            </td>
-            
-        }
-            <!--
-            <td>
-                @*Html.ActionLink("Edit", "Edit", new { id=item.ID }) |
-                @Html.ActionLink("Details", "Details", new { id=item.ID }) |
-                @Html.ActionLink("Delete", "Delete", new { id=item.ID })*@
-            </td>-->
+                if (!String.IsNullOrEmpty(item.DefaultLocationId))
+                {
+                    <td>
+                        @Html.DisplayFor(modelItem => item.DefaultLocation)
+                        @Html.TextBoxFor(modelItem => item.DefaultLocation.Address, new { @Name = "ID", @class = "form-control", @style = "display:none;", @id = "TimeZoneData" })
+                    </td>
+                }
+                else
+                {
+                    <td>
+                        <input class="thirdPartyDefaultLocation"></input>
+                    </td>
+                }
+
+
+                <td>
+                    <input type="submit" value="Delete" class="btn btn-default" />
+                </td>
+
+            }
         </tr>
     }
-    </table>
+</table>
+
+<script>
+    debugger
+
+    let LocationContainer = getDomOrCreateNew("ThirdPartyLocationContainer");
+    let LocationInputContainer = document.querySelectorAll('.thirdPartyDefaultLocation')[0]
+    LocationInputContainer.parentNode.appendChild(LocationContainer.Dom)
+    LocationContainer.Dom.appendChild(LocationInputContainer)
+    LocationInputContainer.setAttribute("autocomplete", "off");
+    let processAutoComplete = LocationSearchCallBack(null, LocationInputContainer);
+    function onKeyPress(e, LocationInputContainer) {
+        processAutoComplete(e);
+    }
+
+    LocationInputContainer.addEventListener("keydown", onKeyPress);
+
+    var NickLocationInputContainer = getDomOrCreateNew("NickLocationInput", "input");
+    LocationContainer.Dom.appendChild(LocationInputContainer);
+    LocationInputContainer.setAttribute("placeholder", "Address?");
+    // LocationContainer.Dom.appendChild(NickLocationInputContainer.Dom);
+    //  NickLocationInputContainer.Dom.setAttribute("placeholder", "Nick Name");
+    LocationContainer.Selector = { Container: LocationContainer, NickName: NickLocationInputContainer, Address: LocationInputContainer };
+            //return LocationContainer;
+</script>
 

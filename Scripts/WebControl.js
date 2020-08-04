@@ -3351,7 +3351,8 @@ function isUndefinedOrNull(data) {
        function positionSearchResultContainer()
        {
            var InputBox = LocationAutoSuggestControl.getInputBox();
-           var Position = $(InputBox.Dom).position();
+           InputBox = InputBox || InputBox.Dom
+           var Position = $(InputBox).position();
            var Left = 50;// Position.left;
            var Top = Position.top;
            var height = $(InputBox.Dom).height();

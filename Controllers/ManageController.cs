@@ -32,6 +32,7 @@ using Google.Apis.Auth.OAuth2;
 using Google.Apis.Util.Store;
 
 using TilerElements;
+using System.Dynamic;
 
 namespace TilerFront.Controllers
 {
@@ -328,7 +329,11 @@ namespace TilerFront.Controllers
         public async Task<ActionResult> ImportCalendar()
         {
             string userID = User.Identity.GetUserId();
-            return View((await dbContext.ThirdPartyAuthentication.Where(obj => userID == obj.TilerID).ToListAsync()).Select(obj => obj.getThirdPartyOut()));
+            TilerUser myUser = UserManager.FindById(User.Identity.GetUserId());
+            dynamic model = new ExpandoObject();
+            model.thirdpartyCalendars = (await dbContext.ThirdPartyAuthentication.Where(obj => userID == obj.TilerID).ToListAsync()).Select(obj => obj.getThirdPartyOut());
+            model.user = myUser;
+            return View(model);
         }
 
         async public Task<List<ThirdPartyCalendarAuthenticationModel>> getAllThirdPartyAuthentication()

@@ -42,13 +42,16 @@ namespace TilerFront.Models
         }
         public DateTimeOffset Deadline { get; set; }
 
+        public string DefaultLocationId { get; set; }
+        [ForeignKey("DefaultLocationId")]
+        public TilerElements.Location DefaultLocation { get; set; }
         /// <summary>
         /// Converts "this" object to "ThirdPartyAuthenticationForView" object. This is to be used to generate the more secure information on the user for the management of third party accounts on the front end
         /// </summary>
         /// <returns></returns>
         public ThirdPartyAuthenticationForView getThirdPartyOut()
         {
-            ThirdPartyAuthenticationForView RetValue = new ThirdPartyAuthenticationForView() { Email = this.Email, ProviderName =this.ProviderID, ID=this.ID };
+            ThirdPartyAuthenticationForView RetValue = new ThirdPartyAuthenticationForView() { Email = this.Email, ProviderName =this.ProviderID, ID=this.ID, DefaultLocation=this.DefaultLocation };
             return RetValue;
         }
 

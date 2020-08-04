@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNet.Identity;
 using Microsoft.Owin.Security;
+using TilerElements;
 
 namespace TilerFront.Models
 {
@@ -26,6 +28,10 @@ namespace TilerFront.Models
 
         [Display(Name = "CalendarID")]
         public string ID { get; set; }
+        public string DefaultLocationId { get; set; }
+        [Display(Name = "Default Location")]
+        [ForeignKey("DefaultLocationId")]
+        public Location DefaultLocation { get; set; }
     }
 
     public class ManageLoginsViewModel
