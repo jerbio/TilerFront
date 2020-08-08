@@ -15,6 +15,7 @@ using TilerFront.Models;
 
 namespace TilerFront.Controllers
 {
+    [System.Web.Http.Authorize]
     public class WhatIfController : TilerApiController
     {
         [System.Web.Http.HttpPost]

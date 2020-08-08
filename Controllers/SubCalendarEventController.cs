@@ -17,6 +17,7 @@ using Newtonsoft.Json.Linq;
 
 namespace TilerFront.Controllers
 {
+    [Authorize]
     public class SubCalendarEventController : TilerApiController
     {
         [HttpPost]
@@ -88,13 +89,14 @@ namespace TilerFront.Controllers
                                 DB_UserActivity activity = new DB_UserActivity(myNow, UserActivity.ActivityType.InternalUpdate, new List<String>() { myUser.EventID });
                                 retrievedUser.ScheduleLogControl.updateUserActivty(activity);
                                 await schedule.persistToDB().ConfigureAwait(false);
-                                EventID eventId = new EventID(myUser.EventID);
-                                CalendarEvent calendarEvent = await retrievedUser.ScheduleLogControl.getCalendarEventWithID(eventId).ConfigureAwait(false);
-                                SubCalendarEvent subEvent = calendarEvent.ActiveSubEvents.FirstOrDefault();
-                                SubCalEvent subCalEvent = subEvent.ToSubCalEvent(calendarEvent);
-                                JObject retSubEvent = new JObject();
-                                retSubEvent.Add("subEvent", JObject.FromObject(subCalEvent));
-                                retValue = new PostBackData(retSubEvent, 0);
+                                //EventID eventId = new EventID(myUser.EventID);
+                                //CalendarEvent calendarEvent = schedule.getCalendarEvent(eventId);
+                                //SubCalendarEvent subEvent = calendarEvent.ActiveSubEvents.FirstOrDefault();
+                                //SubCalEvent subCalEvent = subEvent.ToSubCalEvent(calendarEvent);
+                                //JObject retSubEvent = new JObject();
+                                //retSubEvent.Add("subEvent", JObject.FromObject(subCalEvent));
+                                //retValue = new PostBackData(retSubEvent, 0);
+                                retValue = new PostBackData();
                             } else
                             {
                                 CustomErrors error = new CustomErrors(CustomErrors.Errors.TilerConfig_Zero_SplitCount);
@@ -145,35 +147,18 @@ namespace TilerFront.Controllers
                         break;
                     case "tiler":
                         {
-                            SubCalendarEvent subEvent = await retrievedUser.ScheduleLogControl.getSubEventWithID(UserData.EventID, false, false).ConfigureAwait(false);
-                            if (subEvent != null)
-                            {
-                                if (subEvent.IsDateTimeWithin(refNow))
-                                {
-                                    HashSet<string> calendarIds = new HashSet<string>() { UserData.EventID };
-                                    Task<Tuple<ThirdPartyControl.CalendarTool, IEnumerable<CalendarEvent>>> thirdPartyDataTask = ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(retrievedUser.UserID, db);
-                                    DB_Schedule schedule = new DB_Schedule(retrievedUser, refNow, true, calendarIds: calendarIds);
-                                    schedule.CurrentLocation = UserData.getCurrentLocation();
-                                    var thirdPartyData = await thirdPartyDataTask.ConfigureAwait(false);
-                                    schedule.updateDataSetWithThirdPartyData(thirdPartyData);
-                                    activity.eventIds.Add(UserData.EventID);
-                                    retrievedUser.ScheduleLogControl.updateUserActivty(activity);
-                                    schedule.RepeatEvent(UserData.EventID, schedule.CurrentLocation);
-                                    await schedule.WriteFullScheduleToLog().ConfigureAwait(false);
-                                    retValue = new PostBackData("\"Success\"", 0);
-                                }
-                                else
-                                {
-                                    retValue = new PostBackData(new CustomErrors(CustomErrors.Errors.Repeated_Tile_Is_Not_Current_Tile));
-                                    return Ok(retValue.getPostBack);
-                                }
-
-                            }
-                            else
-                            {
-                                retValue = new PostBackData(new CustomErrors(CustomErrors.Errors.Tile_Or_Event_ID_Cannot_Be_Found));
-                                return Ok(retValue.getPostBack);
-                            }
+                            
+                            HashSet<string> calendarIds = new HashSet<string>() { UserData.EventID };
+                            Task<Tuple<ThirdPartyControl.CalendarTool, IEnumerable<CalendarEvent>>> thirdPartyDataTask = ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(retrievedUser.UserID, db);
+                            DB_Schedule schedule = new DB_Schedule(retrievedUser, refNow, true, calendarIds: calendarIds);
+                            schedule.CurrentLocation = UserData.getCurrentLocation();
+                            var thirdPartyData = await thirdPartyDataTask.ConfigureAwait(false);
+                            schedule.updateDataSetWithThirdPartyData(thirdPartyData);
+                            activity.eventIds.Add(UserData.EventID);
+                            retrievedUser.ScheduleLogControl.updateUserActivty(activity);
+                            schedule.RepeatEvent(UserData.EventID, schedule.CurrentLocation);
+                            await schedule.WriteFullScheduleToLog().ConfigureAwait(false);
+                            retValue = new PostBackData("\"Success\"", 0);
 
                         }
                         break;

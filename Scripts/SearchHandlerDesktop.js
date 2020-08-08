@@ -236,7 +236,7 @@ function CallBackFunctionForReturnedValuesDesktop(data, DomContainer) {
         $(MyIconSet.getCloseButton()).addClass("setAsDisplayNone");
         MyIconSet.hideLocationButton();
         MyIconSet.hideProcrastinateButton();
-        MyIconSet.HidePausePauseResumeButton();
+        MyIconSet.hidePausePauseResumeButton();
         MyIconSet.hideRepeatButton();
         MyIconSet.hideNowButton();
         
@@ -432,7 +432,7 @@ function CallBackFunctionForReturnedValuesDesktop(data, DomContainer) {
                 // will be treated as a single string
             }).done(function (data) {
                 ActivateUserSearch.ClearSearch();
-                sendPostScheduleEditAnalysisUpdate({});
+                sendPostScheduleEditAnalysisUpdate({CallBackSuccess: getRefreshedData});;
             });
         }
     }

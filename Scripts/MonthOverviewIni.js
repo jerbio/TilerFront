@@ -471,7 +471,7 @@ function RenderListTimeInformation(DayOfWeek, ID, isNext)
 
     let isCurrentDayOfWeek = now < DayOfWeek.End.getTime() && now >= DayOfWeek.Start.getTime();
     if(isCurrentDayOfWeek) {
-        let isCurrentSubEvent = now < RefSubEvent.SubCalEndDate.getTime() && now >= RefSubEvent.SubCalStartDate.getTime();
+        let isCurrentSubEvent = now < RefSubEvent.SubCalEndDate.getTime() && now >= RefSubEvent.SubCalStartDate.getTime() && !RefSubEvent.isAllDay;
         if(isCurrentSubEvent) {
             global_UISetup.currentSubEvent = RefSubEvent;
             renderNowUi(RefSubEvent);
@@ -650,14 +650,14 @@ function RevealControlPanelSection(SelectedEvents)
     var MultiSelectPanel = getDomOrCreateNew("MultiSelectPanel")
     var ControlPanelContainer = getDomOrCreateNew("ControlPanelContainer");
     var IconSetContainer = RevealControlPanelSection.IconSet.getIconSetContainer();
-    var PauseResumeButton = RevealControlPanelSection.IconSet.getPauseResumeButton();
-    $(PauseResumeButton).addClass("setAsDisplayNone")
     $(ControlPanelContainer).addClass("ControlPanelContainerLowerBar");
     if (Object.keys(SelectedEvents).length < 1) {
         $(MultiSelectPanel).addClass("hideMultiSelectPanel");
         global_ExitManager.triggerLastExitAndPop();
         return;
     }
+    RevealControlPanelSection.IconSet.hideNowButton()
+    RevealControlPanelSection.IconSet.hidePausePauseResumeButton()
 
     ControlPanelContainer.style.left = "auto";
     ControlPanelContainer.style.top = "auto";
@@ -816,7 +816,7 @@ function RevealControlPanelSection(SelectedEvents)
             }).done(function (data) {
                 HandleNEwPage.Hide();
                 triggerUIUPdate();//hack alert
-                sendPostScheduleEditAnalysisUpdate({});
+                sendPostScheduleEditAnalysisUpdate({CallBackSuccess: getRefreshedData});;
             });
         }
         function triggerUIUPdate() {
@@ -873,7 +873,7 @@ function RevealControlPanelSection(SelectedEvents)
                 HandleNEwPage.Hide();
                 //triggerUIUPdate();//hack alert
                 global_ExitManager.triggerLastExitAndPop();
-                sendPostScheduleEditAnalysisUpdate({});
+                sendPostScheduleEditAnalysisUpdate({CallBackSuccess: getRefreshedData});;
             }
 
 
@@ -978,15 +978,18 @@ function IconSet()
 
     var PauseResumeIconID = "ControlPanelResumePauseButton" + myID;
     var PauseResumeIcon = getDomOrCreateNew(PauseResumeIconID);
+    PauseResumeIcon.setAttribute("Title", "Pause/Resume this tile");
     $(PauseResumeIcon).addClass("ControlPanelButton");
 
     var RepeatIconID = "ControlPanelRepeatButton" + myID;
     var RepeatIcon = getDomOrCreateNew(RepeatIconID);
+    RepeatIcon.setAttribute("Title", "Repeat right after this event");
     $(RepeatIcon).addClass("ControlPanelButton");
     $(RepeatIcon).addClass("ControlPanelRepeatButton");
 
     let NowIconId = "ControlPanelNowButton" + myID;
     let NowIcon =  getDomOrCreateNew(NowIconId);
+    NowIcon.setAttribute("Title", "Do this now");
     $(NowIcon).addClass("ControlPanelButton");
     $(NowIcon).addClass("ControlPanelNowButton");
 
@@ -1068,12 +1071,12 @@ function IconSet()
         $(RepeatIcon).removeClass("setAsDisplayNone");
     }
 
-    this.HidePausePauseResumeButton = function () 
+    this.hidePausePauseResumeButton = function () 
     {
         $(PauseResumeIcon).addClass("setAsDisplayNone");
     }
 
-    this.ShowPausePauseResumeButton = function () {
+    this.showPausePauseResumeButton = function () {
         $(PauseResumeIcon).removeClass("setAsDisplayNone");
     }
 
@@ -1769,7 +1772,7 @@ function initializeWebSockets() {
 }
 
 
-function getRefreshedData(CallBackAfterRefresh)//RangeData)
+function getRefreshedData(CallBackAfterRefresh)
 {
     //setTimeout(refreshIframe,200);
     
@@ -2220,8 +2223,8 @@ getRefreshedData.pauseUnEnroll = function (Id) {
             $(ListElementContainer.Dom).addClass(nextSubEventClassName);
             let timeSpanInMs = nextSubEvent.SubCalStartDate.getTime() - Date.now()
             setTimeout(() => {
-                renderNowUi(nextSubEvent)
                 $(ListElementContainer.Dom).removeClass(nextSubEventClassName);
+                getRefreshedData()
             }, timeSpanInMs)
         }
     }
@@ -3821,6 +3824,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                     global_ControlPanelIconSet.hideProcrastinateButton();
                     global_ControlPanelIconSet.hideCompleteButton();
                     global_ControlPanelIconSet.hideDeleteButton();
+                    global_ControlPanelIconSet.hideNowButton();
                 }
 
                 if (!SubEvent.SubCalRigid) {
@@ -3997,7 +4001,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                         }
 
                         let isValid = true;
-                        isValid = isValid && subEventPost.Split > 0;
+                        isValid = isValid && ((currentSubevent.Split == subEventPost.Split) || (subEventPost.Split > 0));
 
                         subEventPost.Split > 0
 
@@ -4165,7 +4169,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                         }).done(function (data) {
                             HandleNEwPage.Hide();
                             triggerUIUPdate();//hack alert
-                            sendPostScheduleEditAnalysisUpdate({});
+                            sendPostScheduleEditAnalysisUpdate({CallBackSuccess: getRefreshedData});;
                         });
                     }
                     function triggerUIUPdate() {
@@ -4225,7 +4229,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                         }).done(function (data) {
                             HandleNEwPage.Hide();
                             triggerUIUPdate();//hack alert
-                            sendPostScheduleEditAnalysisUpdate({});
+                            sendPostScheduleEditAnalysisUpdate({CallBackSuccess: getRefreshedData});;
                         });
                     }
                     function triggerUIUPdate() {
@@ -4303,7 +4307,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                         }).done(function (data) {
                             HandleNEwPage.Hide();
                             triggerUIUPdate();//hack alert
-                            sendPostScheduleEditAnalysisUpdate({});
+                            sendPostScheduleEditAnalysisUpdate({CallBackSuccess: getRefreshedData});;
                         });
                 }
                     function triggerUIUPdate() {
@@ -4368,7 +4372,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                     }).done(function (data) {
                         HandleNEwPage.Hide();
                         triggerUIUPdate();//hack alert
-                        sendPostScheduleEditAnalysisUpdate({});
+                        sendPostScheduleEditAnalysisUpdate({CallBackSuccess: getRefreshedData});;
                     });
 
                     function triggerUIUPdate() {
@@ -4649,7 +4653,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                             debugger;
                             HandleNEwPage.Hide();
                             triggerUIUPdate();//hack alert
-                            sendPostScheduleEditAnalysisUpdate({});
+                            sendPostScheduleEditAnalysisUpdate({CallBackSuccess: getRefreshedData});;
                         });
                     }
                         function triggerUIUPdate() {
@@ -4719,7 +4723,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                     }).done(function (data) {
                         debugger;
                         triggerUIUPdate();//hack alert
-                        sendPostScheduleEditAnalysisUpdate({});
+                        sendPostScheduleEditAnalysisUpdate({CallBackSuccess: getRefreshedData});;
                     });
 
                     function triggerUIUPdate() {
@@ -4754,7 +4758,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                     global_ControlPanelIconSet.switchToResumeButton();
                     PauseResumeButton.onclick = continueEvent;
                     $(ControlPanelCloseButton).addClass("setAsDisplayNone");
-                    global_ControlPanelIconSet.ShowPausePauseResumeButton();
+                    global_ControlPanelIconSet.showPausePauseResumeButton();
                 }
                 else {
                     global_ControlPanelIconSet.switchToPauseButton();
@@ -4762,11 +4766,11 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                     $(ControlPanelCloseButton).addClass("setAsDisplayNone");
                     if((SubEvent.isPauseAble)&&(!global_eventIsPaused)) 
                     {
-                        global_ControlPanelIconSet.ShowPausePauseResumeButton();
+                        global_ControlPanelIconSet.showPausePauseResumeButton();
                     }
                     else
                     {
-                        global_ControlPanelIconSet.HidePausePauseResumeButton();
+                        global_ControlPanelIconSet.hidePausePauseResumeButton();
                     }
                 }
 
@@ -4923,19 +4927,19 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                     var splitAndNoteContainer = getDomOrCreateNew("SplitCountAndNoteContainer");
                     var ContainerForExtraOptions = getDomOrCreateNew("ExtraOptionsContainer")
                     ContainerForExtraOptions.appendChild(splitAndNoteContainer)
+                    let splitInputBox = getDomOrCreateNew("InputSplitCount", "input");
+                    let splitInputBoxContainer = getDomOrCreateNew("InputSplitCountContainer");
+                    var splitInputBoxLabel = getDomOrCreateNew("splitInputBoxLabel", "label");
+                    splitInputBoxLabel.innerHTML = "Splits"
 
                     if (!SubEvent.isThirdParty) {
                         $(ContainerForExtraOptions.Dom).removeClass("setAsDisplayNone");
                         $(splitAndNoteContainer).addClass("SubEventInformationContainer");
-                        var splitInputBox = getDomOrCreateNew("InputSplitCount", "input");
-                        var splitInputBoxContainer = getDomOrCreateNew("InputSplitCountContainer");
                         if (!Dictionary_OfCalendarData[SubEvent.CalendarID].Rigid) {
                             splitInputBox.oninput = EditContainerData.RevealContainer;
                             splitInputBox.setAttribute("type", "Number");
                             splitInputBox.onkeydown = stopPropagationOfKeyDown;
                             splitInputBox.value = Dictionary_OfCalendarData[SubEvent.CalendarID].TotalNumberOfEvents;
-                            var splitInputBoxLabel = getDomOrCreateNew("splitInputBoxLabel", "label");
-                            splitInputBoxLabel.innerHTML = "Splits"
 
                             splitInputBoxContainer.appendChild(splitInputBoxLabel);
                             splitInputBoxContainer.appendChild(splitInputBox);
@@ -4955,12 +4959,14 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                             $(CompletionMap.Dom).addClass("setAsDisplayNone");
                         }
 
-
-                        let renderNoteResult = renderNotesUIData(null)
-
-
+                        let renderNoteResult = renderNotesUIData(null);
                         splitAndNoteContainer.appendChild(renderNoteResult.button)
                     } else {
+                        splitInputBox.Dom.value = 1;
+                        splitInputBoxContainer.appendChild(splitInputBoxLabel);
+                        splitInputBoxContainer.appendChild(splitInputBox);
+                        splitAndNoteContainer.appendChild(splitInputBoxContainer);
+                        $(splitInputBoxContainer.Dom).addClass("setAsDisplayNone");
                         $(ContainerForExtraOptions.Dom).addClass("setAsDisplayNone");
                     }
                     return ContainerForExtraOptions;
@@ -4970,8 +4976,9 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                 function handleSuggestedDeadline() {
                     let suggestedDedalineContainerId = "suggested-deadline-container"
                     let suggestedDedalineContainerDom = getDomOrCreateNew(suggestedDedalineContainerId);
-                    if (SubEvent.SuggestedDeadline && SubEvent.SuggestedDeadline > 0) {
-                        let suggestedTime = new Date(SubEvent.SuggestedDeadline)
+                    let suggestedDeadline = SubEvent.SuggestedDeadline || SubEvent.LastSuggestedDeadline
+                    if ( suggestedDeadline && suggestedDeadline > 0) {
+                        let suggestedTime = new Date(suggestedDeadline)
                         let onSuggestionClick = () => {
                             CalEndTime.value = moment(suggestedTime, "MM-DD-YYYY").format("hh:mma");
                             CalEventEndDateBinder.datepicker("setDate", suggestedTime);
@@ -5041,7 +5048,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                         HandleNEwPage.Hide();
                         //triggerUIUPdate();//hack alert
                         global_ExitManager.triggerLastExitAndPop();
-                        sendPostScheduleEditAnalysisUpdate({});
+                        sendPostScheduleEditAnalysisUpdate({CallBackSuccess: getRefreshedData});;
                     }
                     $.ajax({
                         type: "POST",
@@ -5624,7 +5631,7 @@ function GlobaPauseResumeButtonManager(events) {
             }).done(function (data) {
                 HandleNEwPage.Hide();
                 triggerUIUPdate();//hack alert
-                sendPostScheduleEditAnalysisUpdate({});
+                sendPostScheduleEditAnalysisUpdate({CallBackSuccess: getRefreshedData});;
             });
         }
         function triggerUIUPdate() {
@@ -5679,7 +5686,7 @@ function GlobaPauseResumeButtonManager(events) {
             }).done(function (data) {
                 HandleNEwPage.Hide();
                 triggerUIUPdate();//hack alert
-                sendPostScheduleEditAnalysisUpdate({});
+                sendPostScheduleEditAnalysisUpdate({CallBackSuccess: getRefreshedData});;
             });
         }
         function triggerUIUPdate() {

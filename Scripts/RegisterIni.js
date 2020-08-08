@@ -361,15 +361,18 @@ function SignInUser(UserName,Password)
         //dataType: "json",
         success: function (response) {
             debugger;
-            var myContainer = response
-            //myContainer= JSON.parse(myContainer);
-            if (myContainer.Error.code === "0") {
-                LaunchLoggedUser(myContainer.Error.Message);
-            }
-            else {
-                showRegistrationError(myContainer.Error.Message);
-                setTimeout(hideRegistrationError, 6000);
-            }
+            let tokenPromise = configureAuthorizationToken(UserName, Password);
+            tokenPromise.then((tokenResponse) => {
+                let myContainer = response
+                if (myContainer.Error.code === "0") {
+                    LaunchLoggedUser(myContainer.Error.Message);
+                }
+                else {
+                    showRegistrationError(myContainer.Error.Message);
+                    setTimeout(hideRegistrationError, 6000);
+                }
+            })
+            
         },
         error: function (err) {
             //debugger;
@@ -433,14 +436,17 @@ function RegisterUser(FullName, UserName, Password,PassWordConfirmation, Email)
         data: RegistrationCredentials,
         success: function (response) {
             var myContainer = response
-            //myContainer= JSON.parse(myContainer);
-            if (myContainer.Error.code === "0") {
-                LaunchLoggedUser(myContainer.Error.Message);
-            }
-            else {
-                showRegistrationError(myContainer.Error.Message);
-                setTimeout(hideRegistrationError, 6000);
-            }
+            let tokenPromise = configureAuthorizationToken(UserName, Password);
+            tokenPromise.then((tokenResponse) => {
+                let myContainer = response
+                if (myContainer.Error.code === "0") {
+                    LaunchLoggedUser(myContainer.Error.Message);
+                }
+                else {
+                    showRegistrationError(myContainer.Error.Message);
+                    setTimeout(hideRegistrationError, 6000);
+                }
+            })
         },
         error: function (err) {
             alert(err);

@@ -20,6 +20,7 @@ using DBTilerElement;
 
 namespace TilerFront.Controllers
 {
+    [Authorize]
     //[EnableCors(origins: "*", headers: "accept, authorization, origin", methods: "DELETE,PUT,POST,GET")]
     public class UserController : TilerApiController
     {

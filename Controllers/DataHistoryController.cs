@@ -14,6 +14,7 @@ using TilerFront.Models;
 
 namespace TilerFront.Controllers
 {
+    [Authorize]
     public class DataHistoryController : TilerApiController
     {
         // GET: DataHistory

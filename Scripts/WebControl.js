@@ -108,8 +108,7 @@ function GetCookieValue()//verifies that user has cookies
     }
     if (CookieValue == "")
     {
-        if (Debug)
-            {
+        if (Debug) {
         ///*
             CookieValue = { UserName: "jerbio", UserID: "d350ba4d-fe0b-445c-bed6-b6411c2156b3",FullName:"Jerome" }
         //*/
@@ -124,7 +123,11 @@ function GetCookieValue()//verifies that user has cookies
     return CookieValue;
 }
 
-
+function getBearerToken() {
+    let localStorage = window.localStorage;
+    let retValue = localStorage.getItem('bearerAccessToken');
+    return retValue;
+}
 
 
 
@@ -237,10 +240,7 @@ function triggerUndoPanel(UndoMessage)
                     hideUndoPanel();
                 }
             }
-
-
         }
-
     }
 
     
@@ -268,6 +268,38 @@ function triggerUndoPanel(UndoMessage)
     }
 }
 
+
+function configureAuthorizationToken(userName, password) {
+    let url = window.location.origin + "/account/token";
+    let LoginCredentials = {username: userName, password: password, "grant_type":'password'};
+    let retValue = $.ajax({
+        type: "POST",
+        url: url,
+        data: LoginCredentials,
+        // DO NOT SET CONTENT TYPE to json
+        // contentType: "application/json; charset=utf-8", 
+        // DataType needs to stay, otherwise the response object
+        // will be treated as a single string
+        //dataType: "json",
+        success: function (response) {
+            debugger;
+            let now = Date.now();
+            let tokenLifeSpan = response['expires_in'];
+            let tokenLifeSpanInMs = tokenLifeSpan * 1000
+            let expiryTime = now + tokenLifeSpanInMs;
+            let localStorage = window.localStorage;
+            localStorage.setItem('bearerAccessToken', response['access_token']);
+            localStorage.setItem('bearerExpiryDate', expiryTime);
+            localStorage.setItem('bearerTokenType', response['token_type']);
+        },
+        error: function (err) {
+            showRegistrationError(err);
+            setTimeout(hideRegistrationError, 6000);
+        }
+    })
+
+    return retValue
+}
 
 function updateSleepTimeline(sleepTimeline) {
     if(sleepTimeline) {
@@ -484,7 +516,7 @@ function sendUndoRequest(CallBack)
     var HandleNEwPage = new LoadingScreenControl("Tiler is Undoing :)");
     preSendRequestWithLocation(UndoData);
     HandleNEwPage.Launch();
-    var ProcrastinateRequest = $.ajax({
+    let undoRequest = $.ajax({
         type: "POST",
         url: URL,
         data: UndoData,
@@ -1025,7 +1057,7 @@ function sendPostScheduleEditAnalysisUpdate({CallBackSuccess, CallBackFailure, C
     let url = global_refTIlerUrl + "Analysis/Analyze";
     preSendRequestWithLocation(postData);
 
-    var ProcrastinateRequest= $.ajax({
+    let scheduleAnalysisRequest= $.ajax({
         type: "POST",
         url: url,
         data: postData,
@@ -1034,9 +1066,20 @@ function sendPostScheduleEditAnalysisUpdate({CallBackSuccess, CallBackFailure, C
         error: CallBackFailure
     })
     
-    if (CallBackDone != undefined) {
-        ProcrastinateRequest.done(CallBackDone);
-    }
+    scheduleAnalysisRequest.done((response) => {
+        // if (isFunction(getRefreshedData)) {
+        //     getRefreshedData()
+        // }
+
+        // if (isFunction(RefreshSubEventsMainDivSubEVents)) {
+        //     RefreshSubEventsMainDivSubEVents()
+        // }
+        
+        if (isFunction(CallBackDone)) {
+            CallBackDone(response)
+        }
+    })
+    
 }
 
 function setSubCalendarEventAsNow(SubEventID, CallBackSuccess, CallBackFailure, CallBackDone)
@@ -1058,7 +1101,7 @@ function setSubCalendarEventAsNow(SubEventID, CallBackSuccess, CallBackFailure, 
         if (CallBackDone != undefined) {
             CallBackDone()
         }
-        sendPostScheduleEditAnalysisUpdate({})        
+        sendPostScheduleEditAnalysisUpdate({CallBackSuccess, CallBackFailure})
     });    
 }
 
@@ -1081,7 +1124,7 @@ function SetCalendarEventAsNow(CalendarEventID, CallBackSuccess, CallBackFailure
         if (CallBackDone != undefined) {
             CallBackDone()
         }
-        sendPostScheduleEditAnalysisUpdate({})        
+        sendPostScheduleEditAnalysisUpdate({CallBackSuccess, CallBackFailure})     
     });
 }
 
@@ -1114,7 +1157,7 @@ function deleteSubEvent(SubEventID, CallBackSuccess, CallBackFailure, CallBackDo
         if (isFunction(CallBackDone)) {
             CallBackDone()
         }
-        sendPostScheduleEditAnalysisUpdate({})        
+        sendPostScheduleEditAnalysisUpdate({CallBackSuccess, CallBackFailure})
     });
 }
 
@@ -1146,7 +1189,7 @@ function deleteCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure, 
         if (isFunction(CallBackDone)) {
             CallBackDone()
         }
-        sendPostScheduleEditAnalysisUpdate({})        
+        sendPostScheduleEditAnalysisUpdate({CallBackSuccess, CallBackFailure})
     });
 }
 
@@ -1180,7 +1223,7 @@ function completeCalendarEvent(CalendarEventID, CallBackSuccess, CallBackFailure
         if (isFunction(CallBackDone)) {
             CallBackDone()
         }
-        sendPostScheduleEditAnalysisUpdate({})        
+        sendPostScheduleEditAnalysisUpdate({CallBackSuccess, CallBackFailure})
     });
 }
 
@@ -3407,10 +3450,10 @@ function isUndefinedOrNull(data) {
                }
            }).done(function (data) {
                if(isFunction(CallBack)) {
-                    CallBack()
+                    CallBack(data)
                }
                HandleNEwPage.Hide();
-               sendPostScheduleEditAnalysisUpdate({});
+               sendPostScheduleEditAnalysisUpdate({CallBackDone: CallBack });
            });
        }
    }

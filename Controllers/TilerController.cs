@@ -19,6 +19,7 @@ using System.Data.Entity;
 
 namespace TilerFront
 {
+    [Authorize]
     /// <summary>
     /// Tiler controller that provides custom tiler functionality
     /// </summary>
@@ -86,6 +87,14 @@ namespace TilerFront
             if(waitForDbSave != null)
             {
                 await waitForDbSave;
+            }
+        }
+
+        public DbContext DbContext
+        {
+            get
+            {
+                return dbContext;
             }
         }
 

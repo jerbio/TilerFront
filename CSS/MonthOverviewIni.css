@@ -1025,7 +1025,7 @@ body {
 {
     content:'\2713';
     display:inline-block;
-    color:green;
+    color:black;
     padding:0 6px 0 0;
     position:relative;
 }
@@ -1034,7 +1034,7 @@ body {
 {
   content:'\2713';
   display:inline-block;
-  color:green;
+  color:black;
   padding:0 6px 0 0;
   position:relative;
 }
@@ -1846,7 +1846,7 @@ button#previewProcrastinateAllButton{
   left: 0;
   /* padding-top: 10px; */
   max-height: 100%;
-  background-color: rgba(0, 114, 206,.92);
+  background-color: rgba(0, 114, 206,.99);
   /* height: 0; */
   text-align: center;
   opacity: 0;

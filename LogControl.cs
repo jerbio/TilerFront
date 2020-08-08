@@ -19,7 +19,7 @@ using BigDataTiler;
 using System.Data.Entity.Core.Objects;
 using System.Collections.Concurrent;
 using System.Diagnostics;
-
+using System.Runtime.CompilerServices;
 
 namespace TilerFront
 {
@@ -63,7 +63,7 @@ namespace TilerFront
             };
         }
 
-        public LogControl(TilerUser user, ApplicationDbContext database, DB_UserActivity useractivity = null)
+        public LogControl(TilerUser user, ApplicationDbContext database, DB_UserActivity useractivity = null):this()
         {
             LogStatus = false;
             CachedLocation = new Dictionary<string, TilerElements.Location>();
@@ -907,6 +907,9 @@ namespace TilerFront
             MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.AutoDeletion_ReasonDB.ToString();
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("RepetitionLock"));
             MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.RepetitionLock_DB.ToString();
+            MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("NowLock"));
+            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.NowLock_DB.ToString();
+            
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("isTardy"));
             MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.isTardy.ToString();
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("IniStartTime"));
@@ -1163,7 +1166,7 @@ namespace TilerFront
         {
             _Context.CalEvents.Where(calEvent => calEvent.CreatorId == _TilerUser.Id)
                 .ForEachAsync(calEvent => {
-                    calEvent.Disable(false);
+                    calEvent.Disable(this.Now, false);
                 });
         }
 #endregion
@@ -1603,7 +1606,7 @@ namespace TilerFront
         /// <param name="timeline"></param>
         /// <param name="user"></param>
         /// <returns></returns>
-        public IEnumerable<SubCalendarEvent> getSubCalendarEventForAnalysis(TimeLine timeline, TilerUser user)
+        public Tuple<IEnumerable<SubCalendarEvent>, Analysis> getSubCalendarEventForAnalysis(TimeLine timeline, TilerUser user)
         {
             if (timeline!=null && user!= null)
             {
@@ -1620,7 +1623,8 @@ namespace TilerFront
                     .Include(calEvent => calEvent.AllSubEvents_DB)
                     ;
                 var calEvents = caleventQuery.ToList();
-                HashSet<SubCalendarEvent> retValue = new HashSet<SubCalendarEvent>(calEvents.SelectMany(calEvent => calEvent.AllSubEvents_DB).ToList());
+                Analysis analysis = _Context.Analysis.Find(user.Id);
+                Tuple<IEnumerable<SubCalendarEvent>, Analysis> retValue = new Tuple<IEnumerable<SubCalendarEvent>, Analysis>(new HashSet<SubCalendarEvent>(calEvents.SelectMany(calEvent => calEvent.AllSubEvents_DB).ToList()), analysis);
                 return retValue;
             }
             
@@ -1634,7 +1638,7 @@ namespace TilerFront
             }
         }
 
-        async public virtual Task<IEnumerable<SubCalendarEvent>> getAllSubCalendarEvents(TimeLine RangeOfLookUP, ReferenceNow Now, bool includeOtherEntities = false, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation) {
+        public virtual IQueryable<SubCalendarEvent> getAllSubCalendarEvents(TimeLine RangeOfLookUP, ReferenceNow Now, bool includeOtherEntities = false, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation) {
 #if liveDebugging
             includeOtherEntities = true;
 #else
@@ -1645,25 +1649,17 @@ namespace TilerFront
             IQueryable<SubCalendarEvent> allSubCalQuery = getSubCalendarEventQuery(retrievalOption, includeOtherEntities: includeOtherEntities);
             allSubCalQuery = allSubCalQuery
                 .Where(subEvent =>
-                        subEvent.IsEnabled_DB
-                        && !subEvent.Complete_EventDB
-                        && subEvent.StartTime_EventDB < RangeOfLookUP.End
+                        subEvent.StartTime_EventDB < RangeOfLookUP.End
                         && subEvent.EndTime_EventDB > RangeOfLookUP.Start
-                        && subEvent.CompletionTime_EventDB< rangeEnd
-                        && subEvent.CompletionTime_EventDB > rangeStart
-                        && subEvent.ParentCalendarEvent.IsEnabled_DB
-                        && !subEvent.ParentCalendarEvent.Complete_EventDB
-                        && subEvent.ParentCalendarEvent.StartTime_EventDB < RangeOfLookUP.End
-                        && subEvent.ParentCalendarEvent.EndTime_EventDB > RangeOfLookUP.Start);
+                        && subEvent.CreatorId == this._TilerUser.Id
+                        );
             allSubCalQuery = allSubCalQuery
                 .Include(subEvent => subEvent.ParentCalendarEvent)
-                .Include(subEvent => subEvent.ParentCalendarEvent.AllSubEvents_DB)
                 .Include(subEvent => subEvent.RepeatParentEvent)
-                .Include(subEvent => subEvent.ParentCalendarEvent.TimeLineHistory_DB)
                 ;
 
-            List<SubCalendarEvent> retValue = await allSubCalQuery.ToListAsync().ConfigureAwait(false);
-            return retValue;
+            //List<SubCalendarEvent> retValue = await allSubCalQuery.ToListAsync().ConfigureAwait(false);
+            return allSubCalQuery;
         }
 
 
@@ -1721,9 +1717,10 @@ namespace TilerFront
             watch.Stop();
             TimeSpan webFrontEndSpan = watch.Elapsed;
             Debug.WriteLine("web Front End Span " + webFrontEndSpan.ToString());
+            Debug.WriteLine("Bungled maybe");
             return retValue;
-
         }
+
         /// <summary>
         /// This gets all cal events within <paramref name="RangeOfLookUP"/>. Note: This uses the subcalendar event as the bases for the query. So if a sub event is not within the rangelookup it won't pull the calendar event, this is for performance reasons. Hence why the general default is to be generous.  If you want to pull a specific calendar event then you need to include the calendar id as part of <paramref name="tilerIds"/>.
         /// <paramref name="retrievalOption"/> provides a way of stream lining whats pulled from the DB. Evaluation ignores the UI component and includes only data to compute the schedule. Information such as NowProfile, procrastination and location
@@ -1890,7 +1887,7 @@ namespace TilerFront
                         rightOfJoin = rightOfJoin
                             .Include(calEvent => calEvent.RepeatParentEvent)
                             .Include(calEvent => calEvent.Location_DB)
-                            .Include(calEvent => calEvent.AllSubEvents_DB)
+                            .Include(calEvent => calEvent.AllSubEvents_DB) // This causes an error when adding a new primary type column to only subcalendar event type. When the join in the latter part of this code is run, for some reason entity framework doesnt realize that the primary type is not nullable but tries to assign a null variavle. I think this is because EF loses the default settings when joining the tables
                             .Include(calEvent => calEvent.TimeLineHistory_DB)
                             .Include(calEvent => calEvent.RestrictionProfile_DB)
                             .Include(calEvent => calEvent.ProfileOfNow_EventDB)
@@ -2860,6 +2857,11 @@ namespace TilerFront
                 {
                     retrievedSubEvent.RepetitionLock_DB = Convert.ToBoolean(RepetitionLockNode.InnerText);
                 }
+                XmlNode NowLockNode = MyXmlNode.ChildNodes[i].SelectSingleNode("NowLock");
+                if (NowLockNode != null)
+                {
+                    retrievedSubEvent.NowLock_DB = Convert.ToBoolean(NowLockNode.InnerText);
+                }
 
                 retrievedSubEvent.InitialStartTime_DB = iniStartTimeInMs;
                 retrievedSubEvent.InitialEndTime_DB = iniEndTimeInMS;
@@ -3429,9 +3431,23 @@ namespace TilerFront
 
         }
 
-        async virtual public Task<Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location>>> getProfileInfo(TimeLine RangeOfLookup, ReferenceNow Now, bool includeUpdateHistory, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation, bool createDump = true, HashSet<string> calendarIds = null)
+        public async Task<Analysis> getAnalysis(TilerUser user)
         {
-            Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location>> retValue;
+            Analysis retValue = _Context.Analysis.Find(user.Id);
+            if(retValue == null)
+            {
+                Analysis scheduleAnalysis = Analysis.generateAnalysisObject(user);
+                scheduleAnalysis.setUser(user);
+                _Context.Analysis.Add(scheduleAnalysis);
+                await _Context.SaveChangesAsync().ConfigureAwait(false);
+                retValue = scheduleAnalysis;
+            }
+            return retValue;
+        }
+
+        async virtual public Task<Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location>, Analysis>> getProfileInfo(TimeLine RangeOfLookup, ReferenceNow Now, bool includeUpdateHistory, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation, bool createDump = true, HashSet<string> calendarIds = null)
+        {
+            Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location>, Analysis> retValue;
             if (this.Status)
             {
                 Task<Dictionary<string, TilerElements.Location>> TaskLocationCache = getAllLocationsByUser();
@@ -3441,6 +3457,7 @@ namespace TilerFront
                 scheduleLoadWatch.Start();
                 Dictionary<string, CalendarEvent> AllScheduleData = await this.getAllEnabledCalendarEvent(RangeOfLookup, Now, includeUpdateHistory, retrievalOption: retrievalOption, tilerIds: calendarIds);
                 scheduleLoadWatch.Stop();
+                Analysis analysis = await getAnalysis(this.getTilerRetrievedUser()).ConfigureAwait(false);
                 Debug.WriteLine("Total DB Lookup took " + scheduleLoadWatch.Elapsed.ToString());
                 if (createDump && _UpdateBigData)
                 {
@@ -3452,7 +3469,7 @@ namespace TilerFront
 
                 await populateDefaultLocation(LocationCache).ConfigureAwait(false);
 
-                retValue = new Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location>>(AllScheduleData, ReferenceTime, LocationCache);
+                retValue = new Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location>, Analysis>(AllScheduleData, ReferenceTime, LocationCache, analysis);
             }
             else
             {

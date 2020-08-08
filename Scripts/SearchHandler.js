@@ -164,7 +164,7 @@ function CallBackFunctionForReturnedValues(data, DomContainer) {
                 // will be treated as a single string
             }).done(function (data) {
                 RefreshSubEventsMainDivSubEVents(generateSearchBarContainer.closeSearch);
-                sendPostScheduleEditAnalysisUpdate({});
+                sendPostScheduleEditAnalysisUpdate({CallBackSuccess: RefreshSubEventsMainDivSubEVents});;
 
                 /*
                 if (InitializeHomePage!=null)
@@ -229,7 +229,9 @@ function generateSearchBarContainer(ParentDom)
         DisablePanel.style.zIndex = 0;
         TopBannerDisablePanel.style.zIndex = 0;
         $(DisablePanel).hide();
-        SearchAutoSuggest.getAutoSuggestControlContainer().outerHTML = "";
+        if (SearchAutoSuggest.getAutoSuggestControlContainer().parentNode) {
+            SearchAutoSuggest.getAutoSuggestControlContainer().outerHTML = "";
+        }
 
     }
 

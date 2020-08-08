@@ -322,6 +322,7 @@ namespace TilerFront.Controllers
                 {
                     user = dbContext.Users.Find(user.Id);
                     await createProcrastinateCalendarEvent(user).ConfigureAwait(false);
+                    await createAnalysis(user).ConfigureAwait(false);
                     await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
                     Task SendEmail = SendEmailConfirmationAsync(user.Id, "Please Confirm Your Tiler Account!");
                     await SendEmail.ConfigureAwait(false);
@@ -345,8 +346,17 @@ namespace TilerFront.Controllers
         public async Task createProcrastinateCalendarEvent (TilerUser user)
         {
             DateTimeOffset now = Utility.ProcrastinateStartTime;
-            CalendarEvent procrastinateCalEvent = ProcrastinateCalendarEvent.generateProcrastinateAll(now, user, TimeSpan.FromSeconds(1), "UTC");
+            CalendarEvent procrastinateCalEvent = ProcrastinateCalendarEvent.generateProcrastinateAll(now, user, TimeSpan.FromSeconds(1), null, "UTC");
             dbContext.CalEvents.Add(procrastinateCalEvent);
+            await dbContext.SaveChangesAsync().ConfigureAwait(false);
+        }
+
+
+        public async Task createAnalysis(TilerUser user)
+        {
+            Analysis scheduleAnalysis = Analysis.generateAnalysisObject(user);
+            scheduleAnalysis.setUser(user);
+            dbContext.Analysis.Add(scheduleAnalysis);
             await dbContext.SaveChangesAsync().ConfigureAwait(false);
         }
 
@@ -371,6 +381,7 @@ namespace TilerFront.Controllers
                 {
                     user = dbContext.Users.Find(user.Id);
                     await createProcrastinateCalendarEvent(user).ConfigureAwait(false);
+                    await createAnalysis(user).ConfigureAwait(false);
                     await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
                     Task SendEmail = SendEmailConfirmationAsync(user.Id, "Please Confirm Your Tiler Account!");
                     await SendEmail.ConfigureAwait(false);
@@ -766,6 +777,7 @@ namespace TilerFront.Controllers
                     {
                         user = dbContext.Users.Find(user.Id);
                         await createProcrastinateCalendarEvent(user).ConfigureAwait(false);
+                        await createAnalysis(user).ConfigureAwait(false);
                         await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
                         Task SendThirdPartyAuthentication = new Task(() => { });
                         if (ThirdPartyCredentials!=null)

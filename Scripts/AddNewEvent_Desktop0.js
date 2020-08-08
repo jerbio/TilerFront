@@ -407,7 +407,7 @@ function generateProcrastinateAll(x, y, height, width,WeekStart, RenderPlane) {
             if(isFunction(CallBack)) {
                 CallBack();
             }
-            sendPostScheduleEditAnalysisUpdate({});
+            sendPostScheduleEditAnalysisUpdate({CallBackSuccess: getRefreshedData});
         });
     }
 
@@ -3060,7 +3060,7 @@ function SendScheduleInformation(NewEvent, CallBack)
             var NewMessage = "Oh No!!! Tiler is having issues creating a new schedule.\n" + response.Error.Message+ "Please the changes and try again"
             var ExitAfter = { ExitNow: true, Delay: 20000 };
             HandleNEwPage.UpdateMessage(NewMessage, ExitAfter, function () { });
-            sendPostScheduleEditAnalysisUpdate({});
+            sendPostScheduleEditAnalysisUpdate({CallBackSuccess: getRefreshedData});;
             return;
         }
 
@@ -3155,7 +3155,7 @@ function affirmNewEvent(response)
 {
     var StartOfEvent=null;
     var EventID = null;
-    function retValue(CallBack)
+    function retValue(response, callBack)
     {
         if (StartOfEvent != null)
         {
@@ -3185,9 +3185,9 @@ function affirmNewEvent(response)
                 populateMonth(StartOfEvent, retValue);
             }
         }
-        if(CallBack!=null)
+        if(isFunction(callBack))
         {
-            CallBack();
+            callBack(response);
         }
     }
     if (response.Error.code == 0)
