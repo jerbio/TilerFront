@@ -1,5 +1,5 @@
 ﻿//#define UseDefaultLocation
-//#define liveDebugging
+#define liveDebugging
 
 using System;
 using System.Collections.Generic;
@@ -1469,16 +1469,15 @@ namespace TilerFront
             {
                 calEVents = calEVents
                     .Include(calEvent => calEvent.AllSubEvents_DB)
-                    .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.ParentCalendarEvent))
-                    .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Name))
-                    .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.DataBlob_EventDB))
-                    .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Name.Creator_EventDB))
-                    .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Creator_EventDB))
-                    .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Location_DB))
-                    .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.DataBlob_EventDB))
-                    .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.RestrictionProfile_DB))
-                    .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Procrastination_EventDB))
-                    .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.ProfileOfNow_EventDB));
+                //    .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.ParentCalendarEvent))
+                //    .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Name))
+                //    .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.DataBlob_EventDB))
+                //    .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Name.Creator_EventDB))
+                //    .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Creator_EventDB))
+                //    .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Location_DB))
+                //    .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.RestrictionProfile_DB))
+                //    .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Procrastination_EventDB))
+                //    .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.ProfileOfNow_EventDB));
                 ;
             }
 
@@ -1544,7 +1543,8 @@ namespace TilerFront
                     .Include(subEvent => subEvent.Location_DB)
                     .Include(subEvent => subEvent.Creator_EventDB)
                     .Include(subEvent => subEvent.Location_DB)
-                    .Include(subEvent => subEvent.DataBlob_EventDB);
+                    .Include(subEvent => subEvent.DataBlob_EventDB)
+                    ;
             }
 
             if (retrievalOption == DataRetrivalOption.Ui)
@@ -1768,94 +1768,75 @@ namespace TilerFront
                         tilerIds = new HashSet<string>();
                     }
                     var calIds = tilerIds.Select(o=> new EventID(o).getAllEventDictionaryLookup).ToArray();
-                    IQueryable<SubCalendarEvent> subCalendarEvents = getSubCalendarEventQuery(retrievalOption, includeOtherEntities: true);
 
-                    subCalendarEvents = subCalendarEvents
-                        .Where(subEvent =>
+                    HashSet<string> calIdSet = new HashSet<string>();
+                    if(calIds.Length > 0)
+                    {
+                        calIdSet = new HashSet<string>(calIds);
+                    }
+                    var calEventQuery = getCalendarEventQuery(retrievalOption, true);
+                    //IQueryable<SubCalendarEvent> subCalendarEvents = getSubCalendarEventQuery(retrievalOption, includeOtherEntities: true);
+
+                    if (includeUpdateHistory)
+                    {
+                        calEventQuery = calEventQuery
+                            .Include(calEvent => calEvent.TimeLineHistory_DB)
+                            .Include(calEvent => calEvent.TimeLineHistory_DB.TimeLines_DB)
+                            ;
+                    }
+
+
+                        calEventQuery = calEventQuery
+                        .Where(calEvent =>
                                 (
-                                    subEvent.IsEnabled_DB
-                                    && !subEvent.Complete_EventDB
-                                    && subEvent.ParentCalendarEvent.IsEnabled_DB
-                                    && !subEvent.ParentCalendarEvent.Complete_EventDB
-                                    && subEvent.ParentCalendarEvent.StartTime_EventDB < RangeOfLookUP.End
-                                    && subEvent.ParentCalendarEvent.EndTime_EventDB > RangeOfLookUP.Start
-                                    && subEvent.StartTime_EventDB < RangeOfLookUP.End// for performance reasons we will ignore sub events outside two weeks that are not within the range
-                                    && subEvent.EndTime_EventDB > RangeOfLookUP.Start// for performance reasons we will ignore sub events outside two weeks that are not within the specified range so the range has to be generous
+                                    calEvent.IsEnabled_DB
+                                    && !calEvent.Complete_EventDB
                                     && (
-                                            (subEvent.RepeatParentEventId == null) ||
-                                            (
-                                                (
-                                                    (
-                                                        subEvent.RepeatParentEventId != null && subEvent.RepeatParentEvent.IsEnabled_DB
-                                                        && !subEvent.RepeatParentEvent.Complete_EventDB
-                                                        && subEvent.RepeatParentEvent.StartTime_EventDB < RangeOfLookUP.End
-                                                        && subEvent.RepeatParentEvent.EndTime_EventDB > RangeOfLookUP.Start
-                                                    ) &&
-                                                    (subEvent.RepeatParentEvent != null && subEvent.RepeatParentEvent.IsEnabled_DB)
-                                                )
-                                                && (
-                                                    (
-                                                        (subEvent.RepeatParentEvent.RepeatParentEventId == null) ||
-                                                        (
-                                                            (
-                                                                subEvent.RepeatParentEvent.RepeatParentEventId != null && subEvent.RepeatParentEvent.RepeatParentEvent.IsEnabled_DB
-                                                                && !subEvent.RepeatParentEvent.RepeatParentEvent.Complete_EventDB
-                                                                && subEvent.RepeatParentEvent.RepeatParentEvent.StartTime_EventDB < RangeOfLookUP.End
-                                                                && subEvent.RepeatParentEvent.RepeatParentEvent.EndTime_EventDB > RangeOfLookUP.Start
-                                                            ) &&
-                                                            (subEvent.RepeatParentEvent.RepeatParentEvent != null && subEvent.RepeatParentEvent.RepeatParentEvent.IsEnabled_DB)
-                                                        )
-                                                    )
-                                                )
-                                            )
-                                        )
-                                    ) || ((
-                                            (calIds.Contains(subEvent.RepeatParentEventId) || calIds.Contains(subEvent.CalendarEventId))
-                                            )
+                                        (calEvent.RepeatParentEvent == null )
                                         || (
-                                                (
-                                                    (
-                                                        subEvent.RepeatParentEvent.RepeatParentEventId != null
-                                                    ) &&
-                                                    (calIds.Contains(subEvent.RepeatParentEvent.RepeatParentEventId))
-                                                )
+                                            calEvent.RepeatParentEvent.IsEnabled_DB
+                                            && !calEvent.RepeatParentEvent.Complete_EventDB
                                             )
                                         )
+                                    && calEvent.StartTime_EventDB < RangeOfLookUP.End
+                                    && calEvent.EndTime_EventDB > RangeOfLookUP.Start
+                                    && calEvent.StartTime_EventDB < RangeOfLookUP.End// for performance reasons we will ignore sub events outside two weeks that are not within the range
+                                    && calEvent.EndTime_EventDB > RangeOfLookUP.Start// for performance reasons we will ignore sub events outside two weeks that are not within the specified range so the range has to be generous
+                                )
 
                             );
 
-                    #region includeCalendarEvents 
-                    subCalendarEvents = subCalendarEvents
-                        .Include(subEvent => subEvent.ParentCalendarEvent)
-                        .Include(subEvent => subEvent.ParentCalendarEvent.RepeatParentEvent)
-                        .Include(subEvent => subEvent.RepeatParentEvent)
-                        .Include(subEvent => subEvent.ParentCalendarEvent.RestrictionProfile_DB)
-                        .Include(subEvent => subEvent.RepeatParentEvent.RestrictionProfile_DB)
-                        .Include(subEvent => subEvent.ProfileOfNow_EventDB)
-                        .Include(subEvent => subEvent.Procrastination_EventDB)
-                        .Include(subEvent => subEvent.Location_DB)
-                        .Include(subEvent => subEvent.ParentCalendarEvent.DayPreference_DB)
-                        ;
 
-                    if(includeUpdateHistory)
-                    {
-                        subCalendarEvents = subCalendarEvents
-                            .Include(subEvent => subEvent.ParentCalendarEvent.TimeLineHistory_DB)
-                            .Include(subEvent => subEvent.ParentCalendarEvent.TimeLineHistory_DB.TimeLines_DB)
-                            ;
-                    }
+
+                    #region includeCalendarEvents
+                    //subCalendarEvents = subCalendarEvents
+                    //    .Include(subEvent => subEvent.ParentCalendarEvent)
+                    //    .Include(subEvent => subEvent.ParentCalendarEvent.RepeatParentEvent)
+                    //    .Include(subEvent => subEvent.RepeatParentEvent)
+                    //    .Include(subEvent => subEvent.ParentCalendarEvent.RestrictionProfile_DB)
+                    //    .Include(subEvent => subEvent.RepeatParentEvent.RestrictionProfile_DB)
+                    //    .Include(subEvent => subEvent.ProfileOfNow_EventDB)
+                    //    .Include(subEvent => subEvent.Procrastination_EventDB)
+                    //    .Include(subEvent => subEvent.Location_DB)
+                    //    .Include(subEvent => subEvent.ParentCalendarEvent.DayPreference_DB)
+                    //    ;
+
                     #endregion
 
-
+                    List<CalendarEvent> calEventsRetrieved = calEventQuery.ToList();
                     HashSet<CalendarEvent> parentCals = new HashSet<CalendarEvent>();
                     HashSet<CalendarEvent> calendarEventsFromSubCalquery = new HashSet<CalendarEvent>();
                     HashSet<string> allIds = new HashSet<string>();
                     HashSet<string> subEventIds = new HashSet<string>();
                     HashSet<string> repeatParentIds = new HashSet<string>();
+                    HashSet<string> retrievedParentIds = new HashSet<string>();
                     HashSet<string> parentIds = new HashSet<string>();
                     Dictionary<string, List<TilerEvent>> procrastinationToTilerEvents = new Dictionary<string, List<TilerEvent>>();
                     Dictionary<string, List<TilerEvent>> ProfileOfNowToTilerEvents = new Dictionary<string, List<TilerEvent>>();
-                    List<SubCalendarEvent> subEventsRetrieved = subCalendarEvents.ToList();
+
+
+
+                    List<SubCalendarEvent> subEventsRetrieved = calEventsRetrieved.SelectMany(calEvent => calEvent.AllSubEvents_DB).ToList();
                     watch.Stop();
                     TimeSpan subeventSpan = watch.Elapsed;
                     Debug.WriteLine("||||>sub event span " + subeventSpan.ToString());
@@ -1870,6 +1851,7 @@ namespace TilerFront
                         allIds.Add(parentCalEvent.Id);
                         allIds.Add(subEvent.Id);
                         subEventIds.Add(subEvent.Id);
+                        retrievedParentIds.Add(subEvent.SubEvent_ID.getCalendarEventComponent());
 
                         if (parentCalEvent.RepeatParentEvent != null)
                         {
@@ -1888,12 +1870,12 @@ namespace TilerFront
 
 
                     var rightOfJoin = _Context.CalEvents.Include(calendarEvent => calendarEvent.Name);
-                    if (tilerIds!=null && tilerIds.Count > 0)
+                    if (calIdSet != null && calIdSet.Count > 0)
                     {
-                        foreach(string tilerId in tilerIds)// this is needed just in case a subevent within the regular range is acted upon. Take for exaple There is a calEvent of with subeventA, subeventB and subeventC. However the schedule performed a delete on subeventA and subeventA is out side the timeRange but subeventB and subeventC are within range. You still need to include subeventA because it is being deleted.
+                        foreach(string calId in calIdSet)// this is needed just in case a subevent within the regular range is acted upon. Take for exaple There is a calEvent of with subeventA, subeventB and subeventC. However the schedule performed a delete on subeventA and subeventA is out side the timeRange but subeventB and subeventC are within range. You still need to include subeventA because it is being deleted.
                         {
-                            EventID eventId = new EventID(tilerId);
-                            if(!subEventIds.Contains(tilerId))
+                            EventID eventId = new EventID(calId);
+                            if(!retrievedParentIds.Contains(eventId.getCalendarEventComponent()))
                             {
                                 parentIds.Add(eventId.getAllEventDictionaryLookup);
                             }

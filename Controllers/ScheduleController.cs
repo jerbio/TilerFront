@@ -706,6 +706,8 @@ namespace TilerFront.Controllers
             retrievedUser.getTilerUser().updateTimeZoneTimeSpan(UserData.getTimeSpan);
             if (retrievedUser.Status)
             {
+                Stopwatch watch = new Stopwatch();
+                watch.Start();
                 DateTimeOffset myNow = myNow = myAuthorizedUser.getRefNow();
                 Task<Tuple<ThirdPartyControl.CalendarTool, IEnumerable<CalendarEvent>>> thirdPartyDataTask = ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(retrievedUser.UserID, db);
                 DB_Schedule schedule = new DB_Schedule(retrievedUser, myNow);
@@ -739,6 +741,9 @@ namespace TilerFront.Controllers
                 await AnalysisController.updateSuggestionAnalysis(retrievedUser.ScheduleLogControl).ConfigureAwait(false);
                 TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
                 scheduleChangeSocket.triggerRefreshData(retrievedUser.getTilerUser());
+                watch.Stop();
+                TimeSpan shuffleScheduleSpan = watch.Elapsed;
+                Debug.WriteLine("----shuffle span " + shuffleScheduleSpan.ToString());
                 return Ok(myPostData.getPostBack);
             }
             throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.Unauthorized)
