@@ -211,7 +211,22 @@ namespace TilerFront
         {
             Task<ScheduleDump> retValue;
             XmlDocument xmldoc = new XmlDocument();
-            xmldoc.InnerXml = "<?xml version=\"1.0\" encoding=\"utf-8\"?><ScheduleLog><LastIDCounter>1024</LastIDCounter><referenceDay>" + now.EndOfDay.DateTime + "</referenceDay><scheduleNotes>" + notes + "</scheduleNotes><lastUpdated>" + user.LastScheduleModification.DateTime + "</lastUpdated><EventSchedules></EventSchedules></ScheduleLog>";
+            xmldoc.InnerXml = "<?xml version=\"1.0\" encoding=\"utf-8\"?><ScheduleLog><LastIDCounter>1024</LastIDCounter><referenceDay>" 
+                                    + now.EndOfDay.DateTime + 
+                                "</referenceDay>"
+                                +"<scheduleNotes>" 
+                                    + notes 
+                                + "</scheduleNotes>"
+                                +"<lastUpdated>" 
+                                    + user.LastScheduleModification.DateTime
+                                + "</lastUpdated>"
+                                +"<constNowTime>"
+                                    + now?.constNow.ToString()
+                                + "</constNowTime>"
+                                + "<dateTimeOffsetUtcNow>"
+                                    + DateTimeOffset.UtcNow.ToString().ToString()
+                                + "</dateTimeOffsetUtcNow>"
+                                + "<EventSchedules></EventSchedules></ScheduleLog>";
 
             CachedLocation = cachedLocation ?? await getAllLocationsByUser().ConfigureAwait(false); ;//populates with current location info
             Dictionary<string, TilerElements.Location> OldLocationCache = new Dictionary<string, TilerElements.Location>(CachedLocation);
