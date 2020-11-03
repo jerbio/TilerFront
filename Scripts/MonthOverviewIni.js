@@ -5541,16 +5541,19 @@ function GlobaPauseResumeButtonManager(events) {
 
     function SwitchToResume(eventId)
     {
+        var SubEvent = Dictionary_OfSubEvents[eventId];
         var pauseResumeButton = getDomOrCreateNew(buttonId)
         $(pauseResumeButton).addClass("ControlPanelResumePanelButton");
         $(pauseResumeButton).removeClass("ControlPanelPausePanelButton");
         ShowPauseResumeButton();
-        var SubEvent = Dictionary_OfSubEvents[eventId];
+        
         if (SubEvent) {
             pauseResumeButton.setAttribute("Title", "Resume \"" + SubEvent.Name + "\"");
             pauseResumeButton.onclick = function () {
                 continueEvent(SubEvent);
             }
+        } else {
+            pauseResumeButton.setAttribute("Title", "There is an error with resuming, sub event was not pulled in probably because its out of range.");
         }
         
     }
