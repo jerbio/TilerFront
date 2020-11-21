@@ -20,6 +20,17 @@ namespace TilerFront.Controllers
     [Authorize]
     public class SubCalendarEventController : TilerApiController
     {
+        [HttpGet]
+        [ResponseType(typeof(PostBackStruct))]
+        [Route("api/SubCalendarEvent")]
+        public async Task<IHttpActionResult> getSubCalEvent([FromBody] getEventModel eventModel)
+        {
+            UserAccount retrievedUser = await eventModel.getUserAccount(db);
+            SubCalendarEvent subEvent = db.SubEvents.SingleOrDefault(obj =>
+                obj.CreatorId == retrievedUser.UserID && obj.Id == eventModel.EventID);
+            return Ok(subEvent);
+        }
+
         [HttpPost]
         [ResponseType(typeof(PostBackStruct))]
         [Route("api/SubCalendarEvent/Update")]

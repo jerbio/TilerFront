@@ -3416,6 +3416,18 @@ function isUndefinedOrNull(data) {
    }
 
 
+   function getSubEvent(subEventId) {
+        let TimeZone = new Date().getTimezoneOffset();
+        let userCredentials = RetrieveUserCredentials()
+        let subEventData = { UserName: userCredentials.UserName, UserID: userCredentials.ID, EventID: subEventId, TimeZoneOffset: TimeZone };
+        let url = global_refTIlerUrl + 'SubCalendarEvent'
+        let paramString = new URLSearchParams(subEventData)
+        let fullUrl = url + '?'+ paramString
+        return fetch(fullUrl, {
+                body: JSON.stringify(data)
+            })
+   }
+
    function genFunctionCallForNow(EventID,CallBack)
    {
        return function ()
