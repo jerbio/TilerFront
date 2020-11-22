@@ -1,11 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-<<<<<<< HEAD
   <Import Project="..\packages\EntityFramework.6.4.4\build\EntityFramework.props" Condition="Exists('..\packages\EntityFramework.6.4.4\build\EntityFramework.props')" />
-=======
-  <Import Project="..\..\My24HourTimerWPF\packages\EntityFramework.6.4.4\build\EntityFramework.props" Condition="Exists('..\..\My24HourTimerWPF\packages\EntityFramework.6.4.4\build\EntityFramework.props')" />
-  <Import Project="..\packages\EntityFramework.6.4.0\build\EntityFramework.props" Condition="Exists('..\packages\EntityFramework.6.4.0\build\EntityFramework.props')" />
->>>>>>> master
   <Import Project="..\..\My24HourTimerWPF\packages\EntityFramework.6.3.0\build\EntityFramework.props" Condition="Exists('..\..\My24HourTimerWPF\packages\EntityFramework.6.3.0\build\EntityFramework.props')" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.Default.props" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.Default.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
@@ -71,17 +66,10 @@
       <HintPath>..\DBTilerElement\bin\Debug\DBTilerElement.dll</HintPath>
     </Reference>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-<<<<<<< HEAD
       <HintPath>..\packages\EntityFramework.6.4.4\lib\net45\EntityFramework.dll</HintPath>
     </Reference>
     <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.4.4\lib\net45\EntityFramework.SqlServer.dll</HintPath>
-=======
-      <HintPath>..\..\My24HourTimerWPF\packages\EntityFramework.6.4.4\lib\net45\EntityFramework.dll</HintPath>
-    </Reference>
-    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <HintPath>..\..\My24HourTimerWPF\packages\EntityFramework.6.4.4\lib\net45\EntityFramework.SqlServer.dll</HintPath>
->>>>>>> master
     </Reference>
     <Reference Include="Google.Apis, Version=1.49.0.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
       <HintPath>..\..\My24HourTimerWPF\packages\Google.Apis.1.49.0\lib\net45\Google.Apis.dll</HintPath>
@@ -95,8 +83,8 @@
     <Reference Include="Google.Apis.Auth.PlatformServices, Version=1.49.0.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
       <HintPath>..\..\My24HourTimerWPF\packages\Google.Apis.Auth.1.49.0\lib\net45\Google.Apis.Auth.PlatformServices.dll</HintPath>
     </Reference>
-    <Reference Include="Google.Apis.Calendar.v3, Version=1.49.0.2119, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
-      <HintPath>..\..\My24HourTimerWPF\packages\Google.Apis.Calendar.v3.1.49.0.2119\lib\net45\Google.Apis.Calendar.v3.dll</HintPath>
+    <Reference Include="Google.Apis.Calendar.v3, Version=1.49.0.2142, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
+      <HintPath>..\packages\Google.Apis.Calendar.v3.1.49.0.2142\lib\net45\Google.Apis.Calendar.v3.dll</HintPath>
     </Reference>
     <Reference Include="Google.Apis.Core, Version=1.49.0.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
       <HintPath>..\..\My24HourTimerWPF\packages\Google.Apis.Core.1.49.0\lib\net45\Google.Apis.Core.dll</HintPath>
@@ -110,13 +98,8 @@
     <Reference Include="Google.Apis.Plus.v1, Version=1.49.0.1627, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
       <HintPath>..\..\My24HourTimerWPF\packages\Google.Apis.Plus.v1.1.49.0.1627\lib\net45\Google.Apis.Plus.v1.dll</HintPath>
     </Reference>
-<<<<<<< HEAD
-    <Reference Include="GoogleApi, Version=3.10.3.0, Culture=neutral, PublicKeyToken=781851e053b06e74, processorArchitecture=MSIL">
-      <HintPath>..\..\My24HourTimerWPF\packages\GoogleApi.3.10.3\lib\net45\GoogleApi.dll</HintPath>
-=======
     <Reference Include="GoogleApi, Version=3.10.5.0, Culture=neutral, PublicKeyToken=781851e053b06e74, processorArchitecture=MSIL">
       <HintPath>..\..\My24HourTimerWPF\packages\GoogleApi.3.10.5\lib\net45\GoogleApi.dll</HintPath>
->>>>>>> master
     </Reference>
     <Reference Include="GoogleMapsApi, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null" />
     <Reference Include="log4net, Version=2.0.12.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
@@ -127,22 +110,27 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.AI.DependencyCollector, Version=2.15.0.44797, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\My24HourTimerWPF\packages\Microsoft.ApplicationInsights.DependencyCollector.2.15.0\lib\net452\Microsoft.AI.DependencyCollector.dll</HintPath>
+      <HintPath>..\packages\Microsoft.ApplicationInsights.DependencyCollector.2.16.0\lib\net452\Microsoft.AI.DependencyCollector.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.AI.PerfCounterCollector, Version=2.15.0.44797, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\My24HourTimerWPF\packages\Microsoft.ApplicationInsights.PerfCounterCollector.2.15.0\lib\net452\Microsoft.AI.PerfCounterCollector.dll</HintPath>
+      <HintPath>..\packages\Microsoft.ApplicationInsights.PerfCounterCollector.2.16.0\lib\net452\Microsoft.AI.PerfCounterCollector.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.AI.ServerTelemetryChannel, Version=2.15.0.44797, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\My24HourTimerWPF\packages\Microsoft.ApplicationInsights.WindowsServer.TelemetryChannel.2.15.0\lib\net452\Microsoft.AI.ServerTelemetryChannel.dll</HintPath>
+      <HintPath>..\packages\Microsoft.ApplicationInsights.WindowsServer.TelemetryChannel.2.16.0\lib\net452\Microsoft.AI.ServerTelemetryChannel.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.AI.Web, Version=2.15.0.44798, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\My24HourTimerWPF\packages\Microsoft.ApplicationInsights.Web.2.15.0\lib\net452\Microsoft.AI.Web.dll</HintPath>
+      <HintPath>..\packages\Microsoft.ApplicationInsights.Web.2.16.0\lib\net452\Microsoft.AI.Web.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.AI.WindowsServer, Version=2.15.0.44797, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\My24HourTimerWPF\packages\Microsoft.ApplicationInsights.WindowsServer.2.15.0\lib\net452\Microsoft.AI.WindowsServer.dll</HintPath>
+      <HintPath>..\packages\Microsoft.ApplicationInsights.WindowsServer.2.16.0\lib\net452\Microsoft.AI.WindowsServer.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.ApplicationInsights, Version=2.15.0.44797, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\My24HourTimerWPF\packages\Microsoft.ApplicationInsights.2.15.0\lib\net46\Microsoft.ApplicationInsights.dll</HintPath>
+    <Reference Include="Microsoft.ApplicationInsights, Version=2.16.0.18277, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.ApplicationInsights.2.16.0\lib\net46\Microsoft.ApplicationInsights.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.ApplicationInsights.Extensibility.PerfCollector, Version=0.14.3.185, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.ApplicationInsights.PerformanceCollector.0.14.3-build00177\lib\net40\Microsoft.ApplicationInsights.Extensibility.PerfCollector.dll</HintPath>
@@ -152,8 +140,8 @@
       <HintPath>..\packages\Microsoft.ApplicationInsights.RuntimeTelemetry.0.14.3-build00177\lib\net45\Microsoft.ApplicationInsights.Extensibility.RuntimeTelemetry.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.ApplicationInsights.Log4NetAppender, Version=2.15.0.44798, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\My24HourTimerWPF\packages\Microsoft.ApplicationInsights.Log4NetAppender.2.15.0\lib\net452\Microsoft.ApplicationInsights.Log4NetAppender.dll</HintPath>
+    <Reference Include="Microsoft.ApplicationInsights.Log4NetAppender, Version=2.16.0.18277, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.ApplicationInsights.Log4NetAppender.2.16.0\lib\net452\Microsoft.ApplicationInsights.Log4NetAppender.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.AspNet.Identity.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.Identity.Core.2.2.3\lib\net45\Microsoft.AspNet.Identity.Core.dll</HintPath>
@@ -178,11 +166,7 @@
       <HintPath>..\..\My24HourTimerWPF\packages\Microsoft.AspNet.SignalR.SystemWeb.2.4.1\lib\net45\Microsoft.AspNet.SignalR.SystemWeb.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.AspNet.TelemetryCorrelation, Version=1.0.8.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-<<<<<<< HEAD
       <HintPath>..\packages\Microsoft.AspNet.TelemetryCorrelation.1.0.8\lib\net45\Microsoft.AspNet.TelemetryCorrelation.dll</HintPath>
-=======
-      <HintPath>..\..\My24HourTimerWPF\packages\Microsoft.AspNet.TelemetryCorrelation.1.0.8\lib\net45\Microsoft.AspNet.TelemetryCorrelation.dll</HintPath>
->>>>>>> master
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.Diagnostics.Instrumentation.Extensions.Intercept, Version=0.14.0.2544, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -254,13 +238,8 @@
     <Reference Include="sdk">
       <HintPath>..\module\sdk\bin\Debug\sdk.dll</HintPath>
     </Reference>
-<<<<<<< HEAD
-    <Reference Include="SendGrid, Version=9.21.0.0, Culture=neutral, PublicKeyToken=4f047e93159395ca, processorArchitecture=MSIL">
-      <HintPath>..\..\My24HourTimerWPF\packages\SendGrid.9.21.0\lib\net452\SendGrid.dll</HintPath>
-=======
-    <Reference Include="SendGrid, Version=9.21.1.0, Culture=neutral, PublicKeyToken=4f047e93159395ca, processorArchitecture=MSIL">
-      <HintPath>..\..\My24HourTimerWPF\packages\SendGrid.9.21.1\lib\net452\SendGrid.dll</HintPath>
->>>>>>> master
+    <Reference Include="SendGrid, Version=9.21.2.0, Culture=neutral, PublicKeyToken=4f047e93159395ca, processorArchitecture=MSIL">
+      <HintPath>..\packages\SendGrid.9.21.2\lib\net452\SendGrid.dll</HintPath>
     </Reference>
     <Reference Include="SendGrid.CSharp.HTTP.Client, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\My24HourTimerWPF\packages\SendGrid.CSharp.HTTP.Client.3.4.8\lib\net45\SendGrid.CSharp.HTTP.Client.dll</HintPath>
@@ -287,13 +266,8 @@
     </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Data.DataSetExtensions" />
-<<<<<<< HEAD
-    <Reference Include="System.Diagnostics.DiagnosticSource, Version=4.0.5.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Diagnostics.DiagnosticSource.4.7.1\lib\net46\System.Diagnostics.DiagnosticSource.dll</HintPath>
-=======
     <Reference Include="System.Diagnostics.DiagnosticSource, Version=5.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\..\My24HourTimerWPF\packages\System.Diagnostics.DiagnosticSource.5.0.0\lib\net46\System.Diagnostics.DiagnosticSource.dll</HintPath>
->>>>>>> master
+      <HintPath>..\packages\System.Diagnostics.DiagnosticSource.5.0.0\lib\net46\System.Diagnostics.DiagnosticSource.dll</HintPath>
     </Reference>
     <Reference Include="System.Diagnostics.TraceSource, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Diagnostics.TraceSource.4.3.0\lib\net46\System.Diagnostics.TraceSource.dll</HintPath>
@@ -333,13 +307,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Microsoft.Net.Http.2.2.29\lib\net45\System.Net.Http.Primitives.dll</HintPath>
     </Reference>
-<<<<<<< HEAD
-    <Reference Include="System.Net.Http.WinHttpHandler, Version=4.0.5.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Net.Http.WinHttpHandler.4.7.2\lib\net461\System.Net.Http.WinHttpHandler.dll</HintPath>
-=======
     <Reference Include="System.Net.Http.WinHttpHandler, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\My24HourTimerWPF\packages\System.Net.Http.WinHttpHandler.5.0.0\lib\net461\System.Net.Http.WinHttpHandler.dll</HintPath>
->>>>>>> master
+      <HintPath>..\packages\System.Net.Http.WinHttpHandler.5.0.0\lib\net461\System.Net.Http.WinHttpHandler.dll</HintPath>
     </Reference>
     <Reference Include="System.Net.NameResolution, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Net.NameResolution.4.3.0\lib\net46\System.Net.NameResolution.dll</HintPath>
@@ -544,14 +513,6 @@
     <Compile Include="LogControlXml.cs" />
     <Compile Include="LogControlDirect.cs" />
     <Compile Include="LogControl.cs" />
-    <Compile Include="Migrations\202011010609084_pauseTImeLineFix.cs" />
-    <Compile Include="Migrations\202011010609084_pauseTImeLineFix.designer.cs">
-      <DependentUpon>202011010609084_pauseTImeLineFix.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202011010804396_pausedTimeLineFix.cs" />
-    <Compile Include="Migrations\202011010804396_pausedTimeLineFix.designer.cs">
-      <DependentUpon>202011010804396_pausedTimeLineFix.cs</DependentUpon>
-    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -2935,14 +2896,6 @@
       <Name>ScheduleAnalysis</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Migrations\202011010609084_pauseTImeLineFix.resx">
-      <DependentUpon>202011010609084_pauseTImeLineFix.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202011010804396_pausedTimeLineFix.resx">
-      <DependentUpon>202011010804396_pausedTimeLineFix.cs</DependentUpon>
-    </EmbeddedResource>
-  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
@@ -2997,56 +2950,34 @@
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-<<<<<<< HEAD
     <Error Condition="!Exists('..\packages\EntityFramework.6.4.4\build\EntityFramework.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\EntityFramework.6.4.4\build\EntityFramework.props'))" />
     <Error Condition="!Exists('..\packages\EntityFramework.6.4.4\build\EntityFramework.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\EntityFramework.6.4.4\build\EntityFramework.targets'))" />
-    <Error Condition="!Exists('..\packages\Microsoft.ApplicationInsights.DependencyCollector.2.14.0\build\Microsoft.ApplicationInsights.DependencyCollector.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.ApplicationInsights.DependencyCollector.2.14.0\build\Microsoft.ApplicationInsights.DependencyCollector.targets'))" />
-    <Error Condition="!Exists('..\packages\Microsoft.ApplicationInsights.PerfCounterCollector.2.14.0\build\Microsoft.ApplicationInsights.PerfCounterCollector.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.ApplicationInsights.PerfCounterCollector.2.14.0\build\Microsoft.ApplicationInsights.PerfCounterCollector.targets'))" />
-    <Error Condition="!Exists('..\packages\Microsoft.ApplicationInsights.WindowsServer.TelemetryChannel.2.14.0\build\Microsoft.ApplicationInsights.WindowsServer.TelemetryChannel.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.ApplicationInsights.WindowsServer.TelemetryChannel.2.14.0\build\Microsoft.ApplicationInsights.WindowsServer.TelemetryChannel.targets'))" />
-    <Error Condition="!Exists('..\packages\Microsoft.ApplicationInsights.WindowsServer.2.14.0\build\Microsoft.ApplicationInsights.WindowsServer.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.ApplicationInsights.WindowsServer.2.14.0\build\Microsoft.ApplicationInsights.WindowsServer.targets'))" />
-    <Error Condition="!Exists('..\packages\Microsoft.ApplicationInsights.Web.2.14.0\build\Microsoft.ApplicationInsights.Web.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.ApplicationInsights.Web.2.14.0\build\Microsoft.ApplicationInsights.Web.targets'))" />
-=======
-    <Error Condition="!Exists('..\packages\EntityFramework.6.4.0\build\EntityFramework.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\EntityFramework.6.4.0\build\EntityFramework.props'))" />
-    <Error Condition="!Exists('..\packages\EntityFramework.6.4.0\build\EntityFramework.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\EntityFramework.6.4.0\build\EntityFramework.targets'))" />
-    <Error Condition="!Exists('..\packages\Microsoft.ApplicationInsights.DependencyCollector.2.13.1\build\Microsoft.ApplicationInsights.DependencyCollector.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.ApplicationInsights.DependencyCollector.2.13.1\build\Microsoft.ApplicationInsights.DependencyCollector.targets'))" />
-    <Error Condition="!Exists('..\packages\Microsoft.ApplicationInsights.PerfCounterCollector.2.13.1\build\Microsoft.ApplicationInsights.PerfCounterCollector.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.ApplicationInsights.PerfCounterCollector.2.13.1\build\Microsoft.ApplicationInsights.PerfCounterCollector.targets'))" />
-    <Error Condition="!Exists('..\packages\Microsoft.ApplicationInsights.WindowsServer.TelemetryChannel.2.13.1\build\Microsoft.ApplicationInsights.WindowsServer.TelemetryChannel.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.ApplicationInsights.WindowsServer.TelemetryChannel.2.13.1\build\Microsoft.ApplicationInsights.WindowsServer.TelemetryChannel.targets'))" />
-    <Error Condition="!Exists('..\packages\Microsoft.ApplicationInsights.WindowsServer.2.13.1\build\Microsoft.ApplicationInsights.WindowsServer.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.ApplicationInsights.WindowsServer.2.13.1\build\Microsoft.ApplicationInsights.WindowsServer.targets'))" />
-    <Error Condition="!Exists('..\packages\Microsoft.ApplicationInsights.Web.2.13.1\build\Microsoft.ApplicationInsights.Web.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.ApplicationInsights.Web.2.13.1\build\Microsoft.ApplicationInsights.Web.targets'))" />
-    <Error Condition="!Exists('..\..\My24HourTimerWPF\packages\EntityFramework.6.4.4\build\EntityFramework.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\My24HourTimerWPF\packages\EntityFramework.6.4.4\build\EntityFramework.props'))" />
-    <Error Condition="!Exists('..\..\My24HourTimerWPF\packages\EntityFramework.6.4.4\build\EntityFramework.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\My24HourTimerWPF\packages\EntityFramework.6.4.4\build\EntityFramework.targets'))" />
->>>>>>> master
     <Error Condition="!Exists('..\..\My24HourTimerWPF\packages\Microsoft.ApplicationInsights.DependencyCollector.2.15.0\build\Microsoft.ApplicationInsights.DependencyCollector.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\My24HourTimerWPF\packages\Microsoft.ApplicationInsights.DependencyCollector.2.15.0\build\Microsoft.ApplicationInsights.DependencyCollector.targets'))" />
     <Error Condition="!Exists('..\..\My24HourTimerWPF\packages\Microsoft.ApplicationInsights.PerfCounterCollector.2.15.0\build\Microsoft.ApplicationInsights.PerfCounterCollector.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\My24HourTimerWPF\packages\Microsoft.ApplicationInsights.PerfCounterCollector.2.15.0\build\Microsoft.ApplicationInsights.PerfCounterCollector.targets'))" />
     <Error Condition="!Exists('..\..\My24HourTimerWPF\packages\Microsoft.ApplicationInsights.WindowsServer.TelemetryChannel.2.15.0\build\Microsoft.ApplicationInsights.WindowsServer.TelemetryChannel.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\My24HourTimerWPF\packages\Microsoft.ApplicationInsights.WindowsServer.TelemetryChannel.2.15.0\build\Microsoft.ApplicationInsights.WindowsServer.TelemetryChannel.targets'))" />
     <Error Condition="!Exists('..\..\My24HourTimerWPF\packages\Microsoft.ApplicationInsights.WindowsServer.2.15.0\build\Microsoft.ApplicationInsights.WindowsServer.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\My24HourTimerWPF\packages\Microsoft.ApplicationInsights.WindowsServer.2.15.0\build\Microsoft.ApplicationInsights.WindowsServer.targets'))" />
     <Error Condition="!Exists('..\..\My24HourTimerWPF\packages\Microsoft.ApplicationInsights.Web.2.15.0\build\Microsoft.ApplicationInsights.Web.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\My24HourTimerWPF\packages\Microsoft.ApplicationInsights.Web.2.15.0\build\Microsoft.ApplicationInsights.Web.targets'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.ApplicationInsights.DependencyCollector.2.16.0\build\Microsoft.ApplicationInsights.DependencyCollector.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.ApplicationInsights.DependencyCollector.2.16.0\build\Microsoft.ApplicationInsights.DependencyCollector.targets'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.ApplicationInsights.PerfCounterCollector.2.16.0\build\Microsoft.ApplicationInsights.PerfCounterCollector.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.ApplicationInsights.PerfCounterCollector.2.16.0\build\Microsoft.ApplicationInsights.PerfCounterCollector.targets'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.ApplicationInsights.WindowsServer.TelemetryChannel.2.16.0\build\Microsoft.ApplicationInsights.WindowsServer.TelemetryChannel.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.ApplicationInsights.WindowsServer.TelemetryChannel.2.16.0\build\Microsoft.ApplicationInsights.WindowsServer.TelemetryChannel.targets'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.ApplicationInsights.WindowsServer.2.16.0\build\Microsoft.ApplicationInsights.WindowsServer.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.ApplicationInsights.WindowsServer.2.16.0\build\Microsoft.ApplicationInsights.WindowsServer.targets'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.ApplicationInsights.Web.2.16.0\build\Microsoft.ApplicationInsights.Web.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.ApplicationInsights.Web.2.16.0\build\Microsoft.ApplicationInsights.Web.targets'))" />
   </Target>
-<<<<<<< HEAD
   <Import Project="..\packages\EntityFramework.6.4.4\build\EntityFramework.targets" Condition="Exists('..\packages\EntityFramework.6.4.4\build\EntityFramework.targets')" />
-  <Import Project="..\packages\Microsoft.ApplicationInsights.DependencyCollector.2.14.0\build\Microsoft.ApplicationInsights.DependencyCollector.targets" Condition="Exists('..\packages\Microsoft.ApplicationInsights.DependencyCollector.2.14.0\build\Microsoft.ApplicationInsights.DependencyCollector.targets')" />
-  <Import Project="..\packages\Microsoft.ApplicationInsights.PerfCounterCollector.2.14.0\build\Microsoft.ApplicationInsights.PerfCounterCollector.targets" Condition="Exists('..\packages\Microsoft.ApplicationInsights.PerfCounterCollector.2.14.0\build\Microsoft.ApplicationInsights.PerfCounterCollector.targets')" />
-  <Import Project="..\packages\Microsoft.ApplicationInsights.WindowsServer.TelemetryChannel.2.14.0\build\Microsoft.ApplicationInsights.WindowsServer.TelemetryChannel.targets" Condition="Exists('..\packages\Microsoft.ApplicationInsights.WindowsServer.TelemetryChannel.2.14.0\build\Microsoft.ApplicationInsights.WindowsServer.TelemetryChannel.targets')" />
-  <Import Project="..\packages\Microsoft.ApplicationInsights.WindowsServer.2.14.0\build\Microsoft.ApplicationInsights.WindowsServer.targets" Condition="Exists('..\packages\Microsoft.ApplicationInsights.WindowsServer.2.14.0\build\Microsoft.ApplicationInsights.WindowsServer.targets')" />
-  <Import Project="..\packages\Microsoft.ApplicationInsights.Web.2.14.0\build\Microsoft.ApplicationInsights.Web.targets" Condition="Exists('..\packages\Microsoft.ApplicationInsights.Web.2.14.0\build\Microsoft.ApplicationInsights.Web.targets')" />
-=======
-  <Import Project="..\packages\EntityFramework.6.4.0\build\EntityFramework.targets" Condition="Exists('..\packages\EntityFramework.6.4.0\build\EntityFramework.targets')" />
-  <Import Project="..\packages\Microsoft.ApplicationInsights.DependencyCollector.2.13.1\build\Microsoft.ApplicationInsights.DependencyCollector.targets" Condition="Exists('..\packages\Microsoft.ApplicationInsights.DependencyCollector.2.13.1\build\Microsoft.ApplicationInsights.DependencyCollector.targets')" />
-  <Import Project="..\packages\Microsoft.ApplicationInsights.PerfCounterCollector.2.13.1\build\Microsoft.ApplicationInsights.PerfCounterCollector.targets" Condition="Exists('..\packages\Microsoft.ApplicationInsights.PerfCounterCollector.2.13.1\build\Microsoft.ApplicationInsights.PerfCounterCollector.targets')" />
-  <Import Project="..\packages\Microsoft.ApplicationInsights.WindowsServer.TelemetryChannel.2.13.1\build\Microsoft.ApplicationInsights.WindowsServer.TelemetryChannel.targets" Condition="Exists('..\packages\Microsoft.ApplicationInsights.WindowsServer.TelemetryChannel.2.13.1\build\Microsoft.ApplicationInsights.WindowsServer.TelemetryChannel.targets')" />
-  <Import Project="..\packages\Microsoft.ApplicationInsights.WindowsServer.2.13.1\build\Microsoft.ApplicationInsights.WindowsServer.targets" Condition="Exists('..\packages\Microsoft.ApplicationInsights.WindowsServer.2.13.1\build\Microsoft.ApplicationInsights.WindowsServer.targets')" />
-  <Import Project="..\packages\Microsoft.ApplicationInsights.Web.2.13.1\build\Microsoft.ApplicationInsights.Web.targets" Condition="Exists('..\packages\Microsoft.ApplicationInsights.Web.2.13.1\build\Microsoft.ApplicationInsights.Web.targets')" />
   <PropertyGroup>
     <PreBuildEvent>
     </PreBuildEvent>
   </PropertyGroup>
-  <Import Project="..\..\My24HourTimerWPF\packages\EntityFramework.6.4.4\build\EntityFramework.targets" Condition="Exists('..\..\My24HourTimerWPF\packages\EntityFramework.6.4.4\build\EntityFramework.targets')" />
->>>>>>> master
   <Import Project="..\..\My24HourTimerWPF\packages\Microsoft.ApplicationInsights.DependencyCollector.2.15.0\build\Microsoft.ApplicationInsights.DependencyCollector.targets" Condition="Exists('..\..\My24HourTimerWPF\packages\Microsoft.ApplicationInsights.DependencyCollector.2.15.0\build\Microsoft.ApplicationInsights.DependencyCollector.targets')" />
   <Import Project="..\..\My24HourTimerWPF\packages\Microsoft.ApplicationInsights.PerfCounterCollector.2.15.0\build\Microsoft.ApplicationInsights.PerfCounterCollector.targets" Condition="Exists('..\..\My24HourTimerWPF\packages\Microsoft.ApplicationInsights.PerfCounterCollector.2.15.0\build\Microsoft.ApplicationInsights.PerfCounterCollector.targets')" />
   <Import Project="..\..\My24HourTimerWPF\packages\Microsoft.ApplicationInsights.WindowsServer.TelemetryChannel.2.15.0\build\Microsoft.ApplicationInsights.WindowsServer.TelemetryChannel.targets" Condition="Exists('..\..\My24HourTimerWPF\packages\Microsoft.ApplicationInsights.WindowsServer.TelemetryChannel.2.15.0\build\Microsoft.ApplicationInsights.WindowsServer.TelemetryChannel.targets')" />
   <Import Project="..\..\My24HourTimerWPF\packages\Microsoft.ApplicationInsights.WindowsServer.2.15.0\build\Microsoft.ApplicationInsights.WindowsServer.targets" Condition="Exists('..\..\My24HourTimerWPF\packages\Microsoft.ApplicationInsights.WindowsServer.2.15.0\build\Microsoft.ApplicationInsights.WindowsServer.targets')" />
   <Import Project="..\..\My24HourTimerWPF\packages\Microsoft.ApplicationInsights.Web.2.15.0\build\Microsoft.ApplicationInsights.Web.targets" Condition="Exists('..\..\My24HourTimerWPF\packages\Microsoft.ApplicationInsights.Web.2.15.0\build\Microsoft.ApplicationInsights.Web.targets')" />
+  <Import Project="..\packages\Microsoft.ApplicationInsights.DependencyCollector.2.16.0\build\Microsoft.ApplicationInsights.DependencyCollector.targets" Condition="Exists('..\packages\Microsoft.ApplicationInsights.DependencyCollector.2.16.0\build\Microsoft.ApplicationInsights.DependencyCollector.targets')" />
+  <Import Project="..\packages\Microsoft.ApplicationInsights.PerfCounterCollector.2.16.0\build\Microsoft.ApplicationInsights.PerfCounterCollector.targets" Condition="Exists('..\packages\Microsoft.ApplicationInsights.PerfCounterCollector.2.16.0\build\Microsoft.ApplicationInsights.PerfCounterCollector.targets')" />
+  <Import Project="..\packages\Microsoft.ApplicationInsights.WindowsServer.TelemetryChannel.2.16.0\build\Microsoft.ApplicationInsights.WindowsServer.TelemetryChannel.targets" Condition="Exists('..\packages\Microsoft.ApplicationInsights.WindowsServer.TelemetryChannel.2.16.0\build\Microsoft.ApplicationInsights.WindowsServer.TelemetryChannel.targets')" />
+  <Import Project="..\packages\Microsoft.ApplicationInsights.WindowsServer.2.16.0\build\Microsoft.ApplicationInsights.WindowsServer.targets" Condition="Exists('..\packages\Microsoft.ApplicationInsights.WindowsServer.2.16.0\build\Microsoft.ApplicationInsights.WindowsServer.targets')" />
+  <Import Project="..\packages\Microsoft.ApplicationInsights.Web.2.16.0\build\Microsoft.ApplicationInsights.Web.targets" Condition="Exists('..\packages\Microsoft.ApplicationInsights.Web.2.16.0\build\Microsoft.ApplicationInsights.Web.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
