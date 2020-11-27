@@ -531,7 +531,6 @@
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\NameSearchModel.cs" />
     <Compile Include="Models\NowEventModel.cs" />
-    <Compile Include="Models\PausedEvent.cs" />
     <Compile Include="Models\ProcrastinateModel.cs" />
     <Compile Include="Models\ProcrastinateSubEventModel.cs" />
     <Compile Include="Models\IndexedThirdPartyAuthentication.cs" />

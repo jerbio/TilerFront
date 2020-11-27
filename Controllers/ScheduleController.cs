@@ -356,7 +356,7 @@ namespace TilerFront.Controllers
                     activity.updateMiscelaneousInfo(json.ToString());
 
                     myUser.ScheduleLogControl.updateUserActivty(activity);
-                    await MySchedule.PauseEvent(myAuthorizedUser.EventID, currentPausedEventId);
+                    await MySchedule.PauseEvent(myAuthorizedUser.EventID);
                     await MySchedule.WriteFullScheduleToLog().ConfigureAwait(false);
                     PausedEvent paused;
                     PausedEvent InstanceOfPausedEventAlreadyInDb = pausedEvents.FirstOrDefault(obj => obj.EventId == myAuthorizedUser.EventID);

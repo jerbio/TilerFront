@@ -1740,7 +1740,11 @@ namespace TilerFront
         }
 
 
-        async public virtual Task<IEnumerable<SubCalendarEvent>> getAllEnabledSubCalendarEvent(TimeLine RangeOfLookUP, ReferenceNow Now, bool includeOtherEntities = true, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation)
+        async public virtual Task<IEnumerable<SubCalendarEvent>> getAllEnabledSubCalendarEvent(
+            TimeLine RangeOfLookUP, 
+            ReferenceNow Now, 
+            bool includeOtherEntities = true, 
+            DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation)
         {
             this.Now = Now;
             Stopwatch watch = new Stopwatch();
@@ -1828,6 +1832,11 @@ namespace TilerFront
                     if (tilerIds == null)
                     {
                         tilerIds = new HashSet<string>();
+                    }
+                    EventID pausedEventId = _TilerUser.PausedEventId;
+                    if(pausedEventId!=null)
+                    {
+                        tilerIds.Add(_TilerUser.PausedEventId.ToString());
                     }
                     var calIds = tilerIds.Select(o=> new EventID(o).getAllEventDictionaryLookup).ToArray();
                     IQueryable<SubCalendarEvent> subCalendarEvents = getSubCalendarEventQuery(retrievalOption, includeOtherEntities: true);
