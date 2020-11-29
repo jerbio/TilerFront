@@ -693,29 +693,29 @@ namespace TilerFront.Controllers
         /// <summary>
         /// Have Tiler get you something to do. 
         /// </summary>
-        /// <param name="UserData"></param>
+        /// <param name="shuffleData"></param>
         /// <returns></returns>
         [HttpPost]
         [ResponseType(typeof(PostBackStruct))]
         [Route("api/Schedule/Shuffle")]
-        public async Task<IHttpActionResult> Shuffle([FromBody]ShuffleModel UserData)
+        public async Task<IHttpActionResult> Shuffle([FromBody]UpdateTriggerModel shuffleData)
         {
-            AuthorizedUser myAuthorizedUser = UserData.User;
-            UserAccount retrievedUser = await UserData.getUserAccount(db);
+            AuthorizedUser authorizedUser = shuffleData.User;
+            UserAccount retrievedUser = await shuffleData.getUserAccount(db);
             await retrievedUser.Login();
-            retrievedUser.getTilerUser().updateTimeZoneTimeSpan(UserData.getTimeSpan);
+            retrievedUser.getTilerUser().updateTimeZoneTimeSpan(shuffleData.getTimeSpan);
             if (retrievedUser.Status)
             {
-                DateTimeOffset myNow = myNow = myAuthorizedUser.getRefNow();
+                DateTimeOffset myNow = myNow = authorizedUser.getRefNow();
                 Task<Tuple<ThirdPartyControl.CalendarTool, IEnumerable<CalendarEvent>>> thirdPartyDataTask = ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(retrievedUser.UserID, db);
                 DB_Schedule schedule = new DB_Schedule(retrievedUser, myNow);
-                schedule.CurrentLocation = myAuthorizedUser.getCurrentLocation();
+                schedule.CurrentLocation = authorizedUser.getCurrentLocation();
                 DB_UserActivity activity = new DB_UserActivity(myNow, UserActivity.ActivityType.Shuffle);
                 retrievedUser.ScheduleLogControl.updateUserActivty(activity);
                 var thirdPartyData = await thirdPartyDataTask.ConfigureAwait(false);
                 schedule.updateDataSetWithThirdPartyData(thirdPartyData);
 
-                TilerElements.Location location = myAuthorizedUser.getCurrentLocation();
+                TilerElements.Location location = authorizedUser.getCurrentLocation();
                 await schedule.FindMeSomethingToDo(location).ConfigureAwait(false);
                 await schedule.WriteFullScheduleToLog().ConfigureAwait(false);
 
@@ -741,6 +741,49 @@ namespace TilerFront.Controllers
                 scheduleChangeSocket.triggerRefreshData(retrievedUser.getTilerUser());
                 return Ok(myPostData.getPostBack);
             }
+            throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.Unauthorized)
+            {
+                ReasonPhrase = "Unauthorized access to tiler"
+            });
+        }
+
+
+        /// <summary>
+        /// Have Tiler revise the day
+        /// </summary>
+        /// <param name="reviseData"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [ResponseType(typeof(PostBackStruct))]
+        [Route("api/Schedule/Revise")]
+        public async Task<IHttpActionResult> reviseSchedule([FromBody] UpdateTriggerModel reviseData)
+        {
+            AuthorizedUser authorizedUser = reviseData.User;
+            UserAccount retrievedUser = await reviseData.getUserAccount(db);
+            await retrievedUser.Login();
+            retrievedUser.getTilerUser().updateTimeZoneTimeSpan(reviseData.getTimeSpan);
+            if (retrievedUser.Status)
+            {
+                DateTimeOffset myNow = myNow = authorizedUser.getRefNow();
+                Task<Tuple<ThirdPartyControl.CalendarTool, IEnumerable<CalendarEvent>>> thirdPartyDataTask = ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(retrievedUser.UserID, db);
+                DB_Schedule schedule = new DB_Schedule(retrievedUser, myNow);
+                schedule.CurrentLocation = authorizedUser.getCurrentLocation();
+                DB_UserActivity activity = new DB_UserActivity(myNow, UserActivity.ActivityType.Revise);
+                retrievedUser.ScheduleLogControl.updateUserActivty(activity);
+                var thirdPartyData = await thirdPartyDataTask.ConfigureAwait(false);
+                schedule.updateDataSetWithThirdPartyData(thirdPartyData);
+
+                TilerElements.Location location = authorizedUser.getCurrentLocation();
+                await schedule.reviseSchedule(location).ConfigureAwait(false);
+                await schedule.WriteFullScheduleToLog().ConfigureAwait(false);
+
+                PostBackData retValue = new PostBackData("\"Success\"", 0);
+
+                TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
+                scheduleChangeSocket.triggerRefreshData(retrievedUser.getTilerUser());
+                return Ok(retValue.getPostBack);
+            }
+
             throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.Unauthorized)
             {
                 ReasonPhrase = "Unauthorized access to tiler"
@@ -1051,6 +1094,8 @@ namespace TilerFront.Controllers
             scheduleChangeSocket.triggerRefreshData(retrievedUser.getTilerUser());
             return Ok(retValue.getPostBack);
         }
+
+
 
         /// <summary>
         /// Undoes the last schedule changing effect triggered on tiler.

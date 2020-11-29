@@ -1595,11 +1595,13 @@ function BindProcrastinateAllButton() {
 }
 
 
+
 function InitializeMonthlyOverview()
 {
     BindAddButton();
     BindProcrastinateAllButton();
     SomethingNewButton(document.getElementById('SomethingNew'))
+    BindReviseButton(document.getElementById('ReviseScheduleButton'))
     initializeUserLocation();
     var verifiedUser = GetCookieValue();
     if (verifiedUser == "")
