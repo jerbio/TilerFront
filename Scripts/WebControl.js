@@ -2832,6 +2832,59 @@ function Location(Tag, Address, LocationIsVerified, LocationId)
     }
 
 
+    
+    function BindReviseButton(reviseButton, callback) {
+        let reviseScheduleButton = reviseButton;
+
+        function reviseSchedule() {
+            var TimeZone = new Date().getTimezoneOffset();
+            let reviseData = { UserName: UserCredentials.UserName, UserID: UserCredentials.ID, TimeZoneOffset: TimeZone, Longitude: global_PositionCoordinate.Longitude, Latitude: global_PositionCoordinate.Latitude, IsInitialized: global_PositionCoordinate.isInitialized };
+            let url = global_refTIlerUrl + "Schedule/Revise";
+            let handleNewPage = new LoadingScreenControl("Tiler revising the day :)");
+            handleNewPage.Launch();
+            reviseData.TimeZone = moment.tz.guess()
+            preSendRequestWithLocation(reviseData);
+            var exit = function (data) {
+                handleNewPage.Hide();
+                global_ExitManager.triggerLastExitAndPop();
+            }
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: reviseData,
+                // DO NOT SET CONTENT TYPE to json
+                // contentType: "application/json; charset=utf-8", 
+                // DataType needs to stay, otherwise the response object
+                // will be treated as a single string
+                dataType: "json",
+                success: function (response) {
+                    triggerUndoPanel("Undo schedule revision");
+                    var myContainer = (response);
+                    if (myContainer.Error.code == 0) {
+                        if (isFunction(callback)) {
+                            callback(response);
+                        }
+                    }
+                    else {
+                        alert("error optimizing your schedule");
+                    }
+
+                },
+                error: function () {
+                    var NewMessage = "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
+                    var ExitAfter = {
+                        ExitNow: true, Delay: 1000
+                    };
+                    handleNewPage.UpdateMessage(NewMessage, ExitAfter, exit);
+                }
+            }).done(function (data) {
+                handleNewPage.Hide();
+                sendPostScheduleEditAnalysisUpdate({});
+            });
+        }
+        reviseScheduleButton.onclick = reviseSchedule;
+    }
+
     function removeAllChildNodes(myNode) {
         while (myNode.firstChild) {
             myNode.removeChild(myNode.firstChild);
