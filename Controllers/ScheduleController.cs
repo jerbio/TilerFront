@@ -22,6 +22,7 @@ using System.Data.Entity;
 using TilerCore;
 using Location = TilerElements.Location;
 using System.Diagnostics;
+using ScheduleAnalysis;
 
 namespace TilerFront.Controllers
 {
@@ -1657,11 +1658,11 @@ namespace TilerFront.Controllers
             string DurationDays = newEvent.DurationDays;
             string DurationHours = newEvent.DurationHours;
             string DurationMins = newEvent.DurationMins;
-            string EndDay = newEvent.EndDay;
-            string EndHour = newEvent.EndHour;
-            string EndMins = newEvent.EndMins;
-            string EndMonth = newEvent.EndMonth;
-            string EndYear = newEvent.EndYear;
+            string EndDay = newEvent.EndDay.isNot_NullEmptyOrWhiteSpace() ? newEvent.EndDay : (1).ToString();
+            string EndHour = newEvent.EndHour.isNot_NullEmptyOrWhiteSpace() ? newEvent.EndHour : (0).ToString();
+            string EndMins = newEvent.EndMins.isNot_NullEmptyOrWhiteSpace() ? newEvent.EndMins : (0).ToString();
+            string EndMonth = newEvent.EndMonth.isNot_NullEmptyOrWhiteSpace() ? newEvent.EndMonth : (1).ToString();
+            string EndYear = newEvent.EndYear.isNot_NullEmptyOrWhiteSpace() ? newEvent.EndYear : (DateTimeOffset.UtcNow.Year + 20).ToString();
 
             string LocationAddress = string.IsNullOrEmpty( newEvent.LocationAddress)?"": newEvent.LocationAddress;
             string LocationTag = LocationAddress = string.IsNullOrEmpty(newEvent.LocationTag) ? "" : newEvent.LocationTag;
@@ -1697,7 +1698,7 @@ namespace TilerFront.Controllers
             string EndTime = EndHour + ":" + EndMins;
             DateTimeOffset StartDateEntry = new DateTimeOffset(Convert.ToInt32(StartYear), Convert.ToInt32(StartMonth), Convert.ToInt32(StartDay), 0, 0, 0, new TimeSpan());
             DateTimeOffset EndDateEntry = new DateTimeOffset(Convert.ToInt32(EndYear), Convert.ToInt32(EndMonth), Convert.ToInt32(EndDay), 0, 0, 0, new TimeSpan());
-
+            
             TimeSpan fullTimeSpan = new TimeSpan(Convert.ToInt32(DurationDays), Convert.ToInt32(DurationHours), Convert.ToInt32(DurationMins), 0);
             TimeSpan EventDuration = TimeSpan.FromSeconds(fullTimeSpan.TotalSeconds * Convert.ToInt32(Count));
 
@@ -1829,10 +1830,19 @@ namespace TilerFront.Controllers
                     MySchedule = (DB_Schedule)tempSched.Item1;
                 }
 #endif
+                TimeLine timeline = new TimeLine(schedule.Now.constNow.AddDays(-45), schedule.Now.constNow.AddDays(45));
+                var tupleOfSUbEVentsAndAnalysis = retrievedUser.ScheduleLogControl.getSubCalendarEventForAnalysis(timeline, retrievedUser.ScheduleLogControl.getTilerRetrievedUser());
+                List<SubCalendarEvent> subEvents = tupleOfSUbEVentsAndAnalysis.Item1.ToList();
+                Analysis analysis = tupleOfSUbEVentsAndAnalysis.Item2;
+
+                ScheduleSuggestionsAnalysis scheduleSuggestion = new ScheduleSuggestionsAnalysis(subEvents, retrievedUser.ScheduleLogControl.Now, retrievedUser.ScheduleLogControl.getTilerRetrievedUser(), analysis);
+                DateTimeOffset deadline = scheduleSuggestion.evaluateIdealDeadline(newCalendarEvent, schedule.getAllActiveCalendarEvents().ToList());
+
 
                 Tuple<List<SubCalendarEvent>[], DayTimeLine[], List<SubCalendarEvent>> peekingEvents = schedule.peekIntoSchedule(newCalendarEvent);
                 PeekResult peekData = new PeekResult(peekingEvents.Item1, peekingEvents.Item2, peekingEvents.Item3);
-                
+                peekData.DeadlineSuggestion = deadline;
+
                 CustomErrors userError = newCalendarEvent.Error;
                 int errorCode = userError?.Code ?? 0;
                 retValue = new PostBackData(peekData, errorCode);
