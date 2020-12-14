@@ -1658,11 +1658,11 @@ namespace TilerFront.Controllers
             string DurationDays = newEvent.DurationDays;
             string DurationHours = newEvent.DurationHours;
             string DurationMins = newEvent.DurationMins;
-            string EndDay = newEvent.EndDay.isNot_NullEmptyOrWhiteSpace() ? newEvent.EndDay : (1).ToString();
-            string EndHour = newEvent.EndHour.isNot_NullEmptyOrWhiteSpace() ? newEvent.EndHour : (0).ToString();
-            string EndMins = newEvent.EndMins.isNot_NullEmptyOrWhiteSpace() ? newEvent.EndMins : (0).ToString();
-            string EndMonth = newEvent.EndMonth.isNot_NullEmptyOrWhiteSpace() ? newEvent.EndMonth : (1).ToString();
-            string EndYear = newEvent.EndYear.isNot_NullEmptyOrWhiteSpace() ? newEvent.EndYear : (DateTimeOffset.UtcNow.Year + 20).ToString();
+            string EndDay = newEvent.EndDay.isNot_NullEmptyOrWhiteSpace() && newEvent.EndDay != "NaN" ? newEvent.EndDay : (1).ToString();
+            string EndHour = newEvent.EndHour.isNot_NullEmptyOrWhiteSpace() && newEvent.EndHour != "NaN" ? newEvent.EndHour : (0).ToString();
+            string EndMins = newEvent.EndMins.isNot_NullEmptyOrWhiteSpace() && newEvent.EndMins != "NaN" ? newEvent.EndMins : (0).ToString();
+            string EndMonth = newEvent.EndMonth.isNot_NullEmptyOrWhiteSpace() && newEvent.EndMonth != "NaN" ? newEvent.EndMonth : (1).ToString();
+            string EndYear = newEvent.EndYear.isNot_NullEmptyOrWhiteSpace() && newEvent.EndYear != "NaN" ? newEvent.EndYear : (DateTimeOffset.UtcNow.Year + 20).ToString();
 
             string LocationAddress = string.IsNullOrEmpty( newEvent.LocationAddress)?"": newEvent.LocationAddress;
             string LocationTag = LocationAddress = string.IsNullOrEmpty(newEvent.LocationTag) ? "" : newEvent.LocationTag;
@@ -1841,7 +1841,7 @@ namespace TilerFront.Controllers
 
                 Tuple<List<SubCalendarEvent>[], DayTimeLine[], List<SubCalendarEvent>> peekingEvents = schedule.peekIntoSchedule(newCalendarEvent);
                 PeekResult peekData = new PeekResult(peekingEvents.Item1, peekingEvents.Item2, peekingEvents.Item3);
-                peekData.DeadlineSuggestion = deadline;
+                peekData.DeadlineSuggestion = deadline.ToUnixTimeMilliseconds();
 
                 CustomErrors userError = newCalendarEvent.Error;
                 int errorCode = userError?.Code ?? 0;

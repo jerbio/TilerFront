@@ -1868,29 +1868,6 @@ function Location(Tag, Address, LocationIsVerified, LocationId)
         return RetValue;
     }
 
-    /*Function tries to check if the passed object (d) is a valid date object*/
-    function isDateValid(d)
-    {
-        var RetValue = true;
-        if (Object.prototype.toString.call(d) === "[object Date]")
-        {
-            if (isNaN(d.getTime())) {  // d.valueOf() could also work
-                // date is not valid
-                RetValue = false;
-            }
-            else {
-                // date is valid
-                RetValue = true;
-            }
-        }
-        else {
-            // not a date
-            RetValue = false;
-        }
-
-        return RetValue;
-    }
-
     function date_mm_dd__yyyy_ToDateObj(DateString,Delimiter)
     {
         var DateArray = DateString.split(Delimiter);
