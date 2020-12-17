@@ -270,6 +270,7 @@ function triggerUndoPanel(UndoMessage)
 
 
 function configureAuthorizationToken(userName, password) {
+    // Checkout this stack over flow for appropriate setup https://stackoverflow.com/questions/29360349/getting-error-unsupported-grant-type-when-trying-to-get-a-jwt-by-calling-an
     let url = window.location.origin + "/account/token";
     let LoginCredentials = {username: userName, password: password, "grant_type":'password'};
     let retValue = $.ajax({
