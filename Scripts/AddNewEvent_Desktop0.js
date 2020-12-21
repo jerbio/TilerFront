@@ -658,6 +658,7 @@ function generatePeek(CalEvent,Container)
 
             },
             error: function (err) {
+                debugger
                 //var myError = err;
                 //var step = "err";
                 //var NewMessage = "Oh No!!! Tiler is having issues modifying your schedule. Please try again Later :(";
@@ -678,9 +679,41 @@ function generatePeek(CalEvent,Container)
         $(Container).removeClass("RevealPreviewPanel");
     }
 
+    function renderSuggestedDeadline(container, peekData) {
+        let suggestedDeadlineDomId = 'suggestedDeadlineContainer'
+        let suggestedDeadlineDom = getDomOrCreateNew(suggestedDeadlineDomId)
+        if(peekData.DeadlineSuggestion > 0) {
+            container.appendChild(suggestedDeadlineDom);
+            let suggestedDeadlineLabelId = 'suggestedDeadlineLabel'
+            let suggestedDeadlineLabel= getDomOrCreateNew(suggestedDeadlineLabelId, 'label')
+            let suggestedDeadlineButtonId = 'suggestedDeadlineButton'
+            let suggestedDeadlineButton = getDomOrCreateNew(suggestedDeadlineButtonId)
+            suggestedDeadlineDom.appendChild(suggestedDeadlineLabel)
+            suggestedDeadlineDom.appendChild(suggestedDeadlineButton)
+            suggestedDeadlineLabel.innerHTML = 'Suggested date:'
+            let dateOfString = (new Date(peekData.DeadlineSuggestion)).toLocaleDateString()
+            suggestedDeadlineButton.innerHTML = dateOfString
+        } else {
+            if (suggestedDeadlineDom.parentNode) {
+                suggestedDeadlineDom.classList.add("setAsDisplayNone");
+                suggestedDeadlineDom.remove()
+            }
+        }
+        
+
+    }
+
     function RevealPeekUI(Container, PeekData)
     {
+        
+        
         $(Container).addClass("RevealPreviewPanel");
+        let forecastChartContainerId = 'forecastChartContainer'
+        let chartContainer = getDomOrCreateNew(forecastChartContainerId)
+        Container.appendChild(chartContainer)
+        
+        
+        renderSuggestedDeadline(Container, PeekData)
         /*
         ;
         var PeekDaysSampleData = [
@@ -764,7 +797,7 @@ function generatePeek(CalEvent,Container)
         {
             setTimeout(function ()
             {
-                var mydata1 = $(Container).highcharts(HighChartsData);
+                var mydata1 = $(chartContainer).highcharts(HighChartsData);
                 generatePeek.ChartData = mydata1;
             }, 700)
             
@@ -779,7 +812,6 @@ function generatePeek(CalEvent,Container)
 
         var startWithDataset = 1;
         var startWithData = 1;
-
 
     }
     
@@ -3079,13 +3111,14 @@ function isCalEvenValidForPeek(CalEvent)
     var Result = { isError: false, ErrorMessage: "" };
     var TotalDuration = getTotalDurationFromCalEvent(CalEvent);
     var EndDate = getCalEventEnd(CalEvent);
+    let currentTime = Date.now();
 
     if (!(TotalDuration > 0)) {
         Result.isError = true;
         Result.ErrorMessage = "You havent set the duration for your tile";
         return Result;
     }
-    if (!isDateValid(EndDate)) {
+    if (isDateValid(EndDate) && EndDate.getTime() < currentTime ) {
         Result.isError = true;
         Result.ErrorMessage = "Please provide the deadline for your event";
         return Result;

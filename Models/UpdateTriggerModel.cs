@@ -5,7 +5,7 @@ using System.Web;
 
 namespace TilerFront.Models
 {
-    public class ShuffleModel : AuthorizedUser
+    public class UpdateTriggerModel : AuthorizedUser
     {
         public bool IsInitialized { get; set; } = false;
         public AuthorizedUser User
