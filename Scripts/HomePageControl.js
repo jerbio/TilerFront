@@ -314,9 +314,9 @@ function populateHomePageFooter(Dom)
         $(ProcrastinateDom).addClass(CurrentTheme.ProcrastinateAllIcon);
         ProcrastinateDom.addEventListener("click", onProcrastinateAll);
     }
-    var shuffleButton = getDomOrCreateNew("ShuffleButton");
+    let shuffleButton = getDomOrCreateNew("ShuffleButton");
     $(shuffleButton).addClass("ShuffleButton ControlPanelButton SomethingNew")
-    var shuffleCallback = function (response) {
+    let shuffleCallback = function (response) {
         RefreshSubEventsMainDivSubEVents();
     }
     SomethingNewButton(shuffleButton, shuffleCallback);
@@ -324,8 +324,18 @@ function populateHomePageFooter(Dom)
     $(ProcrastinateDom).empty();
     AddButtonDom.onclick = AddNewEventOnClick;
 
+
+    let reviseButton = getDomOrCreateNew("ReviseScheduleButton");
+    $(reviseButton).addClass("ReviseScheduleButton ControlPanelButton ReviseScheduleButton")
+    let reviseCallback = function (response) {
+        RefreshSubEventsMainDivSubEVents();
+    }
+    BindReviseButton(reviseButton, reviseCallback);
+
+
     $(Dom).append(AddButtonDom);
     $(Dom).append(shuffleButton);
+    $(Dom).append(reviseButton);
     $(Dom).append(ProcrastinateDom);
     return Dom;
 }

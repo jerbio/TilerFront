@@ -11,6 +11,9 @@ namespace TilerFront
     public class PeekResult
     {
         public PeekDay[] PeekDays;
+        public long DeadlineSuggestion = Utility.BeginningOfTime.ToUnixTimeSeconds();
+        public List<CalendarEvent> RiskCalendarEvents = new List<CalendarEvent>();
+        public List<CalendarEvent> Conflicts = new List<CalendarEvent>();
         public int ConflictingCount;
         public PeekResult(IEnumerable<IEnumerable<SubCalendarEvent>>AllInterferringEvents,DayTimeLine[] DayReferences, IEnumerable<SubCalendarEvent>ConflictingEvents)
         {

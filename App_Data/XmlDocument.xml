@@ -814,11 +814,18 @@
             <param name="UserData"></param>
             <returns></returns>
         </member>
-        <member name="M:TilerFront.Controllers.ScheduleController.Shuffle(TilerFront.Models.ShuffleModel)">
+        <member name="M:TilerFront.Controllers.ScheduleController.Shuffle(TilerFront.Models.UpdateTriggerModel)">
             <summary>
             Have Tiler get you something to do. 
             </summary>
-            <param name="UserData"></param>
+            <param name="shuffleData"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TilerFront.Controllers.ScheduleController.reviseSchedule(TilerFront.Models.UpdateTriggerModel)">
+            <summary>
+            Have Tiler revise the day
+            </summary>
+            <param name="reviseData"></param>
             <returns></returns>
         </member>
         <member name="M:TilerFront.Controllers.ScheduleController.CompleteSubCalendarEvent(TilerFront.Models.getEventModel)">
