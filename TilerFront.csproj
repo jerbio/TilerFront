@@ -508,6 +508,10 @@
     <Compile Include="LogControlXml.cs" />
     <Compile Include="LogControlDirect.cs" />
     <Compile Include="LogControl.cs" />
+    <Compile Include="Migrations\202012290650449_pauseUpdate.cs" />
+    <Compile Include="Migrations\202012290650449_pauseUpdate.designer.cs">
+      <DependentUpon>202012290650449_pauseUpdate.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -2889,6 +2893,11 @@
       <Project>{f948eba6-4b87-4162-b240-a5c19829f889}</Project>
       <Name>ScheduleAnalysis</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\202012290650449_pauseUpdate.resx">
+      <DependentUpon>202012290650449_pauseUpdate.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
