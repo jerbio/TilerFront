@@ -358,7 +358,7 @@ namespace TilerFront
             }
 
 
-            Task saveDbChangesTask = _Context.SaveChangesAsync();
+            Task saveDbChangesTask = SaveDBChanges();
             if (_TempDump != null && _UpdateBigData)
             {
                 ReferenceNow now = new ReferenceNow(_TempDump.ReferenceNow, _TempDump.StartOfDay, _TilerUser.TimeZoneDifference);
@@ -372,6 +372,12 @@ namespace TilerFront
 
             await saveDbChangesTask.ConfigureAwait(false);
 #endif
+        }
+
+        public async Task SaveDBChanges ()
+        {
+            Task saveDbChangesTask = _Context.SaveChangesAsync();
+            await saveDbChangesTask.ConfigureAwait(false);
         }
 
         public async Task Commit(IEnumerable<CalendarEvent> calendarEvents, CalendarEvent calendarEvent, String LatestId, ReferenceNow now, TravelCache travelCache)

@@ -5720,7 +5720,7 @@ function GlobaPauseResumeButtonManager(events) {
     {
         var currentTimeInMs = new Date().getTime();
         //If an event is currently paused then just show resume button and don't handle other pauseable events
-        if (pauseData.pausedEvent != null)
+        if (pauseData.pausedEvent != null && !pauseData.pausedEvent.isPauseDeleted)
         {
             SwitchToResume(pauseData.pausedEvent.EventId);
         }

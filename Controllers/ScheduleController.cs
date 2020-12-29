@@ -377,7 +377,7 @@ namespace TilerFront.Controllers
                         InstanceOfPausedEventAlreadyInDb.isPauseDeleted = false;
                         db.Entry(InstanceOfPausedEventAlreadyInDb).State = EntityState.Modified;
                     }
-                    await db.SaveChangesAsync();
+                    await myUser.ScheduleLogControl.SaveDBChanges().ConfigureAwait(false);
                 }
                 PostBackData myPostData = new PostBackData("\"Success\"", 0);
                 TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
@@ -421,7 +421,7 @@ namespace TilerFront.Controllers
                     pausedCalEvent = MySchedule.getCalendarEvent(PausedEvent.EventId);
                     PausedEvent.isPauseDeleted = true;
                     db.Entry(PausedEvent).State = EntityState.Modified;
-                    await db.SaveChangesAsync();
+                    await myUser.ScheduleLogControl.SaveDBChanges().ConfigureAwait(false);
 
                     TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
                     scheduleChangeSocket.triggerRefreshData(myUser.getTilerUser());
