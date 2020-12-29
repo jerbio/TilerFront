@@ -957,7 +957,7 @@ namespace TilerFront
             //XmlElement PauseTime = xmldoc.CreateElement("PauseTime");
             XmlElement pausedTimeSlots = xmldoc.CreateElement("PausedTimeSlots");
             XmlElement RetValue = xmldoc.CreateElement("PauseInformation");
-            UsedUpTime.InnerText = SubEvent.UsedTime.ToString();
+            UsedUpTime.InnerText = SubEvent.UsedPauseTime.ToString();
 
             List<XmlElement> timeLineNodes = (SubEvent.pausedTimeLines?? new List<PausedTimeLine>()).Select(timeline => TimelineToXmlNode(timeline, xmldoc)).ToList();
             //PauseTime.InnerText = SubEvent.getPauseTime().ToString();
@@ -1899,8 +1899,9 @@ namespace TilerFront
                     subCalendarEvents = subCalendarEvents
                         .Include(subEvent => subEvent.ParentCalendarEvent)
                         .Include(subEvent => subEvent.ParentCalendarEvent.RepeatParentEvent)
-                        .Include(subEvent => subEvent.RepeatParentEvent)
+                        .Include(subEvent => subEvent.RepeatParentEvent.ProfileOfNow_EventDB)
                         .Include(subEvent => subEvent.ParentCalendarEvent.RestrictionProfile_DB)
+                        .Include(subEvent => subEvent.ParentCalendarEvent.ProfileOfNow_EventDB)
                         .Include(subEvent => subEvent.RepeatParentEvent.RestrictionProfile_DB)
                         .Include(subEvent => subEvent.ProfileOfNow_EventDB)
                         .Include(subEvent => subEvent.Procrastination_EventDB)
@@ -2859,13 +2860,13 @@ namespace TilerFront
                 {
                     retrievedSubEvent = new DB_SubCalendarEvent(MyParent, creator, userGroup, timeZone, ID, name, BusySlot, Start, End, PrepTime, ID, rigidFlag, Enabled, UiData, noteData, CompleteFlag, var1, MyParent.StartToEnd, conflictProfile);
                     retrievedSubEvent = new DB_SubCalendarEvent(retrievedSubEvent, MyParent.getNowInfo, MyParent.getProcrastinationInfo, MyParent);
-                    (retrievedSubEvent as DB_SubCalendarEvent).UsedTime = PauseData.Item1;
+                    (retrievedSubEvent as DB_SubCalendarEvent).UsedTime_EventDB = (long)PauseData.Item1.TotalMilliseconds;
                     (retrievedSubEvent as DB_SubCalendarEvent).setPausedTimeSlots(PauseData.Item3);
                 }
                 else
                 {
                     DB_ProcrastinateAllSubCalendarEvent procrastinateSubEvent = new DB_ProcrastinateAllSubCalendarEvent(creator, userGroup, timeZone, new TimeLine(Start, End), new EventID(ID), MyParent.Location, MyParent as ProcrastinateCalendarEvent, Enabled, CompleteFlag);
-                    procrastinateSubEvent.UsedTime = PauseData.Item1;
+                    procrastinateSubEvent.UsedPauseTime_DB = (long)PauseData.Item1.TotalMilliseconds;
                     (procrastinateSubEvent ).setPausedTimeSlots(PauseData.Item3);
                     retrievedSubEvent = procrastinateSubEvent;
                 }
@@ -2885,7 +2886,7 @@ namespace TilerFront
                         XmlNode RestrictionProfileNode = MyXmlNode.ChildNodes[i].SelectSingleNode("RestrictionProfile");
                         DB_RestrictionProfile myRestrictionProfile = (DB_RestrictionProfile)getRestrictionProfile(RestrictionProfileNode);
                         retrievedSubEvent = new DB_SubCalendarEventRestricted(retrievedSubEvent, myRestrictionProfile, MyParent as CalendarEventRestricted, this.Now);
-                        (retrievedSubEvent as DB_SubCalendarEventRestricted).UsedTime = PauseData.Item1;
+                        (retrievedSubEvent as DB_SubCalendarEventRestricted).UsedTime_EventDB = (long)PauseData.Item1.TotalMilliseconds;
                         (retrievedSubEvent as DB_SubCalendarEventRestricted).setPausedTimeSlots(PauseData.Item3);
                     }
                 }
@@ -2985,7 +2986,7 @@ namespace TilerFront
                 TimeSpan UsedUpTime = TimeSpan.Parse(PauseInformation.SelectSingleNode("UsedUpTime").InnerText);
                 XmlNode pauseTimeNode = PauseInformation.SelectSingleNode("PauseTime");
                 DateTimeOffset PauseTime = new DateTimeOffset();
-                if (pauseTimeNode == null)
+                if (pauseTimeNode != null && pauseTimeNode.InnerText.isNot_NullEmptyOrWhiteSpace())
                 {
                     PauseTime = Utility.ParseTime(pauseTimeNode.InnerText);
                 }
