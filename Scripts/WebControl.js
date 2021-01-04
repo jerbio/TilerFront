@@ -270,6 +270,7 @@ function triggerUndoPanel(UndoMessage)
 
 
 function configureAuthorizationToken(userName, password) {
+    // Checkout this stack over flow for appropriate setup https://stackoverflow.com/questions/29360349/getting-error-unsupported-grant-type-when-trying-to-get-a-jwt-by-calling-an
     let url = window.location.origin + "/account/token";
     let LoginCredentials = {username: userName, password: password, "grant_type":'password'};
     let retValue = $.ajax({
@@ -1868,29 +1869,6 @@ function Location(Tag, Address, LocationIsVerified, LocationId)
         return RetValue;
     }
 
-    /*Function tries to check if the passed object (d) is a valid date object*/
-    function isDateValid(d)
-    {
-        var RetValue = true;
-        if (Object.prototype.toString.call(d) === "[object Date]")
-        {
-            if (isNaN(d.getTime())) {  // d.valueOf() could also work
-                // date is not valid
-                RetValue = false;
-            }
-            else {
-                // date is valid
-                RetValue = true;
-            }
-        }
-        else {
-            // not a date
-            RetValue = false;
-        }
-
-        return RetValue;
-    }
-
     function date_mm_dd__yyyy_ToDateObj(DateString,Delimiter)
     {
         var DateArray = DateString.split(Delimiter);
@@ -2831,6 +2809,59 @@ function Location(Tag, Address, LocationIsVerified, LocationId)
         FindSomethingNewButton.onclick = reoptimizeSchedule;
     }
 
+
+    
+    function BindReviseButton(reviseButton, callback) {
+        let reviseScheduleButton = reviseButton;
+
+        function reviseSchedule() {
+            var TimeZone = new Date().getTimezoneOffset();
+            let reviseData = { UserName: UserCredentials.UserName, UserID: UserCredentials.ID, TimeZoneOffset: TimeZone, Longitude: global_PositionCoordinate.Longitude, Latitude: global_PositionCoordinate.Latitude, IsInitialized: global_PositionCoordinate.isInitialized };
+            let url = global_refTIlerUrl + "Schedule/Revise";
+            let handleNewPage = new LoadingScreenControl("Tiler revising the day :)");
+            handleNewPage.Launch();
+            reviseData.TimeZone = moment.tz.guess()
+            preSendRequestWithLocation(reviseData);
+            var exit = function (data) {
+                handleNewPage.Hide();
+                global_ExitManager.triggerLastExitAndPop();
+            }
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: reviseData,
+                // DO NOT SET CONTENT TYPE to json
+                // contentType: "application/json; charset=utf-8", 
+                // DataType needs to stay, otherwise the response object
+                // will be treated as a single string
+                dataType: "json",
+                success: function (response) {
+                    triggerUndoPanel("Undo schedule revision");
+                    var myContainer = (response);
+                    if (myContainer.Error.code == 0) {
+                        if (isFunction(callback)) {
+                            callback(response);
+                        }
+                    }
+                    else {
+                        alert("error optimizing your schedule");
+                    }
+
+                },
+                error: function () {
+                    var NewMessage = "Ooops Tiler is having issues accessing your schedule. Please try again Later:X";
+                    var ExitAfter = {
+                        ExitNow: true, Delay: 1000
+                    };
+                    handleNewPage.UpdateMessage(NewMessage, ExitAfter, exit);
+                }
+            }).done(function (data) {
+                handleNewPage.Hide();
+                sendPostScheduleEditAnalysisUpdate({});
+            });
+        }
+        reviseScheduleButton.onclick = reviseSchedule;
+    }
 
     function removeAllChildNodes(myNode) {
         while (myNode.firstChild) {

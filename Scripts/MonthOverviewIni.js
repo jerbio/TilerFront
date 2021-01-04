@@ -1595,11 +1595,13 @@ function BindProcrastinateAllButton() {
 }
 
 
+
 function InitializeMonthlyOverview()
 {
     BindAddButton();
     BindProcrastinateAllButton();
     SomethingNewButton(document.getElementById('SomethingNew'))
+    BindReviseButton(document.getElementById('ReviseScheduleButton'))
     initializeUserLocation();
     var verifiedUser = GetCookieValue();
     if (verifiedUser == "")
@@ -5541,16 +5543,19 @@ function GlobaPauseResumeButtonManager(events) {
 
     function SwitchToResume(eventId)
     {
+        var SubEvent = Dictionary_OfSubEvents[eventId];
         var pauseResumeButton = getDomOrCreateNew(buttonId)
         $(pauseResumeButton).addClass("ControlPanelResumePanelButton");
         $(pauseResumeButton).removeClass("ControlPanelPausePanelButton");
         ShowPauseResumeButton();
-        var SubEvent = Dictionary_OfSubEvents[eventId];
+        
         if (SubEvent) {
             pauseResumeButton.setAttribute("Title", "Resume \"" + SubEvent.Name + "\"");
             pauseResumeButton.onclick = function () {
                 continueEvent(SubEvent);
             }
+        } else {
+            pauseResumeButton.setAttribute("Title", "There is an error with resuming, sub event was not pulled in probably because its out of range.");
         }
         
     }
@@ -5715,7 +5720,7 @@ function GlobaPauseResumeButtonManager(events) {
     {
         var currentTimeInMs = new Date().getTime();
         //If an event is currently paused then just show resume button and don't handle other pauseable events
-        if (pauseData.pausedEvent != null)
+        if (pauseData.pausedEvent != null && !pauseData.pausedEvent.isPauseDeleted)
         {
             SwitchToResume(pauseData.pausedEvent.EventId);
         }
