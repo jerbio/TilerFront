@@ -613,18 +613,19 @@ function generatePeek(CalEvent,Container)
         return;
     }
 
+    if(generatePeek.Connection === undefined) {
+        generatePeek.Connection = null;
+    }
     
     createPeekUI(CalEvent, Container)
     //RevealPeekUI(Container, PeekData);
 
-    return;
-
     function createPeekUI(CalEvent, Container)
     {
-        if (createPeekUI.Connection!=null)
+        if (generatePeek.Connection!=null)
         {
-            createPeekUI.Connection.abort();
-            createPeekUI.Connection = null;
+            generatePeek.Connection.abort();
+            generatePeek.Connection = null;
         }
 
         CalEvent.UserName = UserCredentials.UserName;
@@ -635,7 +636,7 @@ function generatePeek(CalEvent,Container)
         var url = global_refTIlerUrl + "Schedule/Peek";
         preSendRequestWithLocation(CalEvent);
         getRefreshedData.disableDataRefresh();
-        createPeekUI.Connection = $.ajax({
+        generatePeek.Connection = $.ajax({
             type: "POST",
             url: url,
             data: CalEvent,
@@ -654,7 +655,7 @@ function generatePeek(CalEvent,Container)
                 RevealPeekUI(Container, response.Content);
                 //getRefreshedData.enableDataRefresh(true);
                 //affirmNewEvent(response);
-                createPeekUI.Connection = null;
+                generatePeek.Connection = null;
 
             },
             error: function (err) {
@@ -671,7 +672,7 @@ function generatePeek(CalEvent,Container)
         });
     }
 
-    createPeekUI.Connection = null;
+    
 
     function HidePeekUI(Container)
     {
@@ -814,10 +815,6 @@ function generatePeek(CalEvent,Container)
         var startWithData = 1;
 
     }
-    
-
-    
-    
 }
 
 generatePeek.peekIsOn = false;

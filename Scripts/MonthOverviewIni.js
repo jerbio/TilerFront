@@ -8,7 +8,7 @@ var global_RangeMultiplier = 5;//range for number of weeks to be specified for c
 var global_CurrentRange;
 var global_ClearRefreshDataInterval = 10000;
 var global_ColorAugmentation = 0;
-var refreshCounter = 1000;
+var refreshNoteer = 1000;
 var global_refreshDataInterval = 45000;
 var global_multiSelect;
 var global_ControlPanelIconSet = new IconSet();
@@ -144,7 +144,7 @@ function DisplayFullGrid()
 function MenuManger()
 {
     var TilerManager = getDomOrCreateNew("TilerManager");
-    TilerManager.RevealCount=0;
+    TilerManager.RevealNote=0;
     TilerManager.onmouseover = revealMenuContainer;
     TilerManager.onmouseout = unRevealMenuContainer;
     var MenuContainer = getDomOrCreateNew("MenuContainer");
@@ -159,28 +159,28 @@ function MenuManger()
             $(MenuContainer).removeClass("setAsDisplayNone");
             MenuContainer.style.width = "auto";
             MenuContainer.style.left = "-20px"
-            ++TilerManager.RevealCount;
+            ++TilerManager.RevealNote;
         }//,200)
     }
 
     function unRevealMenuContainer()
     {
-        function getCurrentCount()
+        function getCurrentNote()
         {
-            var RetValue = TilerManager.RevealCount
+            var RetValue = TilerManager.RevealNote
             return RetValue;
         }
-        var CurrentCount = getCurrentCount();
-        ResolveHideStatus(CurrentCount);
+        var CurrentNote = getCurrentNote();
+        ResolveHideStatus(CurrentNote);
 
 
-        function ResolveHideStatus(CountSofar)
+        function ResolveHideStatus(NoteSofar)
         {
             setTimeout(function () {
-                if (CountSofar==getCurrentCount())
+                if (NoteSofar==getCurrentNote())
                 {
                     TriggerHide();
-                    TilerManager.RevealCount=0
+                    TilerManager.RevealNote=0
                     return;
                 }
                 return;
@@ -312,8 +312,8 @@ function RenderTimeInformationClassic(DayOfWeek, ID) {
     var HeightPx = (DayOfWeek.UISpecs[ID].css.height / 100) * global_DayHeight;
     HeightPx = HeightPx < 50 ? 50 : HeightPx;
     var EndPixelTop = TopPixels + HeightPx;
-    ///BestBottom is data on tab a level which ends before myData. BestBottom.Count data member is the level, BestBOttom.End is the end pixel of this base tab
-    var RetValue = { Start: DayOfWeek.UISpecs[ID].Start, CalCCount: 0, Data: DayOfWeek.UISpecs[ID], ID: ID, BestBottom: { End: 10000, Count: 0 }, Count: 0, EarlierCount: 0, top: TopPixels, end: EndPixelTop, PrecedingOverlapers: 0, OverlappingCount: 0,OverlappingAfterMe:0 }
+    ///BestBottom is data on tab a level which ends before myData. BestBottom.Note data member is the level, BestBOttom.End is the end pixel of this base tab
+    var RetValue = { Start: DayOfWeek.UISpecs[ID].Start, CalCNote: 0, Data: DayOfWeek.UISpecs[ID], ID: ID, BestBottom: { End: 10000, Note: 0 }, Note: 0, EarlierNote: 0, top: TopPixels, end: EndPixelTop, PrecedingOverlapers: 0, OverlappingNote: 0,OverlappingAfterMe:0 }
     return RetValue;
 }
 
@@ -487,15 +487,15 @@ function RenderListTimeInformation(DayOfWeek, ID, isNext)
 
     var HeightPx = (DayOfWeek.UISpecs[ID].css.height / 100) * global_DayHeight;
     var EndPixelTop = TopPixels + HeightPx;
-    ///BestBottom is data on tab a level which ends before myData. BestBottom.Count data member is the level, BestBOttom.End is the end pixel of this base tab
+    ///BestBottom is data on tab a level which ends before myData. BestBottom.Note data member is the level, BestBOttom.End is the end pixel of this base tab
     var RetValue= { 
         Start: DayOfWeek.UISpecs[ID].Start, 
-        CalCCount: 0, 
+        CalCNote: 0, 
         Data: DayOfWeek.UISpecs[ID], 
         ID: ID, 
-        BestBottom: { End: 10000, Count: 0 }, 
-        Count: 0, 
-        EarlierCount: 0, 
+        BestBottom: { End: 10000, Note: 0 }, 
+        Note: 0, 
+        EarlierNote: 0, 
         top: TopPixels, 
         end: EndPixelTop,
         refSubEvent: ListElementContainer };
@@ -622,10 +622,10 @@ AddCloseButoon.HideClosButton = function()
 };
 
 
-AddCloseButoon.CloseCounter = 0;
+AddCloseButoon.CloseNoteer = 0;
 AddCloseButoon.getId = () => {
-    AddCloseButoon.CloseCounter+=1;
-    return AddCloseButoon.CloseCounter;
+    AddCloseButoon.CloseNoteer+=1;
+    return AddCloseButoon.CloseNoteer;
 }
 function RevealControlPanelSection(SelectedEvents)
 {
@@ -1559,7 +1559,7 @@ function generateDayContainer()
 generateDayContainer.id = 0;
 
 //var RangeData;
-var miscCounter = 0;
+var miscNoteer = 0;
 
 function BindAddButton()
 {
@@ -1681,7 +1681,7 @@ function populateMonth(refDate,CallBack)
             CallBack();
         }
     }
-    refreshCounter = 1
+    refreshNoteer = 1
     getRefreshedData(MyCallBack);
     return global_WeekGrid;
 }
@@ -1740,7 +1740,7 @@ function onSocketDataReceipt(data) {
     console.log("yo son! " + onSocketDataReceipt.counter);
     if (!!data.refreshData) {
         if (data.refreshData.trigger) {
-            refreshCounter = 1;
+            refreshNoteer = 1;
             console.log("refresh is  " + getRefreshedData.isEnabled);
             global_ExitManager.triggerLastExitAndPop();
             //getRefreshedData.enableDataRefresh();
@@ -1750,7 +1750,7 @@ function onSocketDataReceipt(data) {
 
     if (!!data.pauseData) {
         if (data.pauseData.pausedEvent) {
-            refreshCounter = 1;
+            refreshNoteer = 1;
             console.log("refresh is  " + getRefreshedData.isEnabled);
             global_ExitManager.triggerLastExitAndPop();
             //getRefreshedData.enableDataRefresh();
@@ -1778,11 +1778,11 @@ function getRefreshedData(CallBackAfterRefresh)
 {
     //setTimeout(refreshIframe,200);
     
-    // if (--refreshCounter < 0)//debugging counter. THis allows us to set a max number of refreshes before stopping calls to backend
+    // if (--refreshNoteer < 0)//debugging counter. THis allows us to set a max number of refreshes before stopping calls to backend
     // {
     //     return;
     // }
-    refreshCounter = 0
+    refreshNoteer = 0
     StopPullingData();
     monthViewResetData();
     var DataHolder = { Data: "" };
@@ -2330,14 +2330,14 @@ getRefreshedData.enroll(resetEventStatusUi);
                 {
                     widthSubtraction += 10;
                 }
-                LeftPercent = IntersectingArrayData[i].Count*17;
+                LeftPercent = IntersectingArrayData[i].Note*17;
 
-                if (IntersectingArrayData[i].Count >= MaxTabbingIndex)
+                if (IntersectingArrayData[i].Note >= MaxTabbingIndex)
                 {
-                    MaxTabbingIndex = IntersectingArrayData[i].Count+1;
+                    MaxTabbingIndex = IntersectingArrayData[i].Note+1;
                 }
 
-                widthSubtraction += IntersectingArrayData[i].Count * 10;
+                widthSubtraction += IntersectingArrayData[i].Note * 10;
                 
 
                 if (LeftPercent > 90)
@@ -2374,7 +2374,7 @@ getRefreshedData.enroll(resetEventStatusUi);
                 var CallBackLaterData = { ID: ID, Index: i };
                 CallPrepSyncLater.push(CallBackLaterData);
                 //setTimeout(renderSideBarEvents(DayOfWeek, ID, IntersectingArrayData, i, MaxTabbingIndex), 200 * ++a);
-                DayOfWeek.maxIndex = global_ListOfDayCounter;
+                DayOfWeek.maxIndex = global_ListOfDayNoteer;
 
             }
             else
@@ -2563,7 +2563,7 @@ getRefreshedData.enroll(resetEventStatusUi);
         
     }
     
-    var global_ListOfDayCounter = 0;
+    var global_ListOfDayNoteer = 0;
 
     function DoSideBarsInterSect(MeEnd, Index, AllElements)
     {
@@ -2576,24 +2576,24 @@ getRefreshedData.enroll(resetEventStatusUi);
             var PossibleInterferringTop =Number( PossibleInterferringElement.top.toFixed(2));
             if (PossibleInterferringTop < MeEnd)
             {
-                //++Me.Count;
-                PossibleInterferringElement.CalCCount = Me.CalCCount + 1;
-                PossibleInterferringElement.Count = PossibleInterferringElement.CalCCount;
-                PossibleInterferringElement.EarlierCount = PossibleInterferringElement.Count
+                //++Me.Note;
+                PossibleInterferringElement.CalCNote = Me.CalCNote + 1;
+                PossibleInterferringElement.Note = PossibleInterferringElement.CalCNote;
+                PossibleInterferringElement.EarlierNote = PossibleInterferringElement.Note
 
 
                 ///*// #### Note for revert to simplest tabbing enable on this comment block
-                ///BestBottom is data on tab level which ends before Me. BestBottom.Count data member is the of the level, BestBOttom.End is the end pixel
+                ///BestBottom is data on tab level which ends before Me. BestBottom.Note data member is the of the level, BestBOttom.End is the end pixel
                 if (PossibleInterferringElement.BestBottom.End > MeEnd )
                 {
                     PossibleInterferringElement.BestBottom.End = MeEnd
-                    PossibleInterferringElement.BestBottom.Count = Me.Count;
+                    PossibleInterferringElement.BestBottom.Note = Me.Note;
                 }
                 if (PossibleInterferringTop >= Me.BestBottom.End)//checks to see if the conflicting Event can go to same level as the BestBottom of Me
                 {
-                    PossibleInterferringElement.Count=Me.BestBottom.Count
+                    PossibleInterferringElement.Note=Me.BestBottom.Note
                     Me.BestBottom.End = PossibleInterferringElement.end;
-                    PossibleInterferringElement.CalCCount = Me.CalCCount;
+                    PossibleInterferringElement.CalCNote = Me.CalCNote;
                 }
                 ///*/
                 retValue = true;
@@ -2606,7 +2606,7 @@ getRefreshedData.enroll(resetEventStatusUi);
 
             /*
             if (AllElements[Index].BestBottom.End <= myTop) {
-                AllElements[i].Count = AllElements[Index].BestBottom.Count;
+                AllElements[i].Note = AllElements[Index].BestBottom.Note;
                 AllElements[Index].BestBottom.End = End
             }*/
         }
@@ -2625,32 +2625,32 @@ getRefreshedData.enroll(resetEventStatusUi);
             var PossibleInterferringElement = AllElements[i];
             var PossibleInterferringTop = PossibleInterferringElement.top.toFixed(2);
             if (PossibleInterferringTop < MeEnd) {
-                ++Me.Count;
-                ++Me.OverlappingCount;
+                ++Me.Note;
+                ++Me.OverlappingNote;
                 
                 PossibleInterferringElement.PrecedingOverlapers = Me.PrecedingOverlapers;
                 ++PossibleInterferringElement.PrecedingOverlapers;
-                ++PossibleInterferringElement.OverlappingCount;
+                ++PossibleInterferringElement.OverlappingNote;
                 ++Me.OverlappingAfterMe
 
 
 
-                PossibleInterferringElement.CalCCount = Me.CalCCount + 1;
-                PossibleInterferringElement.Count = PossibleInterferringElement.CalCCount;
-                PossibleInterferringElement.EarlierCount = PossibleInterferringElement.Count
+                PossibleInterferringElement.CalCNote = Me.CalCNote + 1;
+                PossibleInterferringElement.Note = PossibleInterferringElement.CalCNote;
+                PossibleInterferringElement.EarlierNote = PossibleInterferringElement.Note
 
 
                 ///*// #### Note for revert to simplest tabbing enable on this comment block
-                ///BestBottom is data on tab level which ends before Me. BestBottom.Count data member is the of the level, BestBOttom.End is the end pixel
+                ///BestBottom is data on tab level which ends before Me. BestBottom.Note data member is the of the level, BestBOttom.End is the end pixel
                 if (PossibleInterferringElement.BestBottom.End > MeEnd) {
                     PossibleInterferringElement.BestBottom.End = MeEnd
-                    PossibleInterferringElement.BestBottom.Count = Me.Count;
+                    PossibleInterferringElement.BestBottom.Note = Me.Note;
                 }
                 if (PossibleInterferringTop >= Me.BestBottom.End)//checks to see if the conflicting Event can go to same level as the BestBottom of Me
                 {
-                    PossibleInterferringElement.Count = Me.BestBottom.Count
+                    PossibleInterferringElement.Note = Me.BestBottom.Note
                     Me.BestBottom.End = PossibleInterferringElement.end;
-                    PossibleInterferringElement.CalCCount = Me.CalCCount;
+                    PossibleInterferringElement.CalCNote = Me.CalCNote;
                 }
                 ///*/
                 retValue = true;
@@ -2675,8 +2675,8 @@ getRefreshedData.enroll(resetEventStatusUi);
             var PossibleInterferringTop = PossibleInterferringElement.top.toFixed(2);
             if (PossibleInterferringTop < MeEnd)
             {
-                PossibleInterferringElement.CalCCount = Me.CalCCount + 1;
-                PossibleInterferringElement.Count = PossibleInterferringElement.CalCCount
+                PossibleInterferringElement.CalCNote = Me.CalCNote + 1;
+                PossibleInterferringElement.Note = PossibleInterferringElement.CalCNote
 
             }
         }
@@ -2693,11 +2693,11 @@ function dehighlightSubEvent(Dom)
     $(Dom).removeClass("selectedElements");
 }
 
-function renderClassicSubEventLook(DayOfWeek, ID, MyArray, Index, TabCount)
+function renderClassicSubEventLook(DayOfWeek, ID, MyArray, Index, TabNote)
 {
     return function () {
         //debugger;
-        var GridSubEventWidth = renderClassicSubEventLook.PercentWidthOfDay;// / TabCount;
+        var GridSubEventWidth = renderClassicSubEventLook.PercentWidthOfDay;// / TabNote;
         var RefEvent = DayOfWeek.UISpecs[ID]
 
         var ArrayElement = MyArray[Index];
@@ -2737,19 +2737,19 @@ function renderSleepTimeSlot(DayOfWeek) {
 
 }
 
-function renderSideBarEvents(DayOfWeek, ID, MyArray, Index, TabCount)
+function renderSideBarEvents(DayOfWeek, ID, MyArray, Index, TabNote)
 {
     return function () {
         var RefEvent = DayOfWeek.UISpecs[ID];
 
-        var GridSubEventWidth = renderSideBarEvents.SubEventGridWidthContainer / TabCount;
+        var GridSubEventWidth = renderSideBarEvents.SubEventGridWidthContainer / TabNote;
         $(RefEvent.Dom).addClass("SideBar");
         RefEvent.Dom.style.left = (DayOfWeek.RightPercent - GridSubEventWidth )+ "%"
         RefEvent.Dom.style.height = RefEvent.css.height + "%";
         //RefEvent.Dom.style.minHeight = (global_DayHeight * (1 / 24)) + "px";//1/24 because we want the minimum to be the size of an hour
 
         //RefEvent.Dom.style.marginLeft = (-(RefEvent.css.left + 18) + "px");
-        RefEvent.Dom.style.marginLeft = (-(GridSubEventWidth * MyArray[Index].Count) + "%");
+        RefEvent.Dom.style.marginLeft = (-(GridSubEventWidth * MyArray[Index].Note) + "%");
         RefEvent.Dom.style.width = GridSubEventWidth+"%";
         //RefEvent.Dom.style.width = RefEvent.css.width + "%";
         RefEvent.Dom.style.top = RefEvent.css.top + "%";
@@ -3572,7 +3572,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
             let CalDateEndTimeString = CalEndTime.value.trim() + " " + $(CalEndDate).datepicker("getDate").toLocaleDateString().trim();
             let CalEndDateInMS = moment(CalDateEndTimeString, "hh:mm a MM/DD/YYYY").toDate().getTime();
             
-            let splitValue = Number(getDomOrCreateNew("InputSplitCount", "input").value);
+            let splitValue = Number(getDomOrCreateNew("InputSplitNote", "input").value);
             
 
             let notesDom = getDomOrCreateNew("notesArea");
@@ -3779,7 +3779,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
             
 
                 PrimaryControlPanelContainer.appendChild(BasePanel);
-                var EditContainerData = generateEditDoneCOntainer();
+                var EditContainerData = generateEditDoneContainer();
                 ControlPanelContainer.appendChild(EditContainerData.Container);
 
                 var LauchLocation = function () {
@@ -3965,7 +3965,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                 }
                 NotesSubmit.onclick = submitNotes
 
-                function generateEditDoneCOntainer()
+                function generateEditDoneContainer()
                 {
                     var SaveButton = getDomOrCreateNew("SaveButton", "button");
                     SaveButton.innerHTML = "Save"
@@ -4050,7 +4050,229 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
                     return retValue;
                 }
 
+                function generateCalEventDetails(SubEvent) {
+                    let EventDetailsContainer = getDomOrCreateNew('EventDetailsContainer')
+                    
+                    let generateDetails = () => {
+                        let childNodes = EventDetailsContainer.childNodes
+                        childNodes.forEach((childNode) => {
+                            childNode.remove()
+                        })
+                        let initialData = Object.assign({}, SubEvent )
 
+                        let initialDataKeys = Object.keys(initialData)
+                        for (let key of initialDataKeys ) {
+                            let keyString = key+'initialValue'
+                            initialData[keyString] = true
+                        }
+
+                        let handleNameDetails = () =>  {
+                            const nameKey = 'caleventName'
+                            let calEventEditNameContainer = getDomOrCreateNew('calEventEditNameContainer')
+                            let calEventEditNameInputContainer = getDomOrCreateNew('calEventEditNameInputContainer')
+                            let calEventEditNameInput = getDomOrCreateNew('calEventEditNameInput', 'input')
+                            calEventEditNameInput.setAttribute('placeholder', 'Name')
+                            calEventEditNameContainer.appendChild(calEventEditNameInputContainer)
+                            calEventEditNameInputContainer.appendChild(calEventEditNameInput)
+                            let retValue = {
+                                dom: calEventEditNameContainer,
+                                key: nameKey,
+                                getValue: () => {
+                                    return calEventEditNameInput.value
+                                }
+                            }
+                            return retValue
+                        }
+
+                        let handleLocationDetails = () =>  {
+                            const locationKey = 'caleventLocation'
+                            let calEventEditLocationContainer = getDomOrCreateNew('calEventEditLocationContainer')
+                            let calEventEditLocationInputContainer = getDomOrCreateNew('calEventEditLocationInputContainer')
+                            let calEventEditLocationInput = getDomOrCreateNew('calEventEditLocationInput', 'input')
+                            calEventEditLocationInput.setAttribute('placeholder', 'Location')
+                            calEventEditLocationContainer.appendChild(calEventEditLocationInputContainer)
+                            calEventEditLocationInputContainer.appendChild(calEventEditLocationInput)
+                            let retValue = {
+                                dom: calEventEditLocationContainer,
+                                key: locationKey,
+                                getValue: () => {
+                                    return calEventEditLocationInput.value
+                                }
+                            }
+                            return retValue
+                        }
+
+                        let handleRecurringDetails = () =>  {
+
+                        }
+
+                        let handleCountDetails = () =>  {
+                            const countKey = 'caleventCount'
+                            let calEventEditCountContainer = getDomOrCreateNew('calEventEditCountContainer')
+                            let calEventEditCountInputContainer = getDomOrCreateNew('calEventEditCountInputContainer')
+                            let calEventEditCountInput = getDomOrCreateNew('calEventEditCountInput', 'input')
+                            calEventEditCountInput.setAttribute('placeholder', 'count')
+                            calEventEditCountContainer.appendChild(calEventEditCountInputContainer)
+                            calEventEditCountInputContainer.appendChild(calEventEditCountInput)
+                            let retValue = {
+                                dom: calEventEditCountContainer,
+                                key: countKey,
+                                getValue: () => {
+                                    return calEventEditCountInput.value
+                                }
+                            }
+                            return retValue
+                        }
+
+                        let handleNoteDetails = () =>  {
+                            const noteKey = 'caleventNote'
+                            let calEventEditNoteContainer = getDomOrCreateNew('calEventEditNoteContainer')
+                            let calEventEditNoteInputContainer = getDomOrCreateNew('calEventEditNoteInputContainer')
+                            let calEventEditNoteInput = getDomOrCreateNew('calEventEditNoteInput', 'textarea')
+                            calEventEditNoteInput.setAttribute('placeholder', 'notes')
+                            calEventEditNoteContainer.appendChild(calEventEditNoteInputContainer)
+                            calEventEditNoteInputContainer.appendChild(calEventEditNoteInput)
+                            let retValue = {
+                                dom: calEventEditNoteContainer,
+                                key: noteKey,
+                                getValue: () => {
+                                    return calEventEditNoteInput.value
+                                }
+                            }
+                            return retValue
+                        }
+
+                        let handleDeadlineDetails = () =>  {
+                            let deadlineTime = () => {
+                                const deadlineTimeKey = 'caleventDeadlineTime'
+                                let calEventEditDeadlineTimeContainer = getDomOrCreateNew('calEventEditDeadlineTimeContainer')
+                                let calEventEditDeadlineTimeInputContainer = getDomOrCreateNew('calEventEditDeadlineTimeInputContainer')
+                                let calEventEditDeadlineTimeInput = getDomOrCreateNew('calEventEditDeadlineTimeInput', 'input')
+                                calEventEditDeadlineTimeContainer.appendChild(calEventEditDeadlineTimeInputContainer)
+                                calEventEditNameInputContainer.appendChild(calEventEditNameInput)
+                            }
+
+                            let deadlineDate = () => {
+                                const deadlineDateKey = 'caleventDeadlineDate'
+                                let calEventEditDeadlineDateContainer = getDomOrCreateNew('calEventEditDeadlineDateContainer')
+                                let calEventEditDeadlineDateInputContainer = getDomOrCreateNew('calEventEditDeadlineDateInputContainer')
+                                let calEventEditDeadlineDateInput = getDomOrCreateNew('calEventEditDeadlineDateInput', 'input')
+                                calEventEditDeadlineDateContainer.appendChild(calEventEditDeadlineDateInputContainer)
+                                calEventEditDeadlineDateInputContainer.appendChild(calEventEditDeadlineDateInput)
+                            }
+                        }
+
+                        let handleStartDetails = () =>  {
+                            let startTime = () => {
+                                const startTimeKey = 'caleventStartTime'
+                                let calEventEditStartTimeContainer = getDomOrCreateNew('calEventEditStartTimeContainer')
+                                let calEventEditStartTimeInputContainer = getDomOrCreateNew('calEventEditStartTimeInputContainer')
+                                let calEventEditStartTimeInput = getDomOrCreateNew('calEventEditStartTimeInput', 'input')
+                                calEventEditStartTimeContainer.appendChild(calEventEditStartTimeInputContainer)
+                                calEventEditNameInputContainer.appendChild(calEventEditNameInput)
+                            }
+
+                            let startDate = () => {
+                                const startDateKey = 'caleventStartDate'
+                                let calEventEditStartDateContainer = getDomOrCreateNew('calEventEditStartDateContainer')
+                                let calEventEditStartDateInputContainer = getDomOrCreateNew('calEventEditStartDateInputContainer')
+                                let calEventEditStartDateInput = getDomOrCreateNew('calEventEditStartDateInput', 'input')
+                                calEventEditStartDateContainer.appendChild(calEventEditStartDateInputContainer)
+                                calEventEditStartDateInputContainer.appendChild(calEventEditStartDateInput)
+                            }
+                        }
+
+                        let timeRestrictionDetails = () =>  {
+
+                        }
+
+                        let handleSaveDetails = () =>  {
+                            const saveKey = 'caleventSave'
+                            let calEventEditSaveContainer = getDomOrCreateNew('calEventEditSaveContainer')
+                            let calEventEditSaveInputContainer = getDomOrCreateNew('calEventEditSaveInputContainer')
+                            let calEventEditSaveButton = getDomOrCreateNew('calEventEditSaveButton', 'button')
+                            calEventEditSaveButton.innerHTML = 'Save'
+                            calEventEditSaveContainer.appendChild(calEventEditSaveInputContainer)
+                            calEventEditSaveInputContainer.appendChild(calEventEditSaveButton)
+                            let postData = {
+
+                            }
+                            let dataIsDifferent = false
+                            let saveButtonClick = () => {
+                                for(let dataInput of dataDetails) {
+                                    let entry = dataInput.key
+                                    let value = dataInput.getValue()
+                                    let initialValue = initialData[entry]
+                                    let dataIsChanged = value !== initialValue
+                                    if(dataIsChanged) {
+                                        dataIsDifferent = true
+                                        postData[entry] = value
+                                    }
+                                }
+                            }
+                            calEventEditSaveButton.onclick = saveButtonClick
+                            let retValue = {
+                                dom: calEventEditSaveContainer
+                            }
+                            return retValue
+                        }
+
+                        let handleCancelDetails = () =>  {
+                            const cancelKey = 'caleventCancel'
+                            let calEventEditCancelContainer = getDomOrCreateNew('calEventEditCancelContainer')
+                            let calEventEditCancelInputContainer = getDomOrCreateNew('calEventEditCancelInputContainer')
+                            let calEventEditCancelButton = getDomOrCreateNew('calEventEditCancelButton', 'button')
+                            calEventEditCancelButton.innerHTML = 'Cancel'
+                            calEventEditCancelContainer.appendChild(calEventEditCancelInputContainer)
+                            calEventEditCancelInputContainer.appendChild(calEventEditCancelButton)
+
+                            let retValue = {
+                                dom: calEventEditCancelContainer
+                            }
+                            return retValue
+                        }
+
+                        
+                        
+                        let nameDetails = handleNameDetails()
+                        let locationDetails = handleLocationDetails()
+                        let noteDetails = handleNoteDetails()
+                        let countDetails = handleCountDetails()
+                        let saveDetails = handleSaveDetails()
+                        let cancelDetails = handleCancelDetails()
+                        let dataDetails = []
+                        dataDetails.push(nameDetails)
+                        dataDetails.push(locationDetails)
+                        dataDetails.push(noteDetails)
+                        dataDetails.push(countDetails)
+                        
+
+                        EventDetailsContainer.appendChild(nameDetails.dom)
+                        EventDetailsContainer.appendChild(locationDetails.dom)
+                        EventDetailsContainer.appendChild(countDetails.dom)
+                        EventDetailsContainer.appendChild(noteDetails.dom)
+                        EventDetailsContainer.appendChild(saveDetails.dom)
+                        EventDetailsContainer.appendChild(cancelDetails.dom)
+                        EventDetailsContainer.classList.add('render')
+                        EventDetailsContainer.classList.remove('hide')
+                    }
+
+                    return generateDetails
+                }
+
+                function renderMoreDetailsButton(SubEvent) {
+                    debugger
+                    let CalEventDetailsId = 'CalEventDetailsButton'
+                    let CalEventDetails = getDomOrCreateNew(CalEventDetailsId)
+                    PrimaryControlPanelContainer.appendChild(CalEventDetails)
+                    let generateDetails = generateCalEventDetails(SubEvent)
+                    CalEventDetails.onclick = () => {
+                        generateDetails()
+                    }
+                }
+
+
+                renderMoreDetailsButton(SubEvent)
                 ControlPanelProcrastinateButton.onclick = slideOpenProcrastinateEventModal;
             
 
@@ -4926,11 +5148,11 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
             
                 function extraOptionsData()
                 {
-                    var splitAndNoteContainer = getDomOrCreateNew("SplitCountAndNoteContainer");
+                    var splitAndNoteContainer = getDomOrCreateNew("SplitNoteAndNoteContainer");
                     var ContainerForExtraOptions = getDomOrCreateNew("ExtraOptionsContainer")
                     ContainerForExtraOptions.appendChild(splitAndNoteContainer)
-                    let splitInputBox = getDomOrCreateNew("InputSplitCount", "input");
-                    let splitInputBoxContainer = getDomOrCreateNew("InputSplitCountContainer");
+                    let splitInputBox = getDomOrCreateNew("InputSplitNote", "input");
+                    let splitInputBoxContainer = getDomOrCreateNew("InputSplitNoteContainer");
                     var splitInputBoxLabel = getDomOrCreateNew("splitInputBoxLabel", "label");
                     splitInputBoxLabel.innerHTML = "Splits"
 
@@ -5124,7 +5346,7 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
         function PopulateYourself(RangeData) {
     var StartDate = new Date(Number(this.SubCalStartDate));
     var EndDate = new Date(Number(this.SubCalEndDate));
-    this.RangeCounter = new Array();
+    this.RangeNoteer = new Array();
     this.Dom = { DomA: getDomOrCreateNew("EventDOMA" + this.ID), DomB: getDomOrCreateNew("EventDOMB" + this.ID)
         };
 
@@ -5132,17 +5354,17 @@ function getMyPositionFromRange(SubEvent, AllRangeData)//figures out what range 
     var i =0;
     for (; i <RangeData.length; i++) {
         if ((StartDate >= new Date(Number(RangeData[i].Start))) && (StartDate <= new Date(Number(RangeData[i].End)))) {
-            this.RangeCounter.push(RangeData[i]);
+            this.RangeNoteer.push(RangeData[i]);
     }
 
         if ((EndDate >= new Date(Number(RangeData[i].Start))) && (EndDate <= new Date(Number(RangeData[i].End)))) {
-            this.RangeCounter.push(RangeData[i]);
+            this.RangeNoteer.push(RangeData[i]);
     }
         }
 
 
 
-    if (this.RangeCounter[0] != this.RangeCounter[1]) {
+    if (this.RangeNoteer[0] != this.RangeNoteer[1]) {
 
     }
     else {
@@ -5306,7 +5528,7 @@ function genDivForEachWeek(RangeOfWeek, AllRanges)//generates each week containe
                         //debugger;
                         function generateListDom(SubEventData)
                         {
-                            var myID = generateListDom.Count++;
+                            var myID = generateListDom.Note++;
                             var InActiveElementContainer = getDomOrCreateNew("InActiveElementContainer" + myID);
                             $(InActiveElementContainer).addClass("InActiveElementContainer");
                             var InActiveElementNameContainer = getDomOrCreateNew("InActiveElementNameContainer" + myID);
@@ -5334,12 +5556,12 @@ function genDivForEachWeek(RangeOfWeek, AllRanges)//generates each week containe
                             InActiveElementContainer.appendChild(InActiveElementNameContainer);
                             myDay.MoreInfoPanel.appendChild(InActiveElementContainer);
                         }
-                        generateListDom.Count = 0;
+                        generateListDom.Note = 0;
                         DeletedData.forEach(generateListDom);
                         if(!DeletedData.length)
                         {
 
-                            var EmptySpan = getDomOrCreateNew("EmptySpan" + generateListDom.Count, "span");
+                            var EmptySpan = getDomOrCreateNew("EmptySpan" + generateListDom.Note, "span");
                             EmptySpan.innerHTML ="...Empty..."
                             //$(InActiveElementNameSpan).addClass("InActiveElementNameSpan");
                             myDay.MoreInfoPanel.appendChild(EmptySpan)
