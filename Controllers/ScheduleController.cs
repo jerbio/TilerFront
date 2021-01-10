@@ -1564,25 +1564,24 @@ namespace TilerFront.Controllers
                 }
                 string BeforemyName = newCalendarEvent.ToString(); //BColor + " -- " + Count + " -- " + DurationDays + " -- " + DurationHours + " -- " + DurationMins + " -- " + EndDay + " -- " + EndHour + " -- " + EndMins + " -- " + EndMonth + " -- " + EndYear + " -- " + GColor + " -- " + LocationAddress + " -- " + LocationTag + " -- " + Name + " -- " + RColor + " -- " + RepeatData + " -- " + RepeatEndDay + " -- " + RepeatEndMonth + " -- " + RepeatEndYear + " -- " + RepeatStartDay + " -- " + RepeatStartMonth + " -- " + RepeatStartYear + " -- " + RepeatType + " -- " + RepeatWeeklyData + " -- " + Rigid + " -- " + StartDay + " -- " + StartHour + " -- " + StartMins + " -- " + StartMonth + " -- " + StartYear;
                 string AftermyName = newCalendarEvent.ToString();
-                {
-                    retrievedUser.ScheduleLogControl.updateNewLocation(EventLocation);
-                    DB_UserActivity activity = new DB_UserActivity(myNow, UserActivity.ActivityType.NewEventCreation);
-                    JObject json = JObject.FromObject(newEvent);
-                    activity.updateMiscelaneousInfo(json.ToString());
-                    retrievedUser.ScheduleLogControl.updateUserActivty(activity);
-#if loadFromXml
-                    if (!string.IsNullOrEmpty(xmlFileId) && !string.IsNullOrWhiteSpace(xmlFileId))
-                    {
-                        var tempSched = TilerTests.TestUtility.getSchedule(xmlFileId, connectionName: "DefaultConnection", filePath: LogControl.getLogLocation());
-                        MySchedule = (DB_Schedule)tempSched.Item1;
-                    }
-#endif
+                CustomErrors userError = newCalendarEvent.Error;
+                retrievedUser.ScheduleLogControl.updateNewLocation(EventLocation);
+                DB_UserActivity activity = new DB_UserActivity(myNow, UserActivity.ActivityType.NewEventCreation);
+                JObject json = JObject.FromObject(newEvent);
+                activity.updateMiscelaneousInfo(json.ToString());
+                retrievedUser.ScheduleLogControl.updateUserActivty(activity);
 
-                    await schedule.AddToScheduleAndCommitAsync(newCalendarEvent).ConfigureAwait(false);
+                try
+                {
+                    userError = await schedule.AddToScheduleAndCommitAsync(newCalendarEvent).ConfigureAwait(false);
+                } 
+                catch(CustomErrors computeError)
+                {
+                    userError = computeError;
                 }
                 
-
-                CustomErrors userError = newCalendarEvent.Error;
+                
+                
                 int errorCode = userError?.Code ?? 0;
                 retValue = new PostBackData(newCalendarEvent.ActiveSubEvents.First().ToSubCalEvent(newCalendarEvent), errorCode);
                 
