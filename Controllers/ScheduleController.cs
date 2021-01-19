@@ -357,7 +357,7 @@ namespace TilerFront.Controllers
                     activity.updateMiscelaneousInfo(json.ToString());
 
                     myUser.ScheduleLogControl.updateUserActivty(activity);
-                    await MySchedule.PauseEvent(myAuthorizedUser.EventID, currentPausedEventId);
+                    await MySchedule.PauseEvent(myAuthorizedUser.EventID);
                     await MySchedule.WriteFullScheduleToLog().ConfigureAwait(false);
                     PausedEvent paused;
                     PausedEvent InstanceOfPausedEventAlreadyInDb = pausedEvents.FirstOrDefault(obj => obj.EventId == myAuthorizedUser.EventID);
@@ -377,7 +377,7 @@ namespace TilerFront.Controllers
                         InstanceOfPausedEventAlreadyInDb.isPauseDeleted = false;
                         db.Entry(InstanceOfPausedEventAlreadyInDb).State = EntityState.Modified;
                     }
-                    await db.SaveChangesAsync();
+                    await myUser.ScheduleLogControl.SaveDBChanges().ConfigureAwait(false);
                 }
                 PostBackData myPostData = new PostBackData("\"Success\"", 0);
                 TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
@@ -421,7 +421,7 @@ namespace TilerFront.Controllers
                     pausedCalEvent = MySchedule.getCalendarEvent(PausedEvent.EventId);
                     PausedEvent.isPauseDeleted = true;
                     db.Entry(PausedEvent).State = EntityState.Modified;
-                    await db.SaveChangesAsync();
+                    await myUser.ScheduleLogControl.SaveDBChanges().ConfigureAwait(false);
 
                     TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
                     scheduleChangeSocket.triggerRefreshData(myUser.getTilerUser());
@@ -1569,25 +1569,24 @@ namespace TilerFront.Controllers
                 }
                 string BeforemyName = newCalendarEvent.ToString(); //BColor + " -- " + Count + " -- " + DurationDays + " -- " + DurationHours + " -- " + DurationMins + " -- " + EndDay + " -- " + EndHour + " -- " + EndMins + " -- " + EndMonth + " -- " + EndYear + " -- " + GColor + " -- " + LocationAddress + " -- " + LocationTag + " -- " + Name + " -- " + RColor + " -- " + RepeatData + " -- " + RepeatEndDay + " -- " + RepeatEndMonth + " -- " + RepeatEndYear + " -- " + RepeatStartDay + " -- " + RepeatStartMonth + " -- " + RepeatStartYear + " -- " + RepeatType + " -- " + RepeatWeeklyData + " -- " + Rigid + " -- " + StartDay + " -- " + StartHour + " -- " + StartMins + " -- " + StartMonth + " -- " + StartYear;
                 string AftermyName = newCalendarEvent.ToString();
-                {
-                    retrievedUser.ScheduleLogControl.updateNewLocation(EventLocation);
-                    DB_UserActivity activity = new DB_UserActivity(myNow, UserActivity.ActivityType.NewEventCreation);
-                    JObject json = JObject.FromObject(newEvent);
-                    activity.updateMiscelaneousInfo(json.ToString());
-                    retrievedUser.ScheduleLogControl.updateUserActivty(activity);
-#if loadFromXml
-                    if (!string.IsNullOrEmpty(xmlFileId) && !string.IsNullOrWhiteSpace(xmlFileId))
-                    {
-                        var tempSched = TilerTests.TestUtility.getSchedule(xmlFileId, connectionName: "DefaultConnection", filePath: LogControl.getLogLocation());
-                        MySchedule = (DB_Schedule)tempSched.Item1;
-                    }
-#endif
+                CustomErrors userError = newCalendarEvent.Error;
+                retrievedUser.ScheduleLogControl.updateNewLocation(EventLocation);
+                DB_UserActivity activity = new DB_UserActivity(myNow, UserActivity.ActivityType.NewEventCreation);
+                JObject json = JObject.FromObject(newEvent);
+                activity.updateMiscelaneousInfo(json.ToString());
+                retrievedUser.ScheduleLogControl.updateUserActivty(activity);
 
-                    await schedule.AddToScheduleAndCommitAsync(newCalendarEvent).ConfigureAwait(false);
+                try
+                {
+                    userError = await schedule.AddToScheduleAndCommitAsync(newCalendarEvent).ConfigureAwait(false);
+                } 
+                catch(CustomErrors computeError)
+                {
+                    userError = computeError;
                 }
                 
-
-                CustomErrors userError = newCalendarEvent.Error;
+                
+                
                 int errorCode = userError?.Code ?? 0;
                 retValue = new PostBackData(newCalendarEvent.ActiveSubEvents.First().ToSubCalEvent(newCalendarEvent), errorCode);
                 

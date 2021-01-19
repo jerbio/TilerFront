@@ -88,13 +88,21 @@ namespace TilerFront
 
             if (string.IsNullOrEmpty(Message))
             {
-                if(errorDictionary.ContainsKey(errorCode))
+                if (errorDictionary.ContainsKey(errorCode))
                 {
                     retValue = errorDictionary[errorCode];
-                } else {
-                    retValue = defaultMessage;
                 }
-                
+                else
+                {
+                    if (CustomErrors.errorCodeHasMessage(errorCode))
+                    {
+                        retValue = CustomErrors.getErrorMessage(errorCode);
+                    }
+                    else
+                    {
+                        retValue = defaultMessage;
+                    }
+                }
             }
             else
             {

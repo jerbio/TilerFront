@@ -151,7 +151,10 @@ namespace TilerFront
                                 googleEvent.ExtendedProperties = new Event.ExtendedPropertiesData();
                                 googleEvent.ExtendedProperties.Private__ = new Dictionary<string, string>();
                             }
-                            googleEvent.ExtendedProperties.Private__[tilerReadonlyKey] = isReadonly.ToString();
+                            if (googleEvent.ExtendedProperties.Private__ != null)
+                            {
+                                googleEvent.ExtendedProperties.Private__[tilerReadonlyKey] = isReadonly.ToString();
+                            }
                             retValueBag.Add(googleEvent);
                         }
                     }

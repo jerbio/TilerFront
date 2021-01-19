@@ -38,7 +38,7 @@ namespace TilerFront.SocketHubs
             context.Clients.Group(who).refereshDataFromSockets(triggerRefreshRequest);
         }
 
-        public void pausedEventUpdate(Models.PausedEvent PausedEvent, IEnumerable<SubCalendarEvent> SubEvents)
+        public void pausedEventUpdate(PausedEvent PausedEvent, IEnumerable<SubCalendarEvent> SubEvents)
         {
             string who = HttpContext.Current.User.Identity.GetUserId();
             var context = Microsoft.AspNet.SignalR.GlobalHost.ConnectionManager.GetHubContext<TilerFront.SocketHubs.ScheduleChange>();

@@ -10,13 +10,12 @@ using TilerElements;
 using TilerFront.Models;
 
 
-
-
 namespace TilerFront
 {
     public abstract class UserAccount
     {
         protected LogControl UserLog;
+        protected PausedEvent PausedEvent;
         protected string ID="";
         protected string Name;
         protected string Username;
@@ -80,7 +79,50 @@ namespace TilerFront
             await UserLog.Commit(AllEvents, calendarEvent, LatestID, now, travelCache).ConfigureAwait(false);
         }
 
+        /// <summary>
+        /// This contains the functionality for retrieveing the paused event from the db.
+        /// THis is supposed to be part of logcontrol.cs. This should be done after the move to an rdbms like storage
+        /// TODO: move to logcontrol.cs after switching to an rdbms db
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        virtual public PausedEvent getCurrentPausedEvent(ApplicationDbContext db, string userId, bool forceRefresh = false)
+        {
+            if (string.IsNullOrEmpty(userId))
+            {
+                throw new ArgumentException("Null value provided for user Id", "userId");
+            }
+
+            if ((PausedEvent == null) || forceRefresh)
+            {
+                PausedEvent = db.PausedEvents.SingleOrDefault(obj => obj.UserId == userId && obj.isPauseDeleted == false);
+            }
+
+            return PausedEvent;
+        }
+
+        /// <summary>
+        /// Function gets you the paused event and its the paused events with the ID EventId
+        /// THis is supposed to be part of logcontrol.cs. This should be done after the move to an rdbms like storage
+        /// TODO: move to logcontrol.cs after switching to an rdbms db
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="EventId"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        virtual public List<PausedEvent> getCurrentPausedEventAndPausedEventWithId(ApplicationDbContext db, string EventId, string userId)
+        {
+            if (string.IsNullOrEmpty(userId))
+            {
+                throw new ArgumentException("Null value provided for user Id", "userId");
+            }
+            List<PausedEvent> retValue = db.PausedEvents.Where(obj => ((obj.UserId == userId) && ((obj.isPauseDeleted == false) || (obj.EventId == EventId)))).ToList();
+            return retValue;
+        }
+        
         virtual async public Task DiscardChanges()
+
         {
             await UserLog.DiscardChanges().ConfigureAwait(false);
         }
