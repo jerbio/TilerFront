@@ -3004,7 +3004,11 @@ namespace TilerFront
                     foreach(XmlNode timeLineNode in PausedTimeSlots.ChildNodes)
                     {
                         PausedTimeLine timeLine = pauseTimeLineNodeToTimeLine(timeLineNode);
-                        pausedTimeLines.Add(timeLine);
+                        if(timeLine!=null)
+                        {
+                            pausedTimeLines.Add(timeLine);
+                        }
+                        
                     }
                 }
                 
@@ -3033,8 +3037,22 @@ namespace TilerFront
             XmlNode idNode = ReferenceNode.SelectSingleNode("Id");
             XmlNode isDeletedNode = ReferenceNode.SelectSingleNode("IsDeleted");
 
-            PausedTimeLine retValue = new PausedTimeLine(idNode.InnerText, DateTimeOffset.Parse(startNode.InnerText), DateTimeOffset.Parse(endNode.InnerText));
-            retValue.IsDeleted = Convert.ToBoolean(isDeletedNode.InnerText);
+            PausedTimeLine retValue = null;
+            if (
+                idNode != null && 
+                endNode != null && 
+                startNode != null && 
+                endNode.InnerText.isNot_NullEmptyOrWhiteSpace() &&
+                startNode.InnerText.isNot_NullEmptyOrWhiteSpace())
+            {
+                retValue = new PausedTimeLine(idNode.InnerText, DateTimeOffset.Parse(startNode.InnerText), DateTimeOffset.Parse(endNode.InnerText));
+            }
+
+            if(retValue!= null && isDeletedNode !=null && isDeletedNode.InnerText.isNot_NullEmptyOrWhiteSpace())
+            {
+                retValue.IsDeleted = Convert.ToBoolean(isDeletedNode.InnerText);
+            }
+            
             return retValue;
         }
 
