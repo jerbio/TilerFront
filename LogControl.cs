@@ -1511,9 +1511,10 @@ namespace TilerFront
 
 
         public IQueryable<CalendarEvent> getCalendarEventQuery(
-            DataRetrivalOption retrievalOption, 
+            HashSet<DataRetrivalOption> retrievalOptions,
             bool includeSubEvents, 
-            HashSet<string> ids= null)
+            HashSet<string> ids= null
+            )
         {
             IQueryable<CalendarEvent> calEVents = _Context.CalEvents;
             if (ids != null && ids.Count > 0)
@@ -1549,42 +1550,48 @@ namespace TilerFront
                 ;
             }
 
-            if (retrievalOption == DataRetrivalOption.Ui)
-            {
-                calEVents = calEVents
-                    .Include(calEvent => calEvent.UiParams_EventDB)
-                    .Include(calEvent => calEvent.UiParams_EventDB.UIColor)
-                    .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.UiParams_EventDB))
-                    .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.UiParams_EventDB.UIColor));
-            }
-            else if (retrievalOption == DataRetrivalOption.Evaluation)
-            {
-                calEVents = calEVents
-                    .Include(calEvent => calEvent.RestrictionProfile_DB)
-                    .Include(calEvent => calEvent.Procrastination_EventDB)
-                    .Include(calEvent => calEvent.DayPreference_DB)
-                    .Include(calEvent => calEvent.Location_DB)
-                    .Include(calEvent => calEvent.ProfileOfNow_EventDB)
-                    ;
 
-            }
-            else if (retrievalOption == DataRetrivalOption.All)
+            bool isAllRetrievalOPtionIncluded = retrievalOptions.Contains(DataRetrivalOption.All);
+            foreach (DataRetrivalOption eachRetrievalOption in retrievalOptions)
             {
-                calEVents = calEVents
-                    .Include(calEvent => calEvent.UiParams_EventDB)
-                    .Include(calEvent => calEvent.UiParams_EventDB.UIColor)
-                    .Include(calEvent => calEvent.Procrastination_EventDB)
-                    .Include(calEvent => calEvent.DayPreference_DB)
-                    .Include(calEvent => calEvent.Repetition_EventDB)
-                    .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents)
-                    .Include(calEvent => calEvent.Repetition_EventDB.SubRepetitions)
-                    .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Procrastination_EventDB))
-                    .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.ProfileOfNow_EventDB))
-                    .Include(calEvent => calEvent.RestrictionProfile_DB)
-                    ;
+                if (isAllRetrievalOPtionIncluded || eachRetrievalOption == DataRetrivalOption.Ui)
+                {
+                    calEVents = calEVents
+                        .Include(calEvent => calEvent.UiParams_EventDB)
+                        .Include(calEvent => calEvent.UiParams_EventDB.UIColor)
+                        .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.UiParams_EventDB))
+                        .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.UiParams_EventDB.UIColor));
+                }
+                else if (isAllRetrievalOPtionIncluded || eachRetrievalOption == DataRetrivalOption.Evaluation)
+                {
+                    calEVents = calEVents
+                        .Include(calEvent => calEvent.RestrictionProfile_DB)
+                        .Include(calEvent => calEvent.Procrastination_EventDB)
+                        .Include(calEvent => calEvent.DayPreference_DB)
+                        .Include(calEvent => calEvent.Location_DB)
+                        ;
+                }
+                else if (isAllRetrievalOPtionIncluded || eachRetrievalOption == DataRetrivalOption.Now)
+                {
+                    calEVents = calEVents
+                        .Include(calEvent => calEvent.ProfileOfNow_EventDB);
+                }
+                else if (isAllRetrievalOPtionIncluded || eachRetrievalOption == DataRetrivalOption.Repetition)
+                {
+                    calEVents = calEVents
+                        .Include(calEvent => calEvent.Repetition_EventDB);
+                }
+                else if (isAllRetrievalOPtionIncluded || eachRetrievalOption == DataRetrivalOption.DataBlob)
+                {
+                    calEVents = calEVents
+                        .Include(calEvent => calEvent.DataBlob_EventDB);
+                }
+                else if (isAllRetrievalOPtionIncluded || eachRetrievalOption == DataRetrivalOption.Name)
+                {
+                    calEVents = calEVents
+                        .Include(calEvent => calEvent.Name);
+                }
             }
-
-
             
             return calEVents;
         }
@@ -1882,21 +1889,6 @@ namespace TilerFront
                                 )
 
                             );
-
-                    #region includeCalendarEvents
-                    //subCalendarEvents = subCalendarEvents
-                    //    .Include(subEvent => subEvent.ParentCalendarEvent)
-                    //    .Include(subEvent => subEvent.ParentCalendarEvent.RepeatParentEvent)
-                    //    .Include(subEvent => subEvent.RepeatParentEvent)
-                    //    .Include(subEvent => subEvent.ParentCalendarEvent.RestrictionProfile_DB)
-                    //    .Include(subEvent => subEvent.RepeatParentEvent.RestrictionProfile_DB)
-                    //    .Include(subEvent => subEvent.ProfileOfNow_EventDB)
-                    //    .Include(subEvent => subEvent.Procrastination_EventDB)
-                    //    .Include(subEvent => subEvent.Location_DB)
-                    //    .Include(subEvent => subEvent.ParentCalendarEvent.DayPreference_DB)
-                    //    ;
-
-                    #endregion
 
                     #region includeCalendarEvents
                     //subCalendarEvents = subCalendarEvents
