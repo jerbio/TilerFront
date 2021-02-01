@@ -154,6 +154,7 @@ function prepSendTile(NameInput, AddressInput, NickNameSlider, SpliInput, HourIn
             NickName = NickNameSlider.getAllElements()[0].TileInput.getInputDom().value;
         }
         var newEvent= SubmitTile(NameInput.value, AddressInput,NickName, SpliInput.value, HourInput.value, MinuteInput.value, DeadlineInput.value, RepetitionInput.value, calendarColor, RepetitionFlag, restrictionData, AddressInput);
+        generatePeek.abortPeek()
         SendScheduleInformation(newEvent, global_ExitManager.triggerLastExitAndPop);
     }
 }
@@ -622,12 +623,7 @@ function generatePeek(CalEvent,Container)
 
     function createPeekUI(CalEvent, Container)
     {
-        if (generatePeek.Connection!=null)
-        {
-            generatePeek.Connection.abort();
-            generatePeek.Connection = null;
-        }
-
+        generatePeek.abortPeek()
         CalEvent.UserName = UserCredentials.UserName;
         CalEvent.UserID = UserCredentials.ID;
         var TimeZone = new Date().getTimezoneOffset();
@@ -814,6 +810,14 @@ function generatePeek(CalEvent,Container)
         var startWithDataset = 1;
         var startWithData = 1;
 
+    }
+}
+
+generatePeek.abortPeek = () => {
+    if (generatePeek.Connection!=null)
+    {
+        generatePeek.Connection.abort();
+        generatePeek.Connection = null;
     }
 }
 generatePeek.peekIsOn = false;
