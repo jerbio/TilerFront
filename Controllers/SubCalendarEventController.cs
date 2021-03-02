@@ -14,6 +14,7 @@ using DBTilerElement;
 using TilerFront.Models;
 using TilerCore;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 
 namespace TilerFront.Controllers
 {
@@ -172,5 +173,27 @@ namespace TilerFront.Controllers
             scheduleChangeSocket.triggerRefreshData(retrievedUser.getTilerUser());
             return Ok(retValue.getPostBack);
         }
+
+
+        [HttpGet]
+        [ResponseType(typeof(PostBackStruct))]
+        [Route("api/SubCalendarEvent")]
+        public async Task<IHttpActionResult> GetSubEvent(string id, [FromUri] AuthorizedUser myUser)
+        {
+            UserAccount retrievedUser = await myUser.getUserAccount(db);
+            await retrievedUser.Login();
+            SubCalendarEvent retrievedSubCalendarEvent = await retrievedUser.ScheduleLogControl.getSubEventWithID(id, includeRepetition: false);
+            PostBackData retValue = new PostBackData(CustomErrors.Errors.Tile_Or_Event_ID_Cannot_Be_Found);
+
+            if(retrievedSubCalendarEvent!=null)
+            {
+                string json = JsonConvert.SerializeObject(retrievedSubCalendarEvent, Formatting.Indented, new SubCalendarEventConverter());
+                JObject jSubCalendarEvent = JObject.Parse(json);
+                retValue = new PostBackData(jSubCalendarEvent, 0);
+            }
+            return Ok(retValue.getPostBack);
+        }
+
+
     }
 }
