@@ -1564,32 +1564,23 @@ namespace TilerFront
                 }
                 else if (isAllRetrievalOPtionIncluded || eachRetrievalOption == DataRetrivalOption.Evaluation)
                 {
-                    calEVents = calEVents
-                        .Include(calEvent => calEvent.RestrictionProfile_DB)
-                        .Include(calEvent => calEvent.Procrastination_EventDB)
-                        .Include(calEvent => calEvent.DayPreference_DB)
-                        .Include(calEvent => calEvent.Location_DB)
-                        ;
+                    
                 }
                 else if (isAllRetrievalOPtionIncluded || eachRetrievalOption == DataRetrivalOption.Now)
                 {
-                    calEVents = calEVents
-                        .Include(calEvent => calEvent.ProfileOfNow_EventDB);
+                    
                 }
                 else if (isAllRetrievalOPtionIncluded || eachRetrievalOption == DataRetrivalOption.Repetition)
                 {
-                    calEVents = calEVents
-                        .Include(calEvent => calEvent.Repetition_EventDB);
-                }
-                else if (isAllRetrievalOPtionIncluded || eachRetrievalOption == DataRetrivalOption.DataBlob)
+                } == Data
+                else if (isAllRetrievalOPtionIncluded || eachRetrievalOptionRetrivalOption.DataBlob)
                 {
-                    calEVents = calEVents
-                        .Include(calEvent => calEvent.DataBlob_EventDB);
+                    
+                        
                 }
                 else if (isAllRetrievalOPtionIncluded || eachRetrievalOption == DataRetrivalOption.Name)
                 {
-                    calEVents = calEVents
-                        .Include(calEvent => calEvent.Name);
+                    
                 }
             }
             
@@ -1751,6 +1742,52 @@ namespace TilerFront
             //List<SubCalendarEvent> retValue = await allSubCalQuery.ToListAsync().ConfigureAwait(false);
             return allSubCalQuery;
         }
+
+        public virtual IQueryable<CalendarEvent> addCalendarEventEvaluationRetrieval(IQueryable<CalendarEvent> calEventQuery)
+        {
+            var retValue = calEventQuery
+                        .Include(calEvent => calEvent.RestrictionProfile_DB)
+                        .Include(calEvent => calEvent.Procrastination_EventDB)
+                        .Include(calEvent => calEvent.DayPreference_DB)
+                        .Include(calEvent => calEvent.Location_DB)
+                        .Include(calEvent => calEvent.ProfileOfNow_EventDB)
+                        ;
+            return retValue;
+        }
+
+        public virtual IQueryable<T> addCalendarRepetitionRetrieval<T>(IQueryable<T> calEventQuery) where T : TilerEvent
+        {
+            var retValue = calEventQuery
+                .Include(calEvent => calEvent.Repetition_EventDB);
+            return retValue;
+        }
+
+        public virtual IQueryable<T> addCalendarDataBlobRetrieval<T>(IQueryable<T> calEventQuery) where T : TilerEvent
+        {
+            var retValue = calEventQuery
+                .Include(calEvent => calEvent.DataBlob_EventDB);
+            return retValue;
+        }
+
+        public virtual IQueryable<T> addCalendarNameRetrieval<T>(IQueryable<T> calEventQuery) where T : TilerEvent
+        {
+            var retValue = calEventQuery
+                .Include(calEvent => calEvent.Name); ;
+            return retValue;
+        }
+
+        public virtual IQueryable<T> addUiParamsRetrieval<T>(IQueryable<T> calEventQuery) where T : TilerEvent
+        {
+            var retValue = calEventQuery
+                .Include(calEvent => calEvent.UiParams_EventDB)
+                .Include(calEvent => calEvent.UiParams_EventDB.UIColor);
+            return retValue;
+        }
+
+
+
+
+
 
 
         async public virtual Task<IEnumerable<SubCalendarEvent>> getAllEnabledSubCalendarEvent(
