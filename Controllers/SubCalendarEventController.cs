@@ -178,11 +178,11 @@ namespace TilerFront.Controllers
         [HttpGet]
         [ResponseType(typeof(PostBackStruct))]
         [Route("api/SubCalendarEvent")]
-        public async Task<IHttpActionResult> GetSubEvent(string id, [FromUri] AuthorizedUser myUser)
+        public async Task<IHttpActionResult> GetSubEvent([FromUri] getEventModel eventModel)
         {
-            UserAccount retrievedUser = await myUser.getUserAccount(db);
+            UserAccount retrievedUser = await eventModel.getUserAccount(db);
             await retrievedUser.Login();
-            SubCalendarEvent retrievedSubCalendarEvent = await retrievedUser.ScheduleLogControl.getSubEventWithID(id, includeRepetition: false);
+            SubCalendarEvent retrievedSubCalendarEvent = await retrievedUser.ScheduleLogControl.getSubEventWithID(eventModel.EventID, includeRepetition: false);
             PostBackData retValue = new PostBackData(CustomErrors.Errors.Tile_Or_Event_ID_Cannot_Be_Found);
 
             if(retrievedSubCalendarEvent!=null)
