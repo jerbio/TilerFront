@@ -658,7 +658,7 @@ namespace TilerFront
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Enabled"));
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.isEnabled.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Location"));
-            MyEventScheduleNode.ChildNodes[0].InnerXml = CreateLocationNode(MyEvent.Location, "EventScheduleLocation").InnerXml;
+            MyEventScheduleNode.ChildNodes[0].InnerXml = CreateLocationNode(MyEvent.LocationObj, "EventScheduleLocation").InnerXml;
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("UIParams"));
             MyEventScheduleNode.ChildNodes[0].InnerXml = createDisplayUINode(MyEvent.getUIParam, "UIParams").InnerXml;
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("MiscData"));
@@ -689,6 +689,8 @@ namespace TilerFront
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.InitialEndTime_DB.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("DeadlineSuggestion"));
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.DeadlineSuggestion_DB.ToString();
+            MyEventScheduleNode.PrependChild(xmldoc.CreateElement("LocationValidationId"));
+            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.LocationValidationId;
             if (!MyEvent.isThirdParty)
             {
                 MyEventScheduleNode.PrependChild(xmldoc.CreateElement("UpdateHistory"));
@@ -894,7 +896,7 @@ namespace TilerFront
             MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.getName?.NameId.ToString();
 
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("Location"));
-            MyEventSubScheduleNode.ChildNodes[0].InnerXml = CreateLocationNode(MySubEvent.Location, "EventSubScheduleLocation").InnerXml;
+            MyEventSubScheduleNode.ChildNodes[0].InnerXml = CreateLocationNode(MySubEvent.LocationObj, "EventSubScheduleLocation").InnerXml;
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("UIParams"));
             MyEventSubScheduleNode.ChildNodes[0].InnerXml = createDisplayUINode(MySubEvent.getUIParam, "UIParams").InnerXml;
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("MiscData"));
@@ -937,6 +939,8 @@ namespace TilerFront
             MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.InitialStartTime_DB.ToString();
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("IniEndTime"));
             MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.InitialEndTime_DB.ToString();
+            MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("LocationValidationId"));
+            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.LocationValidationId;
 
 
             if (MySubEvent.getIsEventRestricted)
@@ -1128,6 +1132,11 @@ namespace TilerFront
             var1.ChildNodes[0].InnerText = Arg1.isDefault.ToString();
             var1.PrependChild(xmldoc.CreateElement("IsVerified"));
             var1.ChildNodes[0].InnerText = Arg1.IsVerified.ToString();
+            var1.PrependChild(xmldoc.CreateElement("ThirdPartyId"));
+            var1.ChildNodes[0].InnerText = Arg1.ThirdPartyId_DB;
+            var1.PrependChild(xmldoc.CreateElement("ThirdPartySource"));
+            var1.ChildNodes[0].InnerText = Arg1.ThirdPartySource;
+
             return var1;
         }
 
@@ -2982,6 +2991,12 @@ namespace TilerFront
                     retrievedSubEvent.NowLock_DB = Convert.ToBoolean(NowLockNode.InnerText);
                 }
 
+                XmlNode LocationValidationIdNode = MyXmlNode.ChildNodes[i].SelectSingleNode("LocationValidationId");
+                if (LocationValidationIdNode != null)
+                {
+                    retrievedSubEvent.LocationValidationId_DB = Convert.ToString(LocationValidationIdNode.InnerText);
+                }
+
                 retrievedSubEvent.InitialStartTime_DB = iniStartTimeInMs;
                 retrievedSubEvent.InitialEndTime_DB = iniEndTimeInMS;
 
@@ -3475,6 +3490,7 @@ namespace TilerFront
                 .Include(subEvent => subEvent.DataBlob_EventDB)
                 .Include(subEvent => subEvent.Procrastination_EventDB)
                 .Include(subEvent => subEvent.ProfileOfNow_EventDB)
+                .Include(subEvent => subEvent.UiParams_EventDB.UIColor)
                 .Include(subEvent => subEvent.RestrictionProfile_DB);
 
             if(includeParentCalevent)
