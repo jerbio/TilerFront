@@ -3464,6 +3464,7 @@ namespace TilerFront
                 .Include(subEvent => subEvent.DataBlob_EventDB)
                 .Include(subEvent => subEvent.Procrastination_EventDB)
                 .Include(subEvent => subEvent.ProfileOfNow_EventDB)
+                .Include(subEvent => subEvent.UiParams_EventDB.UIColor)
                 .Include(subEvent => subEvent.RestrictionProfile_DB);
 
             if(includeParentCalevent)
