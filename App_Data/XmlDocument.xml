@@ -1286,7 +1286,7 @@
             <param name="user"></param>
             <returns></returns>
         </member>
-        <member name="M:TilerFront.LogControl.getAllEnabledCalendarEvent(TilerElements.TimeLine,TilerElements.ReferenceNow,System.Boolean,System.Boolean,TilerElements.DataRetrivalOption,System.Collections.Generic.HashSet{System.String})">
+        <member name="M:TilerFront.LogControl.getAllEnabledCalendarEvent(TilerElements.TimeLine,TilerElements.ReferenceNow,System.Collections.Generic.HashSet{TilerElements.DataRetrivalOption},System.Collections.Generic.HashSet{System.String})">
             <summary>
             This gets all cal events within <paramref name="RangeOfLookUP"/>. Note: This uses the subcalendar event as the bases for the query. So if a sub event is not within the rangelookup it won't pull the calendar event, this is for performance reasons. Hence why the general default is to be generous.  If you want to pull a specific calendar event then you need to include the calendar id as part of <paramref name="tilerIds"/>.
             <paramref name="retrievalOption"/> provides a way of stream lining whats pulled from the DB. Evaluation ignores the UI component and includes only data to compute the schedule. Information such as NowProfile, procrastination and location
@@ -1295,7 +1295,7 @@
             <param name="Now"></param>
             <param name="includeSubEvents"></param>
             <param name="includeUpdateHistory"></param>
-            <param name="retrievalOption"></param>
+            <param name="retrievalOptions"></param>
             <param name="tilerIds"></param>
             <returns></returns>
         </member>

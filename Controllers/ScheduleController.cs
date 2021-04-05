@@ -92,7 +92,7 @@ namespace TilerFront.Controllers
                 Task<ConcurrentBag<CalendarEvent>> GoogleCalEventsTask = GoogleTilerEventControl.getAllCalEvents(AllGoogleTilerEvents, TimelineForData);
                 ReferenceNow now = new ReferenceNow(myAuthorizedUser.getRefNow(), tilerUser.EndfOfDay, tilerUser.TimeZoneDifference);
 
-                IEnumerable<SubCalendarEvent> subEvents = await LogAccess.getAllEnabledSubCalendarEvent(TimelineForData, now, true, DataRetrivalOption.Ui).ConfigureAwait(false);
+                IEnumerable<SubCalendarEvent> subEvents = await LogAccess.getAllEnabledSubCalendarEvent(TimelineForData, now, retrievalOptions: DataRetrievalSet.UiSet).ConfigureAwait(false);
                 IEnumerable<CalendarEvent> GoogleCalEvents = await GoogleCalEventsTask.ConfigureAwait(false);
                 subEvents = subEvents.Concat(GoogleCalEvents.SelectMany(subEvent => subEvent.AllSubEvents)).Where(subEvent => subEvent.StartToEnd.doesTimeLineInterfere(TimelineForData));
 
@@ -151,7 +151,7 @@ namespace TilerFront.Controllers
             ReferenceNow now = new ReferenceNow(DateTimeOffset.UtcNow.removeSecondsAndMilliseconds(), myUserAccount.getTilerUser().EndfOfDay, new TimeSpan());
             TimeLine timeLine = new TimeLine(Utility.BeginningOfTime, Utility.BeginningOfTime.AddYears(9000));
             LogControl logControl = myUserAccount.ScheduleLogControl;
-            var calEvents = await logControl.getAllEnabledCalendarEvent(timeLine, now, false, retrievalOption: DataRetrivalOption.All).ConfigureAwait(false);
+            var calEvents = await logControl.getAllEnabledCalendarEvent(timeLine, now, retrievalOptions: DataRetrievalSet.All).ConfigureAwait(false);
 
             foreach (var cal in calEvents.Values)
             {
@@ -253,7 +253,7 @@ namespace TilerFront.Controllers
                 List<CalendarEvent> ScheduleData = new List<CalendarEvent>();
                 
                 
-                List<SubCalendarEvent> subEvents = await LogAccess.getAllSubCalendarEvents(TimelineForData, now)
+                List<SubCalendarEvent> subEvents = await LogAccess.getAllSubCalendarEvents(TimelineForData, now, DataRetrievalSet.All)
                     .Include(subEvent => subEvent.Name)
                     .Where(subEvent => 
                     (StartTimeMs <= subEvent.DeletionTime_DB && subEvent.DeletionTime_DB <= EndTimeMs)
@@ -1077,7 +1077,9 @@ namespace TilerFront.Controllers
                 HashSet<string> calendarIds = new HashSet<string>() { myUser.EventID };
 
                 Task<Tuple<ThirdPartyControl.CalendarTool, IEnumerable<CalendarEvent>>> thirdPartyDataTask = ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(retrievedUser.UserID, db);
-                DB_Schedule schedule = new DB_Schedule(retrievedUser, myNow, calendarIds: calendarIds, includeUpdateHistory: true);
+                var retrievalOption = DataRetrievalSet.scheduleManipulation;
+                retrievalOption.Add(DataRetrivalOption.TimeLineHistory);
+                DB_Schedule schedule = new DB_Schedule(retrievedUser, myNow, calendarIds: calendarIds, retrievalOptions: retrievalOption);
                 schedule.CurrentLocation = myUser.getCurrentLocation();
                 DB_UserActivity activity = new DB_UserActivity(myNow, UserActivity.ActivityType.SetAsNowSingle);
                 JObject json = JObject.FromObject(myUser);

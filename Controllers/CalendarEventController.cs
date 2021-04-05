@@ -187,7 +187,9 @@ namespace TilerFront.Controllers
             {
                 HashSet<string> calendarIds = new HashSet<string>() { nowEvent.ID };
                 Task<Tuple<ThirdPartyControl.CalendarTool, IEnumerable<CalendarEvent>>> thirdPartyDataTask = ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(retrievedUser.UserID, db);
-                DB_Schedule schedule = new DB_Schedule(retrievedUser, nowEvent.getRefNow(), includeUpdateHistory: true, calendarIds: calendarIds);
+                var retrievalOption = DataRetrievalSet.scheduleManipulation;
+                retrievalOption.Add(DataRetrivalOption.TimeLineHistory);
+                DB_Schedule schedule = new DB_Schedule(retrievedUser, nowEvent.getRefNow(), retrievalOptions: retrievalOption, calendarIds: calendarIds);
                 schedule.CurrentLocation = nowEvent.getCurrentLocation();
                 var thirdPartyData = await thirdPartyDataTask.ConfigureAwait(false);
                 schedule.updateDataSetWithThirdPartyData(thirdPartyData);
@@ -241,7 +243,7 @@ namespace TilerFront.Controllers
 
                             GoogleThirdPartyControl googleEvents = new GoogleThirdPartyControl(AllCalendarEvents, AllIndexedThirdParty.getTilerUser());
 
-                            DB_Schedule NewSchedule = new DB_Schedule(retrievedUser, myUser.getRefNow(), true);
+                            DB_Schedule NewSchedule = new DB_Schedule(retrievedUser, myUser.getRefNow(), retrievalOptions: DataRetrievalSet.scheduleManipulationWithUpdateHistory);
                             NewSchedule.CurrentLocation = myUser.getCurrentLocation();
                             await NewSchedule.updateDataSetWithThirdPartyDataAndTriggerNewAddition(new Tuple<ThirdPartyControl.CalendarTool, IEnumerable<CalendarEvent>>(ThirdPartyControl.CalendarTool.google, new List<CalendarEvent> { googleEvents.getThirdpartyCalendarEvent() })).ConfigureAwait(false);
 
@@ -251,7 +253,7 @@ namespace TilerFront.Controllers
                     case "tiler":
                         {
                             HashSet<string> calendarIds = new HashSet<string>() { myUser.EventID };
-                            DB_Schedule NewSchedule = new DB_Schedule(retrievedUser, myUser.getRefNow(), true, calendarIds: calendarIds);
+                            DB_Schedule NewSchedule = new DB_Schedule(retrievedUser, myUser.getRefNow(), retrievalOptions: DataRetrievalSet.scheduleManipulationWithUpdateHistory, calendarIds: calendarIds);
                             NewSchedule.CurrentLocation = myUser.getCurrentLocation();
                             DateTimeOffset newStart = TilerElementExtension.JSStartTime.AddMilliseconds(myUser.Start);
                             newStart = newStart.Add(myUser.getTimeSpan);

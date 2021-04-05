@@ -1,5 +1,5 @@
 ﻿//#define UseDefaultLocation
-#define liveDebugging
+//#define liveDebugging
 
 using System;
 using System.Collections.Generic;
@@ -1462,7 +1462,6 @@ namespace TilerFront
         }
 
         private IQueryable<Repetition> getRepeatCalendarEvent(
-            DataRetrivalOption retrievalOption,
             bool includeRecurringEvents, 
             HashSet<string> ids = null
             )
@@ -1521,84 +1520,151 @@ namespace TilerFront
 
         public IQueryable<CalendarEvent> getCalendarEventQuery(
             HashSet<DataRetrivalOption> retrievalOptions,
-            bool includeSubEvents, 
             HashSet<string> ids= null
             )
         {
-            IQueryable<CalendarEvent> calEVents = _Context.CalEvents;
+            IQueryable<CalendarEvent> calEvents = _Context.CalEvents.Where(calEvent => calEvent.CreatorId == _TilerUser.Id);
             if (ids != null && ids.Count > 0)
             {
-                calEVents = calEVents
+                calEvents = calEvents
                 .Join(ids,
                 calEvent => calEvent.Id,
                 id => id,
                 (calEvent, id) => new { calEvent = calEvent, id = id }).Select(obj => obj.calEvent);
-                calEVents = calEVents
-                    .Include(calEvent => calEvent.DataBlob_EventDB)
-                    .Include(calEvent => calEvent.Name)
-                    .Include(calEvent => calEvent.Name.Creator_EventDB)
-                    .Include(calEvent => calEvent.Creator_EventDB)
-                    .Include(calEvent => calEvent.UiParams_EventDB.UIColor)
-                    ;
-
             }
 
-            if (includeSubEvents)
+            bool isSubEventIncluded = retrievalOptions.Contains(DataRetrivalOption.SubEvent);
+            if (isSubEventIncluded)
             {
-                calEVents = calEVents
+                calEvents = calEvents
                     .Include(calEvent => calEvent.AllSubEvents_DB)
-                //    .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.ParentCalendarEvent))
-                //    .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Name))
-                //    .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.DataBlob_EventDB))
-                //    .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Name.Creator_EventDB))
-                //    .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Creator_EventDB))
-                //    .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Location_DB))
-                //    .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.RestrictionProfile_DB))
-                //    .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Procrastination_EventDB))
-                //    .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.ProfileOfNow_EventDB));
                 ;
             }
 
 
-            bool isAllRetrievalOPtionIncluded = retrievalOptions.Contains(DataRetrivalOption.All);
+            bool isAllRetrievalOptionIncluded = retrievalOptions.Contains(DataRetrivalOption.All);
             foreach (DataRetrivalOption eachRetrievalOption in retrievalOptions)
             {
-                if (isAllRetrievalOPtionIncluded || eachRetrievalOption == DataRetrivalOption.Ui)
+                if (isAllRetrievalOptionIncluded || eachRetrievalOption == DataRetrivalOption.Ui)
                 {
-                    calEVents = calEVents
+                    calEvents = calEvents
                         .Include(calEvent => calEvent.UiParams_EventDB)
-                        .Include(calEvent => calEvent.UiParams_EventDB.UIColor)
-                        .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.UiParams_EventDB))
-                        .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.UiParams_EventDB.UIColor));
+                        .Include(calEvent => calEvent.UiParams_EventDB.UIColor);
+                    if(isAllRetrievalOptionIncluded || isSubEventIncluded)
+                    {
+                        calEvents = calEvents
+                            .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.UiParams_EventDB))
+                            .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.UiParams_EventDB.UIColor))
+                            ;
+                    }
                 }
-                else if (isAllRetrievalOPtionIncluded || eachRetrievalOption == DataRetrivalOption.Evaluation)
+                if (isAllRetrievalOptionIncluded || eachRetrievalOption == DataRetrivalOption.TimeLine)
                 {
-                    
+                    //calEvents = calEvents
+                    //    .Include(calEvent => calEvent.StartTime_EventDB)
+                    //    .Include(calEvent => calEvent.EndTime_EventDB)
+                    //    ;
+                    //if (isAllRetrievalOptionIncluded ||isSubEventIncluded)
+                    //{
+                    //    calEvents = calEvents
+                    //        .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.StartTime_EventDB))
+                    //        .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.EndTime_EventDB))
+                    //        ;
+                    //}
                 }
-                else if (isAllRetrievalOPtionIncluded || eachRetrievalOption == DataRetrivalOption.Now)
+                if (isAllRetrievalOptionIncluded || eachRetrievalOption == DataRetrivalOption.Evaluation)
                 {
-                    
+                    calEvents = calEvents
+                        .Include(calEvent => calEvent.RestrictionProfile_DB)
+                        .Include(calEvent => calEvent.DayPreference_DB)
+                        .Include(calEvent => calEvent.Procrastination_EventDB)
+                        ;
+                    if (isAllRetrievalOptionIncluded || isSubEventIncluded)
+                    {
+                        calEvents = calEvents
+                            .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.RestrictionProfile_DB))
+                            .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Procrastination_EventDB))
+                            ;
+                    }
                 }
-                else if (isAllRetrievalOPtionIncluded || eachRetrievalOption == DataRetrivalOption.Repetition)
+                if (isAllRetrievalOptionIncluded || eachRetrievalOption == DataRetrivalOption.Now)
                 {
-                } == Data
-                else if (isAllRetrievalOPtionIncluded || eachRetrievalOptionRetrivalOption.DataBlob)
-                {
-                    
-                        
+                    calEvents = calEvents
+                        .Include(calEvent => calEvent.ProfileOfNow_EventDB)
+                        ;
+                    if (isAllRetrievalOptionIncluded || isSubEventIncluded)
+                    {
+                        calEvents = calEvents
+                            .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.ProfileOfNow_EventDB))
+                            ;
+                    }
                 }
-                else if (isAllRetrievalOPtionIncluded || eachRetrievalOption == DataRetrivalOption.Name)
+                if (isAllRetrievalOptionIncluded || eachRetrievalOption == DataRetrivalOption.Repetition)
                 {
-                    
+                    calEvents = calEvents
+                        .Include(calEvent => calEvent.Repetition_EventDB)
+                        ;
+                    if (isAllRetrievalOptionIncluded || isSubEventIncluded)
+                    {
+                        calEvents = calEvents
+                            .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Repetition_EventDB));
+                    }
+
+
+                    IQueryable<Repetition> repetitions = _Context.Repetitions
+                    .Include(repetition => repetition.SubRepetitions)
+                    .Include(repetition => repetition.SubRepetitions.Select(subRepetition => subRepetition.SubRepetitions))
+                    ;
+                }
+                if (isAllRetrievalOptionIncluded || eachRetrievalOption == DataRetrivalOption.DataBlob)
+                {
+                    calEvents = calEvents
+                        .Include(calEvent => calEvent.DataBlob_EventDB)
+                        ;
+                    if (isAllRetrievalOptionIncluded || isSubEventIncluded)
+                    {
+                        calEvents = calEvents
+                            .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.DataBlob_EventDB))
+                            ;
+                    }
+                }
+                if (isAllRetrievalOptionIncluded || eachRetrievalOption == DataRetrivalOption.Name)
+                {
+                    calEvents = calEvents
+                        .Include(calEvent => calEvent.Name)
+                        ;
+                    if (isAllRetrievalOptionIncluded || isSubEventIncluded)
+                    {
+                        calEvents = calEvents
+                            .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Name))
+                            ;
+                    }
+                }
+                if (isAllRetrievalOptionIncluded || eachRetrievalOption == DataRetrivalOption.Location)
+                {
+                    calEvents = calEvents
+                        .Include(calEvent => calEvent.Location_DB)
+                        ;
+                    if (isAllRetrievalOptionIncluded || isSubEventIncluded)
+                    {
+                        calEvents = calEvents
+                            .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Location_DB))
+                            ;
+                    }
+                }
+                if (isAllRetrievalOptionIncluded || eachRetrievalOption == DataRetrivalOption.TimeLineHistory)
+                {
+                    calEvents = calEvents
+                        .Include(calEvent => calEvent.TimeLineHistory_DB)
+                        ;
                 }
             }
             
-            return calEVents;
+            return calEvents;
         }
 
         private IQueryable<SubCalendarEvent> getSubCalendarEventQuery(
-            DataRetrivalOption retrievalOption,
-            bool includeOtherEntities,
+            HashSet<DataRetrivalOption> retrievalOptions,
             HashSet<string> ids = null)
         {
             IQueryable<SubCalendarEvent> subEvents = _Context.SubEvents.Where(subEvent => subEvent.CreatorId == _TilerUser.Id);
@@ -1610,45 +1676,65 @@ namespace TilerFront
                 id => id,
                 (subEvent, id) => new { subEvent = subEvent, id = id }).Select(obj => obj.subEvent);
             }
-            if (includeOtherEntities)
+
+
+            bool isAllRetrievalOptionIncluded = retrievalOptions.Contains(DataRetrivalOption.All);
+            foreach (DataRetrivalOption eachRetrievalOption in retrievalOptions)
             {
-                subEvents = subEvents
-                    .Include(subEvent => subEvent.Name)
-                    .Include(subEvent => subEvent.Name.Creator_EventDB)
-                    .Include(subEvent => subEvent.Location_DB)
-                    .Include(subEvent => subEvent.Creator_EventDB)
-                    .Include(subEvent => subEvent.Location_DB)
-                    .Include(subEvent => subEvent.DataBlob_EventDB)
-                    ;
+                if (isAllRetrievalOptionIncluded || eachRetrievalOption == DataRetrivalOption.Ui)
+                {
+                    subEvents = subEvents
+                        .Include(calEvent => calEvent.UiParams_EventDB)
+                        .Include(calEvent => calEvent.UiParams_EventDB.UIColor)
+                        ;
+
+                }
+                else if (isAllRetrievalOptionIncluded || eachRetrievalOption == DataRetrivalOption.TimeLine)
+                {
+                    subEvents = subEvents
+                        .Include(calEvent => calEvent.StartTime_EventDB)
+                        .Include(calEvent => calEvent.EndTime_EventDB)
+                        ;
+                }
+                else if (isAllRetrievalOptionIncluded || eachRetrievalOption == DataRetrivalOption.Evaluation)
+                {
+                    subEvents = subEvents
+                        .Include(calEvent => calEvent.RestrictionProfile_DB)
+                        .Include(calEvent => calEvent.Procrastination_EventDB)
+                        ;
+                }
+                else if (isAllRetrievalOptionIncluded || eachRetrievalOption == DataRetrivalOption.Now)
+                {
+                    subEvents = subEvents
+                        .Include(calEvent => calEvent.ProfileOfNow_EventDB)
+                        ;
+                }
+                else if (isAllRetrievalOptionIncluded || eachRetrievalOption == DataRetrivalOption.Repetition)
+                {
+                    subEvents = subEvents
+                        .Include(calEvent => calEvent.Repetition_EventDB)
+                        ;
+                }
+                else if (isAllRetrievalOptionIncluded || eachRetrievalOption == DataRetrivalOption.DataBlob)
+                {
+                    subEvents = subEvents
+                        .Include(calEvent => calEvent.DataBlob_EventDB)
+                        ;
+                }
+                else if (isAllRetrievalOptionIncluded || eachRetrievalOption == DataRetrivalOption.Name)
+                {
+                    subEvents = subEvents
+                        .Include(calEvent => calEvent.Name.NameValue)
+                        ;
+                }
+                else if (isAllRetrievalOptionIncluded || eachRetrievalOption == DataRetrivalOption.Location)
+                {
+                    subEvents = subEvents
+                        .Include(calEvent => calEvent.Location_DB)
+                        ;
+                }
             }
 
-            if (retrievalOption == DataRetrivalOption.Ui)
-            {
-                subEvents = subEvents
-                    .Include(subEvent => subEvent.UiParams_EventDB)
-                    .Include(subEvent => subEvent.UiParams_EventDB.UIColor);
-            }
-            else if (retrievalOption == DataRetrivalOption.Evaluation)
-            {
-                subEvents = subEvents
-                    .Include(subEvent => subEvent.RestrictionProfile_DB)
-                    .Include(subEvent => subEvent.Procrastination_EventDB)
-                    .Include(subEvent => subEvent.ProfileOfNow_EventDB);
-            }
-            else if (retrievalOption == DataRetrivalOption.All)
-            {
-                subEvents = subEvents
-                    .Include(subEvent => subEvent.UiParams_EventDB)
-                    .Include(subEvent => subEvent.UiParams_EventDB.UIColor)
-                    .Include(subEvent => subEvent.Procrastination_EventDB)
-                    .Include(subEvent => subEvent.ProfileOfNow_EventDB)
-                    .Include(subEvent => subEvent.RestrictionProfile_DB)
-                    .Include(subEvent => subEvent.Procrastination_EventDB)
-                    .Include(subEvent => subEvent.ProfileOfNow_EventDB);
-            }
-
-            subEvents = subEvents
-                .Include(subEvent => subEvent.ParentCalendarEvent);
             return subEvents;
         }
 
@@ -1701,7 +1787,7 @@ namespace TilerFront
             if (timeline!=null && user!= null)
             {
                 IQueryable<SubCalendarEvent> subEventQuery = null;
-                IQueryable<CalendarEvent> caleventQuery = getCalendarEventQuery(DataRetrivalOption.Evaluation, false);
+                IQueryable<CalendarEvent> caleventQuery = getCalendarEventQuery(DataRetrievalSet.analysisManipulation);
                 caleventQuery = caleventQuery
                     .Where(calEvent =>
                         calEvent.CreatorId == user.Id
@@ -1728,7 +1814,7 @@ namespace TilerFront
             }
         }
 
-        public virtual IQueryable<SubCalendarEvent> getAllSubCalendarEvents(TimeLine RangeOfLookUP, ReferenceNow Now, bool includeOtherEntities = false, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation) {
+        public virtual IQueryable<SubCalendarEvent> getAllSubCalendarEvents(TimeLine RangeOfLookUP, ReferenceNow Now, HashSet<DataRetrivalOption> retrievalOptions, bool includeOtherEntities = false) {
 #if liveDebugging
             includeOtherEntities = true;
 #else
@@ -1736,7 +1822,7 @@ namespace TilerFront
             this.Now = Now;
             long rangeStart = RangeOfLookUP.Start.ToUnixTimeMilliseconds();
             long rangeEnd = RangeOfLookUP.End.ToUnixTimeMilliseconds();
-            IQueryable<SubCalendarEvent> allSubCalQuery = getSubCalendarEventQuery(retrievalOption, includeOtherEntities: includeOtherEntities);
+            IQueryable<SubCalendarEvent> allSubCalQuery = getSubCalendarEventQuery(retrievalOptions);
             allSubCalQuery = allSubCalQuery
                 .Where(subEvent =>
                         subEvent.StartTime_EventDB < RangeOfLookUP.End
@@ -1748,7 +1834,6 @@ namespace TilerFront
                 .Include(subEvent => subEvent.RepeatParentEvent)
                 ;
 
-            //List<SubCalendarEvent> retValue = await allSubCalQuery.ToListAsync().ConfigureAwait(false);
             return allSubCalQuery;
         }
 
@@ -1801,14 +1886,13 @@ namespace TilerFront
 
         async public virtual Task<IEnumerable<SubCalendarEvent>> getAllEnabledSubCalendarEvent(
             TimeLine RangeOfLookUP, 
-            ReferenceNow Now, 
-            bool includeOtherEntities = true, 
-            DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation)
+            ReferenceNow Now,
+            HashSet<DataRetrivalOption> retrievalOptions)
         {
             this.Now = Now;
             Stopwatch watch = new Stopwatch();
             watch.Start();
-            IQueryable<SubCalendarEvent> allSubCalQuery = getSubCalendarEventQuery(retrievalOption, includeOtherEntities: includeOtherEntities);
+            IQueryable<SubCalendarEvent> allSubCalQuery = getSubCalendarEventQuery(retrievalOptions);
             allSubCalQuery = allSubCalQuery
                 .Where(subEvent =>
                         subEvent.IsEnabled_DB
@@ -1869,18 +1953,16 @@ namespace TilerFront
         /// <param name="Now"></param>
         /// <param name="includeSubEvents"></param>
         /// <param name="includeUpdateHistory"></param>
-        /// <param name="retrievalOption"></param>
+        /// <param name="retrievalOptions"></param>
         /// <param name="tilerIds"></param>
         /// <returns></returns>
         async public virtual Task<Dictionary<string, CalendarEvent>> getAllEnabledCalendarEvent(
             TimeLine RangeOfLookUP,
             ReferenceNow Now,
-            bool includeUpdateHistory,
-            bool includeSubEvents = true,
-            DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation,
+            HashSet<DataRetrivalOption> retrievalOptions,
             HashSet<string> tilerIds = null)
         {
-            if (retrievalOption == DataRetrivalOption.Evaluation)
+            if (retrievalOptions != null)
             {
                 this.Now = Now;
                 Stopwatch watch = new Stopwatch();
@@ -1904,37 +1986,29 @@ namespace TilerFront
                     {
                         calIdSet = new HashSet<string>(calIds);
                     }
-                    var calEventQuery = getCalendarEventQuery(retrievalOption, true);
-                    //IQueryable<SubCalendarEvent> subCalendarEvents = getSubCalendarEventQuery(retrievalOption, includeOtherEntities: true);
-
-                    if (includeUpdateHistory)
-                    {
-                        calEventQuery = calEventQuery
-                            .Include(calEvent => calEvent.TimeLineHistory_DB)
-                            .Include(calEvent => calEvent.TimeLineHistory_DB.TimeLines_DB)
-                            ;
-                    }
+                    var calEventQuery = getCalendarEventQuery(retrievalOptions, tilerIds);
+                    
 
 
-                        calEventQuery = calEventQuery
-                        .Where(calEvent =>
-                                (
-                                    calEvent.IsEnabled_DB
-                                    && !calEvent.Complete_EventDB
-                                    && (
-                                        (calEvent.RepeatParentEvent == null )
-                                        || (
-                                            calEvent.RepeatParentEvent.IsEnabled_DB
-                                            && !calEvent.RepeatParentEvent.Complete_EventDB
-                                            )
+                    calEventQuery = calEventQuery
+                    .Where(calEvent =>
+                            (
+                                calEvent.IsEnabled_DB
+                                && !calEvent.Complete_EventDB
+                                && (
+                                    (calEvent.RepeatParentEvent == null )
+                                    || (
+                                        calEvent.RepeatParentEvent.IsEnabled_DB
+                                        && !calEvent.RepeatParentEvent.Complete_EventDB
                                         )
-                                    && calEvent.StartTime_EventDB < RangeOfLookUP.End
-                                    && calEvent.EndTime_EventDB > RangeOfLookUP.Start
-                                    && calEvent.StartTime_EventDB < RangeOfLookUP.End// for performance reasons we will ignore sub events outside two weeks that are not within the range
-                                    && calEvent.EndTime_EventDB > RangeOfLookUP.Start// for performance reasons we will ignore sub events outside two weeks that are not within the specified range so the range has to be generous
-                                )
+                                    )
+                                && calEvent.StartTime_EventDB < RangeOfLookUP.End
+                                && calEvent.EndTime_EventDB > RangeOfLookUP.Start
+                                && calEvent.StartTime_EventDB < RangeOfLookUP.End// for performance reasons we will ignore sub events outside two weeks that are not within the range
+                                && calEvent.EndTime_EventDB > RangeOfLookUP.Start// for performance reasons we will ignore sub events outside two weeks that are not within the specified range so the range has to be generous
+                            )
 
-                            );
+                        );
 
                     #region includeCalendarEvents
                     //subCalendarEvents = subCalendarEvents
@@ -2061,19 +2135,16 @@ namespace TilerFront
                     {
                         CalendarEventRestricted calAsRestricted = calEvent as CalendarEventRestricted;
                         calEvent.DefaultCalendarEvent = defaultCalEvent;
-                        if (retrievalOption != DataRetrivalOption.Ui)
+                        calAsRestricted.RestrictionProfile_DB.InitializeOverLappingDictionary();
+                        if (Now != null)
                         {
-                            calAsRestricted.RestrictionProfile_DB.InitializeOverLappingDictionary();
-                            if (Now != null)
+                            if (retrievalOptions.Contains( DataRetrivalOption.Evaluation))
                             {
-                                if (retrievalOption == DataRetrivalOption.Evaluation)
-                                {
-                                    calAsRestricted.setNow(Now, true);
-                                }
-                                else
-                                {
-                                    calAsRestricted.setNow(Now, false);
-                                }
+                                calAsRestricted.setNow(Now, true);
+                            }
+                            else
+                            {
+                                calAsRestricted.setNow(Now, false);
                             }
                         }
                     }
@@ -2099,18 +2170,20 @@ namespace TilerFront
             }
             else
             {
-                return await getAllNonEvaluationEnabledCalendarEvent(RangeOfLookUP, Now, includeSubEvents, retrievalOption).ConfigureAwait(false);
+                return await getAllNonEvaluationEnabledCalendarEvent(RangeOfLookUP, Now, retrievalOptions, tilerIds).ConfigureAwait(false);
             }
         }
 
-        async public virtual Task<Dictionary<string, CalendarEvent>> getAllNonEvaluationEnabledCalendarEvent(TimeLine RangeOfLookUP, ReferenceNow Now, bool includeSubEvents = true, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation)
+        async public virtual Task<Dictionary<string, CalendarEvent>> getAllNonEvaluationEnabledCalendarEvent(TimeLine RangeOfLookUP, ReferenceNow Now,
+            HashSet<DataRetrivalOption> retrievalOptions,
+            HashSet<string> tilerIds = null)
         {
             Stopwatch watch = new Stopwatch();
             watch.Start();
             CalendarEvent defaultCalEvent = CalendarEvent.getEmptyCalendarEvent(EventID.GenerateCalendarEvent(), Now.constNow, Now.constNow.AddHours(1));
             if (RangeOfLookUP != null)
             {
-                IQueryable<SubCalendarEvent> subCalendarEvents = getSubCalendarEventQuery(retrievalOption, true);
+                IQueryable<SubCalendarEvent> subCalendarEvents = getSubCalendarEventQuery(retrievalOptions, tilerIds);
                 subCalendarEvents = subCalendarEvents
                     .Where(subEvent =>
                             subEvent.StartTime_EventDB < RangeOfLookUP.End
@@ -2229,7 +2302,7 @@ namespace TilerFront
                 List<CalendarEvent> calendarEvents = new List<CalendarEvent>();
                 if (repeatCalendarEvents.Count > 0)
                 {
-                    IQueryable<Repetition> repetittions = getRepeatCalendarEvent(retrievalOption, false);
+                    IQueryable<Repetition> repetittions = getRepeatCalendarEvent(false);
                     var enumerable = repeatCalendarEvents.Join(
                         repetittions,
                         calEvent => calEvent.EventRepetitionId,
@@ -2332,12 +2405,11 @@ namespace TilerFront
                 {
                     CalendarEventRestricted calAsRestricted = calEvent as CalendarEventRestricted;
                     calEvent.DefaultCalendarEvent = defaultCalEvent;
-                    if (retrievalOption != DataRetrivalOption.Ui)
-                    {
+                    
                         calAsRestricted.RestrictionProfile_DB.InitializeOverLappingDictionary();
                         if (Now != null)
                         {
-                            if (retrievalOption == DataRetrivalOption.Evaluation)
+                            if (retrievalOptions.Contains(DataRetrivalOption.Evaluation))
                             {
                                 calAsRestricted.setNow(Now, true);
                             }
@@ -2346,7 +2418,6 @@ namespace TilerFront
                                 calAsRestricted.setNow(Now, false);
                             }
                         }
-                    }
 
                 }
 
@@ -3396,21 +3467,32 @@ namespace TilerFront
             return retValue;
         }
 
-        public virtual async Task<CalendarEvent> getCalendarEventWithID(EventID id, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation)
+        public virtual async Task<CalendarEvent> getCalendarEventWithID(string tilerId,  HashSet<DataRetrivalOption> retrievalOptions = null)
         {
-            return await getCalendarEventWithID(id.getRepeatCalendarEventID(), retrievalOption).ConfigureAwait(false);
+            
+            return await getCalendarEventWithID(retrievalOptions, new HashSet<string>() { tilerId }).ConfigureAwait(false);
         }
 
-        public async Task<CalendarEvent> getCalendarEventWithID(string id, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation, bool includeSubEvents = true)
+        public async Task<CalendarEvent> getCalendarEventWithID(HashSet<DataRetrivalOption> retrievalOptions,
+            HashSet<string> tilerIds = null)
         {
-            EventID idObj = new EventID(id);
-            id = idObj.getRepeatCalendarEventID();
+            string id = null;
+            if(tilerIds.Count == 1)
+            {
+                id = tilerIds.Single();
+                EventID idObj = new EventID(id);
+                id = idObj.getRepeatCalendarEventID();
+            }
 
+            if (retrievalOptions == null)
+            {
+                retrievalOptions = DataRetrievalSet.All;
+            }
 
             ConcurrentBag<CalendarEvent> parentCalEvents = new ConcurrentBag<CalendarEvent>();
 
             ConcurrentBag<CalendarEvent> childCalEvents = new ConcurrentBag<CalendarEvent>();
-            CalendarEvent retValue = getCalendarEventQuery(retrievalOption, includeSubEvents)
+            CalendarEvent retValue = getCalendarEventQuery(retrievalOptions, tilerIds)
                     .Include(calEvent => calEvent.Repetition_EventDB)
                     .Include(calEvent => calEvent.ProfileOfNow_EventDB)
                     .Include(calEvent => calEvent.Procrastination_EventDB)
@@ -3426,35 +3508,35 @@ namespace TilerFront
 
 
             // Multiple getCalendarEventQuery calls because we're trying to leverage the caching functionality of entity framework. Attributes that have been included don't get pulled in again meaning the row size from DB is smaller.
-            retValue = getCalendarEventQuery(retrievalOption, includeSubEvents)
-                    .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.DayPreference_DB)).SingleOrDefault(calEvent => calEvent.Id == id);
-            retValue = getCalendarEventQuery(retrievalOption, includeSubEvents)
-                    .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB.Select(subEvent => subEvent.Name))).SingleOrDefault(calEvent => calEvent.Id == id);
-            retValue = getCalendarEventQuery(retrievalOption, includeSubEvents)
-                    .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB.Select(subEvent => subEvent.ProfileOfNow_EventDB)))
-                    .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB.Select(subEvent => subEvent.Procrastination_EventDB)))
-                    .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB.Select(subEvent => subEvent.Name))).SingleOrDefault(calEvent => calEvent.Id == id);
-            retValue = getCalendarEventQuery(retrievalOption, includeSubEvents)
-                    .Include(calEvent => calEvent.Repetition_EventDB.SubRepetitions.Select(repetition => repetition.SubRepetitions)).SingleOrDefault(calEvent => calEvent.Id == id);
-            retValue = getCalendarEventQuery(retrievalOption, includeSubEvents)
-                    .Include(calEvent => calEvent.Repetition_EventDB.SubRepetitions.Select(repetition => repetition.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB))).SingleOrDefault(calEvent => calEvent.Id == id);
-            retValue = getCalendarEventQuery(retrievalOption, includeSubEvents)
-                    .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB.Select(subEvent => subEvent.Name))).SingleOrDefault(calEvent => calEvent.Id == id);
-            retValue = getCalendarEventQuery(retrievalOption, includeSubEvents)
-                    .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB.Select(subEvent => subEvent.Name.Creator_EventDB)))
-                    .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB.Select(subEvent => subEvent.DataBlob_EventDB)))
-                    .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB.Select(subEvent => subEvent.Location_DB)))
-                    .SingleOrDefault(calEvent => calEvent.Id == id);
-            retValue = getCalendarEventQuery(retrievalOption, includeSubEvents)
-                    .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB.Select(subEvent => subEvent.Procrastination_EventDB)))
-                    .SingleOrDefault(calEvent => calEvent.Id == id);
-            retValue = getCalendarEventQuery(retrievalOption, includeSubEvents)
-                    .Include(calEvent => calEvent.Repetition_EventDB.SubRepetitions.Select(repetition => repetition.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB)))
-                    .SingleOrDefault(calEvent => calEvent.Id == id);
-            retValue = getCalendarEventQuery(retrievalOption, includeSubEvents)
-                    .Include(calEvent => calEvent.Repetition_EventDB.SubRepetitions.Select(repetition => repetition.RepeatingEvents.Select(repCalEvent => repCalEvent.Procrastination_EventDB)))
-                    .Include(calEvent => calEvent.Repetition_EventDB.SubRepetitions.Select(repetition => repetition.RepeatingEvents.Select(repCalEvent => repCalEvent.ProfileOfNow_EventDB)))
-                    .SingleOrDefault(calEvent => calEvent.Id == id);
+            //retValue = getCalendarEventQuery(retrievalOption, includeSubEvents)
+            //        .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.DayPreference_DB)).SingleOrDefault(calEvent => calEvent.Id == id);
+            //retValue = getCalendarEventQuery(retrievalOption, includeSubEvents)
+            //        .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB.Select(subEvent => subEvent.Name))).SingleOrDefault(calEvent => calEvent.Id == id);
+            //retValue = getCalendarEventQuery(retrievalOption, includeSubEvents)
+            //        .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB.Select(subEvent => subEvent.ProfileOfNow_EventDB)))
+            //        .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB.Select(subEvent => subEvent.Procrastination_EventDB)))
+            //        .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB.Select(subEvent => subEvent.Name))).SingleOrDefault(calEvent => calEvent.Id == id);
+            //retValue = getCalendarEventQuery(retrievalOption, includeSubEvents)
+            //        .Include(calEvent => calEvent.Repetition_EventDB.SubRepetitions.Select(repetition => repetition.SubRepetitions)).SingleOrDefault(calEvent => calEvent.Id == id);
+            //retValue = getCalendarEventQuery(retrievalOption, includeSubEvents)
+            //        .Include(calEvent => calEvent.Repetition_EventDB.SubRepetitions.Select(repetition => repetition.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB))).SingleOrDefault(calEvent => calEvent.Id == id);
+            //retValue = getCalendarEventQuery(retrievalOption, includeSubEvents)
+            //        .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB.Select(subEvent => subEvent.Name))).SingleOrDefault(calEvent => calEvent.Id == id);
+            //retValue = getCalendarEventQuery(retrievalOption, includeSubEvents)
+            //        .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB.Select(subEvent => subEvent.Name.Creator_EventDB)))
+            //        .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB.Select(subEvent => subEvent.DataBlob_EventDB)))
+            //        .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB.Select(subEvent => subEvent.Location_DB)))
+            //        .SingleOrDefault(calEvent => calEvent.Id == id);
+            //retValue = getCalendarEventQuery(retrievalOption, includeSubEvents)
+            //        .Include(calEvent => calEvent.Repetition_EventDB.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB.Select(subEvent => subEvent.Procrastination_EventDB)))
+            //        .SingleOrDefault(calEvent => calEvent.Id == id);
+            //retValue = getCalendarEventQuery(retrievalOption, includeSubEvents)
+            //        .Include(calEvent => calEvent.Repetition_EventDB.SubRepetitions.Select(repetition => repetition.RepeatingEvents.Select(repCalEvent => repCalEvent.AllSubEvents_DB)))
+            //        .SingleOrDefault(calEvent => calEvent.Id == id);
+            //retValue = getCalendarEventQuery(retrievalOption, includeSubEvents)
+            //        .Include(calEvent => calEvent.Repetition_EventDB.SubRepetitions.Select(repetition => repetition.RepeatingEvents.Select(repCalEvent => repCalEvent.Procrastination_EventDB)))
+            //        .Include(calEvent => calEvent.Repetition_EventDB.SubRepetitions.Select(repetition => repetition.RepeatingEvents.Select(repCalEvent => repCalEvent.ProfileOfNow_EventDB)))
+            //        .SingleOrDefault(calEvent => calEvent.Id == id);
 
             if (retValue != null && retValue.getIsEventRestricted)
             {
@@ -3655,7 +3737,7 @@ namespace TilerFront
             return retValue;
         }
 
-        async virtual public Task<Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location>, Analysis>> getProfileInfo(TimeLine RangeOfLookup, ReferenceNow Now, bool includeUpdateHistory, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation, bool createDump = true, HashSet<string> calendarIds = null)
+        async virtual public Task<Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location>, Analysis>> getProfileInfo(TimeLine RangeOfLookup, ReferenceNow Now,  HashSet<DataRetrivalOption> retrievalOptions, bool createDump = true, HashSet<string> calendarIds = null)
         {
             Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, TilerElements.Location>, Analysis> retValue;
             if (this.Status)
@@ -3665,7 +3747,7 @@ namespace TilerFront
                 RangeOfLookup  = RangeOfLookup == null ? new TimeLine(Now.constNow.AddYears(-200), Now.constNow.AddYears(200)) : RangeOfLookup;
                 Stopwatch scheduleLoadWatch = new Stopwatch();
                 scheduleLoadWatch.Start();
-                Dictionary<string, CalendarEvent> AllScheduleData = await this.getAllEnabledCalendarEvent(RangeOfLookup, Now, includeUpdateHistory, retrievalOption: retrievalOption, tilerIds: calendarIds);
+                Dictionary<string, CalendarEvent> AllScheduleData = await this.getAllEnabledCalendarEvent(RangeOfLookup, Now, retrievalOptions: retrievalOptions, tilerIds: calendarIds);
                 scheduleLoadWatch.Stop();
                 Analysis analysis = await getAnalysis(this.getTilerRetrievedUser()).ConfigureAwait(false);
                 Debug.WriteLine("Total DB Lookup took " + scheduleLoadWatch.Elapsed.ToString());
