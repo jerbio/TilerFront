@@ -690,6 +690,7 @@ namespace TilerFront
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("DeadlineSuggestion"));
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.DeadlineSuggestion_DB.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("LocationValidationId"));
+            MyEventScheduleNode.PrependChild(CreatePauseUsedUpNode(MyEvent, xmldoc));
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.LocationValidationId;
             if (!MyEvent.isThirdParty)
             {
@@ -907,7 +908,6 @@ namespace TilerFront
             MyEventSubScheduleNode.ChildNodes[0].InnerXml = ReasonForPosition(MySubEvent.ReasonsForPosiition.SelectMany(obj => obj.Value).ToList(), "TimePositionReasons").InnerXml;
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("Restricted"));
             MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.getIsEventRestricted.ToString();
-            MyEventSubScheduleNode.PrependChild(CreatePauseUsedUpNode(MySubEvent, xmldoc));
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("isProcrastinateEvent"));
             MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.getIsProcrastinateCalendarEvent.ToString();
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("TimeZone"));
@@ -959,7 +959,7 @@ namespace TilerFront
         /// </summary>
         /// <param name="SubEvent"></param>
         /// <returns></returns>
-        public XmlElement CreatePauseUsedUpNode(SubCalendarEvent SubEvent, XmlDocument xmldoc)
+        public XmlElement CreatePauseUsedUpNode(CalendarEvent SubEvent, XmlDocument xmldoc)
         {
 
 
@@ -2536,15 +2536,20 @@ namespace TilerFront
             {
                 RetrievedEvent = new CalendarEvent(Name, start, end, CalendarEventDuration, PreDeadline, PrepTime, Split, Recurrence, location, UiData, noteData, procrastinationData, NowProfileData, EVentEnableFlag, completedFlag, creator, userGroup, timeZone, new EventID(ID), null);
             }
-
+            Tuple<TimeSpan, DateTimeOffset, List<PausedTimeLine>> PauseData = getPauseData(EventScheduleNode);
+            
             if (rigidFlag && procrastinationEventFlag)
             {
                 creator.ClearAllId = ID;
                 RetrievedEvent = new DB_ProcrastinateCalendarEvent(new EventID(creator.getClearAllEventsId()), Name, start, end, CalendarEventDuration, PreDeadline, PrepTime, Recurrence, location, UiData, noteData, EVentEnableFlag, completedFlag, creator, userGroup, timeZone, Split, NowProfileData);
+                (RetrievedEvent as DB_ProcrastinateCalendarEvent).UsedTime_EventDB = (long)PauseData.Item1.TotalMilliseconds;
+                (RetrievedEvent as DB_ProcrastinateCalendarEvent).setPausedTimeSlots(PauseData.Item3);
             }
             else
             {
                 RetrievedEvent = new DB_CalendarEvent(RetrievedEvent, procrastinationData, NowProfileData);
+                RetrievedEvent.UsedTime_EventDB = (long)PauseData.Item1.TotalMilliseconds;
+                (RetrievedEvent as DB_CalendarEvent).setPausedTimeSlots(PauseData.Item3);
             }
             Name.Creator_EventDB = RetrievedEvent.getCreator;
             Name.AssociatedEvent = RetrievedEvent;
@@ -2671,8 +2676,6 @@ namespace TilerFront
             {
                 RetrievedEvent.IsRepeatsChildCalEvent = Convert.ToBoolean(IsRepeatsChildCalEventString);
             }
-            
-
 
             RetrievedEvent.InitialStartTime_DB = iniStartTime;
             RetrievedEvent.InitialEndTime_DB= iniEndTime;
@@ -2867,7 +2870,7 @@ namespace TilerFront
                 }
                 string timeZone = MyXmlNode.ChildNodes[i].SelectSingleNode("TimeZone")?.InnerText ?? "UTC";
                 DB_TilerUserGroup userGroup = getTilerUserGroup(MyXmlNode.ChildNodes[i].SelectSingleNode("UserGroup"));
-                Tuple<TimeSpan, DateTimeOffset, List<PausedTimeLine>> PauseData = getPauseData(SubEventNode);
+                
 
                 SubCalendarEvent retrievedSubEvent;
                 bool procrastinationEventFlag = Convert.ToBoolean(MyXmlNode.ChildNodes[i].SelectSingleNode("isProcrastinateEvent")?.InnerText ?? "False");
@@ -2875,14 +2878,10 @@ namespace TilerFront
                 {
                     retrievedSubEvent = new DB_SubCalendarEvent(MyParent, creator, userGroup, timeZone, ID, name, BusySlot, Start, End, PrepTime, ID, rigidFlag, Enabled, UiData, noteData, CompleteFlag, var1, MyParent.StartToEnd, conflictProfile);
                     retrievedSubEvent = new DB_SubCalendarEvent(retrievedSubEvent, MyParent.getNowInfo, MyParent.getProcrastinationInfo, MyParent);
-                    (retrievedSubEvent as DB_SubCalendarEvent).UsedTime_EventDB = (long)PauseData.Item1.TotalMilliseconds;
-                    (retrievedSubEvent as DB_SubCalendarEvent).setPausedTimeSlots(PauseData.Item3);
                 }
                 else
                 {
                     DB_ProcrastinateAllSubCalendarEvent procrastinateSubEvent = new DB_ProcrastinateAllSubCalendarEvent(creator, userGroup, timeZone, new TimeLine(Start, End), new EventID(ID), MyParent.Location, MyParent as ProcrastinateCalendarEvent, Enabled, CompleteFlag);
-                    procrastinateSubEvent.UsedPauseTime_DB = (long)PauseData.Item1.TotalMilliseconds;
-                    (procrastinateSubEvent ).setPausedTimeSlots(PauseData.Item3);
                     retrievedSubEvent = procrastinateSubEvent;
                 }
                 name.Creator_EventDB = retrievedSubEvent.getCreator;
@@ -2901,8 +2900,6 @@ namespace TilerFront
                         XmlNode RestrictionProfileNode = MyXmlNode.ChildNodes[i].SelectSingleNode("RestrictionProfile");
                         DB_RestrictionProfile myRestrictionProfile = (DB_RestrictionProfile)getRestrictionProfile(RestrictionProfileNode);
                         retrievedSubEvent = new DB_SubCalendarEventRestricted(retrievedSubEvent, myRestrictionProfile, MyParent as CalendarEventRestricted, this.Now);
-                        (retrievedSubEvent as DB_SubCalendarEventRestricted).UsedTime_EventDB = (long)PauseData.Item1.TotalMilliseconds;
-                        (retrievedSubEvent as DB_SubCalendarEventRestricted).setPausedTimeSlots(PauseData.Item3);
                     }
                 }
 
