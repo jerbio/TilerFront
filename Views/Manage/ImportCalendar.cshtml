@@ -33,16 +33,6 @@
     <div>@Html.ActionLink("Add Google Calendar", "ImportGoogle", "Manage")</div>
 </div>
 <table class="table">
-    <tr>
-
-            @*<th>
-                @Html.DisplayNameFor(model => ((ThirdPartyAuthenticationForView)(model.thirdpartyCalendars)).Email)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => ((ThirdPartyAuthenticationForView)(model.thirdpartyCalendars)).ProviderName)
-            </th>
-            <th></th>*@
-        </tr>
 
     @foreach (ThirdPartyAuthenticationForView item in Model.thirdpartyCalendars)
     {
@@ -64,15 +54,14 @@
 
                 if (!String.IsNullOrEmpty(item.DefaultLocationId))
                 {
-                    <td>
-                        @Html.DisplayFor(modelItem => item.DefaultLocation)
-                        @Html.TextBoxFor(modelItem => item.DefaultLocation.Address, new { @Name = "ID", @class = "form-control", @style = "display:none;", @id = "TimeZoneData" })
-                    </td>
+        <td>
+            @Html.TextBoxFor(modelItem => item.DefaultLocation.Address, new { @class = "form-control thirdPartyDefaultLocation", @calId = @item.ID })
+        </td>
                 }
                 else
                 {
                     <td>
-                        <input class="thirdPartyDefaultLocation"></input>
+                        <input calId="@item.ID" class="thirdPartyDefaultLocation"></input>
                     </td>
                 }
 
@@ -88,25 +77,68 @@
 
 <script>
     debugger
+    //TODO: current implementation requires user to click on google result for update to take effect, we need to have a feedback loop to show saving of a default location. Additionally, we need to implement a way to save a typed in address and not just clicked on addresses.
 
-    let LocationContainer = getDomOrCreateNew("ThirdPartyLocationContainer");
-    let LocationInputContainer = document.querySelectorAll('.thirdPartyDefaultLocation')[0]
-    LocationInputContainer.parentNode.appendChild(LocationContainer.Dom)
-    LocationContainer.Dom.appendChild(LocationInputContainer)
-    LocationInputContainer.setAttribute("autocomplete", "off");
-    let processAutoComplete = LocationSearchCallBack(null, LocationInputContainer);
-    function onKeyPress(e, LocationInputContainer) {
-        processAutoComplete(e);
+    let generateOnLocationSelection = (calId) => {
+        let onLocationSelection = async (locationData) => {
+            debugger
+            console.log(locationData)
+            let postData = {
+                Id: calId,
+                Longitude: locationData.geometry.location.lng(),
+                Latitude: locationData.geometry.location.lat(),
+                Address: locationData.formatted_address,
+                Description: locationData.name,
+                IsVerified: true
+            }
+            let URL = global_refTIlerUrl + "ThirdPartyCalendarAuthentication/Location";
+            preSendRequestWithLocation(postData)
+            bindUserCredentials(postData)
+            await fetch(
+                URL,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(postData)
+                },
+            
+            )
+            .then((response) => {
+                let result = response.json()
+                console.log(result)
+            })
+            .catch((err) => {
+                console.error(err)
+            })
+        }
+        return onLocationSelection
+    }
+    function handleEachThirdPartyDefaultLocation(LocationInputContainer) {
+        debugger
+        let LocationContainer = getDomOrCreateNew("ThirdPartyLocationContainer-" + generateUUID());
+        let calId = LocationInputContainer.getAttribute('calId')
+        
+        LocationInputContainer.parentNode.appendChild(LocationContainer.Dom)
+        LocationContainer.Dom.appendChild(LocationInputContainer)
+        LocationInputContainer.setAttribute("autocomplete", "off");
+        let processAutoComplete = LocationSearchCallBack(null, LocationInputContainer, generateOnLocationSelection(calId));
+        function onKeyPress(e, LocationInputContainer) {
+            processAutoComplete(e);
+        }
+
+        LocationInputContainer.addEventListener("keydown", onKeyPress);
+
+        var NickLocationInputContainer = getDomOrCreateNew("NickLocationInput", "input");
+        LocationContainer.Dom.appendChild(LocationInputContainer);
+        LocationInputContainer.setAttribute("placeholder", "Address?");
+        LocationContainer.Selector = { Container: LocationContainer, NickName: NickLocationInputContainer, Address: LocationInputContainer };
     }
 
-    LocationInputContainer.addEventListener("keydown", onKeyPress);
+    let inputContainers = document.querySelectorAll('.thirdPartyDefaultLocation')
+    inputContainers.forEach(handleEachThirdPartyDefaultLocation)
 
-    var NickLocationInputContainer = getDomOrCreateNew("NickLocationInput", "input");
-    LocationContainer.Dom.appendChild(LocationInputContainer);
-    LocationInputContainer.setAttribute("placeholder", "Address?");
-    // LocationContainer.Dom.appendChild(NickLocationInputContainer.Dom);
-    //  NickLocationInputContainer.Dom.setAttribute("placeholder", "Nick Name");
-    LocationContainer.Selector = { Container: LocationContainer, NickName: NickLocationInputContainer, Address: LocationInputContainer };
             //return LocationContainer;
 </script>
 

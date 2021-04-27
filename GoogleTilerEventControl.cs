@@ -56,7 +56,7 @@ namespace TilerFront
             }
             EventID googleAuthenticationID = EventID.generateGoogleAuthenticationID(((TilerFront.Models.IndexedThirdPartyAuthentication)AuthenticationInfo).ThirdPartyIndex);
 
-            List<CalendarEvent> RetValueList = (await GoogleCalExtension.getAllCalEvents(list, CalendarServiceInfo, EmailID, googleAuthenticationID, null, false).ConfigureAwait(false)).ToList();
+            List<CalendarEvent> RetValueList = (await GoogleCalExtension.getAllCalEvents(list, CalendarServiceInfo, EmailID, googleAuthenticationID, null, false, AuthenticationInfo.DefaultLocation).ConfigureAwait(false)).ToList();
             RetValue = new GoogleThirdPartyControl(RetValueList);
             return RetValue;
         }
@@ -236,7 +236,7 @@ namespace TilerFront
             }
             
             EventID googleAuthenticationID = EventID.generateGoogleAuthenticationID(((TilerFront.Models.IndexedThirdPartyAuthentication)AuthenticationInfo).ThirdPartyIndex);
-            RetValue = (await GoogleCalExtension.getAllCalEvents(list, CalendarServiceInfo, EmailID, googleAuthenticationID, CalculationTimeLine, retrieveGoogleLocation).ConfigureAwait(false)).ToList();
+            RetValue = (await GoogleCalExtension.getAllCalEvents(list, CalendarServiceInfo, EmailID, googleAuthenticationID, CalculationTimeLine, retrieveGoogleLocation, AuthenticationInfo.DefaultLocation).ConfigureAwait(false)).ToList();
             
             return RetValue;
         }
@@ -250,7 +250,7 @@ namespace TilerFront
             if(list.Count > 0)
             {   
                 EventID googleAuthenticationID = EventID.generateGoogleAuthenticationID(0);
-                RetValue = (await GoogleCalExtension.getAllCalEvents(list, CalendarServiceInfo, EmailID, googleAuthenticationID, calculationTimeLine, retrieveGoogleLocation).ConfigureAwait(false)).ToList();
+                RetValue = (await GoogleCalExtension.getAllCalEvents(list, CalendarServiceInfo, EmailID, googleAuthenticationID, calculationTimeLine, retrieveGoogleLocation, AuthenticationInfo.DefaultLocation).ConfigureAwait(false)).ToList();
             }
             return RetValue;
         }

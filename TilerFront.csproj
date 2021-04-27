@@ -508,10 +508,15 @@
     <Compile Include="LogControlXml.cs" />
     <Compile Include="LogControlDirect.cs" />
     <Compile Include="LogControl.cs" />
+    <Compile Include="Migrations\202104270632291_defaultLocationPatch.cs" />
+    <Compile Include="Migrations\202104270632291_defaultLocationPatch.designer.cs">
+      <DependentUpon>202104270632291_defaultLocationPatch.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\AuthorizedUser.cs" />
+    <Compile Include="Models\CalendarDefaultLocation.cs" />
     <Compile Include="Models\DataHistoryModel.cs" />
     <Compile Include="Models\DumpModel.cs" />
     <Compile Include="Models\EditCalEventModel.cs" />
@@ -523,6 +528,7 @@
     <Compile Include="Models\GoogleNotificationWatchResponseModel.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\InitScheduleProfile.cs" />
+    <Compile Include="Models\LocationModel.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\NameSearchModel.cs" />
     <Compile Include="Models\NowEventModel.cs" />
@@ -2619,10 +2625,10 @@
     <Content Include="Scripts\YuiCombo\3.18.1\yui\yui.js" />
     <Content Include="Views\Home\Claims.cshtml" />
     <Content Include="Web.config" />
-    <Content Include="Scripts\moment.min.js.map" />
-    <Content Include="Scripts\moment-with-locales.min.js.map" />
     <Content Include="Scripts\jquery-3.6.0.slim.min.map" />
     <Content Include="Scripts\jquery-3.6.0.min.map" />
+    <Content Include="Scripts\moment.min.js.map" />
+    <Content Include="Scripts\moment-with-locales.min.js.map" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -2866,8 +2872,6 @@
     <Content Include="Scripts\popper-utils.js.map" />
     <Content Include="Scripts\jquery-3.5.1.slim.min.map" />
     <Content Include="Scripts\jquery-3.5.1.min.map" />
-    <Content Include="Scripts\moment.min.js.map" />
-    <Content Include="Scripts\moment-with-locales.min.js.map" />
     <None Include="WagTapCalLogs\6b1f3185-994d-49e4-a24c-3c9f2161ce1d.xml">
       <CopyToPublishDirectory>Always</CopyToPublishDirectory>
     </None>
@@ -2889,6 +2893,11 @@
       <Project>{f948eba6-4b87-4162-b240-a5c19829f889}</Project>
       <Name>ScheduleAnalysis</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\202104270632291_defaultLocationPatch.resx">
+      <DependentUpon>202104270632291_defaultLocationPatch.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

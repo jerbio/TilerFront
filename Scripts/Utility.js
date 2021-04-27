@@ -151,6 +151,12 @@ function preSendRequestWithLocation(postData) {
     }
 }
 
+
+function bindUserCredentials(postData) {
+    postData['UserName'] = UserCredentials.UserName
+    postData['UserID'] = UserCredentials.ID
+}
+
 function updateLocationInputWithClickData(inputDom, address, source, locationId) {
     inputDom.LocationId = locationId;
     inputDom.value = address;

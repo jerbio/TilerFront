@@ -51,7 +51,7 @@ namespace TilerFront.Models
         /// <returns></returns>
         public ThirdPartyAuthenticationForView getThirdPartyOut()
         {
-            ThirdPartyAuthenticationForView RetValue = new ThirdPartyAuthenticationForView() { Email = this.Email, ProviderName =this.ProviderID, ID=this.ID, DefaultLocation=this.DefaultLocation };
+            ThirdPartyAuthenticationForView RetValue = new ThirdPartyAuthenticationForView() { Email = this.Email, ProviderName =this.ProviderID, ID=this.ID, DefaultLocation=this.DefaultLocation , DefaultLocationId = this.DefaultLocationId};
             return RetValue;
         }
 

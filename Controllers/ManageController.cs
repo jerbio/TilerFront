@@ -331,7 +331,7 @@ namespace TilerFront.Controllers
             string userID = User.Identity.GetUserId();
             TilerUser myUser = UserManager.FindById(User.Identity.GetUserId());
             dynamic model = new ExpandoObject();
-            model.thirdpartyCalendars = (await dbContext.ThirdPartyAuthentication.Where(obj => userID == obj.TilerID).ToListAsync()).Select(obj => obj.getThirdPartyOut());
+            model.thirdpartyCalendars = (await dbContext.ThirdPartyAuthentication.Include(o=>o.DefaultLocation).Where(obj => userID == obj.TilerID).ToListAsync()).Select(obj => obj.getThirdPartyOut());
             model.user = myUser;
             return View(model);
         }
@@ -339,7 +339,7 @@ namespace TilerFront.Controllers
         async public Task<List<ThirdPartyCalendarAuthenticationModel>> getAllThirdPartyAuthentication()
         {
             string userID = User.Identity.GetUserId();
-            List<ThirdPartyCalendarAuthenticationModel> RetValue = (await dbContext.ThirdPartyAuthentication.Where(obj => userID == obj.TilerID).ToListAsync().ConfigureAwait(false));
+            List<ThirdPartyCalendarAuthenticationModel> RetValue = (await dbContext.ThirdPartyAuthentication.Include(o => o.DefaultLocation).Where(obj => userID == obj.TilerID).ToListAsync().ConfigureAwait(false));
             return RetValue;
         }
 

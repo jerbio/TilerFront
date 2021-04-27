@@ -14,6 +14,7 @@ using Google.Apis.Services;
 using Google.Apis.Plus.v1;
 using Google.Apis.Plus.v1.Data;
 using System.Text.RegularExpressions;
+using Location = TilerElements.Location;
 
 namespace TilerFront
 {
@@ -192,7 +193,7 @@ namespace TilerFront
             return RetValue;
         }
 
-        public async static Task<IEnumerable<CalendarEvent>> getAllCalEvents(IList<Event> AllSubCals, CalendarService CalendarServiceData, string UserID,EventID AuthenticationID, TimeLine CalculationTimeLine, bool retrieveLocationFromGoogle)
+        public async static Task<IEnumerable<CalendarEvent>> getAllCalEvents(IList<Event> AllSubCals, CalendarService CalendarServiceData, string UserID,EventID AuthenticationID, TimeLine CalculationTimeLine, bool retrieveLocationFromGoogle, Location defaultLocation = null)
         {
             List<Event> AllSubCalNoCancels = AllSubCals.Where(obj => obj.Status != "cancelled").ToList();
 
@@ -217,6 +218,14 @@ namespace TilerFront
                         CalendarEvent calEvent = GoogleCalendarEvent.convertFromGoogleToCalendarEvent(GoogleEvent.ToSubCal(AuthenticationID, i));
                         RetValue.Add(calEvent);
                         locations.Add(calEvent.LocationObj);
+                        if (defaultLocation != null && (calEvent.LocationObj!= null && (calEvent.LocationObj.isNull || calEvent.LocationObj.isDefault)))
+                        {
+                            calEvent.Location_DB = defaultLocation;
+                            foreach(var eachSubEvent in calEvent.AllSubEvents)
+                            {
+                                eachSubEvent.Location_DB = defaultLocation;
+                            }
+                        }
                     }
                 }
             }

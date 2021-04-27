@@ -22,6 +22,15 @@ using Google.Apis.Plus.v1.Data;
 using Google.Apis.Auth.OAuth2.Flows;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Util.Store;
+using System.Web.Http;
+using TilerElements;
+using Microsoft.AspNet.Identity;
+
+
+using AuthorizeAttribute = System.Web.Http.AuthorizeAttribute;
+using HttpPostAttribute = System.Web.Http.HttpPostAttribute;
+using System.Web.Http.Description;
+using RouteAttribute = System.Web.Http.RouteAttribute;
 
 namespace TilerFront.Controllers
 {
@@ -231,6 +240,42 @@ namespace TilerFront.Controllers
             return RetValue;
         }
 
+
+        [HttpPost]
+        [ResponseType(typeof(PostBackStruct))]
+        [Route("api/ThirdPartyCalendarAuthentication/Location")]
+        public async Task<IHttpActionResult> UpdateDefaultCalEventLocation([FromBody] CalendarDefaultLocation defaultLocation)
+        {
+            var thirdPartyLocation = await db.ThirdPartyAuthentication
+                .Include(eachThirdPartyAuthentication => eachThirdPartyAuthentication.DefaultLocation)
+                .Where((eachThirdPartyAuthentication) => eachThirdPartyAuthentication.ID == defaultLocation.Id)
+                .SingleAsync().ConfigureAwait(false);
+
+            
+            string userId = User.Identity.GetUserId();
+            TilerUser tilerUser = db.Users.Find(userId);
+            if (thirdPartyLocation!=null && tilerUser!= null)
+            {
+                var LocationObj = defaultLocation.toLocation();
+                LocationObj.User = tilerUser;
+                Location retrievedDefaultLocation = null;
+                if (thirdPartyLocation.DefaultLocationId.isNot_NullEmptyOrWhiteSpace())
+                {
+                    retrievedDefaultLocation = thirdPartyLocation.DefaultLocation;
+                    retrievedDefaultLocation.update(LocationObj);
+                } else
+                {
+                    retrievedDefaultLocation = LocationObj;
+                    
+                    thirdPartyLocation.DefaultLocation = retrievedDefaultLocation;
+                }
+                
+                await db.SaveChangesAsync().ConfigureAwait(false);
+                return Ok(retrievedDefaultLocation);
+            }
+
+            return Ok();
+        }
         /*
         // GET: ThirdPartyCalendarAuthenticationModels
         public async Task<ActionResult> Index()

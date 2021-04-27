@@ -22,6 +22,8 @@ namespace TilerFront.Models
             RefreshToken =AuthenticationData.RefreshToken;
             ProviderID =AuthenticationData.ProviderID;
             Deadline = AuthenticationData.Deadline;
+            DefaultLocation = AuthenticationData.DefaultLocation;
+            DefaultLocationId = AuthenticationData.DefaultLocationId;
         }
     }
 }

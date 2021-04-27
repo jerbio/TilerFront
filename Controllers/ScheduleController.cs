@@ -86,6 +86,7 @@ namespace TilerFront.Controllers
                 List<GoogleTilerEventControl> AllGoogleTilerEvents = AllIndexedThirdParty.Select(obj => new GoogleTilerEventControl(obj, db)).ToList();
                 foreach (IndexedThirdPartyAuthentication obj in AllIndexedThirdParty)
                 {
+                    obj.DefaultLocation = null;// we are setting this to null so the front end UI doesn't send the default location to the front end
                     var GoogleTilerEventControlobj = new GoogleTilerEventControl(obj, db);
                 }
 
@@ -489,7 +490,7 @@ namespace TilerFront.Controllers
         static async public Task<List<IndexedThirdPartyAuthentication>> getAllThirdPartyAuthentication(string ID, ApplicationDbContext db)
         {
             //ApplicationDbContext db = new ApplicationDbContext();
-            List<ThirdPartyCalendarAuthenticationModel> AllAuthentications = ( db.ThirdPartyAuthentication.Where(obj => ID == obj.TilerID).ToList());
+            List<ThirdPartyCalendarAuthenticationModel> AllAuthentications = ( db.ThirdPartyAuthentication.Include(o=>o.DefaultLocation).Where(obj => ID == obj.TilerID).ToList());
             List<IndexedThirdPartyAuthentication> RetValue = AllAuthentications.Select((obj, i) => new IndexedThirdPartyAuthentication(obj,(uint) i)).ToList();
             return RetValue;
         }
