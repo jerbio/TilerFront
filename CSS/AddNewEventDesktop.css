@@ -595,6 +595,31 @@ input:focus:-ms-input-placeholder { color:rgba(0,0,0, 0.2); }
     visibility:hidden;
 }
 
+
+#forecastChartContainer {
+  position:absolute;
+  width:300px;
+  height:250px;
+  background-color:white;
+  transform: translate(0,0);
+  left:0;
+  transition:left .3s;
+  z-index:-1;
+  box-shadow:rgba(10,10,10,.8) 0 0 10px;
+}
+
+#suggestedDeadlineLabel {
+  padding-right: 5px;
+}
+
+#suggestedDeadlineContainer {
+  width:300px;
+  height:50px;
+  position:absolute;
+  top: 250px;
+  display: flex;
+}
+
 .RevealPreviewPanel
 {
     visibility:visible !important;

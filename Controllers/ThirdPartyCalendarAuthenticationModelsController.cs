@@ -214,7 +214,14 @@ namespace TilerFront.Controllers
                 }
                 catch (Exception e)
                 {
-
+                    if(e.Message.Contains("invalid_grant"))
+                    {
+                        db.ThirdPartyAuthentication.Remove(ThirdPartyAuth);
+                    }
+                    else
+                    {
+                        throw e;
+                    }
                 }
                 //await ThirdPartyAuth.getGoogleOauthCredentials().RevokeTokenAsync(CancellationToken.None).ConfigureAwait(false);
 

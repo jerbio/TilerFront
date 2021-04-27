@@ -1,5 +1,9 @@
 //! moment.js
+<<<<<<< HEAD
 //! version : 2.27.0
+=======
+//! version : 2.29.1
+>>>>>>> master
 //! authors : Tim Wood, Iskren Chernev, Moment.js contributors
 //! license : MIT
 //! momentjs.com
@@ -2540,8 +2544,12 @@
     hooks.createFromInputFallback = deprecate(
         'value provided is not in a recognized RFC2822 or ISO format. moment construction falls back to js Date(), ' +
             'which is not reliable across all browsers and versions. Non RFC2822/ISO date formats are ' +
+<<<<<<< HEAD
             'discouraged and will be removed in an upcoming major release. Please refer to ' +
             'http://momentjs.com/guides/#/warnings/js-date/ for more info.',
+=======
+            'discouraged. Please refer to http://momentjs.com/guides/#/warnings/js-date/ for more info.',
+>>>>>>> master
         function (config) {
             config._d = new Date(config._i + (config._useUTC ? ' UTC' : ''));
         }
@@ -3726,7 +3734,14 @@
     function calendar$1(time, formats) {
         // Support for single parameter, formats only overload to the calendar function
         if (arguments.length === 1) {
+<<<<<<< HEAD
             if (isMomentInput(arguments[0])) {
+=======
+            if (!arguments[0]) {
+                time = undefined;
+                formats = undefined;
+            } else if (isMomentInput(arguments[0])) {
+>>>>>>> master
                 time = arguments[0];
                 formats = undefined;
             } else if (isCalendarSpec(arguments[0])) {
@@ -4404,7 +4419,11 @@
             eras = this.localeData().eras();
         for (i = 0, l = eras.length; i < l; ++i) {
             // truncate time
+<<<<<<< HEAD
             val = this.startOf('day').valueOf();
+=======
+            val = this.clone().startOf('day').valueOf();
+>>>>>>> master
 
             if (eras[i].since <= val && val <= eras[i].until) {
                 return eras[i].name;
@@ -4424,7 +4443,11 @@
             eras = this.localeData().eras();
         for (i = 0, l = eras.length; i < l; ++i) {
             // truncate time
+<<<<<<< HEAD
             val = this.startOf('day').valueOf();
+=======
+            val = this.clone().startOf('day').valueOf();
+>>>>>>> master
 
             if (eras[i].since <= val && val <= eras[i].until) {
                 return eras[i].narrow;
@@ -4444,7 +4467,11 @@
             eras = this.localeData().eras();
         for (i = 0, l = eras.length; i < l; ++i) {
             // truncate time
+<<<<<<< HEAD
             val = this.startOf('day').valueOf();
+=======
+            val = this.clone().startOf('day').valueOf();
+>>>>>>> master
 
             if (eras[i].since <= val && val <= eras[i].until) {
                 return eras[i].abbr;
@@ -4467,7 +4494,11 @@
             dir = eras[i].since <= eras[i].until ? +1 : -1;
 
             // truncate time
+<<<<<<< HEAD
             val = this.startOf('day').valueOf();
+=======
+            val = this.clone().startOf('day').valueOf();
+>>>>>>> master
 
             if (
                 (eras[i].since <= val && val <= eras[i].until) ||
@@ -5618,7 +5649,11 @@
 
     //! moment.js
 
+<<<<<<< HEAD
     hooks.version = '2.27.0';
+=======
+    hooks.version = '2.29.1';
+>>>>>>> master
 
     setHookCallback(createLocal);
 

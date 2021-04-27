@@ -42,6 +42,14 @@ body {
   background-position: -450px -44px;
 }
 
+.ReviseScheduleButton {
+    background-position: -637px 0;
+}
+  
+.ReviseScheduleButton:hover {
+    background-position: -637px -44px;
+}
+
 
 .ControlPanelButton.SomethingNew{
     background-position: -360px 1px;

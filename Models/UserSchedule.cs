@@ -55,9 +55,22 @@ namespace TilerFront.Models
                     isPauseDeleted = pausedSubEVent.isEnabled
                 };
             }
+
+            PausedEvent PausedEventDuplicate = null;
+            if (PausedEvent!=null)// doing this to avoid modifying Entity framework attached copy of the object
+            {
+                PausedEventDuplicate = new PausedEvent()
+                {
+                    EventId = PausedEvent.EventId,
+                    isPauseDeleted = PausedEvent.isPauseDeleted,
+                    PauseTime = PausedEvent.PauseTime
+                };
+            }
+            
+
             allSubEvents = allSubEvents.Take(10).ToList();
             dynamic RetValue = new JObject();
-            RetValue.pausedEvent = PausedEvent == null? null : JObject.FromObject(PausedEvent);
+            RetValue.pausedEvent = PausedEvent == null? null : JObject.FromObject(PausedEventDuplicate);
             RetValue.subEvents = JArray.FromObject(allSubEvents);
             this.PauseData = RetValue as JObject;
         }

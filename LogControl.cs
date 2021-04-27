@@ -211,7 +211,22 @@ namespace TilerFront
         {
             Task<ScheduleDump> retValue;
             XmlDocument xmldoc = new XmlDocument();
-            xmldoc.InnerXml = "<?xml version=\"1.0\" encoding=\"utf-8\"?><ScheduleLog><LastIDCounter>1024</LastIDCounter><referenceDay>" + now.EndOfDay.DateTime + "</referenceDay><scheduleNotes>" + notes + "</scheduleNotes><lastUpdated>" + user.LastScheduleModification.DateTime + "</lastUpdated><EventSchedules></EventSchedules></ScheduleLog>";
+            xmldoc.InnerXml = "<?xml version=\"1.0\" encoding=\"utf-8\"?><ScheduleLog><LastIDCounter>1024</LastIDCounter><referenceDay>" 
+                                    + now.EndOfDay.DateTime + 
+                                "</referenceDay>"
+                                +"<scheduleNotes>" 
+                                    + notes 
+                                + "</scheduleNotes>"
+                                +"<lastUpdated>" 
+                                    + user.LastScheduleModification.DateTime
+                                + "</lastUpdated>"
+                                +"<constNowTime>"
+                                    + now?.constNow.ToString()
+                                + "</constNowTime>"
+                                + "<dateTimeOffsetUtcNow>"
+                                    + DateTimeOffset.UtcNow.ToString().ToString()
+                                + "</dateTimeOffsetUtcNow>"
+                                + "<EventSchedules></EventSchedules></ScheduleLog>";
 
             CachedLocation = cachedLocation ?? await getAllLocationsByUser().ConfigureAwait(false); ;//populates with current location info
             Dictionary<string, TilerElements.Location> OldLocationCache = new Dictionary<string, TilerElements.Location>(CachedLocation);
@@ -343,7 +358,7 @@ namespace TilerFront
             }
 
 
-            Task saveDbChangesTask = _Context.SaveChangesAsync();
+            Task saveDbChangesTask = SaveDBChanges();
             if (_TempDump != null && _UpdateBigData)
             {
                 ReferenceNow now = new ReferenceNow(_TempDump.ReferenceNow, _TempDump.StartOfDay, _TilerUser.TimeZoneDifference);
@@ -357,6 +372,12 @@ namespace TilerFront
 
             await saveDbChangesTask.ConfigureAwait(false);
 #endif
+        }
+
+        public async Task SaveDBChanges ()
+        {
+            Task saveDbChangesTask = _Context.SaveChangesAsync();
+            await saveDbChangesTask.ConfigureAwait(false);
         }
 
         public async Task Commit(IEnumerable<CalendarEvent> calendarEvents, CalendarEvent calendarEvent, String LatestId, ReferenceNow now, TravelCache travelCache)
@@ -637,7 +658,7 @@ namespace TilerFront
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Enabled"));
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.isEnabled.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("Location"));
-            MyEventScheduleNode.ChildNodes[0].InnerXml = CreateLocationNode(MyEvent.Location, "EventScheduleLocation").InnerXml;
+            MyEventScheduleNode.ChildNodes[0].InnerXml = CreateLocationNode(MyEvent.LocationObj, "EventScheduleLocation").InnerXml;
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("UIParams"));
             MyEventScheduleNode.ChildNodes[0].InnerXml = createDisplayUINode(MyEvent.getUIParam, "UIParams").InnerXml;
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("MiscData"));
@@ -668,6 +689,8 @@ namespace TilerFront
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.InitialEndTime_DB.ToString();
             MyEventScheduleNode.PrependChild(xmldoc.CreateElement("DeadlineSuggestion"));
             MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.DeadlineSuggestion_DB.ToString();
+            MyEventScheduleNode.PrependChild(xmldoc.CreateElement("LocationValidationId"));
+            MyEventScheduleNode.ChildNodes[0].InnerText = MyEvent.LocationValidationId;
             if (!MyEvent.isThirdParty)
             {
                 MyEventScheduleNode.PrependChild(xmldoc.CreateElement("UpdateHistory"));
@@ -873,7 +896,7 @@ namespace TilerFront
             MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.getName?.NameId.ToString();
 
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("Location"));
-            MyEventSubScheduleNode.ChildNodes[0].InnerXml = CreateLocationNode(MySubEvent.Location, "EventSubScheduleLocation").InnerXml;
+            MyEventSubScheduleNode.ChildNodes[0].InnerXml = CreateLocationNode(MySubEvent.LocationObj, "EventSubScheduleLocation").InnerXml;
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("UIParams"));
             MyEventSubScheduleNode.ChildNodes[0].InnerXml = createDisplayUINode(MySubEvent.getUIParam, "UIParams").InnerXml;
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("MiscData"));
@@ -916,6 +939,8 @@ namespace TilerFront
             MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.InitialStartTime_DB.ToString();
             MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("IniEndTime"));
             MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.InitialEndTime_DB.ToString();
+            MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("LocationValidationId"));
+            MyEventSubScheduleNode.ChildNodes[0].InnerText = MySubEvent.LocationValidationId;
 
 
             if (MySubEvent.getIsEventRestricted)
@@ -939,13 +964,19 @@ namespace TilerFront
 
 
             XmlElement UsedUpTime = xmldoc.CreateElement("UsedUpTime");
-            XmlElement PauseTime = xmldoc.CreateElement("PauseTime");
+            //XmlElement PauseTime = xmldoc.CreateElement("PauseTime");
+            XmlElement pausedTimeSlots = xmldoc.CreateElement("PausedTimeSlots");
             XmlElement RetValue = xmldoc.CreateElement("PauseInformation");
-            UsedUpTime.InnerText = SubEvent.UsedTime.ToString();
-            PauseTime.InnerText = SubEvent.getPauseTime().ToString();
-            RetValue.AppendChild(UsedUpTime);
-            RetValue.AppendChild(PauseTime);
+            UsedUpTime.InnerText = SubEvent.UsedPauseTime.ToString();
 
+            List<XmlElement> timeLineNodes = (SubEvent.pausedTimeLines?? new List<PausedTimeLine>()).Select(timeline => TimelineToXmlNode(timeline, xmldoc)).ToList();
+            //PauseTime.InnerText = SubEvent.getPauseTime().ToString();
+            foreach(XmlElement timeLineNode in timeLineNodes)
+            {
+                pausedTimeSlots.AppendChild(timeLineNode);
+            }
+            RetValue.AppendChild(UsedUpTime);
+            RetValue.AppendChild(pausedTimeSlots);
             return RetValue;
         }
         public XmlElement ReasonForPosition(List<Reason> reasons, string ElementIdentifier = "TimePositionReasons")
@@ -961,6 +992,62 @@ namespace TilerFront
             return retValue;
         }
 
+        public XmlElement PausedTimelineToXmlNode(PausedTimeLine pausedTimeLine, XmlDocument xmldoc)
+        {
+            XmlElement PausedTimelineNode = xmldoc.CreateElement("PausedTimeline");
+            XmlElement startNode = xmldoc.CreateElement("Start");
+            XmlElement endNode = xmldoc.CreateElement("End");
+            XmlElement idNode = xmldoc.CreateElement("Id");
+            XmlElement isDeletedNode = xmldoc.CreateElement("IsDeleted");
+            idNode.InnerText = pausedTimeLine.Id;
+            startNode.InnerText = pausedTimeLine.Start.ToString();
+            endNode.InnerText = pausedTimeLine.End.ToString();
+            isDeletedNode.InnerText = pausedTimeLine.IsDeleted.ToString();
+            PausedTimelineNode.AppendChild(startNode);
+            PausedTimelineNode.AppendChild(endNode);
+            PausedTimelineNode.AppendChild(idNode);
+            PausedTimelineNode.AppendChild(isDeletedNode);
+            return PausedTimelineNode;
+        }
+
+
+        public XmlElement BusyTimelineToXmlNode(BusyTimeLine busyTimeLine, XmlDocument xmldoc)
+        {
+            XmlElement timeLineNode = xmldoc.CreateElement("BusyTimeLine");
+            XmlElement startNode = xmldoc.CreateElement("Start");
+            XmlElement endNode = xmldoc.CreateElement("End");
+            XmlElement idNode = xmldoc.CreateElement("Id");
+            idNode.InnerText = busyTimeLine.Id;
+            startNode.InnerText = busyTimeLine.Start.ToString();
+            endNode.InnerText = busyTimeLine.End.ToString();
+            timeLineNode.AppendChild(startNode);
+            timeLineNode.AppendChild(endNode);
+            timeLineNode.AppendChild(idNode);
+            return timeLineNode;
+        }
+
+
+        public XmlElement TimelineToXmlNode(TimeLine timeLine, XmlDocument xmldoc)
+        {
+            XmlElement timeLineNode = xmldoc.CreateElement("TimeLine");
+            XmlElement busyTimeSlots = xmldoc.CreateElement("BusyTimeLines");
+            XmlElement startNode = xmldoc.CreateElement("Start");
+            XmlElement endNode = xmldoc.CreateElement("End");
+            startNode.InnerText = timeLine.Start.ToString();
+            endNode.InnerText = timeLine.End.ToString();
+            timeLineNode.AppendChild(startNode);
+            timeLineNode.AppendChild(endNode);
+            
+
+            List<XmlElement> busyTimeLineNodes = timeLine.OccupiedSlots.Select(timeline => BusyTimelineToXmlNode(timeline, xmldoc)).ToList();
+            foreach (XmlElement eachBusyTimeLineNode in busyTimeLineNodes)
+            {
+                busyTimeSlots.AppendChild(eachBusyTimeLineNode);
+            }
+            timeLineNode.AppendChild(busyTimeSlots);
+
+            return timeLineNode;
+        }
 
         public XmlElement CreateEventPreference(EventPreference preference, string ElementIdentifier = "EventPreference")
         {
@@ -1045,6 +1132,11 @@ namespace TilerFront
             var1.ChildNodes[0].InnerText = Arg1.isDefault.ToString();
             var1.PrependChild(xmldoc.CreateElement("IsVerified"));
             var1.ChildNodes[0].InnerText = Arg1.IsVerified.ToString();
+            var1.PrependChild(xmldoc.CreateElement("ThirdPartyId"));
+            var1.ChildNodes[0].InnerText = Arg1.ThirdPartyId_DB;
+            var1.PrependChild(xmldoc.CreateElement("ThirdPartySource"));
+            var1.ChildNodes[0].InnerText = Arg1.ThirdPartySource;
+
             return var1;
         }
 
@@ -1663,7 +1755,11 @@ namespace TilerFront
         }
 
 
-        async public virtual Task<IEnumerable<SubCalendarEvent>> getAllEnabledSubCalendarEvent(TimeLine RangeOfLookUP, ReferenceNow Now, bool includeOtherEntities = true, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation)
+        async public virtual Task<IEnumerable<SubCalendarEvent>> getAllEnabledSubCalendarEvent(
+            TimeLine RangeOfLookUP, 
+            ReferenceNow Now, 
+            bool includeOtherEntities = true, 
+            DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation)
         {
             this.Now = Now;
             Stopwatch watch = new Stopwatch();
@@ -1752,6 +1848,11 @@ namespace TilerFront
                     {
                         tilerIds = new HashSet<string>();
                     }
+                    EventID pausedEventId = _TilerUser.PausedEventId;
+                    if(pausedEventId!=null)
+                    {
+                        tilerIds.Add(_TilerUser.PausedEventId.ToString());
+                    }
                     var calIds = tilerIds.Select(o=> new EventID(o).getAllEventDictionaryLookup).ToArray();
                     IQueryable<SubCalendarEvent> subCalendarEvents = getSubCalendarEventQuery(retrievalOption, includeOtherEntities: true);
 
@@ -1813,8 +1914,9 @@ namespace TilerFront
                     subCalendarEvents = subCalendarEvents
                         .Include(subEvent => subEvent.ParentCalendarEvent)
                         .Include(subEvent => subEvent.ParentCalendarEvent.RepeatParentEvent)
-                        .Include(subEvent => subEvent.RepeatParentEvent)
+                        .Include(subEvent => subEvent.RepeatParentEvent.ProfileOfNow_EventDB)
                         .Include(subEvent => subEvent.ParentCalendarEvent.RestrictionProfile_DB)
+                        .Include(subEvent => subEvent.ParentCalendarEvent.ProfileOfNow_EventDB)
                         .Include(subEvent => subEvent.RepeatParentEvent.RestrictionProfile_DB)
                         .Include(subEvent => subEvent.ProfileOfNow_EventDB)
                         .Include(subEvent => subEvent.Procrastination_EventDB)
@@ -2765,7 +2867,7 @@ namespace TilerFront
                 }
                 string timeZone = MyXmlNode.ChildNodes[i].SelectSingleNode("TimeZone")?.InnerText ?? "UTC";
                 DB_TilerUserGroup userGroup = getTilerUserGroup(MyXmlNode.ChildNodes[i].SelectSingleNode("UserGroup"));
-                Tuple<TimeSpan, DateTimeOffset> PauseData = getPauseData(SubEventNode);
+                Tuple<TimeSpan, DateTimeOffset, List<PausedTimeLine>> PauseData = getPauseData(SubEventNode);
 
                 SubCalendarEvent retrievedSubEvent;
                 bool procrastinationEventFlag = Convert.ToBoolean(MyXmlNode.ChildNodes[i].SelectSingleNode("isProcrastinateEvent")?.InnerText ?? "False");
@@ -2773,14 +2875,14 @@ namespace TilerFront
                 {
                     retrievedSubEvent = new DB_SubCalendarEvent(MyParent, creator, userGroup, timeZone, ID, name, BusySlot, Start, End, PrepTime, ID, rigidFlag, Enabled, UiData, noteData, CompleteFlag, var1, MyParent.StartToEnd, conflictProfile);
                     retrievedSubEvent = new DB_SubCalendarEvent(retrievedSubEvent, MyParent.getNowInfo, MyParent.getProcrastinationInfo, MyParent);
-                    (retrievedSubEvent as DB_SubCalendarEvent).UseTime = PauseData.Item1;
-                    (retrievedSubEvent as DB_SubCalendarEvent).PauseTime = PauseData.Item2;
+                    (retrievedSubEvent as DB_SubCalendarEvent).UsedTime_EventDB = (long)PauseData.Item1.TotalMilliseconds;
+                    (retrievedSubEvent as DB_SubCalendarEvent).setPausedTimeSlots(PauseData.Item3);
                 }
                 else
                 {
                     DB_ProcrastinateAllSubCalendarEvent procrastinateSubEvent = new DB_ProcrastinateAllSubCalendarEvent(creator, userGroup, timeZone, new TimeLine(Start, End), new EventID(ID), MyParent.Location, MyParent as ProcrastinateCalendarEvent, Enabled, CompleteFlag);
-                    procrastinateSubEvent.UseTime = PauseData.Item1;
-                    procrastinateSubEvent.PauseTime = PauseData.Item2;
+                    procrastinateSubEvent.UsedPauseTime_DB = (long)PauseData.Item1.TotalMilliseconds;
+                    (procrastinateSubEvent ).setPausedTimeSlots(PauseData.Item3);
                     retrievedSubEvent = procrastinateSubEvent;
                 }
                 name.Creator_EventDB = retrievedSubEvent.getCreator;
@@ -2799,8 +2901,8 @@ namespace TilerFront
                         XmlNode RestrictionProfileNode = MyXmlNode.ChildNodes[i].SelectSingleNode("RestrictionProfile");
                         DB_RestrictionProfile myRestrictionProfile = (DB_RestrictionProfile)getRestrictionProfile(RestrictionProfileNode);
                         retrievedSubEvent = new DB_SubCalendarEventRestricted(retrievedSubEvent, myRestrictionProfile, MyParent as CalendarEventRestricted, this.Now);
-                        (retrievedSubEvent as DB_SubCalendarEventRestricted).UsedTime = PauseData.Item1;
-                        (retrievedSubEvent as DB_SubCalendarEventRestricted).PauseTime = PauseData.Item2;
+                        (retrievedSubEvent as DB_SubCalendarEventRestricted).UsedTime_EventDB = (long)PauseData.Item1.TotalMilliseconds;
+                        (retrievedSubEvent as DB_SubCalendarEventRestricted).setPausedTimeSlots(PauseData.Item3);
                     }
                 }
 
@@ -2863,6 +2965,12 @@ namespace TilerFront
                     retrievedSubEvent.NowLock_DB = Convert.ToBoolean(NowLockNode.InnerText);
                 }
 
+                XmlNode LocationValidationIdNode = MyXmlNode.ChildNodes[i].SelectSingleNode("LocationValidationId");
+                if (LocationValidationIdNode != null)
+                {
+                    retrievedSubEvent.LocationValidationId_DB = Convert.ToString(LocationValidationIdNode.InnerText);
+                }
+
                 retrievedSubEvent.InitialStartTime_DB = iniStartTimeInMs;
                 retrievedSubEvent.InitialEndTime_DB = iniEndTimeInMS;
 
@@ -2890,19 +2998,94 @@ namespace TilerFront
         }
 
 
-        Tuple<TimeSpan, DateTimeOffset> getPauseData(XmlNode ReferenceNode)
+        Tuple<TimeSpan, DateTimeOffset, List<PausedTimeLine>> getPauseData(XmlNode ReferenceNode)
         {
-            Tuple<TimeSpan, DateTimeOffset> RetValue = new Tuple<TimeSpan, DateTimeOffset>(new TimeSpan(), new DateTimeOffset());
+            Tuple<TimeSpan, DateTimeOffset, List<PausedTimeLine>> RetValue = new Tuple<TimeSpan, DateTimeOffset, List<PausedTimeLine>>(new TimeSpan(), new DateTimeOffset(), new List<PausedTimeLine>());
             XmlNode PauseInformation = ReferenceNode.SelectSingleNode("PauseInformation");
             if (PauseInformation != null)
             {
                 TimeSpan UsedUpTime = TimeSpan.Parse(PauseInformation.SelectSingleNode("UsedUpTime").InnerText);
-                DateTimeOffset PauseTime = Utility.ParseTime(PauseInformation.SelectSingleNode("PauseTime").InnerText);
-                RetValue = new Tuple<TimeSpan, DateTimeOffset>(UsedUpTime, PauseTime);
+                XmlNode pauseTimeNode = PauseInformation.SelectSingleNode("PauseTime");
+                DateTimeOffset PauseTime = new DateTimeOffset();
+                if (pauseTimeNode != null && pauseTimeNode.InnerText.isNot_NullEmptyOrWhiteSpace())
+                {
+                    PauseTime = Utility.ParseTime(pauseTimeNode.InnerText);
+                }
+                    
+                XmlNode PausedTimeSlots = PauseInformation.SelectSingleNode("PausedTimeSlots");
+                List<PausedTimeLine> pausedTimeLines = new List<PausedTimeLine>();
+                if (PausedTimeSlots != null)
+                {
+                    foreach(XmlNode timeLineNode in PausedTimeSlots.ChildNodes)
+                    {
+                        PausedTimeLine timeLine = pauseTimeLineNodeToTimeLine(timeLineNode);
+                        if(timeLine!=null)
+                        {
+                            pausedTimeLines.Add(timeLine);
+                        }
+                        
+                    }
+                }
+                
+                RetValue = new Tuple<TimeSpan, DateTimeOffset, List<PausedTimeLine>>(UsedUpTime, PauseTime, pausedTimeLines);
             }
 
             return RetValue;
+        }
 
+
+        BusyTimeLine busyTimeLineNodeToTimeLine(XmlNode ReferenceNode)
+        {
+            XmlNode startNode = ReferenceNode.SelectSingleNode("Start");
+            XmlNode endNode = ReferenceNode.SelectSingleNode("End");
+            XmlNode idNode = ReferenceNode.SelectSingleNode("Id");
+
+            BusyTimeLine retValue = new BusyTimeLine(idNode.InnerText, DateTimeOffset.Parse(startNode.InnerText), DateTimeOffset.Parse(endNode.InnerText));
+            return retValue;
+        }
+
+
+        PausedTimeLine pauseTimeLineNodeToTimeLine(XmlNode ReferenceNode)
+        {
+            XmlNode startNode = ReferenceNode.SelectSingleNode("Start");
+            XmlNode endNode = ReferenceNode.SelectSingleNode("End");
+            XmlNode idNode = ReferenceNode.SelectSingleNode("Id");
+            XmlNode isDeletedNode = ReferenceNode.SelectSingleNode("IsDeleted");
+
+            PausedTimeLine retValue = null;
+            if (
+                idNode != null && 
+                endNode != null && 
+                startNode != null && 
+                endNode.InnerText.isNot_NullEmptyOrWhiteSpace() &&
+                startNode.InnerText.isNot_NullEmptyOrWhiteSpace())
+            {
+                retValue = new PausedTimeLine(idNode.InnerText, DateTimeOffset.Parse(startNode.InnerText), DateTimeOffset.Parse(endNode.InnerText));
+            }
+
+            if(retValue!= null && isDeletedNode !=null && isDeletedNode.InnerText.isNot_NullEmptyOrWhiteSpace())
+            {
+                retValue.IsDeleted = Convert.ToBoolean(isDeletedNode.InnerText);
+            }
+            
+            return retValue;
+        }
+
+        TimeLine timeLineNodeToTimeLine(XmlNode ReferenceNode)
+        {
+            XmlNode startNode = ReferenceNode.SelectSingleNode("Start");
+            XmlNode endNode = ReferenceNode.SelectSingleNode("End");
+            XmlNode BusyTimeLinesNode = ReferenceNode.SelectSingleNode("BusyTimeLines");
+            List<BusyTimeLine> activeSlots = new List<BusyTimeLine>();
+            foreach (XmlNode eachBusyTimeLineNode in BusyTimeLinesNode) {
+                BusyTimeLine busyTimeLine = busyTimeLineNodeToTimeLine(eachBusyTimeLineNode);
+                activeSlots.Add(busyTimeLine);
+            }
+
+
+            TimeLine retValue = new TimeLine(DateTimeOffset.Parse(startNode.InnerText), DateTimeOffset.Parse(endNode.InnerText));
+            retValue.AddBusySlots(activeSlots);
+            return retValue;
         }
 
         NowProfile generateNowProfile(XmlNode ReferenceNode)
@@ -3281,6 +3464,7 @@ namespace TilerFront
                 .Include(subEvent => subEvent.DataBlob_EventDB)
                 .Include(subEvent => subEvent.Procrastination_EventDB)
                 .Include(subEvent => subEvent.ProfileOfNow_EventDB)
+                .Include(subEvent => subEvent.UiParams_EventDB.UIColor)
                 .Include(subEvent => subEvent.RestrictionProfile_DB);
 
             if(includeParentCalevent)
