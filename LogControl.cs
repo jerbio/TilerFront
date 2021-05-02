@@ -1,5 +1,5 @@
 ﻿//#define UseDefaultLocation
-//#define liveDebugging
+#define liveDebugging
 
 using System;
 using System.Collections.Generic;
@@ -1774,8 +1774,10 @@ namespace TilerFront
                 if (isAllRetrievalOptionIncluded || eachRetrievalOption == DataRetrivalOption.Ui)
                 {
                     subEvents = subEvents
-                        .Include(calEvent => calEvent.UiParams_EventDB)
-                        .Include(calEvent => calEvent.UiParams_EventDB.UIColor)
+                        .Include(subEvent => subEvent.ParentCalendarEvent.UiParams_EventDB)
+                        .Include(subEvent => subEvent.ParentCalendarEvent.UiParams_EventDB.UIColor)
+                        .Include(subEvent => subEvent.UiParams_EventDB)
+                        .Include(subEvent => subEvent.UiParams_EventDB.UIColor)
                         ;
 
                 }
