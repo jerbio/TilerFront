@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using TilerCore;
 using TilerElements;
+using System.Data.Entity;
+using System.Diagnostics;
 
 namespace TilerFront
 {
@@ -325,31 +327,78 @@ namespace TilerFront
 
         public override Tuple<CustomErrors, Dictionary<string, CalendarEvent>> BundleChangeUpdate(string EventId, EventName NewName, DateTimeOffset newStart, DateTimeOffset newEnd, int newSplitCount, string notes, bool forceRecalculation = false, SubCalendarEvent triggerSubEvent = null)
         {
-            Task<EventName> pendingOldName = null;
-            if (triggerSubEvent != null)
+            Task<TilerEvent> pendingNameAndMisc = null;
+            //dynamic pendingNameAndMisc = null;
+            bool useSubEvent = triggerSubEvent != null && triggerSubEvent.NameId.isNot_NullEmptyOrWhiteSpace() && triggerSubEvent.DataBlobId.isNot_NullEmptyOrWhiteSpace();
+            if (useSubEvent)
             {
-                pendingOldName = this.myAccount.ScheduleLogControl.Database.EventNames.FindAsync(triggerSubEvent.NameId);
+                if(this.myAccount.ScheduleLogControl.Database!=null)
+                {
+                    pendingNameAndMisc = Task<TilerEvent>.Run(async () =>
+                    {
+                        SubCalendarEvent subRetValue = await this.myAccount.ScheduleLogControl.Database.SubEvents
+                        .Include(eachSubEvent => eachSubEvent.DataBlob_EventDB)
+                        .Include(eachSubEvent => eachSubEvent.Name)
+                        .FirstAsync(eachSubEvent => eachSubEvent.Id == triggerSubEvent.Id).ConfigureAwait(false);
+                        TilerEvent tileRetValue = (TilerEvent)subRetValue;
+                        return tileRetValue;
+
+                    });
+                }
+            } 
+            else
+            {
+                var calEent = getCalendarEvent(EventId);
+                if(calEent!=null)
+                {
+                    if (this.myAccount.ScheduleLogControl.Database != null)
+                    {
+                        pendingNameAndMisc = Task<TilerEvent>.Run(async () =>
+                        {
+                            CalendarEvent calRetValue = await this.myAccount.ScheduleLogControl.Database.CalEvents
+                            .Include(eachSubEvent => eachSubEvent.DataBlob_EventDB)
+                            .Include(eachSubEvent => eachSubEvent.Name)
+                            .FirstAsync(eachSubEvent => eachSubEvent.Id == calEent.Id).ConfigureAwait(false);
+                            TilerEvent tileRetValue = (TilerEvent)calRetValue;
+                            return tileRetValue;
+
+                        });
+                    }
+                        
+                }
+
             }
 
             var retValue = base.BundleChangeUpdate(EventId, NewName, newStart, newEnd, newSplitCount, notes, forceRecalculation, triggerSubEvent);
 
-            if(pendingOldName != null)
-            {
-                pendingOldName.Wait();
-                EventName oldName = pendingOldName.Result;
 
+            TilerEvent tilerEvent = null;
+            if (!useSubEvent)
+            {
+                tilerEvent = getCalendarEvent(EventId);
+            }
+            else
+            {
+                tilerEvent = triggerSubEvent;
+            }
+
+            if (pendingNameAndMisc != null)
+            {
+                pendingNameAndMisc.Wait();
+                var pendingNameAndMiscResult = pendingNameAndMisc.Result;
+
+                EventName oldName = pendingNameAndMiscResult.getName;
+                MiscData miscData = pendingNameAndMiscResult.Notes;
                 bool isNameChange = NewName.NameValue != oldName?.NameValue;
-                var myCalendarEvent = triggerSubEvent.ParentCalendarEvent;
+                
                 if (isNameChange)
                 {
-                    myCalendarEvent.updateEventName(NewName.NameValue);
-                }
-                var note = myCalendarEvent.Notes;
-                if (note == null && triggerSubEvent.RepeatParentEvent != null)
-                {
-                    note = (triggerSubEvent.RepeatParentEvent as CalendarEvent).Notes;
+                    tilerEvent.updateEventName(NewName.NameValue);
                 }
 
+
+                
+                var note = miscData;
                 if (note != null)
                 {
                     note.UserNote = notes;

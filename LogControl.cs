@@ -2082,29 +2082,52 @@ namespace TilerFront
                     {
                         calIdSet = new HashSet<string>(calIds);
                     }
-                    var calEventQuery = getCalendarEventQuery(retrievalOptions, tilerIds);
+                    var calEventQuery = getCalendarEventQuery(retrievalOptions);
                     
-
-
-                    calEventQuery = calEventQuery
-                    .Where(calEvent =>
-                            (
-                                calEvent.IsEnabled_DB
-                                && !calEvent.Complete_EventDB
-                                && (
-                                    (calEvent.RepeatParentEvent == null )
-                                    || (
-                                        calEvent.RepeatParentEvent.IsEnabled_DB
-                                        && !calEvent.RepeatParentEvent.Complete_EventDB
+                    if(calIdSet.Count == 0)
+                    {
+                        calEventQuery = calEventQuery
+                        .Where(calEvent =>
+                                (
+                                    calEvent.IsEnabled_DB
+                                    && !calEvent.Complete_EventDB
+                                    && (
+                                        (calEvent.RepeatParentEvent == null)
+                                        || (
+                                            calEvent.RepeatParentEvent.IsEnabled_DB
+                                            && !calEvent.RepeatParentEvent.Complete_EventDB
+                                            )
                                         )
-                                    )
-                                && calEvent.StartTime_EventDB < RangeOfLookUP.End
-                                && calEvent.EndTime_EventDB > RangeOfLookUP.Start
-                                && calEvent.StartTime_EventDB < RangeOfLookUP.End// for performance reasons we will ignore sub events outside two weeks that are not within the range
-                                && calEvent.EndTime_EventDB > RangeOfLookUP.Start// for performance reasons we will ignore sub events outside two weeks that are not within the specified range so the range has to be generous
-                            )
+                                    && calEvent.StartTime_EventDB < RangeOfLookUP.End
+                                    && calEvent.EndTime_EventDB > RangeOfLookUP.Start
+                                    && calEvent.StartTime_EventDB < RangeOfLookUP.End// for performance reasons we will ignore sub events outside two weeks that are not within the range
+                                    && calEvent.EndTime_EventDB > RangeOfLookUP.Start// for performance reasons we will ignore sub events outside two weeks that are not within the specified range so the range has to be generous
+                                )
+                            );
+                    } else
+                    {
+                        calEventQuery = calEventQuery
+                        .Where(calEvent =>
+                                (
+                                    calEvent.IsEnabled_DB
+                                    && !calEvent.Complete_EventDB
+                                    && (
+                                        (calEvent.RepeatParentEvent == null)
+                                        || (
+                                            calEvent.RepeatParentEvent.IsEnabled_DB
+                                            && !calEvent.RepeatParentEvent.Complete_EventDB
+                                            )
+                                        )
+                                    && calEvent.StartTime_EventDB < RangeOfLookUP.End
+                                    && calEvent.EndTime_EventDB > RangeOfLookUP.Start
+                                    && calEvent.StartTime_EventDB < RangeOfLookUP.End// for performance reasons we will ignore sub events outside two weeks that are not within the range
+                                    && calEvent.EndTime_EventDB > RangeOfLookUP.Start// for performance reasons we will ignore sub events outside two weeks that are not within the specified range so the range has to be generous
+                                )
+                                || calIdSet.Contains(calEvent.Id)
+                            );
+                    }
 
-                        );
+                    
 
                     #region includeCalendarEvents
                     //subCalendarEvents = subCalendarEvents
@@ -2154,10 +2177,11 @@ namespace TilerFront
 
                         CalendarEvent loopParentCalEvent = parentCalEvent;
                         CalendarEvent previousParent = parentCalEvent;
-                        if (isRepetitionObjectLoaded)
+                        //if (isRepetitionObjectLoaded)
                         {
                             while (loopParentCalEvent != null)
                             {
+                                loopParentCalEvent.Now = Now;
                                 if (loopParentCalEvent.RepeatParentEvent != null)
                                 {
                                     CalendarEvent repeatParent = loopParentCalEvent.RepeatParentEvent as CalendarEvent;
@@ -3595,8 +3619,9 @@ namespace TilerFront
             IQueryable<CalendarEvent> calEventQuery = _Context.CalEvents.Where(calEvent => calEvent.CreatorId == _TilerUser.Id);
             if (ids != null && ids.Count > 0)
             {
+                HashSet<string> reviseIds = new HashSet<string>( ids.Select(o=> (new EventID(o)).getRepeatCalendarEventID()));
                 calEventQuery = calEventQuery
-                .Join(ids,
+                .Join(reviseIds,
                 calEvent => calEvent.Id,
                 id => id,
                 (calEvent, id) => new { calEvent = calEvent, id = id }).Select(obj => obj.calEvent);
