@@ -2162,7 +2162,9 @@ namespace TilerFront
                     HashSet<string> parentIds = new HashSet<string>();
                     Dictionary<string, List<TilerEvent>> procrastinationToTilerEvents = new Dictionary<string, List<TilerEvent>>();
                     Dictionary<string, List<TilerEvent>> ProfileOfNowToTilerEvents = new Dictionary<string, List<TilerEvent>>();
-
+                    HashSet<string> allRestrictionProfileIds = new HashSet<string>();
+                    HashSet<string> procrastinationProfileIds = new HashSet<string>();
+                    HashSet<string> dayPreferenceIds = new HashSet<string>();
 
 
                     List<SubCalendarEvent> subEventsRetrieved = calEventsRetrieved.SelectMany(calEvent => calEvent.AllSubEvents_DB).ToList();
@@ -2175,6 +2177,32 @@ namespace TilerFront
                     foreach (SubCalendarEvent subEvent in subEventsRetrieved)
                     {
                         CalendarEvent parentCalEvent = subEvent.ParentCalendarEvent;
+                        if(subEvent.RestrictionProfileId!=null)
+                        {
+                            allRestrictionProfileIds.Add(subEvent.RestrictionProfileId);
+                        }
+
+                        if (subEvent.RestrictionProfileId!= parentCalEvent.RestrictionProfileId && parentCalEvent.RestrictionProfileId != null)
+                        {
+                            allRestrictionProfileIds.Add(parentCalEvent.RestrictionProfileId);
+                        }
+
+
+                        if (subEvent.ProcrastinationId != null)
+                        {
+                            procrastinationProfileIds.Add(subEvent.ProcrastinationId);
+                        }
+
+                        if (subEvent.ProcrastinationId != parentCalEvent.ProcrastinationId && parentCalEvent.ProcrastinationId != null)
+                        {
+                            procrastinationProfileIds.Add(parentCalEvent.ProcrastinationId);
+                        }
+
+                        if (parentCalEvent.DayPreferenceId != null)
+                        {
+                            dayPreferenceIds.Add(parentCalEvent.DayPreferenceId);
+                        }
+
                         parentCalEvent.isRepeatLoaded_DB = isRepetitionObjectLoaded;
                         parentCalEvent.DefaultCalendarEvent = defaultCalEvent;
                         calendarEventsFromSubCalquery.Add(parentCalEvent);
@@ -2203,6 +2231,27 @@ namespace TilerFront
                         
                         
                     }
+
+
+                    //var idToRestrictionProfile = await this._Context.Restrictions.Where(o => allRestrictionProfileIds.Contains(o.Id)).ToDictionaryAsync(o => o.Id, o => o).ConfigureAwait(false);
+                    var idToRestrictionProfile = await this._Context.Restrictions.Join(allRestrictionProfileIds,
+                        restrictionProfile => restrictionProfile.Id,
+                        restrictionId => restrictionId,
+                        (restrictionProfile, restrictionId) => new { restrictionProfile }
+                        ).Select(o => o.restrictionProfile).ToListAsync().ConfigureAwait(false);
+
+                    var idToProcrastinationProfile = await this._Context.Procrastinations.Join(procrastinationProfileIds,
+                        procrastinationProfile => procrastinationProfile.Id,
+                        procrastinationProfileId => procrastinationProfileId,
+                        (restrictionProfile, procrastinationProfileId) => new { restrictionProfile }
+                        ).Select(o => o.restrictionProfile).ToListAsync().ConfigureAwait(false);
+
+
+                    var idToDayPreference = await this._Context.EventPreferences.Join(dayPreferenceIds,
+                        dayPreference => dayPreference.Id,
+                        dayPreferenceId => dayPreferenceId,
+                        (dayPreference, dayPreferenceId) => new { dayPreference }
+                        ).Select(o => o.dayPreference).ToListAsync().ConfigureAwait(false);
 
                     watch.Stop();
                     TimeSpan noParenttSpan = watch.Elapsed;
@@ -3700,25 +3749,26 @@ namespace TilerFront
                         Func<IQueryable<CalendarEvent>, IQueryable<CalendarEvent>> task = (calEvents) =>
                         {
                             return calEvents
-                            //.Include(calEvent => calEvent.RestrictionProfile_DB)
+                            .Include(calEvent => calEvent.RestrictionProfile_DB)
                             .Include(calEvent => calEvent.DayPreference_DB)
                             .Include(calEvent => calEvent.Procrastination_EventDB)
                             ;
                         };
                         returnedQueries.Add(task);
-                    }
+                    
 
-                    if (isAllRetrievalOptionIncluded || isSubEventIncluded)
-                    {
-                        Func<IQueryable<CalendarEvent>, IQueryable<CalendarEvent>> subTask = (calEvents) =>
+                        if (isAllRetrievalOptionIncluded || isSubEventIncluded)
                         {
-                            return calEvents
-                            .Include(calEvent => calEvent.DayPreference_DB)
-                            //.Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.RestrictionProfile_DB))
-                            .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Procrastination_EventDB))
-                            ;
-                        };
-                        returnedQueries.Add(subTask);
+                            Func<IQueryable<CalendarEvent>, IQueryable<CalendarEvent>> subTask = (calEvents) =>
+                            {
+                                return calEvents
+                                .Include(calEvent => calEvent.DayPreference_DB)
+                                .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.RestrictionProfile_DB))
+                                .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Procrastination_EventDB))
+                                ;
+                            };
+                            returnedQueries.Add(subTask);
+                        }
                     }
                 }
                 if (isAllRetrievalOptionIncluded || eachRetrievalOption == DataRetrivalOption.Now)

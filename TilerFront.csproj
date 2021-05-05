@@ -508,6 +508,10 @@
     <Compile Include="LogControlXml.cs" />
     <Compile Include="LogControlDirect.cs" />
     <Compile Include="LogControl.cs" />
+    <Compile Include="Migrations\202105050236559_restrictionProfileId.cs" />
+    <Compile Include="Migrations\202105050236559_restrictionProfileId.designer.cs">
+      <DependentUpon>202105050236559_restrictionProfileId.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -2889,6 +2893,11 @@
       <Project>{f948eba6-4b87-4162-b240-a5c19829f889}</Project>
       <Name>ScheduleAnalysis</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\202105050236559_restrictionProfileId.resx">
+      <DependentUpon>202105050236559_restrictionProfileId.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
