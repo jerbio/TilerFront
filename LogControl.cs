@@ -1822,7 +1822,7 @@ namespace TilerFront
                 else if (isAllRetrievalOptionIncluded || eachRetrievalOption == DataRetrivalOption.Name)
                 {
                     subEvents = subEvents
-                        .Include(calEvent => calEvent.Name.NameValue)
+                        .Include(calEvent => calEvent.Name)
                         ;
                 }
                 else if (isAllRetrievalOptionIncluded || eachRetrievalOption == DataRetrivalOption.Location)
