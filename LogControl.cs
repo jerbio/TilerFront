@@ -701,9 +701,12 @@ namespace TilerFront
             if (MyEvent.getIsEventRestricted)
             {
                 CalendarEventRestricted restrictedMyEvent = (CalendarEventRestricted)MyEvent;
-                XmlElement restrictionProfileData = generateXMLRestrictionProfile(restrictedMyEvent.RestrictionProfile);
-                MyEventScheduleNode.PrependChild(xmldoc.CreateElement("RestrictionProfile"));
-                MyEventScheduleNode.ChildNodes[0].InnerXml = restrictionProfileData.InnerXml;
+                if(restrictedMyEvent.RestrictionProfile!=null)
+                {
+                    XmlElement restrictionProfileData = generateXMLRestrictionProfile(restrictedMyEvent.RestrictionProfile);
+                    MyEventScheduleNode.PrependChild(xmldoc.CreateElement("RestrictionProfile"));
+                    MyEventScheduleNode.ChildNodes[0].InnerXml = restrictionProfileData.InnerXml;
+                }
             }
 
 
@@ -946,9 +949,12 @@ namespace TilerFront
             if (MySubEvent.getIsEventRestricted)
             {
                 restrictedMySub = (SubCalendarEventRestricted)MySubEvent;
-                XmlElement restrictionProfileData = generateXMLRestrictionProfile(restrictedMySub.RestrictionProfile);
-                MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("RestrictionProfile"));
-                MyEventSubScheduleNode.ChildNodes[0].InnerXml = restrictionProfileData.InnerXml;
+                if (restrictedMySub.RestrictionProfile != null)
+                {
+                    XmlElement restrictionProfileData = generateXMLRestrictionProfile(restrictedMySub.RestrictionProfile);
+                    MyEventSubScheduleNode.PrependChild(xmldoc.CreateElement("RestrictionProfile"));
+                    MyEventSubScheduleNode.ChildNodes[0].InnerXml = restrictionProfileData.InnerXml;
+                }
             }
 
             return MyEventSubScheduleNode;
@@ -3341,14 +3347,20 @@ namespace TilerFront
 
         RestrictionProfile getRestrictionProfile(XmlNode RestrictionNode)
         {
-            List<RestrictionDay> RestrictionTimeLines = new List<RestrictionDay>();
-            foreach (XmlNode eachXmlNode in RestrictionNode.SelectNodes("RestrictionNode"))
+            if(RestrictionNode!=null)
             {
-                RestrictionTimeLines.Add(getgetRestrictionTuples(eachXmlNode));
+                List<RestrictionDay> RestrictionTimeLines = new List<RestrictionDay>();
+                foreach (XmlNode eachXmlNode in RestrictionNode.SelectNodes("RestrictionNode"))
+                {
+                    RestrictionTimeLines.Add(getgetRestrictionTuples(eachXmlNode));
+                }
+
+                DB_RestrictionProfile retValue = new DB_RestrictionProfile(RestrictionTimeLines);
+                return retValue;
             }
 
-            DB_RestrictionProfile retValue = new DB_RestrictionProfile(RestrictionTimeLines);
-            return retValue;
+            return null;
+
         }
 
         RestrictionDay getgetRestrictionTuples(XmlNode RestrictionTupleNode)
@@ -3631,6 +3643,7 @@ namespace TilerFront
 
             bool isSubEventIncluded = retrievalOptions.Contains(DataRetrivalOption.SubEvent);
             bool isAllRetrievalOptionIncluded = retrievalOptions.Contains(DataRetrivalOption.All);
+            bool isEvaluationPerformance = retrievalOptions.Contains(DataRetrivalOption.EvaluationPerformance);
             if (isSubEventIncluded || isAllRetrievalOptionIncluded)
             {
                 Func<IQueryable<CalendarEvent>, IQueryable<CalendarEvent>> task = (calEvents) =>
@@ -3680,24 +3693,28 @@ namespace TilerFront
                     //        ;
                     //}
                 }
-                if (isAllRetrievalOptionIncluded || eachRetrievalOption == DataRetrivalOption.Evaluation)
+                if (isAllRetrievalOptionIncluded || eachRetrievalOption == DataRetrivalOption.Evaluation || eachRetrievalOption == DataRetrivalOption.EvaluationPerformance)
                 {
-
-                    Func<IQueryable<CalendarEvent>, IQueryable<CalendarEvent>> task = (calEvents) =>
+                    if (!isEvaluationPerformance)
                     {
-                        return calEvents
-                        .Include(calEvent => calEvent.RestrictionProfile_DB)
-                        .Include(calEvent => calEvent.DayPreference_DB)
-                        .Include(calEvent => calEvent.Procrastination_EventDB)
-                        ;
-                    };
-                    returnedQueries.Add(task);
+                        Func<IQueryable<CalendarEvent>, IQueryable<CalendarEvent>> task = (calEvents) =>
+                        {
+                            return calEvents
+                            //.Include(calEvent => calEvent.RestrictionProfile_DB)
+                            .Include(calEvent => calEvent.DayPreference_DB)
+                            .Include(calEvent => calEvent.Procrastination_EventDB)
+                            ;
+                        };
+                        returnedQueries.Add(task);
+                    }
+
                     if (isAllRetrievalOptionIncluded || isSubEventIncluded)
                     {
                         Func<IQueryable<CalendarEvent>, IQueryable<CalendarEvent>> subTask = (calEvents) =>
                         {
                             return calEvents
-                            .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.RestrictionProfile_DB))
+                            .Include(calEvent => calEvent.DayPreference_DB)
+                            //.Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.RestrictionProfile_DB))
                             .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.Procrastination_EventDB))
                             ;
                         };
@@ -3706,13 +3723,18 @@ namespace TilerFront
                 }
                 if (isAllRetrievalOptionIncluded || eachRetrievalOption == DataRetrivalOption.Now)
                 {
-                    Func<IQueryable<CalendarEvent>, IQueryable<CalendarEvent>> task = (calEvents) =>
+                    if (!isEvaluationPerformance)
                     {
-                        return calEvents
-                        .Include(calEvent => calEvent.ProfileOfNow_EventDB)
-                        ;
-                    };
-                    returnedQueries.Add(task);
+                        Func<IQueryable<CalendarEvent>, IQueryable<CalendarEvent>> task = (calEvents) =>
+                        {
+                            return calEvents
+                            .Include(calEvent => calEvent.ProfileOfNow_EventDB)
+                            ;
+                        };
+                        returnedQueries.Add(task);
+                    }
+                        
+                    
                     if (isAllRetrievalOptionIncluded || isSubEventIncluded)
                     {
                         Func<IQueryable<CalendarEvent>, IQueryable<CalendarEvent>> subTask = (calEvents) =>
@@ -3727,13 +3749,16 @@ namespace TilerFront
                 }
                 if (isAllRetrievalOptionIncluded || eachRetrievalOption == DataRetrivalOption.DataBlob)
                 {
-                    Func<IQueryable<CalendarEvent>, IQueryable<CalendarEvent>> task = (calEvents) =>
+                    if (!isEvaluationPerformance)
                     {
-                        return calEvents
-                        .Include(calEvent => calEvent.DataBlob_EventDB)
-                        ;
-                    };
-                    returnedQueries.Add(task);
+                        Func<IQueryable<CalendarEvent>, IQueryable<CalendarEvent>> task = (calEvents) =>
+                        {
+                            return calEvents
+                            .Include(calEvent => calEvent.DataBlob_EventDB)
+                            ;
+                        };
+                            returnedQueries.Add(task);
+                    }
 
                     if (isAllRetrievalOptionIncluded || isSubEventIncluded)
                     {
@@ -3768,13 +3793,17 @@ namespace TilerFront
                 }
                 if (isAllRetrievalOptionIncluded || eachRetrievalOption == DataRetrivalOption.Location)
                 {
-                    Func<IQueryable<CalendarEvent>, IQueryable<CalendarEvent>> task = (calEvents) =>
+                    if (!isEvaluationPerformance)
                     {
-                        return calEvents
-                        .Include(calEvent => calEvent.Location_DB)
-                        ;
-                    };
-                    returnedQueries.Add(task);
+                        Func<IQueryable<CalendarEvent>, IQueryable<CalendarEvent>> task = (calEvents) =>
+                        {
+                            return calEvents
+                            .Include(calEvent => calEvent.Location_DB)
+                            ;
+                        };
+                        returnedQueries.Add(task);
+                    }
+                    
                     if (isAllRetrievalOptionIncluded || isSubEventIncluded)
                     {
                         Func<IQueryable<CalendarEvent>, IQueryable<CalendarEvent>> subTask = (calEvents) =>
