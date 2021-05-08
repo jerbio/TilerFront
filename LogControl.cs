@@ -1,5 +1,5 @@
 ﻿//#define UseDefaultLocation
-#define liveDebugging
+//#define liveDebugging
 
 using System;
 using System.Collections.Generic;
@@ -1582,20 +1582,6 @@ namespace TilerFront
                             ;
                     }
                 }
-                if (isAllRetrievalOptionIncluded || eachRetrievalOption == DataRetrivalOption.TimeLine)
-                {
-                    //calEvents = calEvents
-                    //    .Include(calEvent => calEvent.StartTime_EventDB)
-                    //    .Include(calEvent => calEvent.EndTime_EventDB)
-                    //    ;
-                    //if (isAllRetrievalOptionIncluded ||isSubEventIncluded)
-                    //{
-                    //    calEvents = calEvents
-                    //        .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.StartTime_EventDB))
-                    //        .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.EndTime_EventDB))
-                    //        ;
-                    //}
-                }
                 if (isAllRetrievalOptionIncluded || eachRetrievalOption == DataRetrivalOption.Evaluation)
                 {
                     calEvents = calEvents
@@ -1786,13 +1772,6 @@ namespace TilerFront
                         .Include(subEvent => subEvent.UiParams_EventDB.UIColor)
                         ;
 
-                }
-                else if (isAllRetrievalOptionIncluded || eachRetrievalOption == DataRetrivalOption.TimeLine)
-                {
-                    //subEvents = subEvents
-                    //    .Include(calEvent => calEvent.StartTime_EventDB)
-                    //    .Include(calEvent => calEvent.EndTime_EventDB)
-                        ;
                 }
                 else if (isAllRetrievalOptionIncluded || eachRetrievalOption == DataRetrivalOption.Evaluation)
                 {
@@ -2174,64 +2153,93 @@ namespace TilerFront
                     watch.Reset();
                     watch.Start();
                     bool isRepetitionObjectLoaded = isRepeatitionLoaded(retrievalOptions);
-                    foreach (SubCalendarEvent subEvent in subEventsRetrieved)
+                    if(subEventsRetrieved.Count > 0)
                     {
-                        CalendarEvent parentCalEvent = subEvent.ParentCalendarEvent;
-                        if(subEvent.RestrictionProfileId!=null)
+                        foreach (SubCalendarEvent subEvent in subEventsRetrieved)
                         {
-                            allRestrictionProfileIds.Add(subEvent.RestrictionProfileId);
-                        }
-
-                        if (subEvent.RestrictionProfileId!= parentCalEvent.RestrictionProfileId && parentCalEvent.RestrictionProfileId != null)
-                        {
-                            allRestrictionProfileIds.Add(parentCalEvent.RestrictionProfileId);
-                        }
-
-
-                        if (subEvent.ProcrastinationId != null)
-                        {
-                            procrastinationProfileIds.Add(subEvent.ProcrastinationId);
-                        }
-
-                        if (subEvent.ProcrastinationId != parentCalEvent.ProcrastinationId && parentCalEvent.ProcrastinationId != null)
-                        {
-                            procrastinationProfileIds.Add(parentCalEvent.ProcrastinationId);
-                        }
-
-                        if (parentCalEvent.DayPreferenceId != null)
-                        {
-                            dayPreferenceIds.Add(parentCalEvent.DayPreferenceId);
-                        }
-
-                        parentCalEvent.isRepeatLoaded_DB = isRepetitionObjectLoaded;
-                        parentCalEvent.DefaultCalendarEvent = defaultCalEvent;
-                        calendarEventsFromSubCalquery.Add(parentCalEvent);
-                        allIds.Add(parentCalEvent.Id);
-                        allIds.Add(subEvent.Id);
-                        subEventIds.Add(subEvent.Id);
-                        retrievedParentIds.Add(subEvent.SubEvent_ID.getCalendarEventComponent());
-
-                        CalendarEvent loopParentCalEvent = parentCalEvent;
-                        CalendarEvent previousParent = parentCalEvent;
-                        //if (isRepetitionObjectLoaded)
-                        {
-                            while (loopParentCalEvent != null)
+                            CalendarEvent parentCalEvent = subEvent.ParentCalendarEvent;
+                            if (subEvent.RestrictionProfileId != null)
                             {
-                                loopParentCalEvent.Now = Now;
-                                if (loopParentCalEvent.RepeatParentEvent != null)
-                                {
-                                    CalendarEvent repeatParent = loopParentCalEvent.RepeatParentEvent as CalendarEvent;
-                                    calendarEventsFromSubCalquery.Add(repeatParent);
-                                    allIds.Add(loopParentCalEvent.RepeatParentId);
-                                    repeatParent.isRepeatLoaded_DB = isRepetitionObjectLoaded;
-                                }
-                                loopParentCalEvent = loopParentCalEvent.RepeatParentEvent as CalendarEvent;
+                                allRestrictionProfileIds.Add(subEvent.RestrictionProfileId);
                             }
-                        }
-                        
-                        
-                    }
 
+                            if (subEvent.RestrictionProfileId != parentCalEvent.RestrictionProfileId && parentCalEvent.RestrictionProfileId != null)
+                            {
+                                allRestrictionProfileIds.Add(parentCalEvent.RestrictionProfileId);
+                            }
+
+
+                            if (subEvent.ProcrastinationId != null)
+                            {
+                                procrastinationProfileIds.Add(subEvent.ProcrastinationId);
+                            }
+
+                            if (subEvent.ProcrastinationId != parentCalEvent.ProcrastinationId && parentCalEvent.ProcrastinationId != null)
+                            {
+                                procrastinationProfileIds.Add(parentCalEvent.ProcrastinationId);
+                            }
+
+                            if (parentCalEvent.DayPreferenceId != null)
+                            {
+                                dayPreferenceIds.Add(parentCalEvent.DayPreferenceId);
+                            }
+
+                            parentCalEvent.isRepeatLoaded_DB = isRepetitionObjectLoaded;
+                            parentCalEvent.DefaultCalendarEvent = defaultCalEvent;
+                            calendarEventsFromSubCalquery.Add(parentCalEvent);
+                            allIds.Add(parentCalEvent.Id);
+                            allIds.Add(subEvent.Id);
+                            subEventIds.Add(subEvent.Id);
+                            retrievedParentIds.Add(subEvent.SubEvent_ID.getCalendarEventComponent());
+
+                            CalendarEvent loopParentCalEvent = parentCalEvent;
+                            CalendarEvent previousParent = parentCalEvent;
+                            //if (isRepetitionObjectLoaded)
+                            {
+                                while (loopParentCalEvent != null)
+                                {
+                                    loopParentCalEvent.Now = Now;
+                                    if (loopParentCalEvent.RepeatParentEvent != null)
+                                    {
+                                        CalendarEvent repeatParent = loopParentCalEvent.RepeatParentEvent as CalendarEvent;
+                                        calendarEventsFromSubCalquery.Add(repeatParent);
+                                        allIds.Add(loopParentCalEvent.RepeatParentId);
+                                        repeatParent.isRepeatLoaded_DB = isRepetitionObjectLoaded;
+                                    }
+                                    loopParentCalEvent = loopParentCalEvent.RepeatParentEvent as CalendarEvent;
+                                }
+                            }
+
+
+                        }
+
+                    }
+                    else if(calEventsRetrieved.Count > 0)
+                    {
+                        calEventsRetrieved.ForEach((parentCalEvent) => {
+                            if (parentCalEvent.RestrictionProfileId != null)
+                            {
+                                allRestrictionProfileIds.Add(parentCalEvent.RestrictionProfileId);
+                            }
+
+                            if (parentCalEvent.ProcrastinationId != null)
+                            {
+                                procrastinationProfileIds.Add(parentCalEvent.ProcrastinationId);
+                            }
+
+                            if (parentCalEvent.DayPreferenceId != null)
+                            {
+                                dayPreferenceIds.Add(parentCalEvent.DayPreferenceId);
+                            }
+
+                            parentCalEvent.isRepeatLoaded_DB = isRepetitionObjectLoaded;
+                            parentCalEvent.DefaultCalendarEvent = defaultCalEvent;
+                            calendarEventsFromSubCalquery.Add(parentCalEvent);
+                            allIds.Add(parentCalEvent.Id);
+                        });
+                        
+
+                    }
 
                     //var idToRestrictionProfile = await this._Context.Restrictions.Where(o => allRestrictionProfileIds.Contains(o.Id)).ToDictionaryAsync(o => o.Id, o => o).ConfigureAwait(false);
                     var idToRestrictionProfile = await this._Context.Restrictions.Join(allRestrictionProfileIds,
@@ -3727,20 +3735,6 @@ namespace TilerFront
                         };
                         returnedQueries.Add(subTask);
                     }
-                }
-                if (isAllRetrievalOptionIncluded || eachRetrievalOption == DataRetrivalOption.TimeLine)
-                {
-                    //calEvents = calEvents
-                    //    .Include(calEvent => calEvent.StartTime_EventDB)
-                    //    .Include(calEvent => calEvent.EndTime_EventDB)
-                    //    ;
-                    //if (isAllRetrievalOptionIncluded ||isSubEventIncluded)
-                    //{
-                    //    calEvents = calEvents
-                    //        .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.StartTime_EventDB))
-                    //        .Include(calEvent => calEvent.AllSubEvents_DB.Select(subEvent => subEvent.EndTime_EventDB))
-                    //        ;
-                    //}
                 }
                 if (isAllRetrievalOptionIncluded || eachRetrievalOption == DataRetrivalOption.Evaluation || eachRetrievalOption == DataRetrivalOption.EvaluationPerformance)
                 {

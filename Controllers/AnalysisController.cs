@@ -48,7 +48,6 @@ namespace TilerFront.Controllers
         [Route("api/Analysis/Analyze")]
         public async Task<IHttpActionResult> UpdateCalEvent([FromBody]AuthorizedUser myUser)
         {
-            return Ok();
             UserAccount retrievedUser = await myUser.getUserAccount(db); //new UserAccountDirect(myUser.UserName, myUser.UserID);
             await retrievedUser.Login();
             retrievedUser.getTilerUser().updateTimeZoneTimeSpan(myUser.getTimeSpan);

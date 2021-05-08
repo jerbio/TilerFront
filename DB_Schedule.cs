@@ -34,7 +34,7 @@ namespace TilerFront
             myAccount = AccountEntry;
             if (retrievalOption == null)
             {
-                retrievalOption = DataRetrievalSet.scheduleManipulation;
+                retrievalOption = DataRetrievalSet.scheduleManipulationPerformance;
             }
             this.retrievalOptions = retrievalOption;
             this.RangeOfLookup = rangeOfLookup ?? new TimeLine(referenceNow.AddDays(Utility.defaultBeginDay), referenceNow.AddDays(Utility.defaultEndDay));
@@ -47,7 +47,7 @@ namespace TilerFront
             myAccount = AccountEntry;
             if(retrievalOptions == null)
             {
-                retrievalOptions = DataRetrievalSet.scheduleManipulation;
+                retrievalOptions = DataRetrievalSet.scheduleManipulationPerformance;
             }
             this.retrievalOptions = retrievalOptions;
             this.RangeOfLookup = rangeOfLookup?? new TimeLine(referenceNow.AddDays(Utility.defaultBeginDay), referenceNow.AddDays(Utility.defaultEndDay));
