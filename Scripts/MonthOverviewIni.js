@@ -550,6 +550,7 @@ function ResetListUIEffects()
         for (var i = 0 ; i < SideBarElements.length; i++) {
             var SideBar = SideBarElements[i];
             $(SideBar).removeClass("SideBar");
+            $(SideBar).removeClass("TranslucentSidebar");
         }
     }
 
@@ -2743,7 +2744,10 @@ function renderSideBarEvents(DayOfWeek, ID, MyArray, Index, TabCount)
         var RefEvent = DayOfWeek.UISpecs[ID];
 
         var GridSubEventWidth = renderSideBarEvents.SubEventGridWidthContainer / TabCount;
+        let translucentClass = "TranslucentSidebar"
         $(RefEvent.Dom).addClass("SideBar");
+        $(RefEvent.Dom).addClass(translucentClass);
+
         RefEvent.Dom.style.left = (DayOfWeek.RightPercent - GridSubEventWidth )+ "%"
         RefEvent.Dom.style.height = RefEvent.css.height + "%";
         //RefEvent.Dom.style.minHeight = (global_DayHeight * (1 / 24)) + "px";//1/24 because we want the minimum to be the size of an hour
@@ -2771,10 +2775,12 @@ function renderSideBarEvents(DayOfWeek, ID, MyArray, Index, TabCount)
         var Range = global_DictionaryOfSubEvents[ID].Day;
         RefEvent.refrenceListElement.Dom.onmouseover = function () {
             Range.Parent.onmouseover();
+            $(RefEvent.Dom).removeClass(translucentClass);
         }
 
         RefEvent.refrenceListElement.Dom.onmouseout = function () {
             Range.Parent.onmouseout();
+            $(RefEvent.Dom).addClass(translucentClass);
         }
 
 
