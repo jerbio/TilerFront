@@ -1,5 +1,5 @@
 ﻿//#define UseDefaultLocation
-#define liveDebugging
+//#define liveDebugging
 
 using System;
 using System.Collections.Generic;
