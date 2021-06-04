@@ -1229,7 +1229,7 @@
             <param name="user">tiler user</param>
             <returns></returns>
         </member>
-        <member name="M:TilerFront.LogControl.CreatePauseUsedUpNode(TilerElements.SubCalendarEvent,System.Xml.XmlDocument)">
+        <member name="M:TilerFront.LogControl.CreatePauseUsedUpNode(TilerElements.CalendarEvent,System.Xml.XmlDocument)">
             <summary>
             Class generates the pause xml mode for a given schedule
             </summary>
