@@ -1768,6 +1768,8 @@ namespace TilerFront
                     subEvents = subEvents
                         .Include(subEvent => subEvent.ParentCalendarEvent.UiParams_EventDB)
                         .Include(subEvent => subEvent.ParentCalendarEvent.UiParams_EventDB.UIColor)
+                        .Include(subEvent => subEvent.ParentCalendarEvent.DataBlob_EventDB)
+                        .Include(subEvent => subEvent.DataBlob_EventDB)
                         .Include(subEvent => subEvent.UiParams_EventDB)
                         .Include(subEvent => subEvent.UiParams_EventDB.UIColor)
                         ;
