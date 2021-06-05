@@ -1803,7 +1803,8 @@ namespace TilerFront
                 else if (isAllRetrievalOptionIncluded || eachRetrievalOption == DataRetrivalOption.Name)
                 {
                     subEvents = subEvents
-                        .Include(calEvent => calEvent.Name)
+                        .Include(subEvent => subEvent.ParentCalendarEvent.Name)
+                        .Include(subEvent => subEvent.Name)
                         ;
                 }
                 else if (isAllRetrievalOptionIncluded || eachRetrievalOption == DataRetrivalOption.Location)
