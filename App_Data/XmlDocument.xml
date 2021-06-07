@@ -1233,7 +1233,7 @@
             <summary>
             Class generates the pause xml mode for a given schedule
             </summary>
-            <param name="SubEvent"></param>
+            <param name="calEvent"></param>
             <returns></returns>
         </member>
         <member name="M:TilerFront.LogControl.getTilerLoggedUser(System.Xml.XmlNode)">
