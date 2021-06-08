@@ -272,18 +272,6 @@ namespace TilerFront
             TilerColor retValue = new TilerColor(r, g, b, o, UserSelection);
             return retValue;
         }
-
-        public async Task<CalendarEvent> getCalendarEventWithID(string ID, ReferenceNow now)
-        {
-            TimeLine RangeOfLookup = new TimeLine(DateTimeOffset.UtcNow.AddYears(-1000), DateTimeOffset.UtcNow.AddYears(1000));
-            Dictionary<string, CalendarEvent> AllScheduleData = await getAllEnabledCalendarEvent(RangeOfLookup, now, true);
-            CalendarEvent retValue = null;
-            if (AllScheduleData.ContainsKey(ID))
-            {
-                retValue = AllScheduleData[ID];
-            }
-            return retValue;
-        }
         #endregion
         #endregion
 

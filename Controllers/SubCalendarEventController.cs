@@ -38,8 +38,9 @@ namespace TilerFront.Controllers
                     case "google":
                         {
                             DateTimeOffset myNow = myUser.getRefNow();
-
-                            DB_Schedule NewSchedule = new DB_Schedule(retrievedUser, myNow, true);
+                            var retrievalOption = DataRetrievalSet.scheduleManipulation;
+                            retrievalOption.Add(DataRetrivalOption.TimeLineHistory);
+                            DB_Schedule NewSchedule = new DB_Schedule(retrievedUser, myNow, retrievalOption);
                             NewSchedule.CurrentLocation = myUser.getCurrentLocation();
                             Models.ThirdPartyCalendarAuthenticationModel AllIndexedThirdParty = await ScheduleController.getThirdPartyAuthentication(retrievedUser.UserID, myUser.ThirdPartyUserID, "Google", db);
                             GoogleTilerEventControl googleControl = new GoogleTilerEventControl(AllIndexedThirdParty, db);
@@ -60,7 +61,7 @@ namespace TilerFront.Controllers
                             myNow = myUser.getRefNow();
                             HashSet<string> calendarIds = new HashSet<string>() { myUser.EventID };
                             Task<Tuple<ThirdPartyControl.CalendarTool, IEnumerable<CalendarEvent>>> thirdPartyDataTask = ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(retrievedUser.UserID, db);
-                            DB_Schedule schedule = new DB_Schedule(retrievedUser, myNow, true, calendarIds: calendarIds);
+                            DB_Schedule schedule = new DB_Schedule(retrievedUser, myNow, retrievalOptions: DataRetrievalSet.scheduleManipulationWithUpdateHistory, calendarIds: calendarIds);
                             schedule.CurrentLocation = myUser.getCurrentLocation();
                             var thirdPartyData = await thirdPartyDataTask.ConfigureAwait(false);
                             schedule.updateDataSetWithThirdPartyData(thirdPartyData);
@@ -151,7 +152,7 @@ namespace TilerFront.Controllers
                             
                             HashSet<string> calendarIds = new HashSet<string>() { UserData.EventID };
                             Task<Tuple<ThirdPartyControl.CalendarTool, IEnumerable<CalendarEvent>>> thirdPartyDataTask = ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(retrievedUser.UserID, db);
-                            DB_Schedule schedule = new DB_Schedule(retrievedUser, refNow, true, calendarIds: calendarIds);
+                            DB_Schedule schedule = new DB_Schedule(retrievedUser, refNow, retrievalOptions: DataRetrievalSet.scheduleManipulationWithUpdateHistory, calendarIds: calendarIds);
                             schedule.CurrentLocation = UserData.getCurrentLocation();
                             var thirdPartyData = await thirdPartyDataTask.ConfigureAwait(false);
                             schedule.updateDataSetWithThirdPartyData(thirdPartyData);

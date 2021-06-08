@@ -1,5 +1,5 @@
 ﻿/// <reference path="modernizr-2.8.3.js" />
-/// <reference path="jquery-3.5.1.js" />
+﻿/// <reference path="jquery-3.6.0.js" />
 /// <autosync enabled="true" />
 /// <reference path="../areas/routedebugger/Scripts/detect.js" />
 /// <reference path="addnewevent.js" />

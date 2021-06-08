@@ -30,7 +30,8 @@ namespace TilerFront.Controllers
                 DateTimeOffset nowTime = authorizedUser.getRefNow();
                 if(retrievedUser.ScheduleLogControl.Now == null)
                 {
-                    DB_Schedule schedule = new DB_Schedule(retrievedUser, nowTime, includeUpdateHistory: true);
+                    var retrievalOption = DataRetrievalSet.analysisManipulation;
+                    DB_Schedule schedule = new DB_Schedule(retrievedUser, nowTime, retrievalOptions: retrievalOption);
                     retrievedUser.ScheduleLogControl.Now = schedule.Now;
                 }
                 

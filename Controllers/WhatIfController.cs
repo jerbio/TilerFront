@@ -131,7 +131,9 @@ namespace TilerFront.Controllers
             if (retrievedUser.Status)
             {
                 Task<Tuple<ThirdPartyControl.CalendarTool, IEnumerable<CalendarEvent>>> thirdPartyDataTask = ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(retrievedUser.UserID, db);
-                DB_Schedule schedule = new DB_Schedule(retrievedUser, myAuthorizedUser.getRefNow(), includeUpdateHistory: true);
+                var retrievalOption = DataRetrievalSet.scheduleManipulation;
+                retrievalOption.Add(DataRetrivalOption.TimeLineHistory);
+                DB_Schedule schedule = new DB_Schedule(retrievedUser, myAuthorizedUser.getRefNow(), retrievalOptions: retrievalOption);
                 var thirdPartyData = await thirdPartyDataTask.ConfigureAwait(false);
                 schedule.updateDataSetWithThirdPartyData(thirdPartyData);
                 schedule.CurrentLocation = myAuthorizedUser.getCurrentLocation();
@@ -212,7 +214,10 @@ namespace TilerFront.Controllers
                         {
                             HashSet<string> calendarIds = new HashSet<string>() { SubEventEdit.EventID };
                             Task<Tuple<ThirdPartyControl.CalendarTool, IEnumerable<CalendarEvent>>> thirdPartyDataTask = ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(retrievedUser.UserID, db);
-                            schedule = new DB_Schedule(retrievedUser, now, calendarIds: calendarIds, includeUpdateHistory: true);
+                            var retrievalOption = DataRetrievalSet.scheduleManipulation;
+                            retrievalOption.Add(DataRetrivalOption.TimeLineHistory);
+
+                            schedule = new DB_Schedule(retrievedUser, now, calendarIds: calendarIds, retrievalOptions: retrievalOption);
                             var thirdPartyData = await thirdPartyDataTask.ConfigureAwait(false);
                             schedule.updateDataSetWithThirdPartyData(thirdPartyData);
                             schedule.CurrentLocation = SubEventEdit.getCurrentLocation();
