@@ -107,12 +107,18 @@ namespace TilerFront.Controllers
                 DayTimeLine sleepTimeline = now.getDayTimeLineByTime(now.constNow.AddDays(2));
                 TimeLine sleepTImeline = TimeOfDayPreferrence.splitIntoDaySections(sleepTimeline)[TimeOfDayPreferrence.DaySection.Sleep];
 
+                HashSet<CalendarEvent> calEVents = new HashSet<CalendarEvent>();
+                var subCalEvents = subEvents.Select(subEvent =>
+
+                    {
+                        calEVents.Add(subEvent.ParentCalendarEvent);
+                        return subEvent.ToSubCalEvent(subEvent.ParentCalendarEvent);
+                    }
+                    ).Concat(calEVents.SelectMany(eachCalEVent => eachCalEVent.PausedTimeLines.Select(eachPausedTimeLine => eachPausedTimeLine.ToSubCalEvent(eachCalEVent)))).ToList() ;
                 UserSchedule currUserSchedule = new UserSchedule {
                     //NonRepeatCalendarEvent = NonRepeatingEvents.Select(obj => obj.ToCalEvent(TimelineForData)).ToArray(),
                     //RepeatCalendarEvent = RepeatingEvents,
-                    SubCalendarEvents = subEvents.Select(subEvent => 
-                        subEvent.ToSubCalEvent(subEvent.ParentCalendarEvent)
-                    ).ToList(),
+                    SubCalendarEvents = subCalEvents,
                     SleepTimeline = sleepTImeline.ToJson()
                 };
                 PausedEvent currentPausedEvent = getCurrentPausedEvent(db);
