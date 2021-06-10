@@ -534,9 +534,13 @@
     <Compile Include="LogControlXml.cs" />
     <Compile Include="LogControlDirect.cs" />
     <Compile Include="LogControl.cs" />
-    <Compile Include="Migrations\202106080542134_pausedTileUpdate.cs" />
-    <Compile Include="Migrations\202106080542134_pausedTileUpdate.designer.cs">
-      <DependentUpon>202106080542134_pausedTileUpdate.cs</DependentUpon>
+    <Compile Include="Migrations\202106090736147_pausedTileFix.cs" />
+    <Compile Include="Migrations\202106090736147_pausedTileFix.designer.cs">
+      <DependentUpon>202106090736147_pausedTileFix.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202106091736099_pauseSubEVentMissing.cs" />
+    <Compile Include="Migrations\202106091736099_pauseSubEVentMissing.designer.cs">
+      <DependentUpon>202106091736099_pauseSubEVentMissing.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
@@ -2939,8 +2943,11 @@
     <TypeScriptCompile Include="Scripts\index.d.ts" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\202106080542134_pausedTileUpdate.resx">
-      <DependentUpon>202106080542134_pausedTileUpdate.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202106090736147_pausedTileFix.resx">
+      <DependentUpon>202106090736147_pausedTileFix.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202106091736099_pauseSubEVentMissing.resx">
+      <DependentUpon>202106091736099_pauseSubEVentMissing.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

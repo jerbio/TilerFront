@@ -2083,7 +2083,6 @@ namespace TilerFront
                         calIdSet = new HashSet<string>(calIds);
                     }
                     var calEventQuery = getCalendarEventQuery(retrievalOptions);
-                    
                     if(calIdSet.Count == 0)
                     {
                         calEventQuery = calEventQuery

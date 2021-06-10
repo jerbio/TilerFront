@@ -33,7 +33,7 @@ namespace TilerFront
         {
             HttpContext ctx = HttpContext.Current;
             TilerUser tilerUser = Database.Users
-                .Include(eachUser => eachUser.ScheduleProfile.PausedTile_DB)
+                .Include(eachUser => eachUser.ScheduleProfile_DB.PausedTile_DB)
                 .SingleOrDefault(eachUser => eachUser.Id == ID);
             if(tilerUser!=null && tilerUser.ScheduleProfile == null)
             {
