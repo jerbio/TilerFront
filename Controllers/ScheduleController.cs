@@ -114,7 +114,7 @@ namespace TilerFront.Controllers
                         calEVents.Add(subEvent.ParentCalendarEvent);
                         return subEvent.ToSubCalEvent(subEvent.ParentCalendarEvent);
                     }
-                    ).Concat(calEVents.SelectMany(eachCalEVent => eachCalEVent.PausedTimeLines.Select(eachPausedTimeLine => eachPausedTimeLine.ToSubCalEvent(eachCalEVent)))).ToList() ;
+                    ).Concat(calEVents.SelectMany(eachCalEVent => eachCalEVent.PausedTimeLines.Where(pausedTimeline => eachCalEVent.getSubEvent(pausedTimeline.getSubEventId())!=null).Select(eachPausedTimeLine => eachPausedTimeLine.ToSubCalEvent(eachCalEVent)))).ToList() ;
                 UserSchedule currUserSchedule = new UserSchedule {
                     //NonRepeatCalendarEvent = NonRepeatingEvents.Select(obj => obj.ToCalEvent(TimelineForData)).ToArray(),
                     //RepeatCalendarEvent = RepeatingEvents,
