@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using TilerCore;
 using TilerElements;
+using System.Data.Entity;
+using System.Diagnostics;
 
 namespace TilerFront
 {
@@ -12,7 +14,6 @@ namespace TilerFront
     {
         protected UserAccount myAccount;
         protected bool _CreateDump;
-        protected bool _IncludeUpdateHistory = false;
         protected DB_Schedule(): base()
         {
 
@@ -28,21 +29,27 @@ namespace TilerFront
         {
             _CreateDump = createDump;
         }
-        public DB_Schedule(UserAccount AccountEntry, DateTimeOffset referenceNow, DateTimeOffset startOfDay, bool includeUpdateHistory = false, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation, TimeLine rangeOfLookup = null, bool createDump = true, HashSet<string> calendarIds = null) : base()
+        public DB_Schedule(UserAccount AccountEntry, DateTimeOffset referenceNow, DateTimeOffset startOfDay, HashSet<DataRetrivalOption> retrievalOption = null, TimeLine rangeOfLookup = null, bool createDump = true, HashSet<string> calendarIds = null) : base()
         {
             myAccount = AccountEntry;
-            this.retrievalOption = retrievalOption;
+            if (retrievalOption == null)
+            {
+                retrievalOption = DataRetrievalSet.scheduleManipulationPerformance;
+            }
+            this.retrievalOptions = retrievalOption;
             this.RangeOfLookup = rangeOfLookup ?? new TimeLine(referenceNow.AddDays(Utility.defaultBeginDay), referenceNow.AddDays(Utility.defaultEndDay));
             _CreateDump = createDump;
-            this._IncludeUpdateHistory = includeUpdateHistory;
             Initialize(referenceNow, startOfDay, calendarIds).Wait();
             
         }
-        public DB_Schedule(UserAccount AccountEntry, DateTimeOffset referenceNow, bool includeUpdateHistory = false, DataRetrivalOption retrievalOption = DataRetrivalOption.Evaluation, TimeLine rangeOfLookup = null, bool createDump = true, HashSet<string> calendarIds = null)
+        public DB_Schedule(UserAccount AccountEntry, DateTimeOffset referenceNow, HashSet<DataRetrivalOption> retrievalOptions = null, TimeLine rangeOfLookup = null, bool createDump = true, HashSet<string> calendarIds = null)
         {
             myAccount = AccountEntry;
-            this.retrievalOption = retrievalOption;
-            this._IncludeUpdateHistory = includeUpdateHistory;
+            if(retrievalOptions == null)
+            {
+                retrievalOptions = DataRetrievalSet.scheduleManipulationPerformance;
+            }
+            this.retrievalOptions = retrievalOptions;
             this.RangeOfLookup = rangeOfLookup?? new TimeLine(referenceNow.AddDays(Utility.defaultBeginDay), referenceNow.AddDays(Utility.defaultEndDay));
             _CreateDump = createDump;
             Initialize(referenceNow, calendarIds).Wait();
@@ -62,7 +69,7 @@ namespace TilerFront
 
             _Now = new ReferenceNow(referenceNow, StartOfDay, myAccount.getTilerUser().TimeZoneDifference);
             this.RangeOfLookup = this.RangeOfLookup ?? new TimeLine(_Now.constNow.AddDays(Schedule.TimeLookUpDayStart), _Now.constNow.AddDays(Schedule.TimeLookUpDayEnd));
-            Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, Location>, Analysis> profileData = await myAccount.ScheduleData.getProfileInfo(RangeOfLookup, _Now, this._IncludeUpdateHistory, this.retrievalOption, calendarIds: calendarIds).ConfigureAwait(false);
+            Tuple<Dictionary<string, CalendarEvent>, DateTimeOffset, Dictionary<string, Location>, Analysis> profileData = await myAccount.ScheduleData.getProfileInfo(RangeOfLookup, _Now, this.retrievalOptions, calendarIds: calendarIds).ConfigureAwait(false);
             myAccount.Now = _Now;
             TravelCache travelCache = await myAccount.ScheduleData.getTravelCache(myAccount.UserID).ConfigureAwait(false);
             updateTravelCache(travelCache);
@@ -315,6 +322,90 @@ namespace TilerFront
             myAccount.ScheduleLogControl.Database.ScheduleDumps.Add(scheduleDump);
             await persistToDB().ConfigureAwait(false);
             return scheduleDump;
+        }
+
+
+        public override Tuple<CustomErrors, Dictionary<string, CalendarEvent>> BundleChangeUpdate(string EventId, EventName NewName, DateTimeOffset newStart, DateTimeOffset newEnd, int newSplitCount, string notes, bool forceRecalculation = false, SubCalendarEvent triggerSubEvent = null)
+        {
+            Task<TilerEvent> pendingNameAndMisc = null;
+            //dynamic pendingNameAndMisc = null;
+            bool useSubEvent = triggerSubEvent != null && triggerSubEvent.NameId.isNot_NullEmptyOrWhiteSpace() && triggerSubEvent.DataBlobId.isNot_NullEmptyOrWhiteSpace();
+            if (useSubEvent)
+            {
+                if(this.myAccount.ScheduleLogControl.Database!=null)
+                {
+                    pendingNameAndMisc = Task<TilerEvent>.Run(async () =>
+                    {
+                        SubCalendarEvent subRetValue = await this.myAccount.ScheduleLogControl.Database.SubEvents
+                        .Include(eachSubEvent => eachSubEvent.DataBlob_EventDB)
+                        .Include(eachSubEvent => eachSubEvent.Name)
+                        .FirstAsync(eachSubEvent => eachSubEvent.Id == triggerSubEvent.Id).ConfigureAwait(false);
+                        TilerEvent tileRetValue = (TilerEvent)subRetValue;
+                        return tileRetValue;
+
+                    });
+                }
+            } 
+            else
+            {
+                var calEent = getCalendarEvent(EventId);
+                if(calEent!=null)
+                {
+                    if (this.myAccount.ScheduleLogControl.Database != null)
+                    {
+                        pendingNameAndMisc = Task<TilerEvent>.Run(async () =>
+                        {
+                            CalendarEvent calRetValue = await this.myAccount.ScheduleLogControl.Database.CalEvents
+                            .Include(eachSubEvent => eachSubEvent.DataBlob_EventDB)
+                            .Include(eachSubEvent => eachSubEvent.Name)
+                            .FirstAsync(eachSubEvent => eachSubEvent.Id == calEent.Id).ConfigureAwait(false);
+                            TilerEvent tileRetValue = (TilerEvent)calRetValue;
+                            return tileRetValue;
+
+                        });
+                    }
+                        
+                }
+
+            }
+
+            var retValue = base.BundleChangeUpdate(EventId, NewName, newStart, newEnd, newSplitCount, notes, forceRecalculation, triggerSubEvent);
+
+
+            TilerEvent tilerEvent = null;
+            if (!useSubEvent)
+            {
+                tilerEvent = getCalendarEvent(EventId);
+            }
+            else
+            {
+                tilerEvent = triggerSubEvent;
+            }
+
+            if (pendingNameAndMisc != null)
+            {
+                pendingNameAndMisc.Wait();
+                var pendingNameAndMiscResult = pendingNameAndMisc.Result;
+
+                EventName oldName = pendingNameAndMiscResult.getName;
+                MiscData miscData = pendingNameAndMiscResult.Notes;
+                bool isNameChange = NewName.NameValue != oldName?.NameValue;
+                
+                if (isNameChange)
+                {
+                    tilerEvent.updateEventName(NewName.NameValue);
+                }
+
+
+                
+                var note = miscData;
+                if (note != null)
+                {
+                    note.UserNote = notes;
+                }
+            }
+
+            return retValue;
         }
 
     }

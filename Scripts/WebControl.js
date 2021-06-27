@@ -1117,15 +1117,15 @@ function SetCalendarEventAsNow(CalendarEventID, CallBackSuccess, CallBackFailure
         url: URL,
         data: NowData,
         dataType: "json",
-        success: CallBackSuccess,
-        error: CallBackFailure
+        // success: CallBackSuccess,
+        // error: CallBackFailure
     })
 
     AjaxRequest.done(() => {
-        if (CallBackDone != undefined) {
-            CallBackDone()
-        }
-        sendPostScheduleEditAnalysisUpdate({CallBackSuccess, CallBackFailure})     
+        // if (CallBackDone != undefined) {
+        //     CallBackDone()
+        // }
+        // sendPostScheduleEditAnalysisUpdate({CallBackSuccess, CallBackFailure})     
     });
 }
 

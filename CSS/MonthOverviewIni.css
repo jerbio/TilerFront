@@ -379,7 +379,7 @@ body {
 .gridSubevent {
   position:absolute;
   cursor: pointer;
-  transition:all 1s;
+  transition:width 1s, height 1s, top 1s, left 1s, bottom 1s, right 1s;
   overflow:hidden;
   text-align:left;
   text-overflow:ellipsis;
@@ -404,10 +404,19 @@ body {
     border:white 1px solid;
 }
 
+.TranslucentSidebar {
+  opacity: 0.25;
+}
+
+.HoveredSideBar {
+  opacity: 1;
+  border: solid 1px gray;
+}
+
 .gridSubeventContainer {
   position:absolute;
   width:12.87%;
-  transition:all 1s;
+  transition:width 1s, height 1s, top 1s, left 1s, bottom 1s, right 1s;
   background-color:transparent;
   box-sizing: border-box;
   padding: 3px;
@@ -702,6 +711,7 @@ body {
   z-index:4;
   background-color:yellow !important;
   transition:all .1s;
+  opacity: 1;
 }
 
 #ViewContainer 

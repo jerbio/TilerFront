@@ -44,7 +44,6 @@ namespace TilerFront
             //                db.Database.Log = sqlLogFile.Write;
             //                db.SaveChanges();
             //            }
-            //            //db.Database.Log = Console.Write;
             //#endif
         }
     }

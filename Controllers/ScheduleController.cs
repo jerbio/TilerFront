@@ -93,7 +93,7 @@ namespace TilerFront.Controllers
                 Task<ConcurrentBag<CalendarEvent>> GoogleCalEventsTask = GoogleTilerEventControl.getAllCalEvents(AllGoogleTilerEvents, TimelineForData);
                 ReferenceNow now = new ReferenceNow(myAuthorizedUser.getRefNow(), tilerUser.EndfOfDay, tilerUser.TimeZoneDifference);
 
-                IEnumerable<SubCalendarEvent> subEvents = await LogAccess.getAllEnabledSubCalendarEvent(TimelineForData, now, true, DataRetrivalOption.Ui).ConfigureAwait(false);
+                IEnumerable<SubCalendarEvent> subEvents = await LogAccess.getAllEnabledSubCalendarEvent(TimelineForData, now, retrievalOptions: DataRetrievalSet.UiSet).ConfigureAwait(false);
                 IEnumerable<CalendarEvent> GoogleCalEvents = await GoogleCalEventsTask.ConfigureAwait(false);
                 subEvents = subEvents.Concat(GoogleCalEvents.SelectMany(subEvent => subEvent.AllSubEvents)).Where(subEvent => subEvent.StartToEnd.doesTimeLineInterfere(TimelineForData));
 
@@ -108,12 +108,18 @@ namespace TilerFront.Controllers
                 DayTimeLine sleepTimeline = now.getDayTimeLineByTime(now.constNow.AddDays(2));
                 TimeLine sleepTImeline = TimeOfDayPreferrence.splitIntoDaySections(sleepTimeline)[TimeOfDayPreferrence.DaySection.Sleep];
 
+                HashSet<CalendarEvent> calEVents = new HashSet<CalendarEvent>();
+                var subCalEvents = subEvents.Select(subEvent =>
+
+                    {
+                        calEVents.Add(subEvent.ParentCalendarEvent);
+                        return subEvent.ToSubCalEvent(subEvent.ParentCalendarEvent);
+                    }
+                    ).Concat(calEVents.SelectMany(eachCalEVent => eachCalEVent.PausedTimeLines.Where(pausedTimeline => eachCalEVent.getSubEvent(pausedTimeline.getSubEventId())!=null).Select(eachPausedTimeLine => eachPausedTimeLine.ToSubCalEvent(eachCalEVent)))).ToList() ;
                 UserSchedule currUserSchedule = new UserSchedule {
                     //NonRepeatCalendarEvent = NonRepeatingEvents.Select(obj => obj.ToCalEvent(TimelineForData)).ToArray(),
                     //RepeatCalendarEvent = RepeatingEvents,
-                    SubCalendarEvents = subEvents.Select(subEvent => 
-                        subEvent.ToSubCalEvent(subEvent.ParentCalendarEvent)
-                    ).ToList(),
+                    SubCalendarEvents = subCalEvents,
                     SleepTimeline = sleepTImeline.ToJson()
                 };
                 PausedEvent currentPausedEvent = getCurrentPausedEvent(db);
@@ -152,7 +158,7 @@ namespace TilerFront.Controllers
             ReferenceNow now = new ReferenceNow(DateTimeOffset.UtcNow.removeSecondsAndMilliseconds(), myUserAccount.getTilerUser().EndfOfDay, new TimeSpan());
             TimeLine timeLine = new TimeLine(Utility.BeginningOfTime, Utility.BeginningOfTime.AddYears(9000));
             LogControl logControl = myUserAccount.ScheduleLogControl;
-            var calEvents = await logControl.getAllEnabledCalendarEvent(timeLine, now, false, retrievalOption: DataRetrivalOption.All).ConfigureAwait(false);
+            var calEvents = await logControl.getAllEnabledCalendarEvent(timeLine, now, retrievalOptions: DataRetrievalSet.All).ConfigureAwait(false);
 
             foreach (var cal in calEvents.Values)
             {
@@ -254,7 +260,7 @@ namespace TilerFront.Controllers
                 List<CalendarEvent> ScheduleData = new List<CalendarEvent>();
                 
                 
-                List<SubCalendarEvent> subEvents = await LogAccess.getAllSubCalendarEvents(TimelineForData, now)
+                List<SubCalendarEvent> subEvents = await LogAccess.getAllSubCalendarEvents(TimelineForData, now, DataRetrievalSet.All)
                     .Include(subEvent => subEvent.Name)
                     .Where(subEvent => 
                     (StartTimeMs <= subEvent.DeletionTime_DB && subEvent.DeletionTime_DB <= EndTimeMs)
@@ -708,6 +714,8 @@ namespace TilerFront.Controllers
             retrievedUser.getTilerUser().updateTimeZoneTimeSpan(shuffleData.getTimeSpan);
             if (retrievedUser.Status)
             {
+                Stopwatch watch = new Stopwatch();
+                watch.Start();
                 DateTimeOffset myNow = myNow = authorizedUser.getRefNow();
                 Task<Tuple<ThirdPartyControl.CalendarTool, IEnumerable<CalendarEvent>>> thirdPartyDataTask = ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(retrievedUser.UserID, db);
                 DB_Schedule schedule = new DB_Schedule(retrievedUser, myNow);
@@ -741,6 +749,9 @@ namespace TilerFront.Controllers
                 await AnalysisController.updateSuggestionAnalysis(retrievedUser.ScheduleLogControl).ConfigureAwait(false);
                 TilerFront.SocketHubs.ScheduleChange scheduleChangeSocket = new TilerFront.SocketHubs.ScheduleChange();
                 scheduleChangeSocket.triggerRefreshData(retrievedUser.getTilerUser());
+                watch.Stop();
+                TimeSpan shuffleScheduleSpan = watch.Elapsed;
+                Debug.WriteLine("----shuffle span " + shuffleScheduleSpan.ToString());
                 return Ok(myPostData.getPostBack);
             }
             throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.Unauthorized)
@@ -1073,7 +1084,9 @@ namespace TilerFront.Controllers
                 HashSet<string> calendarIds = new HashSet<string>() { myUser.EventID };
 
                 Task<Tuple<ThirdPartyControl.CalendarTool, IEnumerable<CalendarEvent>>> thirdPartyDataTask = ScheduleController.updatemyScheduleWithGoogleThirdpartyCalendar(retrievedUser.UserID, db);
-                DB_Schedule schedule = new DB_Schedule(retrievedUser, myNow, calendarIds: calendarIds, includeUpdateHistory: true);
+                var retrievalOption = DataRetrievalSet.scheduleManipulation;
+                retrievalOption.Add(DataRetrivalOption.TimeLineHistory);
+                DB_Schedule schedule = new DB_Schedule(retrievedUser, myNow, calendarIds: calendarIds, retrievalOptions: retrievalOption);
                 schedule.CurrentLocation = myUser.getCurrentLocation();
                 DB_UserActivity activity = new DB_UserActivity(myNow, UserActivity.ActivityType.SetAsNowSingle);
                 JObject json = JObject.FromObject(myUser);

@@ -1,4 +1,9 @@
+<<<<<<< HEAD
 ﻿/// <reference path="jquery-3.6.0.js" />
+=======
+﻿/// <reference path="modernizr-2.8.3.js" />
+/// <reference path="jquery-3.6.0.js" />
+>>>>>>> master
 /// <autosync enabled="true" />
 /// <reference path="../areas/routedebugger/Scripts/detect.js" />
 /// <reference path="addnewevent.js" />
@@ -42,7 +47,6 @@
 /// <reference path="jquery-ui-1.10.4.custom.js" />
 /// <reference path="knockout-3.4.2.js" />
 /// <reference path="mapdata.js" />
-/// <reference path="modernizr-2.8.3.js" />
 /// <reference path="moment.min.js" />
 /// <reference path="moment-timezone.min.js" />
 /// <reference path="moment-timezone-utils.js" />

@@ -32,7 +32,13 @@ namespace TilerFront
         public override async System.Threading.Tasks.Task<bool> Login()
         {
             HttpContext ctx = HttpContext.Current;
-            TilerUser tilerUser = Database.Users.Find(ID);
+            TilerUser tilerUser = Database.Users
+                .Include(eachUser => eachUser.ScheduleProfile_DB.PausedTile_DB)
+                .SingleOrDefault(eachUser => eachUser.Id == ID);
+            if(tilerUser!=null && tilerUser.ScheduleProfile == null)
+            {
+                tilerUser.initializeScheduleProfile();
+            }
             UserLog = new LogControlDirect(tilerUser, Database as ApplicationDbContext);
 
             bool retValue = tilerUser != null;
