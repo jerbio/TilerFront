@@ -2671,7 +2671,7 @@ namespace TilerFront
 
             if (EventSchedulesNodes.ChildNodes != null)
             {
-                string googleId = EventID.generateGoogleCalendarEventID(0).getCalendarEventComponent();
+                string googleId = EventID.generateGoogleCalendarEventID(0.ToString()).getCalendarEventComponent();
                 foreach (XmlNode EventScheduleNode in EventSchedulesNodes.ChildNodes)
                 {
                     CalendarEvent RetrievedEvent;

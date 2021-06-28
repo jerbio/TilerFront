@@ -531,9 +531,9 @@
     <Compile Include="LogControlXml.cs" />
     <Compile Include="LogControlDirect.cs" />
     <Compile Include="LogControl.cs" />
-    <Compile Include="Migrations\202106270745499_masterDefaultLocation.cs" />
-    <Compile Include="Migrations\202106270745499_masterDefaultLocation.designer.cs">
-      <DependentUpon>202106270745499_masterDefaultLocation.cs</DependentUpon>
+    <Compile Include="Migrations\202106281750305_defaultLocationFix.cs" />
+    <Compile Include="Migrations\202106281750305_defaultLocationFix.designer.cs">
+      <DependentUpon>202106281750305_defaultLocationFix.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
@@ -2932,8 +2932,8 @@
     <TypeScriptCompile Include="Scripts\index.d.ts" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\202106270745499_masterDefaultLocation.resx">
-      <DependentUpon>202106270745499_masterDefaultLocation.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202106281750305_defaultLocationFix.resx">
+      <DependentUpon>202106281750305_defaultLocationFix.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
