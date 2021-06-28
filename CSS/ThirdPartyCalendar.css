@@ -1,0 +1,28 @@
+.ThirdPartyLocationContainer .InputBarContainer {
+    margin-top: 20px;
+    background-color: white;
+}
+
+.ThirdPartyLocationContainer .LocationCacheContainer {
+    height: 25px;
+    padding-top: 5px;
+    border-bottom: solid 1px gray;
+}
+
+.ThirdPartyLocationContainer .GoogleSearchSymbolContainer {
+    position: relative;
+    margin-top: 0;
+}
+
+.ThirdPartyLocationContainer .GoogleSearchSymbol {
+    position: relative;
+    top: 5px;
+}
+
+
+.ThirdPartyLocationContainer .returnedValueContainer{
+    padding: 5px;
+    border: solid 1px grey;
+    border-radius: 5px;
+    background: white;
+}

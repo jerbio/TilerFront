@@ -51,6 +51,7 @@ namespace TilerFront
                     "~/CSS/jquery.timepicker.css",
                     "~/CSS/MainUI.css",
                     "~/CSS/SubCalEventStyles.css",
+                    "~/CSS/ThirdPartyCalendar.css",
                     "~/CSS/LoggedHomeUser.css",
                     "~/CSS/SelectedSubEvent.css",
                     "~/CSS/bootstrap-datepicker.css",
@@ -101,7 +102,8 @@ namespace TilerFront
                     "~/CSS/fullcalendar.css",
                     "~/CSS/AddNewEventDesktop.css",
                     "~/CSS/bootstrap-datepicker.css",
-                    "~/CSS/SearchDesktop.css"
+                    "~/CSS/SearchDesktop.css",
+                    "~/CSS/ThirdPartyCalendar.css"
                     ));
 
             bundles.Add(new ScriptBundle("~/Content/TilerDesktopJS").Include(
@@ -219,7 +221,8 @@ namespace TilerFront
                     "~/Scripts/YuiCombo/3.18.1/widget-base/assets/skins/sam/widget-base.css",
                     "~/Scripts/YuiCombo/3.18.1/dial/assets/skins/sam/dial.css",
                     "~/CSS/Notification.css",
-                    "~/CSS/SearchMobile.css"
+                    "~/CSS/SearchMobile.css",
+                    "~/CSS/ThirdPartyCalendar.css"
                     ));
             bundles.Add(new StyleBundle("~/Content/TilerDesktopSettingsCss").Include(
                     "~/CSS/SettingsDesktop.css"

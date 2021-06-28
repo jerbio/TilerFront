@@ -118,6 +118,9 @@
     function handleEachThirdPartyDefaultLocation(LocationInputContainer) {
         debugger
         let LocationContainer = getDomOrCreateNew("ThirdPartyLocationContainer-" + generateUUID());
+        let ThirdPartyLocationContainerClass ='ThirdPartyLocationContainer'
+        LocationContainer.classList.add(ThirdPartyLocationContainerClass);
+        
         let calId = LocationInputContainer.getAttribute('calId')
         
         LocationInputContainer.parentNode.appendChild(LocationContainer.Dom)

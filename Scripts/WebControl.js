@@ -2043,8 +2043,10 @@ function Location(Tag, Address, LocationIsVerified, LocationId)
     function AutoSuggestControl(Url,Method, GenerateEachDomCallBack, UserInputBox,IsNotTilerEndPoint,DataStructure)
     {
         var myID = AutoSuggestControl.Counter++;
+        let InputBarContainerClass = 'InputBarContainer'
         var InputBarContainerID = "InputBarContainer" + myID++;
         var InputBarContainer = getDomOrCreateNew(InputBarContainerID);
+        InputBarContainer.classList.add(InputBarContainerClass);
         var myRequest = null;
         var DomAndContainer = generateFullInputBar(UserInputBox, IsNotTilerEndPoint,DataStructure);
         var IsContentOn = false;
