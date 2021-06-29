@@ -1,4 +1,6 @@
-﻿using System;
+﻿//#define localDebugMode
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,6 +9,7 @@ using TilerCore;
 using TilerElements;
 using System.Data.Entity;
 using System.Diagnostics;
+
 
 namespace TilerFront
 {
@@ -35,6 +38,9 @@ namespace TilerFront
             if (retrievalOption == null)
             {
                 retrievalOption = DataRetrievalSet.scheduleManipulationPerformance;
+#if localDebugMode
+                retrievalOptions.Add(DataRetrivalOption.Name);
+#endif
             }
             this.retrievalOptions = retrievalOption;
             this.RangeOfLookup = rangeOfLookup ?? new TimeLine(referenceNow.AddDays(Utility.defaultBeginDay), referenceNow.AddDays(Utility.defaultEndDay));
@@ -48,6 +54,9 @@ namespace TilerFront
             if(retrievalOptions == null)
             {
                 retrievalOptions = DataRetrievalSet.scheduleManipulationPerformance;
+#if localDebugMode
+                retrievalOptions.Add(DataRetrivalOption.Name);
+#endif
             }
             this.retrievalOptions = retrievalOptions;
             this.RangeOfLookup = rangeOfLookup?? new TimeLine(referenceNow.AddDays(Utility.defaultBeginDay), referenceNow.AddDays(Utility.defaultEndDay));
